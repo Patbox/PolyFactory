@@ -1,0 +1,13 @@
+{
+  "type": "polyfactory:grinding",
+  "input": {
+    "item": "minecraft:dandelion"
+  },
+  "output": {
+    "item": {
+      "Count": 3,
+      "id": "minecraft:yellow_dye"
+    }
+  },
+  "time": 2.0
+}

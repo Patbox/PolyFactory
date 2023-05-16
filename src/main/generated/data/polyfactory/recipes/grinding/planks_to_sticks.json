@@ -1,0 +1,16 @@
+{
+  "type": "polyfactory:grinding",
+  "input": {
+    "tag": "minecraft:planks"
+  },
+  "minimum_speed": 0.05,
+  "output": {
+    "chance": 0.4,
+    "item": {
+      "Count": 1,
+      "id": "minecraft:stick"
+    },
+    "roll": 6
+  },
+  "time": 4.0
+}

@@ -1,0 +1,14 @@
+{
+  "type": "polyfactory:grinding",
+  "input": {
+    "item": "minecraft:gravel"
+  },
+  "minimum_speed": 0.2,
+  "output": {
+    "item": {
+      "Count": 1,
+      "id": "minecraft:sand"
+    }
+  },
+  "time": 6.5
+}

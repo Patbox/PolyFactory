@@ -1,0 +1,24 @@
+{
+  "type": "polyfactory:grinding",
+  "input": {
+    "item": "minecraft:bone"
+  },
+  "output": [
+    {
+      "item": {
+        "Count": 1,
+        "id": "minecraft:bone_meal"
+      },
+      "roll": 3
+    },
+    {
+      "chance": 0.5,
+      "item": {
+        "Count": 1,
+        "id": "minecraft:bone_meal"
+      },
+      "roll": 2
+    }
+  ],
+  "time": 2.0
+}

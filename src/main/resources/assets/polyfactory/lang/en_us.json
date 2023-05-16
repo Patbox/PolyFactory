@@ -1,0 +1,19 @@
+{
+  "itemgroup.polyfactory": "PolyFactory",
+  "block.polyfactory.conveyor": "Item Conveyor",
+  "block.polyfactory.sticky_conveyor": "Sticky Item Conveyor",
+  "block.polyfactory.funnel": "Funnel",
+  "block.polyfactory.fan": "Fan",
+  "block.polyfactory.splitter": "Item Splitter",
+  "block.polyfactory.grinder": "Grinder",
+  "block.polyfactory.press": "Hydraulic Press",
+  "block.polyfactory.axle": "Axle",
+  "block.polyfactory.gearbox": "Gearbox",
+  "block.polyfactory.hand_crank": "Hand Crank",
+  "block.polyfactory.windmill": "Windmill",
+  "item.polyfactory.windmill_sail": "Windmill Sail",
+  "item.polyfactory.steel_alloy_mixture": "Steel Alloy Mixture",
+  "item.polyfactory.steel_ingot": "Steel Ingot",
+  "item.polyfactory.steel_plate": "Steel Plate",
+  "item.polyfactory.steel_cog": "Steel Cog"
+}

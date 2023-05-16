@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "polyfactory",
+  "version": "${version}",
+
+  "name": "PolyFactory",
+  "description": "Server side tech mod",
+  "authors": [
+    "Patbox"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+
+  "license": "LGPLv3",
+  "icon": "assets/polyfactory/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "eu.pb4.polyfactory.ModInit"
+    ],
+    "fabric-datagen": [
+      "eu.pb4.polyfactory.datagen.DataGenInit"
+    ]
+  },
+  "mixins": [
+    "polyfactory.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.11",
+    "fabric-api": "*",
+    "minecraft": "~1.19.3",
+    "java": ">=17"
+  },
+  "suggests": {
+    "polydex": "*"
+  }
+}

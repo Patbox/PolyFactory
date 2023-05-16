@@ -1,0 +1,13 @@
+{
+  "type": "polyfactory:grinding",
+  "input": {
+    "item": "minecraft:rose_bush"
+  },
+  "output": {
+    "item": {
+      "Count": 6,
+      "id": "minecraft:red_dye"
+    }
+  },
+  "time": 2.0
+}

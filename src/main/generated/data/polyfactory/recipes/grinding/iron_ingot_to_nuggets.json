@@ -1,0 +1,14 @@
+{
+  "type": "polyfactory:grinding",
+  "input": {
+    "item": "minecraft:iron_ingot"
+  },
+  "minimum_speed": 0.4,
+  "output": {
+    "item": {
+      "Count": 9,
+      "id": "minecraft:iron_nugget"
+    }
+  },
+  "time": 3.0
+}

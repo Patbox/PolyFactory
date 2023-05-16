@@ -1,0 +1,16 @@
+{
+  "type": "polyfactory:press",
+  "input": {
+    "item": "minecraft:gold_nugget"
+  },
+  "input_count": 9,
+  "minimum_speed": 0.4000000059604645,
+  "output": [
+    {
+      "item": {
+        "Count": 1,
+        "id": "minecraft:gold_ingot"
+      }
+    }
+  ]
+}

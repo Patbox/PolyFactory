@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "#polyfactory:conveyors",
+      "required": false
+    },
+    "polyfactory:press",
+    "minecraft:hopper"
+  ]
+}

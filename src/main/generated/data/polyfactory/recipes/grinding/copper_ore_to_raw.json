@@ -1,0 +1,25 @@
+{
+  "type": "polyfactory:grinding",
+  "input": {
+    "tag": "minecraft:copper_ores"
+  },
+  "minimum_speed": 0.5,
+  "output": [
+    {
+      "item": {
+        "Count": 1,
+        "id": "minecraft:raw_copper"
+      },
+      "roll": 2
+    },
+    {
+      "chance": 0.6,
+      "item": {
+        "Count": 1,
+        "id": "minecraft:raw_copper"
+      },
+      "roll": 20
+    }
+  ],
+  "time": 16.0
+}

@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "#polyfactory:conveyors",
+      "required": false
+    },
+    "polyfactory:fan",
+    "polyfactory:press",
+    "polyfactory:funnel",
+    "polyfactory:grinder",
+    "polyfactory:miner",
+    "polyfactory:splitter"
+  ]
+}

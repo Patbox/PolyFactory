@@ -1,0 +1,13 @@
+{
+  "type": "polyfactory:grinding",
+  "input": {
+    "item": "minecraft:lilac"
+  },
+  "output": {
+    "item": {
+      "Count": 6,
+      "id": "minecraft:magenta_dye"
+    }
+  },
+  "time": 2.0
+}

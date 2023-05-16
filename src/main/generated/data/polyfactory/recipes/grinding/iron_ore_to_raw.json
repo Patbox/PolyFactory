@@ -1,0 +1,24 @@
+{
+  "type": "polyfactory:grinding",
+  "input": {
+    "tag": "minecraft:iron_ores"
+  },
+  "minimum_speed": 0.5,
+  "output": [
+    {
+      "item": {
+        "Count": 1,
+        "id": "minecraft:raw_iron"
+      }
+    },
+    {
+      "chance": 0.6,
+      "item": {
+        "Count": 1,
+        "id": "minecraft:raw_iron"
+      },
+      "roll": 5
+    }
+  ],
+  "time": 16.0
+}

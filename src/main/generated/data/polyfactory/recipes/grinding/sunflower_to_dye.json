@@ -1,0 +1,13 @@
+{
+  "type": "polyfactory:grinding",
+  "input": {
+    "item": "minecraft:sunflower"
+  },
+  "output": {
+    "item": {
+      "Count": 6,
+      "id": "minecraft:yellow_dye"
+    }
+  },
+  "time": 2.0
+}

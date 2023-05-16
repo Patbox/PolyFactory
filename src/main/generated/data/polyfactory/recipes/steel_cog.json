@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "i": {
+      "item": "polyfactory:steel_ingot"
+    },
+    "p": {
+      "item": "polyfactory:steel_plate"
+    }
+  },
+  "pattern": [
+    " p ",
+    "pip",
+    " p "
+  ],
+  "result": {
+    "item": "polyfactory:steel_cog"
+  },
+  "show_notification": true
+}

@@ -1,0 +1,13 @@
+{
+  "type": "polyfactory:grinding",
+  "input": {
+    "item": "minecraft:peony"
+  },
+  "output": {
+    "item": {
+      "Count": 6,
+      "id": "minecraft:pink_dye"
+    }
+  },
+  "time": 2.0
+}

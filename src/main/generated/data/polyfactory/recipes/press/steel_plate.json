@@ -1,0 +1,15 @@
+{
+  "type": "polyfactory:press",
+  "input": {
+    "item": "polyfactory:steel_ingot"
+  },
+  "minimum_speed": 0.5,
+  "output": [
+    {
+      "item": {
+        "Count": 2,
+        "id": "polyfactory:steel_plate"
+      }
+    }
+  ]
+}
