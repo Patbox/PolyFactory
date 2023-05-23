@@ -3,21 +3,37 @@ package eu.pb4.polyfactory.block.machines;
 import com.kneelawk.graphlib.graph.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.block.mechanical.AxleBlock;
+import eu.pb4.polyfactory.block.mechanical.RotationalSource;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.nodes.mechanical.DirectionalMechanicalNode;
+import eu.pb4.polyfactory.display.LodElementHolder;
+import eu.pb4.polyfactory.display.LodItemDisplayElement;
+import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
 import eu.pb4.polyfactory.nodes.mechanical.GearboxNode;
+import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
+import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
+import eu.pb4.polyfactory.util.movingitem.MovingItemProvider;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
+import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
+import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -30,17 +46,21 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class PressBlock extends NetworkBlock implements PolymerBlock, BlockEntityProvider, InventoryProvider {
+public class PressBlock extends NetworkBlock implements PolymerBlock, BlockEntityProvider, InventoryProvider, BlockWithElementHolder, MovingItemConsumer, MovingItemProvider {
     public static final Property<Part> PART = EnumProperty.of("part", Part.class);
     public static final BooleanProperty HAS_CONVEYOR = BooleanProperty.of("has_conveyor");
     public static final Property<Direction> INPUT_FACING = DirectionProperty.of("input_facing", x -> x.getAxis() != Direction.Axis.Y);
@@ -57,23 +77,15 @@ public class PressBlock extends NetworkBlock implements PolymerBlock, BlockEntit
 
     @Override
     public Collection<BlockNode> createNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return state.get(PART) == Part.HEAD ? List.of(
-                new GearboxNode()
+        return state.get(PART) == Part.TOP ? List.of(
+                new AxisMechanicalNode(Direction.Axis.X),
+                new AxisMechanicalNode(Direction.Axis.Z)
         ) : List.of();
     }
 
     @Override
     public Block getPolymerBlock(BlockState state) {
-        return Blocks.ANVIL;
-    }
-
-    @Override
-    public BlockState getPolymerBlockState(BlockState state) {
-        return switch (state.get(PART)) {
-            case MAIN -> Blocks.ANVIL.getDefaultState().with(AnvilBlock.FACING, state.get(INPUT_FACING));
-            case CENTER -> Blocks.BARRIER.getDefaultState();
-            case HEAD -> Blocks.PISTON.getDefaultState().with(PistonBlock.EXTENDED, true).with(PistonBlock.FACING, Direction.DOWN);
-        };
+        return Blocks.BARRIER;
     }
 
     @Nullable
@@ -81,7 +93,6 @@ public class PressBlock extends NetworkBlock implements PolymerBlock, BlockEntit
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         if (
                 !ctx.getWorld().getBlockState(ctx.getBlockPos().up()).canReplace(ItemPlacementContext.offset(ctx, ctx.getBlockPos().up(), Direction.DOWN))
-                        || !ctx.getWorld().getBlockState(ctx.getBlockPos().up().up()).canReplace(ItemPlacementContext.offset(ctx, ctx.getBlockPos().up(), Direction.DOWN))
         ) {
             return null;
         }
@@ -95,8 +106,7 @@ public class PressBlock extends NetworkBlock implements PolymerBlock, BlockEntit
         super.onPlaced(world, pos, state, placer, itemStack);
         if (!world.isClient) {
             BlockPos blockPos = pos.up();
-            world.setBlockState(blockPos, state.with(PART, Part.CENTER), 3);
-            world.setBlockState(blockPos.up(), state.with(PART, Part.HEAD), 3);
+            world.setBlockState(blockPos, state.with(PART, Part.TOP), 3);
             world.updateNeighbors(pos, Blocks.AIR);
             state.updateNeighbors(world, pos, 3);
         }
@@ -107,8 +117,7 @@ public class PressBlock extends NetworkBlock implements PolymerBlock, BlockEntit
         var part = state.get(PART);
 
         if (((part == Part.MAIN && direction == Direction.UP)
-                || (part == Part.CENTER && direction.getAxis() == Direction.Axis.Y)
-                || (part == Part.HEAD && direction == Direction.DOWN)
+                || (part == Part.TOP && direction == Direction.DOWN)
         ) && !neighborState.isOf(this)) {
             NetworkComponent.updateAt(world, pos);
             return Blocks.AIR.getDefaultState();
@@ -121,8 +130,12 @@ public class PressBlock extends NetworkBlock implements PolymerBlock, BlockEntit
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (hand == Hand.MAIN_HAND && !player.isSneaking() && state.get(PART) == Part.MAIN && world.getBlockEntity(pos) instanceof PressBlockEntity be) {
-            be.openGui((ServerPlayerEntity) player);
+        if (!world.isClient && hand == Hand.MAIN_HAND && !player.isSneaking()) {
+            pos = state.get(PART) == Part.MAIN ? pos : pos.down();
+
+            if (world.getBlockEntity(pos) instanceof PressBlockEntity be) {
+                be.openGui((ServerPlayerEntity) player);
+            }
             return ActionResult.SUCCESS;
         }
 
@@ -153,8 +166,7 @@ public class PressBlock extends NetworkBlock implements PolymerBlock, BlockEntit
     public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
         pos = switch (state.get(PART)) {
             case MAIN -> pos;
-            case CENTER -> pos.down();
-            case HEAD -> pos.down(2);
+            case TOP -> pos.down();
         };
 
         var be = world.getBlockEntity(pos);
@@ -168,10 +180,129 @@ public class PressBlock extends NetworkBlock implements PolymerBlock, BlockEntit
         return world instanceof ServerWorld && type == FactoryBlockEntities.PRESS ? PressBlockEntity::ticker : null;
     }
 
+    @Override
+    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return initialBlockState.get(PART) == Part.MAIN ? new Model(world, initialBlockState) : null;
+    }
+
+    @Override
+    public boolean pushItemTo(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+        if (self.getBlockState().get(INPUT_FACING).getOpposite() != pushDirection || self.getBlockState().get(PART) == Part.TOP) {
+            return false;
+        }
+
+        var be = (PressBlockEntity) self.getBlockEntity();
+
+        var container = be.getContainerHolder(0);
+
+        if (container.isContainerEmpty()) {
+            container.pushAndAttach(conveyor.pullAndRemove());
+        } else {
+            var targetStack = container.getContainer().get();
+            var sourceStack = conveyor.getContainer().get();
+
+            if (ItemStack.canCombine(container.getContainer().get(), conveyor.getContainer().get())) {
+                var count = Math.min(targetStack.getCount() + sourceStack.getCount(), container.getMaxStackCount(sourceStack));
+                if (count != targetStack.getCount()) {
+                    var dec = count - targetStack.getCount();
+                    targetStack.increment(dec);
+                    sourceStack.decrement(dec);
+                }
+
+                if (sourceStack.isEmpty()) {
+                    conveyor.clearContainer();
+                }
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public void getItemFrom(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+        var inputDir = self.getBlockState().get(INPUT_FACING);
+        if (!conveyor.isContainerEmpty() || pushDirection == inputDir || inputDir.getOpposite() != relative || self.getBlockState().get(PART) == Part.TOP) {
+            return;
+        }
+
+        var be = (PressBlockEntity) self.getBlockEntity();
+
+        var out = be.getContainerHolder(2);
+
+        if (out.isContainerEmpty()) {
+            return;
+        }
+        var stack = out.getContainer().get();
+
+        var amount = Math.min(stack.getCount(), out.getMaxStackCount(stack));
+
+        if (stack.getCount() == amount) {
+            conveyor.pushAndAttach(out.pullAndRemove());
+        } else {
+            stack.decrement(amount);
+            conveyor.setMovementPosition(pushDirection == inputDir.getOpposite() ? 0 : 0.5);
+            conveyor.pushNew(stack.copyWithCount(amount));
+        }
+    }
+
+    public final class Model extends LodElementHolder {
+        public static final ItemStack MODEL_PISTON = new ItemStack(Items.CANDLE);
+        private final Matrix4f mat = new Matrix4f();
+        private final ItemDisplayElement piston;
+        private final ItemDisplayElement main;
+        private float value;
+
+        private Model(ServerWorld world, BlockState state) {
+            this.main = new LodItemDisplayElement(FactoryItems.PRESS_BLOCK.getDefaultStack());
+            this.main.setDisplaySize(1, 1);
+            this.main.setModelTransformation(ModelTransformationMode.FIXED);
+            this.piston = new LodItemDisplayElement(MODEL_PISTON);
+            this.piston.setDisplaySize(1, 1);
+            this.piston.setModelTransformation(ModelTransformationMode.FIXED);
+            this.piston.setInterpolationDuration(2);
+            this.updateAnimation(state.get(INPUT_FACING));
+            this.addElement(this.piston);
+            this.addElement(this.main);
+        }
+
+        private void updateAnimation(Direction direction) {
+            mat.identity().translate(0, 0.469f, 0);
+            mat.rotate(direction.getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion()));
+            mat.scale(2f);
+
+            this.main.setTransformation(mat);
+            mat.translate(0, 0.5f - this.value * 0.3f, 0);
+            this.piston.setTransformation(mat);
+        }
+
+        @Override
+        protected void onTick() {
+            var tick = this.getAttachment().getWorld().getTime();
+
+            if (tick % 2 == 0) {
+                this.updateAnimation(BlockBoundAttachment.get(this).getBlockState().get(INPUT_FACING));
+                if (this.piston.isDirty()) {
+                    this.piston.startInterpolation();
+                }
+            }
+        }
+
+        static {
+            MODEL_PISTON.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_PISTON.getItem(), FactoryUtil.id("block/press_piston")).value());
+        }
+
+        public void updatePiston(double i) {
+            if (i < 0) {
+                this.value = (float) Math.min(-i * 5f, 1);
+            } else {
+                this.value = (float) Math.min(i * 1.3, 1);
+            }
+        }
+    }
+
     public enum Part implements StringIdentifiable {
         MAIN,
-        CENTER,
-        HEAD;
+        TOP;
 
         @Override
         public String asString() {

@@ -56,19 +56,22 @@ public class DrawerBlock extends Block implements PolymerBlock, BlockEntityProvi
             var stack = player.getStackInHand(hand);
 
             if (stack.isEmpty()) {
-                player.setStackInHand(hand, drawerBlockEntity.removeStack(0));
-            } else {
                 if (drawerBlockEntity.isEmpty()) {
-                    drawerBlockEntity.setStack(0, stack);
-                    player.setStackInHand(hand, ItemStack.EMPTY);
+                    drawerBlockEntity.setItemStack(ItemStack.EMPTY);
+                } else {
+                    player.setStackInHand(hand, drawerBlockEntity.extractStack());
+                }
+            } else {
+                if (drawerBlockEntity.getItemStack().isEmpty()) {
+                    drawerBlockEntity.setItemStack(stack);
+                    stack.decrement(drawerBlockEntity.addItems(stack.getCount()));
                 } else if (drawerBlockEntity.matches(stack)) {
-                    stack.setCount(drawerBlockEntity.addItems(stack.getCount()));
-
-                    if (stack.isEmpty()) {
-                        player.setStackInHand(hand, ItemStack.EMPTY);
-                    }
+                    stack.decrement(drawerBlockEntity.addItems(stack.getCount()));
                 }
 
+                if (stack.isEmpty()) {
+                    player.setStackInHand(hand, ItemStack.EMPTY);
+                }
             }
             return ActionResult.SUCCESS;
         }
@@ -125,7 +128,7 @@ public class DrawerBlock extends Block implements PolymerBlock, BlockEntityProvi
             this.addElement(this.countElement);
         }
 
-        public void setDisplay(ItemStack stack, int count) {
+        public void setDisplay(ItemStack stack, long count) {
             this.itemElement.setItem(stack);
             this.countElement.setText(Text.literal("" + count));
 
@@ -133,7 +136,7 @@ public class DrawerBlock extends Block implements PolymerBlock, BlockEntityProvi
 
         private void updateFacing(BlockState facing) {
             var rot = facing.get(FACING).getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
-            mat.identity();
+            mat.clear();
             mat.rotate(rot);
             mat.pushMatrix();
             mat.scale(2f);

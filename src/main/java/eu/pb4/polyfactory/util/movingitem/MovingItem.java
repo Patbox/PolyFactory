@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.util;
+package eu.pb4.polyfactory.util.movingitem;
 
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -21,7 +21,7 @@ import org.joml.Vector3f;
 
 import java.util.function.Consumer;
 
-public class MovingItemContainer implements VirtualElement, StackReference {
+public class MovingItem implements VirtualElement, StackReference {
     private ItemStack stack;
     private ItemStack stackCurrent;
     private final ItemDisplayElement itemDisplay[] = new ItemDisplayElement[4];
@@ -33,7 +33,7 @@ public class MovingItemContainer implements VirtualElement, StackReference {
     };
     private Vec3d pos;
 
-    public MovingItemContainer(ItemStack stack) {
+    public MovingItem(ItemStack stack) {
         this.stack = stack.copy();
         this.stackCurrent = stack.copy();
 
@@ -49,12 +49,12 @@ public class MovingItemContainer implements VirtualElement, StackReference {
         }
     }
 
-    public MovingItemContainer split(Aware aware) {
+    public MovingItem split(ContainerHolder aware) {
         return split(aware.getMaxStackCount(this.stack));
     }
 
-    public MovingItemContainer split(int newCount) {
-        var x = new MovingItemContainer(this.stack.copyWithCount(newCount));
+    public MovingItem split(int newCount) {
+        var x = new MovingItem(this.stack.copyWithCount(newCount));
         this.stack.decrement(newCount);
         return x;
     }
@@ -181,82 +181,4 @@ public class MovingItemContainer implements VirtualElement, StackReference {
         }
     }
 
-    public interface Aware {
-        @Nullable
-        MovingItemContainer getContainer();
-        void setContainer(@Nullable MovingItemContainer container);
-        default void clearContainer() {
-            setContainer(null);
-        }
-        @Nullable
-        MovingItemContainer pullAndRemove();
-
-        void pushAndAttach(MovingItemContainer container);
-
-        default boolean isContainerEmpty() {
-            return getContainer() == null;
-        }
-
-        default double movementDelta() {
-            return 1;
-        }
-
-        default void setMovementPosition(double pos) {
-        }
-
-        default int getMaxStackCount(ItemStack stack) {
-            return stack.getMaxCount();
-        }
-
-        default boolean pushNew(ItemStack stack) {
-            if (!isContainerEmpty()) {
-                return false;
-            }
-
-            var i = Math.min(stack.getCount(), getMaxStackCount(stack));
-            var moving = new MovingItemContainer(stack.copyWithCount(i));
-            stack.decrement(i);
-
-            setContainer(moving);
-            return true;
-        }
-    }
-
-    public interface AwareRedirecting extends Aware {
-        void setContainerLocal(MovingItemContainer container);
-
-        @Nullable
-        Aware getRedirect();
-
-        @Override
-        default void setContainer(MovingItemContainer container) {
-            this.setContainerLocal(container);
-            var x= getRedirect();
-            if (x != null) {
-                x.setContainer(container);
-            }
-        }
-
-        @Override
-        default MovingItemContainer pullAndRemove() {
-            var redirect = getRedirect();
-            if (redirect != null) {
-                this.setContainerLocal(null);
-                return redirect.pullAndRemove();
-            }
-            var x = this.getContainer();
-            this.setContainerLocal(null);
-            return x;
-        }
-
-        @Override
-        default void pushAndAttach(MovingItemContainer container) {
-            this.setContainerLocal(container);
-
-            var redirect = getRedirect();
-            if (redirect != null) {
-                redirect.pushAndAttach(container);
-            }
-        }
-    }
 }

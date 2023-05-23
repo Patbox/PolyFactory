@@ -29,8 +29,8 @@ public class FactoryBlocks {
     public static final FanBlock FAN = register("fan", new FanBlock(Block.Settings.of(Material.WOOD).hardness(1)));
     public static final CablePlateBlock CABLE_PLATE = register("cable_plate", new CablePlateBlock(Block.Settings.of(Material.METAL, MapColor.IRON_GRAY).hardness(1)));
     public static final HandCrankBlock HAND_CRANK = register("hand_crank", new HandCrankBlock(Block.Settings.of(Material.METAL, MapColor.IRON_GRAY).hardness(1).nonOpaque()));
-    public static final GrinderBlock GRINDER = register("grinder", new GrinderBlock(Block.Settings.of(Material.METAL, MapColor.IRON_GRAY).hardness(1)));
-    public static final PressBlock PRESS = register("press", new PressBlock(Block.Settings.of(Material.METAL, MapColor.IRON_GRAY).hardness(1)));
+    public static final GrinderBlock GRINDER = register("grinder", new GrinderBlock(Block.Settings.of(Material.METAL, MapColor.IRON_GRAY).hardness(1).nonOpaque()));
+    public static final PressBlock PRESS = register("press", new PressBlock(Block.Settings.of(Material.METAL, MapColor.IRON_GRAY).hardness(1).nonOpaque()));
     public static final MinerBlock MINER = register("miner", new MinerBlock(Block.Settings.of(Material.METAL, MapColor.IRON_GRAY).hardness(1)));
     public static final AxleBlock AXLE = register("axle", new AxleBlock(Block.Settings.of(Material.WOOD).nonOpaque().hardness(1)));
     public static final GearboxBlock GEARBOX = register("gearbox", new GearboxBlock(Block.Settings.of(Material.WOOD).hardness(1).nonOpaque()));

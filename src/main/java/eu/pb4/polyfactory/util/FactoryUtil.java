@@ -2,11 +2,13 @@ package eu.pb4.polyfactory.util;
 
 import com.mojang.authlib.GameProfile;
 import eu.pb4.polyfactory.ModInit;
-import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
-import eu.pb4.polyfactory.block.mechanical.conveyor.MovingItemConsumer;
+import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
+import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
+import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
@@ -19,8 +21,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("UnstableApiUsage")
 public class FactoryUtil {
-
     public static final GameProfile GENERIC_PROFILE = new GameProfile(Util.NIL_UUID, "[PolyFactory]");
     public static final Vec3d HALF_BELOW = new Vec3d(0, -0.5, 0);
 
@@ -28,7 +30,28 @@ public class FactoryUtil {
         return new Identifier(ModInit.ID, path);
     }
 
-    public static int tryInserting(Inventory inventory, ItemStack itemStack, Direction direction) {
+    public static int tryInserting(World world, BlockPos pos, ItemStack itemStack, Direction direction) {
+        var inv = HopperBlockEntity.getInventoryAt(world, pos);
+
+        if (inv != null) {
+            return FactoryUtil.tryInsertingInv(inv, itemStack, direction);
+        }
+
+        var storage = ItemStorage.SIDED.find(world, pos, direction);
+        if (storage != null) {
+            try (var t = Transaction.openOuter()) {
+                var x = storage.insert(ItemVariant.of(itemStack), itemStack.getCount(), t);
+                t.commit();
+                itemStack.decrement((int) x);
+                return (int) x;
+            }
+        }
+
+        return -1;
+    }
+
+
+    public static int tryInsertingInv(Inventory inventory, ItemStack itemStack, Direction direction) {
         if (inventory instanceof SidedInventory sidedInventory) {
             return tryInsertingSided(sidedInventory, itemStack, direction);
         } else {
@@ -36,7 +59,7 @@ public class FactoryUtil {
         }
     }
 
-    public static MovableResult tryInsertingMovable(MovingItemContainer.Aware conveyor, World world, BlockPos pos, Direction dir, Direction selfDir, @Nullable TagKey<Block> requiredTag) {
+    public static MovableResult tryInsertingMovable(ContainerHolder conveyor, World world, BlockPos pos, Direction dir, Direction selfDir, @Nullable TagKey<Block> requiredTag) {
         var holdStack = conveyor.getContainer();
         if (holdStack == null || holdStack.get().isEmpty()) {
             return MovableResult.FAILURE;
@@ -51,16 +74,13 @@ public class FactoryUtil {
             if (conveyorInteracting.pushItemTo(pointer, selfDir, dir, pos, conveyor)) {
                 return MovableResult.SUCCESS_MOVABLE;
             }
-        } else {
-            var inventory = pointer.getInventory();
-
-            if (inventory != null) {
-                FactoryUtil.tryInserting(inventory, holdStack.get(), dir);
-                if (holdStack.get().isEmpty()) {
-                    conveyor.clearContainer();
-                    return MovableResult.SUCCESS_REGULAR;
-                }
+        } else if (tryInserting(pointer.getWorld(), pointer.getPos(), holdStack.get(), dir) != -1) {
+            if (holdStack.get().isEmpty()) {
+                conveyor.clearContainer();
+                return MovableResult.SUCCESS_REGULAR;
             }
+
+            return MovableResult.SUCCESS_REGULAR;
         }
         return MovableResult.FAILURE;
     }

@@ -8,7 +8,9 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.RotationalSource;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.MovingItemContainer;
+import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
+import eu.pb4.polyfactory.util.movingitem.MovingItem;
+import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.nodes.mechanical.ConveyorNode;
@@ -35,8 +37,6 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
@@ -53,7 +53,6 @@ import net.minecraft.world.WorldEvents;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -236,7 +235,7 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
         var x = player.getStackInHand(hand);
         if (x.isOf(Items.SLIME_BALL) && this == FactoryBlocks.CONVEYOR) {
             var delta = 0d;
-            MovingItemContainer itemContainer = null;
+            MovingItem itemContainer = null;
 
             if (world.getBlockEntity(pos) instanceof ConveyorBlockEntity conveyor) {
                 itemContainer = conveyor.pullAndRemove();
@@ -257,7 +256,7 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
             return ActionResult.SUCCESS;
         } else if (x.isOf(Items.WET_SPONGE) && this == FactoryBlocks.STICKY_CONVEYOR) {
             var delta = 0d;
-            MovingItemContainer itemContainer = null;
+            MovingItem itemContainer = null;
 
             if (world.getBlockEntity(pos) instanceof ConveyorBlockEntity conveyor) {
                 itemContainer = conveyor.pullAndRemove();
@@ -283,9 +282,9 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
             if (x.isEmpty()) {
                 var be = world.getBlockEntity(pos);
 
-                if (be instanceof ConveyorBlockEntity conveyor && !conveyor.getStack().isEmpty()) {
-                    player.setStackInHand(hand, conveyor.getStack());
-                    conveyor.setStack(ItemStack.EMPTY);
+                if (be instanceof ConveyorBlockEntity conveyor && !conveyor.getStack(0).isEmpty()) {
+                    player.setStackInHand(hand, conveyor.getStack(0));
+                    conveyor.setStack(0, ItemStack.EMPTY);
                     conveyor.setDelta(0);
                     return ActionResult.SUCCESS;
                 }
@@ -355,7 +354,7 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
     @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         var be = world.getBlockEntity(pos);
-        return be.getClass() == ConveyorBlockEntity.class && !((ConveyorBlockEntity) be).getStack().isEmpty() ? 15 : 0;
+        return be.getClass() == ConveyorBlockEntity.class && !((ConveyorBlockEntity) be).getStack(0).isEmpty() ? 15 : 0;
     }
 
     private void pushEntity(ServerWorld world, BlockState state, BlockPos pos, Entity entity) {
@@ -514,7 +513,7 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
     }
 
     @Override
-    public boolean pushItemTo(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainer.Aware conveyor) {
+    public boolean pushItemTo(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         var state = self.getBlockState();
         var vert = state.get(VERTICAL);
         if (!state.isOf(FactoryBlocks.STICKY_CONVEYOR) && vert.stack) {
@@ -562,12 +561,12 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
         }
     }
 
-    public final class Model extends LodElementHolder implements MovingItemContainer.Aware {
+    public final class Model extends LodElementHolder implements ContainerHolder {
         private final Matrix4f mat = new Matrix4f();
         private final ItemDisplayElement base;
         private double speed;
         private Direction direction;
-        private MovingItemContainer movingItemContainer;
+        private MovingItem movingItemContainer;
         private DirectionValue value;
         private double delta;
 
@@ -672,12 +671,12 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
         }
 
         @Override
-        public MovingItemContainer getContainer() {
+        public MovingItem getContainer() {
             return this.movingItemContainer;
         }
 
         @Override
-        public void setContainer(MovingItemContainer container) {
+        public void setContainer(MovingItem container) {
             if (this.movingItemContainer != null) {
                 this.removeElement(this.movingItemContainer);
             }
@@ -699,7 +698,7 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
         }
 
         @Override
-        public MovingItemContainer pullAndRemove() {
+        public MovingItem pullAndRemove() {
             var x = this.movingItemContainer;
             this.movingItemContainer = null;
             if (x != null) {
@@ -710,7 +709,7 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
         }
 
         @Override
-        public void pushAndAttach(MovingItemContainer container) {
+        public void pushAndAttach(MovingItem container) {
             if (this.movingItemContainer != null) {
                 this.removeElement(this.movingItemContainer);
             }

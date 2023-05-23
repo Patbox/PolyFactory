@@ -2,23 +2,34 @@ package eu.pb4.polyfactory.block.machines;
 
 import com.kneelawk.graphlib.graph.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.mechanical.AxleBlock;
+import eu.pb4.polyfactory.block.mechanical.RotationalSource;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.display.LodElementHolder;
+import eu.pb4.polyfactory.display.LodItemDisplayElement;
+import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
-import eu.pb4.polyfactory.nodes.mechanical.DirectionalMechanicalNode;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
+import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
+import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.enums.WallMountLocation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -35,18 +46,21 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class GrinderBlock extends NetworkBlock implements PolymerBlock, BlockEntityProvider, InventoryProvider {
+public class GrinderBlock extends NetworkBlock implements PolymerBlock, BlockEntityProvider, InventoryProvider, BlockWithElementHolder {
     public static final Property<Part> PART = EnumProperty.of("part", Part.class);
     public static final Property<Direction> INPUT_FACING = DirectionProperty.of("input_facing", x -> x.getAxis() != Direction.Axis.Y);
 
     public GrinderBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(PART, Part.MAIN));
+        Model.MODEL_STONE_WHEEL.isEmpty();
     }
 
     @Override
@@ -61,15 +75,7 @@ public class GrinderBlock extends NetworkBlock implements PolymerBlock, BlockEnt
 
     @Override
     public Block getPolymerBlock(BlockState state) {
-        return state.get(PART) == Part.UPPER ? Blocks.GRINDSTONE : Blocks.BARREL;
-    }
-
-    @Override
-    public BlockState getPolymerBlockState(BlockState state) {
-        return switch (state.get(PART)) {
-            case MAIN -> Blocks.BARREL.getDefaultState().with(BarrelBlock.FACING, state.get(INPUT_FACING));
-            case UPPER -> Blocks.GRINDSTONE.getDefaultState().with(GrindstoneBlock.FACING, state.get(INPUT_FACING)).with(GrindstoneBlock.FACE, WallMountLocation.FLOOR);
-        };
+        return Blocks.BARRIER;
     }
 
     @Nullable
@@ -146,6 +152,76 @@ public class GrinderBlock extends NetworkBlock implements PolymerBlock, BlockEnt
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return world instanceof ServerWorld && type == FactoryBlockEntities.GRINDER ? GrinderBlockEntity::ticker : null;
+    }
+
+
+    @Override
+    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return initialBlockState.get(PART) == Part.MAIN ? new Model(world, initialBlockState) : null;
+    }
+
+    @Override
+    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return true;
+    }
+
+    public final class Model extends LodElementHolder {
+        public static final ItemStack MODEL_STONE_WHEEL = new ItemStack(Items.CANDLE);
+        private final Matrix4f mat = new Matrix4f();
+        private final ItemDisplayElement axle;
+        private final ItemDisplayElement stoneWheel;
+        private final ItemDisplayElement main;
+
+        private Model(ServerWorld world, BlockState state) {
+            this.main = new LodItemDisplayElement(FactoryItems.GRINDER_BLOCK.getDefaultStack());
+            this.main.setDisplaySize(1, 1);
+            this.main.setModelTransformation(ModelTransformationMode.FIXED);
+            this.axle = new LodItemDisplayElement(AxleBlock.Model.ITEM_MODEL);
+            this.axle.setDisplaySize(1, 1);
+            this.axle.setModelTransformation(ModelTransformationMode.FIXED);
+            this.axle.setInterpolationDuration(5);
+            this.stoneWheel = new LodItemDisplayElement(MODEL_STONE_WHEEL);
+            this.stoneWheel.setDisplaySize(1, 1);
+            this.stoneWheel.setModelTransformation(ModelTransformationMode.FIXED);
+            this.stoneWheel.setInterpolationDuration(5);
+            this.updateAnimation(0, 0, state.get(INPUT_FACING));
+            this.addElement(this.axle);
+            this.addElement(this.main);
+            this.addElement(this.stoneWheel);
+        }
+
+        private void updateAnimation(double speed, long worldTick, Direction direction) {
+            mat.identity();
+            mat.rotate(direction.getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion()));
+            mat.scale(2f);
+
+            this.main.setTransformation(mat);
+
+            mat.rotateY(((float) speed * worldTick));
+            mat.translate(0, 0.5f, 0);
+            this.axle.setTransformation(mat);
+            mat.translate(0, -0.19f, 0);
+            this.stoneWheel.setTransformation(mat);
+        }
+
+        @Override
+        protected void onTick() {
+            var tick = this.getAttachment().getWorld().getTime();
+
+            if (tick % 4 == 0) {
+                this.updateAnimation(RotationalSource.getNetworkSpeed(this.getAttachment().getWorld(),
+                                ((BlockBoundAttachment) this.getAttachment()).getBlockPos()), tick,
+                        ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(INPUT_FACING));
+                if (this.axle.isDirty()) {
+                    this.axle.startInterpolation();
+                    this.stoneWheel.startInterpolation();
+                }
+            }
+        }
+
+        static {
+            MODEL_STONE_WHEEL.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_STONE_WHEEL.getItem(), FactoryUtil.id("block/grindstone_wheel")).value());
+        }
     }
 
     public enum Part implements StringIdentifiable {

@@ -2,17 +2,18 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
+import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.RotationalSource;
 import eu.pb4.polyfactory.util.CachedBlockPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.MovingItemContainer;
+import eu.pb4.polyfactory.util.movingitem.*;
 import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -22,11 +23,11 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class ConveyorBlockEntity extends BlockEntity implements SingleStackInventory, SidedInventory, MovingItemContainer.AwareRedirecting {
+public class ConveyorBlockEntity extends BlockEntity implements InventoryContainerHolderProvider, SidedInventory, RedirectingContainerHolder {
     public double delta;
     @Nullable
     private ConveyorBlock.Model model;
-    private MovingItemContainer holdStack = null;
+    private MovingItem holdStack = null;
 
     public ConveyorBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.CONVEYOR, pos, state);
@@ -52,6 +53,14 @@ public class ConveyorBlockEntity extends BlockEntity implements SingleStackInven
 
                 if (pointer.getBlockState().getBlock() instanceof MovingItemProvider provider) {
                     provider.getItemFrom(pointer, dir, Direction.DOWN, pos, self);
+                }
+            }
+
+            if (self.isContainerEmpty()) {
+                var pointer = new CachedBlockPointer(world, pos.offset(dir.getOpposite()));
+
+                if (pointer.getBlockState().getBlock() instanceof MovingItemProvider provider) {
+                    provider.getItemFrom(pointer, dir, dir, pos, self);
                 }
             }
 
@@ -113,7 +122,7 @@ public class ConveyorBlockEntity extends BlockEntity implements SingleStackInven
                 return;
             }
 
-            var stack = self.getStack();
+            var stack = self.getStack(0);
             self.clearContainer();
             var moveVec = Vec3d.ZERO.offset(dir, 0.5).add(0, vert.value * 0.6, 0);
             var vec = Vec3d.ofCenter(pos).add(moveVec).add(0, vert == ConveyorBlock.DirectionValue.NONE ? 0.5 : 0, 0);
@@ -132,7 +141,7 @@ public class ConveyorBlockEntity extends BlockEntity implements SingleStackInven
         var x = FactoryUtil.tryInsertingMovable(this, world, pos, dir, this.getCachedState().get(ConveyorBlock.DIRECTION), requiredTag);
 
         if (x == FactoryUtil.MovableResult.SUCCESS_REGULAR) {
-            this.setStack(ItemStack.EMPTY);
+            this.clearContainer();
             this.setDelta(0);
             return true;
         }
@@ -154,7 +163,7 @@ public class ConveyorBlockEntity extends BlockEntity implements SingleStackInven
             if (this.holdStack != null) {
                 this.holdStack.set(stack);
             } else {
-                this.setContainer(new MovingItemContainer(stack));
+                this.setContainer(new MovingItem(stack));
             }
         }
         this.delta = nbt.getDouble("Delta");
@@ -175,6 +184,11 @@ public class ConveyorBlockEntity extends BlockEntity implements SingleStackInven
         return 16;
     }
 
+    @Override
+    public boolean canPlayerUse(PlayerEntity player) {
+        return false;
+    }
+
     public void setDelta(double delta) {
         if (this.model != null) {
             this.model.updateDelta(this.delta, delta);
@@ -183,21 +197,23 @@ public class ConveyorBlockEntity extends BlockEntity implements SingleStackInven
     }
 
     @Override
-    public ItemStack getStack() {
-        return this.holdStack != null ? this.holdStack.get() : ItemStack.EMPTY;
+    public int size() {
+        return 1;
     }
 
     @Override
-    public void setStack(ItemStack stack) {
-        this.setContainer(new MovingItemContainer(stack));
+    public boolean isEmpty() {
+        return this.isContainerEmpty();
+    }
+
+    @Override
+    public void setStack(int slot, ItemStack stack) {
+        InventoryContainerHolderProvider.super.setStack(slot, stack);
         this.setDelta(0.5);
-        this.markDirty();
-        assert this.world != null;
-        this.world.updateComparators(this.pos, this.getCachedState().getBlock());
     }
 
     @Override
-    public MovingItemContainer getContainer() {
+    public MovingItem getContainer() {
         return this.holdStack;
     }
 
@@ -212,12 +228,16 @@ public class ConveyorBlockEntity extends BlockEntity implements SingleStackInven
     }
 
     @Override
-    public void setContainerLocal(MovingItemContainer container) {
+    public void setContainerLocal(MovingItem container) {
         this.holdStack = container;
+        if (this.world != null) {
+            this.world.updateComparators(this.pos, this.getCachedState().getBlock());
+            this.markDirty();
+        }
     }
 
     @Override
-    public @Nullable MovingItemContainer.Aware getRedirect() {
+    public @Nullable ContainerHolder getRedirect() {
         return this.model;
     }
 
@@ -239,5 +259,15 @@ public class ConveyorBlockEntity extends BlockEntity implements SingleStackInven
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
         return true;
+    }
+
+    @Override
+    public ContainerHolder getContainerHolder(int slot) {
+        return this;
+    }
+
+    @Override
+    public void clear() {
+        this.clearContainer();
     }
 }

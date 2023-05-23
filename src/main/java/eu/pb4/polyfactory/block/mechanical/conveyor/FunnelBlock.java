@@ -4,7 +4,9 @@ import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.tool.WrenchItem;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.MovingItemContainer;
+import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
+import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
+import eu.pb4.polyfactory.util.movingitem.MovingItemProvider;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -17,6 +19,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -53,7 +56,7 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
     }
 
     @Override
-    public boolean pushItemTo(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainer.Aware conveyor) {
+    public boolean pushItemTo(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         var selfState = self.getBlockState();
         if (!selfState.get(ENABLED)) {
             return false;
@@ -68,14 +71,11 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
         if (be instanceof FunnelBlockEntity funnelBlockEntity && !funnelBlockEntity.matches(conveyor.getContainer().get())) {
             return false;
         }
-        var inv = HopperBlockEntity.getInventoryAt(self.getWorld(), self.getPos().offset(selfState.get(FACING)));
-
-        if (inv == null) {
-            return selfDir.getAxis() == pushDirection.getAxis();
-        }
         var stack = conveyor.getContainer();
 
-        FactoryUtil.tryInserting(inv, stack.get(), selfDir.getOpposite());
+        if (FactoryUtil.tryInserting(self.getWorld(), self.getPos().offset(selfState.get(FACING)), stack.get(), selfDir.getOpposite()) == -1) {
+            return selfDir.getAxis() == pushDirection.getAxis();
+        }
 
         if (stack.get().isEmpty()) {
             conveyor.clearContainer();
@@ -87,31 +87,31 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
 
 
     @Override
-    public void getItemFrom(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainer.Aware conveyor) {
+    public void getItemFrom(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         if (relative != Direction.DOWN || !conveyor.isContainerEmpty()) {
             return;
         }
 
         var selfState = self.getBlockState();
         var mode = selfState.get(MODE);
-
-        if (!selfState.get(ENABLED) || !mode.toConveyor || pushDirection == selfState.get(FACING)) {
+        var selfFacing = selfState.get(FACING);
+        if (!selfState.get(ENABLED) || !mode.toConveyor || pushDirection == selfFacing) {
             return;
         }
 
-        var inv = HopperBlockEntity.getInventoryAt(self.getWorld(), self.getPos().offset(selfState.get(FACING)));
-
+        var inv = HopperBlockEntity.getInventoryAt(self.getWorld(), self.getPos().offset(selfFacing));
+        var sided = inv instanceof SidedInventory s ? s : null;
         var be = self.getBlockEntity();
         if (inv != null && be instanceof FunnelBlockEntity funnelBlockEntity) {
             for (var i = 0; i < inv.size(); i++) {
                 var stack = inv.getStack(i);
-                if (!stack.isEmpty() && funnelBlockEntity.matches(stack)) {
+                if (!stack.isEmpty() && funnelBlockEntity.matches(stack) && (sided == null || sided.canExtract(i, stack, selfFacing.getOpposite()))) {
                     if (conveyor.pushNew(stack)) {
                         inv.markDirty();
                         if (stack.isEmpty()) {
                             inv.setStack(i, ItemStack.EMPTY);
                         }
-                        conveyor.setMovementPosition(pushDirection.getOpposite() == selfState.get(FACING) ? 0.15 : 0.5);
+                        conveyor.setMovementPosition(pushDirection.getOpposite() == selfFacing ? 0.15 : 0.5);
                         return;
                     }
                 }

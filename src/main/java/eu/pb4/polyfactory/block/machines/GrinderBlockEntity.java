@@ -129,7 +129,7 @@ public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInven
                 }
 
                 for (var item : items) {
-                    FactoryUtil.tryInserting(inv, item, null);
+                    FactoryUtil.tryInsertingInv(inv, item, null);
 
                     if (!item.isEmpty()) {
                         return;

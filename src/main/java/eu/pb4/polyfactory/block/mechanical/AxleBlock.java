@@ -63,12 +63,7 @@ public class AxleBlock extends NetworkBlock implements PolymerBlock, BlockWithEl
 
     @Override
     public Block getPolymerBlock(BlockState state) {
-        return Blocks.STRIPPED_OAK_LOG;
-    }
-
-    @Override
-    public BlockState getPolymerBlockState(BlockState state) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER;
     }
 
     @Override

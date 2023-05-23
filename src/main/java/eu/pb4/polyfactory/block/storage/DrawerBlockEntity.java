@@ -2,6 +2,11 @@ package eu.pb4.polyfactory.block.storage;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.base.SingleItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -9,27 +14,46 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Predicate;
-import java.util.stream.IntStream;
-
-// Fixme - Implement better inventory emulation or use FAPI's item transaction thingy api. Currently breaks if something tries to increase last slot
-public class DrawerBlockEntity extends BlockEntity implements SidedInventory {
+@SuppressWarnings("UnstableApiUsage")
+public class DrawerBlockEntity extends BlockEntity {
     public DrawerBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.DRAWER, pos, state);
     }
-    private static final int MAX_COUNT_MULT = 9 * 3;
-    private static final int[] SLOTS = IntStream.range(0, MAX_COUNT_MULT).toArray();
+    private static final int MAX_COUNT_MULT = 9 * 4;
+    public final SingleItemStorage storage = new SingleItemStorage() {
+        @Override
+        protected long getCapacity(ItemVariant variant) {
+            return DrawerBlockEntity.getMaxCount(DrawerBlockEntity.this.itemStack);
+        }
+
+        @Override
+        public long extract(ItemVariant extractedVariant, long maxAmount, TransactionContext transaction) {
+            var v = this.variant;
+            var i = super.extract(extractedVariant, maxAmount, transaction);
+            this.variant = v;
+            return i;
+        }
+
+        @Override
+        protected void onFinalCommit() {
+            super.onFinalCommit();
+            DrawerBlockEntity.this.markDirty();
+            updateHologram();
+        }
+    };
 
     private ItemStack itemStack = ItemStack.EMPTY;
-    private int count = 0;
 
     @Override
     protected void writeNbt(NbtCompound nbt) {
-        nbt.put("ItemStack", this.itemStack.writeNbt(new NbtCompound()));
-        nbt.putInt("ItemCount", this.count);
+        this.storage.writeNbt(nbt);
+    }
+
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        this.storage.readNbt(nbt);
+        this.itemStack = this.storage.variant.toStack();
     }
 
     @Override
@@ -40,21 +64,18 @@ public class DrawerBlockEntity extends BlockEntity implements SidedInventory {
 
     private void updateHologram() {
         var type = BlockBoundAttachment.get(this.world, this.pos);
+        if (this.itemStack == ItemStack.EMPTY) {
+            this.itemStack = this.storage.variant.toStack();
+        }
 
         if (type != null && type.holder() instanceof DrawerBlock.Model model) {
-            model.setDisplay(this.itemStack, this.count);
+            model.setDisplay(this.itemStack, this.storage.amount);
             model.tick();
         }
     }
 
     public static int getMaxCount(ItemStack stack) {
-        return MAX_COUNT_MULT * stack.getMaxCount();
-    }
-
-    @Override
-    public void readNbt(NbtCompound nbt) {
-        this.itemStack = ItemStack.fromNbt(nbt.getCompound("FilterStackLeft"));
-        this.count = nbt.getInt("ItemCount");
+        return 9 * 4 * stack.getMaxCount();
     }
 
     @Override
@@ -62,106 +83,46 @@ public class DrawerBlockEntity extends BlockEntity implements SidedInventory {
         super.markRemoved();
     }
 
-    @Override
-    public int[] getAvailableSlots(Direction side) {
-        return SLOTS;
-    }
-
-    @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return (this.itemStack.isEmpty() || ItemStack.canCombine(this.itemStack, stack)) && this.count + stack.getCount() <= getMaxCount(stack);
-    }
-
-    @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return true;
-    }
-
-    @Override
-    public int size() {
-        return MAX_COUNT_MULT;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return this.count <= 0;
-    }
-
-    @Override
-    public ItemStack getStack(int slot) {
-        var s = this.count / 64;
-
-        if (s < slot) {
-            return this.itemStack.copyWithCount(64);
-        } else if (slot + 1 == MAX_COUNT_MULT) {
-            return this.itemStack.copyWithCount(this.count % 64);
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public ItemStack removeStack(int slot, int amount) {
-        var x = Math.min(this.count, amount);
-        this.count -= x;
-        this.updateHologram();
-        return this.itemStack.copyWithCount(x);
-    }
-
-    @Override
-    public ItemStack removeStack(int slot) {
-        return removeStack(slot, this.itemStack.getMaxCount());
-    }
-
-    @Override
-    public void setStack(int slot, ItemStack stack) {
-        if (this.count == 0) {
-            if (!stack.isEmpty()) {
-                this.itemStack = stack.copyWithCount(1);
-            } else {
-                this.itemStack = ItemStack.EMPTY;
-                this.updateHologram();
-                return;
-            }
-        }
-
-        var s = this.count / 64;
-
-        if (s < slot) {
-            this.count -= (64 - stack.getCount());
-        } else if (slot + 1 == MAX_COUNT_MULT) {
-            var i = this.count % 64;
-            this.count -= (i - stack.getCount());
-        } else {
-            this.count += stack.getCount();
-        }
-
-        this.updateHologram();
-    }
-
-    @Override
-    public boolean containsAny(Predicate<ItemStack> predicate) {
-        return predicate.test(this.itemStack);
-    }
-
-    @Override
-    public boolean canPlayerUse(PlayerEntity player) {
-        return true;
-    }
-
-    @Override
-    public void clear() {
-        this.count = 0;
-    }
-
     public boolean matches(ItemStack stackInHand) {
         return ItemStack.canCombine(this.itemStack, stackInHand);
     }
 
-    public int addItems(int i) {
-        var out = this.count + i;
-        var max = getMaxCount(this.itemStack);
-        this.count = Math.min(out, max);
+    public void setItemStack(ItemStack stack) {
+        this.itemStack = stack.copyWithCount(1);
+        this.storage.variant = ItemVariant.of(stack);
         this.updateHologram();
-        return Math.max(out - max, 0);
+    }
+
+    public ItemStack getItemStack() {
+        return this.itemStack;
+    }
+
+    public ItemStack extract(int amount) {
+        try (var t = Transaction.openOuter()) {
+            var i = this.storage.extract(this.storage.variant, amount, t);
+            t.commit();
+            return this.itemStack.copyWithCount((int) i);
+        }
+    }
+
+
+    public ItemStack extractStack() {
+        return extract(this.itemStack.getMaxCount());
+    }
+
+    public int addItems(int i) {
+        try (var t = Transaction.openOuter()) {
+            i = (int) this.storage.insert(this.storage.variant, i, t);
+            t.commit();
+            return i;
+        }
+    }
+
+    static {
+        ItemStorage.SIDED.registerForBlockEntity((self, dir) -> self.storage, FactoryBlockEntities.DRAWER);
+    }
+
+    public boolean isEmpty() {
+        return this.storage.amount == 0;
     }
 }
