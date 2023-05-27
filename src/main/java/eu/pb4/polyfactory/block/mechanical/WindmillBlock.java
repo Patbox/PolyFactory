@@ -20,14 +20,18 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.WallMountLocation;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.*;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -40,7 +44,7 @@ import org.joml.Matrix4fStack;
 import java.util.Collection;
 import java.util.List;
 
-public class WindmillBlock extends NetworkBlock implements PolymerBlock, RotationalSource, BlockWithElementHolder {
+public class WindmillBlock extends NetworkBlock implements PolymerBlock, RotationalSource, BlockWithElementHolder, BlockEntityProvider {
     public static final int MAX_SAILS = 8;
     public static final IntProperty SAIL_COUNT = IntProperty.of("sails", 1, MAX_SAILS);
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
@@ -60,6 +64,17 @@ public class WindmillBlock extends NetworkBlock implements PolymerBlock, Rotatio
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         return this.getDefaultState().with(FACING, ctx.getSide().getOpposite());
+    }
+
+    @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (!state.isOf(newState.getBlock())) {
+            if (world.getBlockEntity(pos) instanceof WindmillBlockEntity be) {
+                ItemScatterer.spawn(world, pos, be.getSails());
+            }
+        }
+        super.onStateReplaced(state, world, pos, newState, moved);
+
     }
 
     @Override
@@ -96,12 +111,24 @@ public class WindmillBlock extends NetworkBlock implements PolymerBlock, Rotatio
         return true;
     }
 
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new WindmillBlockEntity(pos, state);
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.OAK_PLANKS.getDefaultState();
+    }
+
     public final class Model extends LodElementHolder {
-        public static final ItemStack MODEL = new ItemStack(Items.STICK);
-        public static final ItemStack MODEL_FLIP = new ItemStack(Items.STICK);
+        public static final ItemStack MODEL = new ItemStack(Items.LEATHER_HORSE_ARMOR);
+        public static final ItemStack MODEL_FLIP = new ItemStack(Items.LEATHER_HORSE_ARMOR);
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private ItemDisplayElement[] sails;
         private final ItemDisplayElement center;
+        private WindmillBlockEntity blockEntity;
 
         private Model(ServerWorld world, BlockState state) {
             this.updateSails(state.get(SAIL_COUNT), state.get(REVERSE));
@@ -122,7 +149,7 @@ public class WindmillBlock extends NetworkBlock implements PolymerBlock, Rotatio
             if (this.sails != null) {
                 if (this.sails.length == count) {
                     for (var i = 0 ; i < count; i++) {
-                        this.sails[i].setItem(model);
+                        this.sails[i].setItem(colored(i, model));
                     }
                     return;
                 } else if (this.sails.length > count) {
@@ -159,9 +186,24 @@ public class WindmillBlock extends NetworkBlock implements PolymerBlock, Rotatio
             }
 
             this.sails = sails;
-            for (var i = 0 ; i < count; i++) {
-                this.sails[i].setItem(model);
+            for (var i = 0; i < count; i++) {
+                 this.sails[i].setItem(colored(i, model));
             }
+        }
+
+        private ItemStack colored(int i, ItemStack model) {
+            var c = model.copy();
+            var d = new NbtCompound();
+            int color = 0xFFFFFF;
+
+            if (this.blockEntity != null) {
+                color = this.blockEntity.getSailColor(i);
+            }
+
+            d.putInt("color", color);
+
+            c.getOrCreateNbt().put("display", d);
+            return c;
         }
 
         private void updateAnimation(double speed, long worldTick, Direction direction, boolean reverse) {
@@ -188,6 +230,12 @@ public class WindmillBlock extends NetworkBlock implements PolymerBlock, Rotatio
         @Override
         protected void onTick() {
             var tick = this.getAttachment().getWorld().getTime();
+            if (this.blockEntity == null) {
+                var attach = BlockBoundAttachment.get(this);
+                this.blockEntity = attach.getWorld().getBlockEntity(attach.getBlockPos()) instanceof WindmillBlockEntity be ? be : null;
+                this.updateSailsBe();
+            }
+
 
             if (tick % 4 == 0) {
                 this.updateAnimation(RotationalSource.getNetworkSpeed(this.getAttachment().getWorld(),
@@ -210,7 +258,7 @@ public class WindmillBlock extends NetworkBlock implements PolymerBlock, Rotatio
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.updateSails(BlockBoundAttachment.get(this).getBlockState().get(SAIL_COUNT), BlockBoundAttachment.get(this).getBlockState().get(REVERSE));
+                this.updateSailsBe();
 
                 this.updateAnimation(RotationalSource.getNetworkSpeed(this.getAttachment().getWorld(),
                                 ((BlockBoundAttachment) this.getAttachment()).getBlockPos()), this.getAttachment().getWorld().getTime(),
@@ -225,8 +273,13 @@ public class WindmillBlock extends NetworkBlock implements PolymerBlock, Rotatio
         }
 
         static {
-            MODEL.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(Items.STICK, FactoryUtil.id("block/windmill_sail")).value());
-            MODEL_FLIP.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(Items.STICK, FactoryUtil.id("block/windmill_sail_flip")).value());
+            MODEL.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL.getItem(), FactoryUtil.id("block/windmill_sail")).value());
+            MODEL_FLIP.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_FLIP.getItem(), FactoryUtil.id("block/windmill_sail_flip")).value());
+        }
+
+        public void updateSailsBe() {
+            var state = BlockBoundAttachment.get(this).getBlockState();
+            this.updateSails(state.get(SAIL_COUNT), state.get(REVERSE));
         }
     }
 }

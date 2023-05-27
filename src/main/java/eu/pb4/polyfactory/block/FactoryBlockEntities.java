@@ -4,11 +4,12 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.ItemGeneratorBlockEntity;
 import eu.pb4.polyfactory.block.machines.*;
 import eu.pb4.polyfactory.block.mechanical.HandCrankBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.WindmillBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.FanBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlockEntity;
-import eu.pb4.polyfactory.block.storage.DrawerBlockEntity;
+import eu.pb4.polyfactory.block.storage.ContainerBlockEntity;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.entity.BlockEntity;
@@ -31,11 +32,14 @@ public class FactoryBlockEntities {
             FabricBlockEntityTypeBuilder.create(FanBlockEntity::new).addBlock(FactoryBlocks.FAN));
 
     public static final BlockEntityType<HandCrankBlockEntity> HAND_CRANK = register("hand_crank",
-            FabricBlockEntityTypeBuilder.create(HandCrankBlockEntity::new).addBlock(FactoryBlocks.FAN));
+            FabricBlockEntityTypeBuilder.create(HandCrankBlockEntity::new).addBlock(FactoryBlocks.HAND_CRANK));
+
+    public static final BlockEntityType<WindmillBlockEntity> WINDMILL = register("windmill",
+            FabricBlockEntityTypeBuilder.create(WindmillBlockEntity::new).addBlock(FactoryBlocks.WINDMILL));
 
 
-    public static final BlockEntityType<DrawerBlockEntity> DRAWER = register("drawer",
-            FabricBlockEntityTypeBuilder.create(DrawerBlockEntity::new).addBlock(FactoryBlocks.DRAWER));
+    public static final BlockEntityType<ContainerBlockEntity> CONTAINER = register("container",
+            FabricBlockEntityTypeBuilder.create(ContainerBlockEntity::new).addBlock(FactoryBlocks.CONTAINER));
 
     public static final BlockEntityType<GrinderBlockEntity> GRINDER = register("grinder",
             FabricBlockEntityTypeBuilder.create(GrinderBlockEntity::new).addBlock(FactoryBlocks.GRINDER));

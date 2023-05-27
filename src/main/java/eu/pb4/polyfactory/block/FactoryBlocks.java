@@ -11,7 +11,7 @@ import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlock;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlock;
-import eu.pb4.polyfactory.block.storage.DrawerBlock;
+import eu.pb4.polyfactory.block.storage.ContainerBlock;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
@@ -35,7 +35,7 @@ public class FactoryBlocks {
     public static final AxleBlock AXLE = register("axle", new AxleBlock(Block.Settings.of(Material.WOOD).nonOpaque().hardness(1)));
     public static final GearboxBlock GEARBOX = register("gearbox", new GearboxBlock(Block.Settings.of(Material.WOOD).hardness(1).nonOpaque()));
     public static final WindmillBlock WINDMILL = register("windmill", new WindmillBlock(Block.Settings.of(Material.WOOD).hardness(1).nonOpaque()));
-    public static final DrawerBlock DRAWER = register("drawer", new DrawerBlock(Block.Settings.of(Material.WOOD).hardness(1).nonOpaque()));
+    public static final ContainerBlock CONTAINER = register("wooden_container", new ContainerBlock(Block.Settings.of(Material.WOOD).hardness(1).nonOpaque()));
     public static final ItemGeneratorBlock ITEM_GENERATOR = register("item_generator", new ItemGeneratorBlock(AbstractBlock.Settings.of(Material.METAL).strength(-1, -1)));
 
 

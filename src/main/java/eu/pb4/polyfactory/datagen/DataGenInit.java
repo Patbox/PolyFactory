@@ -76,6 +76,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .add(FactoryBlocks.WINDMILL)
                     .add(FactoryBlocks.AXLE)
                     .add(FactoryBlocks.GEARBOX)
+                    .add(FactoryBlocks.CONTAINER)
                     .add(FactoryBlocks.FUNNEL)
             ;
         }
@@ -101,12 +102,8 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             this.addDrop(FactoryBlocks.FUNNEL);
             this.addDrop(FactoryBlocks.AXLE);
             this.addDrop(FactoryBlocks.GEARBOX);
-            this.addDrop(FactoryBlocks.WINDMILL, (block) -> this.drops(FactoryItems.AXLE_BLOCK).pool(
-                            this.addSurvivesExplosionCondition(FactoryItems.WINDMILL_SAIL, LootPool.builder().rolls(ConstantLootNumberProvider.create(1.0F))))
-                    .pool(LootPool.builder().rolls(new IntStateLootNumberProvider(block, WindmillBlock.SAIL_COUNT))
-                            .with(ItemEntry.builder(FactoryItems.WINDMILL_SAIL))
-                    )
-            );
+            this.addDrop(FactoryBlocks.CONTAINER);
+            this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE_BLOCK);
         }
     }
 

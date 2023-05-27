@@ -27,6 +27,13 @@ public class ModInit implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		LOGGER.warn("=================================================");
+		LOGGER.warn("PolyFactory is still in pre-alpha state!");
+		LOGGER.warn("Don't expect any stability or playability");
+		LOGGER.warn("until official release!");
+		LOGGER.warn("=================================================");
+
+
 		FactoryBlocks.register();
 		FactoryBlockEntities.register();
 		FactoryItems.register();

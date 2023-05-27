@@ -9,6 +9,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -24,6 +25,16 @@ public class ItemGeneratorBlockEntity extends BlockEntity implements SingleStack
 
     public ItemGeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.ITEM_GENERATOR, pos, state);
+    }
+
+    @Override
+    protected void writeNbt(NbtCompound nbt) {
+        nbt.put("item", this.stack.writeNbt(new NbtCompound()));
+    }
+
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        this.stack = ItemStack.fromNbt(nbt.getCompound("item"));
     }
 
     @Override

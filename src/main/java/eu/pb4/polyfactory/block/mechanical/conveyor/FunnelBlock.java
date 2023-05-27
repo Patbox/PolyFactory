@@ -14,6 +14,10 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.HopperBlockEntity;
@@ -86,6 +90,7 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
     }
 
 
+    @SuppressWarnings("UnstableApiUsage")
     @Override
     public void getItemFrom(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         if (relative != Direction.DOWN || !conveyor.isContainerEmpty()) {
@@ -98,14 +103,17 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
         if (!selfState.get(ENABLED) || !mode.toConveyor || pushDirection == selfFacing) {
             return;
         }
+        var be = self.getBlockEntity() instanceof FunnelBlockEntity x ? x : null;
+        if (be == null) {
+            return;
+        }
 
         var inv = HopperBlockEntity.getInventoryAt(self.getWorld(), self.getPos().offset(selfFacing));
         var sided = inv instanceof SidedInventory s ? s : null;
-        var be = self.getBlockEntity();
-        if (inv != null && be instanceof FunnelBlockEntity funnelBlockEntity) {
+        if (inv != null) {
             for (var i = 0; i < inv.size(); i++) {
                 var stack = inv.getStack(i);
-                if (!stack.isEmpty() && funnelBlockEntity.matches(stack) && (sided == null || sided.canExtract(i, stack, selfFacing.getOpposite()))) {
+                if (!stack.isEmpty() && be.matches(stack) && (sided == null || sided.canExtract(i, stack, selfFacing.getOpposite()))) {
                     if (conveyor.pushNew(stack)) {
                         inv.markDirty();
                         if (stack.isEmpty()) {
@@ -116,8 +124,30 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
                     }
                 }
             }
-        }
+        } else {
+            var storage = ItemStorage.SIDED.find(self.getWorld(), self.getPos().offset(selfFacing), selfFacing);
 
+            if (storage != null) {
+                for (var view : storage) {
+                    if (view.isResourceBlank() || !be.matches(view.getResource().toStack())) {
+                        continue;
+                    }
+
+                    try (var t = Transaction.openOuter()) {
+                        var val = view.extract(view.getResource(), conveyor.getMaxStackCount(view.getResource().toStack()), t);
+
+                        if (val != 0) {
+                            t.commit();
+
+                            if (conveyor.pushNew(view.getResource().toStack((int) val))) {
+                                conveyor.setMovementPosition(pushDirection.getOpposite() == selfFacing ? 0.15 : 0.5);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {

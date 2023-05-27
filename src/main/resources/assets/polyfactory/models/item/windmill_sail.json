@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "polyfactory:item/windmill_sail"
+    "layer0": "polyfactory:item/windmill_sail",
+    "layer1": "polyfactory:item/windmill_sail_base"
   }
 }

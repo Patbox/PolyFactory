@@ -46,7 +46,8 @@ public class PressBlockEntity extends BlockEntity implements InventoryContainerH
     @Nullable
     protected PressRecipe currentRecipe = null;
     @Nullable
-    protected Item currentItem = null;    private final SimpleContainer[] containers = new SimpleContainer[]{
+    protected Item currentItem = null;
+    private final SimpleContainer[] containers = new SimpleContainer[]{
             new SimpleContainer((x, b) -> this.addMoving(0, x, b), this::removeMoving),
             new SimpleContainer(),
             new SimpleContainer((x, b) -> this.addMoving(2, x, b), this::removeMoving)
@@ -67,10 +68,10 @@ public class PressBlockEntity extends BlockEntity implements InventoryContainerH
             self.containers[0].maybeAdd(self.model);
             self.containers[2].maybeAdd(self.model);
         }
-        var stack = self.getStack(0);
+        var stack = self.containers[0];
 
-        if (self.process < 0 && stack.isEmpty()) {
-            var speed = Math.max(Math.abs(RotationalSource.getNetworkSpeed((ServerWorld) world, pos.up(1))), 0);
+        if (self.process < 0 && stack.isContainerEmpty()) {
+            var speed = Math.max(Math.abs(RotationalSource.getNetworkSpeed((ServerWorld) world, pos.up())), 0);
 
             self.process += speed / 6;
             self.model.updatePiston(self.process);
@@ -79,7 +80,7 @@ public class PressBlockEntity extends BlockEntity implements InventoryContainerH
             return;
         }
 
-        if (stack.isEmpty()) {
+        if (stack.isContainerEmpty()) {
             if (self.process != 0) {
                 self.model.updatePiston(0);
             }
@@ -88,7 +89,7 @@ public class PressBlockEntity extends BlockEntity implements InventoryContainerH
             return;
         }
 
-        if (self.currentRecipe == null && self.currentItem != null && stack.isOf(self.currentItem) && stack.getCount() == self.currentItemCount) {
+        if (self.currentRecipe == null && self.currentItem != null && stack.getContainer().get().isOf(self.currentItem) && stack.getContainer().get().getCount() == self.currentItemCount) {
             if (self.process != 0) {
                 self.model.updatePiston(0);
             }
@@ -102,8 +103,8 @@ public class PressBlockEntity extends BlockEntity implements InventoryContainerH
                 self.model.updatePiston(0);
             }
             self.process = 0;
-            self.currentItem = stack.getItem();
-            self.currentItemCount = stack.getCount();
+            self.currentItem = stack.getContainer().get().getItem();
+            self.currentItemCount = stack.getContainer().get().getCount();
             self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.PRESS, self, world).orElse(null);
 
             if (self.currentRecipe == null) {
@@ -116,7 +117,7 @@ public class PressBlockEntity extends BlockEntity implements InventoryContainerH
         if (self.process >= 1) {
             if (self.getStack(OUTPUT_SLOT).isEmpty()) {
                 self.process = -0.3;
-                stack.decrement(self.currentRecipe.inputCount());
+                stack.getContainer().get().decrement(self.currentRecipe.inputCount());
                 var out = self.currentRecipe.craft(self, self.world.getRegistryManager());
 
                 self.setStack(OUTPUT_SLOT, out);

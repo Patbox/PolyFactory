@@ -9,22 +9,20 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 
 @SuppressWarnings("UnstableApiUsage")
-public class DrawerBlockEntity extends BlockEntity {
-    public DrawerBlockEntity(BlockPos pos, BlockState state) {
-        super(FactoryBlockEntities.DRAWER, pos, state);
+public class ContainerBlockEntity extends BlockEntity {
+    public ContainerBlockEntity(BlockPos pos, BlockState state) {
+        super(FactoryBlockEntities.CONTAINER, pos, state);
     }
-    private static final int MAX_COUNT_MULT = 9 * 4;
+    private static final int MAX_SLOT_SIZE = 9 * 4;
     public final SingleItemStorage storage = new SingleItemStorage() {
         @Override
         protected long getCapacity(ItemVariant variant) {
-            return DrawerBlockEntity.getMaxCount(DrawerBlockEntity.this.itemStack);
+            return ContainerBlockEntity.getMaxCount(ContainerBlockEntity.this.itemStack);
         }
 
         @Override
@@ -38,7 +36,7 @@ public class DrawerBlockEntity extends BlockEntity {
         @Override
         protected void onFinalCommit() {
             super.onFinalCommit();
-            DrawerBlockEntity.this.markDirty();
+            ContainerBlockEntity.this.markDirty();
             updateHologram();
         }
     };
@@ -68,14 +66,14 @@ public class DrawerBlockEntity extends BlockEntity {
             this.itemStack = this.storage.variant.toStack();
         }
 
-        if (type != null && type.holder() instanceof DrawerBlock.Model model) {
+        if (type != null && type.holder() instanceof ContainerBlock.Model model) {
             model.setDisplay(this.itemStack, this.storage.amount);
             model.tick();
         }
     }
 
     public static int getMaxCount(ItemStack stack) {
-        return 9 * 4 * stack.getMaxCount();
+        return MAX_SLOT_SIZE * stack.getMaxCount();
     }
 
     @Override
@@ -101,6 +99,7 @@ public class DrawerBlockEntity extends BlockEntity {
         try (var t = Transaction.openOuter()) {
             var i = this.storage.extract(this.storage.variant, amount, t);
             t.commit();
+            this.markDirty();
             return this.itemStack.copyWithCount((int) i);
         }
     }
@@ -119,7 +118,7 @@ public class DrawerBlockEntity extends BlockEntity {
     }
 
     static {
-        ItemStorage.SIDED.registerForBlockEntity((self, dir) -> self.storage, FactoryBlockEntities.DRAWER);
+        ItemStorage.SIDED.registerForBlockEntity((self, dir) -> self.storage, FactoryBlockEntities.CONTAINER);
     }
 
     public boolean isEmpty() {

@@ -31,7 +31,7 @@ public class FactoryItems {
     public static final Item MINER_BLOCK = register("miner", new ModeledBlockItem(FactoryBlocks.MINER, new Item.Settings()));
     public static final Item AXLE_BLOCK = register("axle", new ModeledBlockItem(FactoryBlocks.AXLE, new Item.Settings()));
     public static final Item GEARBOX_BLOCK = register("gearbox", new ModeledBlockItem(FactoryBlocks.GEARBOX, new Item.Settings()));
-    public static final Item DRAWER_BLOCK = register("drawer", new ModeledBlockItem(FactoryBlocks.DRAWER, new Item.Settings()));
+    public static final Item CONTAINER_BLOCK = register("wooden_container", new ModeledBlockItem(FactoryBlocks.CONTAINER, new Item.Settings()));
     public static final Item WINDMILL_SAIL = register("windmill_sail", new WindmillSailItem(new Item.Settings()));
     public static final Item ITEM_GENERATOR_BLOCK = register("item_generator", new ModeledBlockItem(FactoryBlocks.ITEM_GENERATOR, new Item.Settings()));
 
@@ -52,7 +52,7 @@ public class FactoryItems {
                     entries.add(STICKY_CONVEYOR_BLOCK);
                     entries.add(FUNNEL_BLOCK);
                     entries.add(SPLITTER_BLOCK);
-                    entries.add(DRAWER_BLOCK);
+                    entries.add(CONTAINER_BLOCK);
                     entries.add(FAN_BLOCK);
                     entries.add(GRINDER_BLOCK);
                     entries.add(PRESS_BLOCK);

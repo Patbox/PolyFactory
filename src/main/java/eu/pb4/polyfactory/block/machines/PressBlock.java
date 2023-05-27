@@ -78,14 +78,18 @@ public class PressBlock extends NetworkBlock implements PolymerBlock, BlockEntit
     @Override
     public Collection<BlockNode> createNodes(BlockState state, ServerWorld world, BlockPos pos) {
         return state.get(PART) == Part.TOP ? List.of(
-                new AxisMechanicalNode(Direction.Axis.X),
-                new AxisMechanicalNode(Direction.Axis.Z)
+                new GearboxNode()
         ) : List.of();
     }
 
     @Override
     public Block getPolymerBlock(BlockState state) {
         return Blocks.BARRIER;
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.ANVIL.getDefaultState();
     }
 
     @Nullable

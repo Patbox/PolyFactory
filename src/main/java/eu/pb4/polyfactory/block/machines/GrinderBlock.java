@@ -165,6 +165,11 @@ public class GrinderBlock extends NetworkBlock implements PolymerBlock, BlockEnt
         return true;
     }
 
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.GRINDSTONE.getDefaultState();
+    }
+
     public final class Model extends LodElementHolder {
         public static final ItemStack MODEL_STONE_WHEEL = new ItemStack(Items.CANDLE);
         private final Matrix4f mat = new Matrix4f();
