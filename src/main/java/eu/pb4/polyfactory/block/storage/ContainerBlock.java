@@ -1,7 +1,10 @@
 package eu.pb4.polyfactory.block.storage;
 
+import eu.pb4.polyfactory.block.AttackableBlock;
 import eu.pb4.polyfactory.block.mechanical.WindmillBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -9,6 +12,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -37,7 +41,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 
 
-public class ContainerBlock extends Block implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder {
+public class ContainerBlock extends Block implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder, AttackableBlock, VirtualDestroyStage.Marker {
     public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
 
@@ -53,23 +57,21 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        var be = world.getBlockEntity(pos);
-
-        if (be instanceof ContainerBlockEntity drawerBlockEntity && hand == Hand.MAIN_HAND && hit.getSide() == state.get(FACING)) {
+        if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be && hand == Hand.MAIN_HAND && hit.getSide() == state.get(FACING)) {
             var stack = player.getStackInHand(hand);
 
             if (stack.isEmpty()) {
-                if (drawerBlockEntity.isEmpty()) {
-                    drawerBlockEntity.setItemStack(ItemStack.EMPTY);
+                if (be.isEmpty()) {
+                    be.setItemStack(ItemStack.EMPTY);
                 } else {
-                    player.setStackInHand(hand, drawerBlockEntity.extractStack());
+                    player.setStackInHand(hand, be.extractStack());
                 }
             } else {
-                if (drawerBlockEntity.getItemStack().isEmpty()) {
-                    drawerBlockEntity.setItemStack(stack);
-                    stack.decrement(drawerBlockEntity.addItems(stack.getCount()));
-                } else if (drawerBlockEntity.matches(stack)) {
-                    stack.decrement(drawerBlockEntity.addItems(stack.getCount()));
+                if (be.getItemStack().isEmpty()) {
+                    be.setItemStack(stack);
+                    stack.decrement(be.addItems(stack.getCount()));
+                } else if (be.matches(stack)) {
+                    stack.decrement(be.addItems(stack.getCount()));
                 }
 
                 if (stack.isEmpty()) {
@@ -83,6 +85,15 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
     }
 
     @Override
+    public ActionResult onPlayerAttack(BlockState state, PlayerEntity player, World world, BlockPos pos, Direction direction) {
+        if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be && direction == state.get(FACING)) {
+            return ActionResult.FAIL;
+        }
+
+        return ActionResult.PASS;
+    }
+
+    @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (!state.isOf(newState.getBlock())) {
             if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be) {
@@ -93,12 +104,25 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
                     count -= stack.getCount();
                     ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
                 }
+                world.updateComparators(pos, this);
             }
         }
         super.onStateReplaced(state, world, pos, newState, moved);
 
     }
 
+    @Override
+    public boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be) {
+            return (int) ((be.storage.amount * 15) / be.storage.getCapacity());
+        }
+        return 0;
+    }
 
     @Nullable
     @Override

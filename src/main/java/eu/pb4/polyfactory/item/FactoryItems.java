@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.item;
 
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
+import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.item.util.ModeledItem;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.polyfactory.ModInit;
@@ -40,12 +41,15 @@ public class FactoryItems {
     public static final Item STEEL_PLATE = register("steel_plate", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
     public static final Item STEEL_COG = register("steel_cog", new ModeledItem(Items.IRON_NUGGET, new Item.Settings()));
 
+    public static final Item ITEM_FILTER = register("item_filter", new FilterItem(Items.PAPER, new Item.Settings()));
+
+
     public static void register() {
         PolymerItemGroupUtils.builder(new Identifier(ModInit.ID, "group"))
                 .icon(() -> WRENCH.getDefaultStack())
                 .displayName(Text.translatable("itemgroup." + ModInit.ID))
                 .entries(((context, entries) -> {
-                    entries.add(WRENCH);
+                    //entries.add(WRENCH);
 
                     // Rotational machines (tier 1)
                     entries.add(CONVEYOR_BLOCK);
@@ -61,6 +65,7 @@ public class FactoryItems {
                     entries.add(GEARBOX_BLOCK);
                     entries.add(HAND_CRANK_BLOCK);
                     entries.add(WINDMILL_SAIL);
+                    entries.add(ITEM_FILTER);
 
                     // Electrical machines (tier 2)
                     entries.add(MOTOR_BLOCK);

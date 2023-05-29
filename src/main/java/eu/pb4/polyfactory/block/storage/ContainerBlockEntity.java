@@ -37,6 +37,7 @@ public class ContainerBlockEntity extends BlockEntity {
         protected void onFinalCommit() {
             super.onFinalCommit();
             ContainerBlockEntity.this.markDirty();
+            world.updateComparators(pos, ContainerBlockEntity.this.getCachedState().getBlock());
             updateHologram();
         }
     };

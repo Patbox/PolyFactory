@@ -1,9 +1,12 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
+import eu.pb4.polyfactory.block.mechanical.WindmillBlockEntity;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
-import eu.pb4.polyfactory.item.tool.WrenchItem;
+import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polyfactory.util.movingitem.MovingItemProvider;
@@ -15,8 +18,6 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -26,7 +27,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -36,13 +36,15 @@ import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 
-public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsumer, MovingItemProvider, WrenchItem.Wrenchable, BlockEntityProvider, BlockWithElementHolder {
+public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsumer, MovingItemProvider, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
     public static final EnumProperty<ConveyorLikeDirectional.TransferMode> MODE = EnumProperty.of("mode", ConveyorLikeDirectional.TransferMode.class,
@@ -60,6 +62,16 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
     }
 
     @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (!state.isOf(newState.getBlock())) {
+            if (world.getBlockEntity(pos) instanceof FunnelBlockEntity be) {
+                ItemScatterer.spawn(world, pos.getX()  + 0.5, pos.getY()  + 0.5, pos.getZ() + 0.5, be.getFilter());
+            }
+        }
+        super.onStateReplaced(state, world, pos, newState, moved);
+    }
+
+    @Override
     public boolean pushItemTo(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         var selfState = self.getBlockState();
         if (!selfState.get(ENABLED)) {
@@ -68,6 +80,7 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
 
         var selfDir = selfState.get(FACING);
         var mode = selfState.get(MODE);
+
         if (!mode.fromConveyor || relative != Direction.UP || selfDir.getOpposite() == pushDirection || conveyor.movementDelta() < (selfDir == pushDirection ? 0.90 : 0.48) || selfDir.getAxis() == Direction.Axis.Y) {
             return false;
         }
@@ -195,24 +208,33 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
     }
 
     @Override
-    public ActionResult useWithWrench(ItemUsageContext context) {
-        var be = context.getWorld().getBlockEntity(context.getBlockPos());
-        if (be instanceof FunnelBlockEntity funnelBlockEntity) {
-            funnelBlockEntity.setFilter(context.getPlayer().getStackInHand(context.getHand() == Hand.MAIN_HAND ? Hand.OFF_HAND : Hand.MAIN_HAND));
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        var stack = player.getStackInHand(hand);
+
+        if (hand != Hand.MAIN_HAND) {
+            return ActionResult.FAIL;
         }
 
-        return ActionResult.SUCCESS;
-    }
+        var be = world.getBlockEntity(pos) instanceof FunnelBlockEntity x ? x : null;
 
-    @Override
-    public void attackWithWrench(PlayerEntity player, World world, Hand hand, BlockPos pos, Direction direction) {
-        var state = world.getBlockState(pos);
+        if (be == null) {
+            return ActionResult.FAIL;
+        }
 
-        world.setBlockState(pos, state.with(MODE,
-                state.get(MODE) == ConveyorLikeDirectional.TransferMode.TO_CONVEYOR
-                ? ConveyorLikeDirectional.TransferMode.FROM_CONVEYOR
-                : ConveyorLikeDirectional.TransferMode.TO_CONVEYOR
-        ));
+        if (stack.isOf(FactoryItems.ITEM_FILTER) && !FilterItem.getStack(stack).isEmpty()) {
+            if (!be.getFilter().isEmpty()) {
+                player.getInventory().offerOrDrop(be.getFilter());
+            }
+            be.setFilter(stack.copyWithCount(1));
+            stack.decrement(1);
+            return ActionResult.SUCCESS;
+        } else if (stack.isEmpty()) {
+            player.setStackInHand(hand, be.getFilter());
+            be.setFilter(ItemStack.EMPTY);
+            return ActionResult.SUCCESS;
+        }
+
+        return super.onUse(state, world, pos, player, hand, hit);
     }
 
     @Override
@@ -260,7 +282,7 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
             var rot = facing.get(FACING).getOpposite().getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
             mat.identity();
             mat.rotate(rot);
-            mat.scale(2f);
+            mat.scale(2.01f);
             var outModel = facing.get(MODE) == ConveyorLikeDirectional.TransferMode.FROM_CONVEYOR;
 
             this.mainElement.setItem(outModel ? MODEL_OUT : MODEL_IN);

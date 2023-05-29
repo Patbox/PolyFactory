@@ -11,6 +11,7 @@ import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -53,7 +54,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class GrinderBlock extends NetworkBlock implements PolymerBlock, BlockEntityProvider, InventoryProvider, BlockWithElementHolder {
+public class GrinderBlock extends NetworkBlock implements PolymerBlock, BlockEntityProvider, InventoryProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static final Property<Part> PART = EnumProperty.of("part", Part.class);
     public static final Property<Direction> INPUT_FACING = DirectionProperty.of("input_facing", x -> x.getAxis() != Direction.Axis.Y);
 

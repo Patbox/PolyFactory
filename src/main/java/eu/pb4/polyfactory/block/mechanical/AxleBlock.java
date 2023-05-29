@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.item.tool.WrenchItem;
 import eu.pb4.polyfactory.item.util.SimpleModeledPolymerItem;
 import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -39,7 +40,7 @@ import org.joml.Matrix4f;
 import java.util.Collection;
 import java.util.List;
 
-public class AxleBlock extends NetworkBlock implements PolymerBlock, BlockWithElementHolder, WrenchItem.Wrenchable {
+public class AxleBlock extends NetworkBlock implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static final Property<Direction.Axis> AXIS = Properties.AXIS;
 
     public AxleBlock(Settings settings) {

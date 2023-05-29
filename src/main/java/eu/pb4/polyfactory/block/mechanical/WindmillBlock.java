@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.SimpleModeledPolymerItem;
 import eu.pb4.polyfactory.nodes.mechanical.RotationalSourceNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -44,7 +45,7 @@ import org.joml.Matrix4fStack;
 import java.util.Collection;
 import java.util.List;
 
-public class WindmillBlock extends NetworkBlock implements PolymerBlock, RotationalSource, BlockWithElementHolder, BlockEntityProvider {
+public class WindmillBlock extends NetworkBlock implements PolymerBlock, RotationalSource, BlockWithElementHolder, BlockEntityProvider, VirtualDestroyStage.Marker {
     public static final int MAX_SAILS = 8;
     public static final IntProperty SAIL_COUNT = IntProperty.of("sails", 1, MAX_SAILS);
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;

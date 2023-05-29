@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.SimpleModeledPolymerItem;
 import eu.pb4.polyfactory.nodes.mechanical.RotationalSourceNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -41,7 +42,7 @@ import org.joml.Matrix4f;
 import java.util.Collection;
 import java.util.List;
 
-public class HandCrankBlock extends NetworkBlock implements PolymerBlock, RotationalSource, BlockEntityProvider, BlockWithElementHolder {
+public class HandCrankBlock extends NetworkBlock implements PolymerBlock, RotationalSource, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static final DirectionProperty FACING = Properties.FACING;
 
     public HandCrankBlock(Settings settings) {

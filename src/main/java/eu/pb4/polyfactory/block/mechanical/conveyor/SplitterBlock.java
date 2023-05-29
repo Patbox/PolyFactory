@@ -2,8 +2,9 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.tool.WrenchItem;
+import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -18,9 +19,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -28,6 +29,8 @@ import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -37,7 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 
 
-public class SplitterBlock extends Block implements PolymerBlock, MovingItemConsumer, WrenchItem.Wrenchable, BlockEntityProvider, BlockWithElementHolder {
+public class SplitterBlock extends Block implements PolymerBlock, MovingItemConsumer, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static DirectionProperty DIRECTION = DirectionProperty.of("direction", Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
     public static final BooleanProperty ENABLED = Properties.ENABLED;
 
@@ -123,22 +126,53 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
     }
 
     @Override
-    public ActionResult useWithWrench(ItemUsageContext context) {
-        var be = context.getWorld().getBlockEntity(context.getBlockPos());
-        if (be instanceof SplitterBlockEntity splitterBlockEntity) {
-            var dir = context.getWorld().getBlockState(context.getBlockPos()).get(DIRECTION);
-            if (context.getSide().getAxis() != Direction.Axis.Y && context.getSide().getAxis() != dir.getAxis()) {
-                var stack = context.getPlayer().getStackInHand(context.getHand() == Hand.MAIN_HAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
-
-                if (context.getSide() == dir.rotateYCounterclockwise()) {
-                    splitterBlockEntity.setFilterLeft(stack);
-                } else {
-                    splitterBlockEntity.setFilterRight(stack);
-                }
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (!state.isOf(newState.getBlock())) {
+            if (world.getBlockEntity(pos) instanceof SplitterBlockEntity be) {
+                ItemScatterer.spawn(world, pos.getX()  + 0.5, pos.getY()  + 0.5, pos.getZ() + 0.5, be.getFilterRight());
+                ItemScatterer.spawn(world, pos.getX()  + 0.5, pos.getY()  + 0.5, pos.getZ() + 0.5, be.getFilterLeft());
             }
         }
+        super.onStateReplaced(state, world, pos, newState, moved);
+    }
 
-        return ActionResult.SUCCESS;
+
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        var be = world.getBlockEntity(pos);
+        var stack = player.getStackInHand(hand);
+
+        if (((stack.isOf(FactoryItems.ITEM_FILTER) && !FilterItem.getStack(stack).isEmpty()) || stack.isEmpty()) && hand == Hand.MAIN_HAND && be instanceof SplitterBlockEntity splitterBlockEntity) {
+            var dir = state.get(DIRECTION);
+            if (hit.getSide().getAxis() != Direction.Axis.Y && hit.getSide().getAxis() != dir.getAxis()) {
+                if (hit.getSide() == dir.rotateYCounterclockwise()) {
+                    if (stack.isEmpty()) {
+                        player.setStackInHand(hand, splitterBlockEntity.getFilterLeft());
+                        splitterBlockEntity.setFilterLeft(ItemStack.EMPTY);
+                    } else {
+                        if (!splitterBlockEntity.getFilterLeft().isEmpty()) {
+                            player.getInventory().offerOrDrop(splitterBlockEntity.getFilterLeft());
+                        }
+                        splitterBlockEntity.setFilterLeft(stack.copyWithCount(1));
+                        stack.decrement(1);
+                    }
+                } else {
+                    if (stack.isEmpty()) {
+                        player.setStackInHand(hand, splitterBlockEntity.getFilterRight());
+                        splitterBlockEntity.setFilterRight(ItemStack.EMPTY);
+                    } else {
+                        if (!splitterBlockEntity.getFilterRight().isEmpty()) {
+                            player.getInventory().offerOrDrop(splitterBlockEntity.getFilterRight());
+                        }
+                        splitterBlockEntity.setFilterRight(stack.copyWithCount(1));
+                        stack.decrement(1);
+                    }
+                }
+            }
+            return ActionResult.SUCCESS;
+        }
+
+        return ActionResult.FAIL;
     }
 
     @Override

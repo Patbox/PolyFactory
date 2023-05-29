@@ -90,6 +90,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
         var currentDelta = self.delta;
 
         if (state.get(ConveyorBlock.HAS_OUTPUT_TOP)) {
+            self.delta += speed;
             if (self.tryInserting(world, pos.offset(Direction.UP), Direction.UP, FactoryBlockTags.CONVEYOR_TOP_OUTPUT)) {
                 if (self.isContainerEmpty()) {
                     self.setDelta(0);
@@ -97,12 +98,14 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
                 self.model.tick();
                 return;
             }
+            self.delta -= speed;
         }
 
 
         if (currentDelta + speed >= 1) {
             boolean block;
 
+            self.delta += speed;
             if (vert.stack) {
                 block = self.tryInserting(world, pos.up(vert.value), dir, null);
             } else {
@@ -115,6 +118,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
 
 
             if (block) {
+                self.delta -= speed;
                 if (self.isContainerEmpty()) {
                     self.setDelta(0);
                 }
@@ -131,6 +135,8 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
             world.spawnEntity(itemEntity);
 
             self.model.tick();
+            self.delta -= speed;
+
         } else {
             self.setDelta(currentDelta + speed);
             self.model.tick();

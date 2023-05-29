@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
 import eu.pb4.polyfactory.nodes.mechanical.DirectionalMechanicalNode;
+import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -40,7 +41,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class MinerBlock extends NetworkBlock implements PolymerBlock, BlockEntityProvider {
+public class MinerBlock extends NetworkBlock implements PolymerBlock, BlockEntityProvider, VirtualDestroyStage.Marker {
     public static final Property<Direction> FACING = Properties.FACING;
 
     public MinerBlock(Settings settings) {

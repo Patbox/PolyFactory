@@ -12,13 +12,20 @@ import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlock;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlock;
 import eu.pb4.polyfactory.block.storage.ContainerBlock;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 
 public class FactoryBlocks {
     public static final ConveyorBlock CONVEYOR = register("conveyor", new ConveyorBlock(Block.Settings.of(Material.METAL, MapColor.BLACK).hardness(2).nonOpaque()));
@@ -41,6 +48,18 @@ public class FactoryBlocks {
 
     public static void register() {
         ConveyorBlock.registerAssetsEvents();
+
+        AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
+            var state = world.getBlockState(pos);
+
+            if (state.getBlock() instanceof AttackableBlock attackableBlock && hand == Hand.MAIN_HAND) {
+                return attackableBlock.onPlayerAttack(state, player, world, pos, direction);
+            }
+
+            return ActionResult.PASS;
+        });
+
+
     }
 
 

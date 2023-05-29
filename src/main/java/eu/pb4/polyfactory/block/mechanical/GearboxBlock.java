@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
 import eu.pb4.polyfactory.nodes.mechanical.GearboxNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -39,7 +40,7 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
-public class GearboxBlock extends NetworkBlock implements PolymerBlock, BlockWithElementHolder {
+public class GearboxBlock extends NetworkBlock implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public GearboxBlock(Settings settings) {
         super(settings);
     }
