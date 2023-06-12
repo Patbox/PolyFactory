@@ -189,13 +189,13 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
             mat.clear();
             mat.rotate(rot);
             mat.pushMatrix();
+            mat.rotateY(MathHelper.PI);
             mat.scale(2f);
             this.mainElement.setTransformation(mat);
             mat.popMatrix();
 
             mat.pushMatrix();
             mat.translate(0, 1f / 16f, -6.2f / 16f);
-            mat.rotateY(MathHelper.PI);
             mat.scale(0.45f, 0.45f, 0.01f);
             this.itemElement.setTransformation(mat);
             mat.popMatrix();

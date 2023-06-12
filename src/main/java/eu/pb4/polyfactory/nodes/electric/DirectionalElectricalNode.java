@@ -1,5 +1,5 @@
 package eu.pb4.polyfactory.nodes.electric;
-
+/*
 import com.kneelawk.graphlib.graph.BlockNode;
 import com.kneelawk.graphlib.graph.BlockNodeDecoder;
 import com.kneelawk.graphlib.graph.BlockNodeHolder;
@@ -54,3 +54,4 @@ public record DirectionalElectricalNode(Direction direction) implements Electric
 
     }
 }
+*/

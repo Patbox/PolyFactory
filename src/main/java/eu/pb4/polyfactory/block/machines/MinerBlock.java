@@ -1,47 +1,37 @@
 package eu.pb4.polyfactory.block.machines;
 
-import com.kneelawk.graphlib.graph.BlockNode;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.network.NetworkBlock;
-import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
-import eu.pb4.polyfactory.nodes.mechanical.DirectionalMechanicalNode;
+import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.enums.WallMountLocation;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
-public class MinerBlock extends NetworkBlock implements PolymerBlock, BlockEntityProvider, VirtualDestroyStage.Marker {
+public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, VirtualDestroyStage.Marker {
     public static final Property<Direction> FACING = Properties.FACING;
 
     public MinerBlock(Settings settings) {
@@ -54,8 +44,9 @@ public class MinerBlock extends NetworkBlock implements PolymerBlock, BlockEntit
     }
 
     @Override
-    public Collection<BlockNode> createNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new DirectionalMechanicalNode(state.get(FACING).getOpposite()));
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        //        return List.of(new DirectionalMechanicalNode(state.get(FACING).getOpposite()));
+        return List.of();
     }
 
     @Override

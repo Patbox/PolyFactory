@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
-import eu.pb4.polyfactory.block.mechanical.WindmillBlockEntity;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -279,7 +278,7 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
         }
 
         private void updateFacing(BlockState facing) {
-            var rot = facing.get(FACING).getOpposite().getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
+            var rot = facing.get(FACING).getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
             mat.identity();
             mat.rotate(rot);
             mat.scale(2.01f);

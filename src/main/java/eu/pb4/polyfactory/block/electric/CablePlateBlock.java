@@ -1,9 +1,8 @@
 package eu.pb4.polyfactory.block.electric;
 
-import com.kneelawk.graphlib.graph.BlockNode;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polyfactory.block.network.NetworkBlock;
-import eu.pb4.polyfactory.nodes.electric.CablePlateNode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -21,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 
-public class CablePlateBlock extends NetworkBlock implements PolymerBlock {
+public class CablePlateBlock extends RotationalNetworkBlock implements PolymerBlock {
     public static final DirectionProperty FACING = Properties.FACING;
 
     public CablePlateBlock(Settings settings) {
@@ -34,8 +33,12 @@ public class CablePlateBlock extends NetworkBlock implements PolymerBlock {
     }
 
     @Override
-    public Collection<BlockNode> createNodes(BlockState state, ServerWorld world, BlockPos pos) {
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        /*
         return List.of(new CablePlateNode(state.get(FACING)));
+
+         */
+        return List.of();
     }
 
     @Nullable

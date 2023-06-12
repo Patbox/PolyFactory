@@ -1,15 +1,14 @@
 package eu.pb4.polyfactory.block.machines;
 
-import com.kneelawk.graphlib.graph.BlockNode;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationalSource;
-import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -22,7 +21,6 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.enums.WallMountLocation;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -48,13 +46,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class GrinderBlock extends NetworkBlock implements PolymerBlock, BlockEntityProvider, InventoryProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, InventoryProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static final Property<Part> PART = EnumProperty.of("part", Part.class);
     public static final Property<Direction> INPUT_FACING = DirectionProperty.of("input_facing", x -> x.getAxis() != Direction.Axis.Y);
 
@@ -70,8 +67,9 @@ public class GrinderBlock extends NetworkBlock implements PolymerBlock, BlockEnt
     }
 
     @Override
-    public Collection<BlockNode> createNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new AxisMechanicalNode(Direction.Axis.Y));
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        //        return List.of(new AxisMechanicalNode(Direction.Axis.Y));
+        return List.of();
     }
 
     @Override
@@ -103,7 +101,7 @@ public class GrinderBlock extends NetworkBlock implements PolymerBlock, BlockEnt
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         if (state.get(PART).otherPartDir == direction && !neighborState.isOf(this)) {
-            NetworkComponent.updateAt(world, pos);
+            NetworkComponent.Rotational.updateRotationalAt(world, pos);
             return Blocks.AIR.getDefaultState();
         } else {
             return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
@@ -171,8 +169,29 @@ public class GrinderBlock extends NetworkBlock implements PolymerBlock, BlockEnt
         return Blocks.GRINDSTONE.getDefaultState();
     }
 
+    public enum Part implements StringIdentifiable {
+        MAIN(Direction.UP),
+        UPPER(Direction.DOWN);
+
+        private final Direction otherPartDir;
+
+        Part(Direction otherPart) {
+            this.otherPartDir = otherPart;
+        }
+
+        @Override
+        public String asString() {
+            return this.name().toLowerCase(Locale.ROOT);
+        }
+    }
+
     public final class Model extends LodElementHolder {
         public static final ItemStack MODEL_STONE_WHEEL = new ItemStack(Items.CANDLE);
+
+        static {
+            MODEL_STONE_WHEEL.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_STONE_WHEEL.getItem(), FactoryUtil.id("block/grindstone_wheel")).value());
+        }
+
         private final Matrix4f mat = new Matrix4f();
         private final ItemDisplayElement axle;
         private final ItemDisplayElement stoneWheel;
@@ -223,27 +242,6 @@ public class GrinderBlock extends NetworkBlock implements PolymerBlock, BlockEnt
                     this.stoneWheel.startInterpolation();
                 }
             }
-        }
-
-        static {
-            MODEL_STONE_WHEEL.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_STONE_WHEEL.getItem(), FactoryUtil.id("block/grindstone_wheel")).value());
-        }
-    }
-
-    public enum Part implements StringIdentifiable {
-        MAIN(Direction.UP),
-        UPPER(Direction.DOWN)
-        ;
-
-        private final Direction otherPartDir;
-
-        Part(Direction otherPart) {
-            this.otherPartDir = otherPart;
-        }
-
-        @Override
-        public String asString() {
-            return this.name().toLowerCase(Locale.ROOT);
         }
     }
 }

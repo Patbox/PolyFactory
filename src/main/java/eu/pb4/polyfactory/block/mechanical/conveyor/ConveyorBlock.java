@@ -1,28 +1,24 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
-import com.kneelawk.graphlib.graph.BlockNode;
-import eu.pb4.polyfactory.ModInit;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.RotationalSource;
+import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.display.LodElementHolder;
+import eu.pb4.polyfactory.models.ConveyorModel;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItem;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polyfactory.block.network.NetworkBlock;
-import eu.pb4.polyfactory.nodes.mechanical.ConveyorNode;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
-import eu.pb4.polymer.resourcepack.api.ResourcePackBuilder;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -55,202 +51,22 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.awt.image.IndexColorModel;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider, ConveyorLikeDirectional, MovingItemConsumer, VirtualDestroyStage.Marker {
-    public static final int FRAMES = 20;
-    public static final ItemStack[] ANIMATION_REGULAR = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_REGULAR_10 = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_REGULAR_01 = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_REGULAR_00 = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_REGULAR_STICKY = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_REGULAR_STICKY_10 = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_REGULAR_STICKY_01 = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_REGULAR_STICKY_00 = new ItemStack[1 + FRAMES];
-    public static final ItemStack[][] ANIMATION_REGULAR_STICKY_X = new ItemStack[][] { ANIMATION_REGULAR_STICKY, ANIMATION_REGULAR_STICKY_10, ANIMATION_REGULAR_STICKY_01, ANIMATION_REGULAR_STICKY_00 } ;
-    public static final ItemStack[][] ANIMATION_REGULAR_X = new ItemStack[][] { ANIMATION_REGULAR, ANIMATION_REGULAR_10, ANIMATION_REGULAR_01, ANIMATION_REGULAR_00 } ;
-    public static final ItemStack[] ANIMATION_UP = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_UP_STICKY = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_DOWN = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_DOWN_STICKY = new ItemStack[1 + FRAMES];
-
+public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider, ConveyorLikeDirectional, MovingItemConsumer, VirtualDestroyStage.Marker {
     public static DirectionProperty DIRECTION = DirectionProperty.of("direction", Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
     public static EnumProperty<DirectionValue> VERTICAL = EnumProperty.of("vertical", DirectionValue.class);
     public static BooleanProperty NEXT_CONVEYOR = BooleanProperty.of("next");
     public static BooleanProperty PREVIOUS_CONVEYOR = BooleanProperty.of("previous");
     public static BooleanProperty HAS_OUTPUT_TOP = BooleanProperty.of("has_top_output");
 
-    private static final String MODEL_JSON = """
-                {
-                  "parent": "polyfactory:block/|PREFIX|conveyor|TYPE|",
-                  "textures": {
-                    "1": "polyfactory:block/gen/|PREFIX|conveyor_top_|ID|"
-                  }
-                }
-                """;
-    private static final String MODEL_JSON_UP = """
-                {
-                  "parent": "polyfactory:block/|PREFIX|conveyor_up",
-                  "textures": {
-                    "1": "polyfactory:block/gen/|PREFIX|conveyor_top_|ID|"
-                  }
-                }
-                """;
-
-    private static final String MODEL_JSON_DOWN = """
-                {
-                  "parent": "polyfactory:block/|PREFIX|conveyor_down",
-                  "textures": {
-                    "1": "polyfactory:block/gen/|PREFIX|conveyor_top_|ID|"
-                  }
-                }
-                """;
-
     public ConveyorBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(VERTICAL, DirectionValue.NONE).with(DIRECTION, Direction.NORTH).with(HAS_OUTPUT_TOP, false).with(NEXT_CONVEYOR, false).with(PREVIOUS_CONVEYOR, false));
     }
 
-    private static void createItemModel(ItemStack[] array, String path, int i) {
-        var model = PolymerResourcePackUtils.requestModel(Items.PURPLE_CANDLE, FactoryUtil.id(path + "_" + i));
-        var stack = new ItemStack(Items.PURPLE_CANDLE);
-        stack.getOrCreateNbt().putInt("CustomModelData", model.value());
-        array[array.length - i] = stack;
-    }
-
-    private static void createItemModelZero(ItemStack[] array, String path) {
-        var model = PolymerResourcePackUtils.requestModel(Items.PURPLE_CANDLE, FactoryUtil.id(path));
-        var stack = new ItemStack(Items.PURPLE_CANDLE);
-        stack.getOrCreateNbt().putInt("CustomModelData", model.value());
-        array[0] = stack;
-    }
-
-    public static void registerAssetsEvents() {
-        for (int i = 1; i <= FRAMES; i++) {
-            createItemModel(ANIMATION_REGULAR, "block/conveyor", i);
-            createItemModel(ANIMATION_REGULAR_00, "block/conveyor_00", i);
-            createItemModel(ANIMATION_REGULAR_01, "block/conveyor_01", i);
-            createItemModel(ANIMATION_REGULAR_10, "block/conveyor_10", i);
-            createItemModel(ANIMATION_UP, "block/conveyor_up", i);
-            createItemModel(ANIMATION_DOWN, "block/conveyor_down", i);
-            createItemModel(ANIMATION_REGULAR_STICKY, "block/sticky_conveyor", i);
-            createItemModel(ANIMATION_REGULAR_STICKY_00, "block/sticky_conveyor_00", i);
-            createItemModel(ANIMATION_REGULAR_STICKY_01, "block/sticky_conveyor_01", i);
-            createItemModel(ANIMATION_REGULAR_STICKY_10, "block/sticky_conveyor_10", i);
-            createItemModel(ANIMATION_UP_STICKY, "block/sticky_conveyor_up", i);
-            createItemModel(ANIMATION_DOWN_STICKY, "block/sticky_conveyor_down", i);
-        }
-
-        createItemModelZero(ANIMATION_REGULAR_00, "block/conveyor_00");
-        createItemModelZero(ANIMATION_REGULAR_01, "block/conveyor_01");
-        createItemModelZero(ANIMATION_REGULAR_10, "block/conveyor_10");
-        createItemModelZero(ANIMATION_REGULAR_STICKY_00, "block/sticky_conveyor_00");
-        createItemModelZero(ANIMATION_REGULAR_STICKY_01, "block/sticky_conveyor_01");
-        createItemModelZero(ANIMATION_REGULAR_STICKY_10, "block/sticky_conveyor_10");
-        createItemModelZero(ANIMATION_UP, "block/conveyor_up");
-        createItemModelZero(ANIMATION_UP_STICKY, "block/sticky_conveyor_up");
-        createItemModelZero(ANIMATION_DOWN, "block/conveyor_down");
-        createItemModelZero(ANIMATION_DOWN_STICKY, "block/sticky_conveyor_down");
-
-        PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register(ConveyorBlock::generateModels);
-    }
-
-    private static void generateModels(ResourcePackBuilder resourcePackBuilder) {
-        var animJson = """
-                {
-                  "animation": {
-                    "interpolate": false,
-                    "frametime": |SPEED|
-                  }
-                }
-                """;
-        byte[] textureTop = new byte[0];
-        byte[] textureTopSticky = new byte[0];
-        for (var path : FabricLoader.getInstance().getModContainer(ModInit.ID).get().getRootPaths()) {
-            path = path.resolve("assets/polyfactory/textures/block/conveyor_top.png");
-            if (Files.exists(path)) {
-                try {
-                    textureTop = createMovingTexture(path);
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-            }
-            path = path.getParent().resolve("sticky_conveyor_top.png");
-            if (Files.exists(path)) {
-                try {
-                    textureTopSticky = createMovingTexture(path);
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (textureTop.length != 0 && textureTopSticky.length != 0) {
-                break;
-            }
-        }
-
-
-        for (int i = 1; i <= FRAMES; i++) {
-            byte[] bytes = animJson.replace("|SPEED|", "" + i).getBytes(StandardCharsets.UTF_8);
-            createVariations(resourcePackBuilder, i, bytes, textureTop, "");
-            createVariations(resourcePackBuilder, i, bytes, textureTopSticky, "sticky_");
-        }
-    }
-
-    private static void createVariations(ResourcePackBuilder resourcePackBuilder, int i, byte[] mcmeta, byte[] texture, String prefix) {
-        resourcePackBuilder.addData("assets/polyfactory/textures/block/gen/" + prefix + "conveyor_top_" + i + ".png.mcmeta", mcmeta);
-        resourcePackBuilder.addData("assets/polyfactory/textures/block/gen/" + prefix + "conveyor_top_" + i + ".png", texture);
-        resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_" + i + ".json", MODEL_JSON.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", "").getBytes(StandardCharsets.UTF_8));
-        resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_00_" + i + ".json", MODEL_JSON.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", "_00").getBytes(StandardCharsets.UTF_8));
-        resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_01_" + i + ".json", MODEL_JSON.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", "_01").getBytes(StandardCharsets.UTF_8));
-        resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_10_" + i + ".json", MODEL_JSON.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", "_10").getBytes(StandardCharsets.UTF_8));
-        resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_up_" + i + ".json", MODEL_JSON_UP.replace("|PREFIX|", prefix).replace("|ID|", "" + i).getBytes(StandardCharsets.UTF_8));
-        resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_down_" + i + ".json", MODEL_JSON_DOWN.replace("|PREFIX|", prefix).replace("|ID|", "" + i).getBytes(StandardCharsets.UTF_8));
-
-    }
-
-    private static byte[] createMovingTexture(Path path) throws IOException {
-        var image = ImageIO.read(Files.newInputStream(path));
-        var imageSize = 32;
-        var textureXSize = 16;
-        var textureYSize = 18;
-
-        BufferedImage output;
-        if (image.getColorModel() instanceof IndexColorModel colorModel) {
-            output = new BufferedImage(imageSize, imageSize * imageSize, image.getType(), colorModel);
-        } else {
-           output = new BufferedImage(imageSize, imageSize * imageSize, image.getType());
-        }
-
-        var scale = imageSize / image.getWidth();
-
-        for (var i = 0; i < imageSize; i++) {
-            var position = i * imageSize;
-
-            for (var x = 0; x < textureXSize; x++) {
-                for (var y = 0; y < textureYSize; y++) {
-                    var pixel = image.getRGB(((x + i) % textureXSize) / scale, y / scale);
-
-                    output.setRGB(x, y + position, pixel);
-                    output.setRGB(x + 16, y + position, pixel);
-                }
-            }
-        }
-
-        var out = new ByteArrayOutputStream();
-        ImageIO.write(output, "png", out);
-        return out.toByteArray();
-    }
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
@@ -348,7 +164,7 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
 
             return state.with(HAS_OUTPUT_TOP, world.getBlockState(pos.up()).isIn(FactoryBlockTags.CONVEYOR_TOP_OUTPUT));
         } else if (direction.getAxis() == state.get(DIRECTION).getAxis()) {
-            return state.with(direction == state.get(DIRECTION) ? NEXT_CONVEYOR : PREVIOUS_CONVEYOR, neighborState.isIn(FactoryBlockTags.CONVEYORS));
+            return state.with(direction == state.get(DIRECTION) ? NEXT_CONVEYOR : PREVIOUS_CONVEYOR, isMatchingConveyor(neighborState, state.get(DIRECTION)));
         }
         return state;
     }
@@ -467,7 +283,7 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
                 direction = ctx.getSide().getOpposite();
                 state = this.getDefaultState().with(DIRECTION, ctx.getSide().getOpposite());
             } else {
-                direction =  ctx.getHorizontalPlayerFacing();
+                direction = ctx.getHorizontalPlayerFacing();
                 state = this.getDefaultState().with(DIRECTION, ctx.getHorizontalPlayerFacing());
             }
         }
@@ -484,12 +300,14 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
         }
 
 
-
         return state
-                .with(NEXT_CONVEYOR, ctx.getWorld().getBlockState(ctx.getBlockPos().offset(direction)).isIn(FactoryBlockTags.CONVEYORS))
-                .with(PREVIOUS_CONVEYOR, ctx.getWorld().getBlockState(ctx.getBlockPos().offset(direction, -1)).isIn(FactoryBlockTags.CONVEYORS))
-
+                .with(NEXT_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().offset(direction)), direction))
+                .with(PREVIOUS_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().offset(direction, -1)), direction))
                 .with(HAS_OUTPUT_TOP, ctx.getWorld().getBlockState(ctx.getBlockPos().up()).isIn(FactoryBlockTags.CONVEYOR_TOP_OUTPUT));
+    }
+
+    private boolean isMatchingConveyor(BlockState blockState, Direction direction) {
+        return blockState.isOf(this) && blockState.get(DIRECTION) == direction;
     }
 
     @Override
@@ -507,8 +325,12 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
     }
 
     @Override
-    public Collection<BlockNode> createNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new ConveyorNode(state.get(DIRECTION), state.get(VERTICAL)));
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        /*
+                return List.of(new ConveyorNode(state.get(DIRECTION), state.get(VERTICAL)));
+
+         */
+        return List.of();
     }
 
     @Nullable
@@ -538,7 +360,7 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
         if (!state.isOf(newState.getBlock())) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof Inventory) {
-                ItemScatterer.spawn(world, pos, (Inventory)blockEntity);
+                ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
                 world.updateComparators(pos, this);
             }
         }
@@ -582,7 +404,6 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
     }
 
 
-
     public enum DirectionValue implements StringIdentifiable {
         NONE(0, false),
         POSITIVE(1, false),
@@ -624,21 +445,21 @@ public class ConveyorBlock extends NetworkBlock implements PolymerBlock, BlockWi
 
         private ItemStack getModelForSpeed(double speed, DirectionValue directionValue, boolean sticky, boolean prev, boolean next) {
             return (switch (directionValue) {
-                case NONE -> (sticky ? ANIMATION_REGULAR_STICKY_X : ANIMATION_REGULAR_X)[(prev ? 1 : 0) + (next ? 2 : 0)];
-                case POSITIVE, POSITIVE_STACK-> sticky ? ANIMATION_UP_STICKY :ANIMATION_UP;
-                case NEGATIVE, NEGATIVE_STACK -> sticky ? ANIMATION_DOWN_STICKY :ANIMATION_DOWN;
-            })[(int) Math.ceil(MathHelper.clamp(speed * FRAMES * 15, 0, FRAMES))];
+                case NONE -> (sticky ? ConveyorModel.ANIMATION_REGULAR_STICKY_X : ConveyorModel.ANIMATION_REGULAR_X)[(prev ? 1 : 0) + (next ? 2 : 0)];
+                case POSITIVE, POSITIVE_STACK -> sticky ? ConveyorModel.ANIMATION_UP_STICKY : ConveyorModel.ANIMATION_UP;
+                case NEGATIVE, NEGATIVE_STACK -> sticky ? ConveyorModel.ANIMATION_DOWN_STICKY : ConveyorModel.ANIMATION_DOWN;
+            })[(int) Math.ceil(MathHelper.clamp(speed * ConveyorModel.FRAMES * 15, 0, ConveyorModel.FRAMES))];
         }
 
         private void updateAnimation(Direction dir, DirectionValue value) {
             if (dir != this.direction || value != this.value) {
-                mat.identity().translate(0, 0.5f, 0).rotateY((90 - dir.asRotation()) * MathHelper.RADIANS_PER_DEGREE);
+                mat.identity().translate(0, 0.5f, 0).rotateY((270 - dir.asRotation()) * MathHelper.RADIANS_PER_DEGREE);
                 if (value.value == -1) {
                     mat.rotateY(MathHelper.PI);
-                };
+                }
                 var x = value == DirectionValue.NONE;
                 var v = x ? 0 : 0.0015f;
-                mat.translate(v, v, 0);
+                mat.translate(-v, v, 0);
                 mat.scale(x ? 2.001f : 2.015f);
                 this.base.setTransformation(mat);
             }

@@ -1,12 +1,9 @@
 package eu.pb4.polyfactory.block.mechanical;
 
-import com.kneelawk.graphlib.graph.BlockNode;
-import eu.pb4.polyfactory.block.network.NetworkBlock;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
-import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.util.SimpleModeledPolymerItem;
-import eu.pb4.polyfactory.nodes.mechanical.RotationalSourceNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -16,12 +13,12 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.enums.WallMountLocation;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -29,23 +26,22 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.*;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 
 import java.util.Collection;
 import java.util.List;
 
-public class WindmillBlock extends NetworkBlock implements PolymerBlock, RotationalSource, BlockWithElementHolder, BlockEntityProvider, VirtualDestroyStage.Marker {
+public class WindmillBlock extends RotationalNetworkBlock implements PolymerBlock, RotationalSource, BlockWithElementHolder, BlockEntityProvider, VirtualDestroyStage.Marker {
     public static final int MAX_SAILS = 8;
     public static final IntProperty SAIL_COUNT = IntProperty.of("sails", 1, MAX_SAILS);
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
@@ -92,8 +88,12 @@ public class WindmillBlock extends NetworkBlock implements PolymerBlock, Rotatio
     }
 
     @Override
-    public Collection<BlockNode> createNodes(BlockState state, ServerWorld world, BlockPos pos) {
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        /*
         return List.of(new RotationalSourceNode(state.get(FACING)));
+
+         */
+        return List.of();
     }
 
     @Override
@@ -126,9 +126,15 @@ public class WindmillBlock extends NetworkBlock implements PolymerBlock, Rotatio
     public final class Model extends LodElementHolder {
         public static final ItemStack MODEL = new ItemStack(Items.LEATHER_HORSE_ARMOR);
         public static final ItemStack MODEL_FLIP = new ItemStack(Items.LEATHER_HORSE_ARMOR);
+
+        static {
+            MODEL.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL.getItem(), FactoryUtil.id("block/windmill_sail")).value());
+            MODEL_FLIP.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_FLIP.getItem(), FactoryUtil.id("block/windmill_sail_flip")).value());
+        }
+
         private final Matrix4fStack mat = new Matrix4fStack(2);
-        private ItemDisplayElement[] sails;
         private final ItemDisplayElement center;
+        private ItemDisplayElement[] sails;
         private WindmillBlockEntity blockEntity;
 
         private Model(ServerWorld world, BlockState state) {
@@ -149,7 +155,7 @@ public class WindmillBlock extends NetworkBlock implements PolymerBlock, Rotatio
 
             if (this.sails != null) {
                 if (this.sails.length == count) {
-                    for (var i = 0 ; i < count; i++) {
+                    for (var i = 0; i < count; i++) {
                         this.sails[i].setItem(colored(i, model));
                     }
                     return;
@@ -188,7 +194,7 @@ public class WindmillBlock extends NetworkBlock implements PolymerBlock, Rotatio
 
             this.sails = sails;
             for (var i = 0; i < count; i++) {
-                 this.sails[i].setItem(colored(i, model));
+                this.sails[i].setItem(colored(i, model));
             }
         }
 
@@ -271,11 +277,6 @@ public class WindmillBlock extends NetworkBlock implements PolymerBlock, Rotatio
                     this.sails[i].setInterpolationDuration(5);
                 }
             }
-        }
-
-        static {
-            MODEL.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL.getItem(), FactoryUtil.id("block/windmill_sail")).value());
-            MODEL_FLIP.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_FLIP.getItem(), FactoryUtil.id("block/windmill_sail_flip")).value());
         }
 
         public void updateSailsBe() {

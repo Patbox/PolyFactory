@@ -1,5 +1,5 @@
 package eu.pb4.polyfactory.nodes.mechanical;
-
+/*
 import com.kneelawk.graphlib.graph.BlockNode;
 import com.kneelawk.graphlib.graph.BlockNodeDecoder;
 import com.kneelawk.graphlib.graph.BlockNodeHolder;
@@ -56,3 +56,4 @@ public record RotationalSourceNode(Direction direction) implements MechanicalNod
 
     }
 }
+*/

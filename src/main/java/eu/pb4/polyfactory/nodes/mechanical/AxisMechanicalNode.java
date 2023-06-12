@@ -1,5 +1,5 @@
 package eu.pb4.polyfactory.nodes.mechanical;
-
+/*
 import com.kneelawk.graphlib.graph.BlockNode;
 import com.kneelawk.graphlib.graph.BlockNodeDecoder;
 import com.kneelawk.graphlib.graph.BlockNodeHolder;
@@ -57,3 +57,4 @@ public record AxisMechanicalNode(Direction.Axis axis) implements MechanicalNode,
     @Override
     public void onConnectionsChanged(@NotNull ServerWorld world, @NotNull BlockPos pos, @NotNull Node<BlockNodeHolder> self) {}
 }
+*/

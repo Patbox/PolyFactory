@@ -1,9 +1,8 @@
 package eu.pb4.polyfactory.block.mechanical;
 
-import com.kneelawk.graphlib.graph.BlockNode;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.network.NetworkBlock;
-import eu.pb4.polyfactory.nodes.mechanical.DirectionalMechanicalNode;
+import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.Block;
@@ -26,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 
-public class FanBlock extends NetworkBlock implements PolymerBlock, BlockEntityProvider, VirtualDestroyStage.Marker {
+public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, VirtualDestroyStage.Marker {
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
 
@@ -66,8 +65,9 @@ public class FanBlock extends NetworkBlock implements PolymerBlock, BlockEntityP
     }
 
     @Override
-    public Collection<BlockNode> createNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new DirectionalMechanicalNode(state.get(FACING).getOpposite()));
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+//        return List.of(new DirectionalMechanicalNode(state.get(FACING).getOpposite()));
+        return List.of();
     }
 
     @Override

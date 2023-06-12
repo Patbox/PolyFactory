@@ -1,17 +1,13 @@
 package eu.pb4.polyfactory.block.machines;
 
-import com.kneelawk.graphlib.graph.BlockNode;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.mechanical.AxleBlock;
-import eu.pb4.polyfactory.block.mechanical.RotationalSource;
-import eu.pb4.polyfactory.block.network.NetworkBlock;
+import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
-import eu.pb4.polyfactory.nodes.mechanical.GearboxNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
@@ -50,18 +46,16 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class PressBlock extends NetworkBlock implements PolymerBlock, BlockEntityProvider, InventoryProvider, BlockWithElementHolder, MovingItemConsumer, MovingItemProvider, VirtualDestroyStage.Marker {
+public class PressBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, InventoryProvider, BlockWithElementHolder, MovingItemConsumer, MovingItemProvider, VirtualDestroyStage.Marker {
     public static final Property<Part> PART = EnumProperty.of("part", Part.class);
     public static final BooleanProperty HAS_CONVEYOR = BooleanProperty.of("has_conveyor");
     public static final Property<Direction> INPUT_FACING = DirectionProperty.of("input_facing", x -> x.getAxis() != Direction.Axis.Y);
@@ -77,10 +71,13 @@ public class PressBlock extends NetworkBlock implements PolymerBlock, BlockEntit
     }
 
     @Override
-    public Collection<BlockNode> createNodes(BlockState state, ServerWorld world, BlockPos pos) {
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        /*
         return state.get(PART) == Part.TOP ? List.of(
                 new GearboxNode()
         ) : List.of();
+         */
+        return List.of();
     }
 
     @Override
@@ -124,7 +121,7 @@ public class PressBlock extends NetworkBlock implements PolymerBlock, BlockEntit
         if (((part == Part.MAIN && direction == Direction.UP)
                 || (part == Part.TOP && direction == Direction.DOWN)
         ) && !neighborState.isOf(this)) {
-            NetworkComponent.updateAt(world, pos);
+            NetworkComponent.Rotational.updateRotationalAt(world, pos);
             return Blocks.AIR.getDefaultState();
         } else if (direction == state.get(INPUT_FACING).getOpposite()) {
             return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos).with(HAS_CONVEYOR, neighborState.isOf(FactoryBlocks.CONVEYOR));

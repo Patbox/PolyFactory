@@ -59,7 +59,7 @@ public class VirtualDestroyStage extends ElementHolder {
         var vecPos = Vec3d.ofCenter(pos);
 
         if (self.getAttachment() == null || !self.getAttachment().getPos().equals(vecPos)) {
-            ChunkAttachment.of(self, player.getWorld(), vecPos);
+            ChunkAttachment.of(self, player.getServerWorld(), vecPos);
         }
 
         self.setState(i);

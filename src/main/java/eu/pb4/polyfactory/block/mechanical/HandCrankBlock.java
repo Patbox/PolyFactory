@@ -1,32 +1,27 @@
 package eu.pb4.polyfactory.block.mechanical;
 
-import com.kneelawk.graphlib.graph.BlockNode;
-import eu.pb4.polyfactory.block.network.NetworkBlock;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.util.SimpleModeledPolymerItem;
-import eu.pb4.polyfactory.nodes.mechanical.RotationalSourceNode;
-import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.enums.WallMountLocation;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
@@ -42,7 +37,7 @@ import org.joml.Matrix4f;
 import java.util.Collection;
 import java.util.List;
 
-public class HandCrankBlock extends NetworkBlock implements PolymerBlock, RotationalSource, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlock, RotationalSource, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static final DirectionProperty FACING = Properties.FACING;
 
     public HandCrankBlock(Settings settings) {
@@ -79,9 +74,14 @@ public class HandCrankBlock extends NetworkBlock implements PolymerBlock, Rotati
         return 0;
     }
 
+
     @Override
-    public Collection<BlockNode> createNodes(BlockState state, ServerWorld world, BlockPos pos) {
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        /*
         return List.of(new RotationalSourceNode(state.get(FACING)));
+
+         */
+        return List.of();
     }
 
     @Override

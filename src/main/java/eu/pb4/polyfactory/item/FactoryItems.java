@@ -11,6 +11,7 @@ import eu.pb4.polyfactory.item.util.AutoModeledPolymerItem;
 import eu.pb4.polyfactory.item.util.ModeledBlockItem;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -45,7 +46,7 @@ public class FactoryItems {
 
 
     public static void register() {
-        PolymerItemGroupUtils.builder(new Identifier(ModInit.ID, "group"))
+        PolymerItemGroupUtils.registerPolymerItemGroup(new Identifier(ModInit.ID, "group"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
                 .icon(() -> WRENCH.getDefaultStack())
                 .displayName(Text.translatable("itemgroup." + ModInit.ID))
                 .entries(((context, entries) -> {
@@ -80,12 +81,11 @@ public class FactoryItems {
 
                     // Creative stuff
                     entries.add(ITEM_GENERATOR_BLOCK);
-                })).build();
+                })).build()
+        );
 
 
         AttackBlockCallback.EVENT.register(WRENCH::handleBlockAttack);
-        ConveyorBlock.ANIMATION_REGULAR[0] = CONVEYOR_BLOCK.getDefaultStack();
-        ConveyorBlock.ANIMATION_REGULAR_STICKY[0] = STICKY_CONVEYOR_BLOCK.getDefaultStack();
     }
 
 

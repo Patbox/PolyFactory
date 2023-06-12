@@ -82,7 +82,7 @@ public class FakePlayer extends PlayerEntity {
 
         @Override
         public void offer(ItemStack stack, boolean notifiesClient) {
-            FakePlayer.this.world.spawnEntity(new ItemEntity(FakePlayer.this.world, FakePlayer.this.getX(), FakePlayer.this.getY(), FakePlayer.this.getZ(), stack));
+            FakePlayer.this.getWorld().spawnEntity(new ItemEntity(FakePlayer.this.getWorld(), FakePlayer.this.getX(), FakePlayer.this.getY(), FakePlayer.this.getZ(), stack));
         }
 
         @Override

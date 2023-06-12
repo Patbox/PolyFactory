@@ -220,7 +220,7 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
         }
 
         private void updateFacing(BlockState facing) {
-            var rot = facing.get(DIRECTION).getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
+            var rot = facing.get(DIRECTION).getOpposite().getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
             mat.identity();
             mat.rotate(rot);
             mat.pushMatrix();

@@ -1,12 +1,10 @@
 package eu.pb4.polyfactory.block.electric;
 
-import com.kneelawk.graphlib.graph.BlockNode;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationalSource;
+import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polyfactory.block.network.NetworkBlock;
-import eu.pb4.polyfactory.nodes.electric.DirectionalElectricalNode;
-import eu.pb4.polyfactory.nodes.mechanical.RotationalSourceNode;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -23,15 +21,15 @@ import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.util.Collection;
 import java.util.List;
 
-public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, BlockWithElementHolder, RotationalSource {
+public class ElectricMotorBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, RotationalSource {
     public static final DirectionProperty FACING = Properties.FACING;
+
     public ElectricMotorBlock(Settings settings) {
         super(settings);
     }
@@ -64,18 +62,23 @@ public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, Bl
         return Blocks.PISTON.getDefaultState().with(PistonBlock.FACING, state.get(FACING)).with(PistonBlock.EXTENDED, true);
     }
 
+
     @Override
-    public Collection<BlockNode> createNodes(BlockState state, ServerWorld world, BlockPos pos) {
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        /*
         return List.of(new RotationalSourceNode(state.get(FACING)), new DirectionalElectricalNode(state.get(FACING).getOpposite()));
+
+         */
+        return List.of();
     }
 
     @Override
-    public ElementHolder createElementHolder(BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
     @Override
-    public boolean tickElementHolder() {
+    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
@@ -108,7 +111,7 @@ public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, Bl
 
             mat.rotateY(((float) speed * worldTick));
             mat.scale(2, 1.95f, 2);
-            mat.translate(0,  positive ? 0.0075f : -0.0075f, 0);
+            mat.translate(0, positive ? 0.0075f : -0.0075f, 0);
             this.mainElement.setTransformation(mat);
         }
 

@@ -1,22 +1,13 @@
 package eu.pb4.polyfactory.block.electric;
 
-import com.kneelawk.graphlib.GraphLib;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.nodes.electric.ElectricalNode;
-import eu.pb4.polyfactory.nodes.electric.ElectricalSourceNode;
-import eu.pb4.polyfactory.nodes.mechanical.MechanicalNode;
-import eu.pb4.polyfactory.nodes.mechanical.RotationalSourceNode;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.stream.Collectors;
-
 public interface ElectricSource extends NetworkComponent {
-    double getSpeed(BlockState state, ServerWorld world, BlockPos pos);
-
     static double getNetworkSpeed(ServerWorld world, BlockPos pos) {
-        {
+       /* {
             var o = GraphLib.getController(world).getNodesAt(pos).filter(x -> x.data().getNode() instanceof ElectricalNode).findFirst();
             if (o.isPresent()) {
                 // Todo: Replace once there is better logic for that
@@ -38,7 +29,9 @@ public interface ElectricSource extends NetworkComponent {
 
                 return speed / list.size();
             }
-        }
+        }*/
         return 0;
     }
+
+    double getSpeed(BlockState state, ServerWorld world, BlockPos pos);
 }

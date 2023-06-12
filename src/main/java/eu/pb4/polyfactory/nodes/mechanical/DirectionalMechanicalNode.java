@@ -1,5 +1,5 @@
 package eu.pb4.polyfactory.nodes.mechanical;
-
+/*
 import com.kneelawk.graphlib.graph.BlockNode;
 import com.kneelawk.graphlib.graph.BlockNodeDecoder;
 import com.kneelawk.graphlib.graph.BlockNodeHolder;
@@ -53,4 +53,4 @@ public record DirectionalMechanicalNode(Direction direction) implements Mechanic
     public void onConnectionsChanged(@NotNull ServerWorld world, @NotNull BlockPos pos, @NotNull Node<BlockNodeHolder> self) {
 
     }
-}
+}*/

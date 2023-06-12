@@ -1,15 +1,11 @@
 package eu.pb4.polyfactory.nodes;
 
-import com.kneelawk.graphlib.graph.BlockNodeHolder;
-import com.kneelawk.graphlib.graph.struct.Node;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
 
 public interface AxisNode {
     Direction.Axis axis();
 
-    static boolean canConnect(AxisNode self, BlockPos pos, Node<BlockNodeHolder> other) {
+    /*static boolean canConnect(AxisNode self, BlockPos pos, Node<BlockNodeHolder> other) {
         var tmp = other.data().getPos().subtract(pos);
         if (tmp.getSquaredDistance(Vec3i.ZERO) == 1 && tmp.getComponentAlongAxis(self.axis()) != 0) {
             if (other.data().getNode() instanceof DirectionalNode axisNode) {
@@ -22,5 +18,5 @@ public interface AxisNode {
         }
 
         return false;
-    }
+    }*/
 }

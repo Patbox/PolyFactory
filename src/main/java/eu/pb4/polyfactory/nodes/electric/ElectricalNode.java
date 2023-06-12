@@ -1,5 +1,5 @@
 package eu.pb4.polyfactory.nodes.electric;
-
+/*
 import com.kneelawk.graphlib.graph.BlockNode;
 import com.kneelawk.graphlib.graph.BlockNodeHolder;
 import com.kneelawk.graphlib.graph.NodeView;
@@ -14,3 +14,4 @@ public interface ElectricalNode extends BlockNode {
         return other.data().getNode() instanceof ElectricalNode;
     }
 }
+*/

@@ -1,13 +1,11 @@
 package eu.pb4.polyfactory.block.mechanical;
 
-import com.kneelawk.graphlib.graph.BlockNode;
-import eu.pb4.polyfactory.block.network.NetworkBlock;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.tool.WrenchItem;
 import eu.pb4.polyfactory.item.util.SimpleModeledPolymerItem;
-import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -22,25 +20,21 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.util.Collection;
 import java.util.List;
 
-public class AxleBlock extends NetworkBlock implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static final Property<Direction.Axis> AXIS = Properties.AXIS;
 
     public AxleBlock(Settings settings) {
@@ -59,8 +53,9 @@ public class AxleBlock extends NetworkBlock implements PolymerBlock, BlockWithEl
     }
 
     @Override
-    public Collection<BlockNode> createNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new AxisMechanicalNode(state.get(AXIS)));
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        //return List.of(new AxisMechanicalNode(state.get(AXIS)));
+        return List.of();
     }
 
     @Override

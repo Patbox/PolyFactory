@@ -1,5 +1,5 @@
 package eu.pb4.polyfactory.nodes.electric;
-
+/*
 import com.kneelawk.graphlib.graph.BlockNode;
 import com.kneelawk.graphlib.graph.BlockNodeDecoder;
 import com.kneelawk.graphlib.graph.BlockNodeHolder;
@@ -8,8 +8,6 @@ import com.kneelawk.graphlib.graph.struct.Node;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.DirectionalNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
-import eu.pb4.polyfactory.nodes.mechanical.ConveyorNode;
-import eu.pb4.polyfactory.nodes.mechanical.MechanicalNode;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.server.world.ServerWorld;
@@ -55,3 +53,4 @@ public record ElectricalSourceNode(Direction direction) implements ElectricalNod
 
     }
 }
+*/

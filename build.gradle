@@ -55,14 +55,14 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation include('eu.pb4:polymer-core:0.4.11+1.19.4')
-	modImplementation include('eu.pb4:polymer-resource-pack:0.4.11+1.19.4')
-	modImplementation include('eu.pb4:polymer-autohost:0.4.11+1.19.4')
-	modImplementation include('eu.pb4:polymer-virtual-entity:0.4.11+1.19.4')
+	modImplementation include('eu.pb4:polymer-core:0.5.0+1.20')
+	modImplementation include('eu.pb4:polymer-resource-pack:0.5.0+1.20')
+	modImplementation include('eu.pb4:polymer-autohost:0.5.0+1.20')
+	modImplementation include('eu.pb4:polymer-virtual-entity:0.5.0+1.20')
 	modImplementation include('eu.pb4:common-protection-api:1.0.0')
 	//modImplementation include('eu.pb4:sidebar-api:0.1.2+1.19.3')
-	modImplementation include('eu.pb4:sgui:1.2.1+1.19.3')
-	modImplementation include('com.kneelawk:graphlib:0.5.0+1.19.4')
+	modImplementation include('eu.pb4:sgui:1.2.2+1.20')
+	modImplementation include('com.kneelawk:graphlib:1.0.0-alpha.37+1.20')
 
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.

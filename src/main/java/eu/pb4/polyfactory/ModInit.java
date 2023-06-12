@@ -2,8 +2,8 @@ package eu.pb4.polyfactory;
 
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.WindmillBlock;
-import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
+import eu.pb4.polyfactory.models.ConveyorModel;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
@@ -13,7 +13,6 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +44,7 @@ public class ModInit implements ModInitializer {
 		WindmillBlock.Model.MODEL.getItem();
 		FactoryLootTables.register();
 
+		ConveyorModel.registerAssetsEvents();
 		VirtualDestroyStage.setup();
 		PolymerResourcePackUtils.addModAssets(ID);
 	}
