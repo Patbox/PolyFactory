@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationalSource;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
+import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -98,18 +99,18 @@ public class ElectricMotorBlock extends RotationalNetworkBlock implements Polyme
                 positive = !positive;
             }
 
-            this.updateAnimation(0, 0, state.get(FACING).getAxis(), positive);
+            this.updateAnimation(0, state.get(FACING).getAxis(), positive);
             this.addElement(this.mainElement);
         }
 
-        private void updateAnimation(double speed, long worldTick, Direction.Axis axis, boolean positive) {
+        private void updateAnimation(float rotation, Direction.Axis axis, boolean positive) {
             mat.identity();
             switch (axis) {
                 case X -> mat.rotate(Direction.EAST.getRotationQuaternion());
                 case Z -> mat.rotate(Direction.NORTH.getRotationQuaternion());
             }
 
-            mat.rotateY(((float) speed * worldTick));
+            mat.rotateY(rotation);
             mat.scale(2, 1.95f, 2);
             mat.translate(0, positive ? 0.0075f : -0.0075f, 0);
             this.mainElement.setTransformation(mat);
@@ -128,8 +129,7 @@ public class ElectricMotorBlock extends RotationalNetworkBlock implements Polyme
                     positive = !positive;
                 }
 
-                this.updateAnimation(RotationalSource.getNetworkSpeed(this.getAttachment().getWorld(),
-                                ((BlockBoundAttachment) this.getAttachment()).getBlockPos()), tick,
+                this.updateAnimation(RotationalSource.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
                         facing.getAxis(),
                         positive
 

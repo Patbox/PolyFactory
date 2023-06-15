@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
+import eu.pb4.polyfactory.nodes.mechanical.DirectionalMechanicalNode;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.Block;
@@ -66,8 +67,7 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-//        return List.of(new DirectionalMechanicalNode(state.get(FACING).getOpposite()));
-        return List.of();
+        return List.of(new DirectionalMechanicalNode(state.get(FACING).getOpposite()));
     }
 
     @Override

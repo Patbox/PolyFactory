@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.nodes.mechanical.GearboxNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
@@ -72,12 +73,9 @@ public class PressBlock extends RotationalNetworkBlock implements PolymerBlock, 
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        /*
         return state.get(PART) == Part.TOP ? List.of(
                 new GearboxNode()
         ) : List.of();
-         */
-        return List.of();
     }
 
     @Override

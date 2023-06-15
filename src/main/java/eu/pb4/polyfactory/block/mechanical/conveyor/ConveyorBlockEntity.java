@@ -2,12 +2,10 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
-import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.RotationalSource;
 import eu.pb4.polyfactory.util.CachedBlockPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.*;
-import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -43,7 +41,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
             self.model.setContainer(self.holdStack);
         }
 
-        var speed = RotationalSource.getNetworkSpeed((ServerWorld) world, pos);
+        var speed = RotationalSource.getRotation((ServerWorld) world, pos).speed();
 
         var itemChanged = self.model.updateSpeed(speed);
 

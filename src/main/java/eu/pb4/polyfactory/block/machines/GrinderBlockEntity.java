@@ -168,7 +168,7 @@ public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInven
                 }
             }
         } else {
-            var speed = Math.max(Math.abs(RotationalSource.getNetworkSpeed((ServerWorld) world, pos)) - self.currentRecipe.minimumSpeed(), 0);
+            var speed = Math.max(Math.abs(RotationalSource.getRotation((ServerWorld) world, pos).speed()) - self.currentRecipe.minimumSpeed(), 0);
 
             if (speed > 0) {
                 if (world.getTime() % MathHelper.clamp(Math.round(1 / speed), 2, 5) == 0) {

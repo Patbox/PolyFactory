@@ -4,6 +4,7 @@ package eu.pb4.polyfactory.nodes;
 import com.kneelawk.graphlib.api.graph.GraphUniverse;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.nodes.mechanical.*;
@@ -32,14 +33,15 @@ public class FactoryNodes {
             return List.of();
         });
 
-        universe.addLinkKeyDecoder(GenericLinkKey.ID, x -> new GenericLinkKey());
-
         universe.addNodeDecoder(ConveyorNode.ID, ConveyorNode.DECODER);
-        /*universe.addNodeDecoder(RotationalSourceNode.ID, RotationalSourceNode.DECODER);
+        universe.addNodeDecoder(RotationalSourceNode.ID, RotationalSourceNode.DECODER);
         universe.addNodeDecoder(DirectionalMechanicalNode.ID, DirectionalMechanicalNode.DECODER);
         universe.addNodeDecoder(AxisMechanicalNode.ID, AxisMechanicalNode.DECODER);
         universe.addNodeDecoder(GearboxNode.ID,GearboxNode.DECODER);
-*/
+        universe.addCacheCategory(RotationalSourceNode.CACHE);
+
+        universe.addGraphEntityType(RotationData.TYPE);
+
         //universe.addNodeDecoder(CablePlateNode.ID, CablePlateNode.DECODER);
         //universe.addNodeDecoder(DirectionalElectricalNode.ID, DirectionalElectricalNode.DECODER);
 
@@ -49,6 +51,6 @@ public class FactoryNodes {
 
 
     public static boolean canBothConnect(@NotNull NodeHolder<BlockNode> alpha, @NotNull NodeHolder<BlockNode> beta) {
-        return alpha.getNode().canConnect(alpha, new HalfLink(new GenericLinkKey(), beta)) && alpha.getNode().canConnect(beta, new HalfLink(new GenericLinkKey(), alpha));
+        return alpha.getNode().canConnect(alpha, new HalfLink(EmptyLinkKey.INSTANCE, beta)) && beta.getNode().canConnect(beta, new HalfLink(EmptyLinkKey.INSTANCE, alpha));
     }
 }

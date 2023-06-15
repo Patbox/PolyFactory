@@ -9,7 +9,6 @@ import eu.pb4.polyfactory.util.FakePlayer;
 import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.OperatorBlock;
@@ -103,7 +102,7 @@ public class MinerBlockEntity extends BlockEntity implements SingleStackInventor
             return;
         }
 
-        var speed = Math.abs(RotationalSource.getNetworkSpeed((ServerWorld) world, pos)) * 2;
+        var speed = Math.abs(RotationalSource.getRotation((ServerWorld) world, pos).speed()) * 2;
         if (speed == 0) {
             return;
         }

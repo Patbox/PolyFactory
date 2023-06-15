@@ -2,7 +2,6 @@ package eu.pb4.polyfactory.block.machines;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationalSource;
-import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlockEntity;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.PressRecipe;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
@@ -71,7 +70,7 @@ public class PressBlockEntity extends BlockEntity implements InventoryContainerH
         var stack = self.containers[0];
 
         if (self.process < 0 && stack.isContainerEmpty()) {
-            var speed = Math.max(Math.abs(RotationalSource.getNetworkSpeed((ServerWorld) world, pos.up())), 0);
+            var speed = Math.max(Math.abs(RotationalSource.getRotation((ServerWorld) world, pos.up()).speed()), 0);
 
             self.process += speed / 6;
             self.model.updatePiston(self.process);
@@ -123,7 +122,7 @@ public class PressBlockEntity extends BlockEntity implements InventoryContainerH
                 self.setStack(OUTPUT_SLOT, out);
             }
         } else {
-            var speed = Math.max(Math.abs(RotationalSource.getNetworkSpeed((ServerWorld) world, pos.up(1))), 0);
+            var speed = Math.max(Math.abs(RotationalSource.getRotation((ServerWorld) world, pos.up(1)).speed()), 0);
 
             if (speed >= self.currentRecipe.minimumSpeed() && self.getStack(OUTPUT_SLOT).isEmpty()) {
                 self.process += speed / 5;

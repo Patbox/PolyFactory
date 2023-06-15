@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.network;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.nodes.FactoryNodes;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -12,7 +13,7 @@ public interface NetworkComponent {
     interface Rotational extends NetworkComponent {
         static void updateRotationalAt(WorldAccess world, BlockPos pos) {
             if (world instanceof ServerWorld serverWorld) {
-                //GraphLib.getController(serverWorld).updateNodes(pos);
+                FactoryNodes.ROTATIONAL.getGraphWorld(serverWorld).updateNodes(pos);
             }
         }
 

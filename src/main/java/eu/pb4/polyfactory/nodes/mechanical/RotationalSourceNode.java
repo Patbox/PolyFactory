@@ -1,13 +1,13 @@
 package eu.pb4.polyfactory.nodes.mechanical;
-/*
-import com.kneelawk.graphlib.graph.BlockNode;
-import com.kneelawk.graphlib.graph.BlockNodeDecoder;
-import com.kneelawk.graphlib.graph.BlockNodeHolder;
-import com.kneelawk.graphlib.graph.NodeView;
-import com.kneelawk.graphlib.graph.struct.Node;
+
+
+import com.kneelawk.graphlib.api.graph.NodeHolder;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import com.kneelawk.graphlib.api.graph.user.BlockNodeDecoder;
+import com.kneelawk.graphlib.api.util.CacheCategory;
+import com.kneelawk.graphlib.api.util.EmptyLinkKey;
+import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
-import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.nodes.DirectionalNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import net.minecraft.nbt.NbtElement;
@@ -20,13 +20,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Collections;
+
 
 public record RotationalSourceNode(Direction direction) implements MechanicalNode, DirectionalNode {
+    public static CacheCategory<RotationalSourceNode> CACHE = CacheCategory.of(RotationalSourceNode.class);
+
     public static final Identifier ID = ModInit.id("rotational_source");
     public static final BlockNodeDecoder DECODER = new BlockNodeDecoder() {
         @Override
-        public @Nullable BlockNode createBlockNodeFromTag(@Nullable NbtElement tag) {
+        public @Nullable BlockNode decode(@Nullable NbtElement tag) {
             return new RotationalSourceNode(tag instanceof NbtString string ? Direction.byName(string.asString()) : Direction.NORTH);
         }
     };
@@ -42,18 +44,18 @@ public record RotationalSourceNode(Direction direction) implements MechanicalNod
     }
 
     @Override
-    public @NotNull Collection<Node<BlockNodeHolder>> findConnections(@NotNull ServerWorld world, @NotNull NodeView nodeView, @NotNull BlockPos pos, @NotNull Node<BlockNodeHolder> self) {
-        return nodeView.getNodesAt(pos.offset(direction)).filter(x -> FactoryNodes.canBothConnect(world, nodeView, self, x)).toList();
+    public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
+        return self.getGraphWorld().getNodesAt(self.getPos().offset(this.direction))
+                .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).toList();
     }
 
     @Override
-    public boolean canConnect(@NotNull ServerWorld world, @NotNull NodeView nodeView, @NotNull BlockPos pos, @NotNull Node<BlockNodeHolder> self, @NotNull Node<BlockNodeHolder> other) {
-        return other.data().getNode() instanceof MechanicalNode && !(other.data().getNode() instanceof RotationalSourceNode) && !(other.data().getNode() instanceof ConveyorNode && direction == Direction.DOWN);
+    public boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
+        return MechanicalNode.super.canConnect(self, other) && DirectionalNode.canConnect(this, self, other);
     }
 
     @Override
-    public void onConnectionsChanged(@NotNull ServerWorld world, @NotNull BlockPos pos, @NotNull Node<BlockNodeHolder> self) {
+    public void onConnectionsChanged(@NotNull NodeHolder<BlockNode> self) {
 
     }
 }
-*/

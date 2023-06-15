@@ -1,16 +1,17 @@
 package eu.pb4.polyfactory.nodes;
 
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
+import com.kneelawk.graphlib.api.graph.NodeHolder;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import com.kneelawk.graphlib.api.util.HalfLink;
 import net.minecraft.util.math.Direction;
 
 public interface DirectionalNode extends AxisNode {
 
-    /*static boolean canConnect(DirectionalNode self, BlockPos pos, Node<BlockNodeHolder> other) {
-        if (other.data().getPos().offset(self.direction(), -1).equals(pos)) {
-            if (other.data().getNode() instanceof DirectionalNode directionalNode) {
+    static boolean canConnect(DirectionalNode self, NodeHolder<BlockNode> holder, HalfLink other) {
+        if (other.other().getPos().offset(self.direction(), -1).equals(holder.getPos())) {
+            if (other.other().getNode() instanceof DirectionalNode directionalNode) {
                 return self.direction() == directionalNode.direction().getOpposite();
-            } else if (other.data().getNode() instanceof AxisNode axisNode) {
+            } else if (other.other().getNode() instanceof AxisNode axisNode) {
                 return self.axis() == axisNode.axis();
             }
 
@@ -18,7 +19,7 @@ public interface DirectionalNode extends AxisNode {
         }
 
         return false;
-    }*/
+    }
 
     Direction direction();
 

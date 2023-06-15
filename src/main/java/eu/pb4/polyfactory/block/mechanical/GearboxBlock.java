@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.nodes.mechanical.GearboxNode;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -29,11 +30,7 @@ public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        /*
         return List.of(new GearboxNode());
-
-         */
-        return List.of();
     }
 
     @Override

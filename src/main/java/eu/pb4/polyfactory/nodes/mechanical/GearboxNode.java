@@ -1,12 +1,11 @@
 package eu.pb4.polyfactory.nodes.mechanical;
-/*
-import com.kneelawk.graphlib.graph.BlockNode;
-import com.kneelawk.graphlib.graph.BlockNodeDecoder;
-import com.kneelawk.graphlib.graph.BlockNodeHolder;
-import com.kneelawk.graphlib.graph.NodeView;
-import com.kneelawk.graphlib.graph.struct.Node;
-import com.kneelawk.graphlib.wire.FullWireBlockNode;
-import com.kneelawk.graphlib.wire.WireConnectionDiscoverers;
+
+import com.kneelawk.graphlib.api.graph.NodeHolder;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import com.kneelawk.graphlib.api.graph.user.BlockNodeDecoder;
+import com.kneelawk.graphlib.api.util.EmptyLinkKey;
+import com.kneelawk.graphlib.api.util.HalfLink;
+import com.kneelawk.graphlib.api.wire.FullWireBlockNode;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import net.minecraft.nbt.NbtElement;
@@ -20,12 +19,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public record GearboxNode() implements MechanicalNode, FullWireBlockNode {
+public record GearboxNode() implements MechanicalNode {
     public static Identifier ID = ModInit.id("gearbox");
 
     public static final BlockNodeDecoder DECODER = new BlockNodeDecoder() {
         @Override
-        public @Nullable BlockNode createBlockNodeFromTag(@Nullable NbtElement tag) {
+        public @Nullable BlockNode decode(@Nullable NbtElement tag) {
             return new GearboxNode();
         }
     };
@@ -41,27 +40,23 @@ public record GearboxNode() implements MechanicalNode, FullWireBlockNode {
     }
 
     @Override
-    public @NotNull Collection<Node<BlockNodeHolder>> findConnections(@NotNull ServerWorld world, @NotNull NodeView nodeView, @NotNull BlockPos pos, @NotNull Node<BlockNodeHolder> self) {
-        var list = new ArrayList<Node<BlockNodeHolder>>();
+    public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
+        var list = new ArrayList<HalfLink>();
 
         for (var dir : Direction.values()) {
-            var i = nodeView.getNodesAt(pos.offset(dir)).iterator();
-            while (i.hasNext()) {
-                var other = i.next();
-                if (FactoryNodes.canBothConnect(world, nodeView, self, other)) {
-                    list.add(other);
-                }
-            }
+            self.getGraphWorld().getNodesAt(self.getPos().offset(dir))
+                    .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).forEach(list::add);
         }
         return list;
     }
 
     @Override
-    public boolean canConnect(@NotNull ServerWorld world, @NotNull NodeView nodeView, @NotNull BlockPos pos, @NotNull Node<BlockNodeHolder> self, @NotNull Node<BlockNodeHolder> other) {
-        return MechanicalNode.super.canConnect(world, nodeView, pos, self, other);
+    public boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
+        return MechanicalNode.super.canConnect(self, other);
     }
 
     @Override
-    public void onConnectionsChanged(@NotNull ServerWorld world, @NotNull BlockPos pos, @NotNull Node<BlockNodeHolder> self) {}
+    public void onConnectionsChanged(@NotNull NodeHolder<BlockNode> self) {
+
+    }
 }
-*/

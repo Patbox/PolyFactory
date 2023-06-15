@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -68,8 +69,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        //        return List.of(new AxisMechanicalNode(Direction.Axis.Y));
-        return List.of();
+        return List.of(new AxisMechanicalNode(Direction.Axis.Y));
     }
 
     @Override
@@ -209,20 +209,20 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
             this.stoneWheel.setDisplaySize(1, 1);
             this.stoneWheel.setModelTransformation(ModelTransformationMode.FIXED);
             this.stoneWheel.setInterpolationDuration(5);
-            this.updateAnimation(0, 0, state.get(INPUT_FACING));
+            this.updateAnimation(0, state.get(INPUT_FACING));
             this.addElement(this.axle);
             this.addElement(this.main);
             this.addElement(this.stoneWheel);
         }
 
-        private void updateAnimation(double speed, long worldTick, Direction direction) {
+        private void updateAnimation(float speed, Direction direction) {
             mat.identity();
             mat.rotate(direction.getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion()));
             mat.scale(2f);
 
             this.main.setTransformation(mat);
 
-            mat.rotateY(((float) speed * worldTick));
+            mat.rotateY(((float) speed));
             mat.translate(0, 0.5f, 0);
             this.axle.setTransformation(mat);
             mat.translate(0, -0.19f, 0);
@@ -234,8 +234,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
             var tick = this.getAttachment().getWorld().getTime();
 
             if (tick % 4 == 0) {
-                this.updateAnimation(RotationalSource.getNetworkSpeed(this.getAttachment().getWorld(),
-                                ((BlockBoundAttachment) this.getAttachment()).getBlockPos()), tick,
+                this.updateAnimation(RotationalSource.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(INPUT_FACING));
                 if (this.axle.isDirty()) {
                     this.axle.startInterpolation();

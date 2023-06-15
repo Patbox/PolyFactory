@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.block.mechanical.RotationalSource;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.models.ConveyorModel;
+import eu.pb4.polyfactory.nodes.mechanical.ConveyorNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
@@ -222,7 +223,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
 
         var next = entity.getBlockPos().offset(dir);
 
-        var speed = RotationalSource.getNetworkSpeed(world, pos) * 0.9;
+        var speed = RotationalSource.getRotation(world, pos).speed() * 0.9;
 
         if (speed == 0) {
             return;
@@ -326,11 +327,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        /*
-                return List.of(new ConveyorNode(state.get(DIRECTION), state.get(VERTICAL)));
-
-         */
-        return List.of();
+        return List.of(new ConveyorNode(state.get(DIRECTION), state.get(VERTICAL)));
     }
 
     @Nullable

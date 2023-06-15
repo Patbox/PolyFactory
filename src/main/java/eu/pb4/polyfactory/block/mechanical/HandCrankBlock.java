@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.nodes.mechanical.RotationalSourceNode;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -77,11 +78,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        /*
         return List.of(new RotationalSourceNode(state.get(FACING)));
-
-         */
-        return List.of();
     }
 
     @Override
@@ -119,14 +116,14 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
             this.mainElement.setInterpolationDuration(5);
-            this.updateAnimation(0, 0, state.get(FACING));
+            this.updateAnimation(0, state.get(FACING));
             this.addElement(this.mainElement);
         }
 
-        private void updateAnimation(double speed, long worldTick, Direction facing) {
+        private void updateAnimation(float speed, Direction facing) {
             mat.identity();
             mat.rotate(facing.getOpposite().getRotationQuaternion());
-            mat.rotateY(((float) ((facing.getDirection() == Direction.AxisDirection.POSITIVE) == (facing.getAxis() == Direction.Axis.Z) ? speed : -speed) * worldTick));
+            mat.rotateY(((float) ((facing.getDirection() == Direction.AxisDirection.POSITIVE) == (facing.getAxis() == Direction.Axis.Z) ? speed : -speed)));
 
             mat.scale(2f);
             this.mainElement.setTransformation(mat);
@@ -137,8 +134,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
             var tick = this.getAttachment().getWorld().getTime();
 
             if (tick % 4 == 0) {
-                this.updateAnimation(RotationalSource.getNetworkSpeed(this.getAttachment().getWorld(),
-                                ((BlockBoundAttachment) this.getAttachment()).getBlockPos()), tick,
+                this.updateAnimation(RotationalSource.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(FACING));
                 if (this.mainElement.isDirty()) {
                     this.mainElement.startInterpolation();

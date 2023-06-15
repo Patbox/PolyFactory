@@ -4,13 +4,11 @@ import com.kneelawk.graphlib.api.graph.GraphView;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.graph.user.BlockNodeDecoder;
+import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
-import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
-import eu.pb4.polyfactory.nodes.DirectionalNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
-import eu.pb4.polyfactory.nodes.GenericLinkKey;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;
@@ -53,7 +51,6 @@ public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue val
 
         var view = self.getGraphWorld();
         var pos = self.getPos();
-        var world = self.getBlockWorld();
 
         Predicate<NodeHolder<BlockNode>> conv = other -> (other.getNode() instanceof ConveyorNode node && node.direction == this.direction) && FactoryNodes.canBothConnect(self, other);
         Predicate<NodeHolder<BlockNode>> convType = other -> (other.getNode() instanceof ConveyorNode node && node.direction == this.direction && node.value.value == this.value.value) && FactoryNodes.canBothConnect(self, other);
@@ -96,14 +93,14 @@ public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue val
             }
             nextPos.set(pos).move(x);
 
-            view.getNodesAt(nextPos).filter(p).forEach((a) -> list.add(new HalfLink(new GenericLinkKey(), a)));
+            view.getNodesAt(nextPos).filter(p).forEach((a) -> list.add(new HalfLink(EmptyLinkKey.INSTANCE, a)));
         }
 
         return list;
     }
 
     private void addNodes(GraphView view, BlockPos pos, Predicate<NodeHolder<BlockNode>> predicate, List<HalfLink> list) {
-        view.getNodesAt(pos).filter(predicate).forEach((a) -> list.add(new HalfLink(new GenericLinkKey(), a)));
+        view.getNodesAt(pos).filter(predicate).forEach((a) -> list.add(new HalfLink(EmptyLinkKey.INSTANCE, a)));
     }
 
     @Override
