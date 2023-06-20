@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block.machines;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.mechanical.RotationalSource;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.PressRecipe;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
@@ -53,6 +53,8 @@ public class PressBlockEntity extends BlockEntity implements InventoryContainerH
     };
     protected int currentItemCount = -1;
     private PressBlock.Model model;
+    private boolean active;
+
     public PressBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.PRESS, pos, state);
     }
@@ -70,11 +72,11 @@ public class PressBlockEntity extends BlockEntity implements InventoryContainerH
         var stack = self.containers[0];
 
         if (self.process < 0 && stack.isContainerEmpty()) {
-            var speed = Math.max(Math.abs(RotationalSource.getRotation((ServerWorld) world, pos.up()).speed()), 0);
+            var speed = Math.max(Math.abs(RotationUser.getRotation((ServerWorld) world, pos.up()).speed()), 0);
 
-            self.process += speed / 6;
+            self.process += speed / 120;
             self.model.updatePiston(self.process);
-
+            self.active = true;
             self.model.tick();
             return;
         }
@@ -84,6 +86,7 @@ public class PressBlockEntity extends BlockEntity implements InventoryContainerH
                 self.model.updatePiston(0);
             }
             self.process = 0;
+            self.active = false;
             self.model.tick();
             return;
         }
@@ -94,6 +97,7 @@ public class PressBlockEntity extends BlockEntity implements InventoryContainerH
             }
             self.process = 0;
             self.model.tick();
+            self.active = false;
             return;
         }
 
@@ -108,11 +112,12 @@ public class PressBlockEntity extends BlockEntity implements InventoryContainerH
 
             if (self.currentRecipe == null) {
                 self.model.tick();
+                self.active = false;
                 return;
             }
         }
 
-
+        self.active = true;
         if (self.process >= 1) {
             if (self.getStack(OUTPUT_SLOT).isEmpty()) {
                 self.process = -0.3;
@@ -122,15 +127,21 @@ public class PressBlockEntity extends BlockEntity implements InventoryContainerH
                 self.setStack(OUTPUT_SLOT, out);
             }
         } else {
-            var speed = Math.max(Math.abs(RotationalSource.getRotation((ServerWorld) world, pos.up(1)).speed()), 0);
+            var speed = Math.max(Math.abs(RotationUser.getRotation((ServerWorld) world, pos.up(1)).speed()), 0);
 
             if (speed >= self.currentRecipe.minimumSpeed() && self.getStack(OUTPUT_SLOT).isEmpty()) {
-                self.process += speed / 5;
+                self.process += speed / 100;
                 self.model.updatePiston(self.process);
             }
         }
         self.model.tick();
+    }
 
+    public double getStress() {
+        if (this.active) {
+            return this.currentRecipe != null ? this.currentRecipe.minimumSpeed() * 0.8 : 4;
+        }
+        return 0;
     }
 
     @Override

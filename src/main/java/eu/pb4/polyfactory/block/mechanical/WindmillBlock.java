@@ -4,7 +4,8 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
-import eu.pb4.polyfactory.nodes.mechanical.RotationalSourceNode;
+import eu.pb4.polyfactory.nodes.mechanical.DirectionalRotationUserNode;
+import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -42,7 +43,7 @@ import org.joml.Matrix4fStack;
 import java.util.Collection;
 import java.util.List;
 
-public class WindmillBlock extends RotationalNetworkBlock implements PolymerBlock, RotationalSource, BlockWithElementHolder, BlockEntityProvider, VirtualDestroyStage.Marker {
+public class WindmillBlock extends RotationalNetworkBlock implements PolymerBlock, RotationUser, BlockWithElementHolder, BlockEntityProvider, VirtualDestroyStage.Marker {
     public static final int MAX_SAILS = 8;
     public static final IntProperty SAIL_COUNT = IntProperty.of("sails", 1, MAX_SAILS);
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
@@ -76,21 +77,8 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
     }
 
     @Override
-    public double getSpeed(BlockState state, ServerWorld world, BlockPos pos) {
-        var sails = state.get(SAIL_COUNT);
-
-        if (sails < 2) {
-            return 0;
-        }
-
-        var sailMult = MathHelper.lerp(MathHelper.clamp((sails - 2) / 4f, 0, 1), 0.8, 1);
-
-        return sailMult * MathHelper.clamp((pos.getY() - 60) * 0.005, 0, 0.6);
-    }
-
-    @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new RotationalSourceNode(state.get(FACING)));
+        return List.of(new DirectionalRotationUserNode(state.get(FACING)));
     }
 
     @Override
@@ -118,6 +106,28 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
         return Blocks.OAK_PLANKS.getDefaultState();
+    }
+
+    @Override
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+        var speed = 0d;
+        var sails = state.get(SAIL_COUNT);
+
+        if (sails < 2) {
+            modifier.stress(0.15);
+            return;
+        }
+
+        var sailMult = MathHelper.lerp(MathHelper.clamp((sails - 2) / 4f, 0, 1), 0.6, 1);
+
+        // Replace with better formula. wind simulation?
+        speed = sailMult * MathHelper.clamp((pos.getY() - 60) * 0.6, 0, 18);
+
+        if (speed < 1) {
+            modifier.stress(0.15 * sails);
+        } else {
+            modifier.provide(speed, MathHelper.clamp(speed * 0.2 * sails, 2, 30));
+        }
     }
 
     public final class Model extends LodElementHolder {
@@ -242,7 +252,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
 
 
             if (tick % 4 == 0) {
-                this.updateAnimation(RotationalSource.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
+                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(WindmillBlock.FACING),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(WindmillBlock.REVERSE));
 
@@ -263,7 +273,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 this.updateSailsBe();
 
-                this.updateAnimation(RotationalSource.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
+                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(WindmillBlock.FACING),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(WindmillBlock.REVERSE));
                 for (var i = 0; i < this.sails.length; i++) {

@@ -4,7 +4,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.mechanical.RotationalSource;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.models.ConveyorModel;
@@ -223,7 +223,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
 
         var next = entity.getBlockPos().offset(dir);
 
-        var speed = RotationalSource.getRotation(world, pos).speed() * 0.9;
+        var speed = RotationUser.getRotation(world, pos).speed() * MathHelper.RADIANS_PER_DEGREE * 0.9;
 
         if (speed == 0) {
             return;

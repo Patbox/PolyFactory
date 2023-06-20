@@ -4,8 +4,9 @@ import com.kneelawk.graphlib.api.graph.BlockGraph;
 import com.kneelawk.graphlib.api.graph.GraphEntityContext;
 import com.kneelawk.graphlib.api.graph.user.GraphEntity;
 import com.kneelawk.graphlib.api.graph.user.GraphEntityType;
-import eu.pb4.polyfactory.block.mechanical.RotationalSource;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,7 @@ public class RotationData implements GraphEntity<RotationData> {
     private double speed;
     private float rotation;
     private int lastTick = -1;
+    private double stressCapacity;
 
     public RotationData() {
     }
@@ -39,34 +41,61 @@ public class RotationData implements GraphEntity<RotationData> {
         return this.rotation;
     }
 
+    public double stressCapacity() {
+        return stressCapacity;
+    }
+
     public void update(ServerWorld world, BlockGraph graph) {
-        if (this.lastTick == world.getServer().getTicks()) {
+        var currentTick = world.getServer().getTicks();
+        if (this.lastTick == currentTick) {
             return;
         }
-        this.lastTick = world.getServer().getTicks();
+        var delta = this.lastTick == -1 ? 1 : currentTick - this.lastTick;
+        this.lastTick = currentTick;
 
-        var list = graph.getCachedNodes(RotationalSourceNode.CACHE);
+        var list = graph.getCachedNodes(DirectionalRotationUserNode.CACHE);
 
         if (list.size() == 0) {
+            this.speed = 0;
+            this.stressCapacity = 0;
+            return;
+        }
+
+        var state = new State();
+        for (var entries : list) {
+            var blockState = world.getBlockState(entries.getPos());
+
+            if (blockState.getBlock() instanceof RotationUser rotationalSource) {
+                rotationalSource.updateRotationalData(state, blockState, world, entries.getPos());
+            }
+        }
+
+        if (state.count == 0) {
+            this.stressCapacity = 0;
             this.speed = 0;
             return;
         }
 
-        var speed = 0d;
+        if (state.stressCapacity < 0) {
+            this.stressCapacity = 0;
+            this.speed = 0;
 
-        for (var entries : list) {
-            var state = world.getBlockState(entries.getPos());
-
-            if (state.getBlock() instanceof RotationalSource rotationalSource) {
-                speed += rotationalSource.getSpeed(state, world, entries.getPos());
+            for (var entry : list) {
+                var pos = entry.getPos();
+                world.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.3, 0.3, 0.3, 0.2);
             }
+
+            return;
+        } else {
+            this.speed = state.speed / state.count;
+            this.stressCapacity = state.stressCapacity;
         }
 
-        this.speed = speed / list.size();
-        var r = (float) (this.speed + this.rotation);
-        if (r > MathHelper.TAU) {
+        var r = (float) (this.speed * MathHelper.RADIANS_PER_DEGREE * delta + this.rotation);
+        while (r > MathHelper.TAU) {
             r -= MathHelper.TAU;
         }
+
         this.rotation = r;
     }
 
@@ -106,5 +135,21 @@ public class RotationData implements GraphEntity<RotationData> {
 
     private static RotationData create(@NotNull GraphEntityContext graphEntityContext) {
         return new RotationData();
+    }
+
+    public static class State {
+        protected double speed;
+        protected double stressCapacity;
+        protected int count;
+
+        public void provide(double speed, double stressCapacity) {
+            this.speed += speed;
+            this.stressCapacity += stressCapacity;
+            this.count++;
+        }
+
+        public void stress(double stress) {
+            this.stressCapacity -= stress;
+        }
     }
 }

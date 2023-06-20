@@ -3,12 +3,13 @@
   "input": {
     "item": "minecraft:gravel"
   },
-  "minimum_speed": 0.2,
+  "minimum_speed": 3.0,
+  "optimal_speed": 3.0,
   "output": {
     "item": {
       "Count": 1,
       "id": "minecraft:sand"
     }
   },
-  "time": 6.5
+  "time": 5.0
 }

@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
-import eu.pb4.polyfactory.block.mechanical.RotationalSource;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.util.CachedBlockPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.*;
@@ -41,7 +41,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
             self.model.setContainer(self.holdStack);
         }
 
-        var speed = RotationalSource.getRotation((ServerWorld) world, pos).speed();
+        var speed = RotationUser.getRotation((ServerWorld) world, pos).speed() * MathHelper.RADIANS_PER_DEGREE;
 
         var itemChanged = self.model.updateSpeed(speed);
 

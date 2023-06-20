@@ -12,9 +12,7 @@ import eu.pb4.polyfactory.nodes.DirectionalNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,14 +20,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 
 
-public record RotationalSourceNode(Direction direction) implements MechanicalNode, DirectionalNode {
-    public static CacheCategory<RotationalSourceNode> CACHE = CacheCategory.of(RotationalSourceNode.class);
-
-    public static final Identifier ID = ModInit.id("rotational_source");
+public record DirectionalRotationUserNode(Direction direction) implements MechanicalNode, RotationUserNode, DirectionalNode {
+    public static final Identifier ID = ModInit.id("directional_rotation_user");
     public static final BlockNodeDecoder DECODER = new BlockNodeDecoder() {
         @Override
         public @Nullable BlockNode decode(@Nullable NbtElement tag) {
-            return new RotationalSourceNode(tag instanceof NbtString string ? Direction.byName(string.asString()) : Direction.NORTH);
+            return new DirectionalRotationUserNode(tag instanceof NbtString string ? Direction.byName(string.asString()) : Direction.NORTH);
         }
     };
 

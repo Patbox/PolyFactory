@@ -3,7 +3,7 @@
   "input": {
     "item": "polyfactory:steel_ingot"
   },
-  "minimum_speed": 0.5,
+  "minimum_speed": 15.0,
   "output": [
     {
       "item": {

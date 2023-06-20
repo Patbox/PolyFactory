@@ -3,13 +3,15 @@ package eu.pb4.polyfactory.block.machines;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
-import eu.pb4.polyfactory.block.mechanical.RotationalSource;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
+import eu.pb4.polyfactory.nodes.mechanical.AxisRotationUserNode;
+import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -52,7 +54,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, InventoryProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, RotationUser, InventoryProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static final Property<Part> PART = EnumProperty.of("part", Part.class);
     public static final Property<Direction> INPUT_FACING = DirectionProperty.of("input_facing", x -> x.getAxis() != Direction.Axis.Y);
 
@@ -69,7 +71,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new AxisMechanicalNode(Direction.Axis.Y));
+        return List.of(state.get(PART) == Part.MAIN ? new AxisRotationUserNode(Direction.Axis.Y) : new AxisMechanicalNode(Direction.Axis.Y));
     }
 
     @Override
@@ -169,6 +171,13 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
         return Blocks.GRINDSTONE.getDefaultState();
     }
 
+    @Override
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+        if (world.getBlockEntity(pos) instanceof GrinderBlockEntity be) {
+            modifier.stress(be.getStress());
+        }
+    }
+
     public enum Part implements StringIdentifiable {
         MAIN(Direction.UP),
         UPPER(Direction.DOWN);
@@ -234,7 +243,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
             var tick = this.getAttachment().getWorld().getTime();
 
             if (tick % 4 == 0) {
-                this.updateAnimation(RotationalSource.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
+                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(INPUT_FACING));
                 if (this.axle.isDirty()) {
                     this.axle.startInterpolation();

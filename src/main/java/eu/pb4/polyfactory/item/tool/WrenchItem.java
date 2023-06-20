@@ -1,10 +1,13 @@
 package eu.pb4.polyfactory.item.tool;
 
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.item.util.SimpleModeledPolymerItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -21,6 +24,9 @@ public class WrenchItem extends Item implements SimpleModeledPolymerItem {
         if (context.getWorld().getBlockState(context.getBlockPos()).getBlock() instanceof Wrenchable wrenchable) {
             return wrenchable.useWithWrench(context);
         }
+        var data = RotationUser.getRotation((ServerWorld) context.getWorld(), context.getBlockPos());
+
+        context.getPlayer().sendMessage(Text.translatable("Speed: %s | Stress: %s | Rotation: %s", data.speed(), data.stressCapacity(), data.rotation()));
 
         return ActionResult.FAIL;
     }

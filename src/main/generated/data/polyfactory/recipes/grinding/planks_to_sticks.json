@@ -3,7 +3,6 @@
   "input": {
     "tag": "minecraft:planks"
   },
-  "minimum_speed": 0.05,
   "output": {
     "chance": 0.4,
     "item": {
@@ -12,5 +11,5 @@
     },
     "roll": 6
   },
-  "time": 4.0
+  "time": 3.0
 }

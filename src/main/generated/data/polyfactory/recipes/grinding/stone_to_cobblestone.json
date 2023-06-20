@@ -3,12 +3,13 @@
   "input": {
     "item": "minecraft:stone"
   },
-  "minimum_speed": 0.2,
+  "minimum_speed": 5.0,
+  "optimal_speed": 5.0,
   "output": {
     "item": {
       "Count": 1,
       "id": "minecraft:cobblestone"
     }
   },
-  "time": 2.0
+  "time": 3.0
 }

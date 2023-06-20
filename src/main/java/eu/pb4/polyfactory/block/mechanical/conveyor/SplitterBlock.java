@@ -220,17 +220,18 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
         }
 
         private void updateFacing(BlockState facing) {
-            var rot = facing.get(DIRECTION).getOpposite().getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
+            var rot = facing.get(DIRECTION).getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
             mat.identity();
             mat.rotate(rot);
             mat.pushMatrix();
             mat.scale(2f);
+            mat.rotateY(MathHelper.PI);
             this.mainElement.setTransformation(mat);
             mat.popMatrix();
 
             mat.pushMatrix();
             mat.translate(-0.51f, 0.4f, 0);
-            mat.rotateY(-MathHelper.HALF_PI);
+            mat.rotateY(MathHelper.HALF_PI);
             mat.scale(0.3f, 0.3f, 0.02f);
             this.leftLockElement.setTransformation(mat);
             mat.popMatrix();
@@ -238,7 +239,7 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
 
             mat.pushMatrix();
             mat.translate(0.51f, 0.4f, 0);
-            mat.rotateY(MathHelper.HALF_PI);
+            mat.rotateY(-MathHelper.HALF_PI);
             mat.scale(0.3f, 0.3f, 0.02f);
             this.rightLockElement.setTransformation(mat);
             mat.popMatrix();

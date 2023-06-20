@@ -4,7 +4,7 @@
     "item": "minecraft:iron_nugget"
   },
   "input_count": 9,
-  "minimum_speed": 0.4000000059604645,
+  "minimum_speed": 10.0,
   "output": [
     {
       "item": {

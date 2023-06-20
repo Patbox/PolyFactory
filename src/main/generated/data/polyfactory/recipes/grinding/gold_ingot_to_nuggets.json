@@ -3,12 +3,13 @@
   "input": {
     "item": "minecraft:gold_ingot"
   },
-  "minimum_speed": 0.4,
+  "minimum_speed": 5.0,
+  "optimal_speed": 5.0,
   "output": {
     "item": {
       "Count": 9,
       "id": "minecraft:gold_nugget"
     }
   },
-  "time": 3.0
+  "time": 1.8
 }

@@ -4,6 +4,7 @@
     "polyfactory:windmill",
     "polyfactory:axle",
     "polyfactory:gearbox",
+    "polyfactory:wooden_container",
     "polyfactory:funnel"
   ]
 }

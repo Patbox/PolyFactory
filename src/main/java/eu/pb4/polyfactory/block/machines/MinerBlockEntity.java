@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.block.machines;
 import com.mojang.authlib.GameProfile;
 import eu.pb4.common.protection.api.CommonProtection;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.mechanical.RotationalSource;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.FakePlayer;
 import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
@@ -102,7 +102,7 @@ public class MinerBlockEntity extends BlockEntity implements SingleStackInventor
             return;
         }
 
-        var speed = Math.abs(RotationalSource.getRotation((ServerWorld) world, pos).speed()) * 2;
+        var speed = Math.abs(RotationUser.getRotation((ServerWorld) world, pos).speed()) * 2;
         if (speed == 0) {
             return;
         }

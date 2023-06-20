@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.block.electric;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
-import eu.pb4.polyfactory.block.mechanical.RotationalSource;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -28,7 +28,7 @@ import org.joml.Matrix4f;
 import java.util.Collection;
 import java.util.List;
 
-public class ElectricMotorBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, RotationalSource {
+public class ElectricMotorBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, RotationUser {
     public static final DirectionProperty FACING = Properties.FACING;
 
     public ElectricMotorBlock(Settings settings) {
@@ -36,8 +36,8 @@ public class ElectricMotorBlock extends RotationalNetworkBlock implements Polyme
     }
 
     @Override
-    public double getSpeed(BlockState state, ServerWorld world, BlockPos pos) {
-        return state.get(Properties.AGE_25) / 50d;
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+        modifier.provide(state.get(Properties.AGE_25) * 4, 1000f);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class ElectricMotorBlock extends RotationalNetworkBlock implements Polyme
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
         /*
-        return List.of(new RotationalSourceNode(state.get(FACING)), new DirectionalElectricalNode(state.get(FACING).getOpposite()));
+        return List.of(new DirectionalRotationUserNode(state.get(FACING)), new DirectionalElectricalNode(state.get(FACING).getOpposite()));
 
          */
         return List.of();
@@ -129,7 +129,7 @@ public class ElectricMotorBlock extends RotationalNetworkBlock implements Polyme
                     positive = !positive;
                 }
 
-                this.updateAnimation(RotationalSource.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
+                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
                         facing.getAxis(),
                         positive
 

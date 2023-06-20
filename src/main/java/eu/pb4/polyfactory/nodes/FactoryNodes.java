@@ -34,11 +34,12 @@ public class FactoryNodes {
         });
 
         universe.addNodeDecoder(ConveyorNode.ID, ConveyorNode.DECODER);
-        universe.addNodeDecoder(RotationalSourceNode.ID, RotationalSourceNode.DECODER);
+        universe.addNodeDecoder(DirectionalRotationUserNode.ID, DirectionalRotationUserNode.DECODER);
         universe.addNodeDecoder(DirectionalMechanicalNode.ID, DirectionalMechanicalNode.DECODER);
+        universe.addNodeDecoder(AxisRotationUserNode.ID, AxisRotationUserNode.DECODER);
         universe.addNodeDecoder(AxisMechanicalNode.ID, AxisMechanicalNode.DECODER);
-        universe.addNodeDecoder(GearboxNode.ID,GearboxNode.DECODER);
-        universe.addCacheCategory(RotationalSourceNode.CACHE);
+        universe.addNodeDecoder(AllSideNode.ID, AllSideNode.DECODER);
+        universe.addCacheCategory(RotationUserNode.CACHE);
 
         universe.addGraphEntityType(RotationData.TYPE);
 

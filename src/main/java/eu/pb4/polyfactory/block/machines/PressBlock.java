@@ -3,12 +3,14 @@ package eu.pb4.polyfactory.block.machines;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.nodes.mechanical.GearboxNode;
+import eu.pb4.polyfactory.nodes.mechanical.AxisRotationUserNode;
+import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
@@ -56,7 +58,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class PressBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, InventoryProvider, BlockWithElementHolder, MovingItemConsumer, MovingItemProvider, VirtualDestroyStage.Marker {
+public class PressBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, InventoryProvider, BlockWithElementHolder, RotationUser, MovingItemConsumer, MovingItemProvider, VirtualDestroyStage.Marker {
     public static final Property<Part> PART = EnumProperty.of("part", Part.class);
     public static final BooleanProperty HAS_CONVEYOR = BooleanProperty.of("has_conveyor");
     public static final Property<Direction> INPUT_FACING = DirectionProperty.of("input_facing", x -> x.getAxis() != Direction.Axis.Y);
@@ -73,9 +75,7 @@ public class PressBlock extends RotationalNetworkBlock implements PolymerBlock, 
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return state.get(PART) == Part.TOP ? List.of(
-                new GearboxNode()
-        ) : List.of();
+        return state.get(PART) == Part.TOP ? List.of(new AxisRotationUserNode(state.get(INPUT_FACING).rotateYClockwise().getAxis())) : List.of();
     }
 
     @Override
@@ -242,6 +242,13 @@ public class PressBlock extends RotationalNetworkBlock implements PolymerBlock, 
             stack.decrement(amount);
             conveyor.setMovementPosition(pushDirection == inputDir.getOpposite() ? 0 : 0.5);
             conveyor.pushNew(stack.copyWithCount(amount));
+        }
+    }
+
+    @Override
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+        if (world.getBlockEntity(pos) instanceof PressBlockEntity be) {
+            modifier.stress(be.getStress());
         }
     }
 

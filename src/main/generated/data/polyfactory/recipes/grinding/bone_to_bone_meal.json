@@ -3,6 +3,8 @@
   "input": {
     "item": "minecraft:bone"
   },
+  "minimum_speed": 5.0,
+  "optimal_speed": 5.0,
   "output": [
     {
       "item": {
@@ -20,5 +22,5 @@
       "roll": 2
     }
   ],
-  "time": 2.0
+  "time": 1.0
 }

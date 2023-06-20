@@ -8,7 +8,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 
 public interface AxisNode extends BlockNode {
-    static boolean canConnect(AxisMechanicalNode self, NodeHolder<BlockNode> holder, HalfLink other) {
+    static boolean canConnect(AxisNode self, NodeHolder<BlockNode> holder, HalfLink other) {
         var tmp = other.other().getPos().subtract(holder.getPos());
         if (tmp.getSquaredDistance(Vec3i.ZERO) == 1 && tmp.getComponentAlongAxis(self.axis()) != 0) {
             if (other.other().getNode() instanceof DirectionalNode axisNode) {

@@ -5,7 +5,8 @@ import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.display.LodElementHolder;
 import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.nodes.mechanical.RotationalSourceNode;
+import eu.pb4.polyfactory.nodes.mechanical.DirectionalRotationUserNode;
+import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -38,7 +39,7 @@ import org.joml.Matrix4f;
 import java.util.Collection;
 import java.util.List;
 
-public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlock, RotationalSource, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlock, RotationUser, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static final DirectionProperty FACING = Properties.FACING;
 
     public HandCrankBlock(Settings settings) {
@@ -67,18 +68,21 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
     }
 
     @Override
-    public double getSpeed(BlockState state, ServerWorld world, BlockPos pos) {
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof HandCrankBlockEntity be) {
-            return MathHelper.lerp(MathHelper.clamp((world.getServer().getTicks() - be.lastTick - 4) / 2d, 0, 1), 0.1, 0);
-        }
+            var speed = MathHelper.lerp(MathHelper.clamp((world.getServer().getTicks() - be.lastTick - 4) / 2d, 0, 1), 20, 0);
+            var stress = MathHelper.lerp(MathHelper.clamp((world.getServer().getTicks() - be.lastTick - 3) / 2d, 0, 1), 15, 0);
 
-        return 0;
+            if (speed > 0) {
+                modifier.provide(speed, stress);
+            }
+        }
     }
 
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new RotationalSourceNode(state.get(FACING)));
+        return List.of(new DirectionalRotationUserNode(state.get(FACING)));
     }
 
     @Override
@@ -134,7 +138,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
             var tick = this.getAttachment().getWorld().getTime();
 
             if (tick % 4 == 0) {
-                this.updateAnimation(RotationalSource.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
+                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(FACING));
                 if (this.mainElement.isDirty()) {
                     this.mainElement.startInterpolation();

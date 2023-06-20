@@ -27,7 +27,7 @@ public class FanBlockEntity extends BlockEntity {
         }
         var self = (FanBlockEntity) t;
 
-        var speed = RotationalSource.getRotation((ServerWorld) world, pos).speed();
+        var speed = RotationUser.getRotation((ServerWorld) world, pos).speed();
 
         if (speed == 0) {
             return;

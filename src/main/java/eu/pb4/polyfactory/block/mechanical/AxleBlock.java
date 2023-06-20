@@ -111,7 +111,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
             var tick = this.getAttachment().getWorld().getTime();
 
             if (tick % 4 == 0) {
-                this.updateAnimation(RotationalSource.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
+                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(AXIS));
                 if (this.mainElement.isDirty()) {
                     this.mainElement.startInterpolation();

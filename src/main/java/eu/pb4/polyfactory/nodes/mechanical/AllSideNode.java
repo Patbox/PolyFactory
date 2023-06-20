@@ -5,13 +5,10 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.graph.user.BlockNodeDecoder;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
-import com.kneelawk.graphlib.api.wire.FullWireBlockNode;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,13 +16,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public record GearboxNode() implements MechanicalNode {
+public record AllSideNode() implements MechanicalNode {
     public static Identifier ID = ModInit.id("gearbox");
 
     public static final BlockNodeDecoder DECODER = new BlockNodeDecoder() {
         @Override
         public @Nullable BlockNode decode(@Nullable NbtElement tag) {
-            return new GearboxNode();
+            return new AllSideNode();
         }
     };
 

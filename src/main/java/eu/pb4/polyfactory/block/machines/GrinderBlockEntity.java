@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block.machines;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.mechanical.RotationalSource;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -45,6 +45,7 @@ public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInven
     protected GrindingRecipe currentRecipe = null;
     @Nullable
     protected Item currentItem = null;
+    private boolean active;
 
     public GrinderBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.GRINDER, pos, state);
@@ -94,11 +95,13 @@ public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInven
         var stack = self.getStack(0);
         if (stack.isEmpty()) {
             self.process = 0;
+            self.active = false;
             return;
         }
 
         if (self.currentRecipe == null && self.currentItem != null && stack.isOf(self.currentItem)) {
             self.process = 0;
+            self.active = false;
             return;
         }
 
@@ -108,9 +111,11 @@ public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInven
             self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.GRINDING, self, world).orElse(null);
 
             if (self.currentRecipe == null) {
+                self.active = false;
                 return;
             }
         }
+        self.active = true;
 
         if (self.process >= self.currentRecipe.grindTime()) {
             // Check space
@@ -168,7 +173,9 @@ public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInven
                 }
             }
         } else {
-            var speed = Math.max(Math.abs(RotationalSource.getRotation((ServerWorld) world, pos).speed()) - self.currentRecipe.minimumSpeed(), 0);
+            var d = Math.max(self.currentRecipe.optimalSpeed() - self.currentRecipe.minimumSpeed(), 1);
+
+            var speed = Math.min(Math.max(Math.abs(RotationUser.getRotation((ServerWorld) world, pos).speed()) - self.currentRecipe.minimumSpeed(), 0), d) / d / 20;
 
             if (speed > 0) {
                 if (world.getTime() % MathHelper.clamp(Math.round(1 / speed), 2, 5) == 0) {
@@ -178,6 +185,13 @@ public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInven
                 self.process += speed;
             }
         }
+    }
+
+    public double getStress() {
+        if (this.active) {
+            return this.currentRecipe != null ? this.currentRecipe.optimalSpeed() * 0.6 : 4;
+        }
+        return 0;
     }
 
     private class Gui extends SimpleGui {
