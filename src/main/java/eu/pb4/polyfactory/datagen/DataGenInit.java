@@ -62,6 +62,9 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             this.getOrCreateTagBuilder(FactoryBlockTags.CONVEYOR_TOP_OUTPUT)
                     .add(FactoryBlocks.FUNNEL).add(FactoryBlocks.SPLITTER);
 
+            this.getOrCreateTagBuilder(FactoryBlockTags.GRINDER_TOP_PLACEABLE)
+                    .add(FactoryBlocks.HAND_CRANK).add(FactoryBlocks.AXLE);
+
             this.getOrCreateTagBuilder(FactoryBlockTags.CONVEYOR_SIDE_OUTPUT)
                     .addOptionalTag(FactoryBlockTags.CONVEYORS)
                     .add(FactoryBlocks.PRESS)
@@ -92,7 +95,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             this.addDrop(FactoryBlocks.SPLITTER);
             this.addDrop(FactoryBlocks.MINER);
             this.addDrop(FactoryBlocks.FAN);
-            this.addDrop(FactoryBlocks.GRINDER, (block) -> this.dropsWithProperty(block, GrinderBlock.PART, GrinderBlock.Part.MAIN));
+            this.addDrop(FactoryBlocks.GRINDER);
             this.addDrop(FactoryBlocks.PRESS, (block) -> this.dropsWithProperty(block, PressBlock.PART, PressBlock.Part.MAIN));
             this.addDrop(FactoryBlocks.HAND_CRANK);
             this.addDrop(FactoryBlocks.CONVEYOR);

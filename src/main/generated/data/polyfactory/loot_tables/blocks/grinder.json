@@ -11,15 +11,6 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "conditions": [
-            {
-              "block": "polyfactory:grinder",
-              "condition": "minecraft:block_state_property",
-              "properties": {
-                "part": "main"
-              }
-            }
-          ],
           "name": "polyfactory:grinder"
         }
       ],

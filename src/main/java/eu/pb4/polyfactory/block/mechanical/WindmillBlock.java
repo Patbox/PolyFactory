@@ -126,7 +126,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
         if (speed < 1) {
             modifier.stress(0.15 * sails);
         } else {
-            modifier.provide(speed, MathHelper.clamp(speed * 0.2 * sails, 2, 30));
+            modifier.provide(speed, MathHelper.clamp(speed * 0.15 * sails, 2, 25));
         }
     }
 

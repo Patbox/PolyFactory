@@ -70,8 +70,8 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
     @Override
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof HandCrankBlockEntity be) {
-            var speed = MathHelper.lerp(MathHelper.clamp((world.getServer().getTicks() - be.lastTick - 4) / 2d, 0, 1), 20, 0);
-            var stress = MathHelper.lerp(MathHelper.clamp((world.getServer().getTicks() - be.lastTick - 3) / 2d, 0, 1), 15, 0);
+            var speed = MathHelper.lerp(MathHelper.clamp((world.getServer().getTicks() - be.lastTick - 5) / 2d, 0, 1), 15, 0);
+            var stress = MathHelper.lerp(MathHelper.clamp((world.getServer().getTicks() - be.lastTick - 5) / 2d, 0, 1), 10, 0);
 
             if (speed > 0) {
                 modifier.provide(speed, stress);

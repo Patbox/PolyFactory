@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.item;
 
-import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.item.util.ModeledItem;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
@@ -36,6 +35,7 @@ public class FactoryItems {
     public static final Item CONTAINER_BLOCK = register("wooden_container", new ModeledBlockItem(FactoryBlocks.CONTAINER, new Item.Settings()));
     public static final Item WINDMILL_SAIL = register("windmill_sail", new WindmillSailItem(new Item.Settings()));
     public static final Item ITEM_GENERATOR_BLOCK = register("item_generator", new ModeledBlockItem(FactoryBlocks.ITEM_GENERATOR, new Item.Settings()));
+    public static final Item ROTATION_DEBUG_BLOCK = register("rot_debug", new ModeledBlockItem(FactoryBlocks.ROTATION_DEBUG, new Item.Settings()));
 
     public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
     public static final Item STEEL_INGOT = register("steel_ingot", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
@@ -81,6 +81,7 @@ public class FactoryItems {
 
                     // Creative stuff
                     entries.add(ITEM_GENERATOR_BLOCK);
+                    entries.add(ROTATION_DEBUG_BLOCK);
                 })).build()
         );
 

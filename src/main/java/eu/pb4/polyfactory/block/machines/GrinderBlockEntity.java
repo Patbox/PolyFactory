@@ -71,18 +71,18 @@ public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInven
     @Override
     public int[] getAvailableSlots(Direction side) {
         var facing = this.getCachedState().get(GrinderBlock.INPUT_FACING);
-        return facing == side ? INPUT_SLOTS : (facing.getOpposite() == side ? OUTPUT_SLOTS : new int[0]);
+        return facing.getOpposite() == side ? INPUT_SLOTS : (facing == side ? OUTPUT_SLOTS : new int[0]);
     }
 
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return slot == INPUT_SLOT && (dir == null || this.getCachedState().get(GrinderBlock.INPUT_FACING) == dir);
+        return slot == INPUT_SLOT && (dir == null || this.getCachedState().get(GrinderBlock.INPUT_FACING) == dir.getOpposite());
     }
 
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
         var facing = this.getCachedState().get(GrinderBlock.INPUT_FACING);
-        return (slot == INPUT_SLOT && facing == dir) || (slot != INPUT_SLOT && facing.getOpposite() == dir);
+        return (slot == INPUT_SLOT && facing.getOpposite() == dir) || (slot != INPUT_SLOT && facing == dir);
     }
 
     public void openGui(ServerPlayerEntity player) {
@@ -180,7 +180,9 @@ public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInven
             if (speed > 0) {
                 if (world.getTime() % MathHelper.clamp(Math.round(1 / speed), 2, 5) == 0) {
                     var dir = state.get(GrinderBlock.INPUT_FACING).getAxis();
-                    ((ServerWorld) world).spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, stack.copy()), pos.getX() + 0.5, pos.getY() + 1.15, pos.getZ() + 0.5, 0, (Math.random() - 0.5) * (dir == Direction.Axis.Z ? 2 : 0.2), 0.02, (Math.random() - 0.5) * (dir == Direction.Axis.X ? 2 : 0.2), 2);
+                    ((ServerWorld) world).spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, stack.copy()),
+                            pos.getX() + 0.5, pos.getY() + 1.15, pos.getZ() + 0.5, 0,
+                            (Math.random() - 0.5) * 0.2, 0.02, (Math.random() - 0.5) * 0.2, 2);
                 }
                 self.process += speed;
             }

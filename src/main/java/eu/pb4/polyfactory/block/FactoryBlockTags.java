@@ -9,6 +9,7 @@ public class FactoryBlockTags {
     public static final TagKey<Block> CONVEYORS = of("conveyors");
     public static final TagKey<Block> CONVEYOR_TOP_OUTPUT = of("conveyor/top_output");
     public static final TagKey<Block> CONVEYOR_SIDE_OUTPUT = of("conveyor/side_output");
+    public static final TagKey<Block> GRINDER_TOP_PLACEABLE = of("grinder/top_placeable");
 
     private static TagKey<Block> of(String path) {
         return TagKey.of(RegistryKeys.BLOCK, ModInit.id(path));

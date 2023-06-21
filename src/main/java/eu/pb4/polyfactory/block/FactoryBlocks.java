@@ -38,6 +38,7 @@ public class FactoryBlocks {
     public static final WindmillBlock WINDMILL = register("windmill", new WindmillBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final ContainerBlock CONTAINER = register("wooden_container", new ContainerBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final ItemGeneratorBlock ITEM_GENERATOR = register("item_generator", new ItemGeneratorBlock(AbstractBlock.Settings.create().strength(-1, -1)));
+    public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", new RotationalDebugBlock(AbstractBlock.Settings.create().strength(-1, -1)));
 
 
     public static void register() {

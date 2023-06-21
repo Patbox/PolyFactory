@@ -179,7 +179,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
 
     @Override
     public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-        if (world instanceof ServerWorld serverWorld) {
+        /*if (world instanceof ServerWorld serverWorld) {
             var box = entity.getBoundingBox().offset(0, -0.1, 0);
 
             boolean match = false;
@@ -193,7 +193,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
             if (match) {
                 this.pushEntity(serverWorld, state, pos, entity);
             }
-        }
+        }*/
     }
 
     @Override
@@ -208,7 +208,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
     }
 
     private void pushEntity(ServerWorld world, BlockState state, BlockPos pos, Entity entity) {
-        if (entity instanceof ItemEntity itemEntity) {
+        if (entity instanceof ItemEntity itemEntity && itemEntity.age > 10) {
             var be = world.getBlockEntity(pos);
             if (be instanceof ConveyorBlockEntity conveyorBlockEntity && conveyorBlockEntity.tryAdding(itemEntity.getStack())) {
                 conveyorBlockEntity.setDelta(0.5);
