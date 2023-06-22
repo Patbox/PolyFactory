@@ -130,6 +130,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
             var vec = Vec3d.ofCenter(pos).add(moveVec).add(0, vert == ConveyorBlock.DirectionValue.NONE ? 0.5 : 0, 0);
             moveVec = moveVec.multiply(0.5);
             var itemEntity = new ItemEntity(world, vec.x, vec.y, vec.z, stack, moveVec.x, moveVec.y, moveVec.z);
+            itemEntity.age = -20;
             world.spawnEntity(itemEntity);
 
             self.model.tick();

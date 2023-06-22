@@ -4,6 +4,7 @@ package eu.pb4.polyfactory.nodes.mechanical;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.graph.user.BlockNodeDecoder;
+import com.kneelawk.graphlib.api.graph.user.BlockNodeType;
 import com.kneelawk.graphlib.api.util.CacheCategory;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
@@ -21,17 +22,12 @@ import java.util.Collection;
 
 
 public record DirectionalRotationUserNode(Direction direction) implements MechanicalNode, RotationUserNode, DirectionalNode {
-    public static final Identifier ID = ModInit.id("directional_rotation_user");
-    public static final BlockNodeDecoder DECODER = new BlockNodeDecoder() {
-        @Override
-        public @Nullable BlockNode decode(@Nullable NbtElement tag) {
-            return new DirectionalRotationUserNode(tag instanceof NbtString string ? Direction.byName(string.asString()) : Direction.NORTH);
-        }
-    };
+    public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("directional_rotation_user"),
+            tag -> new DirectionalRotationUserNode(tag instanceof NbtString string ? Direction.byName(string.asString()) : Direction.NORTH));
 
     @Override
-    public @NotNull Identifier getTypeId() {
-        return ID;
+    public @NotNull BlockNodeType getType() {
+        return TYPE;
     }
 
     @Override
@@ -41,7 +37,7 @@ public record DirectionalRotationUserNode(Direction direction) implements Mechan
 
     @Override
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
-        return self.getGraphWorld().getNodesAt(self.getPos().offset(this.direction))
+        return self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.direction))
                 .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).toList();
     }
 

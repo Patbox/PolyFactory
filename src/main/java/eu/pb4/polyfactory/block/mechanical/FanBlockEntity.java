@@ -27,7 +27,7 @@ public class FanBlockEntity extends BlockEntity {
         }
         var self = (FanBlockEntity) t;
 
-        var speed = RotationUser.getRotation((ServerWorld) world, pos).speed();
+        var speed = RotationUser.getRotation((ServerWorld) world, pos).speed() * MathHelper.RADIANS_PER_DEGREE;
 
         if (speed == 0) {
             return;
@@ -50,14 +50,19 @@ public class FanBlockEntity extends BlockEntity {
             var x = speed * Math.pow(0.98, l);
             if (x > 0.05) {
                 var base = entity.getVelocity().getComponentAlongAxis(self.cachedDirection.getAxis());
-
                 entity.setVelocity(entity.getVelocity().withAxis(self.cachedDirection.getAxis(), base * 0.8f).add(Vec3d.of(self.cachedDirection.getVector()).multiply(x)));
-                entity.velocityModified = true;
+
                 if (self.cachedDirection == Direction.UP) {
                     entity.fallDistance = 0;
                 }
+
                 if (entity instanceof ServerPlayerEntity player) {
+                    if (player.age % 2 == 0) {
+                        entity.velocityModified = true;
+                    }
                     ((ServerPlayNetExt) player.networkHandler).polyFactory$resetFloating();
+                } else {
+                    entity.velocityModified = true;
                 }
             }
         }

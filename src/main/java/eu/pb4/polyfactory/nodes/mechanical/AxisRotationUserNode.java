@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.nodes.mechanical;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.graph.user.BlockNodeDecoder;
+import com.kneelawk.graphlib.api.graph.user.BlockNodeType;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
@@ -19,18 +20,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public record AxisRotationUserNode(Direction.Axis axis) implements MechanicalNode, RotationUserNode, AxisNode {
-    public static Identifier ID = ModInit.id("axis_rotation_user");
-
-    public static final BlockNodeDecoder DECODER = new BlockNodeDecoder() {
-        @Override
-        public @Nullable BlockNode decode(@Nullable NbtElement tag) {
-            return new AxisRotationUserNode(tag instanceof NbtString string ? Direction.Axis.fromName(string.asString()) : Direction.Axis.Y);
-        }
-    };
+    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("axis_rotation_user"),
+            tag -> new AxisRotationUserNode(tag instanceof NbtString string ? Direction.Axis.fromName(string.asString()) : Direction.Axis.Y));
 
     @Override
-    public @NotNull Identifier getTypeId() {
-        return ID;
+    public @NotNull BlockNodeType getType() {
+        return TYPE;
     }
 
     @Override
@@ -41,9 +36,9 @@ public record AxisRotationUserNode(Direction.Axis axis) implements MechanicalNod
     @Override
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
         var list = new ArrayList<HalfLink>();
-        self.getGraphWorld().getNodesAt(self.getPos().offset(this.axis,1))
+        self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.axis,1))
                 .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).forEach(list::add);
-        self.getGraphWorld().getNodesAt(self.getPos().offset(this.axis,-1))
+        self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.axis,-1))
                 .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).forEach(list::add);
 
         return list;

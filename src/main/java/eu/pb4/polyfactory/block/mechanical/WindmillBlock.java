@@ -234,7 +234,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
             for (var i = 0; i < sails.length; i++) {
                 mat.pushMatrix();
                 mat.rotateX((MathHelper.TAU / sails.length) * i);
-                mat.rotateY(MathHelper.HALF_PI);
+                mat.rotateY(-MathHelper.HALF_PI);
                 mat.translate(0, 0, 0.01f * (i % tmp));
                 this.sails[i].setTransformation(mat);
                 mat.popMatrix();

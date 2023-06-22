@@ -2,19 +2,31 @@ package eu.pb4.polyfactory.block.machines;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
+import eu.pb4.polyfactory.display.LodElementHolder;
+import eu.pb4.polyfactory.display.LodItemDisplayElement;
+import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.mechanical.DirectionalMechanicalNode;
+import eu.pb4.polyfactory.nodes.mechanical.DirectionalRotationUserNode;
+import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
+import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
+import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ToolItem;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -26,13 +38,15 @@ import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 
 import java.util.Collection;
 import java.util.List;
 
-public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, VirtualDestroyStage.Marker {
+public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, RotationUser, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static final Property<Direction> FACING = Properties.FACING;
 
     public MinerBlock(Settings settings) {
@@ -46,17 +60,17 @@ public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, 
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new DirectionalMechanicalNode(state.get(FACING).getOpposite()));
+        return List.of(new DirectionalRotationUserNode(state.get(FACING).getOpposite()));
     }
 
     @Override
     public Block getPolymerBlock(BlockState state) {
-        return Blocks.DISPENSER;
+        return Blocks.BARRIER;
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
-        return Blocks.DISPENSER.getDefaultState().with(DispenserBlock.FACING, state.get(FACING));
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.DISPENSER.getDefaultState();
     }
 
     @Override
@@ -82,7 +96,7 @@ public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, 
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection());
+        return this.getDefaultState().with(FACING, ctx.getSide().getOpposite());
     }
 
     @Override
@@ -117,5 +131,84 @@ public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return world instanceof ServerWorld && type == FactoryBlockEntities.MINER ? MinerBlockEntity::ticker : null;
+    }
+
+    @Override
+    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return new Model(world, initialBlockState);
+    }
+
+    @Override
+    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return true;
+    }
+
+    @Override
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+        if (world.getBlockEntity(pos) instanceof MinerBlockEntity be) {
+            modifier.stress(be.getStress());
+        }
+    }
+
+    public final class Model extends LodElementHolder {
+        private final Matrix4f mat = new Matrix4f();
+        private final ItemDisplayElement item;
+        private final ItemDisplayElement main;
+        private float rotation = 0;
+
+        private Model(ServerWorld world, BlockState state) {
+            this.main = new LodItemDisplayElement(FactoryItems.MINER_BLOCK.getDefaultStack());
+            this.main.setDisplaySize(1, 1);
+            this.main.setModelTransformation(ModelTransformationMode.FIXED);
+            this.item = new LodItemDisplayElement();
+            this.item.setDisplaySize(1, 1);
+            this.item.setModelTransformation(ModelTransformationMode.FIXED);
+            this.item.setInterpolationDuration(1);
+            this.updateAnimation(state.get(FACING));
+            this.addElement(this.main);
+            this.addElement(this.item);
+        }
+
+        private void updateAnimation(Direction direction) {
+            mat.identity();
+            mat.rotate(direction.getOpposite().getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion()));
+            mat.scale(2f);
+            this.main.setTransformation(mat);
+
+            mat.rotateY(MathHelper.HALF_PI);
+            mat.scale(0.5f);
+
+
+            if (this.item.getItem().getItem() instanceof ToolItem) {
+                mat.translate(-0.1f, 0.25f, 0);
+                mat.translate(-0.25f, -0.25f, 0);
+                mat.rotateZ(this.rotation);
+                mat.translate(0.25f, 0.25f, 0);
+            } else {
+                mat.translate(-0.3f, 0, 0);
+                mat.rotateZ(this.rotation);
+            }
+
+            this.item.setTransformation(mat);
+        }
+
+        @Override
+        protected void onTick() {
+            this.updateAnimation(((BlockBoundAttachment) this.getAttachment()).getBlockState().get(FACING));
+            if (this.item.isDirty()) {
+                this.item.startInterpolation();
+            }
+        }
+
+        public void setItem(ItemStack stack) {
+            this.item.setItem(stack);
+        }
+
+        public void rotate(float value) {
+            this.rotation += value;
+            if (this.rotation > MathHelper.TAU) {
+                this.rotation -= MathHelper.TAU;
+            }
+        }
     }
 }

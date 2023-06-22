@@ -12,10 +12,9 @@ public interface RotationUser extends NetworkComponent {
 
     static RotationData getRotation(ServerWorld world, BlockPos pos) {
         {
-            var o = FactoryNodes.ROTATIONAL.getGraphWorld(world).getNodesAt(pos).findFirst();
+            var o = FactoryNodes.ROTATIONAL.getGraphView(world).getNodesAt(pos).findFirst();
             if (o.isPresent()) {
-
-                var graph = FactoryNodes.ROTATIONAL.getGraphWorld(world).getGraph(o.get().getGraphId());
+                var graph = FactoryNodes.ROTATIONAL.getGraphView(world).getGraph(o.get().getGraphId());
                 var ent = graph.getGraphEntity(RotationData.TYPE);
 
                 ent.update(world, graph);

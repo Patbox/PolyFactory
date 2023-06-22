@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.GraphView;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.graph.user.BlockNodeDecoder;
+import com.kneelawk.graphlib.api.graph.user.BlockNodeType;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
@@ -21,19 +22,18 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue value) implements MechanicalNode {
-    public static final Identifier ID = ModInit.id("conveyor");
-    public static final BlockNodeDecoder DECODER = tag -> {
+    public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("conveyor"), tag -> {
         if (tag == null) {
             return null;
         }
 
         var compound = (NbtCompound) tag;
         return new ConveyorNode(Direction.byName(compound.getString("direction")), ConveyorBlock.DirectionValue.valueOf(compound.getString("value").toUpperCase(Locale.ROOT)));
-    };
+    });
 
     @Override
-    public @NotNull Identifier getTypeId() {
-        return ID;
+    public @NotNull BlockNodeType getType() {
+        return TYPE;
     }
 
     @Override
@@ -50,7 +50,7 @@ public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue val
         var list = new ArrayList<HalfLink>();
 
         var view = self.getGraphWorld();
-        var pos = self.getPos();
+        var pos = self.getBlockPos();
 
         Predicate<NodeHolder<BlockNode>> conv = other -> (other.getNode() instanceof ConveyorNode node && node.direction == this.direction) && FactoryNodes.canBothConnect(self, other);
         Predicate<NodeHolder<BlockNode>> convType = other -> (other.getNode() instanceof ConveyorNode node && node.direction == this.direction && node.value.value == this.value.value) && FactoryNodes.canBothConnect(self, other);
@@ -105,7 +105,7 @@ public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue val
 
     @Override
     public boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
-        return MechanicalNode.super.canConnect(self, other) && (other.other().getNode() instanceof ConveyorNode || other.other().getPos().getY() - self.getPos().getY() != 1);
+        return MechanicalNode.super.canConnect(self, other) && (other.other().getNode() instanceof ConveyorNode || other.other().getBlockPos().getY() - self.getBlockPos().getY() != 1);
     }
 
     @Override

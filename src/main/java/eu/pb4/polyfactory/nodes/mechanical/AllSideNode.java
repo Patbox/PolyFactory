@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.nodes.mechanical;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.graph.user.BlockNodeDecoder;
+import com.kneelawk.graphlib.api.graph.user.BlockNodeType;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
@@ -17,18 +18,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public record AllSideNode() implements MechanicalNode {
-    public static Identifier ID = ModInit.id("gearbox");
-
-    public static final BlockNodeDecoder DECODER = new BlockNodeDecoder() {
-        @Override
-        public @Nullable BlockNode decode(@Nullable NbtElement tag) {
-            return new AllSideNode();
-        }
-    };
+    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("gearbox"), (nbt) -> new AllSideNode());
 
     @Override
-    public @NotNull Identifier getTypeId() {
-        return ID;
+    public @NotNull BlockNodeType getType() {
+        return TYPE;
     }
 
     @Override
@@ -41,7 +35,7 @@ public record AllSideNode() implements MechanicalNode {
         var list = new ArrayList<HalfLink>();
 
         for (var dir : Direction.values()) {
-            self.getGraphWorld().getNodesAt(self.getPos().offset(dir))
+            self.getGraphWorld().getNodesAt(self.getBlockPos().offset(dir))
                     .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).forEach(list::add);
         }
         return list;

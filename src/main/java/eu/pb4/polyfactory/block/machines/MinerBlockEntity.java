@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.FakePlayer;
 import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.block.BlockState;
@@ -19,12 +20,15 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
@@ -35,6 +39,8 @@ public class MinerBlockEntity extends BlockEntity implements SingleStackInventor
     protected GameProfile owner = null;
     protected FakePlayer player = null;
     protected double process = 0;
+    private float stress = 0;
+    private MinerBlock.Model model;
 
     public MinerBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.MINER, pos, state);
@@ -68,6 +74,9 @@ public class MinerBlockEntity extends BlockEntity implements SingleStackInventor
     @Override
     public void setStack(ItemStack stack) {
         this.currentTool = stack;
+        if (this.model != null) {
+            this.model.setItem(stack);
+        }
     }
 
     public FakePlayer getFakePlayer() {
@@ -86,6 +95,11 @@ public class MinerBlockEntity extends BlockEntity implements SingleStackInventor
     public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
         var self = (MinerBlockEntity) t;
 
+        if (self.model == null) {
+            self.model = (MinerBlock.Model) BlockBoundAttachment.get(world, pos).holder();
+            self.model.setItem(self.currentTool);
+        }
+
         var blockPos = pos.offset(state.get(MinerBlock.FACING));
         var stateFront = world.getBlockState(blockPos);
 
@@ -93,29 +107,48 @@ public class MinerBlockEntity extends BlockEntity implements SingleStackInventor
             self.process = 0;
             self.targetState = stateFront;
             world.setBlockBreakingInfo(self.getFakePlayer().getId(), blockPos, -1);
-
             return;
         }
         var player = self.getFakePlayer();
 
-        if (stateFront.isAir() || !self.currentTool.getItem().canMine(stateFront, world, blockPos, player)) {
-            return;
-        }
-
-        var speed = Math.abs(RotationUser.getRotation((ServerWorld) world, pos).speed()) * 2;
-        if (speed == 0) {
+        if (self.currentTool.isEmpty() || !self.currentTool.getItem().canMine(stateFront, world, blockPos, player)) {
+            self.stress = 0;
             return;
         }
 
         if (!CommonProtection.canBreakBlock(world, blockPos, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner,null)) {
+            self.stress = 0;
             return;
         }
 
-        self.process += stateFront.calcBlockBreakingDelta(player, self.world, blockPos) * speed;
+        var delta = stateFront.calcBlockBreakingDelta(player, self.world, blockPos);
+        if (delta < 0) {
+            delta = 0;
+        }
+
+        var speed = Math.abs(RotationUser.getRotation((ServerWorld) world, pos).speed()) * MathHelper.RADIANS_PER_DEGREE * 2.5f;
+
+        if (stateFront.isAir() || stateFront.getOutlineShape(world, blockPos).isEmpty()) {
+            self.stress = 0;
+            self.model.rotate((float) speed);
+            return;
+        }
+        self.stress = Math.min(0.2f / delta, player.canHarvest(stateFront) ? 20 : 99999);
+
+        if (speed == 0) {
+            return;
+        }
+
+        self.process += delta * speed;
+
+        self.model.rotate((float) speed);
+
         world.setBlockBreakingInfo(player.getId(), blockPos, (int) (self.process * 10.0F));
 
         if (self.process >= 1) {
             self.process = 0;
+            self.stress = 0;
+
             BlockEntity blockEntity = world.getBlockEntity(blockPos);
             if (!(stateFront.getBlock() instanceof OperatorBlock) && !player.isBlockBreakingRestricted(world, blockPos, GameMode.SURVIVAL)) {
                 stateFront.getBlock().onBreak(world, blockPos, stateFront, player);
@@ -133,6 +166,10 @@ public class MinerBlockEntity extends BlockEntity implements SingleStackInventor
             }
             world.updateComparators(pos, state.getBlock());
         }
+    }
+
+    public float getStress() {
+        return this.stress;
     }
 
     private class Gui extends SimpleGui {

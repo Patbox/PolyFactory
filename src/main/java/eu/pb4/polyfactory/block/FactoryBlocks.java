@@ -32,7 +32,7 @@ public class FactoryBlocks {
     public static final HandCrankBlock HAND_CRANK = register("hand_crank", new HandCrankBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final GrinderBlock GRINDER = register("grinder", new GrinderBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final PressBlock PRESS = register("press", new PressBlock(Block.Settings.create().hardness(1).nonOpaque()));
-    public static final MinerBlock MINER = register("miner", new MinerBlock(Block.Settings.create().hardness(1)));
+    public static final MinerBlock MINER = register("miner", new MinerBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final AxleBlock AXLE = register("axle", new AxleBlock(Block.Settings.create().nonOpaque().hardness(1)));
     public static final GearboxBlock GEARBOX = register("gearbox", new GearboxBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final WindmillBlock WINDMILL = register("windmill", new WindmillBlock(Block.Settings.create().hardness(1).nonOpaque()));

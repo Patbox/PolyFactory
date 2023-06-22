@@ -13,7 +13,7 @@ public interface NetworkComponent {
     interface Rotational extends NetworkComponent {
         static void updateRotationalAt(WorldAccess world, BlockPos pos) {
             if (world instanceof ServerWorld serverWorld) {
-                FactoryNodes.ROTATIONAL.getGraphWorld(serverWorld).updateNodes(pos);
+                FactoryNodes.ROTATIONAL.getServerGraphWorld(serverWorld).updateNodes(pos);
             }
         }
 

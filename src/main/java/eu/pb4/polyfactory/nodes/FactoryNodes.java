@@ -33,18 +33,19 @@ public class FactoryNodes {
             return List.of();
         });
 
-        universe.addNodeDecoder(ConveyorNode.ID, ConveyorNode.DECODER);
-        universe.addNodeDecoder(DirectionalRotationUserNode.ID, DirectionalRotationUserNode.DECODER);
-        universe.addNodeDecoder(DirectionalMechanicalNode.ID, DirectionalMechanicalNode.DECODER);
-        universe.addNodeDecoder(AxisRotationUserNode.ID, AxisRotationUserNode.DECODER);
-        universe.addNodeDecoder(AxisMechanicalNode.ID, AxisMechanicalNode.DECODER);
-        universe.addNodeDecoder(AllSideNode.ID, AllSideNode.DECODER);
+        universe.addNodeType(ConveyorNode.TYPE);
+        universe.addNodeType(DirectionalRotationUserNode.TYPE);
+        universe.addNodeType(DirectionalMechanicalNode.TYPE);
+        universe.addNodeType(AxisRotationUserNode.TYPE);
+        universe.addNodeType(AxisMechanicalNode.TYPE);
+        universe.addNodeType(AllSideNode.TYPE);
+
         universe.addCacheCategory(RotationUserNode.CACHE);
 
         universe.addGraphEntityType(RotationData.TYPE);
 
-        //universe.addNodeDecoder(CablePlateNode.ID, CablePlateNode.DECODER);
-        //universe.addNodeDecoder(DirectionalElectricalNode.ID, DirectionalElectricalNode.DECODER);
+        //universe.addNodeType(CablePlateNode.TYPE, CablePlateNode.DECODER);
+        //universe.addNodeType(DirectionalElectricalNode.TYPE, DirectionalElectricalNode.DECODER);
 
         universe.register();
         return universe;

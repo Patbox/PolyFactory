@@ -4,6 +4,8 @@ import com.kneelawk.graphlib.api.graph.BlockGraph;
 import com.kneelawk.graphlib.api.graph.GraphEntityContext;
 import com.kneelawk.graphlib.api.graph.user.GraphEntity;
 import com.kneelawk.graphlib.api.graph.user.GraphEntityType;
+import eu.pb4.polyfactory.block.machines.MinerBlock;
+import eu.pb4.polyfactory.block.machines.MinerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
@@ -22,13 +24,13 @@ public class RotationData implements GraphEntity<RotationData> {
         }
     };
 
-    public static final GraphEntityType<RotationData> TYPE = new GraphEntityType<>(id("rotation_info"),
-            RotationData::create, RotationData::decode, RotationData::split);
+    public static final GraphEntityType<RotationData> TYPE = GraphEntityType.of(id("rotation_info"), RotationData::new, RotationData::decode, RotationData::split);
 
     private double speed;
     private float rotation;
     private int lastTick = -1;
     private double stressCapacity;
+    private GraphEntityContext ctx;
 
     public RotationData() {
     }
@@ -63,10 +65,10 @@ public class RotationData implements GraphEntity<RotationData> {
 
         var state = new State();
         for (var entries : list) {
-            var blockState = world.getBlockState(entries.getPos());
+            var blockState = world.getBlockState(entries.getBlockPos());
 
             if (blockState.getBlock() instanceof RotationUser rotationalSource) {
-                rotationalSource.updateRotationalData(state, blockState, world, entries.getPos());
+                rotationalSource.updateRotationalData(state, blockState, world, entries.getBlockPos());
             }
         }
 
@@ -81,7 +83,7 @@ public class RotationData implements GraphEntity<RotationData> {
             this.speed = 0;
 
             for (var entry : list) {
-                var pos = entry.getPos();
+                var pos = entry.getBlockPos();
                 world.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.3, 0.3, 0.3, 0.2);
             }
 
@@ -97,6 +99,16 @@ public class RotationData implements GraphEntity<RotationData> {
         }
 
         this.rotation = r;
+    }
+
+    @Override
+    public void onInit(@NotNull GraphEntityContext ctx) {
+        this.ctx = ctx;
+    }
+
+    @Override
+    public @NotNull GraphEntityContext getContext() {
+        return null;
     }
 
     @Override
@@ -122,18 +134,14 @@ public class RotationData implements GraphEntity<RotationData> {
 
     }
 
-    private RotationData split(@NotNull BlockGraph blockGraph, @NotNull GraphEntityContext graphEntityContext) {
+    private @NotNull RotationData split(@NotNull BlockGraph originalGraph, @NotNull BlockGraph newGraph) {
         var data = new RotationData();
         data.rotation = this.rotation;
         data.speed = this.speed;
         return data;
     }
 
-    private static RotationData decode(@Nullable NbtElement nbtElement, @NotNull GraphEntityContext graphEntityContext) {
-        return new RotationData();
-    }
-
-    private static RotationData create(@NotNull GraphEntityContext graphEntityContext) {
+    private static RotationData decode(@Nullable NbtElement nbtElement) {
         return new RotationData();
     }
 

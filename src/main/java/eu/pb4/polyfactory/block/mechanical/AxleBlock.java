@@ -18,6 +18,7 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.LightningRodBlock;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -64,6 +65,11 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
     }
 
     @Override
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.LIGHTNING_ROD.getDefaultState().with(Properties.FACING, Direction.from(state.get(AXIS), Direction.AxisDirection.POSITIVE)).with(LightningRodBlock.POWERED, true);
+    }
+
+    @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
         return Blocks.STRIPPED_OAK_LOG.getDefaultState();
     }
@@ -102,7 +108,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
 
             mat.rotateY(rotation);
 
-            mat.scale(2f);
+            mat.scale(2, 2.005f, 2);
             this.mainElement.setTransformation(mat);
         }
 

@@ -8,7 +8,7 @@ import net.minecraft.util.math.Direction;
 public interface DirectionalNode extends AxisNode {
 
     static boolean canConnect(DirectionalNode self, NodeHolder<BlockNode> holder, HalfLink other) {
-        if (other.other().getPos().offset(self.direction(), -1).equals(holder.getPos())) {
+        if (other.other().getBlockPos().offset(self.direction(), -1).equals(holder.getBlockPos())) {
             if (other.other().getNode() instanceof DirectionalNode directionalNode) {
                 return self.direction() == directionalNode.direction().getOpposite();
             } else if (other.other().getNode() instanceof AxisNode axisNode) {

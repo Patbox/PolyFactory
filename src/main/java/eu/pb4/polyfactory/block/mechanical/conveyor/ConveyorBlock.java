@@ -208,7 +208,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
     }
 
     private void pushEntity(ServerWorld world, BlockState state, BlockPos pos, Entity entity) {
-        if (entity instanceof ItemEntity itemEntity && itemEntity.age > 10) {
+        if (entity instanceof ItemEntity itemEntity && itemEntity.age > 0) {
             var be = world.getBlockEntity(pos);
             if (be instanceof ConveyorBlockEntity conveyorBlockEntity && conveyorBlockEntity.tryAdding(itemEntity.getStack())) {
                 conveyorBlockEntity.setDelta(0.5);

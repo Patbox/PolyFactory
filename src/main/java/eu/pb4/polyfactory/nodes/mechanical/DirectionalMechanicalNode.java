@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.nodes.mechanical;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.graph.user.BlockNodeDecoder;
+import com.kneelawk.graphlib.api.graph.user.BlockNodeType;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
@@ -20,18 +21,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 
 public record DirectionalMechanicalNode(Direction direction) implements MechanicalNode, DirectionalNode {
-    public static Identifier ID = ModInit.id("directional_mechanical_input");
-
-    public static final BlockNodeDecoder DECODER = new BlockNodeDecoder() {
-        @Override
-        public @Nullable BlockNode decode(@Nullable NbtElement tag) {
-            return new DirectionalMechanicalNode(tag instanceof NbtString string ? Direction.byName(string.asString()) : Direction.NORTH);
-        }
-    };
+    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("directional_mechanical_input"),
+            tag -> new DirectionalMechanicalNode(tag instanceof NbtString string ? Direction.byName(string.asString()) : Direction.NORTH));
 
     @Override
-    public @NotNull Identifier getTypeId() {
-        return ID;
+    public @NotNull BlockNodeType getType() {
+        return TYPE;
     }
 
     @Override
@@ -41,7 +36,7 @@ public record DirectionalMechanicalNode(Direction direction) implements Mechanic
 
     @Override
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
-        return self.getGraphWorld().getNodesAt(self.getPos().offset(this.direction)).filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).toList();
+        return self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.direction)).filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).toList();
     }
 
     @Override
