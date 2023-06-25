@@ -33,9 +33,8 @@ public class FactoryItems {
     public static final Item AXLE_BLOCK = register("axle", new ModeledBlockItem(FactoryBlocks.AXLE, new Item.Settings()));
     public static final Item GEARBOX_BLOCK = register("gearbox", new ModeledBlockItem(FactoryBlocks.GEARBOX, new Item.Settings()));
     public static final Item CONTAINER_BLOCK = register("wooden_container", new ModeledBlockItem(FactoryBlocks.CONTAINER, new Item.Settings()));
+    public static final Item NIXIE_TUBE = register("nixie_tube", new ModeledBlockItem(FactoryBlocks.NIXIE_TUBE, new Item.Settings()));
     public static final Item WINDMILL_SAIL = register("windmill_sail", new WindmillSailItem(new Item.Settings()));
-    public static final Item ITEM_GENERATOR_BLOCK = register("item_generator", new ModeledBlockItem(FactoryBlocks.ITEM_GENERATOR, new Item.Settings()));
-    public static final Item ROTATION_DEBUG_BLOCK = register("rot_debug", new ModeledBlockItem(FactoryBlocks.ROTATION_DEBUG, new Item.Settings()));
 
     public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
     public static final Item STEEL_INGOT = register("steel_ingot", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
@@ -43,6 +42,10 @@ public class FactoryItems {
     public static final Item STEEL_COG = register("steel_cog", new ModeledItem(Items.IRON_NUGGET, new Item.Settings()));
 
     public static final Item ITEM_FILTER = register("item_filter", new FilterItem(Items.PAPER, new Item.Settings()));
+
+    public static final Item ITEM_GENERATOR_BLOCK = register("item_generator", new ModeledBlockItem(FactoryBlocks.ITEM_GENERATOR, new Item.Settings()));
+    public static final Item ROTATION_DEBUG_BLOCK = register("rot_debug", new ModeledBlockItem(FactoryBlocks.ROTATION_DEBUG, new Item.Settings()));
+    public static final Item GREEN_SCREEN_BLOCK = register("green_screen", new ModeledBlockItem(FactoryBlocks.GREEN_SCREEN, new Item.Settings()));
 
 
     public static void register() {
@@ -53,21 +56,27 @@ public class FactoryItems {
                     //entries.add(WRENCH);
 
                     // Rotational machines (tier 1)
+
+                    // Movement/Storage
                     entries.add(CONVEYOR_BLOCK);
                     entries.add(STICKY_CONVEYOR_BLOCK);
+                    entries.add(FAN_BLOCK);
                     entries.add(FUNNEL_BLOCK);
                     entries.add(SPLITTER_BLOCK);
                     entries.add(CONTAINER_BLOCK);
-                    entries.add(FAN_BLOCK);
+                    entries.add(NIXIE_TUBE);
+
                     entries.add(GRINDER_BLOCK);
                     entries.add(PRESS_BLOCK);
                     entries.add(MINER_BLOCK);
+
                     entries.add(AXLE_BLOCK);
                     entries.add(GEARBOX_BLOCK);
                     entries.add(HAND_CRANK_BLOCK);
                     entries.add(WINDMILL_SAIL);
-                    entries.add(ITEM_FILTER);
 
+                    entries.add(ITEM_FILTER);
+                    
                     // Electrical machines (tier 2)
                     entries.add(MOTOR_BLOCK);
                     entries.add(CABLE_PLATE_BLOCK);
@@ -78,10 +87,12 @@ public class FactoryItems {
                     entries.add(STEEL_PLATE);
                     entries.add(STEEL_COG);
 
-
-                    // Creative stuff
-                    entries.add(ITEM_GENERATOR_BLOCK);
-                    entries.add(ROTATION_DEBUG_BLOCK);
+                    if (ModInit.DEV) {
+                        // Creative stuff
+                        entries.add(ITEM_GENERATOR_BLOCK);
+                        entries.add(ROTATION_DEBUG_BLOCK);
+                        entries.add(GREEN_SCREEN_BLOCK);
+                    }
                 })).build()
         );
 

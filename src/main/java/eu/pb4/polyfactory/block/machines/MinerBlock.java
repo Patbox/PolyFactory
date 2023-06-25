@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.mechanical.DirectionalMechanicalNode;
 import eu.pb4.polyfactory.nodes.mechanical.DirectionalRotationUserNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -32,9 +33,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -134,6 +133,16 @@ public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, 
     }
 
     @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.transform(state, rotation::rotate, FACING);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.transform(state, mirror::apply, FACING);
+    }
+
+    @Override
     public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return new Model(world, initialBlockState);
     }
@@ -160,10 +169,13 @@ public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, 
             this.main = new LodItemDisplayElement(FactoryItems.MINER_BLOCK.getDefaultStack());
             this.main.setDisplaySize(1, 1);
             this.main.setModelTransformation(ModelTransformationMode.FIXED);
+            this.main.setInvisible(true);
             this.item = new LodItemDisplayElement();
             this.item.setDisplaySize(1, 1);
             this.item.setModelTransformation(ModelTransformationMode.FIXED);
             this.item.setInterpolationDuration(1);
+            this.item.setInvisible(true);
+
             this.updateAnimation(state.get(FACING));
             this.addElement(this.main);
             this.addElement(this.item);

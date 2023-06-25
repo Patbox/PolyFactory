@@ -32,6 +32,8 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -47,16 +49,15 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
     public static final int MAX_SAILS = 8;
     public static final IntProperty SAIL_COUNT = IntProperty.of("sails", 1, MAX_SAILS);
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
-    public static final BooleanProperty REVERSE = BooleanProperty.of("reverse");
 
     public WindmillBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(SAIL_COUNT, 4).with(REVERSE, false));
+        this.setDefaultState(this.getDefaultState().with(SAIL_COUNT, 4));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING).add(SAIL_COUNT).add(REVERSE);
+        builder.add(FACING).add(SAIL_COUNT);
     }
 
     @Nullable
@@ -73,12 +74,21 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
             }
         }
         super.onStateReplaced(state, world, pos, newState, moved);
-
     }
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
         return List.of(new DirectionalRotationUserNode(state.get(FACING)));
+    }
+
+    @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.transform(state, rotation::rotate, FACING);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.transform(state, mirror::apply, FACING);
     }
 
     @Override
@@ -145,14 +155,15 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
         private WindmillBlockEntity blockEntity;
 
         private Model(ServerWorld world, BlockState state) {
-            this.updateSails(state.get(SAIL_COUNT), state.get(REVERSE));
+            this.updateSails(state.get(SAIL_COUNT), state.get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
 
             this.center = new LodItemDisplayElement(AxleBlock.Model.ITEM_MODEL_SHORT);
             this.center.setDisplaySize(3, 3);
             this.center.setModelTransformation(ModelTransformationMode.FIXED);
             this.center.setInterpolationDuration(5);
+            this.center.setInvisible(true);
             this.addElement(this.center);
-            this.updateAnimation(0, state.get(WindmillBlock.FACING), state.get(REVERSE));
+            this.updateAnimation(0, state.get(WindmillBlock.FACING), state.get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
         }
 
         private void updateSails(int count, boolean reverse) {
@@ -183,6 +194,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
                             //x.setDisplaySize(3, 3);
                             x.setModelTransformation(ModelTransformationMode.FIXED);
                             x.setInterpolationDuration(5);
+                            x.setInvisible(true);
                             sails[i] = x;
                             this.addElement(x);
                         }
@@ -194,6 +206,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
                     //x.setDisplaySize(3, 3);
                     x.setModelTransformation(ModelTransformationMode.FIXED);
                     x.setInterpolationDuration(5);
+                    x.setInvisible(true);
                     sails[i] = x;
                     this.addElement(x);
                 }
@@ -221,8 +234,8 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
         }
 
         private void updateAnimation(float speed, Direction direction, boolean reverse) {
+            this.center.setYaw(direction.asRotation() - 90);
             mat.identity();
-            mat.rotateY(MathHelper.HALF_PI - direction.asRotation() * MathHelper.RADIANS_PER_DEGREE);
             mat.rotateX(((float) (reverse ? speed : -speed)));
 
             mat.pushMatrix();
@@ -235,6 +248,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
                 mat.pushMatrix();
                 mat.rotateX((MathHelper.TAU / sails.length) * i);
                 mat.rotateY(-MathHelper.HALF_PI);
+                this.sails[i].setYaw(direction.asRotation() - 90);
                 mat.translate(0, 0, 0.01f * (i % tmp));
                 this.sails[i].setTransformation(mat);
                 mat.popMatrix();
@@ -254,7 +268,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
             if (tick % 4 == 0) {
                 this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(WindmillBlock.FACING),
-                        ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(WindmillBlock.REVERSE));
+                        ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
 
                 for (var i = 0; i < sails.length; i++) {
                     if (this.sails[i].isDirty()) {
@@ -275,7 +289,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
 
                 this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(WindmillBlock.FACING),
-                        ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(WindmillBlock.REVERSE));
+                        ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
                 for (var i = 0; i < this.sails.length; i++) {
                     this.sails[i].setInterpolationDuration(0);
                     this.sails[i].tick();
@@ -286,7 +300,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
 
         public void updateSailsBe() {
             var state = BlockBoundAttachment.get(this).getBlockState();
-            this.updateSails(state.get(SAIL_COUNT), state.get(REVERSE));
+            this.updateSails(state.get(SAIL_COUNT), state.get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
         }
     }
 }

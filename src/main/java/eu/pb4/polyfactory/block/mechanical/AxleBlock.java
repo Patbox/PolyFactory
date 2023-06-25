@@ -28,6 +28,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
@@ -80,6 +82,17 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
     }
 
     @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        var a = state.get(AXIS);
+
+        if (a == Direction.Axis.Y || rotation == BlockRotation.NONE || rotation == BlockRotation.CLOCKWISE_180) {
+            return state;
+        }
+
+        return state.with(AXIS, a == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X);
+    }
+
+    @Override
     public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
@@ -95,6 +108,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
             this.mainElement.setInterpolationDuration(5);
+            this.mainElement.setInvisible(true);
             this.updateAnimation(0,  state.get(AXIS));
             this.addElement(this.mainElement);
         }
@@ -103,7 +117,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
             mat.identity();
             switch (axis) {
                 case X -> mat.rotate(Direction.EAST.getRotationQuaternion());
-                case Z -> mat.rotate(Direction.NORTH.getRotationQuaternion());
+                case Z -> mat.rotate(Direction.SOUTH.getRotationQuaternion());
             }
 
             mat.rotateY(rotation);

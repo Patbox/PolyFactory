@@ -41,10 +41,7 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Property;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
@@ -179,6 +176,15 @@ public class PressBlock extends RotationalNetworkBlock implements PolymerBlock, 
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return world instanceof ServerWorld && type == FactoryBlockEntities.PRESS ? PressBlockEntity::ticker : null;
     }
+    @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.transform(state, rotation::rotate, INPUT_FACING);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.transform(state, mirror::apply, INPUT_FACING);
+    }
 
     @Override
     public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
@@ -263,10 +269,14 @@ public class PressBlock extends RotationalNetworkBlock implements PolymerBlock, 
             this.main = new LodItemDisplayElement(FactoryItems.PRESS_BLOCK.getDefaultStack());
             this.main.setDisplaySize(1, 1);
             this.main.setModelTransformation(ModelTransformationMode.FIXED);
+            this.main.setInvisible(true);
+
             this.piston = new LodItemDisplayElement(MODEL_PISTON);
             this.piston.setDisplaySize(1, 1);
             this.piston.setModelTransformation(ModelTransformationMode.FIXED);
             this.piston.setInterpolationDuration(2);
+            this.piston.setInvisible(true);
+
             this.updateAnimation(state.get(INPUT_FACING));
             this.addElement(this.piston);
             this.addElement(this.main);

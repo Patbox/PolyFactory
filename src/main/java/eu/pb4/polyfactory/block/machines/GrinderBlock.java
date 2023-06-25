@@ -41,10 +41,7 @@ import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -141,6 +138,16 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
         super.onStateReplaced(state, world, pos, newState, moved);
     }
 
+    @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.transform(state, rotation::rotate, INPUT_FACING);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.transform(state, mirror::apply, INPUT_FACING);
+    }
+
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
@@ -191,10 +198,14 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
             this.main = new LodItemDisplayElement(FactoryItems.GRINDER_BLOCK.getDefaultStack());
             this.main.setDisplaySize(1, 1);
             this.main.setModelTransformation(ModelTransformationMode.FIXED);
+            this.main.setInvisible(true);
+
             this.stoneWheel = new LodItemDisplayElement(MODEL_STONE_WHEEL);
             this.stoneWheel.setDisplaySize(1, 1);
             this.stoneWheel.setModelTransformation(ModelTransformationMode.FIXED);
             this.stoneWheel.setInterpolationDuration(5);
+            this.stoneWheel.setInvisible(true);
+
             this.updateAnimation(0, state.get(INPUT_FACING));
             this.addElement(this.main);
             this.addElement(this.stoneWheel);

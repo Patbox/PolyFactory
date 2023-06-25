@@ -11,10 +11,13 @@ import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlock;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlock;
-import eu.pb4.polyfactory.block.storage.ContainerBlock;
+import eu.pb4.polyfactory.block.other.ContainerBlock;
+import eu.pb4.polyfactory.block.other.GreenScreenBlock;
+import eu.pb4.polyfactory.block.other.NixieTubeBlock;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.ActionResult;
@@ -27,7 +30,7 @@ public class FactoryBlocks {
     public static final ElectricMotorBlock MOTOR = register("electric_motor", new ElectricMotorBlock(Block.Settings.create().hardness(2)));
     public static final FunnelBlock FUNNEL = register("funnel", new FunnelBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final SplitterBlock SPLITTER = register("splitter", new SplitterBlock(Block.Settings.create().hardness(1).nonOpaque()));
-    public static final FanBlock FAN = register("fan", new FanBlock(Block.Settings.create().hardness(1)));
+    public static final FanBlock FAN = register("fan", new FanBlock(Block.Settings.create().nonOpaque().hardness(1)));
     public static final CablePlateBlock CABLE_PLATE = register("cable_plate", new CablePlateBlock(Block.Settings.create().hardness(1)));
     public static final HandCrankBlock HAND_CRANK = register("hand_crank", new HandCrankBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final GrinderBlock GRINDER = register("grinder", new GrinderBlock(Block.Settings.create().hardness(1).nonOpaque()));
@@ -37,8 +40,10 @@ public class FactoryBlocks {
     public static final GearboxBlock GEARBOX = register("gearbox", new GearboxBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final WindmillBlock WINDMILL = register("windmill", new WindmillBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final ContainerBlock CONTAINER = register("wooden_container", new ContainerBlock(Block.Settings.create().hardness(1).nonOpaque()));
+    public static final NixieTubeBlock NIXIE_TUBE = register("nixie_tube", new NixieTubeBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final ItemGeneratorBlock ITEM_GENERATOR = register("item_generator", new ItemGeneratorBlock(AbstractBlock.Settings.create().strength(-1, -1)));
     public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", new RotationalDebugBlock(AbstractBlock.Settings.create().strength(-1, -1)));
+    public static final GreenScreenBlock GREEN_SCREEN = register("green_screen", new GreenScreenBlock(AbstractBlock.Settings.copy(Blocks.GREEN_WOOL)));
 
 
     public static void register() {

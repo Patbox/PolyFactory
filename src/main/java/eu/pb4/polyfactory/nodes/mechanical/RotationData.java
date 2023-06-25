@@ -7,6 +7,7 @@ import com.kneelawk.graphlib.api.graph.user.GraphEntityType;
 import eu.pb4.polyfactory.block.machines.MinerBlock;
 import eu.pb4.polyfactory.block.machines.MinerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
@@ -19,9 +20,7 @@ import static eu.pb4.polyfactory.ModInit.id;
 public class RotationData implements GraphEntity<RotationData> {
     public static RotationData EMPTY = new RotationData() {
         @Override
-        public void update(ServerWorld world, BlockGraph graph) {
-
-        }
+        public void update(ServerWorld world, BlockGraph graph) {}
     };
 
     public static final GraphEntityType<RotationData> TYPE = GraphEntityType.of(id("rotation_info"), RotationData::new, RotationData::decode, RotationData::split);
@@ -118,7 +117,9 @@ public class RotationData implements GraphEntity<RotationData> {
 
     @Override
     public @Nullable NbtElement toTag() {
-        return null;
+        var nbt = new NbtCompound();
+        nbt.putFloat("Rot", this.rotation);
+        return nbt;
     }
 
     @Override
@@ -142,7 +143,12 @@ public class RotationData implements GraphEntity<RotationData> {
     }
 
     private static RotationData decode(@Nullable NbtElement nbtElement) {
-        return new RotationData();
+        var rotation = new RotationData();
+        if (nbtElement instanceof NbtCompound compound) {
+            rotation.rotation = compound.getFloat("Rot");
+        }
+
+        return rotation;
     }
 
     public static class State {

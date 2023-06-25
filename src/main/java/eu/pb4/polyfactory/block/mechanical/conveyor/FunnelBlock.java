@@ -33,9 +33,7 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
@@ -237,6 +235,16 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
     }
 
     @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.transform(state, rotation::rotate, FACING);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.transform(state, mirror::apply, FACING);
+    }
+
+    @Override
     public Block getPolymerBlock(BlockState state) {
         return Blocks.IRON_TRAPDOOR;
     }
@@ -268,10 +276,13 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
             this.mainElement = new LodItemDisplayElement();
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
+            this.mainElement.setInvisible(true);
             this.filterElement = new LodItemDisplayElement();
             this.filterElement.setDisplaySize(1, 1);
             this.filterElement.setModelTransformation(ModelTransformationMode.GUI);
             this.filterElement.setViewRange(0.1f);
+            this.filterElement.setInvisible(true);
+
             this.updateFacing(state);
             this.addElement(this.mainElement);
             this.addElement(this.filterElement);

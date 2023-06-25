@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.block.storage;
+package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;

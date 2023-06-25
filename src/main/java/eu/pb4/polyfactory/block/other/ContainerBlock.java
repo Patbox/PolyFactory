@@ -1,9 +1,8 @@
-package eu.pb4.polyfactory.block.storage;
+package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.polyfactory.block.AttackableBlock;
-import eu.pb4.polyfactory.block.mechanical.WindmillBlockEntity;
-import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -12,7 +11,6 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -29,9 +27,7 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -131,6 +127,16 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
     }
 
     @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.transform(state, rotation::rotate, FACING);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.transform(state, mirror::apply, FACING);
+    }
+
+    @Override
     public Block getPolymerBlock(BlockState state) {
         return Blocks.BARRIER;
     }
@@ -162,14 +168,18 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
             this.mainElement.setItem(FactoryItems.CONTAINER_BLOCK.getDefaultStack());
+            this.mainElement.setInvisible(true);
 
             this.itemElement = new ItemDisplayElement();
             this.itemElement.setDisplaySize(1, 1);
             this.itemElement.setModelTransformation(ModelTransformationMode.GUI);
+            this.itemElement.setInvisible(true);
 
             this.countElement = new TextDisplayElement(Text.literal("0"));
             this.countElement.setDisplaySize(1, 1);
             this.countElement.setBackground(0);
+            this.countElement.setInvisible(true);
+
             //this.countElement.setShadow(true);
 
             this.updateFacing(state);

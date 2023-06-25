@@ -27,9 +27,7 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
@@ -41,7 +39,7 @@ import org.joml.Matrix4fStack;
 
 
 public class SplitterBlock extends Block implements PolymerBlock, MovingItemConsumer, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
-    public static DirectionProperty DIRECTION = DirectionProperty.of("direction", Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
+    public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
 
     public SplitterBlock(Settings settings) {
@@ -51,13 +49,13 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(DIRECTION, ENABLED);
+        builder.add(FACING, ENABLED);
     }
 
     @Override
     public boolean pushItemTo(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         var selfState = self.getBlockState();
-        var dir = selfState.get(DIRECTION);
+        var dir = selfState.get(FACING);
         var item = conveyor.getContainer();
 
         if (!selfState.get(ENABLED) || item == null || item.get().isEmpty() || conveyor.movementDelta() < 0.49) {
@@ -122,7 +120,7 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
             dir = ctx.getHorizontalPlayerFacing();
         }
 
-        return this.getDefaultState().with(DIRECTION, dir);
+        return this.getDefaultState().with(FACING, dir);
     }
 
     @Override
@@ -143,7 +141,7 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
         var stack = player.getStackInHand(hand);
 
         if (((stack.isOf(FactoryItems.ITEM_FILTER) && !FilterItem.getStack(stack).isEmpty()) || stack.isEmpty()) && hand == Hand.MAIN_HAND && be instanceof SplitterBlockEntity splitterBlockEntity) {
-            var dir = state.get(DIRECTION);
+            var dir = state.get(FACING);
             if (hit.getSide().getAxis() != Direction.Axis.Y && hit.getSide().getAxis() != dir.getAxis()) {
                 if (hit.getSide() == dir.rotateYCounterclockwise()) {
                     if (stack.isEmpty()) {
@@ -176,6 +174,16 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
     }
 
     @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.transform(state, rotation::rotate, FACING);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.transform(state, mirror::apply, FACING);
+    }
+
+    @Override
     public Block getPolymerBlock(BlockState state) {
         return Blocks.BARRIER;
     }
@@ -202,14 +210,18 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
             this.mainElement.setItem(FactoryItems.SPLITTER_BLOCK.getDefaultStack());
+            this.mainElement.setInvisible(true);
 
             this.leftLockElement = new ItemDisplayElement();
             this.leftLockElement.setDisplaySize(1, 1);
             this.leftLockElement.setModelTransformation(ModelTransformationMode.GUI);
+            this.leftLockElement.setInvisible(true);
 
             this.rightLockElement = new ItemDisplayElement();
             this.rightLockElement.setDisplaySize(1, 1);
             this.rightLockElement.setModelTransformation(ModelTransformationMode.GUI);
+            this.rightLockElement.setInvisible(true);
+
 
             this.updateFacing(state);
             this.addElement(this.mainElement);
@@ -220,7 +232,7 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
         }
 
         private void updateFacing(BlockState facing) {
-            var rot = facing.get(DIRECTION).getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
+            var rot = facing.get(FACING).getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
             mat.identity();
             mat.rotate(rot);
             mat.pushMatrix();

@@ -38,7 +38,7 @@ public class WindmillSailItem extends ModeledItem implements DyeableItem {
 
             context.getWorld()
                     .setBlockState(context.getBlockPos(), FactoryBlocks.WINDMILL.getDefaultState()
-                            .with(WindmillBlock.FACING, Direction.from(axis, val)).with(WindmillBlock.REVERSE, val == Direction.AxisDirection.NEGATIVE).with(WindmillBlock.SAIL_COUNT, 1));
+                            .with(WindmillBlock.FACING, Direction.from(axis, val)).with(WindmillBlock.SAIL_COUNT, 1));
 
             if (context.getWorld().getBlockEntity(context.getBlockPos()) instanceof WindmillBlockEntity be) {
                 be.addSail(0, context.getStack());

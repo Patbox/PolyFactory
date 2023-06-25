@@ -39,10 +39,7 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
@@ -400,6 +397,16 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
         return true;
     }
 
+    @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.transform(state, rotation::rotate, DIRECTION);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.transform(state, mirror::apply, DIRECTION);
+    }
+
 
     public enum DirectionValue implements StringIdentifiable {
         NONE(0, false),
@@ -436,6 +443,8 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
             this.base = new ItemDisplayElement(getModelForSpeed(0, type, state.isOf(FactoryBlocks.STICKY_CONVEYOR), state.get(PREVIOUS_CONVEYOR), state.get(NEXT_CONVEYOR)));
             this.base.setDisplaySize(1, 1);
             this.base.setModelTransformation(ModelTransformationMode.FIXED);
+            this.base.setInvisible(true);
+
             this.addElement(this.base);
             this.updateAnimation(state.get(ConveyorBlock.DIRECTION), state.get(ConveyorBlock.VERTICAL));
         }

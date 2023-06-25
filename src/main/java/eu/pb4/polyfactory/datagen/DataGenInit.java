@@ -72,7 +72,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
 
             this.getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE)
                     .addOptionalTag(FactoryBlockTags.CONVEYORS)
-                    .add(FactoryBlocks.FAN, FactoryBlocks.PRESS, FactoryBlocks.FUNNEL, FactoryBlocks.GRINDER, FactoryBlocks.MINER, FactoryBlocks.SPLITTER)
+                    .add(FactoryBlocks.FAN, FactoryBlocks.NIXIE_TUBE, FactoryBlocks.PRESS, FactoryBlocks.FUNNEL, FactoryBlocks.GRINDER, FactoryBlocks.MINER, FactoryBlocks.SPLITTER)
             ;
 
             this.getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)
@@ -106,6 +106,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             this.addDrop(FactoryBlocks.AXLE);
             this.addDrop(FactoryBlocks.GEARBOX);
             this.addDrop(FactoryBlocks.CONTAINER);
+            this.addDrop(FactoryBlocks.NIXIE_TUBE);
             this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE_BLOCK);
         }
     }

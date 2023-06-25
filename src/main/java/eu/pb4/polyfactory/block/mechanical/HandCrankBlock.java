@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.display.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.mechanical.DirectionalRotationUserNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -27,6 +28,8 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -79,6 +82,15 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
         }
     }
 
+    @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.transform(state, rotation::rotate, FACING);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.transform(state, mirror::apply, FACING);
+    }
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
@@ -120,6 +132,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
             this.mainElement.setInterpolationDuration(5);
+            this.mainElement.setInvisible(true);
             this.updateAnimation(0, state.get(FACING));
             this.addElement(this.mainElement);
         }
@@ -127,7 +140,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
         private void updateAnimation(float speed, Direction facing) {
             mat.identity();
             mat.rotate(facing.getOpposite().getRotationQuaternion());
-            mat.rotateY(((float) ((facing.getDirection() == Direction.AxisDirection.POSITIVE) == (facing.getAxis() == Direction.Axis.Z) ? speed : -speed)));
+            mat.rotateY(((float) ((facing.getDirection() == Direction.AxisDirection.NEGATIVE) ? speed : -speed)));
 
             mat.scale(2f);
             this.mainElement.setTransformation(mat);

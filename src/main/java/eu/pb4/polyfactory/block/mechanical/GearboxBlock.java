@@ -69,22 +69,26 @@ public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
             this.mainElement.setScale(new Vector3f(2));
+            this.mainElement.setInvisible(true);
             this.addElement(this.mainElement);
 
             this.xAxle = new LodItemDisplayElement(AxleBlock.Model.ITEM_MODEL);
             this.xAxle.setDisplaySize(1, 1);
             this.xAxle.setModelTransformation(ModelTransformationMode.FIXED);
+            this.xAxle.setInvisible(true);
             this.xAxle.setInterpolationDuration(5);
 
             this.yAxle = new LodItemDisplayElement(AxleBlock.Model.ITEM_MODEL);
             this.yAxle.setDisplaySize(1, 1);
             this.yAxle.setModelTransformation(ModelTransformationMode.FIXED);
+            this.yAxle.setInvisible(true);
             this.yAxle.setInterpolationDuration(5);
 
             this.zAxle = new LodItemDisplayElement(AxleBlock.Model.ITEM_MODEL);
             this.zAxle.setDisplaySize(1, 1);
             this.zAxle.setModelTransformation(ModelTransformationMode.FIXED);
             this.zAxle.setInterpolationDuration(5);
+            this.zAxle.setInvisible(true);
             this.updateAnimation(0);
 
             this.addElement(this.mainElement);
@@ -98,6 +102,7 @@ public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock
             mat.rotateY(rotation);
             mat.scale(2, 2.005f, 2);
             this.yAxle.setTransformation(mat);
+
             mat.identity();
             mat.rotate(Direction.EAST.getRotationQuaternion());
             mat.rotateY(rotation);
@@ -105,7 +110,7 @@ public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock
             this.xAxle.setTransformation(mat);
 
             mat.identity();
-            mat.rotate(Direction.NORTH.getRotationQuaternion());
+            mat.rotate(Direction.SOUTH.getRotationQuaternion());
             mat.rotateY(rotation);
             mat.scale(2, 2.005f, 2);
             this.zAxle.setTransformation(mat);

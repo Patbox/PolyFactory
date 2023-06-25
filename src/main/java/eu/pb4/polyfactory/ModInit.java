@@ -13,6 +13,7 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +21,9 @@ import org.slf4j.LoggerFactory;
 public class ModInit implements ModInitializer {
 	public static final String ID = "polyfactory";
 	public static final Logger LOGGER = LoggerFactory.getLogger("PolyFactory");
+    public static final boolean DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
 
-	public static Identifier id(String path) {
+    public static Identifier id(String path) {
 		return new Identifier(ID, path);
 	}
 
