@@ -3,6 +3,7 @@
   "input": {
     "item": "minecraft:rose_bush"
   },
+  "optimal_speed": 6.0,
   "output": {
     "item": {
       "Count": 6,

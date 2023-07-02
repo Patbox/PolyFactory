@@ -6,6 +6,7 @@
       "required": false
     },
     "polyfactory:press",
+    "polyfactory:mixer",
     "minecraft:hopper"
   ]
 }

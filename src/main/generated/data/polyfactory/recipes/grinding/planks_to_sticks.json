@@ -3,6 +3,7 @@
   "input": {
     "tag": "minecraft:planks"
   },
+  "optimal_speed": 10.0,
   "output": {
     "chance": 0.4,
     "item": {

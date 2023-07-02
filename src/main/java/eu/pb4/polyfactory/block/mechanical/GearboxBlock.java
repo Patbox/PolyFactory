@@ -2,8 +2,8 @@ package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
-import eu.pb4.polyfactory.display.LodElementHolder;
-import eu.pb4.polyfactory.display.LodItemDisplayElement;
+import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.mechanical.AllSideNode;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
@@ -56,7 +56,7 @@ public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock
         return true;
     }
 
-    public final class Model extends LodElementHolder {
+    public final class Model extends BaseModel {
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement xAxle;
         private final ItemDisplayElement yAxle;

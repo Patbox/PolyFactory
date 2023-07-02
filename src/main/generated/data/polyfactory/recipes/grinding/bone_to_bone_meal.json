@@ -4,7 +4,7 @@
     "item": "minecraft:bone"
   },
   "minimum_speed": 5.0,
-  "optimal_speed": 5.0,
+  "optimal_speed": 10.0,
   "output": [
     {
       "item": {

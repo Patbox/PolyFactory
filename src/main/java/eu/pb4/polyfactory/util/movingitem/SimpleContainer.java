@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.util.movingitem;
 
-import eu.pb4.polyfactory.block.machines.PressBlock;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -9,7 +8,6 @@ import net.minecraft.nbt.NbtList;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class SimpleContainer implements ContainerHolder {
     private static final BiConsumer<MovingItem, Boolean> NOOP = (a, b) -> {};

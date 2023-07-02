@@ -4,7 +4,7 @@
     "item": "minecraft:cobblestone"
   },
   "minimum_speed": 6.0,
-  "optimal_speed": 6.0,
+  "optimal_speed": 20.0,
   "output": {
     "item": {
       "Count": 1,

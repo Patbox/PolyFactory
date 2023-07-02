@@ -2,8 +2,8 @@ package eu.pb4.polyfactory.item;
 
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
-import eu.pb4.polyfactory.block.mechanical.WindmillBlock;
-import eu.pb4.polyfactory.block.mechanical.WindmillBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
+import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
 import eu.pb4.polyfactory.item.util.ModeledItem;
 import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;

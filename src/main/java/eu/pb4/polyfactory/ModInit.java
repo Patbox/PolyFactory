@@ -1,11 +1,13 @@
 package eu.pb4.polyfactory;
 
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
-import eu.pb4.polyfactory.block.mechanical.WindmillBlock;
+import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
 import eu.pb4.polyfactory.models.ConveyorModel;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
+import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
@@ -48,6 +50,8 @@ public class ModInit implements ModInitializer {
 
 		ConveyorModel.registerAssetsEvents();
 		VirtualDestroyStage.setup();
+		UiResourceCreator.setup();
+		GuiTextures.register();
 		PolymerResourcePackUtils.addModAssets(ID);
 	}
 }

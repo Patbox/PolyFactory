@@ -29,6 +29,7 @@ public class FactoryItems {
     public static final Item HAND_CRANK_BLOCK = register("hand_crank", new ModeledBlockItem(FactoryBlocks.HAND_CRANK, new Item.Settings()));
     public static final Item GRINDER_BLOCK = register("grinder", new ModeledBlockItem(FactoryBlocks.GRINDER, new Item.Settings()));
     public static final Item PRESS_BLOCK = register("press", new ModeledBlockItem(FactoryBlocks.PRESS, new Item.Settings()));
+    public static final Item MIXER_BLOCK = register("mixer", new ModeledBlockItem(FactoryBlocks.MIXER, new Item.Settings()));
     public static final Item MINER_BLOCK = register("miner", new ModeledBlockItem(FactoryBlocks.MINER, new Item.Settings()));
     public static final Item AXLE_BLOCK = register("axle", new ModeledBlockItem(FactoryBlocks.AXLE, new Item.Settings()));
     public static final Item GEARBOX_BLOCK = register("gearbox", new ModeledBlockItem(FactoryBlocks.GEARBOX, new Item.Settings()));
@@ -68,6 +69,7 @@ public class FactoryItems {
 
                     entries.add(GRINDER_BLOCK);
                     entries.add(PRESS_BLOCK);
+                    entries.add(MIXER_BLOCK);
                     entries.add(MINER_BLOCK);
 
                     entries.add(AXLE_BLOCK);

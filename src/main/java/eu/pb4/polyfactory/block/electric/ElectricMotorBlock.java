@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
+import eu.pb4.polyfactory.nodes.mechanical.DirectionalRotationUserNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -66,11 +67,7 @@ public class ElectricMotorBlock extends RotationalNetworkBlock implements Polyme
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        /*
-        return List.of(new DirectionalRotationUserNode(state.get(FACING)), new DirectionalElectricalNode(state.get(FACING).getOpposite()));
-
-         */
-        return List.of();
+        return List.of(new DirectionalRotationUserNode(state.get(FACING)));
     }
 
     @Override

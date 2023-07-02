@@ -3,13 +3,13 @@ package eu.pb4.polyfactory.datagen;
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.machines.GrinderBlock;
-import eu.pb4.polyfactory.block.machines.PressBlock;
-import eu.pb4.polyfactory.block.mechanical.WindmillBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.PressTemplateItem;
-import eu.pb4.polyfactory.loottable.IntStateLootNumberProvider;
+import eu.pb4.polyfactory.recipe.CountedIngredient;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
+import eu.pb4.polyfactory.recipe.MixingRecipe;
 import eu.pb4.polyfactory.recipe.PressRecipe;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
@@ -23,18 +23,19 @@ import net.minecraft.data.server.recipe.CookingRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
+import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.loot.LootPool;
-import net.minecraft.loot.entry.ItemEntry;
-import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.book.RecipeCategory;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.util.Identifier;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -68,11 +69,13 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             this.getOrCreateTagBuilder(FactoryBlockTags.CONVEYOR_SIDE_OUTPUT)
                     .addOptionalTag(FactoryBlockTags.CONVEYORS)
                     .add(FactoryBlocks.PRESS)
+                    .add(FactoryBlocks.MIXER)
                     .add(Blocks.HOPPER);
 
             this.getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE)
                     .addOptionalTag(FactoryBlockTags.CONVEYORS)
                     .add(FactoryBlocks.FAN, FactoryBlocks.NIXIE_TUBE, FactoryBlocks.PRESS, FactoryBlocks.FUNNEL, FactoryBlocks.GRINDER, FactoryBlocks.MINER, FactoryBlocks.SPLITTER)
+                    .add(FactoryBlocks.MIXER)
             ;
 
             this.getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)
@@ -97,6 +100,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             this.addDrop(FactoryBlocks.FAN);
             this.addDrop(FactoryBlocks.GRINDER);
             this.addDrop(FactoryBlocks.PRESS, (block) -> this.dropsWithProperty(block, PressBlock.PART, PressBlock.Part.MAIN));
+            this.addDrop(FactoryBlocks.MIXER, (block) -> this.dropsWithProperty(block, MixerBlock.PART, MixerBlock.Part.MAIN));
             this.addDrop(FactoryBlocks.HAND_CRANK);
             this.addDrop(FactoryBlocks.CONVEYOR);
             this.addDrop(FactoryBlocks.STICKY_CONVEYOR);
@@ -174,6 +178,16 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     PressRecipe.of("gold_ingot", Ingredient.ofItems(Items.GOLD_NUGGET), 9, PressTemplateItem.DEFAULT_TYPE, 10f, Items.GOLD_INGOT),
                     PressRecipe.of("steel_plate", Ingredient.ofItems(FactoryItems.STEEL_INGOT), 1, PressTemplateItem.DEFAULT_TYPE, 15f, new ItemStack(FactoryItems.STEEL_PLATE, 2))
             );
+
+            var dyes = List.of(Items.BLACK_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.CYAN_DYE, Items.GRAY_DYE, Items.GREEN_DYE, Items.LIGHT_BLUE_DYE, Items.LIGHT_GRAY_DYE, Items.LIME_DYE, Items.MAGENTA_DYE, Items.ORANGE_DYE, Items.PINK_DYE, Items.PURPLE_DYE, Items.RED_DYE, Items.YELLOW_DYE, Items.WHITE_DYE);
+
+            for (var dye : dyes) {
+                var name = ((DyeItem) dye).getColor().getName() + "_concrete_powder";
+                of(exporter, MixingRecipe.CODEC, MixingRecipe.ofCounted(name,
+                        List.of(CountedIngredient.fromTag(5, ItemTags.SMELTS_TO_GLASS), CountedIngredient.ofItems(5, Items.GRAVEL), CountedIngredient.ofItems(1, dye)),
+                        4, 1, 8, new ItemStack(Registries.ITEM.get(new Identifier(name)), 8)));
+            }
+
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_COG)
                     .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))

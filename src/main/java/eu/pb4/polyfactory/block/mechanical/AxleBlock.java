@@ -2,8 +2,8 @@ package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
-import eu.pb4.polyfactory.display.LodElementHolder;
-import eu.pb4.polyfactory.display.LodItemDisplayElement;
+import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.SimpleModeledPolymerItem;
 import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
@@ -28,7 +28,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
-import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -97,7 +96,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
         return true;
     }
 
-    public final class Model extends LodElementHolder {
+    public final class Model extends BaseModel {
         public static final ItemStack ITEM_MODEL = new ItemStack(Items.PAPER);
         public static final ItemStack ITEM_MODEL_SHORT = new ItemStack(Items.PAPER);
         private final Matrix4f mat = new Matrix4f();

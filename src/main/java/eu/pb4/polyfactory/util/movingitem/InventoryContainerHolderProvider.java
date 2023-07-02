@@ -1,9 +1,13 @@
 package eu.pb4.polyfactory.util.movingitem;
 
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 
 public interface InventoryContainerHolderProvider extends Inventory {
+
     ContainerHolder getContainerHolder(int slot);
 
     @Override
@@ -28,6 +32,7 @@ public interface InventoryContainerHolderProvider extends Inventory {
             }
             return o;
         }
+        this.markDirty();
         return ItemStack.EMPTY;
     }
 
@@ -37,6 +42,7 @@ public interface InventoryContainerHolderProvider extends Inventory {
         var x = h.getContainer();
         if (x != null) {
             h.clearContainer();
+            this.markDirty();
             return x.get();
         }
         return ItemStack.EMPTY;
@@ -50,5 +56,6 @@ public interface InventoryContainerHolderProvider extends Inventory {
         } else {
             h.setContainer(new MovingItem(stack));
         }
+        this.markDirty();
     }
 }

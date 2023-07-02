@@ -3,8 +3,7 @@ package eu.pb4.polyfactory.recipe;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import eu.pb4.polyfactory.block.machines.PressBlock;
-import eu.pb4.polyfactory.block.machines.PressBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
 import eu.pb4.polyfactory.item.tool.PressTemplateItem;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.PolymerRecipe;
@@ -18,7 +17,6 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
-import java.util.Arrays;
 import java.util.List;
 
 public record PressRecipe(Identifier identifier, Ingredient input, int inputCount, Identifier pressTemplate, List<Output> output, double minimumSpeed) implements Recipe<PressBlockEntity>, PolymerRecipe {

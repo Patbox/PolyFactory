@@ -6,10 +6,12 @@
       "required": false
     },
     "polyfactory:fan",
+    "polyfactory:nixie_tube",
     "polyfactory:press",
     "polyfactory:funnel",
     "polyfactory:grinder",
     "polyfactory:miner",
-    "polyfactory:splitter"
+    "polyfactory:splitter",
+    "polyfactory:mixer"
   ]
 }

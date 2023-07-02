@@ -2,9 +2,12 @@ package eu.pb4.polyfactory.block;
 
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.ItemGeneratorBlockEntity;
-import eu.pb4.polyfactory.block.machines.*;
-import eu.pb4.polyfactory.block.mechanical.HandCrankBlockEntity;
-import eu.pb4.polyfactory.block.mechanical.WindmillBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.machines.*;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.source.HandCrankBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.FanBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlockEntity;
@@ -49,6 +52,9 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<PressBlockEntity> PRESS = register("press",
             FabricBlockEntityTypeBuilder.create(PressBlockEntity::new).addBlock(FactoryBlocks.PRESS));
+
+    public static final BlockEntityType<MixerBlockEntity> MIXER = register("mixer",
+            FabricBlockEntityTypeBuilder.create(MixerBlockEntity::new).addBlock(FactoryBlocks.MIXER));
 
     public static final BlockEntityType<ItemGeneratorBlockEntity> ITEM_GENERATOR = register("item_generator",
             FabricBlockEntityTypeBuilder.create(ItemGeneratorBlockEntity::new).addBlock(FactoryBlocks.ITEM_GENERATOR));

@@ -4,8 +4,6 @@ import com.kneelawk.graphlib.api.graph.BlockGraph;
 import com.kneelawk.graphlib.api.graph.GraphEntityContext;
 import com.kneelawk.graphlib.api.graph.user.GraphEntity;
 import com.kneelawk.graphlib.api.graph.user.GraphEntityType;
-import eu.pb4.polyfactory.block.machines.MinerBlock;
-import eu.pb4.polyfactory.block.machines.MinerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;

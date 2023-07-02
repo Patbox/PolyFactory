@@ -11,6 +11,7 @@ import net.minecraft.util.Identifier;
 public class FactoryRecipeSerializers {
     public static final CodecRecipeSerializer<GrindingRecipe> GRINDING = register("grinding", GrindingRecipe.CODEC);
     public static final CodecRecipeSerializer<PressRecipe> PRESS = register("press", PressRecipe.CODEC);
+    public static final CodecRecipeSerializer<MixingRecipe> MIXING = register("mixing", MixingRecipe.CODEC);
 
     public static void register() {
 

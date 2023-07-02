@@ -4,7 +4,7 @@
     "tag": "minecraft:iron_ores"
   },
   "minimum_speed": 10.0,
-  "optimal_speed": 10.0,
+  "optimal_speed": 30.0,
   "output": [
     {
       "item": {

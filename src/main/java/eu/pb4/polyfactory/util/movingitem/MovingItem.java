@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.util.movingitem;
 
-import eu.pb4.polyfactory.display.LodItemDisplayElement;
+import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.elements.*;
@@ -32,6 +32,7 @@ public class MovingItem implements VirtualElement, StackReference {
         }
     };
     private Vec3d pos;
+    private float globalScale = 1;
 
     public MovingItem(ItemStack stack) {
         this.stack = stack.copy();
@@ -68,7 +69,11 @@ public class MovingItem implements VirtualElement, StackReference {
             this.itemDisplay[i].setItem(ItemStack.EMPTY);
         }
 
-        this.itemDisplay[i].setScale(new Vector3f(stack.getItem() instanceof BlockItem ? 0.9f : 0.5f));
+        this.updateScale(i);
+    }
+
+    private void updateScale(int i) {
+        this.itemDisplay[i].setScale(new Vector3f((stack.getItem() instanceof BlockItem ? 0.9f : 0.5f) * this.globalScale ));
     }
 
     @Override
@@ -181,4 +186,13 @@ public class MovingItem implements VirtualElement, StackReference {
         }
     }
 
+    public void scale(float v) {
+        if (this.globalScale == v) {
+            return;
+        }
+        this.globalScale = v;
+        for (int i = 0; i < 4; i++) {
+            this.updateScale(i);
+        }
+    }
 }

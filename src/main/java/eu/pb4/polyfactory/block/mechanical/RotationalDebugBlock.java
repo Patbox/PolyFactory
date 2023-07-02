@@ -2,30 +2,19 @@ package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
-import eu.pb4.polyfactory.display.LodElementHolder;
-import eu.pb4.polyfactory.display.LodItemDisplayElement;
-import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.util.SimpleModeledPolymerItem;
+import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.nodes.mechanical.AllSideNode;
-import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
-import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.decoration.DisplayEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.joml.Matrix4f;
 
 import java.util.Collection;
@@ -56,7 +45,7 @@ public class RotationalDebugBlock extends RotationalNetworkBlock implements Poly
         return true;
     }
 
-    public final class Model extends LodElementHolder {
+    public final class Model extends BaseModel {
         private final Matrix4f mat = new Matrix4f();
         private final TextDisplayElement mainElement;
         private final ServerWorld world;

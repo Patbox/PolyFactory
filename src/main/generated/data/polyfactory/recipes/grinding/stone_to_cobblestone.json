@@ -4,7 +4,7 @@
     "item": "minecraft:stone"
   },
   "minimum_speed": 5.0,
-  "optimal_speed": 5.0,
+  "optimal_speed": 20.0,
   "output": {
     "item": {
       "Count": 1,

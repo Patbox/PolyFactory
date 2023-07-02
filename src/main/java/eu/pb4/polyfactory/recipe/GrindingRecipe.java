@@ -2,12 +2,10 @@ package eu.pb4.polyfactory.recipe;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import eu.pb4.polyfactory.block.machines.GrinderBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.PolymerRecipe;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
@@ -28,7 +26,7 @@ public record GrindingRecipe(Identifier identifier, Ingredient input, List<Outpu
                     Output.LIST_CODEC.fieldOf("output").forGetter(GrindingRecipe::output),
                     Codec.DOUBLE.fieldOf("time").forGetter(GrindingRecipe::grindTime),
                     Codec.DOUBLE.optionalFieldOf("minimum_speed", 0d).forGetter(GrindingRecipe::minimumSpeed),
-                    Codec.DOUBLE.optionalFieldOf("optimal_speed", 0d).forGetter(GrindingRecipe::minimumSpeed)
+                    Codec.DOUBLE.optionalFieldOf("optimal_speed", 0d).forGetter(GrindingRecipe::optimalSpeed)
             ).apply(x, GrindingRecipe::new)
     );
 

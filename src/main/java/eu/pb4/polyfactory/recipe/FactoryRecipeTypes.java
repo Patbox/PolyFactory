@@ -10,6 +10,7 @@ import net.minecraft.util.Identifier;
 public class FactoryRecipeTypes {
     public static final RecipeType<GrindingRecipe> GRINDING = register("grinding");
     public static final RecipeType<PressRecipe> PRESS = register("press");
+    public static final RecipeType<MixingRecipe> MIXER = register("mixer");
 
     public static void register() {
 

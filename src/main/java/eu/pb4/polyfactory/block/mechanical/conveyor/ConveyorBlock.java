@@ -6,7 +6,7 @@ import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
-import eu.pb4.polyfactory.display.LodElementHolder;
+import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.ConveyorModel;
 import eu.pb4.polyfactory.nodes.mechanical.ConveyorNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -429,7 +429,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
         }
     }
 
-    public final class Model extends LodElementHolder implements ContainerHolder {
+    public final class Model extends BaseModel implements ContainerHolder {
         private final Matrix4f mat = new Matrix4f();
         private final ItemDisplayElement base;
         private double speed;
@@ -557,6 +557,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
             this.movingItemContainer = container;
             if (container != null) {
                 container.setPos(calculatePos(this.delta));
+                container.scale(1);
                 updateDelta(-1, this.delta);
                 this.addElement(container);
             }

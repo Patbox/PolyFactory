@@ -1,0 +1,9 @@
+{
+    "sources": [
+        {
+            "type": "directory",
+            "source": "sgui/elements",
+            "prefix": "sgui/elements/"
+        }
+    ]
+}

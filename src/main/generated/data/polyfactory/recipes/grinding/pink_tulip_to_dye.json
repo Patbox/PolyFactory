@@ -3,6 +3,7 @@
   "input": {
     "item": "minecraft:pink_tulip"
   },
+  "optimal_speed": 6.0,
   "output": {
     "item": {
       "Count": 3,

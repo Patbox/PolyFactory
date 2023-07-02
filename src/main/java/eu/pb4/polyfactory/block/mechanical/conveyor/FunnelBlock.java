@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
-import eu.pb4.polyfactory.display.LodElementHolder;
-import eu.pb4.polyfactory.display.LodItemDisplayElement;
+import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -265,7 +265,7 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
         return new Model(world, pos, initialBlockState);
     }
 
-    public final class Model extends LodElementHolder {
+    public final class Model extends BaseModel {
         private static final ItemStack MODEL_IN = new ItemStack(Items.CANDLE);
         private static final ItemStack MODEL_OUT = new ItemStack(Items.CANDLE);
         private final Matrix4f mat = new Matrix4f();
