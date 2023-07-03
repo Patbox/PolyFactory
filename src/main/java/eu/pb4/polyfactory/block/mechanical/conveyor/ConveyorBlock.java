@@ -463,9 +463,11 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
                 if (value.value == -1) {
                     mat.rotateY(MathHelper.PI);
                 }
+                var f = dir.getAxis().ordinal() * 0.0001f;
+
                 var x = value == DirectionValue.NONE;
                 var v = x ? 0 : 0.0015f;
-                mat.translate(-v, v, 0);
+                mat.translate(-v, v + f, 0);
                 mat.scale(x ? 2.001f : 2.015f);
                 this.base.setTransformation(mat);
             }

@@ -1,0 +1,27 @@
+{
+  "type": "polyfactory:mixing/generic",
+  "input": [
+    {
+      "base": {
+        "item": "minecraft:iron_ingot"
+      },
+      "count": 2
+    },
+    {
+      "base": {
+        "item": "minecraft:coal"
+      }
+    },
+    {
+      "base": {
+        "item": "minecraft:redstone"
+      }
+    }
+  ],
+  "optimal_speed": 6.0,
+  "output": {
+    "Count": 1,
+    "id": "polyfactory:steel_alloy_mixture"
+  },
+  "time": 2.0
+}

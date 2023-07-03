@@ -1,0 +1,28 @@
+{
+  "type": "polyfactory:mixing/generic",
+  "input": [
+    {
+      "base": {
+        "tag": "minecraft:smelts_to_glass"
+      },
+      "count": 4
+    },
+    {
+      "base": {
+        "item": "minecraft:gravel"
+      },
+      "count": 4
+    },
+    {
+      "base": {
+        "item": "minecraft:magenta_dye"
+      }
+    }
+  ],
+  "optimal_speed": 13.0,
+  "output": {
+    "Count": 8,
+    "id": "minecraft:magenta_concrete_powder"
+  },
+  "time": 4.0
+}

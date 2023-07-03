@@ -1,0 +1,22 @@
+{
+  "type": "polyfactory:mixing/generic",
+  "input": [
+    {
+      "base": {
+        "item": "minecraft:wheat"
+      },
+      "count": 2
+    },
+    {
+      "base": {
+        "item": "minecraft:cocoa_beans"
+      }
+    }
+  ],
+  "optimal_speed": 6.0,
+  "output": {
+    "Count": 8,
+    "id": "minecraft:cookie"
+  },
+  "time": 2.0
+}

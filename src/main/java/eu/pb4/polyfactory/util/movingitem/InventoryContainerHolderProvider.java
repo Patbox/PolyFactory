@@ -53,6 +53,8 @@ public interface InventoryContainerHolderProvider extends Inventory {
         var h = getContainerHolder(slot);
         if (stack.isEmpty()) {
             h.clearContainer();
+        } else if (h.getContainer() != null) {
+            h.getContainer().set(stack);
         } else {
             h.setContainer(new MovingItem(stack));
         }

@@ -1,7 +1,9 @@
 {
   "type": "polyfactory:press",
-  "input": {
-    "item": "polyfactory:steel_ingot"
+  "input_a": {
+    "base": {
+      "item": "polyfactory:steel_ingot"
+    }
   },
   "minimum_speed": 15.0,
   "output": [

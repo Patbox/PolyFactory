@@ -10,17 +10,20 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiConsumer;
 
 public class SimpleContainer implements ContainerHolder {
-    private static final BiConsumer<MovingItem, Boolean> NOOP = (a, b) -> {};
+    private static final AddedCallback NOOP_ADD = (a, b, c) -> {};
+    private static final RemovedCallback NOOP_REMOVE = (a, b) -> {};
+    private final int id;
 
     @Nullable
     private MovingItem movingItem;
-    private BiConsumer<MovingItem, Boolean> added;
-    private BiConsumer<MovingItem, Boolean> removed;
+    private AddedCallback added;
+    private RemovedCallback removed;
 
     public SimpleContainer() {
-        this(NOOP, NOOP);
+        this(-1, NOOP_ADD, NOOP_REMOVE);
     }
-    public SimpleContainer(BiConsumer<MovingItem, Boolean> added, BiConsumer<MovingItem, Boolean> removed) {
+    public SimpleContainer(int id, AddedCallback added, RemovedCallback removed) {
+        this.id = id;
         this.added = added;
         this.removed = removed;
     }
@@ -43,6 +46,15 @@ public class SimpleContainer implements ContainerHolder {
         return list;
     }
 
+    public static SimpleContainer[] createArray(int size, AddedCallback added, RemovedCallback removed) {
+        var arr = new SimpleContainer[size];
+
+        for (int i = 0; i < size; i++) {
+            arr[i] = new SimpleContainer(i, added, removed);
+        }
+        return arr;
+    }
+
     @Override
     public @Nullable MovingItem getContainer() {
         return this.movingItem;
@@ -59,7 +71,7 @@ public class SimpleContainer implements ContainerHolder {
             }
 
             this.movingItem = container;
-            this.added.accept(container, true);
+            this.added.accept(this.id, container, true);
         }
     }
 
@@ -77,7 +89,7 @@ public class SimpleContainer implements ContainerHolder {
             this.removed.accept(this.movingItem, true);
         }
         this.movingItem = container;
-        this.added.accept(container, false);
+        this.added.accept(this.id, container, false);
     }
 
     public NbtCompound writeNbt() {
@@ -98,5 +110,20 @@ public class SimpleContainer implements ContainerHolder {
         if (!this.isContainerEmpty()) {
             model.addElement(this.getContainer());
         }
+    }
+
+    public ItemStack getStack() {
+        if (this.movingItem != null) {
+            return this.movingItem.get();
+        }
+        return ItemStack.EMPTY;
+    }
+
+    public interface AddedCallback {
+        void accept(int i, MovingItem item, boolean newlyAdded);
+    }
+
+    public interface RemovedCallback {
+        void accept(MovingItem item, boolean destroy);
     }
 }

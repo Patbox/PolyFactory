@@ -1,9 +1,11 @@
 {
   "type": "polyfactory:press",
-  "input": {
-    "item": "minecraft:gold_nugget"
+  "input_a": {
+    "base": {
+      "item": "minecraft:gold_nugget"
+    },
+    "count": 9
   },
-  "input_count": 9,
   "minimum_speed": 10.0,
   "output": [
     {

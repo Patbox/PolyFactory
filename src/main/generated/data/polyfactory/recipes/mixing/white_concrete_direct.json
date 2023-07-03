@@ -1,0 +1,34 @@
+{
+  "type": "polyfactory:mixing/generic",
+  "input": [
+    {
+      "base": {
+        "tag": "minecraft:smelts_to_glass"
+      },
+      "count": 4
+    },
+    {
+      "base": {
+        "item": "minecraft:gravel"
+      },
+      "count": 4
+    },
+    {
+      "base": {
+        "item": "minecraft:water_bucket"
+      },
+      "count": 0
+    },
+    {
+      "base": {
+        "item": "minecraft:white_dye"
+      }
+    }
+  ],
+  "optimal_speed": 15.0,
+  "output": {
+    "Count": 8,
+    "id": "minecraft:white_concrete"
+  },
+  "time": 6.0
+}

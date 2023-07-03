@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.recipe;
 
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.Registries;

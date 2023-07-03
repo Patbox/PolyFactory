@@ -64,7 +64,7 @@ public class MovingItem implements VirtualElement, StackReference {
         var count = this.stack.getCount();
 
         if (i * 16 <= count) {
-            this.itemDisplay[i].setItem(this.stack);
+            this.itemDisplay[i].setItem(this.stack.copy());
         } else {
             this.itemDisplay[i].setItem(ItemStack.EMPTY);
         }

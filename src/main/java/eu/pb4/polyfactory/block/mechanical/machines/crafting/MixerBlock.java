@@ -29,6 +29,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 public class MixerBlock extends TallItemMachineBlock {
     public MixerBlock(Settings settings) {
@@ -66,7 +67,7 @@ public class MixerBlock extends TallItemMachineBlock {
 
         var be = (MixerBlockEntity) self.getBlockEntity();
 
-        for (int i = 0; i < MixerBlockEntity.OUTPUT_SLOT; i++) {
+        for (int i = 0; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
             var container = be.getContainerHolder(i);
 
             if (container.isContainerEmpty()) {
@@ -138,6 +139,8 @@ public class MixerBlock extends TallItemMachineBlock {
             this.main = new LodItemDisplayElement(FactoryItems.PRESS_BLOCK.getDefaultStack());
             this.main.setDisplaySize(1, 1);
             this.main.setModelTransformation(ModelTransformationMode.FIXED);
+            this.main.setScale(new Vector3f(2));
+            this.main.setTranslation(new Vector3f(0, 0.469f, 0));
             this.main.setInvisible(true);
 
             this.whisk = new LodItemDisplayElement(MODEL_PISTON);
@@ -162,9 +165,8 @@ public class MixerBlock extends TallItemMachineBlock {
             mat.identity();
             mat.translate(0, 0.5f, 0);
             mat.scale(2f);
-            this.main.setTransformation(mat);
             mat.rotateY(this.rotation);
-            mat.translate(0, this.active ? 0.65f : 0.4f, 0);
+            mat.translate(0, this.active ? 0.4f : 0.65f, 0);
             this.whisk.setTransformation(mat);
         }
 

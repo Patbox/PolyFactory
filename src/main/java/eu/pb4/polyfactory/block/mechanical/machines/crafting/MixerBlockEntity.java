@@ -5,24 +5,24 @@ import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
-import eu.pb4.polyfactory.recipe.MixingRecipe;
+import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
-import eu.pb4.polyfactory.util.movingitem.InventorySimpleContainerProvider;
-import eu.pb4.polyfactory.util.movingitem.MovingItem;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.SidedInventory;
+import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -30,24 +30,20 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class MixerBlockEntity extends TallItemMachineBlockEntity {
-    public static final int OUTPUT_SLOT = 6;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MixerBlockEntity extends TallItemMachineBlockEntity implements RecipeInputInventory {
+    public static final int OUTPUT_FIRST = 6;
     public static final int INPUT_FIRST = 0;
-    private static final int[] OUTPUT_SLOTS = { OUTPUT_SLOT };
+    public static final int SIZE = 9;
+    private static final int[] OUTPUT_SLOTS = { 6, 7, 8 };
     private static final int[] INPUT_SLOTS = { 0, 1, 2, 3, 4, 5 };
     protected double process = 0;
     @Nullable
     protected MixingRecipe currentRecipe = null;
     private boolean active;
-    private final SimpleContainer[] containers = new SimpleContainer[] {
-            new SimpleContainer((x, b) -> this.addMoving(0, x, b), this::removeMoving),
-            new SimpleContainer((x, b) -> this.addMoving(1, x, b), this::removeMoving),
-            new SimpleContainer((x, b) -> this.addMoving(2, x, b), this::removeMoving),
-            new SimpleContainer((x, b) -> this.addMoving(3, x, b), this::removeMoving),
-            new SimpleContainer((x, b) -> this.addMoving(4, x, b), this::removeMoving),
-            new SimpleContainer((x, b) -> this.addMoving(5, x, b), this::removeMoving),
-            new SimpleContainer((x, b) -> this.addMoving(6, x, b), this::removeMoving)
-    };
+    private final SimpleContainer[] containers = SimpleContainer.createArray(9, this::addMoving, this::removeMoving);
     private MixerBlock.Model model;
     private boolean inventoryChanged = false;
 
@@ -60,8 +56,9 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
 
         if (!c.isContainerEmpty()) {
             Vec3d base;
-            if (id == OUTPUT_SLOT) {
-                base = Vec3d.ofCenter(this.pos).add(0, 0.5, 0);
+            if (id >= OUTPUT_FIRST) {
+                id = id - OUTPUT_FIRST;
+                base = Vec3d.ofCenter(this.pos).add(((id >> 1) - 0.5f) * 0.12f, 0.5 - id * 0.005, ((id % 2) - 0.5) * 0.2);
             } else {
                 base = Vec3d.ofCenter(this.pos).add(((id >> 1) - 0.5f) * 0.26f, 0.4 - id * 0.005, ((id % 2) - 0.5) * 0.4);
             }
@@ -91,12 +88,12 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
 
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return slot != OUTPUT_SLOT;
+        return slot != OUTPUT_FIRST;
     }
 
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return slot == OUTPUT_SLOT;
+        return slot == OUTPUT_FIRST;
     }
 
     public void openGui(ServerPlayerEntity player) {
@@ -150,7 +147,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         self.model.tick();
 
         if (self.process >= self.currentRecipe.time()) {
-            var currentOutput = self.getStack(OUTPUT_SLOT);
+            var currentOutput = self.getStack(OUTPUT_FIRST);
             {
                 var output = self.currentRecipe.getOutput(world.getRegistryManager());
 
@@ -164,10 +161,37 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             var output = self.currentRecipe.craft(self, world.getRegistryManager());
 
             if (currentOutput.isEmpty()) {
-                self.setStack(OUTPUT_SLOT, output);
+                self.setStack(OUTPUT_FIRST, output);
             } else {
                 currentOutput.increment(output.getCount());
             }
+
+            for (var remainder : self.currentRecipe.remainders()) {
+                if (remainder.isEmpty()) {
+                    continue;
+                }
+
+                for (int i = OUTPUT_FIRST; i < SIZE; i++) {
+                    var slot = self.getStack(i);
+                    if (slot.isEmpty()) {
+                        self.setStack(i, remainder.copyAndEmpty());
+                    } else if (ItemStack.canCombine(slot, remainder)) {
+                        var count = Math.max(remainder.getCount(), slot.getMaxCount() - slot.getCount());
+                        remainder.decrement(count);
+                        slot.increment(count);
+
+                        if (remainder.isEmpty()) {
+                            break;
+                        }
+                    }
+                }
+
+                if (!remainder.isEmpty()) {
+                    ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5, remainder);
+                }
+            }
+
+
             self.markDirty();
         } else {
             var d = Math.max(self.currentRecipe.optimalSpeed() - self.currentRecipe.minimumSpeed(), 1);
@@ -182,7 +206,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     }
 
     private boolean isInputEmpty() {
-        for (int i = 0; i < OUTPUT_SLOT; i++) {
+        for (int i = 0; i < OUTPUT_FIRST; i++) {
             if (!this.getStack(i).isEmpty()) {
                 return false;
             }
@@ -213,6 +237,33 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         return this.model;
     }
 
+    @Override
+    public int getWidth() {
+        return 2;
+    }
+
+    @Override
+    public int getHeight() {
+        return 3;
+    }
+
+    @Override
+    public List<ItemStack> getInputStacks() {
+        var stacks = new ArrayList<ItemStack>(this.containers.length);
+        for (var container : this.containers) {
+            stacks.add(container.getStack());
+        }
+
+        return stacks;
+    }
+
+    @Override
+    public void provideRecipeInputs(RecipeMatcher finder) {
+        for (var container : this.containers) {
+            finder.addInput(container.getStack());
+        }
+    }
+
     private class Gui extends SimpleGui {
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X3, player, false);
@@ -224,7 +275,9 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             this.setSlotRedirect(1 + 18, new Slot(MixerBlockEntity.this, 4, 4, 0));
             this.setSlotRedirect(2 + 18, new Slot(MixerBlockEntity.this, 5, 5, 0));
             this.setSlot(4 + 9, GuiTextures.PROGRESS_HORIZONTAL.get(progress()));
-            this.setSlotRedirect(6 + 9, new FurnaceOutputSlot(player, MixerBlockEntity.this, OUTPUT_SLOT, 3, 0));
+            this.setSlotRedirect(6, new FurnaceOutputSlot(player, MixerBlockEntity.this, 6, 3, 0));
+            this.setSlotRedirect(6 + 9, new FurnaceOutputSlot(player, MixerBlockEntity.this, 7, 3, 0));
+            this.setSlotRedirect(6 + 18, new FurnaceOutputSlot(player, MixerBlockEntity.this, 8, 3, 0));
             while (this.getFirstEmptySlot() != -1) {
                 this.addSlot(Items.WHITE_STAINED_GLASS_PANE.getDefaultStack());
             }

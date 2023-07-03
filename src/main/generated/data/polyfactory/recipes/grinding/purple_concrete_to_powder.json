@@ -1,0 +1,14 @@
+{
+  "type": "polyfactory:grinding",
+  "input": {
+    "item": "minecraft:purple_concrete"
+  },
+  "optimal_speed": 5.0,
+  "output": {
+    "item": {
+      "Count": 1,
+      "id": "minecraft:purple_concrete"
+    }
+  },
+  "time": 3.0
+}

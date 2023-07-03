@@ -6,11 +6,9 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.tool.PressTemplateItem;
-import eu.pb4.polyfactory.recipe.CountedIngredient;
-import eu.pb4.polyfactory.recipe.GrindingRecipe;
-import eu.pb4.polyfactory.recipe.MixingRecipe;
-import eu.pb4.polyfactory.recipe.PressRecipe;
+import eu.pb4.polyfactory.recipe.*;
+import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
+import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -38,6 +36,8 @@ import net.minecraft.util.Identifier;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+
+import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
 public class DataGenInit implements DataGeneratorEntrypoint {
     @Override
@@ -122,6 +122,8 @@ public class DataGenInit implements DataGeneratorEntrypoint {
 
         @Override
         public void generate(Consumer<RecipeJsonProvider> exporter) {
+            var dyes = List.of(Items.BLACK_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.CYAN_DYE, Items.GRAY_DYE, Items.GREEN_DYE, Items.LIGHT_BLUE_DYE, Items.LIGHT_GRAY_DYE, Items.LIME_DYE, Items.MAGENTA_DYE, Items.ORANGE_DYE, Items.PINK_DYE, Items.PURPLE_DYE, Items.RED_DYE, Items.YELLOW_DYE, Items.WHITE_DYE);
+
             of(exporter, GrindingRecipe.CODEC,
                     GrindingRecipe.of("stone_to_cobblestone", Ingredient.ofItems(Items.STONE), 3, 5, 20, Items.COBBLESTONE),
                     GrindingRecipe.of("cobblestone_to_gravel", Ingredient.ofItems(Items.COBBLESTONE), 5, 6, 20, Items.GRAVEL),
@@ -168,26 +170,60 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .offerTo(exporter);
 
             CookingRecipeJsonBuilder.createSmelting(
-                    Ingredient.ofItems(FactoryItems.STEEL_ALLOY_MIXTURE), RecipeCategory.MISC, FactoryItems.STEEL_INGOT, 0.4f, 80)
+                            Ingredient.ofItems(FactoryItems.STEEL_ALLOY_MIXTURE), RecipeCategory.MISC, FactoryItems.STEEL_INGOT, 0.4f, 80)
                     .criterion("get_steel_mixture", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_ALLOY_MIXTURE))
                     .offerTo(exporter);
 
 
             of(exporter, PressRecipe.CODEC,
-                    PressRecipe.of("iron_ingot", Ingredient.ofItems(Items.IRON_NUGGET), 9, PressTemplateItem.DEFAULT_TYPE, 10f, Items.IRON_INGOT),
-                    PressRecipe.of("gold_ingot", Ingredient.ofItems(Items.GOLD_NUGGET), 9, PressTemplateItem.DEFAULT_TYPE, 10f, Items.GOLD_INGOT),
-                    PressRecipe.of("steel_plate", Ingredient.ofItems(FactoryItems.STEEL_INGOT), 1, PressTemplateItem.DEFAULT_TYPE, 15f, new ItemStack(FactoryItems.STEEL_PLATE, 2))
+                    PressRecipe.of("iron_ingot", Ingredient.ofItems(Items.IRON_NUGGET), 9, 10f, Items.IRON_INGOT),
+                    PressRecipe.of("gold_ingot", Ingredient.ofItems(Items.GOLD_NUGGET), 9, 10f, Items.GOLD_INGOT),
+                    PressRecipe.of("steel_plate", Ingredient.ofItems(FactoryItems.STEEL_INGOT), 1, 15f, new ItemStack(FactoryItems.STEEL_PLATE, 2))
             );
 
-            var dyes = List.of(Items.BLACK_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.CYAN_DYE, Items.GRAY_DYE, Items.GREEN_DYE, Items.LIGHT_BLUE_DYE, Items.LIGHT_GRAY_DYE, Items.LIME_DYE, Items.MAGENTA_DYE, Items.ORANGE_DYE, Items.PINK_DYE, Items.PURPLE_DYE, Items.RED_DYE, Items.YELLOW_DYE, Items.WHITE_DYE);
-
             for (var dye : dyes) {
-                var name = ((DyeItem) dye).getColor().getName() + "_concrete_powder";
-                of(exporter, MixingRecipe.CODEC, MixingRecipe.ofCounted(name,
-                        List.of(CountedIngredient.fromTag(5, ItemTags.SMELTS_TO_GLASS), CountedIngredient.ofItems(5, Items.GRAVEL), CountedIngredient.ofItems(1, dye)),
-                        4, 1, 8, new ItemStack(Registries.ITEM.get(new Identifier(name)), 8)));
+                var nameSolid = ((DyeItem) dye).getColor().getName() + "_concrete";
+                var namePowder = nameSolid + "_powder";
+
+                var powder = Registries.ITEM.get(new Identifier(namePowder));
+                var solid = Registries.ITEM.get(new Identifier(nameSolid));
+                of(exporter, GrindingRecipe.CODEC, GrindingRecipe.of(nameSolid + "_to_powder",
+                        Ingredient.ofItems(solid), 3, 5, solid
+                ));
+
+                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid,
+                        List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS), CountedIngredient.ofItems(4, Items.GRAVEL), CountedIngredient.ofItems(1, dye)),
+                        4, 1, 13, new ItemStack(powder, 8)));
+
+                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid + "_direct",
+                        List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS), CountedIngredient.ofItems(4, Items.GRAVEL), CountedIngredient.ofItems(0, Items.WATER_BUCKET),
+                                CountedIngredient.ofItems(1, dye)),
+                        6, 1, 15, new ItemStack(solid, 8)));
+
+                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder",
+                        List.of(CountedIngredient.ofItems(1, powder), CountedIngredient.ofItems(0, Items.WATER_BUCKET)),
+                        1, 1, 4, new ItemStack(solid, 1)));
             }
 
+            of(exporter, FireworkStarMixingRecipe.CODEC,
+                    new FireworkStarMixingRecipe(id("mixing/firework_star"), 10, 4, 8)
+            );
+
+            of(exporter, GenericMixingRecipe.CODEC,
+                    GenericMixingRecipe.ofCounted("cake",
+                            List.of(CountedIngredient.ofItems(3, Items.WHEAT), CountedIngredient.ofItems(2, Items.SUGAR),
+                                    CountedIngredient.ofItems(1, Items.EGG),
+                                    CountedIngredient.ofItemsRemainder(3, Items.MILK_BUCKET, Items.BUCKET)),
+                            2, 1, 6, new ItemStack(Items.CAKE)),
+                    GenericMixingRecipe.ofCounted("cookie",
+                            List.of(CountedIngredient.ofItems(2, Items.WHEAT), CountedIngredient.ofItems(1, Items.COCOA_BEANS)),
+                            2, 1, 6, new ItemStack(Items.COOKIE, 8)),
+
+                    GenericMixingRecipe.ofCounted("steel_alloy_mixture",
+                            List.of(CountedIngredient.ofItems(2, Items.IRON_INGOT), CountedIngredient.ofItems(1, Items.COAL),
+                                    CountedIngredient.ofItems(1, Items.REDSTONE)),
+                            2, 1, 6, new ItemStack(FactoryItems.STEEL_ALLOY_MIXTURE))
+            );
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_COG)
                     .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))

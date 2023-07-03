@@ -7,12 +7,11 @@ import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.PressRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
-import eu.pb4.polyfactory.util.movingitem.*;
+import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -30,24 +29,26 @@ import org.jetbrains.annotations.Nullable;
 
 public class PressBlockEntity extends TallItemMachineBlockEntity {
     public static final int INPUT_SLOT = 0;
-    public static final int TEMPLATE_SLOT = 1;
+    public static final int INPUT_2_SLOT = 1;
     public static final int OUTPUT_SLOT = 2;
     private static final int[] INPUT_SLOTS = {INPUT_SLOT};
-    private static final int[] TEMPLATE_SLOTS = {TEMPLATE_SLOT};
+    private static final int[] INPUT_2_SLOTS = {INPUT_2_SLOT};
     private static final int[] OUTPUT_SLOTS = {OUTPUT_SLOT};
+    private final SimpleContainer[] containers = new SimpleContainer[]{
+            new SimpleContainer(0, this::addMoving, this::removeMoving),
+            new SimpleContainer(),
+            new SimpleContainer(2, this::addMoving, this::removeMoving)
+    };
     protected double process = 0;
     @Nullable
     protected PressRecipe currentRecipe = null;
     @Nullable
     protected Item currentItem = null;
-    private final SimpleContainer[] containers = new SimpleContainer[]{
-            new SimpleContainer((x, b) -> this.addMoving(0, x, b), this::removeMoving),
-            new SimpleContainer(),
-            new SimpleContainer((x, b) -> this.addMoving(2, x, b), this::removeMoving)
-    };
     protected int currentItemCount = -1;
     private PressBlock.Model model;
     private boolean active;
+    private Item currentItem2;
+    private int currentItemCount2;
 
     public PressBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.PRESS, pos, state);
@@ -64,6 +65,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             self.containers[2].maybeAdd(self.model);
         }
         var stack = self.containers[0];
+        var stack2 = self.containers[1];
 
         if (self.process < 0 && stack.isContainerEmpty()) {
             var speed = Math.max(Math.abs(RotationUser.getRotation((ServerWorld) world, pos.up()).speed()), 0);
@@ -85,7 +87,8 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             return;
         }
 
-        if (self.currentRecipe == null && self.currentItem != null && stack.getContainer().get().isOf(self.currentItem) && stack.getContainer().get().getCount() == self.currentItemCount) {
+        if (self.currentRecipe == null && self.currentItem != null && stack.getStack().isOf(self.currentItem) && stack.getStack().getCount() == self.currentItemCount
+                && stack2.getStack().isOf(self.currentItem2) && stack2.getStack().getCount() == self.currentItemCount2) {
             if (self.process != 0) {
                 self.model.updatePiston(0);
             }
@@ -100,8 +103,10 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
                 self.model.updatePiston(0);
             }
             self.process = 0;
-            self.currentItem = stack.getContainer().get().getItem();
-            self.currentItemCount = stack.getContainer().get().getCount();
+            self.currentItem = stack.getStack().getItem();
+            self.currentItem2 = stack2.getStack().getItem();
+            self.currentItemCount = stack.getStack().getCount();
+            self.currentItemCount2 = stack2.getStack().getCount();
             self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.PRESS, self, world).orElse(null);
 
             if (self.currentRecipe == null) {
@@ -115,7 +120,8 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
         if (self.process >= 1) {
             if (self.getStack(OUTPUT_SLOT).isEmpty()) {
                 self.process = -0.3;
-                stack.getContainer().get().decrement(self.currentRecipe.inputCount());
+                stack.getStack().decrement(self.currentRecipe.inputA().count());
+                stack2.getStack().decrement(self.currentRecipe.inputB().count());
                 var out = self.currentRecipe.craft(self, self.world.getRegistryManager());
 
                 self.setStack(OUTPUT_SLOT, out);
@@ -144,6 +150,14 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
     }
 
     @Override
+    public void setStack(int slot, ItemStack stack) {
+        super.setStack(slot, stack);
+        if (slot == INPUT_2_SLOT && this.model != null) {
+            this.model.setItem(stack.copyWithCount(1));
+        }
+    }
+
+    @Override
     protected void writeNbt(NbtCompound nbt) {
         this.writeInventoryNbt(nbt);
         nbt.putDouble("Progress", this.process);
@@ -158,12 +172,21 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
     @Override
     public int[] getAvailableSlots(Direction side) {
         var facing = this.getCachedState().get(PressBlock.INPUT_FACING);
-        return facing == side ? INPUT_SLOTS : (facing.getOpposite() == side ? OUTPUT_SLOTS : new int[0]);
+        if (facing == side) {
+            return INPUT_SLOTS;
+        } else if (facing.getOpposite() == side) {
+            return OUTPUT_SLOTS;
+        } else if (facing.rotateYClockwise().getAxis() == side.getAxis()) {
+            return INPUT_2_SLOTS;
+        }
+
+        return new int[0];
     }
 
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return slot == INPUT_SLOT && (dir == null || this.getCachedState().get(PressBlock.INPUT_FACING) == dir);
+        return (slot == INPUT_SLOT && (dir == null || this.getCachedState().get(PressBlock.INPUT_FACING) == dir))
+                || (slot == INPUT_2_SLOT && dir == null || this.getCachedState().get(PressBlock.INPUT_FACING).rotateYClockwise().getAxis() == dir.getAxis());
     }
 
     @Override
@@ -201,7 +224,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             super(ScreenHandlerType.GENERIC_9X3, player, false);
             this.setTitle(GuiTextures.PRESS.apply(PressBlockEntity.this.getCachedState().getBlock().getName()));
             this.setSlotRedirect(3, new Slot(PressBlockEntity.this, INPUT_SLOT, 0, 0));
-            this.setSlotRedirect(5, new Slot(PressBlockEntity.this, TEMPLATE_SLOT, 0, 0));
+            this.setSlotRedirect(5, new Slot(PressBlockEntity.this, INPUT_2_SLOT, 0, 0));
             this.setSlot(13, GuiTextures.PROGRESS_VERTICAL.get(progress()));
             this.setSlotRedirect(22, new FurnaceOutputSlot(player, PressBlockEntity.this, OUTPUT_SLOT, 1, 0));
 

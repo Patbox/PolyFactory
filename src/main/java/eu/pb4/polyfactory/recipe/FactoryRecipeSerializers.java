@@ -2,6 +2,8 @@ package eu.pb4.polyfactory.recipe;
 
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
+import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.Registries;
@@ -11,7 +13,8 @@ import net.minecraft.util.Identifier;
 public class FactoryRecipeSerializers {
     public static final CodecRecipeSerializer<GrindingRecipe> GRINDING = register("grinding", GrindingRecipe.CODEC);
     public static final CodecRecipeSerializer<PressRecipe> PRESS = register("press", PressRecipe.CODEC);
-    public static final CodecRecipeSerializer<MixingRecipe> MIXING = register("mixing", MixingRecipe.CODEC);
+    public static final CodecRecipeSerializer<GenericMixingRecipe> MIXING_GENERIC = register("mixing/generic", GenericMixingRecipe.CODEC);
+    public static final CodecRecipeSerializer<FireworkStarMixingRecipe> MIXING_FIREWORK = register("mixing/firework", FireworkStarMixingRecipe.CODEC);
 
     public static void register() {
 

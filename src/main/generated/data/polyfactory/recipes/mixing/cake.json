@@ -1,0 +1,38 @@
+{
+  "type": "polyfactory:mixing/generic",
+  "input": [
+    {
+      "base": {
+        "item": "minecraft:wheat"
+      },
+      "count": 3
+    },
+    {
+      "base": {
+        "item": "minecraft:sugar"
+      },
+      "count": 2
+    },
+    {
+      "base": {
+        "item": "minecraft:egg"
+      }
+    },
+    {
+      "base": {
+        "item": "minecraft:milk_bucket"
+      },
+      "count": 3,
+      "leftover": {
+        "Count": 3,
+        "id": "minecraft:bucket"
+      }
+    }
+  ],
+  "optimal_speed": 6.0,
+  "output": {
+    "Count": 1,
+    "id": "minecraft:cake"
+  },
+  "time": 2.0
+}

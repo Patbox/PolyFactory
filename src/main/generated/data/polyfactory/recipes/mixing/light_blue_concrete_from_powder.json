@@ -1,0 +1,22 @@
+{
+  "type": "polyfactory:mixing/generic",
+  "input": [
+    {
+      "base": {
+        "item": "minecraft:light_blue_concrete_powder"
+      }
+    },
+    {
+      "base": {
+        "item": "minecraft:water_bucket"
+      },
+      "count": 0
+    }
+  ],
+  "optimal_speed": 4.0,
+  "output": {
+    "Count": 1,
+    "id": "minecraft:light_blue_concrete"
+  },
+  "time": 1.0
+}

@@ -24,6 +24,7 @@ import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -125,6 +126,7 @@ public class PressBlock extends TallItemMachineBlock {
 
         private final Matrix4f mat = new Matrix4f();
         private final ItemDisplayElement piston;
+        private final ItemDisplayElement pistonItem;
         private final ItemDisplayElement main;
         private float value;
 
@@ -140,8 +142,15 @@ public class PressBlock extends TallItemMachineBlock {
             this.piston.setInterpolationDuration(2);
             this.piston.setInvisible(true);
 
+            this.pistonItem = new LodItemDisplayElement();
+            this.pistonItem.setDisplaySize(1, 1);
+            this.pistonItem.setModelTransformation(ModelTransformationMode.FIXED);
+            this.pistonItem.setInterpolationDuration(2);
+            this.pistonItem.setInvisible(true);
+
             this.updateAnimation();
             this.addElement(this.piston);
+            this.addElement(this.pistonItem);
             this.addElement(this.main);
         }
 
@@ -150,9 +159,12 @@ public class PressBlock extends TallItemMachineBlock {
             mat.scale(2f);
 
             this.main.setTransformation(mat);
-            mat.translate(0, 0.2f, 0);
-            mat.rotateY(this.value);
+            mat.translate(0, 0.5f - this.value * 0.3f, 0);
             this.piston.setTransformation(mat);
+            mat.translate(0,  -0.25f, 0);
+            mat.scale(0.2f);
+            mat.rotateX(MathHelper.HALF_PI);
+            this.pistonItem.setTransformation(mat);
         }
 
         @Override
@@ -163,6 +175,7 @@ public class PressBlock extends TallItemMachineBlock {
                 this.updateAnimation();
                 if (this.piston.isDirty()) {
                     this.piston.startInterpolation();
+                    this.pistonItem.startInterpolation();
                 }
             }
         }
@@ -173,6 +186,10 @@ public class PressBlock extends TallItemMachineBlock {
             } else {
                 this.value = (float) Math.min(i * 1.3, 1);
             }
+        }
+
+        public void setItem(ItemStack stack) {
+            this.pistonItem.setItem(stack);
         }
     }
 }
