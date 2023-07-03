@@ -191,12 +191,14 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                         Ingredient.ofItems(solid), 3, 5, solid
                 ));
 
-                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid,
+                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(namePowder,
                         List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS), CountedIngredient.ofItems(4, Items.GRAVEL), CountedIngredient.ofItems(1, dye)),
                         4, 1, 13, new ItemStack(powder, 8)));
 
                 of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid + "_direct",
-                        List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS), CountedIngredient.ofItems(4, Items.GRAVEL), CountedIngredient.ofItems(0, Items.WATER_BUCKET),
+                        List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS),
+                                CountedIngredient.ofItems(4, Items.GRAVEL),
+                                CountedIngredient.ofItems(0, Items.WATER_BUCKET),
                                 CountedIngredient.ofItems(1, dye)),
                         6, 1, 15, new ItemStack(solid, 8)));
 

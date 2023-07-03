@@ -62,6 +62,10 @@ public record GenericMixingRecipe(Identifier identifier, List<CountedIngredient>
         int count = this.input.size();
         for (var entry : this.input) {
             var itemCount = entry.count();
+            if (itemCount == 0) {
+                itemCount++;
+            }
+            var noMatches = true;
 
             for (int i = MixerBlockEntity.INPUT_FIRST; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
                 var stack = inventory.getStack(i);
@@ -71,16 +75,18 @@ public record GenericMixingRecipe(Identifier identifier, List<CountedIngredient>
 
                 if (entry.ingredient().test(stack)) {
                     itemCount -= stack.getCount();
+                    noMatches = false;
                 }
 
                 if (itemCount <= 0) {
-                    count--;
                     break;
                 }
             }
 
-            if (itemCount > 0) {
+            if (itemCount > 0 || noMatches) {
                 return false;
+            } else {
+                count--;
             }
         }
 
@@ -91,6 +97,9 @@ public record GenericMixingRecipe(Identifier identifier, List<CountedIngredient>
         var list = new ArrayList<>(this.input);
         for (var ig : list) {
             int count = ig.count();
+            if (count == 0) {
+                continue;
+            }
 
             for (int i = MixerBlockEntity.INPUT_FIRST; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
                 var stack = inventory.getStack(i);
