@@ -42,12 +42,12 @@ public record FireworkStarMixingRecipe(Identifier identifier, double time,
 
     @Override
     public boolean matches(MixerBlockEntity inventory, World world) {
-        return VANILLA.matches(inventory, world);
+        return VANILLA.matches(inventory.asRecipeInputProvider(), world);
     }
 
     @Override
     public ItemStack craft(MixerBlockEntity inventory, DynamicRegistryManager registryManager) {
-        return VANILLA.craft(inventory, registryManager);
+        return VANILLA.craft(inventory.asRecipeInputProvider(), registryManager);
     }
 
     @Override

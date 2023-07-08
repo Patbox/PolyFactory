@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block;
 
+import com.google.common.collect.ImmutableSet;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.ItemGeneratorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.*;
@@ -13,8 +14,10 @@ import eu.pb4.polyfactory.block.mechanical.FanBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlockEntity;
 import eu.pb4.polyfactory.block.other.ContainerBlockEntity;
+import eu.pb4.polyfactory.mixin.BlockEntityTypeAccessor;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
@@ -59,7 +62,12 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<ItemGeneratorBlockEntity> ITEM_GENERATOR = register("item_generator",
             FabricBlockEntityTypeBuilder.create(ItemGeneratorBlockEntity::new).addBlock(FactoryBlocks.ITEM_GENERATOR));
 
-    public static void register() {}
+    public static void register() {
+        var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;
+        var set = ImmutableSet.<Block>builder();
+        set.addAll(x.polyfactory$getBlocks());
+        x.polyfactory$setBlocks(set.build());
+    }
 
 
     public static <T extends BlockEntity> BlockEntityType<T> register(String path, FabricBlockEntityTypeBuilder<T> item) {

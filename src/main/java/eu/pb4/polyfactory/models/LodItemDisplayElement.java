@@ -5,6 +5,7 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DataTrackerLike;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import eu.pb4.polymer.virtualentity.api.tracker.SimpleDataTracker;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.item.ItemStack;
@@ -28,6 +29,26 @@ public class LodItemDisplayElement extends ItemDisplayElement {
 
     public LodItemDisplayElement() {
         super();
+    }
+
+    public static LodItemDisplayElement createSimple(ItemStack model) {
+        var element = createSimple();
+        element.setItem(model);
+        return element;
+    }
+
+    public static LodItemDisplayElement createSimple(ItemStack model, int updateRate) {
+        var element = createSimple(model);
+        element.setInterpolationDuration(updateRate);
+        return element;
+    }
+
+    public static LodItemDisplayElement createSimple() {
+        var element = new LodItemDisplayElement();
+        element.setDisplaySize(1, 1);
+        element.setModelTransformation(ModelTransformationMode.FIXED);
+        element.setInvisible(true);
+        return element;
     }
 
     @Override

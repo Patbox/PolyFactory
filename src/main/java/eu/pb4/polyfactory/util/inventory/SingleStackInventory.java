@@ -2,10 +2,14 @@ package eu.pb4.polyfactory.util.inventory;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.Nullable;
 
-public interface SingleStackInventory extends Inventory {
+public interface SingleStackInventory extends SidedInventory {
+    int[] SLOTS = new int[] { 0 };
     ItemStack getStack();
     void setStack(ItemStack stack);
 
@@ -64,5 +68,20 @@ public interface SingleStackInventory extends Inventory {
     @Override
     default void clear() {
         setStack(ItemStack.EMPTY);
+    }
+
+    @Override
+    default int[] getAvailableSlots(Direction side) {
+        return SLOTS;
+    }
+
+    @Override
+    default boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+        return true;
+    }
+
+    @Override
+    default boolean canExtract(int slot, ItemStack stack, Direction dir) {
+        return true;
     }
 }

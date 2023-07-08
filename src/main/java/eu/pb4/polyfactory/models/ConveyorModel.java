@@ -1,11 +1,15 @@
 package eu.pb4.polyfactory.models;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.resourcepack.api.ResourcePackBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
@@ -17,72 +21,80 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 
 public class ConveyorModel {
     public static final int FRAMES = 20;
-    public static final ItemStack[] ANIMATION_REGULAR = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_REGULAR_10 = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_REGULAR_01 = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_REGULAR_00 = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_REGULAR_STICKY = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_REGULAR_STICKY_10 = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_REGULAR_STICKY_01 = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_REGULAR_STICKY_00 = new ItemStack[1 + FRAMES];
-    public static final ItemStack[][] ANIMATION_REGULAR_STICKY_X = new ItemStack[][] { ANIMATION_REGULAR_STICKY, ANIMATION_REGULAR_STICKY_10, ANIMATION_REGULAR_STICKY_01, ANIMATION_REGULAR_STICKY_00 } ;
-    public static final ItemStack[][] ANIMATION_REGULAR_X = new ItemStack[][] { ANIMATION_REGULAR, ANIMATION_REGULAR_10, ANIMATION_REGULAR_01, ANIMATION_REGULAR_00 } ;
-    public static final ItemStack[] ANIMATION_UP = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_UP_STICKY = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_DOWN = new ItemStack[1 + FRAMES];
-    public static final ItemStack[] ANIMATION_DOWN_STICKY = new ItemStack[1 + FRAMES];
+
+    private static final Item[] MODEL_ITEMS = new Item[] {
+            Items.PURPLE_CANDLE, Items.RED_CANDLE, Items.YELLOW_CANDLE, Items.BLUE_CANDLE, Items.LIGHT_BLUE_CANDLE,
+            Items.BLUE_CARPET, Items.RED_CARPET, Items.GREEN_CARPET, Items.YELLOW_CARPET, Items.PURPLE_CARPET
+    };
+    private static int currentItemIndex = 0;
+
+    public static final ItemStack[][] ANIMATION_REGULAR_STICKY = new ItemStack[16][1 + FRAMES];
+    public static final ItemStack[][] ANIMATION_REGULAR = new ItemStack[16][1 + FRAMES];
+
+    public static final ItemStack[][] ANIMATION_UP = new ItemStack[32][1 + FRAMES];
+    public static final ItemStack[][] ANIMATION_UP_STICKY = new ItemStack[32][1 + FRAMES];
+    public static final ItemStack[][] ANIMATION_DOWN = new ItemStack[32][1 + FRAMES];
+    public static final ItemStack[][] ANIMATION_DOWN_STICKY = new ItemStack[32][1 + FRAMES];
 
 
     private static final String MODEL_JSON = """
-                {
-                  "parent": "polyfactory:block/|PREFIX|conveyor|TYPE|",
-                  "textures": {
-                    "1": "polyfactory:block/gen/|PREFIX|conveyor_top_|ID|"
-                  }
-                }
-                """;
+            {
+              "parent": "polyfactory:block/conveyor|TYPE|",
+              "textures": {
+                "1": "polyfactory:block/gen/|PREFIX|conveyor_top_|ID|"
+              }
+            }
+            """;
     private static final String MODEL_JSON_UP = """
-                {
-                  "parent": "polyfactory:block/|PREFIX|conveyor_up",
-                  "textures": {
-                    "1": "polyfactory:block/gen/|PREFIX|conveyor_top_|ID|"
-                  }
-                }
-                """;
+            {
+              "parent": "polyfactory:block/conveyor_up|TYPE|",
+              "textures": {
+                "1": "polyfactory:block/gen/|PREFIX|conveyor_top_|ID|"
+              }
+            }
+            """;
 
     private static final String MODEL_JSON_DOWN = """
-                {
-                  "parent": "polyfactory:block/|PREFIX|conveyor_down",
-                  "textures": {
-                    "1": "polyfactory:block/gen/|PREFIX|conveyor_top_|ID|"
-                  }
-                }
-                """;
+            {
+              "parent": "polyfactory:block/conveyor_down|TYPE|",
+              "textures": {
+                "1": "polyfactory:block/gen/|PREFIX|conveyor_top_|ID|"
+              }
+            }
+            """;
 
     private static void createItemModel(ItemStack[] array, String path, int i) {
-        var model = PolymerResourcePackUtils.requestModel(Items.PURPLE_CANDLE, FactoryUtil.id(path + (i == 0 ? "" : ("_" + i))));
-        var stack = new ItemStack(Items.PURPLE_CANDLE);
+        var model = PolymerResourcePackUtils.requestModel(MODEL_ITEMS[currentItemIndex++ % MODEL_ITEMS.length], FactoryUtil.id(path + (i == 0 ? "" : ("/" + i))));
+        var stack = new ItemStack(model.item());
         stack.getOrCreateNbt().putInt("CustomModelData", model.value());
         array[i == 0 ? 0 : (array.length - i)] = stack;
     }
 
     public static void registerAssetsEvents() {
         for (int i = 0; i <= FRAMES; i++) {
-            createItemModel(ANIMATION_REGULAR, "block/conveyor", i);
-            createItemModel(ANIMATION_REGULAR_00, "block/conveyor_00", i);
-            createItemModel(ANIMATION_REGULAR_01, "block/conveyor_01", i);
-            createItemModel(ANIMATION_REGULAR_10, "block/conveyor_10", i);
-            createItemModel(ANIMATION_UP, "block/conveyor_up", i);
-            createItemModel(ANIMATION_DOWN, "block/conveyor_down", i);
-            createItemModel(ANIMATION_REGULAR_STICKY, "block/sticky_conveyor", i);
-            createItemModel(ANIMATION_REGULAR_STICKY_00, "block/sticky_conveyor_00", i);
-            createItemModel(ANIMATION_REGULAR_STICKY_01, "block/sticky_conveyor_01", i);
-            createItemModel(ANIMATION_REGULAR_STICKY_10, "block/sticky_conveyor_10", i);
-            createItemModel(ANIMATION_UP_STICKY, "block/sticky_conveyor_up", i);
-            createItemModel(ANIMATION_DOWN_STICKY, "block/sticky_conveyor_down", i);
+            for (var a = 0; a < 16; a++) {
+                String addition = a == 0 ? "" : ("_" + a);
+
+                createItemModel(ANIMATION_REGULAR[a], "block/conveyor" + addition, i);
+                createItemModel(ANIMATION_UP[a], "block/conveyor_up" + addition, i);
+                createItemModel(ANIMATION_DOWN[a], "block/conveyor_down" + addition, i);
+                createItemModel(ANIMATION_REGULAR_STICKY[a], "block/sticky_conveyor" + addition, i);
+                createItemModel(ANIMATION_UP_STICKY[a], "block/sticky_conveyor_up" + addition, i);
+                createItemModel(ANIMATION_DOWN_STICKY[a], "block/sticky_conveyor_down" + addition, i);
+            }
+
+            for (var a = 16; a < 32; a++) {
+                String addition = a == 0 ? "" : ("_" + a);
+
+                createItemModel(ANIMATION_UP[a], "block/conveyor_up" + addition, i);
+                createItemModel(ANIMATION_DOWN[a], "block/conveyor_down" + addition, i);
+                createItemModel(ANIMATION_UP_STICKY[a], "block/sticky_conveyor_up" + addition, i);
+                createItemModel(ANIMATION_DOWN_STICKY[a], "block/sticky_conveyor_down" + addition, i);
+            }
         }
 
         PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register(ConveyorModel::generateModels);
@@ -99,7 +111,7 @@ public class ConveyorModel {
                 """;
         byte[] textureTop = new byte[0];
         byte[] textureTopSticky = new byte[0];
-        //JsonObject baseConveyorModel = null;
+        var models = new HashMap<String, JsonObject>();
         //JsonObject upConveyorModel = null;
         //JsonObject downConveyorModel = null;
 
@@ -120,18 +132,65 @@ public class ConveyorModel {
                     e.printStackTrace();
                 }
             }
-
-            /*path = basePath.resolve("assets/polyfactory/models/block/conveyor.json");
-            if (Files.exists(path)) {
-                try {
-                    textureTopSticky = createMovingTexture(path);
-                } catch (Throwable e) {
-                    e.printStackTrace();
+            for (var variant : new String[]{ "conveyor", "conveyor_up", "conveyor_down" }) {
+                path = basePath.resolve("assets/polyfactory/models/block/" + variant + ".json");
+                if (Files.exists(path)) {
+                    try {
+                        models.put(variant, (JsonObject) JsonParser.parseReader(Files.newBufferedReader(path)));
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
                 }
-            }*/
+            }
 
-            if (textureTop.length != 0 && textureTopSticky.length != 0/* && baseConveyorModel != null*/) {
+            if (textureTop.length != 0 && textureTopSticky.length != 0 && models.size() == 3) {
                 break;
+            }
+        }
+
+        for (var variant : new String[]{ "conveyor", "conveyor_up", "conveyor_down" }) {
+            var model = models.get(variant);
+            for (int i = 1; i < 32; i++) {
+                if (i == 16 && variant.equals("conveyor")) {
+                    break;
+                }
+
+                var base = new JsonObject();
+                base.asMap().putAll(model.asMap());
+                var elements = new JsonArray();
+
+                for (var element : model.getAsJsonArray("elements")) {
+                    var name = element.getAsJsonObject().get("name");
+
+                    if (name == null || !(switch (name.getAsString()) {
+                        case "top" -> ConveyorBlock.hasTop(i);
+                        case "bottom" -> ConveyorBlock.hasBottom(i);
+                        case "front" -> ConveyorBlock.hasNext(i);
+                        case "back" -> ConveyorBlock.hasPrevious(i);
+                        case "top_front" -> ConveyorBlock.hasTop(i) && ConveyorBlock.hasNext(i);
+                        case "bottom_front" -> ConveyorBlock.hasBottom(i) && ConveyorBlock.hasNext(i);
+                        case "top_back" -> ConveyorBlock.hasTop(i) && ConveyorBlock.hasPrevious(i);
+                        case "bottom_back" -> ConveyorBlock.hasBottom(i) && ConveyorBlock.hasPrevious(i);
+                        case "extra" -> (i & 16) != 0;
+                        case "extra_bottom_back" -> (i & 16) != 0 && ConveyorBlock.hasBottom(i) && ConveyorBlock.hasPrevious(i);
+                        default -> false;
+                    })) {
+                        elements.add(element);
+                    }
+                }
+                base.add("elements", elements);
+
+                resourcePackBuilder.addData("assets/polyfactory/models/block/" + variant + "_" + i + ".json", base.toString().getBytes(StandardCharsets.UTF_8));
+                resourcePackBuilder.addData("assets/polyfactory/models/block/sticky_" + variant + "_" + i + ".json", ("""
+                        {
+                          "parent": "polyfactory:block/""" + variant + "_" + i
+                        + """
+                        ",
+                         "textures": {
+                          "1": "polyfactory:block/sticky_conveyor_top"
+                         }
+                        }
+                        """).getBytes(StandardCharsets.UTF_8));
             }
         }
 
@@ -146,13 +205,17 @@ public class ConveyorModel {
     private static void createVariations(ResourcePackBuilder resourcePackBuilder, int i, byte[] mcmeta, byte[] texture, String prefix) {
         resourcePackBuilder.addData("assets/polyfactory/textures/block/gen/" + prefix + "conveyor_top_" + i + ".png.mcmeta", mcmeta);
         resourcePackBuilder.addData("assets/polyfactory/textures/block/gen/" + prefix + "conveyor_top_" + i + ".png", texture);
-        resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_" + i + ".json", MODEL_JSON.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", "").getBytes(StandardCharsets.UTF_8));
-        resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_00_" + i + ".json", MODEL_JSON.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", "_00").getBytes(StandardCharsets.UTF_8));
-        resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_01_" + i + ".json", MODEL_JSON.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", "_01").getBytes(StandardCharsets.UTF_8));
-        resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_10_" + i + ".json", MODEL_JSON.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", "_10").getBytes(StandardCharsets.UTF_8));
-        resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_up_" + i + ".json", MODEL_JSON_UP.replace("|PREFIX|", prefix).replace("|ID|", "" + i).getBytes(StandardCharsets.UTF_8));
-        resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_down_" + i + ".json", MODEL_JSON_DOWN.replace("|PREFIX|", prefix).replace("|ID|", "" + i).getBytes(StandardCharsets.UTF_8));
 
+        for (int a = 0; a < 32; a++) {
+            var base = (a == 0 ? "" : ("_" + a + ""));
+            var addition = (a == 0 ? "/" : ("_" + a + "/")) + i;
+
+            if (a < 16) {
+                resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor" + addition + ".json", MODEL_JSON.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
+            }
+            resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_up" + addition + ".json", MODEL_JSON_UP.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
+            resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_down" + addition + ".json", MODEL_JSON_DOWN.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
+        }
     }
 
     private static byte[] createMovingTexture(Path path) throws IOException {

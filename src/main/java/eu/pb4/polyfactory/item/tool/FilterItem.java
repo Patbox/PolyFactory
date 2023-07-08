@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ModeledItem;
+import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.GuiHelpers;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
@@ -104,12 +105,7 @@ public class FilterItem extends ModeledItem {
         public Gui(ServerPlayerEntity player, ItemStack stack) {
             super(ScreenHandlerType.HOPPER, player, false);
             this.stack = stack;
-            this.setTitle(Text.translatable("item.polyfactory.item_filter"));
-            var x= new GuiElementBuilder(Items.WHITE_STAINED_GLASS_PANE).setName(Text.empty());
-            this.setSlot(0, x);
-            this.setSlot(1, x);
-            this.setSlot(3, x);
-            this.setSlot(4, x);
+            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(Text.translatable("item.polyfactory.item_filter")));
             this.setSlot(2, new GuiElementInterface() {
                 @Override
                 public ItemStack getItemStack() {
@@ -130,6 +126,10 @@ public class FilterItem extends ModeledItem {
 
         @Override
         public boolean onAnyClick(int index, ClickType type, SlotActionType action) {
+            if (index == -999) {
+                return true;
+            }
+
             if (this.screenHandler.getSlot(index).getStack() == stack) {
                 GuiHelpers.sendSlotUpdate(player, this.screenHandler.syncId, index, stack, 0);
                 return false;

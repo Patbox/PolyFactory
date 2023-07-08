@@ -1,14 +1,18 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
+import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -28,6 +32,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
+import org.joml.Vector3f;
 
 import java.util.Locale;
 
@@ -38,11 +44,33 @@ public class PressBlock extends TallItemMachineBlock {
 
     @Override
     public boolean pushItemTo(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
-        if (self.getBlockState().get(INPUT_FACING).getOpposite() != pushDirection || self.getBlockState().get(PART) == Part.TOP) {
+        if (self.getBlockState().get(INPUT_FACING) == pushDirection || self.getBlockState().get(PART) == Part.TOP) {
             return false;
         }
 
         var be = (PressBlockEntity) self.getBlockEntity();
+
+        if (self.getBlockState().get(INPUT_FACING).getOpposite() != pushDirection) {
+            var stack = be.getStack(1);
+            if (stack.isEmpty()) {
+                be.setStack(1, conveyor.pullAndDestroy().get());
+                return true;
+            }
+
+            var container = conveyor.getContainer();
+
+            if (ItemStack.canCombine(container.get(), stack)) {
+                var i = Math.min(container.get().getCount(), stack.getMaxCount() - stack.getCount());
+                stack.increment(i);
+                container.get().decrement(i);
+            }
+
+            if (container.get().isEmpty()) {
+                conveyor.clearContainer();
+            }
+
+            return true;
+        }
 
         var container = be.getContainerHolder(0);
 
@@ -124,41 +152,59 @@ public class PressBlock extends TallItemMachineBlock {
             MODEL_PISTON.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_PISTON.getItem(), FactoryUtil.id("block/press_piston")).value());
         }
 
-        private final Matrix4f mat = new Matrix4f();
+        private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement piston;
         private final ItemDisplayElement pistonItem;
         private final ItemDisplayElement main;
+        private final ItemDisplayElement gearA;
+        private final ItemDisplayElement gearB;
+
         private float value;
 
         private Model(ServerWorld world, BlockState state) {
-            this.main = new LodItemDisplayElement(FactoryItems.PRESS_BLOCK.getDefaultStack());
-            this.main.setDisplaySize(1, 1);
-            this.main.setModelTransformation(ModelTransformationMode.FIXED);
-            this.main.setInvisible(true);
+            this.main = LodItemDisplayElement.createSimple(FactoryItems.PRESS_BLOCK.getDefaultStack(), 0);
+            this.main.setScale(new Vector3f(2));
+            this.main.setTranslation(new Vector3f(0, 0.469f, 0));
+            this.piston = LodItemDisplayElement.createSimple(MODEL_PISTON, 2);
+            this.pistonItem = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 2);
+            this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4);
+            this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4);
 
-            this.piston = new LodItemDisplayElement(MODEL_PISTON);
-            this.piston.setDisplaySize(1, 1);
-            this.piston.setModelTransformation(ModelTransformationMode.FIXED);
-            this.piston.setInterpolationDuration(2);
-            this.piston.setInvisible(true);
-
-            this.pistonItem = new LodItemDisplayElement();
-            this.pistonItem.setDisplaySize(1, 1);
-            this.pistonItem.setModelTransformation(ModelTransformationMode.FIXED);
-            this.pistonItem.setInterpolationDuration(2);
-            this.pistonItem.setInvisible(true);
-
-            this.updateAnimation();
+            updateStatePos(state);
+            var dir = state.get(INPUT_FACING);
+            this.updateAnimation(true, 0, (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
             this.addElement(this.piston);
             this.addElement(this.pistonItem);
             this.addElement(this.main);
+            this.addElement(this.gearA);
+            this.addElement(this.gearB);
         }
 
-        private void updateAnimation() {
-            mat.identity().translate(0, 0.469f, 0);
+        private void updateStatePos(BlockState state) {
+            var direction = state.get(INPUT_FACING);
+
+            this.main.setYaw(direction.asRotation());
+            this.pistonItem.setYaw(direction.asRotation());
+            this.piston.setYaw(direction.asRotation());
+            this.gearA.setYaw(direction.asRotation());
+            this.gearB.setYaw(direction.asRotation());
+        }
+
+        private void updateAnimation(boolean b, float rotation, boolean negative) {
+            mat.identity();
+            mat.translate(0, 0.5f, 0);
+            if (b) {
+                mat.pushMatrix();
+                mat.rotateY(negative ? MathHelper.HALF_PI : -MathHelper.HALF_PI);
+                mat.translate(0, 0.5f, 0.40f);
+                mat.rotateZ(rotation);
+                this.gearA.setTransformation(mat);
+                mat.translate(0, 0, -0.80f);
+                this.gearB.setTransformation(mat);
+                mat.popMatrix();
+            }
             mat.scale(2f);
 
-            this.main.setTransformation(mat);
             mat.translate(0, 0.5f - this.value * 0.3f, 0);
             this.piston.setTransformation(mat);
             mat.translate(0,  -0.25f, 0);
@@ -172,11 +218,29 @@ public class PressBlock extends TallItemMachineBlock {
             var tick = this.getAttachment().getWorld().getTime();
 
             if (tick % 2 == 0) {
-                this.updateAnimation();
+                var b = tick % 4 == 0;
+
+                var dir = BlockBoundAttachment.get(this).getBlockState().get(INPUT_FACING);
+                this.updateAnimation(b,
+                        b ? RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos().up()).rotation() : 0,
+                        (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
+
                 if (this.piston.isDirty()) {
                     this.piston.startInterpolation();
                     this.pistonItem.startInterpolation();
                 }
+
+                if (this.gearA.isDirty()) {
+                    this.gearA.startInterpolation();
+                    this.gearB.startInterpolation();
+                }
+            }
+        }
+
+        @Override
+        public void notifyUpdate(HolderAttachment.UpdateType updateType) {
+            if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
+                updateStatePos(BlockBoundAttachment.get(this).getBlockState());
             }
         }
 

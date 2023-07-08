@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "polyfactory:block/decorative_small_gear"
+  }
+}

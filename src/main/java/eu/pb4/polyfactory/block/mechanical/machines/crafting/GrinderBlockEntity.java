@@ -177,7 +177,6 @@ public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInven
 
             if (speed > 0) {
                 if (world.getTime() % MathHelper.clamp(Math.round(1 / speed), 2, 5) == 0) {
-                    var dir = state.get(GrinderBlock.INPUT_FACING).getAxis();
                     ((ServerWorld) world).spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, stack.copy()),
                             pos.getX() + 0.5, pos.getY() + 1.15, pos.getZ() + 0.5, 0,
                             (Math.random() - 0.5) * 0.2, 0.02, (Math.random() - 0.5) * 0.2, 2);

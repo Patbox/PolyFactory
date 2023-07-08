@@ -32,6 +32,7 @@ import static eu.pb4.polyfactory.util.FactoryUtil.id;
 public class UiResourceCreator {
     public static final String BASE_MODEL = "minecraft:item/generated";
     public static final String X32_MODEL = "polyfactory:sgui/button_32";
+    public static final String X32_RIGHT_MODEL = "polyfactory:sgui/button_32_right";
 
     private static final Style STYLE = Style.EMPTY.withColor(0xFFFFFF).withFont(id("gui"));
     private static final String ITEM_TEMPLATE = """
@@ -80,6 +81,10 @@ public class UiResourceCreator {
         return genericProgress(path, start, stop, X32_MODEL, HORIZONTAL_PROGRESS);
     }
 
+    public static IntFunction<GuiElementBuilder> horizontalProgress32Right(String path, int start, int stop) {
+        return genericProgress(path, start, stop, X32_RIGHT_MODEL, HORIZONTAL_PROGRESS);
+    }
+
     public static IntFunction<GuiElementBuilder> verticalProgress32(String path, int start, int stop) {
         return genericProgress(path, start, stop, X32_MODEL, VERTICAL_PROGRESS);
     }
@@ -95,7 +100,7 @@ public class UiResourceCreator {
         progressType.add(new SlicedTexture(path, start, stop));
 
         for (var i = start; i < stop; i++) {
-            models[i] = genericIconRaw(Items.ALLIUM,  "gen/" + path + "_" + i, base);
+            models[i - start] = genericIconRaw(Items.ALLIUM,  "gen/" + path + "_" + i, base);
         }
         return (i) -> new GuiElementBuilder(models[i].item()).setName(Text.empty()).hideFlags().setCustomModelData(models[i].value());
     }

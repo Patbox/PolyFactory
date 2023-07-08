@@ -6,6 +6,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
+import it.unimi.dsi.fastutil.objects.ObjectIntMutablePair;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
@@ -59,38 +61,36 @@ public record GenericMixingRecipe(Identifier identifier, List<CountedIngredient>
 
     @Override
     public boolean matches(MixerBlockEntity inventory, World world) {
-        int count = this.input.size();
-        for (var entry : this.input) {
-            var itemCount = entry.count();
-            if (itemCount == 0) {
-                itemCount++;
+        var map = new Object2IntArrayMap<CountedIngredient>();
+        for (int i = MixerBlockEntity.INPUT_FIRST; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
+            var stack = inventory.getStack(i);
+            if (stack.isEmpty()) {
+                continue;
             }
-            var noMatches = true;
-
-            for (int i = MixerBlockEntity.INPUT_FIRST; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-                var stack = inventory.getStack(i);
-                if (stack.isEmpty()) {
-                    continue;
-                }
-
-                if (entry.ingredient().test(stack)) {
-                    itemCount -= stack.getCount();
-                    noMatches = false;
-                }
-
-                if (itemCount <= 0) {
+            var notFound = true;
+            for (var ig : this.input) {
+                if (ig.ingredient().test(stack)) {
+                    map.put(ig, map.getInt(ig) + stack.getCount());
+                    notFound = false;
                     break;
                 }
             }
-
-            if (itemCount > 0 || noMatches) {
+            if (notFound) {
                 return false;
-            } else {
-                count--;
             }
         }
 
-        return count == 0;
+        if (this.input.size() != map.size()) {
+            return false;
+        }
+
+        for (var entry : map.object2IntEntrySet()) {
+            if (entry.getKey().count() > entry.getIntValue()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public void applyRecipeUse(MixerBlockEntity inventory, World world) {
@@ -124,7 +124,7 @@ public record GenericMixingRecipe(Identifier identifier, List<CountedIngredient>
 
     @Override
     public ItemStack craft(MixerBlockEntity inventory, DynamicRegistryManager registryManager) {
-        return this.output;
+        return this.output.copy();
     }
 
     @Override

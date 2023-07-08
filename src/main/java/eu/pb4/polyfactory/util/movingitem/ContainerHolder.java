@@ -4,6 +4,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+
 public interface ContainerHolder {
     @Nullable
     MovingItem getContainer();
@@ -45,5 +47,11 @@ public interface ContainerHolder {
 
         setContainer(moving);
         return true;
+    }
+
+    default MovingItem pullAndDestroy() {
+        var x = this.getContainer();
+        this.clearContainer();
+        return x;
     }
 }

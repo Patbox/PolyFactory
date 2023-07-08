@@ -54,6 +54,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
     public WindmillBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(SAIL_COUNT, 4));
+        Model.MODEL.getItem();
     }
 
     @Override
@@ -158,11 +159,8 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
         private Model(ServerWorld world, BlockState state) {
             this.updateSails(state.get(SAIL_COUNT), state.get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
 
-            this.center = new LodItemDisplayElement(AxleBlock.Model.ITEM_MODEL_SHORT);
+            this.center = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, 4);
             this.center.setDisplaySize(3, 3);
-            this.center.setModelTransformation(ModelTransformationMode.FIXED);
-            this.center.setInterpolationDuration(5);
-            this.center.setInvisible(true);
             this.addElement(this.center);
             this.updateAnimation(0, state.get(WindmillBlock.FACING), state.get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
         }
@@ -206,7 +204,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
                     var x = new LodItemDisplayElement();
                     //x.setDisplaySize(3, 3);
                     x.setModelTransformation(ModelTransformationMode.FIXED);
-                    x.setInterpolationDuration(5);
+                    x.setInterpolationDuration(4);
                     x.setInvisible(true);
                     sails[i] = x;
                     this.addElement(x);

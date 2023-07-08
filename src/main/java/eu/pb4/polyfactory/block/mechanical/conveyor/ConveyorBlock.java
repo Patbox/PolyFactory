@@ -39,6 +39,7 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
@@ -54,15 +55,22 @@ import java.util.List;
 import java.util.Locale;
 
 public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider, ConveyorLikeDirectional, MovingItemConsumer, VirtualDestroyStage.Marker {
-    public static DirectionProperty DIRECTION = DirectionProperty.of("direction", Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
-    public static EnumProperty<DirectionValue> VERTICAL = EnumProperty.of("vertical", DirectionValue.class);
-    public static BooleanProperty NEXT_CONVEYOR = BooleanProperty.of("next");
-    public static BooleanProperty PREVIOUS_CONVEYOR = BooleanProperty.of("previous");
-    public static BooleanProperty HAS_OUTPUT_TOP = BooleanProperty.of("has_top_output");
+    public static final DirectionProperty DIRECTION = DirectionProperty.of("direction", Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
+    public static final EnumProperty<DirectionValue> VERTICAL = EnumProperty.of("vertical", DirectionValue.class);
+
+
+
+    public static final BooleanProperty TOP_CONVEYOR = BooleanProperty.of("hide_top");
+    public static final BooleanProperty BOTTOM_CONVEYOR = BooleanProperty.of("hide_bottom");
+    public static final BooleanProperty PREVIOUS_CONVEYOR = BooleanProperty.of("hide_back");
+    public static final BooleanProperty NEXT_CONVEYOR = BooleanProperty.of("hide_front");
+    public static final BooleanProperty EXTRA_CONVEYOR = BooleanProperty.of("hide_extra");
+    public static final BooleanProperty HAS_OUTPUT_TOP = BooleanProperty.of("has_top_output");
 
     public ConveyorBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(VERTICAL, DirectionValue.NONE).with(DIRECTION, Direction.NORTH).with(HAS_OUTPUT_TOP, false).with(NEXT_CONVEYOR, false).with(PREVIOUS_CONVEYOR, false));
+        this.setDefaultState(this.getDefaultState().with(VERTICAL, DirectionValue.NONE).with(DIRECTION, Direction.NORTH).with(HAS_OUTPUT_TOP, false)
+                .with(NEXT_CONVEYOR, false).with(PREVIOUS_CONVEYOR, false).with(TOP_CONVEYOR, false).with(BOTTOM_CONVEYOR, false).with(EXTRA_CONVEYOR, false));
     }
 
     @Override
@@ -73,6 +81,9 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
         builder.add(HAS_OUTPUT_TOP);
         builder.add(NEXT_CONVEYOR);
         builder.add(PREVIOUS_CONVEYOR);
+        builder.add(TOP_CONVEYOR);
+        builder.add(BOTTOM_CONVEYOR);
+        builder.add(EXTRA_CONVEYOR);
     }
 
     @Override
@@ -158,9 +169,13 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
                         default -> vert;
                     });
                 }
+            } else if (vert != DirectionValue.NONE && direction == Direction.DOWN) {
+                state = state.with(EXTRA_CONVEYOR, neighborState.isOf(this) && neighborState.get(VERTICAL) == DirectionValue.NONE);
             }
 
-            return state.with(HAS_OUTPUT_TOP, world.getBlockState(pos.up()).isIn(FactoryBlockTags.CONVEYOR_TOP_OUTPUT));
+
+
+            return state.with(HAS_OUTPUT_TOP, world.getBlockState(pos.up()).isIn(FactoryBlockTags.CONVEYOR_TOP_OUTPUT)).with(direction == Direction.UP ? TOP_CONVEYOR : BOTTOM_CONVEYOR, isMatchingConveyor(neighborState, state.get(DIRECTION)));
         } else if (direction.getAxis() == state.get(DIRECTION).getAxis()) {
             return state.with(direction == state.get(DIRECTION) ? NEXT_CONVEYOR : PREVIOUS_CONVEYOR, isMatchingConveyor(neighborState, state.get(DIRECTION)));
         }
@@ -172,25 +187,6 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
         if (world instanceof ServerWorld serverWorld) {
             pushEntity(serverWorld, state, pos, entity);
         }
-    }
-
-    @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-        /*if (world instanceof ServerWorld serverWorld) {
-            var box = entity.getBoundingBox().offset(0, -0.1, 0);
-
-            boolean match = false;
-            for (var shape : state.getCollisionShape(world, pos).getBoundingBoxes()) {
-                if (shape.offset(pos).intersects(box)) {
-                    match = true;
-                    break;
-                }
-            }
-
-            if (match) {
-                this.pushEntity(serverWorld, state, pos, entity);
-            }
-        }*/
     }
 
     @Override
@@ -297,11 +293,56 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
             });
         }
 
+        var bottom = ctx.getWorld().getBlockState(ctx.getBlockPos().down());
 
         return state
                 .with(NEXT_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().offset(direction)), direction))
                 .with(PREVIOUS_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().offset(direction, -1)), direction))
+                .with(TOP_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().up()), direction))
+                .with(BOTTOM_CONVEYOR, isMatchingConveyor(bottom, direction))
+                .with(EXTRA_CONVEYOR, isMatchingConveyor(bottom, direction) && bottom.get(VERTICAL) == DirectionValue.NONE)
                 .with(HAS_OUTPUT_TOP, ctx.getWorld().getBlockState(ctx.getBlockPos().up()).isIn(FactoryBlockTags.CONVEYOR_TOP_OUTPUT));
+    }
+
+    public static int getModelId(BlockState state) {
+        return getModelId(state.get(TOP_CONVEYOR), state.get(BOTTOM_CONVEYOR), state.get(PREVIOUS_CONVEYOR), state.get(NEXT_CONVEYOR), state.get(VERTICAL).value != 0 && state.get(EXTRA_CONVEYOR));
+    }
+
+    public static int getModelId(boolean top, boolean bottom, boolean previous, boolean next, boolean extra) {
+        int i = 0;
+        if (top) {
+            i |= 1;
+        }
+        if (bottom) {
+            i |= 2;
+        }
+        if (previous) {
+            i |= 4;
+        }
+        if (next) {
+            i |= 8;
+        }
+
+        if (extra) {
+            i |= 16;
+        }
+        return i;
+    }
+
+    public static boolean hasTop(int i) {
+        return (i & 1) != 0;
+    }
+
+    public static boolean hasBottom(int i) {
+        return (i & 2) != 0;
+    }
+
+    public static boolean hasPrevious(int i) {
+        return (i & 4) != 0;
+    }
+
+    public static boolean hasNext(int i) {
+        return (i & 8) != 0;
     }
 
     private boolean isMatchingConveyor(BlockState blockState, Direction direction) {
@@ -440,7 +481,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
 
         private Model(ServerWorld world, BlockState state) {
             var type = state.get(ConveyorBlock.VERTICAL);
-            this.base = new ItemDisplayElement(getModelForSpeed(0, type, state.isOf(FactoryBlocks.STICKY_CONVEYOR), state.get(PREVIOUS_CONVEYOR), state.get(NEXT_CONVEYOR)));
+            this.base = new ItemDisplayElement(getModelForSpeed(0, type, state.isOf(FactoryBlocks.STICKY_CONVEYOR), state));
             this.base.setDisplaySize(1, 1);
             this.base.setModelTransformation(ModelTransformationMode.FIXED);
             this.base.setInvisible(true);
@@ -449,12 +490,12 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
             this.updateAnimation(state.get(ConveyorBlock.DIRECTION), state.get(ConveyorBlock.VERTICAL));
         }
 
-        private ItemStack getModelForSpeed(double speed, DirectionValue directionValue, boolean sticky, boolean prev, boolean next) {
+        private ItemStack getModelForSpeed(double speed, DirectionValue directionValue, boolean sticky, BlockState state) {
             return (switch (directionValue) {
-                case NONE -> (sticky ? ConveyorModel.ANIMATION_REGULAR_STICKY_X : ConveyorModel.ANIMATION_REGULAR_X)[(prev ? 1 : 0) + (next ? 2 : 0)];
+                case NONE -> sticky ? ConveyorModel.ANIMATION_REGULAR_STICKY : ConveyorModel.ANIMATION_REGULAR;
                 case POSITIVE, POSITIVE_STACK -> sticky ? ConveyorModel.ANIMATION_UP_STICKY : ConveyorModel.ANIMATION_UP;
                 case NEGATIVE, NEGATIVE_STACK -> sticky ? ConveyorModel.ANIMATION_DOWN_STICKY : ConveyorModel.ANIMATION_DOWN;
-            })[(int) Math.ceil(MathHelper.clamp(speed * ConveyorModel.FRAMES * 15, 0, ConveyorModel.FRAMES))];
+            })[getModelId(state)][(int) Math.ceil(MathHelper.clamp(speed * ConveyorModel.FRAMES * 15, 0, ConveyorModel.FRAMES))];
         }
 
         private void updateAnimation(Direction dir, DirectionValue value) {
@@ -488,7 +529,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 var state = BlockBoundAttachment.get(this).getBlockState();
-                this.base.setItem(getModelForSpeed(speed, state.get(ConveyorBlock.VERTICAL), state.isOf(FactoryBlocks.STICKY_CONVEYOR), state.get(PREVIOUS_CONVEYOR), state.get(NEXT_CONVEYOR)));
+                this.base.setItem(getModelForSpeed(speed, state.get(ConveyorBlock.VERTICAL), state.isOf(FactoryBlocks.STICKY_CONVEYOR), state));
 
                 this.tick();
             }
@@ -497,7 +538,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
         public boolean updateSpeed(double speed) {
             if (this.speed != speed) {
                 var state = BlockBoundAttachment.get(this).getBlockState();
-                this.base.setItem(getModelForSpeed(speed, state.get(ConveyorBlock.VERTICAL), state.isOf(FactoryBlocks.STICKY_CONVEYOR), state.get(PREVIOUS_CONVEYOR), state.get(NEXT_CONVEYOR)));
+                this.base.setItem(getModelForSpeed(speed, state.get(ConveyorBlock.VERTICAL), state.isOf(FactoryBlocks.STICKY_CONVEYOR), state));
                 this.speed = speed;
                 return true;
             }

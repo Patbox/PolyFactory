@@ -4,7 +4,10 @@
   "package": "eu.pb4.polyfactory.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "BlockEntityTypeAccessor",
     "BlockItemMixin",
+    "HopperBlockEntityMixin",
+    "HopperBlockMixin",
     "PlayerEntityAccessor",
     "RegistryOpsMixin",
     "ServerPlayerEntityMixin",

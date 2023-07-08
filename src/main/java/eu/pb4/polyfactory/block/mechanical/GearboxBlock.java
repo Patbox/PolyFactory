@@ -72,23 +72,9 @@ public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock
             this.mainElement.setInvisible(true);
             this.addElement(this.mainElement);
 
-            this.xAxle = new LodItemDisplayElement(AxleBlock.Model.ITEM_MODEL);
-            this.xAxle.setDisplaySize(1, 1);
-            this.xAxle.setModelTransformation(ModelTransformationMode.FIXED);
-            this.xAxle.setInvisible(true);
-            this.xAxle.setInterpolationDuration(5);
-
-            this.yAxle = new LodItemDisplayElement(AxleBlock.Model.ITEM_MODEL);
-            this.yAxle.setDisplaySize(1, 1);
-            this.yAxle.setModelTransformation(ModelTransformationMode.FIXED);
-            this.yAxle.setInvisible(true);
-            this.yAxle.setInterpolationDuration(5);
-
-            this.zAxle = new LodItemDisplayElement(AxleBlock.Model.ITEM_MODEL);
-            this.zAxle.setDisplaySize(1, 1);
-            this.zAxle.setModelTransformation(ModelTransformationMode.FIXED);
-            this.zAxle.setInterpolationDuration(5);
-            this.zAxle.setInvisible(true);
+            this.xAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, 4);
+            this.yAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, 4);
+            this.zAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, 4);
             this.updateAnimation(0);
 
             this.addElement(this.mainElement);

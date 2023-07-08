@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
+import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
@@ -45,6 +46,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
         var pack = fabricDataGenerator.createPack();
 
         pack.addProvider(BlockTagsProvider::new);
+        pack.addProvider(ItemTagsProvider::new);
         pack.addProvider(LootTables::new);
         pack.addProvider(Recipes::new);
     }
@@ -84,6 +86,20 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .add(FactoryBlocks.GEARBOX)
                     .add(FactoryBlocks.CONTAINER)
                     .add(FactoryBlocks.FUNNEL)
+            ;
+        }
+    }
+
+    class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
+        public ItemTagsProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+            super(output, registriesFuture);
+        }
+
+        @Override
+        protected void configure(RegistryWrapper.WrapperLookup arg) {
+            this.getOrCreateTagBuilder(FactoryItemTags.ALLOWED_IN_MINER)
+                    .addOptionalTag(ItemTags.TOOLS)
+                    .add(FactoryItems.STEEL_COG)
             ;
         }
     }
@@ -208,7 +224,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             }
 
             of(exporter, FireworkStarMixingRecipe.CODEC,
-                    new FireworkStarMixingRecipe(id("mixing/firework_star"), 10, 4, 8)
+                    new FireworkStarMixingRecipe(id("mixing/firework_star"), 4, 4, 17)
             );
 
             of(exporter, GenericMixingRecipe.CODEC,

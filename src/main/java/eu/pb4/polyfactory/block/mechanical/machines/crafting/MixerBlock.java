@@ -1,9 +1,11 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
@@ -17,7 +19,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -28,7 +29,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 import org.joml.Vector3f;
 
 public class MixerBlock extends TallItemMachineBlock {
@@ -56,7 +57,7 @@ public class MixerBlock extends TallItemMachineBlock {
 
     @Override
     protected ElementHolder createModel(ServerWorld serverWorld, BlockPos pos, BlockState initialBlockState) {
-        return new Model(serverWorld, initialBlockState);
+        return new Model(initialBlockState);
     }
 
     @Override
@@ -129,29 +130,29 @@ public class MixerBlock extends TallItemMachineBlock {
             MODEL_PISTON.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_PISTON.getItem(), FactoryUtil.id("block/mixer_whisk")).value());
         }
 
-        private final Matrix4f mat = new Matrix4f();
+        private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement whisk;
         private final ItemDisplayElement main;
+        private final ItemDisplayElement gearA;
+        private final ItemDisplayElement gearB;
         private float rotation;
         private boolean active;
 
-        private Model(ServerWorld world, BlockState state) {
-            this.main = new LodItemDisplayElement(FactoryItems.PRESS_BLOCK.getDefaultStack());
-            this.main.setDisplaySize(1, 1);
-            this.main.setModelTransformation(ModelTransformationMode.FIXED);
+        private Model(BlockState state) {
+            this.main = LodItemDisplayElement.createSimple(FactoryItems.MIXER_BLOCK.getDefaultStack(), 0);
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.469f, 0));
-            this.main.setInvisible(true);
 
-            this.whisk = new LodItemDisplayElement(MODEL_PISTON);
-            this.whisk.setDisplaySize(1, 1);
-            this.whisk.setModelTransformation(ModelTransformationMode.FIXED);
-            this.whisk.setInterpolationDuration(2);
-            this.whisk.setInvisible(true);
+            this.whisk = LodItemDisplayElement.createSimple(MODEL_PISTON, 2);
+            this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4);
+            this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4);
+
             this.updateStatePos(state);
-            this.updateAnimation();
-            this.addElement(this.whisk);
+            var dir = state.get(INPUT_FACING);
+            this.updateAnimation(true, 0, (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));            this.addElement(this.whisk);
             this.addElement(this.main);
+            this.addElement(this.gearA);
+            this.addElement(this.gearB);
         }
 
         private void updateStatePos(BlockState state) {
@@ -159,14 +160,26 @@ public class MixerBlock extends TallItemMachineBlock {
 
             this.main.setYaw(direction.asRotation());
             this.whisk.setYaw(direction.asRotation());
+            this.gearA.setYaw(direction.asRotation());
+            this.gearB.setYaw(direction.asRotation());
         }
 
-        private void updateAnimation() {
+        private void updateAnimation(boolean b, float rotation, boolean negative) {
             mat.identity();
             mat.translate(0, 0.5f, 0);
+            if (b) {
+                mat.pushMatrix();
+                mat.rotateY(negative ? MathHelper.HALF_PI : -MathHelper.HALF_PI);
+                mat.translate(0, 0.5f, 0.40f);
+                mat.rotateZ(rotation);
+                this.gearA.setTransformation(mat);
+                mat.translate(0, 0, -0.80f);
+                this.gearB.setTransformation(mat);
+                mat.popMatrix();
+            }
             mat.scale(2f);
             mat.rotateY(this.rotation);
-            mat.translate(0, this.active ? 0.4f : 0.65f, 0);
+            mat.translate(0, this.active ? -0.1f : 0.2f, 0);
             this.whisk.setTransformation(mat);
         }
 
@@ -182,15 +195,25 @@ public class MixerBlock extends TallItemMachineBlock {
             var tick = this.getAttachment().getWorld().getTime();
 
             if (tick % 2 == 0) {
-                this.updateAnimation();
+                var b = tick % 4 == 0;
+
+                var dir = BlockBoundAttachment.get(this).getBlockState().get(INPUT_FACING);
+                this.updateAnimation(b,
+                        b ? RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos().up()).rotation() : 0,
+                        (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
                 if (this.whisk.isDirty()) {
                     this.whisk.startInterpolation();
+                }
+
+                if (this.gearA.isDirty()) {
+                    this.gearA.startInterpolation();
+                    this.gearB.startInterpolation();
                 }
             }
         }
 
         public void rotate(float speed) {
-            this.rotation += speed * MathHelper.RADIANS_PER_DEGREE;
+            this.rotation += speed * MathHelper.RADIANS_PER_DEGREE * 2;
             if (this.rotation > MathHelper.TAU) {
                 this.rotation -= MathHelper.TAU;
             }

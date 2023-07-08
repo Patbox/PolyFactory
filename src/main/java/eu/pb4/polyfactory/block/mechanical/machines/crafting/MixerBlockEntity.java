@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.util.inventory.WrappingRecipeInputInventory;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
@@ -16,6 +17,8 @@ import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ItemStackParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
@@ -33,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MixerBlockEntity extends TallItemMachineBlockEntity implements RecipeInputInventory {
+public class MixerBlockEntity extends TallItemMachineBlockEntity {
     public static final int OUTPUT_FIRST = 6;
     public static final int INPUT_FIRST = 0;
     public static final int SIZE = 9;
@@ -46,6 +49,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Reci
     private final SimpleContainer[] containers = SimpleContainer.createArray(9, this::addMoving, this::removeMoving);
     private MixerBlock.Model model;
     private boolean inventoryChanged = false;
+    private RecipeInputInventory recipeInputProvider;
 
     public MixerBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.MIXER, pos, state);
@@ -58,9 +62,9 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Reci
             Vec3d base;
             if (id >= OUTPUT_FIRST) {
                 id = id - OUTPUT_FIRST;
-                base = Vec3d.ofCenter(this.pos).add(((id >> 1) - 0.5f) * 0.12f, 0.5 - id * 0.005, ((id % 2) - 0.5) * 0.2);
+                base = Vec3d.ofCenter(this.pos).add(((id >> 1) - 0.5f) * 0.12f, - id * 0.005, ((id % 2) - 0.5) * 0.2);
             } else {
-                base = Vec3d.ofCenter(this.pos).add(((id >> 1) - 0.5f) * 0.26f, 0.4 - id * 0.005, ((id % 2) - 0.5) * 0.4);
+                base = Vec3d.ofCenter(this.pos).add(((id >> 1) - 0.5f) * 0.15f, -0.15 - id * 0.005, ((id % 2) - 0.5) * 0.2);
             }
 
             c.getContainer().setPos(base);
@@ -88,12 +92,12 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Reci
 
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return slot != OUTPUT_FIRST;
+        return slot < OUTPUT_FIRST;
     }
 
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return slot == OUTPUT_FIRST;
+        return slot >= OUTPUT_FIRST;
     }
 
     public void openGui(ServerPlayerEntity player) {
@@ -143,14 +147,13 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Reci
         self.active = true;
         self.model.setActive(true);
         var fullSpeed = RotationUser.getRotation((ServerWorld) world, pos.up()).speed();
-        self.model.rotate((float) (fullSpeed * MathHelper.RADIANS_PER_DEGREE * 5));
+        self.model.rotate((float) fullSpeed);
         self.model.tick();
 
         if (self.process >= self.currentRecipe.time()) {
             var currentOutput = self.getStack(OUTPUT_FIRST);
+            var output = self.currentRecipe.craft(self, world.getRegistryManager());
             {
-                var output = self.currentRecipe.getOutput(world.getRegistryManager());
-
                 if (!currentOutput.isEmpty() && (!ItemStack.canCombine(currentOutput, output) || output.getCount() + currentOutput.getCount() > output.getMaxCount())) {
                     return;
                 }
@@ -158,7 +161,6 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Reci
             self.process = 0;
 
             self.currentRecipe.applyRecipeUse(self, world);
-            var output = self.currentRecipe.craft(self, world.getRegistryManager());
 
             if (currentOutput.isEmpty()) {
                 self.setStack(OUTPUT_FIRST, output);
@@ -198,8 +200,16 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Reci
             var speed = Math.min(Math.max(Math.abs(fullSpeed) - self.currentRecipe.minimumSpeed(), 0), d) / d / 20;
             if (speed > 0) {
                 self.process += speed;
-                if (self.world != null) {
-                    markDirty(self.world, self.pos, self.getCachedState());
+                markDirty(world, pos, self.getCachedState());
+
+                var stack = self.getStack(world.random.nextBetween(0, OUTPUT_FIRST));
+                if (!stack.isEmpty()) {
+                    ((ServerWorld) world).spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, stack.copy()),
+                            pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0,
+                            (Math.random() - 0.5) * 0.2, 0.8, (Math.random() - 0.5) * 0.2, 2);
+                    ((ServerWorld) world).spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, stack.copy()),
+                            pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0,
+                            (Math.random() - 0.5) * 0.2, 0, (Math.random() - 0.5) * 0.2, 2);
                 }
             }
         }
@@ -237,50 +247,27 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Reci
         return this.model;
     }
 
-    @Override
-    public int getWidth() {
-        return 2;
-    }
-
-    @Override
-    public int getHeight() {
-        return 3;
-    }
-
-    @Override
-    public List<ItemStack> getInputStacks() {
-        var stacks = new ArrayList<ItemStack>(this.containers.length);
-        for (var container : this.containers) {
-            stacks.add(container.getStack());
+    public RecipeInputInventory asRecipeInputProvider() {
+        if (this.recipeInputProvider == null) {
+            this.recipeInputProvider = WrappingRecipeInputInventory.of(this, INPUT_FIRST, OUTPUT_FIRST, 2, 3);
         }
-
-        return stacks;
-    }
-
-    @Override
-    public void provideRecipeInputs(RecipeMatcher finder) {
-        for (var container : this.containers) {
-            finder.addInput(container.getStack());
-        }
+        return this.recipeInputProvider;
     }
 
     private class Gui extends SimpleGui {
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X3, player, false);
-            //this.setTitle(GuiTextures.GRINDER.apply(MixerBlockEntity.this.getCachedState().getBlock().getName()));
-            this.setSlotRedirect(1, new Slot(MixerBlockEntity.this, 0, 0, 0));
-            this.setSlotRedirect(2, new Slot(MixerBlockEntity.this, 1, 1, 0));
-            this.setSlotRedirect(1 + 9, new Slot(MixerBlockEntity.this, 2, 2, 0));
-            this.setSlotRedirect(2 + 9, new Slot(MixerBlockEntity.this, 3, 3, 0));
-            this.setSlotRedirect(1 + 18, new Slot(MixerBlockEntity.this, 4, 4, 0));
-            this.setSlotRedirect(2 + 18, new Slot(MixerBlockEntity.this, 5, 5, 0));
-            this.setSlot(4 + 9, GuiTextures.PROGRESS_HORIZONTAL.get(progress()));
+            this.setTitle(GuiTextures.MIXER.apply(MixerBlockEntity.this.getCachedState().getBlock().getName()));
+            this.setSlotRedirect(2, new Slot(MixerBlockEntity.this, 0, 0, 0));
+            this.setSlotRedirect(3, new Slot(MixerBlockEntity.this, 1, 1, 0));
+            this.setSlotRedirect(2 + 9, new Slot(MixerBlockEntity.this, 2, 2, 0));
+            this.setSlotRedirect(3 + 9, new Slot(MixerBlockEntity.this, 3, 3, 0));
+            this.setSlotRedirect(2 + 18, new Slot(MixerBlockEntity.this, 4, 4, 0));
+            this.setSlotRedirect(3 + 18, new Slot(MixerBlockEntity.this, 5, 5, 0));
+            this.setSlot(4 + 9, GuiTextures.PROGRESS_HORIZONTAL_OFFSET_RIGHT.get(progress()));
             this.setSlotRedirect(6, new FurnaceOutputSlot(player, MixerBlockEntity.this, 6, 3, 0));
             this.setSlotRedirect(6 + 9, new FurnaceOutputSlot(player, MixerBlockEntity.this, 7, 3, 0));
             this.setSlotRedirect(6 + 18, new FurnaceOutputSlot(player, MixerBlockEntity.this, 8, 3, 0));
-            while (this.getFirstEmptySlot() != -1) {
-                this.addSlot(Items.WHITE_STAINED_GLASS_PANE.getDefaultStack());
-            }
             this.open();
         }
 
@@ -295,7 +282,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Reci
             if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(MixerBlockEntity.this.pos)) > (18*18)) {
                 this.close();
             }
-            this.setSlot(4 + 9, GuiTextures.PROGRESS_HORIZONTAL.get(progress()));
+            this.setSlot(4 + 9, GuiTextures.PROGRESS_HORIZONTAL_OFFSET_RIGHT.get(progress()));
             super.onTick();
         }
     }

@@ -132,7 +132,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
             this.mainElement = new LodItemDisplayElement(FactoryItems.HAND_CRANK_BLOCK.getDefaultStack());
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
-            this.mainElement.setInterpolationDuration(5);
+            this.mainElement.setInterpolationDuration(4);
             this.mainElement.setInvisible(true);
             this.updateAnimation(0, state.get(FACING));
             this.addElement(this.mainElement);
