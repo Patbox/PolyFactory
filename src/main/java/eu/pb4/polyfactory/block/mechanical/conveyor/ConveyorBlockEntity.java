@@ -87,7 +87,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
 
         var currentDelta = self.delta;
 
-        if (state.get(ConveyorBlock.HAS_OUTPUT_TOP)) {
+        if (state.get(ConveyorBlock.HAS_OUTPUT_TOP) && !vert.stack) {
             self.delta += speed;
             if (self.tryInserting(world, pos.offset(Direction.UP), Direction.UP, FactoryBlockTags.CONVEYOR_TOP_OUTPUT)) {
                 if (self.isContainerEmpty()) {
@@ -101,19 +101,16 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
 
 
         if (currentDelta + speed >= 1) {
-            boolean block;
+            boolean block = false;
 
             self.delta += speed;
-            if (vert.stack) {
-                block = self.tryInserting(world, pos.up(vert.value), dir, null);
-            } else {
-                if (vert.value == -1) {
-                    block = self.tryInserting(world, pos.offset(dir).down(), dir, FactoryBlockTags.CONVEYOR_SIDE_OUTPUT);
-                } else {
-                    block = self.tryInserting(world, pos.offset(dir).up(), dir, FactoryBlockTags.CONVEYOR_SIDE_OUTPUT) || self.tryInserting(world, pos.offset(dir), dir, FactoryBlockTags.CONVEYOR_SIDE_OUTPUT);
-                }
+            if (!vert.stack) {
+                block = self.tryInserting(world, pos.offset(dir), dir, FactoryBlockTags.CONVEYOR_SIDE_OUTPUT);
             }
 
+            if (!block) {
+                block = self.tryMovingConveyor(world, pos, state, vert, dir);
+            }
 
             if (block) {
                 self.delta -= speed;
@@ -123,6 +120,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
                 self.model.tick();
                 return;
             }
+
 
             var stack = self.getStack(0);
             self.clearContainer();
@@ -140,6 +138,61 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
             self.setDelta(currentDelta + speed);
             self.model.tick();
         }
+    }
+
+    private boolean tryMovingConveyor(World world, BlockPos pos, BlockState state, ConveyorBlock.DirectionValue vert, Direction dir) {
+        BlockPos next;
+        if (vert.stack) {
+            next = pos.up(vert.value);
+        } else if (vert.value == 0 || vert.value == 1) {
+            next = pos.offset(dir);
+            var possibleNext = world.getBlockState(next);
+            if (possibleNext.isIn(FactoryBlockTags.CONVEYORS)) {
+                var maybeNext = next.up();
+                var possibleNext2 = world.getBlockState(maybeNext);
+                if (possibleNext2.isIn(FactoryBlockTags.CONVEYORS) && possibleNext2.get(ConveyorBlock.VERTICAL).value == 1) {
+                    next = maybeNext;
+                }
+            }
+        } else if (vert.value == -1) {
+            next = pos.down();
+            var possibleNext = world.getBlockState(next);
+            if (possibleNext.isIn(FactoryBlockTags.CONVEYORS)) {
+                var maybeNext = next.offset(dir);
+                var possibleNext2 = world.getBlockState(maybeNext);
+                if (possibleNext2.isIn(FactoryBlockTags.CONVEYORS)) {
+                    next = maybeNext;
+                }
+            }
+        } else {
+            return false;
+        }
+
+        var nextConveyor = world.getBlockEntity(next) instanceof ConveyorBlockEntity conveyorBlock ? conveyorBlock : null;
+        if (nextConveyor == null) {
+            return false;
+        }
+
+        if (!nextConveyor.isContainerEmpty()) {
+            return true;
+        }
+        var nextState = nextConveyor.getCachedState();
+
+        var nextDir = nextState.get(ConveyorBlock.DIRECTION);
+        if (nextDir == dir) {
+            nextConveyor.setDelta(0);
+        } else if (nextDir.rotateYCounterclockwise().getAxis() == dir.getAxis()) {
+            nextConveyor.setDelta(0.5);
+        } else if (nextDir.getOpposite() == dir) {
+            nextConveyor.setDelta(0.8);
+        }
+
+        if (vert.stack && vert.value == -1 && nextState.get(ConveyorBlock.VERTICAL) == ConveyorBlock.DirectionValue.NONE) {
+            nextConveyor.setDelta(1);
+        }
+
+        nextConveyor.pushAndAttach(this.pullAndRemove());
+        return true;
     }
 
     private boolean tryInserting(World world, BlockPos pos, Direction dir, TagKey<Block> requiredTag) {

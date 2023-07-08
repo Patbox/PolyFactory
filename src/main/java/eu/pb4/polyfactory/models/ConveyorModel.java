@@ -35,10 +35,10 @@ public class ConveyorModel {
     public static final ItemStack[][] ANIMATION_REGULAR_STICKY = new ItemStack[16][1 + FRAMES];
     public static final ItemStack[][] ANIMATION_REGULAR = new ItemStack[16][1 + FRAMES];
 
-    public static final ItemStack[][] ANIMATION_UP = new ItemStack[32][1 + FRAMES];
-    public static final ItemStack[][] ANIMATION_UP_STICKY = new ItemStack[32][1 + FRAMES];
-    public static final ItemStack[][] ANIMATION_DOWN = new ItemStack[32][1 + FRAMES];
-    public static final ItemStack[][] ANIMATION_DOWN_STICKY = new ItemStack[32][1 + FRAMES];
+    public static final ItemStack[][] ANIMATION_UP = new ItemStack[16][1 + FRAMES];
+    public static final ItemStack[][] ANIMATION_UP_STICKY = new ItemStack[16][1 + FRAMES];
+    public static final ItemStack[][] ANIMATION_DOWN = new ItemStack[16][1 + FRAMES];
+    public static final ItemStack[][] ANIMATION_DOWN_STICKY = new ItemStack[16][1 + FRAMES];
 
 
     private static final String MODEL_JSON = """
@@ -83,15 +83,6 @@ public class ConveyorModel {
                 createItemModel(ANIMATION_UP[a], "block/conveyor_up" + addition, i);
                 createItemModel(ANIMATION_DOWN[a], "block/conveyor_down" + addition, i);
                 createItemModel(ANIMATION_REGULAR_STICKY[a], "block/sticky_conveyor" + addition, i);
-                createItemModel(ANIMATION_UP_STICKY[a], "block/sticky_conveyor_up" + addition, i);
-                createItemModel(ANIMATION_DOWN_STICKY[a], "block/sticky_conveyor_down" + addition, i);
-            }
-
-            for (var a = 16; a < 32; a++) {
-                String addition = a == 0 ? "" : ("_" + a);
-
-                createItemModel(ANIMATION_UP[a], "block/conveyor_up" + addition, i);
-                createItemModel(ANIMATION_DOWN[a], "block/conveyor_down" + addition, i);
                 createItemModel(ANIMATION_UP_STICKY[a], "block/sticky_conveyor_up" + addition, i);
                 createItemModel(ANIMATION_DOWN_STICKY[a], "block/sticky_conveyor_down" + addition, i);
             }
@@ -150,11 +141,7 @@ public class ConveyorModel {
 
         for (var variant : new String[]{ "conveyor", "conveyor_up", "conveyor_down" }) {
             var model = models.get(variant);
-            for (int i = 1; i < 32; i++) {
-                if (i == 16 && variant.equals("conveyor")) {
-                    break;
-                }
-
+            for (int i = 1; i < 16; i++) {
                 var base = new JsonObject();
                 base.asMap().putAll(model.asMap());
                 var elements = new JsonArray();
@@ -171,8 +158,6 @@ public class ConveyorModel {
                         case "bottom_front" -> ConveyorBlock.hasBottom(i) && ConveyorBlock.hasNext(i);
                         case "top_back" -> ConveyorBlock.hasTop(i) && ConveyorBlock.hasPrevious(i);
                         case "bottom_back" -> ConveyorBlock.hasBottom(i) && ConveyorBlock.hasPrevious(i);
-                        case "extra" -> (i & 16) != 0;
-                        case "extra_bottom_back" -> (i & 16) != 0 && ConveyorBlock.hasBottom(i) && ConveyorBlock.hasPrevious(i);
                         default -> false;
                     })) {
                         elements.add(element);
@@ -206,13 +191,11 @@ public class ConveyorModel {
         resourcePackBuilder.addData("assets/polyfactory/textures/block/gen/" + prefix + "conveyor_top_" + i + ".png.mcmeta", mcmeta);
         resourcePackBuilder.addData("assets/polyfactory/textures/block/gen/" + prefix + "conveyor_top_" + i + ".png", texture);
 
-        for (int a = 0; a < 32; a++) {
+        for (int a = 0; a < 16; a++) {
             var base = (a == 0 ? "" : ("_" + a + ""));
             var addition = (a == 0 ? "/" : ("_" + a + "/")) + i;
 
-            if (a < 16) {
-                resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor" + addition + ".json", MODEL_JSON.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
-            }
+            resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor" + addition + ".json", MODEL_JSON.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
             resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_up" + addition + ".json", MODEL_JSON_UP.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
             resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_down" + addition + ".json", MODEL_JSON_DOWN.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
         }

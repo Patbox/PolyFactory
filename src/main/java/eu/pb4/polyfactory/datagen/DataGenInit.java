@@ -69,7 +69,6 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .add(FactoryBlocks.HAND_CRANK).add(FactoryBlocks.AXLE);
 
             this.getOrCreateTagBuilder(FactoryBlockTags.CONVEYOR_SIDE_OUTPUT)
-                    .addOptionalTag(FactoryBlockTags.CONVEYORS)
                     .add(FactoryBlocks.PRESS)
                     .add(FactoryBlocks.MIXER)
                     .add(Blocks.HOPPER);

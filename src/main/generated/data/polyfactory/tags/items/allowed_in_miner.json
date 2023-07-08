@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "#minecraft:tools",
+      "required": false
+    },
+    "polyfactory:steel_cog"
+  ]
+}

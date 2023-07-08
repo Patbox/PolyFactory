@@ -1,10 +1,6 @@
 {
   "replace": false,
   "values": [
-    {
-      "id": "#polyfactory:conveyors",
-      "required": false
-    },
     "polyfactory:press",
     "polyfactory:mixer",
     "minecraft:hopper"

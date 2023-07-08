@@ -9,6 +9,7 @@ import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
+import eu.pb4.polyfactory.nodes.AxisNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -21,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
-public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue value) implements MechanicalNode {
+public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue value) implements MechanicalNode, AxisNode {
     public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("conveyor"), tag -> {
         if (tag == null) {
             return null;
@@ -52,49 +53,38 @@ public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue val
         var view = self.getGraphWorld();
         var pos = self.getBlockPos();
 
-        Predicate<NodeHolder<BlockNode>> conv = other -> (other.getNode() instanceof ConveyorNode node && node.direction == this.direction) && FactoryNodes.canBothConnect(self, other);
-        Predicate<NodeHolder<BlockNode>> convType = other -> (other.getNode() instanceof ConveyorNode node && node.direction == this.direction && node.value.value == this.value.value) && FactoryNodes.canBothConnect(self, other);
-        Predicate<NodeHolder<BlockNode>> convTypeUp = other -> (other.getNode() instanceof ConveyorNode node && node.direction == this.direction && node.value.value == 1) && FactoryNodes.canBothConnect(self, other);
-        Predicate<NodeHolder<BlockNode>> convTypeDown = other -> (other.getNode() instanceof ConveyorNode node && node.direction == this.direction && node.value.value == -1) && FactoryNodes.canBothConnect(self, other);
-        Predicate<NodeHolder<BlockNode>> p = other -> !(other.getNode() instanceof ConveyorNode node && node.direction != this.direction) && FactoryNodes.canBothConnect(self, other);
+        Predicate<NodeHolder<BlockNode>> conv = other -> (other.getNode() instanceof ConveyorNode node && node.direction == this.direction);
+        Predicate<NodeHolder<BlockNode>> sides = other -> FactoryNodes.canBothConnect(self, other);
 
         if (this.value.value == 0) {
             nextPos.set(pos).move(direction, -1);
             addNodes(view, nextPos, conv, list);
-            nextPos.move(Direction.UP, 1);
-            addNodes(view, nextPos, convTypeDown, list);
-
             nextPos.move(direction, 2);
             addNodes(view, nextPos, conv, list);
-            nextPos.move(Direction.UP, 1);
-            addNodes(view, nextPos, convTypeUp, list);
 
+            nextPos.set(pos).move(0, 1, 0);
+            addNodes(view, nextPos, conv, list);
+            nextPos.move(0, -2, 0);
+            addNodes(view, nextPos, conv, list);
+        } else if (this.value.stack) {
+            nextPos.set(pos).move(0, 1, 0);
+            addNodes(view, nextPos, conv, list);
+            nextPos.move(0, -2, 0);
+            addNodes(view, nextPos, conv, list);
         } else {
             nextPos.set(pos).move(direction, this.value.value);
             addNodes(view, nextPos, conv, list);
-            addNodes(view, nextPos.move(0, 1, 0), conv, list);
-
-            nextPos.set(pos).move(direction, -this.value.value).move(0, -1, 0);
+            nextPos.set(pos).move(0, -1, 0);
             addNodes(view, nextPos, conv, list);
-
-
-            if (this.value.stack) {
-                nextPos.set(pos).move(0, -1, 0);
-                addNodes(view, nextPos, convType, list);
-                nextPos.move(0, 2, 0);
-                addNodes(view, nextPos, convType, list);
-            }
         }
 
+        var side = direction.rotateYClockwise();
 
-        for (var x : Direction.values()) {
-            if (x == Direction.UP) {
-                continue;
-            }
-            nextPos.set(pos).move(x);
+        nextPos.set(pos).move(side, 1);
+        addNodes(view, nextPos, sides, list);
+        nextPos.move(side, -2);
+        addNodes(view, nextPos, sides, list);
 
-            view.getNodesAt(nextPos).filter(p).forEach((a) -> list.add(new HalfLink(EmptyLinkKey.INSTANCE, a)));
-        }
 
         return list;
     }
@@ -105,7 +95,8 @@ public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue val
 
     @Override
     public boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
-        return MechanicalNode.super.canConnect(self, other) && (other.other().getNode() instanceof ConveyorNode || other.other().getBlockPos().getY() - self.getBlockPos().getY() != 1);
+        return MechanicalNode.super.canConnect(self, other)
+                && ((other.other().getNode() instanceof ConveyorNode conv && conv.direction == this.direction) || AxisNode.canConnect(this, self, other));
     }
 
     @Override
@@ -113,66 +104,8 @@ public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue val
 
     }
 
-    /*
-    // Todo, rewrite this, it could be way shorter
     @Override
-    public @NotNull Collection<Node<BlockNodeHolder>> findConnections(@NotNull ServerWorld world, @NotNull NodeView view, @NotNull BlockPos pos, @NotNull Node<BlockNodeHolder> self) {
-        var nextPos = new BlockPos.Mutable();
-        var list = new ArrayList<Node<BlockNodeHolder>>();
-        Predicate<Node<BlockNodeHolder>> conv = other -> (other.other().getNode() instanceof ConveyorNode node && node.direction == this.direction) && FactoryNodes.canBothConnect(world, view, self, other);
-        Predicate<Node<BlockNodeHolder>> convType = other -> (other.other().getNode() instanceof ConveyorNode node && node.direction == this.direction && node.value.value == this.value.value) && FactoryNodes.canBothConnect(world, view, self, other);
-        Predicate<Node<BlockNodeHolder>> convTypeUp = other -> (other.other().getNode() instanceof ConveyorNode node && node.direction == this.direction && node.value.value == 1) && FactoryNodes.canBothConnect(world, view, self, other);
-        Predicate<Node<BlockNodeHolder>> convTypeDown = other -> (other.other().getNode() instanceof ConveyorNode node && node.direction == this.direction && node.value.value == -1) && FactoryNodes.canBothConnect(world, view, self, other);
-        Predicate<Node<BlockNodeHolder>> p = other -> !(other.other().getNode() instanceof ConveyorNode node && node.direction != this.direction) && FactoryNodes.canBothConnect(world, view, self, other);
-
-        if (this.value.value == 0) {
-            nextPos.set(pos).move(direction, -1);
-            addNodes(view, nextPos, conv, list);
-            nextPos.move(Direction.UP, 1);
-            addNodes(view, nextPos, convTypeDown, list);
-
-            nextPos.move(direction, 2);
-            addNodes(view, nextPos, conv, list);
-            nextPos.move(Direction.UP, 1);
-            addNodes(view, nextPos, convTypeUp, list);
-
-        } else {
-            nextPos.set(pos).move(direction, this.value.value);
-            addNodes(view, nextPos, conv, list);
-            addNodes(view, nextPos.move(0, 1, 0), conv, list);
-
-            nextPos.set(pos).move(direction, -this.value.value).move(0, -1, 0);
-            addNodes(view, nextPos, conv, list);
-
-
-            if (this.value.stack) {
-                nextPos.set(pos).move(0, -1, 0);
-                addNodes(view, nextPos, convType, list);
-                nextPos.move(0, 2, 0);
-                addNodes(view, nextPos, convType, list);
-            }
-        }
-
-
-        for (var x : Direction.values()) {
-            if (x == Direction.UP) {
-                continue;
-            }
-            nextPos.set(pos).move(x);
-
-            view.getNodesAt(nextPos).filter(p).forEach(list::add);
-        }
-
-        return list;
+    public Direction.Axis axis() {
+        return this.direction.rotateYClockwise().getAxis();
     }
-
-    private void addNodes(NodeView view, BlockPos pos, Predicate<Node<BlockNodeHolder>> predicate, List<Node<BlockNodeHolder>> list) {
-        view.getNodesAt(pos).filter(predicate).forEach(list::add);
-    }
-
-    @Override
-    public boolean canConnect(@NotNull ServerWorld world, @NotNull NodeView nodeView, @NotNull BlockPos pos, @NotNull Node<BlockNodeHolder> self, @NotNull Node<BlockNodeHolder> other) {
-        return MechanicalNode.super.canConnect(world, nodeView, pos, self, other) && (other.other().getNode() instanceof ConveyorNode || other.other().getPos().getY() - pos.getY() != 1);
-    }
-    */
 }

@@ -1,4 +1,4 @@
-// 1.20.1	2023-07-03T23:45:55.629676274	PolyFactory/Recipes
+// 1.20.1	2023-07-08T09:26:57.5534699	PolyFactory/Recipes
 0ce191fffe46d87d4c39fd1d71fb55d0f5c52eba data/polyfactory/recipes/grinding/allium_to_dye.json
 ff8f0ef337f4ec1f37ea69a0f0e773a7775d052f data/polyfactory/recipes/grinding/blue_concrete_to_powder.json
 2a8559c71e9637053e2f96405799f8d421d6bbcd data/polyfactory/recipes/mixing/red_concrete_direct.json
@@ -7,7 +7,7 @@ b4c0a51a3a0825bbc64d6598e2ce54cde99d95cd data/polyfactory/recipes/grinding/lime_
 e733ffdf507a1e1819379c254df8e94568562e26 data/polyfactory/recipes/grinding/gold_ingot_to_nuggets.json
 987b6f976c87a10a23e73bd80f03ed6f2cf4873f data/polyfactory/recipes/mixing/brown_concrete_powder.json
 3ea3aa4059371bc327eb0672983c586c8a119091 data/polyfactory/recipes/mixing/red_concrete_powder.json
-554b27382bb4540793dde302b070af28105249eb data/polyfactory/recipes/mixing/firework_star.json
+3edfdbbf3997bb38ee24afe733c86af8c6a05684 data/polyfactory/recipes/mixing/firework_star.json
 4878f6bd9bf7c543820a1655660eb686240843f8 data/polyfactory/recipes/grinding/gold_ore_to_raw.json
 8c532f07636a4515fda09bd1d1ed0835970229d2 data/polyfactory/recipes/grinding/cornflower_to_dye.json
 b9bbeeac51e80bed61ec29a6c1e2a7f8e207fda5 data/polyfactory/recipes/grinding/wither_rose_to_dye.json
