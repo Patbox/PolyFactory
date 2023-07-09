@@ -155,7 +155,7 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
             this.fan.setDisplaySize(1, 1);
             this.fan.setModelTransformation(ModelTransformationMode.FIXED);
             this.fan.setInvisible(true);
-            this.fan.setInterpolationDuration(1);
+            this.fan.setInterpolationDuration(2);
             this.updateStatePos(state);
             this.updateAnimation(0);
 
@@ -184,7 +184,7 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
         }
 
         private void updateAnimation(double speed) {
-            this.rotation += speed * MathHelper.RADIANS_PER_DEGREE * 3;
+            this.rotation += Math.min(speed * MathHelper.RADIANS_PER_DEGREE * 3, RotationConstants.MAX_ROTATION_PER_TICK_2);
             if (this.rotation > MathHelper.TAU) {
                 this.rotation -= MathHelper.TAU;
             }
@@ -197,9 +197,11 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
 
         @Override
         protected void onTick() {
-            this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).speed());
-            if (this.fan.isDirty()) {
-                this.fan.startInterpolation();
+            if (this.getTick() % 2 == 0) {
+                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).speed());
+                if (this.fan.isDirty()) {
+                    this.fan.startInterpolation();
+                }
             }
         }
 

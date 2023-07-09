@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 public class LodItemDisplayElement extends ItemDisplayElement {
     public final DataTrackerLike nearTracker = new SimpleDataTracker(this.getEntityType());
     public final DataTrackerLike mediumTracker = new SimpleDataTracker(this.getEntityType());
+    private int updateTick = 0;
 
     public LodItemDisplayElement(ItemStack stack) {
         super();
@@ -62,7 +63,9 @@ public class LodItemDisplayElement extends ItemDisplayElement {
             @Override
             public <T> void set(TrackedData<T> key, T value, boolean forceDirty) {
                 nearTracker.set(key, value, forceDirty);
-                mediumTracker.set(key, value, forceDirty);
+                if (key != DisplayTrackedData.START_INTERPOLATION) {
+                    mediumTracker.set(key, value, forceDirty);
+                }
             }
 
             @Override
@@ -105,17 +108,17 @@ public class LodItemDisplayElement extends ItemDisplayElement {
             nearPacket = new EntityTrackerUpdateS2CPacket(this.getEntityId(), this.nearTracker.getDirtyEntries());
         }
 
-        if (this.mediumTracker.isDirty() && ((BaseModel) this.getHolder()).isTimeForMediumUpdate()) {
+        if (this.mediumTracker.isDirty() && (updateTick++) % 4 == 0) {
             mediumPacket = new EntityTrackerUpdateS2CPacket(this.getEntityId(), this.mediumTracker.getDirtyEntries());
         }
 
         for (var player : this.getHolder().getWatchingPlayers()) {
             var d = player.player.getPos().squaredDistanceTo(this.getHolder().getPos());
-            if (d < 32 * 32) {
+            if (d < 50 * 50) {
                 if (nearPacket != null) {
                     player.sendPacket(nearPacket);
                 }
-            } else if (d < 80 * 80) {
+            } else if (d < 90 * 90) {
                 if (mediumPacket != null) {
                     player.sendPacket(mediumPacket);
                 }

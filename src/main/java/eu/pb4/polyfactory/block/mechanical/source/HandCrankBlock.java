@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.source;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.mechanical.RotationConstants;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.models.BaseModel;
@@ -74,8 +75,8 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
     @Override
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof HandCrankBlockEntity be) {
-            var speed = MathHelper.lerp(MathHelper.clamp((world.getServer().getTicks() - be.lastTick - 5) / 2d, 0, 1), 15, 0);
-            var stress = MathHelper.lerp(MathHelper.clamp((world.getServer().getTicks() - be.lastTick - 5) / 2d, 0, 1), 10, 0);
+            var speed = MathHelper.lerp(MathHelper.clamp((world.getServer().getTicks() - be.lastTick - 5) / 2d, 0, 1), RotationConstants.HAND_CRANK_SPEED, 0);
+            var stress = MathHelper.lerp(MathHelper.clamp((world.getServer().getTicks() - be.lastTick - 5) / 2d, 0, 1), RotationConstants.HAND_CRANK_STRESS, 0);
 
             if (speed > 0) {
                 modifier.provide(speed, stress);

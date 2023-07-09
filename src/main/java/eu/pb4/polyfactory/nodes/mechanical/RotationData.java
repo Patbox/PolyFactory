@@ -5,6 +5,7 @@ import com.kneelawk.graphlib.api.graph.GraphEntityContext;
 import com.kneelawk.graphlib.api.graph.user.GraphEntity;
 import com.kneelawk.graphlib.api.graph.user.GraphEntityType;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.block.mechanical.RotationConstants;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
@@ -90,7 +91,7 @@ public class RotationData implements GraphEntity<RotationData> {
             this.stressCapacity = state.stressCapacity;
         }
 
-        var r = (float) (this.speed * MathHelper.RADIANS_PER_DEGREE * delta + this.rotation);
+        var r = (float) (Math.min(this.speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.MAX_ROTATION_PER_TICK_4 * delta) + this.rotation);
         while (r > MathHelper.TAU) {
             r -= MathHelper.TAU;
         }

@@ -60,7 +60,6 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
     public static final EnumProperty<DirectionValue> VERTICAL = EnumProperty.of("vertical", DirectionValue.class);
 
 
-
     public static final BooleanProperty TOP_CONVEYOR = BooleanProperty.of("hide_top");
     public static final BooleanProperty BOTTOM_CONVEYOR = BooleanProperty.of("hide_bottom");
     public static final BooleanProperty PREVIOUS_CONVEYOR = BooleanProperty.of("hide_back");
@@ -496,7 +495,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
                 }
                 var f = dir.getAxis().ordinal() * 0.0001f;
 
-                var x = value == DirectionValue.NONE;
+                var x = value == DirectionValue.NONE || value.stack;
                 var v = x ? 0 : 0.0015f;
                 mat.translate(-v, v + f, 0);
                 mat.scale(x ? 2.001f : 2.015f);

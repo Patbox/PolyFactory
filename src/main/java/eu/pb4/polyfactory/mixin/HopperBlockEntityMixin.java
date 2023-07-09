@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.mixin;
 
+import eu.pb4.polyfactory.block.other.CustomBlockEntityCalls;
 import eu.pb4.polyfactory.block.other.FilteredBlockEntity;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.models.HopperModel;
@@ -18,6 +19,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.SoftOverride;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -25,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(HopperBlockEntity.class)
-public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntity implements FilteredBlockEntity {
+public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntity implements FilteredBlockEntity, CustomBlockEntityCalls {
     @Unique
     private ItemStack polyfactory$filterStack = ItemStack.EMPTY;
     @Unique
@@ -65,32 +67,16 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
         }
     }
 
-    @SuppressWarnings("deprecation")
-    @Intrinsic
     @Override
-    public void markRemoved() {
-        super.markRemoved();
-    }
-
-    @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference"})
-    @Inject(method = "markRemoved()V", at = @At("HEAD"))
-    private void polyfactory$destroyModel(CallbackInfo ci) {
+    public void polyfactory$markRemoved() {
         if (this.polyfactory$model != null) {
             this.polyfactory$model.destroy();
             this.polyfactory$model = null;
         }
     }
 
-    @SuppressWarnings("deprecation")
-    @Intrinsic
     @Override
-    public void setCachedState(BlockState state) {
-        super.setCachedState(state);
-    }
-
-    @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference"})
-    @Inject(method = "setCachedState(Lnet/minecraft/block/BlockState;)V", at = @At("HEAD"))
-    private void invalidateOnSetCachedState(BlockState state, CallbackInfo ci) {
+    public void polyfactory$setCachedState(BlockState state) {
         if (this.polyfactory$model != null) {
             this.polyfactory$model.updateRotation(state);
         }

@@ -189,7 +189,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
         private Model(ServerWorld world, BlockState state) {
 
             this.main = LodItemDisplayElement.createSimple(FactoryItems.GRINDER_BLOCK.getDefaultStack(), 0);
-            this.stoneWheel = LodItemDisplayElement.createSimple(MODEL_STONE_WHEEL, 5);
+            this.stoneWheel = LodItemDisplayElement.createSimple(MODEL_STONE_WHEEL, 4);
 
             this.updateAnimation(0, state.get(INPUT_FACING));
             this.addElement(this.main);
@@ -211,9 +211,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
 
         @Override
         protected void onTick() {
-            var tick = this.getAttachment().getWorld().getTime();
-
-            if (tick % 4 == 0) {
+            if (this.getTick() % 4 == 0) {
                 this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(INPUT_FACING));
                 if (this.stoneWheel.isDirty()) {

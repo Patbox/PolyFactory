@@ -29,7 +29,7 @@
       }
     }
   ],
-  "optimal_speed": 6.0,
+  "optimal_speed": 10.0,
   "output": {
     "Count": 1,
     "id": "minecraft:cake"

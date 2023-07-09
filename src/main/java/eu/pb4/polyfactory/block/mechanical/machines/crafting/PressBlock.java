@@ -215,7 +215,7 @@ public class PressBlock extends TallItemMachineBlock {
 
         @Override
         protected void onTick() {
-            var tick = this.getAttachment().getWorld().getTime();
+            var tick = this.getTick();
 
             if (tick % 2 == 0) {
                 var b = tick % 4 == 0;

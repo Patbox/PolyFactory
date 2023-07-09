@@ -39,7 +39,7 @@ public class FanBlockEntity extends BlockEntity {
             self.center = Vec3d.ofCenter(pos);
         }
 
-        if (world.getTime() % MathHelper.clamp(Math.round(2 / speed), 2, 4) == 0) {
+        if ((world.getTime() + pos.getX() * 3 + pos.getY() * 7 + pos.getZ() * 5) % MathHelper.clamp(Math.round(2 / speed), 8, 16) == 0) {
             var a = Vec3d.ofCenter(pos).offset(self.cachedDirection, 1f);
             ((ServerWorld) world).spawnParticles(ParticleTypes.CLOUD, a.x + world.random.nextFloat() - 0.5, a.y + world.random.nextFloat() - 0.5, a.z + world.random.nextFloat() - 0.5, 0, self.cachedDirection.getOffsetX(), self.cachedDirection.getOffsetY(), self.cachedDirection.getOffsetZ(), speed);
         }

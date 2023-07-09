@@ -10,6 +10,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -37,12 +38,23 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NixieTubeBlock extends Block implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     public static EnumProperty<BlockHalf> HALF = Properties.BLOCK_HALF;
+    private static final List<Model> UPDATE_NEXT_TICK = new ArrayList<>();
+
 
     public NixieTubeBlock(Settings settings) {
         super(settings);
+        ServerTickEvents.END_SERVER_TICK.register((server -> {
+            for (var x : UPDATE_NEXT_TICK) {
+                x.updateValues();
+            }
+            UPDATE_NEXT_TICK.clear();
+        }));
     }
 
     @Override
@@ -132,6 +144,8 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockWithElem
             for (int i = 0; i < 4; i++) {
                 this.addElement(this.display[i]);
             }
+
+            UPDATE_NEXT_TICK.add(this);
         }
 
         private boolean updateValues() {
@@ -153,9 +167,6 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockWithElem
 
         @Override
         public boolean startWatching(ServerPlayNetworkHandler player) {
-            if (this.value == Integer.MIN_VALUE) {
-                this.updateValues();
-            }
             return super.startWatching(player);
         }
 

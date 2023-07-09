@@ -3,7 +3,12 @@ package eu.pb4.polyfactory.models;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 
 public class BaseModel extends ElementHolder {
-    private int updateTick = 0;
+    private static int startTick = 0;
+    private int updateTick = (startTick++) % 20;
+
+    public final int getTick() {
+        return this.updateTick;
+    }
 
     public boolean isTimeForMediumUpdate() {
         return updateTick % 2 == 0;

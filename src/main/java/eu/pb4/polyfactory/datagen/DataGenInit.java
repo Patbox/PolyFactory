@@ -231,15 +231,18 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                             List.of(CountedIngredient.ofItems(3, Items.WHEAT), CountedIngredient.ofItems(2, Items.SUGAR),
                                     CountedIngredient.ofItems(1, Items.EGG),
                                     CountedIngredient.ofItemsRemainder(3, Items.MILK_BUCKET, Items.BUCKET)),
-                            2, 1, 6, new ItemStack(Items.CAKE)),
+                            2, 1, 10, new ItemStack(Items.CAKE)),
                     GenericMixingRecipe.ofCounted("cookie",
                             List.of(CountedIngredient.ofItems(2, Items.WHEAT), CountedIngredient.ofItems(1, Items.COCOA_BEANS)),
-                            2, 1, 6, new ItemStack(Items.COOKIE, 8)),
+                            2, 1, 10, new ItemStack(Items.COOKIE, 8)),
 
                     GenericMixingRecipe.ofCounted("steel_alloy_mixture",
                             List.of(CountedIngredient.ofItems(2, Items.IRON_INGOT), CountedIngredient.ofItems(1, Items.COAL),
                                     CountedIngredient.ofItems(1, Items.REDSTONE)),
-                            2, 1, 6, new ItemStack(FactoryItems.STEEL_ALLOY_MIXTURE))
+                            2, 1, 15, new ItemStack(FactoryItems.STEEL_ALLOY_MIXTURE)),
+                    GenericMixingRecipe.ofCounted("tnt",
+                            List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS), CountedIngredient.ofItems(5, Items.GUNPOWDER)),
+                            2, 1, 16, new ItemStack(Items.TNT))
             );
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_COG)

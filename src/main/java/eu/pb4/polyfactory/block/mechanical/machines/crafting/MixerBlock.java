@@ -194,8 +194,8 @@ public class MixerBlock extends TallItemMachineBlock {
         protected void onTick() {
             var tick = this.getAttachment().getWorld().getTime();
 
-            if (tick % 2 == 0) {
-                var b = tick % 4 == 0;
+            if (this.getTick() % 2 == 0) {
+                var b = this.getTick() % 4 == 0;
 
                 var dir = BlockBoundAttachment.get(this).getBlockState().get(INPUT_FACING);
                 this.updateAnimation(b,
