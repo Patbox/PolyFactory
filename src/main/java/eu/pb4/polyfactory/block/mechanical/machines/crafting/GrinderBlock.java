@@ -189,7 +189,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
         private Model(ServerWorld world, BlockState state) {
 
             this.main = LodItemDisplayElement.createSimple(FactoryItems.GRINDER_BLOCK.getDefaultStack(), 0);
-            this.stoneWheel = LodItemDisplayElement.createSimple(MODEL_STONE_WHEEL, 4);
+            this.stoneWheel = LodItemDisplayElement.createSimple(MODEL_STONE_WHEEL, 4, 0.6f, 0.6f);
 
             this.updateAnimation(0, state.get(INPUT_FACING));
             this.addElement(this.main);

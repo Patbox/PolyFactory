@@ -507,11 +507,9 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
 
         @Override
         protected void onTick() {
-            var bs = BlockBoundAttachment.get(this).getBlockState();
             if (this.movingItemContainer != null) {
                 this.movingItemContainer.checkItems();
             }
-            this.updateAnimation(bs.get(ConveyorBlock.DIRECTION), bs.get(ConveyorBlock.VERTICAL));
         }
 
         @Override
@@ -519,7 +517,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 var state = BlockBoundAttachment.get(this).getBlockState();
                 this.base.setItem(getModelForSpeed(speed, state.get(ConveyorBlock.VERTICAL), state.isOf(FactoryBlocks.STICKY_CONVEYOR), state));
-
+                this.updateAnimation(state.get(ConveyorBlock.DIRECTION), state.get(ConveyorBlock.VERTICAL));
                 this.tick();
             }
         }

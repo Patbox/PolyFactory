@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -16,9 +17,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.entity.decoration.Brightness;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
@@ -33,10 +34,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
-import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +48,7 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockWithElem
 
     public NixieTubeBlock(Settings settings) {
         super(settings);
-        ServerTickEvents.END_SERVER_TICK.register((server -> {
+        ServerTickEvents.START_SERVER_TICK.register((server -> {
             for (var x : UPDATE_NEXT_TICK) {
                 x.updateValues();
             }
@@ -113,7 +112,8 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockWithElem
         return i;
     }
 
-    public final class Model extends ElementHolder {
+    public final class Model extends BaseModel {
+        private static final Brightness MAX_BRIGHTNESS = new Brightness(15, 15);
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement mainElement;
         private final TextDisplayElement[] display = new TextDisplayElement[4];
@@ -135,6 +135,8 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockWithElem
                 e.setShadow(true);
                 e.setDisplaySize(1, 1);
                 e.setInvisible(true);
+                e.setViewRange(0.5f);
+                e.setBrightness(MAX_BRIGHTNESS);
 
                 display[i] = e;
             }

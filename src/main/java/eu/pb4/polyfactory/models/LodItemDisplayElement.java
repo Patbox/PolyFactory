@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.models;
 
-import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
+import eu.pb4.polyfactory.util.DebugData;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DataTrackerLike;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
@@ -22,6 +23,8 @@ public class LodItemDisplayElement extends ItemDisplayElement {
     public final DataTrackerLike nearTracker = new SimpleDataTracker(this.getEntityType());
     public final DataTrackerLike mediumTracker = new SimpleDataTracker(this.getEntityType());
     private int updateTick = 0;
+    private double nearDistanceSquared = 50 * 50;
+    private float farDistanceSquared = 90 * 90;
 
     public LodItemDisplayElement(ItemStack stack) {
         super();
@@ -38,6 +41,18 @@ public class LodItemDisplayElement extends ItemDisplayElement {
         return element;
     }
 
+    public static LodItemDisplayElement createSimple(ItemStack model, int updateRate, float qualityMultiplier, float farQualityDistanceMultiplier) {
+        var element = createSimple(model, updateRate);
+        element.nearDistanceSquared = 50 * 50 * qualityMultiplier * qualityMultiplier;
+        element.farDistanceSquared = 90 * 90 * farQualityDistanceMultiplier * farQualityDistanceMultiplier;
+        return element;
+    }
+
+    public static LodItemDisplayElement createSimple(ItemStack model, int updateRate, float qualityMultiplier) {
+        var element = createSimple(model, updateRate);
+        element.nearDistanceSquared = 50 * 50 * qualityMultiplier * qualityMultiplier;
+        return element;
+    }
     public static LodItemDisplayElement createSimple(ItemStack model, int updateRate) {
         var element = createSimple(model);
         element.setInterpolationDuration(updateRate);
@@ -108,21 +123,34 @@ public class LodItemDisplayElement extends ItemDisplayElement {
             nearPacket = new EntityTrackerUpdateS2CPacket(this.getEntityId(), this.nearTracker.getDirtyEntries());
         }
 
-        if (this.mediumTracker.isDirty() && (updateTick++) % 4 == 0) {
+        if (this.mediumTracker.isDirty() && (updateTick++) % 10 == 0) {
             mediumPacket = new EntityTrackerUpdateS2CPacket(this.getEntityId(), this.mediumTracker.getDirtyEntries());
         }
 
+        if (nearPacket == null && mediumPacket == null) {
+            return;
+        }
+
+        boolean sendOnce = false;
+
         for (var player : this.getHolder().getWatchingPlayers()) {
             var d = player.player.getPos().squaredDistanceTo(this.getHolder().getPos());
-            if (d < 50 * 50) {
+            if (d < this.nearDistanceSquared) {
                 if (nearPacket != null) {
                     player.sendPacket(nearPacket);
+                    sendOnce = true;
                 }
-            } else if (d < 90 * 90) {
+            } else if (d < this.farDistanceSquared) {
                 if (mediumPacket != null) {
                     player.sendPacket(mediumPacket);
+                    sendOnce = true;
                 }
             }
+        }
+
+        if (sendOnce) {
+            DebugData.addPacketCall(this.getHolder());
+            DebugData.addPacketCall(nearPacket != null ? nearPacket : mediumPacket);
         }
     }
 }

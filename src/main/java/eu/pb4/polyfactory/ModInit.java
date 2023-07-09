@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
+import eu.pb4.polyfactory.util.DebugData;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
@@ -48,6 +49,8 @@ public class ModInit implements ModInitializer {
 		AxleBlock.Model.ITEM_MODEL.getItem();
 		WindmillBlock.Model.MODEL.getItem();
 		FactoryLootTables.register();
+		FactoryCommands.register();
+		DebugData.register();
 
 		ConveyorModel.registerAssetsEvents();
 		VirtualDestroyStage.setup();

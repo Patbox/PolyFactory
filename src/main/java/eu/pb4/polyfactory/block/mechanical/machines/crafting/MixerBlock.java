@@ -143,9 +143,9 @@ public class MixerBlock extends TallItemMachineBlock {
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.469f, 0));
 
-            this.whisk = LodItemDisplayElement.createSimple(MODEL_PISTON, 2);
-            this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4);
-            this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4);
+            this.whisk = LodItemDisplayElement.createSimple(MODEL_PISTON, 2, 0.4f, 0.8f);
+            this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4, 0.3f, 0.5f);
+            this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4, 0.3f, 0.5f);
 
             this.updateStatePos(state);
             var dir = state.get(INPUT_FACING);
@@ -192,8 +192,6 @@ public class MixerBlock extends TallItemMachineBlock {
 
         @Override
         protected void onTick() {
-            var tick = this.getAttachment().getWorld().getTime();
-
             if (this.getTick() % 2 == 0) {
                 var b = this.getTick() % 4 == 0;
 
