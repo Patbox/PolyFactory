@@ -1,0 +1,6 @@
+{
+  "parent": "polyfactory:block/conveyor",
+  "textures": {
+    "1": "polyfactory:block/gen/conveyor_top_13"
+  }
+}

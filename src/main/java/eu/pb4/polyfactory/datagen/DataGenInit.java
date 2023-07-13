@@ -1,15 +1,21 @@
 package eu.pb4.polyfactory.datagen;
 
+import com.google.common.collect.Sets;
+import com.google.common.hash.HashCode;
+import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.models.ConveyorModel;
 import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
+import eu.pb4.polyfactory.ui.UiResourceCreator;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -18,6 +24,9 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.block.Blocks;
+import net.minecraft.data.DataOutput;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.DataWriter;
 import net.minecraft.data.server.recipe.CookingRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
@@ -33,9 +42,15 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
@@ -45,13 +60,42 @@ public class DataGenInit implements DataGeneratorEntrypoint {
     public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
         var pack = fabricDataGenerator.createPack();
 
-        pack.addProvider(BlockTagsProvider::new);
-        pack.addProvider(ItemTagsProvider::new);
+        var blockTags = pack.addProvider(BlockTagsProvider::new);
+        pack.addProvider((a, b) -> new ItemTagsProvider(a, b, blockTags));
         pack.addProvider(LootTables::new);
         pack.addProvider(Recipes::new);
+        pack.addProvider(AssetProvider::new);
     }
 
-    class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
+    static class AssetProvider implements DataProvider {
+        private final DataOutput output;
+
+        public AssetProvider(FabricDataOutput output) {
+            this.output = output;
+        }
+
+        @Override
+        public CompletableFuture<?> run(DataWriter writer) {
+            BiConsumer<String, byte[]> assetWriter = (path, data) -> {
+                try {
+                    writer.write(this.output.getPath().resolve(path), data, HashCode.fromBytes(data));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            };
+            return CompletableFuture.runAsync(() -> {
+                ConveyorModel.generateModels(assetWriter);
+                UiResourceCreator.generateAssets(assetWriter);
+            }, Util.getMainWorkerExecutor());
+        }
+
+        @Override
+        public String getName() {
+            return "polyfactory:assets";
+        }
+    }
+
+    static class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
         public BlockTagsProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
             super(output, registriesFuture);
         }
@@ -89,9 +133,9 @@ public class DataGenInit implements DataGeneratorEntrypoint {
         }
     }
 
-    class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
-        public ItemTagsProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
-            super(output, registriesFuture);
+    static class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
+        public ItemTagsProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture, @Nullable FabricTagProvider.BlockTagProvider blockTagProvider) {
+            super(output, registriesFuture, blockTagProvider);
         }
 
         @Override
@@ -100,10 +144,12 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .addOptionalTag(ItemTags.TOOLS)
                     .add(FactoryItems.STEEL_COG)
             ;
+
+            this.copy(FactoryBlockTags.STRIPPED_LOGS, FactoryItemTags.STRIPPED_LOGS);
         }
     }
 
-    class LootTables extends FabricBlockLootTableProvider {
+    static class LootTables extends FabricBlockLootTableProvider {
         protected LootTables(FabricDataOutput dataOutput) {
             super(dataOutput);
         }
@@ -138,6 +184,40 @@ public class DataGenInit implements DataGeneratorEntrypoint {
         @Override
         public void generate(Consumer<RecipeJsonProvider> exporter) {
             var dyes = List.of(Items.BLACK_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.CYAN_DYE, Items.GRAY_DYE, Items.GREEN_DYE, Items.LIGHT_BLUE_DYE, Items.LIGHT_GRAY_DYE, Items.LIME_DYE, Items.MAGENTA_DYE, Items.ORANGE_DYE, Items.PINK_DYE, Items.PURPLE_DYE, Items.RED_DYE, Items.YELLOW_DYE, Items.WHITE_DYE);
+
+            ShapelessRecipeJsonBuilder.create(RecipeCategory.TOOLS, FactoryItems.STEEL_ALLOY_MIXTURE)
+                    .input(Items.IRON_INGOT, 2).input(Items.COAL).input(Items.REDSTONE)
+                    .criterion("get_iron", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
+                    .offerTo(exporter);
+
+            CookingRecipeJsonBuilder.createSmelting(
+                            Ingredient.ofItems(FactoryItems.STEEL_ALLOY_MIXTURE), RecipeCategory.MISC, FactoryItems.STEEL_INGOT, 0.4f, 80)
+                    .criterion("get_steel_mixture", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_ALLOY_MIXTURE))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.AXLE_BLOCK, 12)
+                    .pattern("www")
+                    .pattern("sss")
+                    .pattern("www")
+                    .input('w', FactoryItemTags.STRIPPED_LOGS).input('s', FactoryItems.STEEL_INGOT)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.GEARBOX_BLOCK, 1)
+                    .pattern("gw ")
+                    .pattern("sws")
+                    .pattern(" wg")
+                    .input('w', FactoryItems.AXLE_BLOCK).input('s', ItemTags.PLANKS)
+                    .input('g', FactoryItems.STEEL_COG)
+                    .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.AXLE_BLOCK))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.HAND_CRANK_BLOCK)
+                    .pattern("ip")
+                    .pattern("a ")
+                    .input('a', FactoryItems.AXLE_BLOCK).input('p', ItemTags.PLANKS).input('i', FactoryItems.STEEL_INGOT)
+                    .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.AXLE_BLOCK))
+                    .offerTo(exporter);
 
             of(exporter, GrindingRecipe.CODEC,
                     GrindingRecipe.of("stone_to_cobblestone", Ingredient.ofItems(Items.STONE), 3, 5, 20, Items.COBBLESTONE),
@@ -178,17 +258,6 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     GrindingRecipe.of("rose_to_dye", Ingredient.ofItems(Items.ROSE_BUSH), 1, 6, new ItemStack(Items.RED_DYE, 6)),
                     GrindingRecipe.of("cactus_to_dye", Ingredient.ofItems(Items.CACTUS), 1, 6, new ItemStack(Items.GREEN_DYE, 3))
             );
-
-            ShapelessRecipeJsonBuilder.create(RecipeCategory.TOOLS, FactoryItems.STEEL_ALLOY_MIXTURE)
-                    .input(Items.IRON_INGOT, 2).input(Items.COAL).input(Items.REDSTONE)
-                    .criterion("get_iron", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
-                    .offerTo(exporter);
-
-            CookingRecipeJsonBuilder.createSmelting(
-                            Ingredient.ofItems(FactoryItems.STEEL_ALLOY_MIXTURE), RecipeCategory.MISC, FactoryItems.STEEL_INGOT, 0.4f, 80)
-                    .criterion("get_steel_mixture", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_ALLOY_MIXTURE))
-                    .offerTo(exporter);
-
 
             of(exporter, PressRecipe.CODEC,
                     PressRecipe.of("iron_ingot", Ingredient.ofItems(Items.IRON_NUGGET), 9, 10f, Items.IRON_INGOT),

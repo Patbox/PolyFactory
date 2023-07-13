@@ -7,7 +7,6 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
-import eu.pb4.polymer.resourcepack.api.ResourcePackBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -22,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.function.BiConsumer;
 
 public class ConveyorModel {
     public static final int FRAMES = 20;
@@ -88,10 +88,12 @@ public class ConveyorModel {
             }
         }
 
-        PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register(ConveyorModel::generateModels);
+        if (ModInit.DYNAMIC_ASSETS) {
+            PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register((resourcePackBuilder) -> ConveyorModel.generateModels(resourcePackBuilder::addData));
+        }
     }
 
-    private static void generateModels(ResourcePackBuilder resourcePackBuilder) {
+    public static void generateModels(BiConsumer<String, byte[]> dataWriter) {
         var animJson = """
                 {
                   "animation": {
@@ -165,8 +167,8 @@ public class ConveyorModel {
                 }
                 base.add("elements", elements);
 
-                resourcePackBuilder.addData("assets/polyfactory/models/block/" + variant + "_" + i + ".json", base.toString().getBytes(StandardCharsets.UTF_8));
-                resourcePackBuilder.addData("assets/polyfactory/models/block/sticky_" + variant + "_" + i + ".json", ("""
+                dataWriter.accept("assets/polyfactory/models/block/" + variant + "_" + i + ".json", base.toString().getBytes(StandardCharsets.UTF_8));
+                dataWriter.accept("assets/polyfactory/models/block/sticky_" + variant + "_" + i + ".json", ("""
                         {
                           "parent": "polyfactory:block/""" + variant + "_" + i
                         + """
@@ -182,22 +184,22 @@ public class ConveyorModel {
 
         for (int i = 1; i <= FRAMES; i++) {
             byte[] bytes = animJson.replace("|SPEED|", "" + i).getBytes(StandardCharsets.UTF_8);
-            createVariations(resourcePackBuilder, i, bytes, textureTop, "");
-            createVariations(resourcePackBuilder, i, bytes, textureTopSticky, "sticky_");
+            createVariations(dataWriter, i, bytes, textureTop, "");
+            createVariations(dataWriter, i, bytes, textureTopSticky, "sticky_");
         }
     }
 
-    private static void createVariations(ResourcePackBuilder resourcePackBuilder, int i, byte[] mcmeta, byte[] texture, String prefix) {
-        resourcePackBuilder.addData("assets/polyfactory/textures/block/gen/" + prefix + "conveyor_top_" + i + ".png.mcmeta", mcmeta);
-        resourcePackBuilder.addData("assets/polyfactory/textures/block/gen/" + prefix + "conveyor_top_" + i + ".png", texture);
+    private static void createVariations(BiConsumer<String, byte[]> dataWriter, int i, byte[] mcmeta, byte[] texture, String prefix) {
+        dataWriter.accept("assets/polyfactory/textures/block/gen/" + prefix + "conveyor_top_" + i + ".png.mcmeta", mcmeta);
+        dataWriter.accept("assets/polyfactory/textures/block/gen/" + prefix + "conveyor_top_" + i + ".png", texture);
 
         for (int a = 0; a < 16; a++) {
             var base = (a == 0 ? "" : ("_" + a + ""));
             var addition = (a == 0 ? "/" : ("_" + a + "/")) + i;
 
-            resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor" + addition + ".json", MODEL_JSON.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
-            resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_up" + addition + ".json", MODEL_JSON_UP.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
-            resourcePackBuilder.addData("assets/polyfactory/models/block/" + prefix + "conveyor_down" + addition + ".json", MODEL_JSON_DOWN.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
+            dataWriter.accept("assets/polyfactory/models/block/" + prefix + "conveyor" + addition + ".json", MODEL_JSON.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
+            dataWriter.accept("assets/polyfactory/models/block/" + prefix + "conveyor_up" + addition + ".json", MODEL_JSON_UP.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
+            dataWriter.accept("assets/polyfactory/models/block/" + prefix + "conveyor_down" + addition + ".json", MODEL_JSON_DOWN.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
         }
     }
 

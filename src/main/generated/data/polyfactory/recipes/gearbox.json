@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "g": {
+      "item": "polyfactory:steel_cog"
+    },
+    "s": {
+      "tag": "minecraft:planks"
+    },
+    "w": {
+      "item": "polyfactory:axle"
+    }
+  },
+  "pattern": [
+    "gw ",
+    "sws",
+    " wg"
+  ],
+  "result": {
+    "item": "polyfactory:gearbox"
+  },
+  "show_notification": true
+}

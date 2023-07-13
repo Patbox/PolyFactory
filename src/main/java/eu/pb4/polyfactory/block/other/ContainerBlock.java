@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.polyfactory.block.AttackableBlock;
+import eu.pb4.polyfactory.block.SneakBypassingBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
@@ -37,7 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 
 
-public class ContainerBlock extends Block implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder, AttackableBlock, VirtualDestroyStage.Marker {
+public class ContainerBlock extends Block implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder, AttackableBlock, SneakBypassingBlock, VirtualDestroyStage.Marker {
     public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
 
@@ -57,17 +58,14 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
             var stack = player.getStackInHand(hand);
 
             if (stack.isEmpty()) {
-                if (be.isEmpty()) {
-                    be.setItemStack(ItemStack.EMPTY);
-                } else {
-                    player.setStackInHand(hand, be.extractStack());
-                }
+                return ActionResult.FAIL;
             } else {
+                var count = player.isSneaking() ? stack.getCount() : 1;
                 if (be.getItemStack().isEmpty()) {
                     be.setItemStack(stack);
-                    stack.decrement(be.addItems(stack.getCount()));
+                    stack.decrement(be.addItems(count));
                 } else if (be.matches(stack)) {
-                    stack.decrement(be.addItems(stack.getCount()));
+                    stack.decrement(be.addItems(count));
                 }
 
                 if (stack.isEmpty()) {
@@ -83,7 +81,12 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
     @Override
     public ActionResult onPlayerAttack(BlockState state, PlayerEntity player, World world, BlockPos pos, Direction direction) {
         if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be && direction == state.get(FACING)) {
-            return ActionResult.FAIL;
+            if (!be.isEmpty()) {
+                var stack = be.extract( player.isSneaking() ? be.getItemStack().getMaxCount() : 1);
+                player.getInventory().offerOrDrop(stack);
+            }
+
+            return ActionResult.SUCCESS;
         }
 
         return ActionResult.PASS;

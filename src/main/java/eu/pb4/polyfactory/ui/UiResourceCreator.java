@@ -2,11 +2,11 @@ package eu.pb4.polyfactory.ui;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.util.ResourceUtils;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
-import eu.pb4.polymer.resourcepack.api.ResourcePackBuilder;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import it.unimi.dsi.fastutil.chars.*;
 import net.minecraft.item.Item;
@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
@@ -130,10 +131,12 @@ public class UiResourceCreator {
         SPACES.put(CHEST_SPACE0, -8);
         SPACES.put(CHEST_SPACE1, -168);
 
-        PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register(UiResourceCreator::generate);
+        if (ModInit.DYNAMIC_ASSETS) {
+            PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register((b) -> UiResourceCreator.generateAssets(b::addData));
+        }
     }
 
-    private static void generateProgress(ResourcePackBuilder builder, List<SlicedTexture> list, boolean horizontal) {
+    private static void generateProgress(BiConsumer<String, byte[]> assetWriter, List<SlicedTexture> list, boolean horizontal) {
         for (var pair : list) {
             var sourceImage = ResourceUtils.getTexture(elementPath(pair.path()));
 
@@ -159,19 +162,19 @@ public class UiResourceCreator {
                     e.printStackTrace();
                 }
 
-                builder.addData(AssetPaths.texture(path.getNamespace(), path.getPath() + ".png"), out.toByteArray());
+                assetWriter.accept(AssetPaths.texture(path.getNamespace(), path.getPath() + ".png"), out.toByteArray());
             }
         }
     }
 
-    private static void generate(ResourcePackBuilder builder) {
+    public static void generateAssets(BiConsumer<String, byte[]> assetWriter) {
         for (var texture : SIMPLE_MODEL) {
-            builder.addData("assets/" + texture.getLeft().modelPath().getNamespace() + "/models/" + texture.getLeft().modelPath().getPath() + ".json",
+            assetWriter.accept("assets/" + texture.getLeft().modelPath().getNamespace() + "/models/" + texture.getLeft().modelPath().getPath() + ".json",
                     ITEM_TEMPLATE.replace("|ID|", texture.getLeft().modelPath().toString()).replace("|BASE|", texture.getRight()).getBytes(StandardCharsets.UTF_8));
         }
 
-        generateProgress(builder, VERTICAL_PROGRESS, false);
-        generateProgress(builder, HORIZONTAL_PROGRESS, true);
+        generateProgress(assetWriter, VERTICAL_PROGRESS, false);
+        generateProgress(assetWriter, HORIZONTAL_PROGRESS, true);
 
         var fontBase = new JsonObject();
         var providers = new JsonArray();
@@ -200,7 +203,7 @@ public class UiResourceCreator {
 
         fontBase.add("providers", providers);
 
-        builder.addData("assets/polyfactory/font/gui.json", fontBase.toString().getBytes(StandardCharsets.UTF_8));
+        assetWriter.accept("assets/polyfactory/font/gui.json", fontBase.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     private record TextBuilders(Text base) implements Function<Text, Text> {

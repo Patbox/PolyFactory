@@ -12,6 +12,7 @@
     "PlayerEntityAccessor",
     "RegistryOpsMixin",
     "ServerPlayerEntityMixin",
+    "ServerPlayerInteractionManagerMixin",
     "ServerPlayNetworkHandlerMixin"
   ],
   "client": [

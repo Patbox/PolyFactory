@@ -17,7 +17,6 @@ public class GuiTextures {
     public static final Progress PROGRESS_HORIZONTAL = Progress.createHorizontal("progress_horizontal", 0, 15);
     public static final Progress PROGRESS_HORIZONTAL_OFFSET_RIGHT = Progress.createHorizontal32Right("progress_horizontal_offset_right", 6, 26);
 
-
     public static void register() {
     }
 

@@ -26,6 +26,7 @@ public class ModInit implements ModInitializer {
 	public static final String ID = "polyfactory";
 	public static final Logger LOGGER = LoggerFactory.getLogger("PolyFactory");
     public static final boolean DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
+    public static final boolean DYNAMIC_ASSETS = false;
 
     public static Identifier id(String path) {
 		return new Identifier(ID, path);
@@ -57,5 +58,6 @@ public class ModInit implements ModInitializer {
 		UiResourceCreator.setup();
 		GuiTextures.register();
 		PolymerResourcePackUtils.addModAssets(ID);
+		PolymerResourcePackUtils.markAsRequired();
 	}
 }
