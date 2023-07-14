@@ -33,5 +33,8 @@ public interface MixingRecipe extends Recipe<MixerBlockEntity>, PolymerRecipe {
 
     double optimalSpeed();
     double minimumSpeed();
+    float minimumTemperature();
+    float maxTemperature();
+
     double time();
 }

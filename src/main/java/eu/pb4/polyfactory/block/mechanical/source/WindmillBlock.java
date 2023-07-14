@@ -122,23 +122,8 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
 
     @Override
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
-        var speed = 0d;
-        var sails = state.get(SAIL_COUNT);
-
-        if (sails < 2) {
-            modifier.stress(0.15);
-            return;
-        }
-
-        var sailMult = MathHelper.lerp(MathHelper.clamp((sails - 2) / 4f, 0, 1), 0.6, 1);
-
-        // Replace with better formula. wind simulation?
-        speed = sailMult * MathHelper.clamp((pos.getY() - 60) * 0.6, 0, 18);
-
-        if (speed < 1) {
-            modifier.stress(0.15 * sails);
-        } else {
-            modifier.provide(speed, MathHelper.clamp(speed * 0.15 * sails, 2, 25));
+        if (world.getBlockEntity(pos) instanceof WindmillBlockEntity blockEntity) {
+            blockEntity.updateRotationalData(modifier, state, world, pos);
         }
     }
 

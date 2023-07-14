@@ -210,7 +210,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
 
         var next = entity.getBlockPos().offset(dir);
 
-        var speed = RotationUser.getRotation(world, pos).speed() * MathHelper.RADIANS_PER_DEGREE * 0.9;
+        var speed = RotationUser.getRotation(world, pos).speed() * MathHelper.RADIANS_PER_DEGREE * 0.9 * 0.7;
 
         if (speed == 0) {
             return;

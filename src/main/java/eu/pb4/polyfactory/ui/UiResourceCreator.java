@@ -74,31 +74,35 @@ public class UiResourceCreator {
         return (i) -> new GuiElementBuilder(models[i].item()).setName(Text.empty()).hideFlags().setCustomModelData(models[i].value());
     }
 
-    public static IntFunction<GuiElementBuilder> horizontalProgress16(String path, int start, int stop) {
-        return genericProgress(path, start, stop, BASE_MODEL, HORIZONTAL_PROGRESS);
+    public static IntFunction<GuiElementBuilder> horizontalProgress16(String path, int start, int stop, boolean reverse) {
+        return genericProgress(path, start, stop, reverse, BASE_MODEL, HORIZONTAL_PROGRESS);
     }
 
-    public static IntFunction<GuiElementBuilder> horizontalProgress32(String path, int start, int stop) {
-        return genericProgress(path, start, stop, X32_MODEL, HORIZONTAL_PROGRESS);
+    public static IntFunction<GuiElementBuilder> horizontalProgress32(String path, int start, int stop, boolean reverse) {
+        return genericProgress(path, start, stop, reverse, X32_MODEL, HORIZONTAL_PROGRESS);
     }
 
-    public static IntFunction<GuiElementBuilder> horizontalProgress32Right(String path, int start, int stop) {
-        return genericProgress(path, start, stop, X32_RIGHT_MODEL, HORIZONTAL_PROGRESS);
+    public static IntFunction<GuiElementBuilder> horizontalProgress32Right(String path, int start, int stop, boolean reverse) {
+        return genericProgress(path, start, stop, reverse, X32_RIGHT_MODEL, HORIZONTAL_PROGRESS);
     }
 
-    public static IntFunction<GuiElementBuilder> verticalProgress32(String path, int start, int stop) {
-        return genericProgress(path, start, stop, X32_MODEL, VERTICAL_PROGRESS);
+    public static IntFunction<GuiElementBuilder> verticalProgress32(String path, int start, int stop, boolean reverse) {
+        return genericProgress(path, start, stop, reverse, X32_MODEL, VERTICAL_PROGRESS);
     }
 
-    public static IntFunction<GuiElementBuilder> verticalProgress16(String path, int start, int stop) {
-        return genericProgress(path, start, stop, BASE_MODEL, VERTICAL_PROGRESS);
+    public static IntFunction<GuiElementBuilder> verticalProgress32Right(String path, int start, int stop, boolean reverse) {
+        return genericProgress(path, start, stop, reverse, X32_RIGHT_MODEL, VERTICAL_PROGRESS);
     }
 
-    public static IntFunction<GuiElementBuilder> genericProgress(String path, int start, int stop, String base, List<SlicedTexture> progressType) {
+    public static IntFunction<GuiElementBuilder> verticalProgress16(String path, int start, int stop, boolean reverse) {
+        return genericProgress(path, start, stop, reverse, BASE_MODEL, VERTICAL_PROGRESS);
+    }
+
+    public static IntFunction<GuiElementBuilder> genericProgress(String path, int start, int stop, boolean reverse, String base, List<SlicedTexture> progressType) {
 
         var models = new PolymerModelData[stop - start];
 
-        progressType.add(new SlicedTexture(path, start, stop));
+        progressType.add(new SlicedTexture(path, start, stop, reverse));
 
         for (var i = start; i < stop; i++) {
             models[i - start] = genericIconRaw(Items.ALLIUM,  "gen/" + path + "_" + i, base);
@@ -144,14 +148,18 @@ public class UiResourceCreator {
 
             var xw = horizontal ? image.getHeight() : image.getWidth();
 
+            var mult = pair.reverse ? -1 : 1;
+            var offset = pair.reverse ? pair.stop + pair.start - 1 : 0;
+
             for (var y = pair.start; y < pair.stop; y++) {
                 var path = elementPath("gen/" + pair.path + "_" + y);
+                var pos = offset + y * mult;
 
                 for (var x = 0; x < xw; x++) {
                     if (horizontal) {
-                        image.setRGB(y, x, sourceImage.getRGB(y, x));
+                        image.setRGB(pos, x, sourceImage.getRGB(pos, x));
                     } else {
-                        image.setRGB(x, y, sourceImage.getRGB(x, y));
+                        image.setRGB(x, pos, sourceImage.getRGB(x, pos));
                     }
                 }
 
@@ -213,5 +221,5 @@ public class UiResourceCreator {
         }
     }
 
-    public record SlicedTexture(String path, int start, int stop) {};
+    public record SlicedTexture(String path, int start, int stop, boolean reverse) {};
 }

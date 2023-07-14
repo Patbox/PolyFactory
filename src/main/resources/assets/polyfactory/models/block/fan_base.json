@@ -1,10 +1,10 @@
 {
 	"textures": {
-		"0": "polyfactory:block/conveyor_side",
+		"0": "polyfactory:block/steel_plate_rot_input",
 		"1": "polyfactory:block/fan_side",
 		"2": "polyfactory:block/fan_top",
 		"3": "polyfactory:block/fan_top_inside",
-		"particle": "polyfactory:block/conveyor_side"
+		"particle": "polyfactory:block/steel_plate_rot_input"
 	},
 	"elements": [
 		{

@@ -220,13 +220,13 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .offerTo(exporter);
 
             of(exporter, GrindingRecipe.CODEC,
-                    GrindingRecipe.of("stone_to_cobblestone", Ingredient.ofItems(Items.STONE), 3, 5, 20, Items.COBBLESTONE),
-                    GrindingRecipe.of("cobblestone_to_gravel", Ingredient.ofItems(Items.COBBLESTONE), 5, 6, 20, Items.GRAVEL),
-                    GrindingRecipe.of("gravel_to_sand", Ingredient.ofItems(Items.GRAVEL), 5, 3, 15, Items.SAND),
+                    GrindingRecipe.of("stone_to_cobblestone", Ingredient.ofItems(Items.STONE), 2, 5, 15, Items.COBBLESTONE),
+                    GrindingRecipe.of("cobblestone_to_gravel", Ingredient.ofItems(Items.COBBLESTONE), 4, 6, 15, Items.GRAVEL),
+                    GrindingRecipe.of("gravel_to_sand", Ingredient.ofItems(Items.GRAVEL), 4, 3, 15, Items.SAND),
                     GrindingRecipe.of("planks_to_sticks", Ingredient.fromTag(ItemTags.PLANKS), 3, 10, GrindingRecipe.Output.of(Items.STICK, 0.4f, 6)),
 
-                    GrindingRecipe.of("iron_ingot_to_nuggets", Ingredient.ofItems(Items.IRON_INGOT), 2, 5, 18, new ItemStack(Items.IRON_NUGGET, 9)),
-                    GrindingRecipe.of("gold_ingot_to_nuggets", Ingredient.ofItems(Items.GOLD_INGOT), 1.8, 5, 18, new ItemStack(Items.GOLD_NUGGET, 9)),
+                    GrindingRecipe.of("iron_ingot_to_nuggets", Ingredient.ofItems(Items.IRON_INGOT), 2, 5, 10, new ItemStack(Items.IRON_NUGGET, 9)),
+                    GrindingRecipe.of("gold_ingot_to_nuggets", Ingredient.ofItems(Items.GOLD_INGOT), 1.8, 5, 10, new ItemStack(Items.GOLD_NUGGET, 9)),
 
                     GrindingRecipe.of("iron_ore_to_raw", Ingredient.fromTag(ItemTags.IRON_ORES), 6, 10, 30,
                             GrindingRecipe.Output.of(Items.RAW_IRON, 1f, 1), GrindingRecipe.Output.of(Items.RAW_IRON, 0.6f, 5)
@@ -238,6 +238,8 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                             GrindingRecipe.Output.of(Items.RAW_COPPER, 1f, 2), GrindingRecipe.Output.of(Items.RAW_COPPER, 0.6f, 20)
                     ),
                     GrindingRecipe.of("bone_to_bone_meal", Ingredient.ofItems(Items.BONE), 1, 5, 10, GrindingRecipe.Output.of(Items.BONE_MEAL, 1, 3), GrindingRecipe.Output.of(Items.BONE_MEAL, 0.5f, 2)),
+                    GrindingRecipe.of("blaze_rod_to_powder", Ingredient.ofItems(Items.BLAZE_ROD), 2, 5, 10, GrindingRecipe.Output.of(Items.BLAZE_POWDER, 1, 2), GrindingRecipe.Output.of(Items.BLAZE_POWDER, 0.5f, 2)),
+                    GrindingRecipe.of("glowstone_to_powder", Ingredient.ofItems(Items.GLOWSTONE), 1, 5, 10, new ItemStack(Items.GLOWSTONE_DUST, 4)),
 
                     // Flower to Dye
                     GrindingRecipe.of("dandelion_to_dye", Ingredient.ofItems(Items.DANDELION), 1, 6, new ItemStack(Items.YELLOW_DYE, 3)),
@@ -261,8 +263,8 @@ public class DataGenInit implements DataGeneratorEntrypoint {
 
             of(exporter, PressRecipe.CODEC,
                     PressRecipe.of("iron_ingot", Ingredient.ofItems(Items.IRON_NUGGET), 9, 10f, Items.IRON_INGOT),
-                    PressRecipe.of("gold_ingot", Ingredient.ofItems(Items.GOLD_NUGGET), 9, 10f, Items.GOLD_INGOT),
-                    PressRecipe.of("steel_plate", Ingredient.ofItems(FactoryItems.STEEL_INGOT), 1, 15f, new ItemStack(FactoryItems.STEEL_PLATE, 2))
+                    PressRecipe.of("gold_ingot", Ingredient.ofItems(Items.GOLD_NUGGET), 9, 8f, Items.GOLD_INGOT),
+                    PressRecipe.of("steel_plate", Ingredient.ofItems(FactoryItems.STEEL_INGOT), 1, 12f, new ItemStack(FactoryItems.STEEL_PLATE, 2))
             );
 
             for (var dye : dyes) {
@@ -284,7 +286,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                                 CountedIngredient.ofItems(4, Items.GRAVEL),
                                 CountedIngredient.ofItems(0, Items.WATER_BUCKET),
                                 CountedIngredient.ofItems(1, dye)),
-                        6, 1, 15, new ItemStack(solid, 8)));
+                        5, 1, 15, new ItemStack(solid, 8)));
 
                 of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder",
                         List.of(CountedIngredient.ofItems(1, powder), CountedIngredient.ofItems(0, Items.WATER_BUCKET)),
@@ -304,14 +306,20 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     GenericMixingRecipe.ofCounted("cookie",
                             List.of(CountedIngredient.ofItems(2, Items.WHEAT), CountedIngredient.ofItems(1, Items.COCOA_BEANS)),
                             2, 1, 10, new ItemStack(Items.COOKIE, 8)),
-
+                    GenericMixingRecipe.ofCounted("bread",
+                            List.of(CountedIngredient.ofItems(3, Items.WHEAT)),
+                            2, 1, 10, new ItemStack(Items.BREAD, 1 )),
                     GenericMixingRecipe.ofCounted("steel_alloy_mixture",
                             List.of(CountedIngredient.ofItems(2, Items.IRON_INGOT), CountedIngredient.ofItems(1, Items.COAL),
                                     CountedIngredient.ofItems(1, Items.REDSTONE)),
                             2, 1, 15, new ItemStack(FactoryItems.STEEL_ALLOY_MIXTURE)),
                     GenericMixingRecipe.ofCounted("tnt",
                             List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS), CountedIngredient.ofItems(5, Items.GUNPOWDER)),
-                            2, 1, 16, new ItemStack(Items.TNT))
+                            2, 1, 16, new ItemStack(Items.TNT)),
+                    GenericMixingRecipe.ofCounted("redstone_to_glowstone",
+                            List.of(CountedIngredient.ofItems(8, Items.REDSTONE), CountedIngredient.ofItems(1, Items.BLAZE_POWDER)),
+                            8, 1, 16, new ItemStack(Items.GLOWSTONE_DUST, 12))
+
             );
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_COG)

@@ -12,6 +12,7 @@ import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
@@ -20,6 +21,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.RecipeMatcher;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
@@ -43,6 +45,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     private static final int[] OUTPUT_SLOTS = { 6, 7, 8 };
     private static final int[] INPUT_SLOTS = { 0, 1, 2, 3, 4, 5 };
     protected double process = 0;
+    protected float temperature = 0;
     @Nullable
     protected MixingRecipe currentRecipe = null;
     private boolean active;
@@ -115,6 +118,22 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             }
         }
 
+        var belowBlock = world.getBlockState(pos.down());
+
+        if (belowBlock.isIn(BlockTags.CAMPFIRES)) {
+            self.temperature = 0.5f;
+        } else if (belowBlock.isIn(BlockTags.FIRE)) {
+            self.temperature = 0.6f;
+        } else if (belowBlock.isOf(Blocks.LAVA)) {
+            self.temperature = 0.8f;
+        } else if (belowBlock.isOf(Blocks.TORCH)) {
+            self.temperature = 0.2f;
+        } else if (belowBlock.isOf(Blocks.TORCHFLOWER)) {
+            self.temperature = 0.1f;
+        } else {
+            self.temperature = 0;
+        }
+
         if (self.isInputEmpty()) {
             self.process = 0;
             self.active = false;
@@ -144,6 +163,15 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             }
         }
         self.inventoryChanged = false;
+
+
+        if (self.temperature < self.currentRecipe.minimumTemperature() && self.temperature > self.currentRecipe.maxTemperature()) {
+            self.active = false;
+            self.model.setActive(false);
+            self.model.tick();
+            return;
+        }
+
         self.active = true;
         self.model.setActive(true);
         var fullSpeed = RotationUser.getRotation((ServerWorld) world, pos.up()).speed();
@@ -265,6 +293,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             this.setSlotRedirect(2 + 18, new Slot(MixerBlockEntity.this, 4, 4, 0));
             this.setSlotRedirect(3 + 18, new Slot(MixerBlockEntity.this, 5, 5, 0));
             this.setSlot(4 + 9, GuiTextures.PROGRESS_HORIZONTAL_OFFSET_RIGHT.get(progress()));
+            this.setSlot(4 + 9 + 9, GuiTextures.FLAME_OFFSET_RIGHT.get(MathHelper.clamp(MixerBlockEntity.this.temperature, 0, 1)));
             this.setSlotRedirect(6, new FurnaceOutputSlot(player, MixerBlockEntity.this, 6, 3, 0));
             this.setSlotRedirect(6 + 9, new FurnaceOutputSlot(player, MixerBlockEntity.this, 7, 3, 0));
             this.setSlotRedirect(6 + 18, new FurnaceOutputSlot(player, MixerBlockEntity.this, 8, 3, 0));
@@ -283,6 +312,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
                 this.close();
             }
             this.setSlot(4 + 9, GuiTextures.PROGRESS_HORIZONTAL_OFFSET_RIGHT.get(progress()));
+            this.setSlot(4 + 9 + 9, GuiTextures.FLAME_OFFSET_RIGHT.get(MathHelper.clamp(MixerBlockEntity.this.temperature, 0, 1)));
             super.onTick();
         }
     }

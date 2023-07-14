@@ -1,11 +1,11 @@
 {
 	"textures": {
-		"0": "polyfactory:block/conveyor_side",
+		"0": "polyfactory:block/steel_plate_rot_input",
 		"1": "polyfactory:block/miner_side",
 		"2": "polyfactory:block/miner_side_c",
 		"3": "polyfactory:block/miner_front",
 		"4": "polyfactory:block/miner_attach",
-		"particle": "polyfactory:block/conveyor_side"
+		"particle": "polyfactory:block/steel_plate_rot_input"
 	},
 	"elements": [
 		{

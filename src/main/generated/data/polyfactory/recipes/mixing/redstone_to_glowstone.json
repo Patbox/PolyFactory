@@ -1,0 +1,22 @@
+{
+  "type": "polyfactory:mixing/generic",
+  "input": [
+    {
+      "base": {
+        "item": "minecraft:redstone"
+      },
+      "count": 8
+    },
+    {
+      "base": {
+        "item": "minecraft:blaze_powder"
+      }
+    }
+  ],
+  "optimal_speed": 16.0,
+  "output": {
+    "Count": 12,
+    "id": "minecraft:glowstone_dust"
+  },
+  "time": 8.0
+}

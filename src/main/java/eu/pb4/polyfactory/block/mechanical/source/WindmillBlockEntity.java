@@ -2,18 +2,26 @@ package eu.pb4.polyfactory.block.mechanical.source;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBiomeTags;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.Heightmap;
+import net.minecraft.world.World;
 
 public class WindmillBlockEntity extends BlockEntity {
+    private static final double LOG_BASE = Math.log(3);
     private DefaultedList<ItemStack> sails = DefaultedList.of();
+    private int sample = Integer.MIN_VALUE;
 
     public WindmillBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.WINDMILL, pos, state);
@@ -80,5 +88,50 @@ public class WindmillBlockEntity extends BlockEntity {
 
     public DefaultedList<ItemStack> getSails() {
         return this.sails;
+    }
+
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {
+        var baseHeight = this.sample;
+        if (baseHeight == Integer.MIN_VALUE) {
+            baseHeight = serverWorld.getChunkManager().getChunkGenerator()
+                    .getHeightOnGround(pos.getX(), pos.getZ(), Heightmap.Type.MOTION_BLOCKING, serverWorld, serverWorld.getChunkManager().getNoiseConfig());
+            this.sample = baseHeight;
+        }
+        var sails = state.get(WindmillBlock.SAIL_COUNT);
+
+        double x;
+
+        if (serverWorld.getRegistryKey().equals(World.NETHER)) {
+            x = 32 - Math.abs(pos.getY() - 64) / 2d;
+        } else if (serverWorld.getRegistryKey().equals(World.END)) {
+            x = 5;
+        } else {
+            x = pos.getY() - baseHeight - 2;
+        }
+
+        if (x <= 0 || sails < 2) {
+            modifier.stress(0.15);
+            return;
+        }
+
+        var speed = Math.min(Math.log(x) / LOG_BASE * 1.8, 8);
+        if (speed <= 0) {
+            return;
+        }
+
+        var biome = serverWorld.getBiome(pos);
+        if (biome.isIn(ConventionalBiomeTags.OCEAN)) {
+            speed *= 1.4;
+        } else if (biome.isIn(ConventionalBiomeTags.BEACH)) {
+            speed *= 1.3;
+        } else if (biome.isIn(ConventionalBiomeTags.MOUNTAIN)) {
+            speed *= 1.2;
+        }
+
+        if (serverWorld.isRaining()) {
+            speed *= 1.1;
+        }
+
+        modifier.provide(speed, MathHelper.clamp(speed * 0.15 * sails, 2, 25));
     }
 }

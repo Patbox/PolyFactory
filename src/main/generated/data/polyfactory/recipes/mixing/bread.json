@@ -1,0 +1,15 @@
+{
+  "type": "polyfactory:mixing/generic",
+  "input": {
+    "base": {
+      "item": "minecraft:wheat"
+    },
+    "count": 3
+  },
+  "optimal_speed": 10.0,
+  "output": {
+    "Count": 1,
+    "id": "minecraft:bread"
+  },
+  "time": 2.0
+}

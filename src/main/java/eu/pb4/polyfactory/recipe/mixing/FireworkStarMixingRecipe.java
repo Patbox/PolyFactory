@@ -41,6 +41,16 @@ public record FireworkStarMixingRecipe(Identifier identifier, double time,
     }
 
     @Override
+    public float minimumTemperature() {
+        return 0;
+    }
+
+    @Override
+    public float maxTemperature() {
+        return 0.3f;
+    }
+
+    @Override
     public boolean matches(MixerBlockEntity inventory, World world) {
         return VANILLA.matches(inventory.asRecipeInputProvider(), world);
     }
