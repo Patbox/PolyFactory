@@ -40,6 +40,7 @@ import java.util.Locale;
 public class PressBlock extends TallItemMachineBlock {
     public PressBlock(Settings settings) {
         super(settings);
+        Model.MODEL_PISTON.isEmpty();
     }
 
     @Override
@@ -164,7 +165,7 @@ public class PressBlock extends TallItemMachineBlock {
         private Model(ServerWorld world, BlockState state) {
             this.main = LodItemDisplayElement.createSimple(FactoryItems.PRESS_BLOCK.getDefaultStack(), 0);
             this.main.setScale(new Vector3f(2));
-            this.main.setTranslation(new Vector3f(0, 0.469f, 0));
+            this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.piston = LodItemDisplayElement.createSimple(MODEL_PISTON, 2, 0.4f, 0.8f);
             this.pistonItem = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 2, 0.4f, 0.8f);
             this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4, 0.3f, 0.5f);

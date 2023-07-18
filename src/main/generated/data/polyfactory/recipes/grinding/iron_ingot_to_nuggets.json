@@ -4,7 +4,7 @@
     "item": "minecraft:iron_ingot"
   },
   "minimum_speed": 5.0,
-  "optimal_speed": 18.0,
+  "optimal_speed": 10.0,
   "output": {
     "item": {
       "Count": 9,

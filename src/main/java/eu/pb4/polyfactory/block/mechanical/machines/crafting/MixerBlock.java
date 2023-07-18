@@ -35,6 +35,7 @@ import org.joml.Vector3f;
 public class MixerBlock extends TallItemMachineBlock {
     public MixerBlock(Settings settings) {
         super(settings);
+        Model.MODEL_PISTON.isEmpty();
     }
 
     @Override
@@ -141,8 +142,7 @@ public class MixerBlock extends TallItemMachineBlock {
         private Model(BlockState state) {
             this.main = LodItemDisplayElement.createSimple(FactoryItems.MIXER_BLOCK.getDefaultStack(), 0);
             this.main.setScale(new Vector3f(2));
-            this.main.setTranslation(new Vector3f(0, 0.469f, 0));
-
+            this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.whisk = LodItemDisplayElement.createSimple(MODEL_PISTON, 2, 0.4f, 0.8f);
             this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4, 0.3f, 0.5f);
             this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4, 0.3f, 0.5f);

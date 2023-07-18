@@ -88,7 +88,7 @@ public class ElectricMotorBlock extends RotationalNetworkBlock implements Polyme
             this.mainElement = new ItemDisplayElement(AxleBlock.Model.ITEM_MODEL);
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
-            this.mainElement.setInterpolationDuration(5);
+            this.mainElement.setInterpolationDuration(4);
 
             var positive = state.get(FACING).getDirection() == Direction.AxisDirection.POSITIVE;
 

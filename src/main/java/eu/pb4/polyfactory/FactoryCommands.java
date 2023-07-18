@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import eu.pb4.polyfactory.util.DebugData;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -9,6 +10,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
+import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class FactoryCommands {
@@ -20,10 +22,21 @@ public class FactoryCommands {
         dispatcher.register(literal("polyfactory")
                 .then(literal("debug")
                         .requires((x) -> x.hasPermissionLevel(3))
-                        .then(literal("packetinfo").executes(FactoryCommands::printPacketInfo))
+                        .then(literal("packetinfo")
+                                .then(argument("enable", BoolArgumentType.bool())
+                                        .executes(FactoryCommands::togglePacketDebug)
+                                )
+                                .executes(FactoryCommands::printPacketInfo)
+                        )
                         
                 )
         );
+    }
+
+    private static int togglePacketDebug(CommandContext<ServerCommandSource> context) {
+        DebugData.enabled = !DebugData.enabled;
+        context.getSource().sendFeedback(() -> Text.literal("Packet debug: " + DebugData.enabled), false);
+        return 0;
     }
 
     private static int printPacketInfo(CommandContext<ServerCommandSource> context) {

@@ -1,7 +1,7 @@
-// 1.20.1	2023-07-14T21:03:15.703051145	PolyFactory/Tags for minecraft:block
+// 1.20.1	2023-07-18T10:01:09.262670255	PolyFactory/Tags for minecraft:block
 8970dfe3e1602f1f5445b6f8bc5906817ee33736 data/polyfactory/tags/blocks/grinder/top_placeable.json
 e713282cebdf67bbc7c9acec941867bf1d6027ef data/polyfactory/tags/blocks/conveyors.json
 5d35dd918dc4ec25a41b7543742e6eec18c2b950 data/minecraft/tags/blocks/mineable/pickaxe.json
-e1660cf5c39ba77678334cced56d3a27c63b87da data/polyfactory/tags/blocks/conveyor/side_output.json
+d0353e7047a4a28ef0764edd901920ce4126d3f3 data/polyfactory/tags/blocks/conveyor/side_output.json
 f38b12a907152b5fcadc2d8ceb6c3b2b7ef0d009 data/polyfactory/tags/blocks/conveyor/top_output.json
 5b9ae16d3c4e03a00d7887507acab4db3bf1ddad data/minecraft/tags/blocks/mineable/axe.json

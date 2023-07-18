@@ -3,6 +3,7 @@
   "values": [
     "polyfactory:press",
     "polyfactory:mixer",
-    "minecraft:hopper"
+    "minecraft:hopper",
+    "minecraft:composter"
   ]
 }

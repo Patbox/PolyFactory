@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.util;
 
+import eu.pb4.polyfactory.ModInit;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -9,13 +10,13 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class DebugData {
-    private static boolean enabled = false;
+    public static boolean enabled = false;
     private static int tick;
     private static Object2IntMap<Class<?>> CURRENT_CALL_MAP = new Object2IntOpenCustomHashMap<>(Util.identityHashStrategy());
     private static Object2IntMap<Class<?>> PREVIOUS_CALL_MAP = new Object2IntOpenCustomHashMap<>(Util.identityHashStrategy());
 
     public static void register() {
-        enabled = true;
+        enabled = ModInit.DEV;
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             if (enabled && tick % 20 == 0) {
                 var old = PREVIOUS_CALL_MAP;

@@ -40,7 +40,6 @@ public class ModInit implements ModInitializer {
 		LOGGER.warn("until official release!");
 		LOGGER.warn("=================================================");
 
-
 		FactoryBlocks.register();
 		FactoryBlockEntities.register();
 		FactoryItems.register();
@@ -51,6 +50,7 @@ public class ModInit implements ModInitializer {
 		WindmillBlock.Model.MODEL.getItem();
 		FactoryLootTables.register();
 		FactoryCommands.register();
+		GenericParts.SMALL_GEAR.isEmpty();
 		DebugData.register();
 
 		ConveyorModel.registerAssetsEvents();

@@ -115,7 +115,9 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             this.getOrCreateTagBuilder(FactoryBlockTags.CONVEYOR_SIDE_OUTPUT)
                     .add(FactoryBlocks.PRESS)
                     .add(FactoryBlocks.MIXER)
-                    .add(Blocks.HOPPER);
+                    .add(Blocks.HOPPER)
+                    .add(Blocks.COMPOSTER)
+            ;
 
             this.getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE)
                     .addOptionalTag(FactoryBlockTags.CONVEYORS)
