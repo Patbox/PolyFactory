@@ -14,6 +14,7 @@ import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlock;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlock;
 import eu.pb4.polyfactory.block.mechanical.source.HandCrankBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
+import eu.pb4.polyfactory.block.multiblock.MultiBlock;
 import eu.pb4.polyfactory.block.other.ContainerBlock;
 import eu.pb4.polyfactory.block.other.GreenScreenBlock;
 import eu.pb4.polyfactory.block.other.NixieTubeBlock;
@@ -48,6 +49,8 @@ public class FactoryBlocks {
     public static final ItemGeneratorBlock ITEM_GENERATOR = register("item_generator", new ItemGeneratorBlock(AbstractBlock.Settings.create().strength(-1, -1)));
     public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", new RotationalDebugBlock(AbstractBlock.Settings.create().strength(-1, -1)));
     public static final GreenScreenBlock GREEN_SCREEN = register("green_screen", new GreenScreenBlock(AbstractBlock.Settings.copy(Blocks.GREEN_WOOL)));
+    public static final MultiBlock TEST_MULTI_2 =  register("test_multi_2", new MultiBlock(2, 2, 2, AbstractBlock.Settings.copy(Blocks.STONE)));
+    public static final MultiBlock TEST_MULTI_3 =  register("test_multi_3", new MultiBlock(3, 3, 3, AbstractBlock.Settings.copy(Blocks.STONE)));
 
 
     public static void register() {

@@ -84,6 +84,8 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
             if (!be.isEmpty()) {
                 var stack = be.extract( player.isSneaking() ? be.getItemStack().getMaxCount() : 1);
                 player.getInventory().offerOrDrop(stack);
+            } else {
+                be.setItemStack(ItemStack.EMPTY);
             }
 
             return ActionResult.SUCCESS;

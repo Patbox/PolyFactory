@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.item;
 
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.item.util.ModeledItem;
+import eu.pb4.polyfactory.item.util.MultiBlockItem;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.FactoryBlocks;
@@ -47,6 +48,8 @@ public class FactoryItems {
     public static final Item ITEM_GENERATOR_BLOCK = register("item_generator", new ModeledBlockItem(FactoryBlocks.ITEM_GENERATOR, new Item.Settings()));
     public static final Item ROTATION_DEBUG_BLOCK = register("rot_debug", new ModeledBlockItem(FactoryBlocks.ROTATION_DEBUG, new Item.Settings()));
     public static final Item GREEN_SCREEN_BLOCK = register("green_screen", new ModeledBlockItem(FactoryBlocks.GREEN_SCREEN, new Item.Settings()));
+    public static final Item TEST_MULTI_2_BLOCK = register("text_multi_2", new MultiBlockItem(FactoryBlocks.TEST_MULTI_2, new Item.Settings()));
+    public static final Item TEST_MULTI_3_BLOCK = register("text_multi_3", new MultiBlockItem(FactoryBlocks.TEST_MULTI_3, new Item.Settings()));
 
 
     public static void register() {

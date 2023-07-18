@@ -9,6 +9,7 @@
     "BlockItemMixin",
     "HopperBlockEntityMixin",
     "HopperBlockMixin",
+    "ItemUsageContextAccessor",
     "PlayerEntityAccessor",
     "RegistryOpsMixin",
     "ServerPlayerEntityMixin",
