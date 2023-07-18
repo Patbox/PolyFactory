@@ -8,12 +8,17 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class MultiBlock extends Block implements PolymerBlock {
     private static IntProperty[] currentProperties;
@@ -150,12 +155,29 @@ public class MultiBlock extends Block implements PolymerBlock {
                     if (!this.isValid(state, x, y, z)) {
                         continue;
                     }
-                    context.getWorld().setBlockState(mut.set(corner).move(x, y, z), partZ != null ? posState.with(partZ, z) : posState);
+                    posState = partZ != null ? posState.with(partZ, z) : posState;
+                    context.getWorld().setBlockState(mut.set(corner).move(x, y, z), posState);
+                    this.onPlacedMultiBlock(world, mut, posState, context.getPlayer(), context.getStack());
                 }
             }
         }
 
         return true;
+    }
+
+    @Override
+    public List<ItemStack> getDroppedStacks(BlockState state, LootContextParameterSet.Builder builder) {
+        if (this.canDropStackFrom(state)) {
+            return super.getDroppedStacks(state, builder);
+        }
+        return List.of();
+    }
+
+    protected boolean canDropStackFrom(BlockState state) {
+        return isCenter(state);
+    }
+
+    protected void onPlacedMultiBlock(World world, BlockPos pos, BlockState state, PlayerEntity player, ItemStack stack) {
     }
 
     @SuppressWarnings("deprecation")

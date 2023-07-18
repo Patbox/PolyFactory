@@ -7,7 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
-public interface RotationUser extends NetworkComponent {
+public interface RotationUser extends NetworkComponent.Rotational {
     void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos);
 
     static RotationData getRotation(ServerWorld world, BlockPos pos) {

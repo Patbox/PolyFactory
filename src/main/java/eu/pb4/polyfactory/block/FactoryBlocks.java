@@ -13,6 +13,7 @@ import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlock;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlock;
 import eu.pb4.polyfactory.block.mechanical.source.HandCrankBlock;
+import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.multiblock.MultiBlock;
 import eu.pb4.polyfactory.block.other.ContainerBlock;
@@ -37,6 +38,7 @@ public class FactoryBlocks {
     public static final FanBlock FAN = register("fan", new FanBlock(Block.Settings.create().nonOpaque().hardness(1)));
     public static final CablePlateBlock CABLE_PLATE = register("cable_plate", new CablePlateBlock(Block.Settings.create().hardness(1)));
     public static final HandCrankBlock HAND_CRANK = register("hand_crank", new HandCrankBlock(Block.Settings.create().hardness(1).nonOpaque()));
+    public static final SteamEngineBlock STEAM_ENGINE = register("steam_engine", new SteamEngineBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final GrinderBlock GRINDER = register("grinder", new GrinderBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final PressBlock PRESS = register("press", new PressBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final MixerBlock MIXER = register("mixer", new MixerBlock(Block.Settings.create().hardness(1).nonOpaque()));

@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.source.HandCrankBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.FanBlockEntity;
@@ -42,6 +43,9 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<WindmillBlockEntity> WINDMILL = register("windmill",
             FabricBlockEntityTypeBuilder.create(WindmillBlockEntity::new).addBlock(FactoryBlocks.WINDMILL));
+
+    public static final BlockEntityType<SteamEngineBlockEntity> STEAM_ENGINE = register("steam_engine",
+            FabricBlockEntityTypeBuilder.create(SteamEngineBlockEntity::new).addBlock(FactoryBlocks.STEAM_ENGINE));
 
 
     public static final BlockEntityType<ContainerBlockEntity> CONTAINER = register("container",

@@ -28,6 +28,7 @@ public class FactoryItems {
     public static final Item FAN_BLOCK = register("fan", new ModeledBlockItem(FactoryBlocks.FAN, new Item.Settings()));
     public static final Item CABLE_PLATE_BLOCK = register("cable_plate", new ModeledBlockItem(FactoryBlocks.CABLE_PLATE, new Item.Settings()));
     public static final Item HAND_CRANK_BLOCK = register("hand_crank", new ModeledBlockItem(FactoryBlocks.HAND_CRANK, new Item.Settings()));
+    public static final Item STEAM_ENGINE_BLOCK = register("steam_engine", new MultiBlockItem(FactoryBlocks.STEAM_ENGINE, new Item.Settings()));
     public static final Item GRINDER_BLOCK = register("grinder", new ModeledBlockItem(FactoryBlocks.GRINDER, new Item.Settings()));
     public static final Item PRESS_BLOCK = register("press", new ModeledBlockItem(FactoryBlocks.PRESS, new Item.Settings()));
     public static final Item MIXER_BLOCK = register("mixer", new ModeledBlockItem(FactoryBlocks.MIXER, new Item.Settings()));

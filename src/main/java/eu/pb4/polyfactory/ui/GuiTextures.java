@@ -13,7 +13,7 @@ public class GuiTextures {
     public static final Function<Text, Text> MIXER = background("mixer");
     public static final Function<Text, Text> CENTER_SLOT_GENERIC = background("center_slot");
     public static final GuiElement EMPTY = icon16("empty").get().build();
-    //public static final Progress FLAME = Progress.createVertical("flame", 1, 14, true);
+    public static final Progress FLAME = Progress.createVertical("flame", 1, 14, true);
     public static final Progress FLAME_OFFSET_RIGHT = Progress.createVertical32Right("flame_offset_right", 9, 22, true);
     public static final Progress PROGRESS_VERTICAL = Progress.createVertical("progress_vertical", 0, 15, false);
     //public static final Progress PROGRESS_HORIZONTAL = Progress.createHorizontal("progress_horizontal", 0, 15, false);
