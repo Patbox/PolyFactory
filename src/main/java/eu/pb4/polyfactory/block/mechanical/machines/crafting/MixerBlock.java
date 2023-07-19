@@ -147,6 +147,10 @@ public class MixerBlock extends TallItemMachineBlock {
             this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4, 0.3f, 0.5f);
             this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4, 0.3f, 0.5f);
 
+            this.whisk.setViewRange(0.4f);
+            this.gearA.setViewRange(0.4f);
+            this.gearB.setViewRange(0.4f);
+
             this.updateStatePos(state);
             var dir = state.get(INPUT_FACING);
             this.updateAnimation(true, 0, (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));            this.addElement(this.whisk);

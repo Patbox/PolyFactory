@@ -170,6 +170,10 @@ public class PressBlock extends TallItemMachineBlock {
             this.pistonItem = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 2, 0.4f, 0.8f);
             this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4, 0.3f, 0.5f);
             this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4, 0.3f, 0.5f);
+            this.piston.setViewRange(0.4f);
+            this.pistonItem.setViewRange(0.4f);
+            this.gearA.setViewRange(0.4f);
+            this.gearB.setViewRange(0.4f);
 
             updateStatePos(state);
             var dir = state.get(INPUT_FACING);

@@ -211,16 +211,19 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
             this.mainElement.setItem(FactoryItems.SPLITTER_BLOCK.getDefaultStack());
             this.mainElement.setInvisible(true);
+            this.mainElement.setViewRange(0.8f);
 
             this.leftLockElement = new ItemDisplayElement();
             this.leftLockElement.setDisplaySize(1, 1);
             this.leftLockElement.setModelTransformation(ModelTransformationMode.GUI);
             this.leftLockElement.setInvisible(true);
+            this.leftLockElement.setViewRange(0.3f);
 
             this.rightLockElement = new ItemDisplayElement();
             this.rightLockElement.setDisplaySize(1, 1);
             this.rightLockElement.setModelTransformation(ModelTransformationMode.GUI);
             this.rightLockElement.setInvisible(true);
+            this.rightLockElement.setViewRange(0.3f);
 
 
             this.updateFacing(state);

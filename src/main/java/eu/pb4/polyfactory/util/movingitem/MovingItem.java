@@ -43,7 +43,7 @@ public class MovingItem implements VirtualElement, StackReference {
             this.itemDisplay[i].setLeftRotation(Direction.NORTH.getRotationQuaternion());
             this.itemDisplay[i].setDisplayWidth(1);
             this.itemDisplay[i].setDisplayHeight(2);
-            this.itemDisplay[i].setViewRange(0.8f);
+            this.itemDisplay[i].setViewRange(i == 0 ? 0.5f : 0.2f);
             this.itemDisplay[i].setModelTransformation(ModelTransformationMode.FIXED);
             this.itemDisplay[i].setInterpolationDuration(10);
             this.updateDisplay(i);

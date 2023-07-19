@@ -25,21 +25,30 @@ import java.util.function.BiConsumer;
 
 public class ConveyorModel {
     public static final int FRAMES = 20;
-
-    private static final Item[] MODEL_ITEMS = new Item[] {
-            Items.PURPLE_CANDLE, Items.RED_CANDLE, Items.YELLOW_CANDLE, Items.BLUE_CANDLE, Items.LIGHT_BLUE_CANDLE,
-            Items.BLUE_CARPET, Items.RED_CARPET, Items.GREEN_CARPET, Items.YELLOW_CARPET, Items.PURPLE_CARPET
-    };
-    private static int currentItemIndex = 0;
-
     public static final ItemStack[][] ANIMATION_REGULAR_STICKY = new ItemStack[16][1 + FRAMES];
     public static final ItemStack[][] ANIMATION_REGULAR = new ItemStack[16][1 + FRAMES];
-
     public static final ItemStack[][] ANIMATION_UP = new ItemStack[16][1 + FRAMES];
     public static final ItemStack[][] ANIMATION_UP_STICKY = new ItemStack[16][1 + FRAMES];
     public static final ItemStack[][] ANIMATION_DOWN = new ItemStack[16][1 + FRAMES];
     public static final ItemStack[][] ANIMATION_DOWN_STICKY = new ItemStack[16][1 + FRAMES];
-
+    private static final Item[] MODEL_ITEMS = new Item[]{
+            Items.WHITE_CARPET,
+            Items.ORANGE_CARPET,
+            Items.MAGENTA_CARPET,
+            Items.LIGHT_BLUE_CARPET,
+            Items.YELLOW_CARPET,
+            Items.LIME_CARPET,
+            Items.PINK_CARPET,
+            Items.GRAY_CARPET,
+            Items.LIGHT_GRAY_CARPET,
+            Items.CYAN_CARPET,
+            Items.PURPLE_CARPET,
+            Items.BLUE_CARPET,
+            Items.BROWN_CARPET,
+            Items.GREEN_CARPET,
+            Items.RED_CARPET,
+            Items.BLACK_CARPET
+    };
 
     private static final String MODEL_JSON = """
             {
@@ -57,7 +66,6 @@ public class ConveyorModel {
               }
             }
             """;
-
     private static final String MODEL_JSON_DOWN = """
             {
               "parent": "polyfactory:block/conveyor_down|TYPE|",
@@ -66,6 +74,7 @@ public class ConveyorModel {
               }
             }
             """;
+    private static int currentItemIndex = 0;
 
     private static void createItemModel(ItemStack[] array, String path, int i) {
         var model = PolymerResourcePackUtils.requestModel(MODEL_ITEMS[currentItemIndex++ % MODEL_ITEMS.length], FactoryUtil.id(path + (i == 0 ? "" : ("/" + i))));
@@ -125,7 +134,7 @@ public class ConveyorModel {
                     e.printStackTrace();
                 }
             }
-            for (var variant : new String[]{ "conveyor", "conveyor_up", "conveyor_down" }) {
+            for (var variant : new String[]{"conveyor", "conveyor_up", "conveyor_down"}) {
                 path = basePath.resolve("assets/polyfactory/models/block/" + variant + ".json");
                 if (Files.exists(path)) {
                     try {
@@ -141,7 +150,7 @@ public class ConveyorModel {
             }
         }
 
-        for (var variant : new String[]{ "conveyor", "conveyor_up", "conveyor_down" }) {
+        for (var variant : new String[]{"conveyor", "conveyor_up", "conveyor_down"}) {
             var model = models.get(variant);
             for (int i = 1; i < 16; i++) {
                 var base = new JsonObject();

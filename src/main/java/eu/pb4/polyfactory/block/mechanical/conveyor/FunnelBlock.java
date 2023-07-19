@@ -277,11 +277,13 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
             this.mainElement.setInvisible(true);
+            this.mainElement.setViewRange(0.8f);
             this.filterElement = new LodItemDisplayElement();
             this.filterElement.setDisplaySize(1, 1);
             this.filterElement.setModelTransformation(ModelTransformationMode.GUI);
             this.filterElement.setViewRange(0.1f);
             this.filterElement.setInvisible(true);
+            this.filterElement.setViewRange(0.3f);
 
             this.updateFacing(state);
             this.addElement(this.mainElement);

@@ -51,7 +51,7 @@ public class SteamEngineBlockEntity extends BlockEntity implements MinimalSidedI
 
         if (self.fuelTicks > 0) {
             self.fuelTicks--;
-            self.state = (float) Math.min(self.state + 0.02, 1);
+            self.state = (float) Math.min(self.state + 0.005, 1);
 
             if (!state.get(SteamEngineBlock.LIT)) {
                 world.setBlockState(pos, state.with(SteamEngineBlock.LIT, true));
@@ -77,7 +77,7 @@ public class SteamEngineBlockEntity extends BlockEntity implements MinimalSidedI
             }
 
             if (self.state != 0) {
-                self.state = (float) Math.max(self.state - 0.01, 0);
+                self.state = (float) Math.max(self.state - 0.02, 0);
                 self.markDirty();
             }
             if (state.get(SteamEngineBlock.LIT)) {

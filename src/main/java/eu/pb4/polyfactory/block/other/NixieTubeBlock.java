@@ -128,6 +128,7 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockWithElem
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
             this.mainElement.setInvisible(true);
+            this.mainElement.setViewRange(0.8f);
 
             for (int i = 0; i < 4; i++) {
                 var e = new TextDisplayElement();
@@ -135,7 +136,7 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockWithElem
                 e.setShadow(true);
                 e.setDisplaySize(1, 1);
                 e.setInvisible(true);
-                e.setViewRange(0.5f);
+                e.setViewRange(0.4f);
                 e.setBrightness(MAX_BRIGHTNESS);
 
                 display[i] = e;

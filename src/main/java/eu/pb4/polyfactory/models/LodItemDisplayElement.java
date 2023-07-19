@@ -61,7 +61,8 @@ public class LodItemDisplayElement extends ItemDisplayElement {
 
     public static LodItemDisplayElement createSimple() {
         var element = new LodItemDisplayElement();
-        element.setDisplaySize(1, 1);
+        element.setDisplaySize(2, 2);
+        element.setViewRange(0.8f);
         element.setModelTransformation(ModelTransformationMode.FIXED);
         element.setInvisible(true);
         return element;

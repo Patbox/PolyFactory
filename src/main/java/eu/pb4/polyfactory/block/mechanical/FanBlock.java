@@ -148,10 +148,12 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
             this.mainElement = new LodItemDisplayElement(FactoryItems.FAN_BLOCK.getDefaultStack());
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
-            this.mainElement.setScale(new Vector3f(2.001f));
+            this.mainElement.setScale(new Vector3f(2f));
+            this.mainElement.setViewRange(0.8f);
             this.mainElement.setInvisible(true);
 
             this.fan = LodItemDisplayElement.createSimple(ITEM_MODEL, 2, 0.2f, 0.4f);
+            this.fan.setViewRange(0.3f);
             this.updateStatePos(state);
             this.updateAnimation(0);
 

@@ -75,8 +75,8 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
     @Override
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof HandCrankBlockEntity be) {
-            var speed = MathHelper.lerp(MathHelper.clamp((world.getServer().getTicks() - be.lastTick - 5) / 2d, 0, 1), RotationConstants.HAND_CRANK_SPEED, 0);
-            var stress = MathHelper.lerp(MathHelper.clamp((world.getServer().getTicks() - be.lastTick - 5) / 2d, 0, 1), RotationConstants.HAND_CRANK_STRESS, 0);
+            var speed = MathHelper.lerp(MathHelper.clamp(((world.getServer().getTicks() - be.lastTick) / 2d - 5) / 5d, 0, 1), RotationConstants.HAND_CRANK_SPEED, 0);
+            var stress = MathHelper.lerp(MathHelper.clamp(((world.getServer().getTicks() - be.lastTick) / 2d - 5) / 5d, 0, 1), RotationConstants.HAND_CRANK_STRESS, 0);
 
             if (speed > 0) {
                 modifier.provide(speed, stress);
@@ -130,11 +130,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
         private final ItemDisplayElement mainElement;
 
         private Model(ServerWorld world, BlockState state) {
-            this.mainElement = new LodItemDisplayElement(FactoryItems.HAND_CRANK_BLOCK.getDefaultStack());
-            this.mainElement.setDisplaySize(1, 1);
-            this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
-            this.mainElement.setInterpolationDuration(4);
-            this.mainElement.setInvisible(true);
+            this.mainElement = LodItemDisplayElement.createSimple(FactoryItems.HAND_CRANK_BLOCK.getDefaultStack(), 4, 0.3f, 0.6f);
             this.updateAnimation(0, state.get(FACING));
             this.addElement(this.mainElement);
         }

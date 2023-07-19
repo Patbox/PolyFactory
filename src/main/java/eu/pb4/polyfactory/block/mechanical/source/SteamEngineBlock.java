@@ -58,7 +58,7 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
     public static final BooleanProperty LIT = Properties.LIT;
 
     public SteamEngineBlock(Settings settings) {
-        super(3, 3, 3, settings);
+        super(2, 3, 2, settings);
         Model.AXLE.getItem();
         this.setDefaultState(this.getDefaultState().with(LIT, false));
     }
@@ -71,7 +71,7 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (hand == Hand.MAIN_HAND && !player.isSneaking() && world.getBlockEntity(getCenter(state, pos)) instanceof SteamEngineBlockEntity be) {
+        if (getY(state) != 2 && hand == Hand.MAIN_HAND && !player.isSneaking() && world.getBlockEntity(getCenter(state, pos)) instanceof SteamEngineBlockEntity be) {
             be.openGui((ServerPlayerEntity) player);
             return ActionResult.SUCCESS;
         }
@@ -86,10 +86,13 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
     }
 
     @Override
-    protected boolean isValid(BlockState state, int x, int y, int z) {
-        var axis = state.get(FACING);
+    protected int getMaxX(BlockState state) {
+        return state.get(FACING).getAxis() == Direction.Axis.X ? 0 : 1;
+    }
 
-        return (axis.getAxis() == Direction.Axis.X && (y != 2 || x == 1)) || (axis.getAxis() == Direction.Axis.Z && (y != 2 || z == 1));
+    @Override
+    protected int getMaxZ(BlockState state) {
+        return state.get(FACING).getAxis() == Direction.Axis.Z ? 0 : 1;
     }
 
     @Override
@@ -155,7 +158,7 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return getY(state) == 2 ? List.of(getX(state) == 1 && getZ(state) == 1 ?
+        return getY(state) == 2 ? List.of(getX(state) == 0 && getZ(state) == 0 ?
                 new AxisRotationUserNode(state.get(FACING).rotateYCounterclockwise().getAxis()) : new AxisMechanicalNode(state.get(FACING).rotateYCounterclockwise().getAxis())) : List.of();
     }
 
@@ -183,18 +186,25 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
 
         private Model(BlockState state) {
             this.main = LodItemDisplayElement.createSimple(state.get(LIT) ? ACTIVE : FactoryItems.STEAM_ENGINE_BLOCK.getDefaultStack(), 0);
-            this.main.setScale(new Vector3f(4));
-            this.main.setOffset(new Vec3d(0, -1, 0));
+            this.main.setScale(new Vector3f(2));
+            var facing = state.get(FACING);
+            var offset = new Vec3d(
+                     facing.getAxis() == Direction.Axis.Z ? 0.5f : 0,
+                    -1,
+                     facing.getAxis() == Direction.Axis.X ? 0.5f : 0
+            );
+            this.main.setOffset(offset);
             this.main.setDisplayWidth(3);
+            offset = offset.add(0, 2, 0);
             this.axle = LodItemDisplayElement.createSimple(AXLE, 4, 0.3f, 0.6f);
-            this.axle.setOffset(new Vec3d(0, 1, 0));
+            this.axle.setOffset(offset);
             this.axle.setScale(new Vector3f(2));
             this.axle.setDisplayWidth(3);
             this.rotatingA = LodItemDisplayElement.createSimple(LINK, 4, 0.3f, 0.5f);
-            this.rotatingA.setOffset(new Vec3d(0, 1, 0));
+            this.rotatingA.setOffset(offset);
             this.rotatingA.setDisplayWidth(3);
             this.rotatingB = LodItemDisplayElement.createSimple(LINK, 4, 0.3f, 0.5f);
-            this.rotatingB.setOffset(new Vec3d(0, 1, 0));
+            this.rotatingB.setOffset(offset);
             this.rotatingB.setDisplayWidth(3);
 
 
@@ -219,22 +229,21 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
 
         private void updateAnimation(float rotation, boolean negative) {
             rotation = negative ? rotation : -rotation;
-            //rotation = MathHelper.HALF_PI;
             this.axle.setLeftRotation(new Quaternionf().rotateX(rotation));
 
             var sin = MathHelper.sin(rotation);
             var cos = MathHelper.cos(rotation);
-            var sin2 = MathHelper.sin(rotation - MathHelper.HALF_PI) * 0.4f;
+            var sin2 = MathHelper.sin(rotation - MathHelper.HALF_PI) * 0.6f;
 
             mat.identity()
-                    .translate(-11f / 16,  sin * -10 / 16f, cos * 10 / 16f)
+                    .translate(-8f / 16,  sin * -10 / 16f, cos * 10 / 16f)
                     .rotateX(-sin2)
             ;
 
             this.rotatingA.setTransformation(mat);
 
             mat.identity()
-                    .translate(11f / 16,  sin * 10 / 16f, -cos * 10 / 16f)
+                    .translate(8f / 16,  sin * 10 / 16f, -cos * 10 / 16f)
                     .rotateX(sin2)
             ;
 

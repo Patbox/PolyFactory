@@ -65,11 +65,8 @@ public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock
         private final Matrix4f mat = new Matrix4f();
 
         private Model() {
-            this.mainElement = new LodItemDisplayElement(FactoryItems.GEARBOX_BLOCK.getDefaultStack());
-            this.mainElement.setDisplaySize(1, 1);
-            this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
+            this.mainElement = LodItemDisplayElement.createSimple(FactoryItems.GEARBOX_BLOCK.getDefaultStack());
             this.mainElement.setScale(new Vector3f(2));
-            this.mainElement.setInvisible(true);
             this.addElement(this.mainElement);
 
             this.xAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, 4, 0.3f, 0.6f);

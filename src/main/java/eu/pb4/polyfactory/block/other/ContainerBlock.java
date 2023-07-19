@@ -174,16 +174,19 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
             this.mainElement.setItem(FactoryItems.CONTAINER_BLOCK.getDefaultStack());
             this.mainElement.setInvisible(true);
+            this.mainElement.setViewRange(0.8f);
 
             this.itemElement = new ItemDisplayElement();
             this.itemElement.setDisplaySize(1, 1);
             this.itemElement.setModelTransformation(ModelTransformationMode.GUI);
             this.itemElement.setInvisible(true);
+            this.itemElement.setViewRange(0.3f);
 
             this.countElement = new TextDisplayElement(Text.literal("0"));
             this.countElement.setDisplaySize(1, 1);
             this.countElement.setBackground(0);
             this.countElement.setInvisible(true);
+            this.countElement.setViewRange(0.2f);
 
             //this.countElement.setShadow(true);
 

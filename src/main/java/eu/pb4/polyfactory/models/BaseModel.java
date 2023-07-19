@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.util.DebugData;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 
 public class BaseModel extends ElementHolder {
     private static int startTick = 0;
@@ -28,5 +29,9 @@ public class BaseModel extends ElementHolder {
         super.sendPacket(packet);
         DebugData.addPacketCall(packet);
         DebugData.addPacketCall(this);
+    }
+
+    protected double getSquaredDistance(ServerPlayNetworkHandler player) {
+        return this.getPos().squaredDistanceTo(player.player.getPos());
     }
 }
