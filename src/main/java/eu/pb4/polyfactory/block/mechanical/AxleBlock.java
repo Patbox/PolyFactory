@@ -98,7 +98,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
     @Override
     public void onPolymerBlockSend(BlockState blockState, BlockPos.Mutable pos, ServerPlayerEntity player) {
         if (pos.getSquaredDistanceFromCenter(player.getX(), player.getY(), player.getZ()) < 32 * 32) {
-            player.networkHandler.sendPacket(new BlockUpdateS2CPacket(pos, Blocks.LIGHTNING_ROD.getDefaultState().with(Properties.FACING, Direction.from(blockState.get(AXIS), Direction.AxisDirection.POSITIVE)).with(LightningRodBlock.POWERED, true)));
+            player.networkHandler.sendPacket(new BlockUpdateS2CPacket(pos.toImmutable(), Blocks.LIGHTNING_ROD.getDefaultState().with(Properties.FACING, Direction.from(blockState.get(AXIS), Direction.AxisDirection.POSITIVE)).with(LightningRodBlock.POWERED, true)));
             //noinspection UnstableApiUsage
             PolymerServerProtocol.sendBlockUpdate(player.networkHandler, pos, blockState);
         }
