@@ -174,11 +174,8 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
                         if (i < this.sails.length) {
                             sails[i] = this.sails[i];
                         } else {
-                            var x = new LodItemDisplayElement();
-                            //x.setDisplaySize(3, 3);
-                            x.setModelTransformation(ModelTransformationMode.FIXED);
-                            x.setInterpolationDuration(5);
-                            x.setInvisible(true);
+                            var x = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 4);
+                            x.setDisplaySize(0, 0);
                             sails[i] = x;
                             this.addElement(x);
                         }
@@ -186,11 +183,8 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
                 }
             } else {
                 for (var i = 0; i < sails.length; i++) {
-                    var x = new LodItemDisplayElement();
-                    //x.setDisplaySize(3, 3);
-                    x.setModelTransformation(ModelTransformationMode.FIXED);
-                    x.setInterpolationDuration(4);
-                    x.setInvisible(true);
+                    var x = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 4);
+                    x.setDisplaySize(0, 0);
                     sails[i] = x;
                     this.addElement(x);
                 }

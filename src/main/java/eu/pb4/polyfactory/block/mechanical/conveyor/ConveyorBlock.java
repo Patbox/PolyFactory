@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.ConveyorModel;
+import eu.pb4.polyfactory.models.FastItemDisplayElement;
 import eu.pb4.polyfactory.nodes.mechanical.ConveyorNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
@@ -438,6 +439,11 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
     }
 
 
+    @Override
+    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return true;
+    }
+
     public enum DirectionValue implements StringIdentifiable {
         NONE(0, false),
         POSITIVE(1, false),
@@ -461,7 +467,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
 
     public final class Model extends BaseModel implements ContainerHolder {
         private final Matrix4f mat = new Matrix4f();
-        private final ItemDisplayElement base;
+        private final FastItemDisplayElement base;
         private double speed;
         private Direction direction;
         private MovingItem movingItemContainer;
@@ -470,9 +476,11 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
 
         private Model(ServerWorld world, BlockState state) {
             var type = state.get(ConveyorBlock.VERTICAL);
-            this.base = new ItemDisplayElement(getModelForSpeed(0, type, state.isOf(FactoryBlocks.STICKY_CONVEYOR), state));
+            this.base = new FastItemDisplayElement(getModelForSpeed(0, type, state.isOf(FactoryBlocks.STICKY_CONVEYOR), state));
+            this.base.setFastItem(getFastModel(type, state.isOf(FactoryBlocks.STICKY_CONVEYOR), state), 24);
             this.base.setDisplaySize(1, 1);
             this.base.setModelTransformation(ModelTransformationMode.FIXED);
+            this.base.setViewRange(0.7f);
             this.base.setInvisible(true);
 
             this.addElement(this.base);
@@ -485,6 +493,14 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
                 case NEGATIVE -> sticky ? ConveyorModel.ANIMATION_DOWN_STICKY : ConveyorModel.ANIMATION_DOWN;
                 default -> sticky ? ConveyorModel.ANIMATION_REGULAR_STICKY : ConveyorModel.ANIMATION_REGULAR;
             })[getModelId(state)][(int) Math.ceil(MathHelper.clamp(speed * ConveyorModel.FRAMES * 15, 0, ConveyorModel.FRAMES))];
+        }
+
+        private ItemStack getFastModel(DirectionValue directionValue, boolean sticky, BlockState state) {
+            return (switch (directionValue) {
+                case POSITIVE -> sticky ? ConveyorModel.STICKY_UP_FAST : ConveyorModel.UP_FAST;
+                case NEGATIVE -> sticky ? ConveyorModel.STICKY_DOWN_FAST : ConveyorModel.DOWN_FAST;
+                default -> sticky ? ConveyorModel.STICKY_REGULAR_FAST : ConveyorModel.REGULAR_FAST;
+            });
         }
 
         private void updateAnimation(Direction dir, DirectionValue value) {
@@ -517,6 +533,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 var state = BlockBoundAttachment.get(this).getBlockState();
                 this.base.setItem(getModelForSpeed(speed, state.get(ConveyorBlock.VERTICAL), state.isOf(FactoryBlocks.STICKY_CONVEYOR), state));
+                this.base.setFastItem(getFastModel(state.get(ConveyorBlock.VERTICAL), state.isOf(FactoryBlocks.STICKY_CONVEYOR), state), 24);
                 this.updateAnimation(state.get(ConveyorBlock.DIRECTION), state.get(ConveyorBlock.VERTICAL));
                 this.tick();
             }

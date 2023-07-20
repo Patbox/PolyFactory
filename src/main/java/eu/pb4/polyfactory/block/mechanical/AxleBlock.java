@@ -120,6 +120,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
 
         private Model(ServerWorld world, BlockState state) {
             this.mainElement = LodItemDisplayElement.createSimple(ITEM_MODEL, 4, 0.3f, 0.6f);
+            this.mainElement.setViewRange(0.7f);
             this.updateAnimation(0,  state.get(AXIS));
             this.addElement(this.mainElement);
         }

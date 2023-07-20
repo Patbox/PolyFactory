@@ -3,12 +3,21 @@ package eu.pb4.polyfactory;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.util.DebugData;
+import eu.pb4.polymer.virtualentity.impl.HolderAttachmentHolder;
+import eu.pb4.polymer.virtualentity.impl.HolderHolder;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -28,9 +37,35 @@ public class FactoryCommands {
                                 )
                                 .executes(FactoryCommands::printPacketInfo)
                         )
-                        
+                        .then(literal("list_models").executes(FactoryCommands::listModels))
                 )
         );
+    }
+
+    private static int listModels(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        var player = context.getSource().getPlayerOrThrow();
+
+        var map = new HashMap<Class<?>, List<BaseModel>>();
+
+
+        ((HolderHolder) player.networkHandler).polymer$getHolders().forEach((x) -> {
+            if (x instanceof BaseModel b) {
+                map.computeIfAbsent(x.getClass(), (a) -> new ArrayList<>()).add(b);
+            }
+        });
+        map.forEach(((aClass, list) -> {
+            int parts = 0;
+            for (var e : list) {
+                parts += e.getElements().size();
+            }
+
+
+            var x = aClass.getName().split("\\.");
+            int finalParts = parts;
+            context.getSource().sendFeedback(() -> Text.literal(x[x.length - 1]).append(" - ").append(list.size() + " Models | " ).append(finalParts + " Parts"), false);
+        }));
+
+        return 0;
     }
 
     private static int togglePacketDebug(CommandContext<ServerCommandSource> context) {

@@ -80,6 +80,7 @@ public class FactoryItems {
                     entries.add(GEARBOX_BLOCK);
                     entries.add(HAND_CRANK_BLOCK);
                     entries.add(WINDMILL_SAIL);
+                    entries.add(STEAM_ENGINE_BLOCK);
 
                     entries.add(ITEM_FILTER);
                     

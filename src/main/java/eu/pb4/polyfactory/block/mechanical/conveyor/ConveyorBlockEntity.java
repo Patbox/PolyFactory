@@ -72,12 +72,6 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
 
         if (self.holdStack != null && self.holdStack.get().isEmpty()) {
             self.clearContainer();
-            self.model.tick();
-            return;
-        }
-
-        if (speed == 0) {
-            self.model.tick();
             return;
         }
 
@@ -93,7 +87,6 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
                 if (self.isContainerEmpty()) {
                     self.setDelta(0);
                 }
-                self.model.tick();
                 return;
             }
             self.delta -= speed;
@@ -117,7 +110,6 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
                 if (self.isContainerEmpty()) {
                     self.setDelta(0);
                 }
-                self.model.tick();
                 return;
             }
 
@@ -131,12 +123,10 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
             itemEntity.age = -20;
             world.spawnEntity(itemEntity);
 
-            self.model.tick();
             self.delta -= speed;
 
         } else {
             self.setDelta(currentDelta + speed);
-            self.model.tick();
         }
     }
 

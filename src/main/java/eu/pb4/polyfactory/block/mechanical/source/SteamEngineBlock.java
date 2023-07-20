@@ -13,6 +13,7 @@ import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
 import eu.pb4.polyfactory.nodes.mechanical.AxisRotationUserNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -53,7 +54,7 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
-public class SteamEngineBlock extends MultiBlock implements BlockWithElementHolder, BlockEntityProvider, InventoryProvider, RotationUser {
+public class SteamEngineBlock extends MultiBlock implements BlockWithElementHolder, BlockEntityProvider, InventoryProvider, RotationUser, VirtualDestroyStage.Marker {
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty LIT = Properties.LIT;
 

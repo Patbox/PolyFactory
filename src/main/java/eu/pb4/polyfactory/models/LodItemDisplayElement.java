@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.models;
 
-import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.util.DebugData;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DataTrackerLike;
@@ -13,18 +12,18 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class LodItemDisplayElement extends ItemDisplayElement {
     public final DataTrackerLike nearTracker = new SimpleDataTracker(this.getEntityType());
     public final DataTrackerLike mediumTracker = new SimpleDataTracker(this.getEntityType());
     private int updateTick = 0;
-    private double nearDistanceSquared = 50 * 50;
-    private float farDistanceSquared = 90 * 90;
+    protected double nearDistanceSquared = 50 * 50;
+    protected float farDistanceSquared = 90 * 90;
 
     public LodItemDisplayElement(ItemStack stack) {
         super();
@@ -112,11 +111,6 @@ public class LodItemDisplayElement extends ItemDisplayElement {
     }
 
     @Override
-    protected void sendChangedTrackerEntries(ServerPlayerEntity player, Consumer<Packet<ClientPlayPacketListener>> packetConsumer) {
-        super.sendChangedTrackerEntries(player, packetConsumer);
-    }
-
-    @Override
     protected void sendTrackerUpdates() {
         Packet<ClientPlayPacketListener> nearPacket = null;
         Packet<ClientPlayPacketListener> mediumPacket = null;
@@ -135,7 +129,7 @@ public class LodItemDisplayElement extends ItemDisplayElement {
         boolean sendOnce = false;
 
         for (var player : this.getHolder().getWatchingPlayers()) {
-            var d = player.player.getPos().squaredDistanceTo(this.getHolder().getPos());
+            var d = this.getSquaredDistance(player);
             if (d < this.nearDistanceSquared) {
                 if (nearPacket != null) {
                     player.sendPacket(nearPacket);
@@ -153,5 +147,9 @@ public class LodItemDisplayElement extends ItemDisplayElement {
             DebugData.addPacketCall(this.getHolder());
             DebugData.addPacketCall(nearPacket != null ? nearPacket : mediumPacket);
         }
+    }
+
+    protected double getSquaredDistance(ServerPlayNetworkHandler player) {
+        return ((BaseModel) this.getHolder()).getSquaredDistance(player);
     }
 }

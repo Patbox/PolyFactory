@@ -25,6 +25,7 @@ import java.util.function.BiConsumer;
 
 public class ConveyorModel {
     public static final int FRAMES = 20;
+
     public static final ItemStack[][] ANIMATION_REGULAR_STICKY = new ItemStack[16][1 + FRAMES];
     public static final ItemStack[][] ANIMATION_REGULAR = new ItemStack[16][1 + FRAMES];
     public static final ItemStack[][] ANIMATION_UP = new ItemStack[16][1 + FRAMES];
@@ -49,7 +50,6 @@ public class ConveyorModel {
             Items.RED_CARPET,
             Items.BLACK_CARPET
     };
-
     private static final String MODEL_JSON = """
             {
               "parent": "polyfactory:block/conveyor|TYPE|",
@@ -74,7 +74,13 @@ public class ConveyorModel {
               }
             }
             """;
-    private static int currentItemIndex = 0;
+    private static int currentItemIndex;
+    public static final ItemStack REGULAR_FAST = new ItemStack(MODEL_ITEMS[currentItemIndex++]);
+    public static final ItemStack UP_FAST = new ItemStack(MODEL_ITEMS[currentItemIndex++]);
+    public static final ItemStack DOWN_FAST = new ItemStack(MODEL_ITEMS[currentItemIndex++]);
+    public static final ItemStack STICKY_REGULAR_FAST = new ItemStack(MODEL_ITEMS[currentItemIndex++]);
+    public static final ItemStack STICKY_UP_FAST = new ItemStack(MODEL_ITEMS[currentItemIndex++]);
+    public static final ItemStack STICKY_DOWN_FAST = new ItemStack(MODEL_ITEMS[currentItemIndex++]);
 
     private static void createItemModel(ItemStack[] array, String path, int i) {
         var model = PolymerResourcePackUtils.requestModel(MODEL_ITEMS[currentItemIndex++ % MODEL_ITEMS.length], FactoryUtil.id(path + (i == 0 ? "" : ("/" + i))));
@@ -84,6 +90,13 @@ public class ConveyorModel {
     }
 
     public static void registerAssetsEvents() {
+        createFast(REGULAR_FAST, "", "");
+        createFast(UP_FAST, "", "_up");
+        createFast(DOWN_FAST, "", "_down");
+        createFast(STICKY_REGULAR_FAST, "sticky_", "");
+        createFast(STICKY_UP_FAST, "sticky_", "_up");
+        createFast(STICKY_DOWN_FAST, "sticky_", "_down");
+
         for (int i = 0; i <= FRAMES; i++) {
             for (var a = 0; a < 16; a++) {
                 String addition = a == 0 ? "" : ("_" + a);
@@ -100,6 +113,11 @@ public class ConveyorModel {
         if (ModInit.DYNAMIC_ASSETS) {
             PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register((resourcePackBuilder) -> ConveyorModel.generateModels(resourcePackBuilder::addData));
         }
+    }
+
+    private static void createFast(ItemStack stack, String prefix, String suffix) {
+        var path = FactoryUtil.id("block/" + prefix + "conveyor" + suffix + "_fast");
+        stack.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(stack.getItem(), path).value());
     }
 
     public static void generateModels(BiConsumer<String, byte[]> dataWriter) {
