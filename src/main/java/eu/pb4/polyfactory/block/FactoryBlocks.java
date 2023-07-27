@@ -18,6 +18,7 @@ import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.multiblock.MultiBlock;
 import eu.pb4.polyfactory.block.other.ContainerBlock;
 import eu.pb4.polyfactory.block.other.GreenScreenBlock;
+import eu.pb4.polyfactory.block.other.SelectivePassthroughBlock;
 import eu.pb4.polyfactory.block.other.NixieTubeBlock;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.minecraft.block.AbstractBlock;
@@ -36,6 +37,7 @@ public class FactoryBlocks {
     public static final FunnelBlock FUNNEL = register("funnel", new FunnelBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final SplitterBlock SPLITTER = register("splitter", new SplitterBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final FanBlock FAN = register("fan", new FanBlock(Block.Settings.create().nonOpaque().hardness(1)));
+    public static final SelectivePassthroughBlock METAL_GRID = register("metal_grid", new SelectivePassthroughBlock(Block.Settings.create().nonOpaque().hardness(1)));
     public static final CablePlateBlock CABLE_PLATE = register("cable_plate", new CablePlateBlock(Block.Settings.create().hardness(1)));
     public static final HandCrankBlock HAND_CRANK = register("hand_crank", new HandCrankBlock(Block.Settings.create().hardness(1).nonOpaque()));
     public static final SteamEngineBlock STEAM_ENGINE = register("steam_engine", new SteamEngineBlock(Block.Settings.create().hardness(1).nonOpaque()));

@@ -1,12 +1,9 @@
 package eu.pb4.polyfactory.datagen;
 
-import com.google.common.collect.Sets;
 import com.google.common.hash.HashCode;
-import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.item.FactoryItemTags;
@@ -16,6 +13,7 @@ import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
+import eu.pb4.polyfactory.util.FactoryEntityTags;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -31,6 +29,7 @@ import net.minecraft.data.server.recipe.CookingRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -40,15 +39,14 @@ import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -62,6 +60,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
 
         var blockTags = pack.addProvider(BlockTagsProvider::new);
         pack.addProvider((a, b) -> new ItemTagsProvider(a, b, blockTags));
+        pack.addProvider(EntityTagsProvider::new);
         pack.addProvider(LootTables::new);
         pack.addProvider(Recipes::new);
         pack.addProvider(AssetProvider::new);
@@ -119,10 +118,26 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .add(Blocks.COMPOSTER)
             ;
 
+            this.getOrCreateTagBuilder(FactoryBlockTags.SPLITTER_SIDE_OUTPUT)
+                    .addOptionalTag(FactoryBlockTags.CONVEYOR_SIDE_OUTPUT)
+                    .addOptionalTag(FactoryBlockTags.CONVEYORS);
+
+            this.getOrCreateTagBuilder(FactoryBlockTags.WIND_PASSTHROUGH)
+                    .addOptionalTag(BlockTags.TRAPDOORS)
+                    .addOptionalTag(BlockTags.FENCES)
+                    .addOptionalTag(BlockTags.FENCE_GATES)
+                    .addOptionalTag(BlockTags.BANNERS)
+                    .addOptionalTag(BlockTags.ALL_SIGNS)
+                    .add(FactoryBlocks.NIXIE_TUBE)
+                    .add(FactoryBlocks.HAND_CRANK)
+                    .add(FactoryBlocks.METAL_GRID)
+            ;
+
             this.getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE)
                     .addOptionalTag(FactoryBlockTags.CONVEYORS)
                     .add(FactoryBlocks.FAN, FactoryBlocks.NIXIE_TUBE, FactoryBlocks.PRESS, FactoryBlocks.FUNNEL, FactoryBlocks.GRINDER, FactoryBlocks.MINER, FactoryBlocks.SPLITTER)
                     .add(FactoryBlocks.MIXER)
+                    .add(FactoryBlocks.STEAM_ENGINE)
             ;
 
             this.getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)
@@ -148,6 +163,24 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             ;
 
             this.copy(FactoryBlockTags.STRIPPED_LOGS, FactoryItemTags.STRIPPED_LOGS);
+        }
+    }
+
+    static class EntityTagsProvider extends FabricTagProvider.EntityTypeTagProvider {
+        public EntityTagsProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> completableFuture) {
+            super(output, completableFuture);
+        }
+
+        @Override
+        protected void configure(RegistryWrapper.WrapperLookup arg) {
+            this.getOrCreateTagBuilder(FactoryEntityTags.GRID_PASSABLE)
+                    .addOptionalTag(EntityTypeTags.ARROWS)
+                    .addOptionalTag(EntityTypeTags.IMPACT_PROJECTILES)
+                    .add(EntityType.ITEM)
+                    .add(EntityType.EXPERIENCE_ORB)
+                    .add(EntityType.EXPERIENCE_BOTTLE)
+                    .add(EntityType.POTION)
+            ;
         }
     }
 

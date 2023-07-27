@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "#polyfactory:conveyor/side_output",
+      "required": false
+    },
+    {
+      "id": "#polyfactory:conveyors",
+      "required": false
+    }
+  ]
+}

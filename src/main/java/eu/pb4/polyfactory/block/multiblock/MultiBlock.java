@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -32,7 +33,7 @@ public class MultiBlock extends Block implements PolymerBlock {
     private final int centerBlockZ;
 
     public MultiBlock(int x, int y, int z, Settings settings) {
-        this(x - 1, y - 1, z - 1, hackPass(x - 1, y - 1, z - 1), settings);
+        this(x - 1, y - 1, z - 1, hackPass(x - 1, y - 1, z - 1), settings.pistonBehavior(PistonBehavior.BLOCK));
     }
 
     private MultiBlock(int x, int y, int z, IntProperty[] hackPass, Settings settings) {

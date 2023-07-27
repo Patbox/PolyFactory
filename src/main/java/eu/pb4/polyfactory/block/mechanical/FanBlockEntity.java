@@ -1,6 +1,9 @@
 package eu.pb4.polyfactory.block.mechanical;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.FactoryBlockTags;
+import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.util.FactoryEntityTags;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -34,8 +37,10 @@ public class FanBlockEntity extends BlockEntity {
         var mut = pos.mutableCopy().move(dir);
         int length = 0;
 
-        while (!world.getBlockState(mut).isSideSolidFullSquare(world, mut, dir) && length < 32) {
+        var testState = world.getBlockState(mut);
+        while ((!testState.isSideSolidFullSquare(world, mut, dir) || testState.isIn(FactoryBlockTags.WIND_PASSTHROUGH)) && length < 32) {
             mut.move(dir);
+            testState = world.getBlockState(mut);
             length++;
         }
         if (length == 0) {

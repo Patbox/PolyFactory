@@ -38,6 +38,7 @@ public class FactoryItems {
     public static final Item CONTAINER_BLOCK = register("wooden_container", new ModeledBlockItem(FactoryBlocks.CONTAINER, new Item.Settings()));
     public static final Item NIXIE_TUBE = register("nixie_tube", new ModeledBlockItem(FactoryBlocks.NIXIE_TUBE, new Item.Settings()));
     public static final Item WINDMILL_SAIL = register("windmill_sail", new WindmillSailItem(new Item.Settings()));
+    public static final Item METAL_GRID_BLOCK = register("metal_grid", new ModeledBlockItem(FactoryBlocks.METAL_GRID, new Item.Settings()));
 
     public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
     public static final Item STEEL_INGOT = register("steel_ingot", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
@@ -66,6 +67,7 @@ public class FactoryItems {
                     entries.add(CONVEYOR_BLOCK);
                     entries.add(STICKY_CONVEYOR_BLOCK);
                     entries.add(FAN_BLOCK);
+                    entries.add(METAL_GRID_BLOCK);
                     entries.add(FUNNEL_BLOCK);
                     entries.add(SPLITTER_BLOCK);
                     entries.add(CONTAINER_BLOCK);

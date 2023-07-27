@@ -1,11 +1,8 @@
 package eu.pb4.polyfactory.models;
 
-import eu.pb4.polyfactory.util.DebugData;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -22,8 +19,8 @@ public class FastItemDisplayElement extends LodItemDisplayElement {
     private final ObjectOpenCustomHashSet<ServerPlayNetworkHandler> fastPlayers = new ObjectOpenCustomHashSet<>(Util.identityHashStrategy());
     private ItemStack fastItemStack = ItemStack.EMPTY;
     private int fastItemDistance = Integer.MAX_VALUE;
-    private Packet<ClientPlayPacketListener> fastPacket = new PlayPingS2CPacket(0);
-    private Packet<ClientPlayPacketListener> slowPacket = new PlayPingS2CPacket(0);
+    private Packet<ClientPlayPacketListener> fastPacket;
+    private Packet<ClientPlayPacketListener> slowPacket;
 
     public FastItemDisplayElement(ItemStack stack) {
         super();
@@ -52,32 +49,36 @@ public class FastItemDisplayElement extends LodItemDisplayElement {
     protected void sendChangedTrackerEntries(ServerPlayerEntity player, Consumer<Packet<ClientPlayPacketListener>> packetConsumer) {
         super.sendChangedTrackerEntries(player, packetConsumer);
 
-        var d = this.getSquaredDistance(player.networkHandler);
-        if (d > this.fastItemDistance) {
-            packetConsumer.accept(this.fastPacket);
+        if (isEnabled) {
+            var d = this.getSquaredDistance(player.networkHandler);
+            if (d > this.fastItemDistance) {
+                packetConsumer.accept(this.fastPacket);
+            }
         }
-    }
-
-    @Override
-    protected void sendTrackerUpdates() {
-        super.sendTrackerUpdates();
     }
 
     @Override
     public void tick() {
         super.tick();
-        for (var player : this.getHolder().getWatchingPlayers()) {
-            var d = this.getSquaredDistance(player);
+        if (isEnabled) {
+            for (var player : this.getHolder().getWatchingPlayers()) {
+                var d = this.getSquaredDistance(player);
 
-            if (d > this.fastItemDistance) {
-                if (this.fastPlayers.add(player)) {
-                    player.sendPacket(this.fastPacket);
-                }
-            } else {
-                if (this.fastPlayers.remove(player)) {
-                    player.sendPacket(this.slowPacket);
+                if (d > this.fastItemDistance) {
+                    if (this.fastPlayers.add(player)) {
+                        player.sendPacket(this.fastPacket);
+                    }
+                } else {
+                    if (this.fastPlayers.remove(player)) {
+                        player.sendPacket(this.slowPacket);
+                    }
                 }
             }
+        } else {
+            for (var player : this.fastPlayers) {
+                player.sendPacket(this.slowPacket);
+            }
+            this.fastPlayers.clear();
         }
     }
 }

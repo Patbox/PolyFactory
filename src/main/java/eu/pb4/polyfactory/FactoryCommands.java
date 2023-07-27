@@ -5,10 +5,9 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.DebugData;
-import eu.pb4.polymer.virtualentity.impl.HolderAttachmentHolder;
 import eu.pb4.polymer.virtualentity.impl.HolderHolder;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
@@ -38,8 +37,20 @@ public class FactoryCommands {
                                 .executes(FactoryCommands::printPacketInfo)
                         )
                         .then(literal("list_models").executes(FactoryCommands::listModels))
+                        .then(literal("enable_lod")
+                                .then(argument("enable", BoolArgumentType.bool())
+                                        .executes(FactoryCommands::enableLod)
+                                )
+                        )
                 )
         );
+    }
+
+    private static int enableLod(CommandContext<ServerCommandSource> context) {
+        LodItemDisplayElement.isEnabled = BoolArgumentType.getBool(context, "enable");;
+        LodItemDisplayElement.isDisabled = !LodItemDisplayElement.isEnabled;
+        context.getSource().sendFeedback(() -> Text.literal("Model LOD: " + LodItemDisplayElement.isEnabled), false);
+        return 0;
     }
 
     private static int listModels(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
@@ -69,7 +80,7 @@ public class FactoryCommands {
     }
 
     private static int togglePacketDebug(CommandContext<ServerCommandSource> context) {
-        DebugData.enabled = !DebugData.enabled;
+        DebugData.enabled = BoolArgumentType.getBool(context, "enable");
         context.getSource().sendFeedback(() -> Text.literal("Packet debug: " + DebugData.enabled), false);
         return 0;
     }

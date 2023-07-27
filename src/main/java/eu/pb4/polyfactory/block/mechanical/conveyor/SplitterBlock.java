@@ -71,14 +71,14 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
                 return false;
             }
 
-            var x = FactoryUtil.tryInsertingMovable(conveyor, self.getWorld(),
-                    conveyorPos.offset(direction), direction, direction, FactoryBlockTags.CONVEYOR_SIDE_OUTPUT);
+            var x = FactoryUtil.tryInsertingMovable(conveyor, self.getWorld(), conveyorPos,
+                    conveyorPos.offset(direction), direction, direction, FactoryBlockTags.SPLITTER_SIDE_OUTPUT);
 
             if (x != FactoryUtil.MovableResult.FAILURE) {
                 return true;
             }
 
-            x = FactoryUtil.tryInsertingMovable(conveyor, self.getWorld(), conveyorPos.offset(direction).down(), direction, direction, FactoryBlockTags.CONVEYOR_SIDE_OUTPUT);
+            x = FactoryUtil.tryInsertingMovable(conveyor, self.getWorld(), conveyorPos, conveyorPos.offset(direction).up(), direction, direction, FactoryBlockTags.SPLITTER_SIDE_OUTPUT);
             if (x != FactoryUtil.MovableResult.FAILURE) {
                 return true;
             }

@@ -279,13 +279,17 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
 
         var upState = ctx.getWorld().getBlockState(ctx.getBlockPos().up());
 
-        if (upState.isOf(this) && upState.get(VERTICAL).value != 0) {
-            var vert = state.get(VERTICAL);
-            state = state.with(VERTICAL, switch (vert) {
-                case POSITIVE -> DirectionValue.POSITIVE_STACK;
-                case NEGATIVE -> DirectionValue.NEGATIVE_STACK;
-                default -> vert;
-            });
+        if (upState.isOf(this) && upState.get(DIRECTION) == direction) {
+            if (upState.get(VERTICAL).value != 0) {
+                var vert = state.get(VERTICAL);
+                state = state.with(VERTICAL, switch (vert) {
+                    case POSITIVE, POSITIVE_STACK -> DirectionValue.POSITIVE_STACK;
+                    case NEGATIVE, NEGATIVE_STACK -> DirectionValue.NEGATIVE_STACK;
+                    default -> vert;
+                });
+            } else if (ctx.getSide() == Direction.DOWN) {
+                state = state.with(VERTICAL, DirectionValue.NEGATIVE_STACK);
+            }
         }
 
         var bottom = ctx.getWorld().getBlockState(ctx.getBlockPos().down());

@@ -12,6 +12,7 @@
     "polyfactory:grinder",
     "polyfactory:miner",
     "polyfactory:splitter",
-    "polyfactory:mixer"
+    "polyfactory:mixer",
+    "polyfactory:steam_engine"
   ]
 }

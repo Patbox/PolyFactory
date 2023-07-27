@@ -64,19 +64,19 @@ public class FactoryUtil {
         }
     }
 
-    public static MovableResult tryInsertingMovable(ContainerHolder conveyor, World world, BlockPos pos, Direction dir, Direction selfDir, @Nullable TagKey<Block> requiredTag) {
+    public static MovableResult tryInsertingMovable(ContainerHolder conveyor, World world, BlockPos conveyorPos, BlockPos targetPos, Direction dir, Direction selfDir, @Nullable TagKey<Block> requiredTag) {
         var holdStack = conveyor.getContainer();
         if (holdStack == null || holdStack.get().isEmpty()) {
             return MovableResult.FAILURE;
         }
 
-        var pointer = new CachedBlockPointer(world, pos);
+        var pointer = new CachedBlockPointer(world, targetPos);
         if (requiredTag != null && !pointer.getBlockState().isIn(requiredTag)) {
             return MovableResult.FAILURE;
         }
 
         if (pointer.getBlockState().getBlock() instanceof MovingItemConsumer conveyorInteracting) {
-            if (conveyorInteracting.pushItemTo(pointer, selfDir, dir, pos, conveyor)) {
+            if (conveyorInteracting.pushItemTo(pointer, selfDir, dir, conveyorPos, conveyor)) {
                 return MovableResult.SUCCESS_MOVABLE;
             }
         } else if (tryInserting(pointer.getWorld(), pointer.getPos(), holdStack.get(), dir) != -1) {

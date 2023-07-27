@@ -13,12 +13,13 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class LodItemDisplayElement extends ItemDisplayElement {
+    public static boolean isEnabled = true;
+    public static boolean isDisabled = false;
     public final DataTrackerLike nearTracker = new SimpleDataTracker(this.getEntityType());
     public final DataTrackerLike mediumTracker = new SimpleDataTracker(this.getEntityType());
     private int updateTick = 0;
@@ -113,39 +114,54 @@ public class LodItemDisplayElement extends ItemDisplayElement {
     @Override
     protected void sendTrackerUpdates() {
         Packet<ClientPlayPacketListener> nearPacket = null;
-        Packet<ClientPlayPacketListener> mediumPacket = null;
-        if (this.nearTracker.isDirty()) {
-            nearPacket = new EntityTrackerUpdateS2CPacket(this.getEntityId(), this.nearTracker.getDirtyEntries());
-        }
+        if (isDisabled) {
+            if (this.nearTracker.isDirty()) {
+                nearPacket = new EntityTrackerUpdateS2CPacket(this.getEntityId(), this.nearTracker.getDirtyEntries());
+            } else {
+                return;
+            }
 
-        if (this.mediumTracker.isDirty() && (updateTick++) % 10 == 0) {
-            mediumPacket = new EntityTrackerUpdateS2CPacket(this.getEntityId(), this.mediumTracker.getDirtyEntries());
-        }
+            for (var player : this.getHolder().getWatchingPlayers()) {
+                player.sendPacket(nearPacket);
+            }
 
-        if (nearPacket == null && mediumPacket == null) {
-            return;
-        }
+            DebugData.addPacketCall(this.getHolder());
+            DebugData.addPacketCall(nearPacket);
+        } else {
+            Packet<ClientPlayPacketListener> mediumPacket = null;
+            if (this.nearTracker.isDirty()) {
+                nearPacket = new EntityTrackerUpdateS2CPacket(this.getEntityId(), this.nearTracker.getDirtyEntries());
+            }
 
-        boolean sendOnce = false;
+            if (this.mediumTracker.isDirty() && (updateTick++) % 10 == 0) {
+                mediumPacket = new EntityTrackerUpdateS2CPacket(this.getEntityId(), this.mediumTracker.getDirtyEntries());
+            }
 
-        for (var player : this.getHolder().getWatchingPlayers()) {
-            var d = this.getSquaredDistance(player);
-            if (d < this.nearDistanceSquared) {
-                if (nearPacket != null) {
-                    player.sendPacket(nearPacket);
-                    sendOnce = true;
-                }
-            } else if (d < this.farDistanceSquared) {
-                if (mediumPacket != null) {
-                    player.sendPacket(mediumPacket);
-                    sendOnce = true;
+            if (nearPacket == null && mediumPacket == null) {
+                return;
+            }
+
+            boolean sendOnce = false;
+
+            for (var player : this.getHolder().getWatchingPlayers()) {
+                var d = this.getSquaredDistance(player);
+                if (d < this.nearDistanceSquared) {
+                    if (nearPacket != null) {
+                        player.sendPacket(nearPacket);
+                        sendOnce = true;
+                    }
+                } else if (d < this.farDistanceSquared) {
+                    if (mediumPacket != null) {
+                        player.sendPacket(mediumPacket);
+                        sendOnce = true;
+                    }
                 }
             }
-        }
 
-        if (sendOnce) {
-            DebugData.addPacketCall(this.getHolder());
-            DebugData.addPacketCall(nearPacket != null ? nearPacket : mediumPacket);
+            if (sendOnce) {
+                DebugData.addPacketCall(this.getHolder());
+                DebugData.addPacketCall(nearPacket != null ? nearPacket : mediumPacket);
+            }
         }
     }
 

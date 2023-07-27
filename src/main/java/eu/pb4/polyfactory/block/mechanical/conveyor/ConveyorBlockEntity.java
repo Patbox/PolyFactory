@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
+import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.util.CachedBlockPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -168,6 +169,11 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
         }
         var nextState = nextConveyor.getCachedState();
 
+        var nextVert = nextState.get(ConveyorBlock.VERTICAL);
+        if (nextState.get(ConveyorBlock.VERTICAL).stack && !nextState.isOf(FactoryBlocks.STICKY_CONVEYOR)) {
+            return nextVert.value == 1;
+        }
+
         var nextDir = nextState.get(ConveyorBlock.DIRECTION);
         if (nextDir == dir) {
             nextConveyor.setDelta(0);
@@ -186,7 +192,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
     }
 
     private boolean tryInserting(World world, BlockPos pos, Direction dir, TagKey<Block> requiredTag) {
-        var x = FactoryUtil.tryInsertingMovable(this, world, pos, dir, this.getCachedState().get(ConveyorBlock.DIRECTION), requiredTag);
+        var x = FactoryUtil.tryInsertingMovable(this, world, this.getPos(), pos, dir, this.getCachedState().get(ConveyorBlock.DIRECTION), requiredTag);
 
         if (x == FactoryUtil.MovableResult.SUCCESS_REGULAR) {
             this.clearContainer();

@@ -136,14 +136,11 @@ public class SteamEngineBlockEntity extends BlockEntity implements MinimalSidedI
     private class Gui extends SimpleGui {
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X2, player, false);
-            this.setTitle(SteamEngineBlockEntity.this.getCachedState().getBlock().getName());
+            this.setTitle(GuiTextures.STEAM_ENGINE.apply(SteamEngineBlockEntity.this.getCachedState().getBlock().getName()));
             this.setSlotRedirect(9 + 3, new FuelSlot(SteamEngineBlockEntity.this, 0, 0, 0));
             this.setSlotRedirect(9 + 4, new FuelSlot(SteamEngineBlockEntity.this, 1, 1, 0));
             this.setSlotRedirect(9 + 5, new FuelSlot(SteamEngineBlockEntity.this, 2, 2, 0));
             this.setSlot(4, GuiTextures.FLAME.get(progress()));
-            while (this.getFirstEmptySlot() != -1) {
-                this.addSlot(Items.WHITE_STAINED_GLASS_PANE.getDefaultStack());
-            }
             this.open();
         }
 

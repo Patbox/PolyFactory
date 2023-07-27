@@ -11,6 +11,7 @@ public class GuiTextures {
     public static final Function<Text, Text> GRINDER = background("grinder");
     public static final Function<Text, Text> PRESS = background("press");
     public static final Function<Text, Text> MIXER = background("mixer");
+    public static final Function<Text, Text> STEAM_ENGINE = background("steam_engine");
     public static final Function<Text, Text> CENTER_SLOT_GENERIC = background("center_slot");
     public static final GuiElement EMPTY = icon16("empty").get().build();
     public static final Progress FLAME = Progress.createVertical("flame", 1, 14, true);
