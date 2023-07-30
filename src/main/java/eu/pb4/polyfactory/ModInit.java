@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
 import eu.pb4.polyfactory.models.ConveyorModel;
 import eu.pb4.polyfactory.models.GenericParts;
+import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.ui.GuiTextures;
@@ -26,7 +27,8 @@ public class ModInit implements ModInitializer {
 	public static final String ID = "polyfactory";
 	public static final Logger LOGGER = LoggerFactory.getLogger("PolyFactory");
     public static final boolean DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
-    public static final boolean DYNAMIC_ASSETS = false;
+    @SuppressWarnings("PointlessBooleanExpression")
+	public static final boolean DYNAMIC_ASSETS = true && DEV;
 
     public static Identifier id(String path) {
 		return new Identifier(ID, path);
@@ -57,6 +59,7 @@ public class ModInit implements ModInitializer {
 		VirtualDestroyStage.setup();
 		UiResourceCreator.setup();
 		GuiTextures.register();
+		PolydexCompat.register();
 		PolymerResourcePackUtils.addModAssets(ID);
 		PolymerResourcePackUtils.markAsRequired();
 	}

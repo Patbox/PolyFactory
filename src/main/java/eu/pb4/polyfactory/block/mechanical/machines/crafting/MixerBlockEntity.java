@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
@@ -79,12 +80,14 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     protected void writeNbt(NbtCompound nbt) {
         this.writeInventoryNbt(nbt);
         nbt.putDouble("Progress", this.process);
+        super.writeNbt(nbt);
     }
 
     @Override
     public void readNbt(NbtCompound nbt) {
         this.readInventoryNbt(nbt);
         this.process = nbt.getDouble("Progress");
+        super.readNbt(nbt);
     }
 
     @Override
@@ -103,7 +106,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         return slot >= OUTPUT_FIRST;
     }
 
-    public void openGui(ServerPlayerEntity player) {
+    public void createGui(ServerPlayerEntity player) {
         new Gui(player);
     }
 
@@ -286,6 +289,8 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X3, player, false);
             this.setTitle(GuiTextures.MIXER.apply(MixerBlockEntity.this.getCachedState().getBlock().getName()));
+            this.setSlot(9, PolydexCompat.getButton(FactoryRecipeTypes.MIXER));
+
             this.setSlotRedirect(2, new Slot(MixerBlockEntity.this, 0, 0, 0));
             this.setSlotRedirect(3, new Slot(MixerBlockEntity.this, 1, 1, 0));
             this.setSlotRedirect(2 + 9, new Slot(MixerBlockEntity.this, 2, 2, 0));

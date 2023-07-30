@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.PressRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
@@ -161,12 +162,14 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
     protected void writeNbt(NbtCompound nbt) {
         this.writeInventoryNbt(nbt);
         nbt.putDouble("Progress", this.process);
+        super.writeNbt(nbt);
     }
 
     @Override
     public void readNbt(NbtCompound nbt) {
         this.readInventoryNbt(nbt);
         this.process = nbt.getDouble("Progress");
+        super.readNbt(nbt);
     }
 
     @Override
@@ -195,7 +198,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
         return (slot == INPUT_SLOT && facing == dir) || (slot != INPUT_SLOT && facing.getOpposite() == dir);
     }
 
-    public void openGui(ServerPlayerEntity player) {
+    public void createGui(ServerPlayerEntity player) {
         new Gui(player);
     }
 
@@ -223,6 +226,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X3, player, false);
             this.setTitle(GuiTextures.PRESS.apply(PressBlockEntity.this.getCachedState().getBlock().getName()));
+            this.setSlot(9, PolydexCompat.getButton(FactoryRecipeTypes.PRESS));
             this.setSlotRedirect(3, new Slot(PressBlockEntity.this, INPUT_SLOT, 0, 0));
             this.setSlotRedirect(5, new Slot(PressBlockEntity.this, INPUT_2_SLOT, 0, 0));
             this.setSlot(13, GuiTextures.PROGRESS_VERTICAL.get(progress()));

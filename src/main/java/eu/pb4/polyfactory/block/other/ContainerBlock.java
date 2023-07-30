@@ -55,21 +55,23 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be && hand == Hand.MAIN_HAND && hit.getSide() == state.get(FACING)) {
-            var stack = player.getStackInHand(hand);
-
-            if (stack.isEmpty()) {
-                return ActionResult.FAIL;
-            } else {
-                var count = player.isSneaking() ? stack.getCount() : 1;
-                if (be.getItemStack().isEmpty()) {
-                    be.setItemStack(stack);
-                    stack.decrement(be.addItems(count));
-                } else if (be.matches(stack)) {
-                    stack.decrement(be.addItems(count));
-                }
+            if (be.checkUnlocked(player)) {
+                var stack = player.getStackInHand(hand);
 
                 if (stack.isEmpty()) {
-                    player.setStackInHand(hand, ItemStack.EMPTY);
+                    return ActionResult.FAIL;
+                } else {
+                    var count = player.isSneaking() ? stack.getCount() : 1;
+                    if (be.getItemStack().isEmpty()) {
+                        be.setItemStack(stack);
+                        stack.decrement(be.addItems(count));
+                    } else if (be.matches(stack)) {
+                        stack.decrement(be.addItems(count));
+                    }
+
+                    if (stack.isEmpty()) {
+                        player.setStackInHand(hand, ItemStack.EMPTY);
+                    }
                 }
             }
             return ActionResult.SUCCESS;
@@ -80,14 +82,15 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
 
     @Override
     public ActionResult onPlayerAttack(BlockState state, PlayerEntity player, World world, BlockPos pos, Direction direction) {
-        if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be && direction == state.get(FACING)) {
-            if (!be.isEmpty()) {
-                var stack = be.extract( player.isSneaking() ? be.getItemStack().getMaxCount() : 1);
-                player.getInventory().offerOrDrop(stack);
-            } else {
-                be.setItemStack(ItemStack.EMPTY);
-            }
-
+        if (direction == state.get(FACING)) {
+            if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be && be.checkUnlocked(player)) {
+                if (!be.isEmpty()) {
+                    var stack = be.extract(player.isSneaking() ? be.getItemStack().getMaxCount() : 1);
+                    player.getInventory().offerOrDrop(stack);
+                } else {
+                    be.setItemStack(ItemStack.EMPTY);
+                }
+             }
             return ActionResult.SUCCESS;
         }
 

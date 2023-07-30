@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import eu.pb4.common.protection.api.CommonProtection;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.block.other.LockableBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -15,6 +16,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.OperatorBlock;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.LockableContainerBlockEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.StackReference;
@@ -22,10 +25,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.registry.Registries;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -34,7 +39,7 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class MinerBlockEntity extends BlockEntity implements SingleStackInventory, SidedInventory {
+public class MinerBlockEntity extends LockableBlockEntity implements SingleStackInventory, SidedInventory {
     private ItemStack currentTool = ItemStack.EMPTY;
     private BlockState targetState = Blocks.AIR.getDefaultState();
     protected GameProfile owner = null;
@@ -55,6 +60,7 @@ public class MinerBlockEntity extends BlockEntity implements SingleStackInventor
         if (this.owner != null) {
             nbt.put("Owner", NbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
+        super.writeNbt(nbt);
     }
 
     @Override
@@ -65,6 +71,7 @@ public class MinerBlockEntity extends BlockEntity implements SingleStackInventor
             this.owner = NbtHelper.toGameProfile(nbt.getCompound("Owner"));
         }
         this.targetState = NbtHelper.toBlockState(Registries.BLOCK.getReadOnlyWrapper(), nbt.getCompound("BlockState"));
+        super.readNbt(nbt);
     }
 
     @Override
@@ -103,7 +110,8 @@ public class MinerBlockEntity extends BlockEntity implements SingleStackInventor
         return this.currentTool.isEmpty() && stack.isIn(FactoryItemTags.ALLOWED_IN_MINER);
     }
 
-    public void openGui(ServerPlayerEntity player) {
+    @Override
+    protected void createGui(ServerPlayerEntity playerEntity) {
         new Gui(player);
     }
 

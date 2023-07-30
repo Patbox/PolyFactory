@@ -1,9 +1,11 @@
 package eu.pb4.polyfactory.ui;
 
 import eu.pb4.sgui.api.elements.GuiElement;
+import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.minecraft.text.Text;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static eu.pb4.polyfactory.ui.UiResourceCreator.*;
 
@@ -14,6 +16,7 @@ public class GuiTextures {
     public static final Function<Text, Text> STEAM_ENGINE = background("steam_engine");
     public static final Function<Text, Text> CENTER_SLOT_GENERIC = background("center_slot");
     public static final GuiElement EMPTY = icon16("empty").get().build();
+    public static final Supplier<GuiElementBuilder> POLYDEX_BUTTON = icon32("polydex");
     public static final Progress FLAME = Progress.createVertical("flame", 1, 14, true);
     public static final Progress FLAME_OFFSET_RIGHT = Progress.createVertical32Right("flame_offset_right", 9, 22, true);
     public static final Progress PROGRESS_VERTICAL = Progress.createVertical("progress_vertical", 0, 15, false);

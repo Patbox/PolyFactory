@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.source;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.other.LockableBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.ui.FuelSlot;
@@ -20,6 +21,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceFuelSlot;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
@@ -35,7 +37,7 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class SteamEngineBlockEntity extends BlockEntity implements MinimalSidedInventory {
+public class SteamEngineBlockEntity extends LockableBlockEntity implements MinimalSidedInventory {
     private static final int[] SLOTS = new int[]{0, 1, 2};
     public float state = 0;
     public int fuelTicks = 0;
@@ -57,6 +59,16 @@ public class SteamEngineBlockEntity extends BlockEntity implements MinimalSidedI
                 world.setBlockState(pos, state.with(SteamEngineBlock.LIT, true));
             }
             self.markDirty();
+            if ((world.getTime() + pos.getX() * 3L + pos.getY() * 7L + pos.getZ() * 5L) % MathHelper.clamp(Math.round(2 / self.state), 4, 8) == 0) {
+                var facing = state.get(SteamEngineBlock.FACING);
+                var a = new Vec3d(
+                        pos.getX() + 0.5 + (facing.getAxis() == Direction.Axis.Z ? 0.5f : 0),
+                        pos.getY() + 1,
+                        pos.getZ() + 0.5 + (facing.getAxis() == Direction.Axis.X ? 0.5f : 0)
+                );
+
+                ((ServerWorld) world).spawnParticles(ParticleTypes.CLOUD, a.x + world.random.nextFloat() - 0.5, a.y + world.random.nextFloat() - 0.5, a.z + world.random.nextFloat() - 0.5, 0, 0, 1, 0, 0.1);
+            }
         } else {
             for (int i = 0; i < 3; i++) {
                 var stack = self.getStack(i);
@@ -93,6 +105,7 @@ public class SteamEngineBlockEntity extends BlockEntity implements MinimalSidedI
         nbt.putInt("FuelTicks", this.fuelTicks);
         nbt.putInt("FuelInitial", this.fuelInitial);
         nbt.putFloat("State", this.state);
+        super.writeNbt(nbt);
     }
 
     @Override
@@ -101,6 +114,7 @@ public class SteamEngineBlockEntity extends BlockEntity implements MinimalSidedI
         this.fuelInitial = nbt.getInt("FuelInitial");
         this.fuelTicks = nbt.getInt("FuelTicks");
         this.state = nbt.getFloat("State");
+        super.readNbt(nbt);
     }
 
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {
@@ -129,7 +143,7 @@ public class SteamEngineBlockEntity extends BlockEntity implements MinimalSidedI
         return false;
     }
 
-    public void openGui(ServerPlayerEntity player) {
+    public void createGui(ServerPlayerEntity player) {
         new Gui(player);
     }
 

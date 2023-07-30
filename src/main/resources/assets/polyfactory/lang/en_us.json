@@ -24,5 +24,9 @@
   "item.polyfactory.steel_alloy_mixture": "Steel Alloy Mixture",
   "item.polyfactory.steel_ingot": "Steel Ingot",
   "item.polyfactory.steel_plate": "Steel Plate",
-  "item.polyfactory.steel_cog": "Steel Cog"
+  "item.polyfactory.steel_cog": "Steel Cog",
+  "text.polyfactory.recipes": "Recipes",
+  "recipe_type.polyfactory.press": "Press",
+  "recipe_type.polyfactory.mixer": "Mixer",
+  "recipe_type.polyfactory.grinding": "Grinder"
 }

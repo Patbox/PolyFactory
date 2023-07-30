@@ -3,6 +3,7 @@
   "minVersion": "0.8",
   "package": "eu.pb4.polyfactory.mixin",
   "compatibilityLevel": "JAVA_17",
+  "plugin": "eu.pb4.polyfactory.mixin.PolyFactoryMixinConfigPlugin",
   "mixins": [
     "BlockEntityMixin",
     "BlockEntityTypeAccessor",
@@ -14,7 +15,8 @@
     "RegistryOpsMixin",
     "ServerPlayerEntityMixin",
     "ServerPlayerInteractionManagerMixin",
-    "ServerPlayNetworkHandlerMixin"
+    "ServerPlayNetworkHandlerMixin",
+    "compat.htm_LockableBlockEntityMixin"
   ],
   "client": [
   ],

@@ -14,7 +14,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 
 @SuppressWarnings("UnstableApiUsage")
-public class ContainerBlockEntity extends BlockEntity {
+public class ContainerBlockEntity extends LockableBlockEntity {
     public ContainerBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.CONTAINER, pos, state);
     }
@@ -47,12 +47,14 @@ public class ContainerBlockEntity extends BlockEntity {
     @Override
     protected void writeNbt(NbtCompound nbt) {
         this.storage.writeNbt(nbt);
+        super.writeNbt(nbt);
     }
 
     @Override
     public void readNbt(NbtCompound nbt) {
         this.storage.readNbt(nbt);
         this.itemStack = this.storage.variant.toStack();
+        super.readNbt(nbt);
     }
 
     @Override

@@ -197,14 +197,14 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
             this.main.setOffset(offset);
             this.main.setDisplayWidth(3);
             offset = offset.add(0, 2, 0);
-            this.axle = LodItemDisplayElement.createSimple(AXLE, 4, 0.3f, 0.6f);
+            this.axle = LodItemDisplayElement.createSimple(AXLE, 4);
             this.axle.setOffset(offset);
             this.axle.setScale(new Vector3f(2));
             this.axle.setDisplayWidth(3);
-            this.rotatingA = LodItemDisplayElement.createSimple(LINK, 4, 0.3f, 0.5f);
+            this.rotatingA = LodItemDisplayElement.createSimple(LINK, 4);
             this.rotatingA.setOffset(offset);
             this.rotatingA.setDisplayWidth(3);
-            this.rotatingB = LodItemDisplayElement.createSimple(LINK, 4, 0.3f, 0.5f);
+            this.rotatingB = LodItemDisplayElement.createSimple(LINK, 4);
             this.rotatingB.setOffset(offset);
             this.rotatingB.setDisplayWidth(3);
 

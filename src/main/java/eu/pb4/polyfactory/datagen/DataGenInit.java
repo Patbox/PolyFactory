@@ -258,22 +258,22 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     GrindingRecipe.of("stone_to_cobblestone", Ingredient.ofItems(Items.STONE), 2, 5, 15, Items.COBBLESTONE),
                     GrindingRecipe.of("cobblestone_to_gravel", Ingredient.ofItems(Items.COBBLESTONE), 4, 6, 15, Items.GRAVEL),
                     GrindingRecipe.of("gravel_to_sand", Ingredient.ofItems(Items.GRAVEL), 4, 3, 15, Items.SAND),
-                    GrindingRecipe.of("planks_to_sticks", Ingredient.fromTag(ItemTags.PLANKS), 3, 10, GrindingRecipe.Output.of(Items.STICK, 0.4f, 6)),
+                    GrindingRecipe.of("planks_to_sticks", Ingredient.fromTag(ItemTags.PLANKS), 3, 10, OutputStack.of(Items.STICK, 0.4f, 6)),
 
                     GrindingRecipe.of("iron_ingot_to_nuggets", Ingredient.ofItems(Items.IRON_INGOT), 2, 5, 10, new ItemStack(Items.IRON_NUGGET, 9)),
                     GrindingRecipe.of("gold_ingot_to_nuggets", Ingredient.ofItems(Items.GOLD_INGOT), 1.8, 5, 10, new ItemStack(Items.GOLD_NUGGET, 9)),
 
                     GrindingRecipe.of("iron_ore_to_raw", Ingredient.fromTag(ItemTags.IRON_ORES), 6, 10, 30,
-                            GrindingRecipe.Output.of(Items.RAW_IRON, 1f, 1), GrindingRecipe.Output.of(Items.RAW_IRON, 0.6f, 5)
+                            OutputStack.of(Items.RAW_IRON, 1f, 1), OutputStack.of(Items.RAW_IRON, 0.6f, 5)
                     ),
                     GrindingRecipe.of("gold_ore_to_raw", Ingredient.fromTag(ItemTags.GOLD_ORES), 6, 10, 30,
-                            GrindingRecipe.Output.of(Items.RAW_GOLD, 1f, 1), GrindingRecipe.Output.of(Items.RAW_GOLD, 0.6f, 5)
+                            OutputStack.of(Items.RAW_GOLD, 1f, 1), OutputStack.of(Items.RAW_GOLD, 0.6f, 5)
                     ),
                     GrindingRecipe.of("copper_ore_to_raw", Ingredient.fromTag(ItemTags.COPPER_ORES), 6, 10, 30,
-                            GrindingRecipe.Output.of(Items.RAW_COPPER, 1f, 2), GrindingRecipe.Output.of(Items.RAW_COPPER, 0.6f, 20)
+                            OutputStack.of(Items.RAW_COPPER, 1f, 2), OutputStack.of(Items.RAW_COPPER, 0.6f, 20)
                     ),
-                    GrindingRecipe.of("bone_to_bone_meal", Ingredient.ofItems(Items.BONE), 1, 5, 10, GrindingRecipe.Output.of(Items.BONE_MEAL, 1, 3), GrindingRecipe.Output.of(Items.BONE_MEAL, 0.5f, 2)),
-                    GrindingRecipe.of("blaze_rod_to_powder", Ingredient.ofItems(Items.BLAZE_ROD), 2, 5, 10, GrindingRecipe.Output.of(Items.BLAZE_POWDER, 1, 2), GrindingRecipe.Output.of(Items.BLAZE_POWDER, 0.5f, 2)),
+                    GrindingRecipe.of("bone_to_bone_meal", Ingredient.ofItems(Items.BONE), 1, 5, 10, OutputStack.of(Items.BONE_MEAL, 1, 3), OutputStack.of(Items.BONE_MEAL, 0.5f, 2)),
+                    GrindingRecipe.of("blaze_rod_to_powder", Ingredient.ofItems(Items.BLAZE_ROD), 2, 5, 10, OutputStack.of(Items.BLAZE_POWDER, 1, 2), OutputStack.of(Items.BLAZE_POWDER, 0.5f, 2)),
                     GrindingRecipe.of("glowstone_to_powder", Ingredient.ofItems(Items.GLOWSTONE), 1, 5, 10, new ItemStack(Items.GLOWSTONE_DUST, 4)),
 
                     // Flower to Dye

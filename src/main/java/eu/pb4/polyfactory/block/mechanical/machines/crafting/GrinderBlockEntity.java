@@ -2,6 +2,8 @@ package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.block.other.LockableBlockEntity;
+import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
@@ -12,6 +14,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -22,6 +25,8 @@ import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -32,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
-public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInventory {
+public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSidedInventory {
     public static final int INPUT_SLOT = 0;
     private static final int[] INPUT_SLOTS = {INPUT_SLOT};
     private static final int[] OUTPUT_SLOTS = {1, 2, 3};
@@ -52,12 +57,14 @@ public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInven
     protected void writeNbt(NbtCompound nbt) {
         Inventories.writeNbt(nbt, stacks);
         nbt.putDouble("Progress", this.process);
+        super.writeNbt(nbt);
     }
 
     @Override
     public void readNbt(NbtCompound nbt) {
         Inventories.readNbt(nbt, this.stacks);
         this.process = nbt.getDouble("Progress");
+        super.readNbt(nbt);
     }
 
     @Override
@@ -82,7 +89,7 @@ public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInven
         return (slot == INPUT_SLOT && facing.getOpposite() == dir) || (slot != INPUT_SLOT && facing == dir);
     }
 
-    public void openGui(ServerPlayerEntity player) {
+    public void createGui(ServerPlayerEntity player) {
         new Gui(player);
     }
 
@@ -181,6 +188,11 @@ public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInven
                             pos.getX() + 0.5, pos.getY() + 1.15, pos.getZ() + 0.5, 0,
                             (Math.random() - 0.5) * 0.2, 0.02, (Math.random() - 0.5) * 0.2, 2);
                 }
+                /*if (world.getTime() % 10 == 0) {
+                    var sound = stack.getItem() instanceof BlockItem blockItem ? blockItem.getBlock().getSoundGroup(blockItem.getBlock().getDefaultState()).getHitSound() : SoundEvents.BLOCK_STONE_BREAK;
+                    world.playSound(null, pos, sound, SoundCategory.BLOCKS, 0.4f, 0.3f);
+                }*/
+
                 self.process += speed;
                 self.markDirty();
             }
@@ -198,6 +210,8 @@ public class GrinderBlockEntity extends BlockEntity implements MinimalSidedInven
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X3, player, false);
             this.setTitle(GuiTextures.GRINDER.apply(GrinderBlockEntity.this.getCachedState().getBlock().getName()));
+            this.setSlot(9, PolydexCompat.getButton(FactoryRecipeTypes.GRINDING));
+
             this.setSlotRedirect(4, new Slot(GrinderBlockEntity.this, 0, 0, 0));
             this.setSlot(13, GuiTextures.PROGRESS_VERTICAL.get(progress()));
             this.setSlotRedirect(21, new FurnaceOutputSlot(player, GrinderBlockEntity.this, 1, 1, 0));

@@ -1,0 +1,58 @@
+package eu.pb4.polyfactory.polydex.pages;
+
+import eu.pb4.polydex.api.v1.recipe.*;
+import eu.pb4.polydex.impl.PolydexImplUtils;
+import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
+import eu.pb4.polyfactory.recipe.PressRecipe;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+
+public class PressRecipePage extends AbstractRecipePolydexPage<PressRecipe> {
+    private static final ItemStack ICON = FactoryItems.PRESS_BLOCK.getDefaultStack();
+    private final List<PolydexIngredient<?>> ingredients;
+    private final PolydexStack<?>[] output;
+
+    public PressRecipePage(PressRecipe recipe) {
+        super(recipe);
+        this.ingredients = PolydexCompatImpl.createIngredients(this.recipe.inputA(), this.recipe.inputB());
+        this.output = PolydexCompatImpl.createOutput(this.recipe.output());
+    }
+
+    @Override
+    public boolean isOwner(MinecraftServer server, PolydexEntry entry) {
+        for (var i : this.output) {
+            if (entry.isPartOf(i)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public ItemStack entryIcon(@Nullable PolydexEntry entry, ServerPlayerEntity player) {
+        return this.recipe.output().get(0).stack();
+    }
+
+    @Override
+    public ItemStack typeIcon(ServerPlayerEntity player) {
+        return ICON;
+    }
+
+    @Override
+    public List<PolydexIngredient<?>> ingredients() {
+        return ingredients;
+    }
+
+    @Override
+    public void createPage(@Nullable PolydexEntry entry, ServerPlayerEntity player, PageBuilder layer) {
+        layer.setIngredient(2, 2, this.ingredients.get(0));
+        layer.setIngredient(4, 2, this.ingredients.get(1));
+        layer.setOutput(6, 2, this.output);
+    }
+}
