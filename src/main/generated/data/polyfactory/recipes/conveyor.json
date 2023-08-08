@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "c": {
+      "item": "minecraft:copper_ingot"
+    },
+    "s": {
+      "item": "minecraft:smooth_stone_slab"
+    },
+    "x": {
+      "item": "polyfactory:treated_dried_kelp"
+    }
+  },
+  "pattern": [
+    "xxx",
+    "csc",
+    "xxx"
+  ],
+  "result": {
+    "item": "polyfactory:conveyor"
+  },
+  "show_notification": true
+}

@@ -101,6 +101,20 @@ public class DataGenInit implements DataGeneratorEntrypoint {
 
         @Override
         protected void configure(RegistryWrapper.WrapperLookup arg) {
+            this.getOrCreateTagBuilder(FactoryBlockTags.STRIPPED_LOGS)
+                    .add(Blocks.STRIPPED_OAK_LOG)
+                    .add(Blocks.STRIPPED_BIRCH_LOG)
+                    .add(Blocks.STRIPPED_SPRUCE_LOG)
+                    .add(Blocks.STRIPPED_JUNGLE_LOG)
+                    .add(Blocks.STRIPPED_ACACIA_LOG)
+                    .add(Blocks.STRIPPED_DARK_OAK_LOG)
+                    .add(Blocks.STRIPPED_MANGROVE_LOG)
+                    .add(Blocks.STRIPPED_CHERRY_LOG)
+                    .add(Blocks.STRIPPED_CRIMSON_STEM)
+                    .add(Blocks.STRIPPED_WARPED_STEM)
+            ;
+
+
             this.getOrCreateTagBuilder(FactoryBlockTags.CONVEYORS)
                     .add(FactoryBlocks.CONVEYOR)
                     .add(FactoryBlocks.STICKY_CONVEYOR);
@@ -135,14 +149,22 @@ public class DataGenInit implements DataGeneratorEntrypoint {
 
             this.getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE)
                     .addOptionalTag(FactoryBlockTags.CONVEYORS)
-                    .add(FactoryBlocks.FAN, FactoryBlocks.NIXIE_TUBE, FactoryBlocks.PRESS, FactoryBlocks.FUNNEL, FactoryBlocks.GRINDER, FactoryBlocks.MINER, FactoryBlocks.SPLITTER)
+                    .add(FactoryBlocks.FAN,
+                            FactoryBlocks.NIXIE_TUBE,
+                            FactoryBlocks.PRESS,
+                            FactoryBlocks.FUNNEL,
+                            FactoryBlocks.GRINDER,
+                            FactoryBlocks.MINER,
+                            FactoryBlocks.SPLITTER)
                     .add(FactoryBlocks.MIXER)
                     .add(FactoryBlocks.STEAM_ENGINE)
+                    .add(FactoryBlocks.METAL_GRID)
             ;
 
             this.getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)
                     .add(FactoryBlocks.WINDMILL)
                     .add(FactoryBlocks.AXLE)
+                    .add(FactoryBlocks.HAND_CRANK)
                     .add(FactoryBlocks.GEARBOX)
                     .add(FactoryBlocks.CONTAINER)
                     .add(FactoryBlocks.FUNNEL)
@@ -201,12 +223,14 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             this.addDrop(FactoryBlocks.CONVEYOR);
             this.addDrop(FactoryBlocks.STICKY_CONVEYOR);
             this.addDrop(FactoryBlocks.MOTOR);
-            this.addDrop(FactoryBlocks.CABLE_PLATE);
             this.addDrop(FactoryBlocks.FUNNEL);
             this.addDrop(FactoryBlocks.AXLE);
             this.addDrop(FactoryBlocks.GEARBOX);
             this.addDrop(FactoryBlocks.CONTAINER);
             this.addDrop(FactoryBlocks.NIXIE_TUBE);
+            this.addDrop(FactoryBlocks.METAL_GRID);
+            this.addDrop(FactoryBlocks.MINER);
+            this.addDrop(FactoryBlocks.STEAM_ENGINE);
             this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE_BLOCK);
         }
     }
@@ -225,10 +249,84 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .criterion("get_iron", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
                     .offerTo(exporter);
 
+
             CookingRecipeJsonBuilder.createSmelting(
                             Ingredient.ofItems(FactoryItems.STEEL_ALLOY_MIXTURE), RecipeCategory.MISC, FactoryItems.STEEL_INGOT, 0.4f, 80)
                     .criterion("get_steel_mixture", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_ALLOY_MIXTURE))
                     .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.METAL_GRID_BLOCK, 1)
+                    .pattern(" w ")
+                    .pattern("www")
+                    .pattern(" w ")
+                    .input('w', Items.IRON_BARS)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.GRINDER_BLOCK, 1)
+                    .pattern(" s ")
+                    .pattern("wiw")
+                    .pattern("ppp")
+                    .input('i', Items.STONE_SLAB)
+                    .input('w', Items.SMOOTH_STONE_SLAB).input('s', FactoryItems.AXLE_BLOCK)
+                    .input('p', ItemTags.PLANKS)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                    .offerTo(exporter);
+
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.MINER_BLOCK, 1)
+                    .pattern(" i ")
+                    .pattern("wsw")
+                    .pattern("waw")
+                    .input('i', Items.IRON_INGOT).input('s', FactoryItems.STEEL_COG)
+                    .input('w', FactoryItems.STEEL_PLATE).input('a', FactoryItems.AXLE_BLOCK)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.FAN_BLOCK, 1)
+                    .pattern("iii")
+                    .pattern("wsw")
+                    .pattern("waw")
+                    .input('i', Items.IRON_BARS).input('s', Items.IRON_INGOT)
+                    .input('w', FactoryItems.STEEL_PLATE).input('a', FactoryItems.AXLE_BLOCK)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.FUNNEL_BLOCK, 1)
+                    .pattern("wp ")
+                    .pattern(" o ")
+                    .pattern("wp ")
+                    .input('p', FactoryItems.WOODEN_PLATE).input('o', ItemTags.WOOL)
+                    .input('w', FactoryItems.STEEL_PLATE)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.CONTAINER_BLOCK, 1)
+                    .pattern("www")
+                    .pattern("wsw")
+                    .pattern("www")
+                    .input('w', FactoryItems.WOODEN_PLATE).input('s', FactoryItems.STEEL_INGOT)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                    .offerTo(exporter);
+
+            ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.ITEM_FILTER)
+                    .input(FactoryItems.WOODEN_PLATE).input(Items.COBWEB)
+                    .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.WOODEN_PLATE))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.CONVEYOR_BLOCK, 1)
+                    .pattern("xxx")
+                    .pattern("scs")
+                    .pattern("xxx")
+                    .input('s', Items.SMOOTH_STONE_SLAB).input('c', Items.COPPER_INGOT).input('x', FactoryItems.TREATED_DRIED_KELP)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                    .offerTo(exporter);
+
+            ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STICKY_CONVEYOR_BLOCK)
+                    .input(FactoryItems.STICKY_CONVEYOR_BLOCK).input(Items.SLIME_BALL)
+                    .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.CONVEYOR_BLOCK))
+                    .offerTo(exporter);
+
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.AXLE_BLOCK, 12)
                     .pattern("www")

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "i": {
+      "item": "minecraft:iron_bars"
+    },
+    "s": {
+      "item": "polyfactory:steel_ingot"
+    },
+    "w": {
+      "item": "polyfactory:steel_plate"
+    }
+  },
+  "pattern": [
+    "iii",
+    "wsw",
+    "www"
+  ],
+  "result": {
+    "item": "polyfactory:fan"
+  },
+  "show_notification": true
+}

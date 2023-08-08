@@ -52,7 +52,7 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
         var self = (SteamEngineBlockEntity) t;
 
         if (self.fuelTicks > 0) {
-            self.fuelTicks--;
+            self.fuelTicks -= MathHelper.lerp(self.state, 40, 16);
             self.state = (float) Math.min(self.state + 0.005, 1);
 
             if (!state.get(SteamEngineBlock.LIT)) {
@@ -77,8 +77,8 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
                     var value = FuelRegistry.INSTANCE.get(stack.getItem());
                     if (value != null) {
                         stack.decrement(1);
-                        self.fuelTicks = value;
-                        self.fuelInitial = value;
+                        self.fuelTicks = value * 10;
+                        self.fuelInitial = self.fuelTicks;
                         if (self.isEmpty()) {
                             self.setStack(i, ItemStack.EMPTY);
                         }

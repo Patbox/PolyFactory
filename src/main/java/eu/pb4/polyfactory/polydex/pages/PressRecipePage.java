@@ -5,10 +5,12 @@ import eu.pb4.polydex.impl.PolydexImplUtils;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
+import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.polyfactory.recipe.PressRecipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -22,6 +24,11 @@ public class PressRecipePage extends AbstractRecipePolydexPage<PressRecipe> {
         super(recipe);
         this.ingredients = PolydexCompatImpl.createIngredients(this.recipe.inputA(), this.recipe.inputB());
         this.output = PolydexCompatImpl.createOutput(this.recipe.output());
+    }
+
+    @Override
+    public @Nullable Text texture(ServerPlayerEntity player) {
+        return PolydexTextures.PRESS;
     }
 
     @Override
@@ -51,8 +58,8 @@ public class PressRecipePage extends AbstractRecipePolydexPage<PressRecipe> {
 
     @Override
     public void createPage(@Nullable PolydexEntry entry, ServerPlayerEntity player, PageBuilder layer) {
-        layer.setIngredient(2, 2, this.ingredients.get(0));
-        layer.setIngredient(4, 2, this.ingredients.get(1));
-        layer.setOutput(6, 2, this.output);
+        layer.setIngredient(3, 1, this.ingredients.get(0));
+        layer.setIngredient(5, 1, this.ingredients.get(1));
+        layer.setOutput(4, 3, this.output);
     }
 }

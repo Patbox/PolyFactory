@@ -3,6 +3,7 @@
   "values": [
     "polyfactory:windmill",
     "polyfactory:axle",
+    "polyfactory:hand_crank",
     "polyfactory:gearbox",
     "polyfactory:wooden_container",
     "polyfactory:funnel"

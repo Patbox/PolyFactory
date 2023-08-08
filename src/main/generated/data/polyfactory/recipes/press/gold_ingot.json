@@ -7,12 +7,10 @@
     "count": 9
   },
   "minimum_speed": 8.0,
-  "output": [
-    {
-      "item": {
-        "Count": 1,
-        "id": "minecraft:gold_ingot"
-      }
+  "output": {
+    "item": {
+      "Count": 1,
+      "id": "minecraft:gold_ingot"
     }
-  ]
+  }
 }

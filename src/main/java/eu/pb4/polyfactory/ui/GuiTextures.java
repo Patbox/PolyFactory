@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.ui;
 
+import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.minecraft.text.Text;
@@ -24,6 +25,7 @@ public class GuiTextures {
     public static final Progress PROGRESS_HORIZONTAL_OFFSET_RIGHT = Progress.createHorizontal32Right("progress_horizontal_offset_right", 6, 26, false);
 
     public static void register() {
+        PolydexTextures.register();
     }
 
     public record Progress(GuiElement[] elements) {

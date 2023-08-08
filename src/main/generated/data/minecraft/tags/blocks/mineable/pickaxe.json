@@ -13,6 +13,7 @@
     "polyfactory:miner",
     "polyfactory:splitter",
     "polyfactory:mixer",
-    "polyfactory:steam_engine"
+    "polyfactory:steam_engine",
+    "polyfactory:metal_grid"
   ]
 }

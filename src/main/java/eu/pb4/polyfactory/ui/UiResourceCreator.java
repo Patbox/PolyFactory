@@ -9,6 +9,8 @@ import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import it.unimi.dsi.fastutil.chars.*;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.text.Style;
@@ -50,6 +52,7 @@ public class UiResourceCreator {
     private static List<Pair<PolymerModelData, String>> SIMPLE_MODEL = new ArrayList<>();
     private static Char2IntMap SPACES = new Char2IntOpenHashMap();
     private static Char2ObjectMap<Identifier> TEXTURES = new Char2ObjectOpenHashMap<>();
+    private static Object2ObjectMap<Pair<Character, Character>, Identifier> TEXTURES_POLYDEX = new Object2ObjectOpenHashMap<>();
     private static char character = 'a';
 
     private static final char CHEST_SPACE0 = character++;
@@ -131,6 +134,17 @@ public class UiResourceCreator {
         return new TextBuilders(Text.literal(builder.toString()).setStyle(STYLE));
     }
 
+    public static Pair<Text, Text> polydexBackground(String path) {
+        var c = (character++);
+        var d = (character++);
+        TEXTURES_POLYDEX.put(new Pair<>(c, d), id("sgui/polydex/" + path));
+
+        return new Pair<>(
+                Text.literal(Character.toString(c)).setStyle(STYLE),
+                Text.literal(Character.toString(d)).setStyle(STYLE)
+        );
+    }
+
     public static void setup() {
         SPACES.put(CHEST_SPACE0, -8);
         SPACES.put(CHEST_SPACE1, -168);
@@ -205,6 +219,19 @@ public class UiResourceCreator {
             bitmap.addProperty("height", 256);
             var chars = new JsonArray();
             chars.add(Character.toString(character));
+            bitmap.add("chars", chars);
+            providers.add(bitmap);
+        });
+
+        TEXTURES_POLYDEX.forEach((characters, id) -> {
+            var bitmap = new JsonObject();
+            bitmap.addProperty("type", "bitmap");
+            bitmap.addProperty("file", id.toString() + ".png");
+            bitmap.addProperty("ascent", -4);
+            bitmap.addProperty("height", 128);
+            var chars = new JsonArray();
+            chars.add(Character.toString(characters.getLeft()));
+            chars.add(Character.toString(characters.getRight()));
             bitmap.add("chars", chars);
             providers.add(bitmap);
         });

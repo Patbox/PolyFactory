@@ -26,7 +26,7 @@ public class FactoryItems {
     public static final Item FUNNEL_BLOCK = register("funnel", new ModeledBlockItem(FactoryBlocks.FUNNEL, new Item.Settings()));
     public static final Item SPLITTER_BLOCK = register("splitter", new ModeledBlockItem(FactoryBlocks.SPLITTER, new Item.Settings()));
     public static final Item FAN_BLOCK = register("fan", new ModeledBlockItem(FactoryBlocks.FAN, new Item.Settings()));
-    public static final Item CABLE_PLATE_BLOCK = register("cable_plate", new ModeledBlockItem(FactoryBlocks.CABLE_PLATE, new Item.Settings()));
+    //public static final Item CABLE_PLATE_BLOCK = register("cable_plate", new ModeledBlockItem(FactoryBlocks.CABLE_PLATE, new Item.Settings()));
     public static final Item HAND_CRANK_BLOCK = register("hand_crank", new ModeledBlockItem(FactoryBlocks.HAND_CRANK, new Item.Settings()));
     public static final Item STEAM_ENGINE_BLOCK = register("steam_engine", new MultiBlockItem(FactoryBlocks.STEAM_ENGINE, new Item.Settings()));
     public static final Item GRINDER_BLOCK = register("grinder", new ModeledBlockItem(FactoryBlocks.GRINDER, new Item.Settings()));
@@ -44,6 +44,9 @@ public class FactoryItems {
     public static final Item STEEL_INGOT = register("steel_ingot", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
     public static final Item STEEL_PLATE = register("steel_plate", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
     public static final Item STEEL_COG = register("steel_cog", new ModeledItem(Items.IRON_NUGGET, new Item.Settings()));
+
+    public static final Item WOODEN_PLATE = register("wooden_plate", new ModeledItem(Items.PAPER, new Item.Settings()));
+    public static final Item TREATED_DRIED_KELP = register("treated_dried_kelp", new ModeledItem(Items.PAPER, new Item.Settings()));
 
     public static final Item ITEM_FILTER = register("item_filter", new FilterItem(Items.PAPER, new Item.Settings()));
 
@@ -88,13 +91,15 @@ public class FactoryItems {
                     
                     // Electrical machines (tier 2)
                     entries.add(MOTOR_BLOCK);
-                    entries.add(CABLE_PLATE_BLOCK);
+                    //entries.add(CABLE_PLATE_BLOCK);
 
                     // Materials
                     entries.add(STEEL_ALLOY_MIXTURE);
                     entries.add(STEEL_INGOT);
                     entries.add(STEEL_PLATE);
                     entries.add(STEEL_COG);
+                    entries.add(WOODEN_PLATE);
+                    entries.add(TREATED_DRIED_KELP);
 
                     if (ModInit.DEV) {
                         // Creative stuff

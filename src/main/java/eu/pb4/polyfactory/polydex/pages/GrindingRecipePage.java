@@ -3,11 +3,13 @@ package eu.pb4.polyfactory.polydex.pages;
 import eu.pb4.polydex.api.v1.recipe.*;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
+import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import eu.pb4.polyfactory.recipe.PressRecipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -19,6 +21,11 @@ public class GrindingRecipePage extends AbstractRecipePolydexPage<GrindingRecipe
     public GrindingRecipePage(GrindingRecipe recipe) {
         super(recipe);
         this.output = PolydexCompatImpl.createOutput(this.recipe.output());
+    }
+
+    @Override
+    public @Nullable Text texture(ServerPlayerEntity player) {
+        return PolydexTextures.GRINDER;
     }
 
     @Override
@@ -43,14 +50,14 @@ public class GrindingRecipePage extends AbstractRecipePolydexPage<GrindingRecipe
 
     @Override
     public void createPage(@Nullable PolydexEntry entry, ServerPlayerEntity player, PageBuilder layer) {
-        layer.setIngredient(2, 2, this.recipe.input());
+        layer.setIngredient(4, 1, this.recipe.input());
 
         var i = 0;
         for (; i < this.output.length; i++) {
-            layer.setOutput(4 + i, 2, this.output[i]);
+            layer.setOutput(3 + i, 3, this.output[i]);
         }
         for (; i < 3; i++) {
-            layer.setEmpty(4 + i, 2);
+            layer.setEmpty(3 + i, 3);
         }
     }
 }

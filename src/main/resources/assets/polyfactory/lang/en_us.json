@@ -25,6 +25,8 @@
   "item.polyfactory.steel_ingot": "Steel Ingot",
   "item.polyfactory.steel_plate": "Steel Plate",
   "item.polyfactory.steel_cog": "Steel Cog",
+  "item.polyfactory.wooden_plate": "Wooden Plate",
+  "item.polyfactory.treated_dried_kelp": "Treated Dried Kelp",
   "text.polyfactory.recipes": "Recipes",
   "recipe_type.polyfactory.press": "Press",
   "recipe_type.polyfactory.mixer": "Mixer",
