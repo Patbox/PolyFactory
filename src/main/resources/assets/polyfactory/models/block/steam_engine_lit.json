@@ -1,6 +1,6 @@
 {
 	"parent": "polyfactory:block/steam_engine",
 	"textures": {
-		"0": "polyfactory:block/steam_engine_front_lit"
+		"0": "polyfactory:block/steam_engine/front_lit"
 	}
 }

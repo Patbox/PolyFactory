@@ -264,11 +264,11 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .offerTo(exporter);
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.GRINDER_BLOCK, 1)
-                    .pattern(" s ")
-                    .pattern("wiw")
+                    .pattern(" i ")
+                    .pattern("www")
                     .pattern("ppp")
                     .input('i', Items.STONE_SLAB)
-                    .input('w', Items.SMOOTH_STONE_SLAB).input('s', FactoryItems.AXLE_BLOCK)
+                    .input('w', Items.SMOOTH_STONE_SLAB)
                     .input('p', ItemTags.PLANKS)
                     .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                     .offerTo(exporter);
@@ -375,23 +375,23 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     GrindingRecipe.of("glowstone_to_powder", Ingredient.ofItems(Items.GLOWSTONE), 1, 5, 10, new ItemStack(Items.GLOWSTONE_DUST, 4)),
 
                     // Flower to Dye
-                    GrindingRecipe.of("dandelion_to_dye", Ingredient.ofItems(Items.DANDELION), 1, 6, new ItemStack(Items.YELLOW_DYE, 3)),
-                    GrindingRecipe.of("orchid_to_dye", Ingredient.ofItems(Items.BLUE_ORCHID), 1, 6, new ItemStack(Items.LIGHT_BLUE_DYE, 3)),
-                    GrindingRecipe.of("allium_to_dye", Ingredient.ofItems(Items.ALLIUM), 1, 6, new ItemStack(Items.MAGENTA_DYE, 3)),
-                    GrindingRecipe.of("azure_bluet_to_dye", Ingredient.ofItems(Items.AZURE_BLUET), 1, 6, new ItemStack(Items.LIGHT_GRAY_DYE, 3)),
-                    GrindingRecipe.of("daisy_to_dye", Ingredient.ofItems(Items.OXEYE_DAISY), 1, 6, new ItemStack(Items.LIGHT_GRAY_DYE, 3)),
-                    GrindingRecipe.of("red_tulip_to_dye", Ingredient.ofItems(Items.RED_TULIP), 1, 6, new ItemStack(Items.RED_DYE, 3)),
-                    GrindingRecipe.of("orange_tulip_to_dye", Ingredient.ofItems(Items.ORANGE_TULIP), 1, 6, new ItemStack(Items.ORANGE_DYE, 3)),
-                    GrindingRecipe.of("white_tulip_to_dye", Ingredient.ofItems(Items.WHITE_TULIP), 1, 6, new ItemStack(Items.LIGHT_GRAY_DYE, 3)),
-                    GrindingRecipe.of("pink_tulip_to_dye", Ingredient.ofItems(Items.PINK_TULIP), 1, 6, new ItemStack(Items.PINK_DYE, 3)),
-                    GrindingRecipe.of("cornflower_to_dye", Ingredient.ofItems(Items.CORNFLOWER), 1, 6, new ItemStack(Items.BLUE_DYE, 3)),
-                    GrindingRecipe.of("lily_to_dye", Ingredient.ofItems(Items.LILY_OF_THE_VALLEY), 1, 6, new ItemStack(Items.WHITE_DYE, 3)),
-                    GrindingRecipe.of("wither_rose_to_dye", Ingredient.ofItems(Items.WITHER_ROSE), 1, 6, new ItemStack(Items.BLACK_DYE, 3)),
-                    GrindingRecipe.of("sunflower_to_dye", Ingredient.ofItems(Items.SUNFLOWER), 1, 6, new ItemStack(Items.YELLOW_DYE, 6)),
-                    GrindingRecipe.of("lilac_to_dye", Ingredient.ofItems(Items.LILAC), 1, 6, new ItemStack(Items.MAGENTA_DYE, 6)),
-                    GrindingRecipe.of("peony_to_dye", Ingredient.ofItems(Items.PEONY), 1, 6, new ItemStack(Items.PINK_DYE, 6)),
-                    GrindingRecipe.of("rose_to_dye", Ingredient.ofItems(Items.ROSE_BUSH), 1, 6, new ItemStack(Items.RED_DYE, 6)),
-                    GrindingRecipe.of("cactus_to_dye", Ingredient.ofItems(Items.CACTUS), 1, 6, new ItemStack(Items.GREEN_DYE, 3))
+                    GrindingRecipe.of("dandelion_to_dye", "dye", Ingredient.ofItems(Items.DANDELION), 1, 6, new ItemStack(Items.YELLOW_DYE, 3)),
+                    GrindingRecipe.of("orchid_to_dye", "dye", Ingredient.ofItems(Items.BLUE_ORCHID), 1, 6, new ItemStack(Items.LIGHT_BLUE_DYE, 3)),
+                    GrindingRecipe.of("allium_to_dye", "dye", Ingredient.ofItems(Items.ALLIUM), 1, 6, new ItemStack(Items.MAGENTA_DYE, 3)),
+                    GrindingRecipe.of("azure_bluet_to_dye", "dye", Ingredient.ofItems(Items.AZURE_BLUET), 1, 6, new ItemStack(Items.LIGHT_GRAY_DYE, 3)),
+                    GrindingRecipe.of("daisy_to_dye", "dye", Ingredient.ofItems(Items.OXEYE_DAISY), 1, 6, new ItemStack(Items.LIGHT_GRAY_DYE, 3)),
+                    GrindingRecipe.of("red_tulip_to_dye", "dye", Ingredient.ofItems(Items.RED_TULIP), 1, 6, new ItemStack(Items.RED_DYE, 3)),
+                    GrindingRecipe.of("orange_tulip_to_dye", "dye", Ingredient.ofItems(Items.ORANGE_TULIP), 1, 6, new ItemStack(Items.ORANGE_DYE, 3)),
+                    GrindingRecipe.of("white_tulip_to_dye", "dye", Ingredient.ofItems(Items.WHITE_TULIP), 1, 6, new ItemStack(Items.LIGHT_GRAY_DYE, 3)),
+                    GrindingRecipe.of("pink_tulip_to_dye", "dye", Ingredient.ofItems(Items.PINK_TULIP), 1, 6, new ItemStack(Items.PINK_DYE, 3)),
+                    GrindingRecipe.of("cornflower_to_dye", "dye", Ingredient.ofItems(Items.CORNFLOWER), 1, 6, new ItemStack(Items.BLUE_DYE, 3)),
+                    GrindingRecipe.of("lily_to_dye", "dye", Ingredient.ofItems(Items.LILY_OF_THE_VALLEY), 1, 6, new ItemStack(Items.WHITE_DYE, 3)),
+                    GrindingRecipe.of("wither_rose_to_dye", "dye", Ingredient.ofItems(Items.WITHER_ROSE), 1, 6, new ItemStack(Items.BLACK_DYE, 3)),
+                    GrindingRecipe.of("sunflower_to_dye", "dye", Ingredient.ofItems(Items.SUNFLOWER), 1, 6, new ItemStack(Items.YELLOW_DYE, 6)),
+                    GrindingRecipe.of("lilac_to_dye", "dye", Ingredient.ofItems(Items.LILAC), 1, 6, new ItemStack(Items.MAGENTA_DYE, 6)),
+                    GrindingRecipe.of("peony_to_dye", "dye", Ingredient.ofItems(Items.PEONY), 1, 6, new ItemStack(Items.PINK_DYE, 6)),
+                    GrindingRecipe.of("rose_to_dye", "dye", Ingredient.ofItems(Items.ROSE_BUSH), 1, 6, new ItemStack(Items.RED_DYE, 6)),
+                    GrindingRecipe.of("cactus_to_dye", "dye", Ingredient.ofItems(Items.CACTUS), 1, 6, new ItemStack(Items.GREEN_DYE, 3))
             );
 
             of(exporter, PressRecipe.CODEC,
@@ -406,22 +406,22 @@ public class DataGenInit implements DataGeneratorEntrypoint {
 
                 var powder = Registries.ITEM.get(new Identifier(namePowder));
                 var solid = Registries.ITEM.get(new Identifier(nameSolid));
-                of(exporter, GrindingRecipe.CODEC, GrindingRecipe.of(nameSolid + "_to_powder",
-                        Ingredient.ofItems(solid), 3, 5, solid
+                of(exporter, GrindingRecipe.CODEC, GrindingRecipe.of(nameSolid + "_to_powder", "concrete_to_powder",
+                        Ingredient.ofItems(solid), 3, 5, powder
                 ));
 
-                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(namePowder,
+                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(namePowder, "concrete_powder",
                         List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS), CountedIngredient.ofItems(4, Items.GRAVEL), CountedIngredient.ofItems(1, dye)),
                         4, 1, 13, new ItemStack(powder, 8)));
 
-                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid + "_direct",
+                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid + "_direct", "concrete_direct",
                         List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS),
                                 CountedIngredient.ofItems(4, Items.GRAVEL),
                                 CountedIngredient.ofItems(0, Items.WATER_BUCKET),
                                 CountedIngredient.ofItems(1, dye)),
                         5, 1, 15, new ItemStack(solid, 8)));
 
-                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder",
+                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder", "concrete_water",
                         List.of(CountedIngredient.ofItems(1, powder), CountedIngredient.ofItems(0, Items.WATER_BUCKET)),
                         1, 1, 4, new ItemStack(solid, 1)));
             }

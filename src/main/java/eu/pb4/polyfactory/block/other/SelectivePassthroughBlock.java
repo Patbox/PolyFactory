@@ -38,7 +38,7 @@ public class SelectivePassthroughBlock extends Block implements PolymerBlock, Bl
     @Override
     public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         var model = new BaseModel();
-        var element = LodItemDisplayElement.createSimple(this.asItem().getDefaultStack());
+        var element = LodItemDisplayElement.createSimple(this.asItem());
         element.setScale(new Vector3f(2));
         model.addElement(element);
         return model;

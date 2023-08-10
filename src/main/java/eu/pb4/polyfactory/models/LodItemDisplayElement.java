@@ -1,23 +1,29 @@
 package eu.pb4.polyfactory.models;
 
+import eu.pb4.polyfactory.item.util.SimpleModeledPolymerItem;
 import eu.pb4.polyfactory.util.DebugData;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DataTrackerLike;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import eu.pb4.polymer.virtualentity.api.tracker.SimpleDataTracker;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 
 public class LodItemDisplayElement extends ItemDisplayElement {
+    private static final Map<Item, ItemStack> MODEL_MAP = new Object2ObjectOpenCustomHashMap<>(Util.identityHashStrategy());
     public static boolean isEnabled = true;
     public static boolean isDisabled = false;
     public final DataTrackerLike nearTracker = new SimpleDataTracker(this.getEntityType());
@@ -33,6 +39,25 @@ public class LodItemDisplayElement extends ItemDisplayElement {
 
     public LodItemDisplayElement() {
         super();
+    }
+
+    public static LodItemDisplayElement createSimple(Item model) {
+        return createSimple(getModel(model));
+    }
+
+    private static ItemStack getModel(Item model) {
+        var stack = MODEL_MAP.get(model);
+
+        if (stack == null) {
+            if (model instanceof SimpleModeledPolymerItem simpleModeledPolymerItem) {
+                stack = new ItemStack(simpleModeledPolymerItem.getPolymerItem());
+                stack.getOrCreateNbt().putInt("CustomModelData", simpleModeledPolymerItem.getPolymerCustomModelData());
+            } else {
+                stack = new ItemStack(model);
+            }
+            MODEL_MAP.put(model, stack);
+        }
+        return stack;
     }
 
     public static LodItemDisplayElement createSimple(ItemStack model) {
@@ -53,6 +78,10 @@ public class LodItemDisplayElement extends ItemDisplayElement {
         element.nearDistanceSquared = 50 * 50 * qualityMultiplier * qualityMultiplier;
         return element;
     }
+    public static LodItemDisplayElement createSimple(Item model, int updateRate) {
+        return createSimple(getModel(model), updateRate);
+    }
+
     public static LodItemDisplayElement createSimple(ItemStack model, int updateRate) {
         var element = createSimple(model);
         element.setInterpolationDuration(updateRate);

@@ -26,6 +26,10 @@ public interface SimpleModeledPolymerItem extends AutoModeledPolymerItem {
         return MODELS.get(this).value();
     }
 
+    default int getPolymerCustomModelData() {
+        return MODELS.get(this).value();
+    }
+
     @Override
     default void defineModels(Identifier selfId) {
         var item = new Identifier(selfId.getNamespace(), "item/" + selfId.getPath());

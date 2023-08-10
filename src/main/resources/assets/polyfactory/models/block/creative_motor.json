@@ -1,0 +1,11 @@
+{
+	"parent": "polyfactory:block/motor",
+	"textures": {
+		"particle": "polyfactory:block/motor/creative/side",
+		"side": "polyfactory:block/motor/creative/side",
+		"back": "polyfactory:block/motor/creative/back",
+		"front": "polyfactory:block/motor/creative/front",
+		"connector": "polyfactory:block/motor/creative/back_connector"
+
+	}
+}

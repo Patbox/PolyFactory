@@ -20,11 +20,12 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.List;
 
-public record GenericMixingRecipe(Identifier identifier, List<CountedIngredient> input, ItemStack output, double time,
+public record GenericMixingRecipe(Identifier identifier, String group, List<CountedIngredient> input, ItemStack output, double time,
                                   double minimumSpeed,
                                   double optimalSpeed, float minimumTemperature, float maxTemperature) implements MixingRecipe {
     public static final Codec<GenericMixingRecipe> CODEC = RecordCodecBuilder.create(x -> x.group(
                     CodecRecipeSerializer.idCodec(),
+                    Codec.STRING.optionalFieldOf("group", "").forGetter(GenericMixingRecipe::group),
                     CountedIngredient.LIST_CODEC.fieldOf("input").forGetter(GenericMixingRecipe::input),
                     ItemStack.CODEC.fieldOf("output").forGetter(GenericMixingRecipe::output),
                     Codec.DOUBLE.fieldOf("time").forGetter(GenericMixingRecipe::time),
@@ -36,7 +37,11 @@ public record GenericMixingRecipe(Identifier identifier, List<CountedIngredient>
     );
 
     public static GenericMixingRecipe ofCounted(String string, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
-        return new GenericMixingRecipe(FactoryUtil.id("mixing/" + string), ingredient, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f);
+        return new GenericMixingRecipe(FactoryUtil.id("mixing/" + string), "", ingredient, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f);
+    }
+
+    public static GenericMixingRecipe ofCounted(String string, String group, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
+        return new GenericMixingRecipe(FactoryUtil.id("mixing/" + string), group, ingredient, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f);
     }
 
     public Iterable<ItemStack> remainders() {
@@ -49,7 +54,12 @@ public record GenericMixingRecipe(Identifier identifier, List<CountedIngredient>
             CountedIngredient countedIngredient = new CountedIngredient(x, 1, CountedIngredient.tryGettingLeftover(x));
             list.add(countedIngredient);
         }
-        return new GenericMixingRecipe(FactoryUtil.id("mixing/" + string), list, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f);
+        return new GenericMixingRecipe(FactoryUtil.id("mixing/" + string),"", list, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f);
+    }
+
+    @Override
+    public String getGroup() {
+        return this.group;
     }
 
     @Override

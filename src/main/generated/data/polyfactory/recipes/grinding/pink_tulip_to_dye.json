@@ -1,5 +1,6 @@
 {
   "type": "polyfactory:grinding",
+  "group": "dye",
   "input": {
     "item": "minecraft:pink_tulip"
   },

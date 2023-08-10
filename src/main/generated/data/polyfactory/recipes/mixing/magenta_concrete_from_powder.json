@@ -1,5 +1,6 @@
 {
   "type": "polyfactory:mixing/generic",
+  "group": "concrete_water",
   "input": [
     {
       "base": {

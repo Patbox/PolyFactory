@@ -50,11 +50,10 @@ public class FactoryItems {
 
     public static final Item ITEM_FILTER = register("item_filter", new FilterItem(Items.PAPER, new Item.Settings()));
 
+    public static final Item CREATIVE_MOTOR_BLOCK = register("creative_motor", new ModeledBlockItem(FactoryBlocks.CREATIVE_MOTOR, new Item.Settings()));
     public static final Item ITEM_GENERATOR_BLOCK = register("item_generator", new ModeledBlockItem(FactoryBlocks.ITEM_GENERATOR, new Item.Settings()));
     public static final Item ROTATION_DEBUG_BLOCK = register("rot_debug", new ModeledBlockItem(FactoryBlocks.ROTATION_DEBUG, new Item.Settings()));
     public static final Item GREEN_SCREEN_BLOCK = register("green_screen", new ModeledBlockItem(FactoryBlocks.GREEN_SCREEN, new Item.Settings()));
-    public static final Item TEST_MULTI_2_BLOCK = register("text_multi_2", new MultiBlockItem(FactoryBlocks.TEST_MULTI_2, new Item.Settings()));
-    public static final Item TEST_MULTI_3_BLOCK = register("text_multi_3", new MultiBlockItem(FactoryBlocks.TEST_MULTI_3, new Item.Settings()));
 
 
     public static void register() {
@@ -100,6 +99,10 @@ public class FactoryItems {
                     entries.add(STEEL_COG);
                     entries.add(WOODEN_PLATE);
                     entries.add(TREATED_DRIED_KELP);
+
+
+
+                    entries.add(CREATIVE_MOTOR_BLOCK);
 
                     if (ModInit.DEV) {
                         // Creative stuff

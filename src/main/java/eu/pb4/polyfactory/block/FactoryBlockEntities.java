@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block;
 
 import com.google.common.collect.ImmutableSet;
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.block.creative.CreativeMotorBlockEntity;
 import eu.pb4.polyfactory.block.creative.ItemGeneratorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.*;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
@@ -47,7 +48,6 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<SteamEngineBlockEntity> STEAM_ENGINE = register("steam_engine",
             FabricBlockEntityTypeBuilder.create(SteamEngineBlockEntity::new).addBlock(FactoryBlocks.STEAM_ENGINE));
 
-
     public static final BlockEntityType<ContainerBlockEntity> CONTAINER = register("container",
             FabricBlockEntityTypeBuilder.create(ContainerBlockEntity::new).addBlock(FactoryBlocks.CONTAINER));
 
@@ -65,6 +65,9 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<ItemGeneratorBlockEntity> ITEM_GENERATOR = register("item_generator",
             FabricBlockEntityTypeBuilder.create(ItemGeneratorBlockEntity::new).addBlock(FactoryBlocks.ITEM_GENERATOR));
+
+    public static final BlockEntityType<CreativeMotorBlockEntity> CREATIVE_MOTOR = register("creative_motor",
+            FabricBlockEntityTypeBuilder.create(CreativeMotorBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_MOTOR));
 
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;

@@ -30,6 +30,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
@@ -48,18 +49,19 @@ import java.util.List;
 
 public class WindmillBlock extends RotationalNetworkBlock implements PolymerBlock, RotationUser, BlockWithElementHolder, BlockEntityProvider, VirtualDestroyStage.Marker {
     public static final int MAX_SAILS = 8;
+    public static final BooleanProperty BIG = BooleanProperty.of("deco_big");
     public static final IntProperty SAIL_COUNT = IntProperty.of("sails", 1, MAX_SAILS);
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     public WindmillBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(SAIL_COUNT, 4));
+        this.setDefaultState(this.getDefaultState().with(SAIL_COUNT, 4).with(BIG, false));
         Model.MODEL.getItem();
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING).add(SAIL_COUNT);
+        builder.add(FACING).add(SAIL_COUNT).add(BIG);
     }
 
     @Nullable
@@ -138,10 +140,12 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement center;
+        private boolean big;
         private ItemDisplayElement[] sails;
         private WindmillBlockEntity blockEntity;
 
         private Model(ServerWorld world, BlockState state) {
+            this.big = state.get(BIG);
             this.updateSails(state.get(SAIL_COUNT), state.get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
 
             this.center = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, 4);
@@ -219,15 +223,21 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
             mat.pushMatrix();
             mat.rotateZ(-MathHelper.HALF_PI);
             mat.scale(2);
+            if (this.big) {
+                mat.scale(2);
+            }
             this.center.setTransformation(mat);
             mat.popMatrix();
-            var tmp = Math.max(sails.length / 2, 1);
+            //var tmp = Math.max(sails.length / 2, 1);
             for (var i = 0; i < sails.length; i++) {
                 mat.pushMatrix();
                 mat.rotateX((MathHelper.TAU / sails.length) * i);
                 mat.rotateY(-MathHelper.HALF_PI);
                 this.sails[i].setYaw(direction.asRotation() - 90);
-                mat.translate(0, 0, 0.01f * (i % tmp));
+                mat.translate(0, 0, 0.008f * i);
+                if (this.big) {
+                    mat.scale(2);
+                }
                 this.sails[i].setTransformation(mat);
                 mat.popMatrix();
             }
@@ -263,6 +273,8 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
+                var state = BlockBoundAttachment.get(this).getBlockState();
+                this.big = state.get(BIG);
                 this.updateSailsBe();
 
                 this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),

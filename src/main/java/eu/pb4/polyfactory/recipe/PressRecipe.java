@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
+import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.PolymerRecipe;
 import net.minecraft.item.ItemConvertible;
@@ -92,5 +93,10 @@ public record PressRecipe(Identifier identifier, CountedIngredient inputA, Count
     @Override
     public DefaultedList<Ingredient> getIngredients() {
         return DefaultedList.copyOf(null, this.inputA.ingredient(), this.inputB.ingredient());
+    }
+
+    @Override
+    public ItemStack createIcon() {
+        return FactoryItems.PRESS_BLOCK.getDefaultStack();
     }
 }

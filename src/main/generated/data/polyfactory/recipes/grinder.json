@@ -8,16 +8,13 @@
     "p": {
       "tag": "minecraft:planks"
     },
-    "s": {
-      "item": "polyfactory:axle"
-    },
     "w": {
       "item": "minecraft:smooth_stone_slab"
     }
   },
   "pattern": [
-    " s ",
-    "wiw",
+    " i ",
+    "www",
     "ppp"
   ],
   "result": {

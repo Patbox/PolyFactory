@@ -1,7 +1,7 @@
 {
 	"textures": {
-		"0": "polyfactory:block/steam_engine_rotating_thing_2",
-		"particle": "polyfactory:block/steam_engine_rotating_thing_2"
+		"0": "polyfactory:block/steam_engine/rotating_thing_2",
+		"particle": "polyfactory:block/steam_engine/rotating_thing_2"
 	},
 	"elements": [
 		{

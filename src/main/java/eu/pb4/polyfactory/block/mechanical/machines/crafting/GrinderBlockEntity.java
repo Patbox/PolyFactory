@@ -145,7 +145,8 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
                     }
                 }
             }
-
+            var sound = stack.getItem() instanceof BlockItem blockItem ? blockItem.getBlock().getSoundGroup(blockItem.getBlock().getDefaultState()).getBreakSound() : SoundEvents.BLOCK_STONE_BREAK;
+            world.playSound(null, pos, sound, SoundCategory.BLOCKS, 0.6f, 0.5f);
             self.process = 0;
             stack.decrement(1);
 
@@ -176,6 +177,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
                     }
                 }
             }
+
             self.markDirty();
         } else {
             var d = Math.max(self.currentRecipe.optimalSpeed() - self.currentRecipe.minimumSpeed(), 1);
@@ -188,10 +190,10 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
                             pos.getX() + 0.5, pos.getY() + 1.15, pos.getZ() + 0.5, 0,
                             (Math.random() - 0.5) * 0.2, 0.02, (Math.random() - 0.5) * 0.2, 2);
                 }
-                /*if (world.getTime() % 10 == 0) {
-                    var sound = stack.getItem() instanceof BlockItem blockItem ? blockItem.getBlock().getSoundGroup(blockItem.getBlock().getDefaultState()).getHitSound() : SoundEvents.BLOCK_STONE_BREAK;
-                    world.playSound(null, pos, sound, SoundCategory.BLOCKS, 0.4f, 0.3f);
-                }*/
+                if (world.getTime() % 20 == 0) {
+                    var sound = stack.getItem() instanceof BlockItem blockItem ? blockItem.getBlock().getSoundGroup(blockItem.getBlock().getDefaultState()).getHitSound() : SoundEvents.BLOCK_STONE_HIT;
+                    world.playSound(null, pos, sound, SoundCategory.BLOCKS, 0.5f, 0.5f);
+                }
 
                 self.process += speed;
                 self.markDirty();

@@ -130,7 +130,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
         private final ItemDisplayElement mainElement;
 
         private Model(ServerWorld world, BlockState state) {
-            this.mainElement = LodItemDisplayElement.createSimple(FactoryItems.HAND_CRANK_BLOCK.getDefaultStack(), 4);
+            this.mainElement = LodItemDisplayElement.createSimple(FactoryItems.HAND_CRANK_BLOCK, 4);
             this.updateAnimation(0, state.get(FACING));
             this.addElement(this.mainElement);
         }

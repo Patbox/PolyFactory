@@ -1,9 +1,9 @@
 {
 	"textures": {
-		"0": "polyfactory:block/wooden_container_back",
-		"1": "polyfactory:block/wooden_container_front",
-		"2": "polyfactory:block/wooden_container_side",
-		"particle": "polyfactory:block/wooden_container_back"
+		"0": "polyfactory:block/container/wooden_back",
+		"1": "polyfactory:block/container/wooden_front",
+		"2": "polyfactory:block/container/wooden_side",
+		"particle": "polyfactory:block/container/wooden_back"
 	},
 	"elements": [
 		{

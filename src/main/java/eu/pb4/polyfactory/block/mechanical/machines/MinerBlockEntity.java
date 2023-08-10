@@ -204,6 +204,12 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         }
 
         @Override
+        public void onClose() {
+            super.onClose();
+            System.out.println("Close");
+        }
+
+        @Override
         public void onTick() {
             if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(MinerBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();

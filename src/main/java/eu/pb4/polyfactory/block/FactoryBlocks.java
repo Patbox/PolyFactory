@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block;
 
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
 import eu.pb4.polyfactory.block.creative.ItemGeneratorBlock;
 import eu.pb4.polyfactory.block.electric.CablePlateBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlock;
@@ -53,11 +54,10 @@ public class FactoryBlocks {
     public static final NixieTubeBlock NIXIE_TUBE = register("nixie_tube", new NixieTubeBlock(Block.Settings.copy(Blocks.GLASS).nonOpaque()));
 
 
+    public static final CreativeMotorBlock CREATIVE_MOTOR = register("creative_motor", new CreativeMotorBlock(AbstractBlock.Settings.create().strength(-1, -1).nonOpaque()));
     public static final ItemGeneratorBlock ITEM_GENERATOR = register("item_generator", new ItemGeneratorBlock(AbstractBlock.Settings.create().strength(-1, -1)));
     public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", new RotationalDebugBlock(AbstractBlock.Settings.create().strength(-1, -1)));
     public static final GreenScreenBlock GREEN_SCREEN = register("green_screen", new GreenScreenBlock(AbstractBlock.Settings.copy(Blocks.GREEN_WOOL)));
-    public static final MultiBlock TEST_MULTI_2 =  register("test_multi_2", new MultiBlock(2, 2, 2, AbstractBlock.Settings.copy(Blocks.STONE)));
-    public static final MultiBlock TEST_MULTI_3 =  register("test_multi_3", new MultiBlock(3, 3, 3, AbstractBlock.Settings.copy(Blocks.STONE)));
 
 
     public static void register() {

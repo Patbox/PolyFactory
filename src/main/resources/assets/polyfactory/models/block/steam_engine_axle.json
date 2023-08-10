@@ -3,7 +3,7 @@
 	"ambientocclusion": false,
 	"textures": {
 		"0": "polyfactory:block/axle",
-		"2": "polyfactory:block/steam_engine_rotating_thing_1",
+		"2": "polyfactory:block/steam_engine/rotating_thing_1",
 		"3": "block/anvil",
 		"4": "block/lightning_rod",
 		"particle": "polyfactory:block/axle"

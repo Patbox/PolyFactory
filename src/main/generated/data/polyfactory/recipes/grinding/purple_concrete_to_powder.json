@@ -1,5 +1,6 @@
 {
   "type": "polyfactory:grinding",
+  "group": "concrete_to_powder",
   "input": {
     "item": "minecraft:purple_concrete"
   },
@@ -7,7 +8,7 @@
   "output": {
     "item": {
       "Count": 1,
-      "id": "minecraft:purple_concrete"
+      "id": "minecraft:purple_concrete_powder"
     }
   },
   "time": 3.0
