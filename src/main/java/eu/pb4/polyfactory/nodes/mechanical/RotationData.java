@@ -6,6 +6,7 @@ import com.kneelawk.graphlib.api.graph.user.GraphEntity;
 import com.kneelawk.graphlib.api.graph.user.GraphEntityType;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationConstants;
+import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
@@ -53,7 +54,7 @@ public class RotationData implements GraphEntity<RotationData> {
         var delta = this.lastTick == -1 ? 1 : currentTick - this.lastTick;
         this.lastTick = currentTick;
 
-        var list = graph.getCachedNodes(DirectionalRotationUserNode.CACHE);
+        var list = graph.getCachedNodes(FunctionalDirectionNode.CACHE);
 
         if (list.size() == 0) {
             this.speed = 0;
@@ -106,7 +107,7 @@ public class RotationData implements GraphEntity<RotationData> {
 
     @Override
     public @NotNull GraphEntityContext getContext() {
-        return null;
+        return this.ctx;
     }
 
     @Override

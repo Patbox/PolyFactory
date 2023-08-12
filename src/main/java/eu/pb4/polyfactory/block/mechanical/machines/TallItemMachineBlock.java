@@ -4,7 +4,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
-import eu.pb4.polyfactory.nodes.mechanical.AxisRotationUserNode;
+import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
@@ -57,7 +57,7 @@ public abstract class TallItemMachineBlock extends RotationalNetworkBlock implem
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return state.get(PART) == Part.TOP ? List.of(new AxisRotationUserNode(state.get(INPUT_FACING).rotateYClockwise().getAxis())) : List.of();
+        return state.get(PART) == Part.TOP ? List.of(new FunctionalAxisNode(state.get(INPUT_FACING).rotateYClockwise().getAxis())) : List.of();
     }
 
     @Override

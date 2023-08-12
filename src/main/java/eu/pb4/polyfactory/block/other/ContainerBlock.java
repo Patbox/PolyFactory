@@ -3,6 +3,8 @@ package eu.pb4.polyfactory.block.other;
 import eu.pb4.polyfactory.block.AttackableBlock;
 import eu.pb4.polyfactory.block.SneakBypassingBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -40,16 +42,15 @@ import org.joml.Matrix4fStack;
 
 public class ContainerBlock extends Block implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder, AttackableBlock, SneakBypassingBlock, VirtualDestroyStage.Marker {
     public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
-    public static final BooleanProperty ENABLED = Properties.ENABLED;
 
     public ContainerBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(ENABLED, true));
+        this.setDefaultState(this.getDefaultState());
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING, ENABLED);
+        builder.add(FACING);
     }
 
     @Override
@@ -165,24 +166,18 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
         return new Model(world, pos, initialBlockState);
     }
 
-    public final class Model extends ElementHolder {
+    public final class Model extends BaseModel {
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement itemElement;
         private final TextDisplayElement countElement;
 
         private Model(ServerWorld world, BlockPos pos, BlockState state) {
-            this.mainElement = new ItemDisplayElement();
-            this.mainElement.setDisplaySize(1, 1);
-            this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
-            this.mainElement.setItem(FactoryItems.CONTAINER_BLOCK.getDefaultStack());
-            this.mainElement.setInvisible(true);
-            this.mainElement.setViewRange(0.8f);
+            this.mainElement = LodItemDisplayElement.createSimple(ContainerBlock.this.asItem());
 
-            this.itemElement = new ItemDisplayElement();
+            this.itemElement = LodItemDisplayElement.createSimple();
             this.itemElement.setDisplaySize(1, 1);
             this.itemElement.setModelTransformation(ModelTransformationMode.GUI);
-            this.itemElement.setInvisible(true);
             this.itemElement.setViewRange(0.3f);
 
             this.countElement = new TextDisplayElement(Text.literal("0"));

@@ -1,0 +1,9 @@
+{
+	"parent": "polyfactory:block/wooden_container",
+	"textures": {
+		"0": "polyfactory:block/container/creative_back",
+		"1": "polyfactory:block/container/creative_front",
+		"2": "polyfactory:block/container/creative_side",
+		"particle": "polyfactory:block/container/creative_back"
+	}
+}

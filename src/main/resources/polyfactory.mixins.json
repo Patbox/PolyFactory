@@ -8,6 +8,7 @@
     "BlockEntityMixin",
     "BlockEntityTypeAccessor",
     "BlockItemMixin",
+    "DyeColorMixin",
     "HopperBlockEntityMixin",
     "HopperBlockMixin",
     "ItemUsageContextAccessor",
@@ -16,7 +17,10 @@
     "ServerPlayerEntityMixin",
     "ServerPlayerInteractionManagerMixin",
     "ServerPlayNetworkHandlerMixin",
-    "compat.htm_LockableBlockEntityMixin"
+    "compat.htm_LockableBlockEntityMixin",
+    "nbtrecipe.ShapedRecipeJsonBuilderMixin",
+    "nbtrecipe.ShapedRecipeJsonBuilderMixin$ShapedRecipeJsonProviderMixin",
+    "nbtrecipe.ShapedRecipeMixin"
   ],
   "client": [
   ],

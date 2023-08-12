@@ -114,7 +114,7 @@ public class WindmillBlockEntity extends BlockEntity {
             return;
         }
 
-        var speed = Math.min(Math.log(x) / LOG_BASE * 1.8, 8);
+        var speed = Math.min(Math.log(x) / LOG_BASE * 1.85, 8);
         if (speed <= 0) {
             return;
         }

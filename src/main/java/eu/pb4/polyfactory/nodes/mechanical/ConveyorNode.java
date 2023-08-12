@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
-public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue value) implements MechanicalNode, AxisNode {
+public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue value) implements AxisNode {
     public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("conveyor"), tag -> {
         if (tag == null) {
             return null;
@@ -95,8 +95,7 @@ public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue val
 
     @Override
     public boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
-        return MechanicalNode.super.canConnect(self, other)
-                && ((other.other().getNode() instanceof ConveyorNode conv && conv.direction == this.direction) || AxisNode.canConnect(this, self, other));
+        return ((other.other().getNode() instanceof ConveyorNode conv && conv.direction == this.direction) || AxisNode.canConnect(this, self, other));
     }
 
     @Override

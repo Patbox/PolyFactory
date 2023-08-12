@@ -19,4 +19,14 @@ public interface NetworkComponent {
 
         Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos);
     }
+
+    interface Energy extends NetworkComponent {
+        static void updateEnergyAt(WorldAccess world, BlockPos pos) {
+            if (world instanceof ServerWorld serverWorld) {
+                FactoryNodes.ENERGY.getServerGraphWorld(serverWorld).updateNodes(pos);
+            }
+        }
+
+        Collection<BlockNode> createEnergyNodes(BlockState state, ServerWorld world, BlockPos pos);
+    }
 }

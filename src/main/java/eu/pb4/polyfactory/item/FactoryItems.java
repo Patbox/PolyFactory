@@ -51,7 +51,8 @@ public class FactoryItems {
     public static final Item ITEM_FILTER = register("item_filter", new FilterItem(Items.PAPER, new Item.Settings()));
 
     public static final Item CREATIVE_MOTOR_BLOCK = register("creative_motor", new ModeledBlockItem(FactoryBlocks.CREATIVE_MOTOR, new Item.Settings()));
-    public static final Item ITEM_GENERATOR_BLOCK = register("item_generator", new ModeledBlockItem(FactoryBlocks.ITEM_GENERATOR, new Item.Settings()));
+    public static final Item CREATIVE_CONTAINER_BLOCK = register("creative_container", new ModeledBlockItem(FactoryBlocks.CREATIVE_CONTAINER, new Item.Settings()));
+
     public static final Item ROTATION_DEBUG_BLOCK = register("rot_debug", new ModeledBlockItem(FactoryBlocks.ROTATION_DEBUG, new Item.Settings()));
     public static final Item GREEN_SCREEN_BLOCK = register("green_screen", new ModeledBlockItem(FactoryBlocks.GREEN_SCREEN, new Item.Settings()));
 
@@ -103,10 +104,10 @@ public class FactoryItems {
 
 
                     entries.add(CREATIVE_MOTOR_BLOCK);
+                    entries.add(CREATIVE_CONTAINER_BLOCK);
 
                     if (ModInit.DEV) {
                         // Creative stuff
-                        entries.add(ITEM_GENERATOR_BLOCK);
                         entries.add(ROTATION_DEBUG_BLOCK);
                         entries.add(GREEN_SCREEN_BLOCK);
                     }

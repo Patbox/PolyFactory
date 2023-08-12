@@ -1,16 +1,13 @@
-package eu.pb4.polyfactory.nodes.mechanical;
+package eu.pb4.polyfactory.nodes.generic;
 
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import com.kneelawk.graphlib.api.graph.user.BlockNodeDecoder;
 import com.kneelawk.graphlib.api.graph.user.BlockNodeType;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
-import eu.pb4.polyfactory.nodes.AxisNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtString;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,9 +15,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public record AxisMechanicalNode(Direction.Axis axis) implements MechanicalNode, AxisNode {
-    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("axis_mechanical"),
-            tag -> new AxisMechanicalNode(tag instanceof NbtString string ? Direction.Axis.fromName(string.asString()) : Direction.Axis.Y));
+public record AllSideNode() implements BlockNode {
+    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("all_side"), (nbt) -> new AllSideNode());
 
     @Override
     public @NotNull BlockNodeType getType() {
@@ -29,28 +25,27 @@ public record AxisMechanicalNode(Direction.Axis axis) implements MechanicalNode,
 
     @Override
     public @Nullable NbtElement toTag() {
-        return NbtString.of(axis.asString());
+        return null;
     }
 
     @Override
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
         var list = new ArrayList<HalfLink>();
-        self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.axis,1))
-                .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).forEach(list::add);
-        self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.axis,-1))
-                .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).forEach(list::add);
 
+        for (var dir : Direction.values()) {
+            self.getGraphWorld().getNodesAt(self.getBlockPos().offset(dir))
+                    .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).forEach(list::add);
+        }
         return list;
     }
 
     @Override
     public boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
-        return MechanicalNode.super.canConnect(self, other) && AxisNode.canConnect(this, self, other);
+        return self.getBlockPos().getManhattanDistance(other.other().getBlockPos()) == 1;
     }
 
     @Override
     public void onConnectionsChanged(@NotNull NodeHolder<BlockNode> self) {
 
     }
-
 }

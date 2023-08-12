@@ -2,15 +2,13 @@ package eu.pb4.polyfactory.block.mechanical.source;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.polyfactory.block.mechanical.machines.MinerBlockEntity;
 import eu.pb4.polyfactory.block.multiblock.MultiBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseModel;
-import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
-import eu.pb4.polyfactory.nodes.mechanical.AxisMechanicalNode;
-import eu.pb4.polyfactory.nodes.mechanical.AxisRotationUserNode;
+import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
+import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
@@ -160,7 +158,7 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
         return getY(state) == 2 ? List.of(getX(state) == 0 && getZ(state) == 0 ?
-                new AxisRotationUserNode(state.get(FACING).rotateYCounterclockwise().getAxis()) : new AxisMechanicalNode(state.get(FACING).rotateYCounterclockwise().getAxis())) : List.of();
+                new FunctionalAxisNode(state.get(FACING).rotateYCounterclockwise().getAxis()) : new SimpleAxisNode(state.get(FACING).rotateYCounterclockwise().getAxis())) : List.of();
     }
 
     @Override

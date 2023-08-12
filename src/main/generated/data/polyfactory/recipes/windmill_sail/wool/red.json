@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "group": "polyfactory:windmill_sail",
+  "key": {
+    "c": {
+      "item": "minecraft:red_wool"
+    },
+    "s": {
+      "item": "minecraft:stick"
+    },
+    "w": {
+      "item": "polyfactory:wooden_plate"
+    }
+  },
+  "pattern": [
+    " sw",
+    " ws",
+    "wsc"
+  ],
+  "result": {
+    "item": "polyfactory:windmill_sail",
+    "polyfactory:nbt": {
+      "display": {
+        "color": 11546150
+      }
+    }
+  },
+  "show_notification": true
+}

@@ -2,8 +2,8 @@ package eu.pb4.polyfactory.block;
 
 import com.google.common.collect.ImmutableSet;
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.block.creative.CreativeContainerBlockEntity;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlockEntity;
-import eu.pb4.polyfactory.block.creative.ItemGeneratorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.*;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
@@ -63,8 +63,8 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<MixerBlockEntity> MIXER = register("mixer",
             FabricBlockEntityTypeBuilder.create(MixerBlockEntity::new).addBlock(FactoryBlocks.MIXER));
 
-    public static final BlockEntityType<ItemGeneratorBlockEntity> ITEM_GENERATOR = register("item_generator",
-            FabricBlockEntityTypeBuilder.create(ItemGeneratorBlockEntity::new).addBlock(FactoryBlocks.ITEM_GENERATOR));
+    public static final BlockEntityType<CreativeContainerBlockEntity> CREATIVE_CONTAINER = register("creative_container",
+            FabricBlockEntityTypeBuilder.create(CreativeContainerBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_CONTAINER));
 
     public static final BlockEntityType<CreativeMotorBlockEntity> CREATIVE_MOTOR = register("creative_motor",
             FabricBlockEntityTypeBuilder.create(CreativeMotorBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_MOTOR));

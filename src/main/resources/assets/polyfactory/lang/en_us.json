@@ -18,6 +18,7 @@
   "block.polyfactory.steam_engine": "Steam Engine",
   "block.polyfactory.windmill": "Windmill",
   "block.polyfactory.creative_motor": "Creative Motor",
+  "block.polyfactory.creative_container": "Creative Container",
   "item.polyfactory.windmill_sail": "Windmill Sail",
   "item.polyfactory.item_filter": "Item Filter",
   "item.polyfactory.item_filter.empty": "Empty Item Filter",

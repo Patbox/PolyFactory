@@ -1,9 +1,8 @@
 package eu.pb4.polyfactory.block;
 
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.block.creative.CreativeContainerBlock;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
-import eu.pb4.polyfactory.block.creative.ItemGeneratorBlock;
-import eu.pb4.polyfactory.block.electric.CablePlateBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.MinerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
@@ -16,7 +15,6 @@ import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlock;
 import eu.pb4.polyfactory.block.mechanical.source.HandCrankBlock;
 import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
-import eu.pb4.polyfactory.block.multiblock.MultiBlock;
 import eu.pb4.polyfactory.block.other.ContainerBlock;
 import eu.pb4.polyfactory.block.other.GreenScreenBlock;
 import eu.pb4.polyfactory.block.other.SelectivePassthroughBlock;
@@ -55,7 +53,8 @@ public class FactoryBlocks {
 
 
     public static final CreativeMotorBlock CREATIVE_MOTOR = register("creative_motor", new CreativeMotorBlock(AbstractBlock.Settings.create().strength(-1, -1).nonOpaque()));
-    public static final ItemGeneratorBlock ITEM_GENERATOR = register("item_generator", new ItemGeneratorBlock(AbstractBlock.Settings.create().strength(-1, -1)));
+    public static final CreativeContainerBlock CREATIVE_CONTAINER = register("creative_container", new CreativeContainerBlock(AbstractBlock.Settings.create().strength(-1, -1).nonOpaque()));
+
     public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", new RotationalDebugBlock(AbstractBlock.Settings.create().strength(-1, -1)));
     public static final GreenScreenBlock GREEN_SCREEN = register("green_screen", new GreenScreenBlock(AbstractBlock.Settings.copy(Blocks.GREEN_WOOL)));
 

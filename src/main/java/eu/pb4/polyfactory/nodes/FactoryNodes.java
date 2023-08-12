@@ -7,6 +7,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.nodes.generic.*;
 import eu.pb4.polyfactory.nodes.mechanical.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,14 +17,13 @@ import static eu.pb4.polyfactory.ModInit.id;
 
 public class FactoryNodes {
     public static final GraphUniverse ROTATIONAL = registerRotational();
+    public static final GraphUniverse ENERGY = registerEnergy();
 
     public static void register() {
     }
 
     private static GraphUniverse registerRotational() {
         var universe = GraphUniverse.builder().build(id("rotations"));
-
-
         universe.addDiscoverer((world, pos) -> {
             var blockState = world.getBlockState(pos);
 
@@ -34,21 +34,37 @@ public class FactoryNodes {
         });
 
         universe.addNodeType(ConveyorNode.TYPE);
-        universe.addNodeType(DirectionalRotationUserNode.TYPE);
-        universe.addNodeType(DirectionalMechanicalNode.TYPE);
-        universe.addNodeType(AxisRotationUserNode.TYPE);
-        universe.addNodeType(AxisMechanicalNode.TYPE);
-        universe.addNodeType(AllSideNode.TYPE);
-
-        universe.addCacheCategory(RotationUserNode.CACHE);
-
         universe.addGraphEntityType(RotationData.TYPE);
-
-        //universe.addNodeType(CablePlateNode.TYPE, CablePlateNode.DECODER);
-        //universe.addNodeType(DirectionalElectricalNode.TYPE, DirectionalElectricalNode.DECODER);
+        addSimpleNodes(universe);
 
         universe.register();
         return universe;
+    }
+
+    private static GraphUniverse registerEnergy() {
+        var universe = GraphUniverse.builder().build(id("energy"));
+        universe.addDiscoverer((world, pos) -> {
+            var blockState = world.getBlockState(pos);
+
+            if (blockState.getBlock() instanceof NetworkComponent.Energy rotational) {
+                return rotational.createEnergyNodes(blockState, world, pos);
+            }
+            return List.of();
+        });
+
+        addSimpleNodes(universe);
+        universe.register();
+        return universe;
+    }
+
+    private static void addSimpleNodes(GraphUniverse universe) {
+        universe.addNodeType(FunctionalDirectionNode.TYPE);
+        universe.addNodeType(FunctionalAxisNode.TYPE);
+        universe.addNodeType(SimpleDirectionNode.TYPE);
+        universe.addNodeType(SimpleAxisNode.TYPE);
+        universe.addNodeType(AllSideNode.TYPE);
+
+        universe.addCacheCategory(FunctionalNode.CACHE);
     }
 
 

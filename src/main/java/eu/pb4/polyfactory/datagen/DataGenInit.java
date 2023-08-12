@@ -13,6 +13,7 @@ import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
+import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryEntityTags;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
@@ -33,6 +34,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.book.RecipeCategory;
@@ -242,7 +244,8 @@ public class DataGenInit implements DataGeneratorEntrypoint {
 
         @Override
         public void generate(Consumer<RecipeJsonProvider> exporter) {
-            var dyes = List.of(Items.BLACK_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.CYAN_DYE, Items.GRAY_DYE, Items.GREEN_DYE, Items.LIGHT_BLUE_DYE, Items.LIGHT_GRAY_DYE, Items.LIME_DYE, Items.MAGENTA_DYE, Items.ORANGE_DYE, Items.PINK_DYE, Items.PURPLE_DYE, Items.RED_DYE, Items.YELLOW_DYE, Items.WHITE_DYE);
+            //noinspection unchecked
+            var dyes = (List<DyeItem>) (Object) List.of(Items.BLACK_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.CYAN_DYE, Items.GRAY_DYE, Items.GREEN_DYE, Items.LIGHT_BLUE_DYE, Items.LIGHT_GRAY_DYE, Items.LIME_DYE, Items.MAGENTA_DYE, Items.ORANGE_DYE, Items.PINK_DYE, Items.PURPLE_DYE, Items.RED_DYE, Items.YELLOW_DYE, Items.WHITE_DYE);
 
             ShapelessRecipeJsonBuilder.create(RecipeCategory.TOOLS, FactoryItems.STEEL_ALLOY_MIXTURE)
                     .input(Items.IRON_INGOT, 2).input(Items.COAL).input(Items.REDSTONE)
@@ -299,6 +302,14 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .input('p', FactoryItems.WOODEN_PLATE).input('o', ItemTags.WOOL)
                     .input('w', FactoryItems.STEEL_PLATE)
                     .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.SPLITTER_BLOCK, 1)
+                    .pattern("sss")
+                    .pattern("f f")
+                    .pattern("sss")
+                    .input('f', FactoryItems.FUNNEL_BLOCK).input('s', FactoryItems.STEEL_PLATE)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.FUNNEL_BLOCK))
                     .offerTo(exporter);
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.CONTAINER_BLOCK, 1)
@@ -401,7 +412,28 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             );
 
             for (var dye : dyes) {
-                var nameSolid = ((DyeItem) dye).getColor().getName() + "_concrete";
+                var x = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.WINDMILL_SAIL, 1)
+                        .pattern(" sw")
+                        .pattern(" ws")
+                        .pattern("wsc")
+                        .input('w', FactoryItems.WOODEN_PLATE).input('s', Items.STICK)
+                        .input('c', Registries.ITEM.get(new Identifier(dye.getColor().getName() + "_wool")))
+                        .group("polyfactory:windmill_sail")
+                        .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.WOODEN_PLATE));
+
+                if (dye != Items.WHITE_DYE) {
+                    var nbt = new NbtCompound();
+                    var display = new NbtCompound();
+                    display.putInt("color", DyeColorExtra.getColor(dye.getColor()));
+                    nbt.put("display", display);
+
+                    ((NbtRecipe) x).polyfactory$setNbt(nbt);
+                }
+
+                x.offerTo(exporter, id("windmill_sail/wool/" + dye.getColor()));
+
+
+                var nameSolid = dye.getColor().getName() + "_concrete";
                 var namePowder = nameSolid + "_powder";
 
                 var powder = Registries.ITEM.get(new Identifier(namePowder));
