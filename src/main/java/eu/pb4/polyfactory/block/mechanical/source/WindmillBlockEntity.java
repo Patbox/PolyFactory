@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 
 public class WindmillBlockEntity extends BlockEntity {
     private static final double LOG_BASE = Math.log(3);
-    private DefaultedList<ItemStack> sails = DefaultedList.of();
+    private final DefaultedList<ItemStack> sails = DefaultedList.of();
     private int sample = Integer.MIN_VALUE;
 
     public WindmillBlockEntity(BlockPos pos, BlockState state) {

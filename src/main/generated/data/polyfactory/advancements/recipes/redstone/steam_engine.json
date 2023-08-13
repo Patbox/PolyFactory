@@ -1,13 +1,7 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_the_recipe": {
-      "conditions": {
-        "recipe": "polyfactory:steel_cog"
-      },
-      "trigger": "minecraft:recipe_unlocked"
-    },
-    "steel_ingot": {
+    "get_steel": {
       "conditions": {
         "items": [
           {
@@ -18,17 +12,23 @@
         ]
       },
       "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "polyfactory:steam_engine"
+      },
+      "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "steel_ingot",
+      "get_steel",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "polyfactory:steel_cog"
+      "polyfactory:steam_engine"
     ]
   },
   "sends_telemetry_event": false

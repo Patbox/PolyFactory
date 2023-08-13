@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
+import eu.pb4.polyfactory.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -10,10 +11,13 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.function.Predicate;
 
-public class FunnelBlockEntity extends BlockEntity {
+public class FunnelBlockEntity extends BlockEntity implements BlockEntityExtraListener {
+    private FunnelBlock.Model model;
+
     public FunnelBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.FUNNEL, pos, state);
     }
@@ -31,16 +35,10 @@ public class FunnelBlockEntity extends BlockEntity {
         super.setWorld(world);
     }
 
-    @Override
-    public NbtCompound toInitialChunkDataNbt() {
-        this.updateHologram();
-        return super.toInitialChunkDataNbt();
-    }
 
     private void updateHologram() {
-        var type = BlockBoundAttachment.get(this.world, this.pos);
 
-        if (type != null && type.holder() instanceof FunnelBlock.Model model) {
+        if (this.model != null) {
             model.filterElement.setItem(this.filter.icon());
             model.tick();
         }
@@ -70,5 +68,11 @@ public class FunnelBlockEntity extends BlockEntity {
 
     public ItemStack getFilter() {
         return this.filterStack;
+    }
+
+    @Override
+    public void onListenerUpdate(WorldChunk chunk) {
+        this.model = BlockBoundAttachment.get(chunk, this.pos).holder() instanceof FunnelBlock.Model model ? model : null;
+        this.updateHologram();
     }
 }

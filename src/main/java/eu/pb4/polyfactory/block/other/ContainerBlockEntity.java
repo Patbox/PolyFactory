@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.other;
 
+import eu.pb4.polyfactory.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -14,15 +15,18 @@ import net.minecraft.inventory.ContainerLock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.WorldChunk;
 
 @SuppressWarnings("UnstableApiUsage")
-public class ContainerBlockEntity extends LockableBlockEntity {
+public class ContainerBlockEntity extends LockableBlockEntity implements BlockEntityExtraListener {
     static  {
         ItemStorage.SIDED.registerForBlockEntity((self, dir) -> self.storage, FactoryBlockEntities.CONTAINER);
     }
     private static final int MAX_SLOT_SIZE = 9 * 4;
 
     private ItemStack itemStack = ItemStack.EMPTY;
+    private ContainerBlock.Model model;
+
     public ContainerBlockEntity(BlockPos pos, BlockState state) {
         this(FactoryBlockEntities.CONTAINER, pos, state);
     }
@@ -70,19 +74,12 @@ public class ContainerBlockEntity extends LockableBlockEntity {
         super.readNbt(nbt);
     }
 
-    @Override
-    public NbtCompound toInitialChunkDataNbt() {
-        this.updateHologram();
-        return super.toInitialChunkDataNbt();
-    }
-
     private void updateHologram() {
-        var type = BlockBoundAttachment.get(this.world, this.pos);
         if (this.itemStack == ItemStack.EMPTY) {
             this.itemStack = this.storage.variant.toStack();
         }
 
-        if (type != null && type.holder() instanceof ContainerBlock.Model model) {
+        if (this.model != null) {
             model.setDisplay(this.itemStack, this.storage.amount);
             model.tick();
         }
@@ -133,4 +130,9 @@ public class ContainerBlockEntity extends LockableBlockEntity {
     }
 
 
+    @Override
+    public void onListenerUpdate(WorldChunk chunk) {
+        this.model = BlockBoundAttachment.get(chunk, this.pos).holder() instanceof ContainerBlock.Model model ? model : null;
+        this.updateHologram();
+    }
 }

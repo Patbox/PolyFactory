@@ -3,7 +3,7 @@
   "category": "redstone",
   "ingredients": [
     {
-      "item": "polyfactory:sticky_conveyor"
+      "item": "polyfactory:conveyor"
     },
     {
       "item": "minecraft:slime_ball"

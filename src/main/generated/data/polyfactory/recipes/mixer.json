@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "c": {
+      "item": "minecraft:cauldron"
+    },
+    "g": {
+      "item": "polyfactory:generic_machine_part"
+    },
+    "i": {
+      "item": "minecraft:iron_shovel"
+    }
+  },
+  "pattern": [
+    "g",
+    "i",
+    "c"
+  ],
+  "result": {
+    "item": "polyfactory:mixer"
+  },
+  "show_notification": true
+}

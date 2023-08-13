@@ -16,6 +16,7 @@ import eu.pb4.polyfactory.block.mechanical.FanBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlockEntity;
 import eu.pb4.polyfactory.block.other.ContainerBlockEntity;
+import eu.pb4.polyfactory.block.other.NixieTubeBlockEntity;
 import eu.pb4.polyfactory.mixin.BlockEntityTypeAccessor;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -62,6 +63,9 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<MixerBlockEntity> MIXER = register("mixer",
             FabricBlockEntityTypeBuilder.create(MixerBlockEntity::new).addBlock(FactoryBlocks.MIXER));
+
+    public static final BlockEntityType<NixieTubeBlockEntity> NIXIE_TUBES = register("nixie_tube",
+            FabricBlockEntityTypeBuilder.create(NixieTubeBlockEntity::new).addBlock(FactoryBlocks.NIXIE_TUBE));
 
     public static final BlockEntityType<CreativeContainerBlockEntity> CREATIVE_CONTAINER = register("creative_container",
             FabricBlockEntityTypeBuilder.create(CreativeContainerBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_CONTAINER));

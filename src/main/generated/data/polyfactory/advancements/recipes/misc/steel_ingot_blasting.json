@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "get_steel": {
+    "get_steel_mixture": {
       "conditions": {
         "items": [
           {
             "items": [
-              "minecraft:iron_ingot"
+              "polyfactory:steel_alloy_mixture"
             ]
           }
         ]
@@ -15,20 +15,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "polyfactory:grinder"
+        "recipe": "polyfactory:steel_ingot_blasting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "get_steel",
+      "get_steel_mixture",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "polyfactory:grinder"
+      "polyfactory:steel_ingot_blasting"
     ]
   },
   "sends_telemetry_event": false

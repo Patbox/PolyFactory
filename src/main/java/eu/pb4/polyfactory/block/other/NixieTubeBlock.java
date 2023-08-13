@@ -1,7 +1,9 @@
 package eu.pb4.polyfactory.block.other;
 
+import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -13,52 +15,51 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.decoration.Brightness;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
+import net.minecraft.state.property.*;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Formatting;
+import net.minecraft.util.*;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class NixieTubeBlock extends Block implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker {
-    public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
+    public static Property<Direction.Axis> AXIS = Properties.AXIS;
+    public static BooleanProperty POSITIVE_CONNECTED = BooleanProperty.of("positive_connected");
+    public static BooleanProperty NEGATIVE_CONNECTED = BooleanProperty.of("negative_connected");
     public static EnumProperty<BlockHalf> HALF = Properties.BLOCK_HALF;
-    private static final List<Model> UPDATE_NEXT_TICK = new ArrayList<>();
 
 
     public NixieTubeBlock(Settings settings) {
         super(settings);
-        ServerTickEvents.START_SERVER_TICK.register((server -> {
-            for (var x : UPDATE_NEXT_TICK) {
-                x.updateValues();
-            }
-            UPDATE_NEXT_TICK.clear();
-        }));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING, HALF);
+        builder.add(AXIS, HALF, POSITIVE_CONNECTED, NEGATIVE_CONNECTED);
     }
 
     @Override
@@ -66,35 +67,64 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockWithElem
         return Blocks.BARRIER;
     }
 
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (!player.canModifyBlocks()) {
+            return ActionResult.PASS;
+        }
+        var stack = player.getStackInHand(hand);
+
+        if (stack.isOf(Items.NAME_TAG)) {
+            var name = stack.hasCustomName() ? stack.getName().getString() : "";
+
+            if (world.getBlockEntity(pos) instanceof NixieTubeBlockEntity be) {
+                be.pushText(name);
+                return ActionResult.SUCCESS;
+            }
+        } else if (stack.getItem() instanceof DyeItem dye) {
+            var color = DyeColorExtra.getColor(dye.getColor());
+            if (world.getBlockEntity(pos) instanceof NixieTubeBlockEntity be) {
+                if (be.setColor(color)) {
+                    be.updateText();
+                    if (!player.isCreative()) {
+                        stack.decrement(1);
+                    }
+                    return ActionResult.SUCCESS;
+                }
+            }
+        }
+
+        return super.onUse(state, world, pos, player, hand, hit);
+    }
+
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite()).with(HALF,
+        return this.getDefaultState().with(POSITIVE_CONNECTED, false).with(NEGATIVE_CONNECTED, false).with(AXIS, ctx.getHorizontalPlayerFacing().rotateYClockwise().getAxis()).with(HALF,
                 ((ctx.getSide().getAxis() == Direction.Axis.Y && ctx.getSide() == Direction.DOWN) || (ctx.getSide().getAxis() != Direction.Axis.Y && ctx.getHitPos().y - ctx.getBlockPos().getY() > 0.5)) ? BlockHalf.TOP : BlockHalf.BOTTOM);
     }
 
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        if (!world.isClient) {
-            world.scheduleBlockTick(pos, this, 4);
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        if (state.get(AXIS) != direction.getAxis()) {
+            return state;
         }
+
+        return state.with(direction.getDirection() == Direction.AxisDirection.POSITIVE ? POSITIVE_CONNECTED : NEGATIVE_CONNECTED, neighborState.isOf(FactoryBlocks.NIXIE_TUBE) && neighborState.get(AXIS) == state.get(AXIS) && neighborState.get(HALF) == state.get(HALF));
     }
 
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        var model = BlockBoundAttachment.get(world, pos);
-
-        if (model != null) {
-            ((Model) model.holder()).update();
+    @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (newState.isOf(this) && world.getBlockEntity(pos) instanceof NixieTubeBlockEntity be) {
+            be.updatePositions(world, pos, newState);
         }
+
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @Override
     public BlockState rotate(BlockState state, BlockRotation rotation) {
-        return FactoryUtil.transform(state, rotation::rotate, FACING);
-    }
-
-    @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return FactoryUtil.transform(state, mirror::apply, FACING);
+        return state.with(AXIS, rotation.rotate(Direction.get(Direction.AxisDirection.POSITIVE, state.get(AXIS))).getAxis());
     }
 
     @Override
@@ -102,14 +132,10 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockWithElem
         return new Model(world, pos, initialBlockState);
     }
 
-    private static int getDisplayValue(ServerWorld world, BlockPos pos) {
-        int i = 0;
-
-        for(var direction : Direction.values()) {
-            i += world.getEmittedRedstonePower(pos.offset(direction), direction);
-        }
-
-        return i;
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new NixieTubeBlockEntity(pos, state);
     }
 
     public final class Model extends BaseModel {
@@ -117,13 +143,15 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockWithElem
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement mainElement;
         private final TextDisplayElement[] display = new TextDisplayElement[4];
-        private final ServerWorld world;
-        private final BlockPos pos;
-        private int value = Integer.MIN_VALUE;
+        private char positiveFirst = ' ';
+        private char positiveSecond = ' ';
+        private char negativeFirst = ' ';
+        private char negativeSecond = ' ';
+        private int color;
 
         private Model(ServerWorld world, BlockPos pos, BlockState state) {
-            this.world = world;
-            this.pos = pos;
+            //this.world = world;
+            //this.pos = pos;
             this.mainElement = new ItemDisplayElement(FactoryItems.NIXIE_TUBE);
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
@@ -147,26 +175,72 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockWithElem
             for (int i = 0; i < 4; i++) {
                 this.addElement(this.display[i]);
             }
-
-            UPDATE_NEXT_TICK.add(this);
         }
 
-        private boolean updateValues() {
+        public void setColor(int color) {
+            if (this.color == color) {
+                return;
+            }
+            this.positiveFirst = 0;
+            this.positiveSecond = 0;
+            this.negativeFirst = 0;
+            this.negativeSecond = 0;
+            this.color = color;
+        }
+
+        public void setText(char positiveFirst, char positiveSecond, char negativeFirst, char negativeSecond) {
+            boolean dirty = false;
+            if (this.positiveFirst != positiveFirst) {
+                this.display[2].setText(asText(Character.toString(positiveFirst)));
+                this.positiveFirst = positiveFirst;
+                dirty = true;
+            }
+
+            if (this.positiveSecond != positiveSecond) {
+                this.display[0].setText(asText(Character.toString(positiveSecond)));
+                this.positiveSecond = positiveSecond;
+                dirty = true;
+            }
+
+            if (this.negativeFirst != negativeFirst) {
+                this.display[3].setText(asText(Character.toString(negativeFirst)));
+                this.negativeFirst = negativeFirst;
+                dirty = true;
+            }
+
+            if (this.negativeSecond != negativeSecond) {
+                this.display[1].setText(asText(Character.toString(negativeSecond)));
+                this.negativeSecond = negativeSecond;
+                dirty = true;
+            }
+
+            if (dirty) {
+                this.tick();
+            }
+        }
+
+        private Text asText(String text) {
+            return Text.literal(text).setStyle(Style.EMPTY.withColor(this.color));
+        }
+
+
+
+        /*private boolean updateValues() {
             var x = Math.min(getDisplayValue(world, pos), 99);
 
             if (x != this.value) {
                 this.value = x;
-
-                for (int i = 0; i < 4; i += 2) {
+for (int i = 0; i < 4; i += 2) {
                     var t = Text.literal("" + (x % 10)).formatted(Formatting.GOLD);
                     this.display[i].setText(t);
                     this.display[i + 1].setText(t);
                     x /= 10;
                 }
+
                 return true;
             }
             return false;
-        }
+        }*/
 
         @Override
         public boolean startWatching(ServerPlayNetworkHandler player) {
@@ -174,14 +248,14 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockWithElem
         }
 
         public void update() {
-            if (updateValues()) {
+           // if (updateValues()) {
                 this.updateFacing(BlockBoundAttachment.get(this).getBlockState());
                 this.tick();
-            }
+            //}
         }
 
         private void updateFacing(BlockState facing) {
-            var rot = facing.get(FACING).getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
+            var rot = Direction.get(Direction.AxisDirection.POSITIVE, facing.get(AXIS)).rotateYClockwise().getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
             var up = facing.get(HALF) == BlockHalf.TOP;
             mat.clear();
             mat.rotate(rot);

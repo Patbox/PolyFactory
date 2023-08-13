@@ -29,6 +29,7 @@
       }
     }
   ],
+  "minimum_speed": 4.0,
   "optimal_speed": 10.0,
   "output": {
     "Count": 1,

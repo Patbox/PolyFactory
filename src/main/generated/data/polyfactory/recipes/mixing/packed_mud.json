@@ -3,22 +3,20 @@
   "input": [
     {
       "base": {
-        "tag": "minecraft:smelts_to_glass"
-      },
-      "count": 4
+        "item": "minecraft:wheat"
+      }
     },
     {
       "base": {
-        "item": "minecraft:gunpowder"
-      },
-      "count": 5
+        "item": "minecraft:mud"
+      }
     }
   ],
   "minimum_speed": 4.0,
-  "optimal_speed": 16.0,
+  "optimal_speed": 10.0,
   "output": {
     "Count": 1,
-    "id": "minecraft:tnt"
+    "id": "minecraft:packed_mud"
   },
   "time": 2.0
 }

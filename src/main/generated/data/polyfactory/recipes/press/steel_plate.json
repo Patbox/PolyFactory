@@ -8,7 +8,7 @@
   "minimum_speed": 12.0,
   "output": {
     "item": {
-      "Count": 2,
+      "Count": 1,
       "id": "polyfactory:steel_plate"
     }
   }

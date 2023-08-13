@@ -17,6 +17,7 @@
     "ServerPlayerEntityMixin",
     "ServerPlayerInteractionManagerMixin",
     "ServerPlayNetworkHandlerMixin",
+    "WorldChunkMixin",
     "compat.htm_LockableBlockEntityMixin",
     "nbtrecipe.ShapedRecipeJsonBuilderMixin",
     "nbtrecipe.ShapedRecipeJsonBuilderMixin$ShapedRecipeJsonProviderMixin",

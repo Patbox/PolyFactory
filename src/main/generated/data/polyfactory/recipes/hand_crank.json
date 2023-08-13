@@ -2,11 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "a": {
-      "item": "polyfactory:axle"
-    },
     "i": {
-      "item": "polyfactory:steel_ingot"
+      "item": "minecraft:iron_ingot"
+    },
+    "l": {
+      "tag": "polyfactory:stripped_logs"
     },
     "p": {
       "tag": "minecraft:planks"
@@ -14,7 +14,7 @@
   },
   "pattern": [
     "ip",
-    "a "
+    "l "
   ],
   "result": {
     "item": "polyfactory:hand_crank"

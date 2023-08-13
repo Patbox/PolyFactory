@@ -4,18 +4,15 @@
   "key": {
     "i": {
       "item": "polyfactory:steel_ingot"
-    },
-    "p": {
-      "item": "polyfactory:steel_plate"
     }
   },
   "pattern": [
-    " p ",
-    "pip",
-    " p "
+    " i ",
+    "i i",
+    " i "
   ],
   "result": {
-    "item": "polyfactory:steel_cog"
+    "item": "polyfactory:steel_gear"
   },
   "show_notification": true
 }

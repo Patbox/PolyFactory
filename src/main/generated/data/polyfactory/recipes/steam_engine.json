@@ -3,25 +3,22 @@
   "category": "redstone",
   "key": {
     "a": {
-      "item": "polyfactory:axle"
+      "item": "minecraft:deepslate_bricks"
     },
-    "i": {
-      "item": "minecraft:iron_ingot"
-    },
-    "s": {
-      "item": "polyfactory:steel_gear"
+    "b": {
+      "item": "minecraft:blast_furnace"
     },
     "w": {
       "item": "polyfactory:steel_plate"
     }
   },
   "pattern": [
-    " i ",
-    "wsw",
-    "waw"
+    "www",
+    "wbw",
+    "aaa"
   ],
   "result": {
-    "item": "polyfactory:miner"
+    "item": "polyfactory:steam_engine"
   },
   "show_notification": true
 }

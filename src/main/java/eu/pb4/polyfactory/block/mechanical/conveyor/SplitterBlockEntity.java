@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
+import eu.pb4.polyfactory.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -13,14 +14,16 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.function.Predicate;
 
-public class SplitterBlockEntity extends BlockEntity {
+public class SplitterBlockEntity extends BlockEntity implements BlockEntityExtraListener {
     private FilterItem.Data filterLeft = FilterItem.createData(ItemStack.EMPTY, false);
     private FilterItem.Data filterRight = FilterItem.createData(ItemStack.EMPTY, false);
     private ItemStack filterStackLeft = ItemStack.EMPTY;
     private ItemStack filterStackRight = ItemStack.EMPTY;
+    private SplitterBlock.Model model;
 
     public SplitterBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.SPLITTER, pos, state);
@@ -32,16 +35,8 @@ public class SplitterBlockEntity extends BlockEntity {
         nbt.put("FilterStackRight", this.filterStackRight.writeNbt(new NbtCompound()));
     }
 
-    @Override
-    public NbtCompound toInitialChunkDataNbt() {
-        this.updateHologram();
-        return super.toInitialChunkDataNbt();
-    }
-
     private void updateHologram() {
-        var type = BlockBoundAttachment.get(this.world, this.pos);
-
-        if (type != null && type.holder() instanceof SplitterBlock.Model model) {
+        if (this.model != null) {
             model.updateFilters(filterLeft.icon(), filterRight.icon());
             model.tick();
         }
@@ -88,6 +83,12 @@ public class SplitterBlockEntity extends BlockEntity {
         this.filterRight = FilterItem.createData(stack, false);
 
         this.markDirty();
+        this.updateHologram();
+    }
+
+    @Override
+    public void onListenerUpdate(WorldChunk chunk) {
+        this.model = BlockBoundAttachment.get(chunk, this.pos).holder() instanceof SplitterBlock.Model model ? model : null;
         this.updateHologram();
     }
 }

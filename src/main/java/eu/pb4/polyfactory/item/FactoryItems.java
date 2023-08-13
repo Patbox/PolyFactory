@@ -40,10 +40,12 @@ public class FactoryItems {
     public static final Item WINDMILL_SAIL = register("windmill_sail", new WindmillSailItem(new Item.Settings()));
     public static final Item METAL_GRID_BLOCK = register("metal_grid", new ModeledBlockItem(FactoryBlocks.METAL_GRID, new Item.Settings()));
 
+    public static final Item COAL_DUST = register("coal_dust", new ModeledItem(Items.COAL, new Item.Settings()));
     public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
     public static final Item STEEL_INGOT = register("steel_ingot", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
     public static final Item STEEL_PLATE = register("steel_plate", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
-    public static final Item STEEL_COG = register("steel_cog", new ModeledItem(Items.IRON_NUGGET, new Item.Settings()));
+    public static final Item STEEL_GEAR = register("steel_gear", new ModeledItem(Items.IRON_NUGGET, new Item.Settings()));
+    public static final Item GENERIC_MACHINE_PART = register("generic_machine_part", new ModeledItem(Items.IRON_NUGGET, new Item.Settings()));
 
     public static final Item WOODEN_PLATE = register("wooden_plate", new ModeledItem(Items.PAPER, new Item.Settings()));
     public static final Item TREATED_DRIED_KELP = register("treated_dried_kelp", new ModeledItem(Items.PAPER, new Item.Settings()));
@@ -94,12 +96,14 @@ public class FactoryItems {
                     //entries.add(CABLE_PLATE_BLOCK);
 
                     // Materials
+                    entries.add(COAL_DUST);
                     entries.add(STEEL_ALLOY_MIXTURE);
                     entries.add(STEEL_INGOT);
                     entries.add(STEEL_PLATE);
-                    entries.add(STEEL_COG);
+                    entries.add(STEEL_GEAR);
                     entries.add(WOODEN_PLATE);
                     entries.add(TREATED_DRIED_KELP);
+                    entries.add(GENERIC_MACHINE_PART);
 
 
 

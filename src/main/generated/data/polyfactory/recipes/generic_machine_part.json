@@ -6,19 +6,16 @@
       "item": "polyfactory:steel_gear"
     },
     "s": {
-      "tag": "minecraft:planks"
-    },
-    "w": {
-      "item": "polyfactory:axle"
+      "item": "polyfactory:steel_ingot"
     }
   },
   "pattern": [
-    "gw ",
-    "sws",
-    " wg"
+    "sss",
+    "g g",
+    "s s"
   ],
   "result": {
-    "item": "polyfactory:gearbox"
+    "item": "polyfactory:generic_machine_part"
   },
   "show_notification": true
 }

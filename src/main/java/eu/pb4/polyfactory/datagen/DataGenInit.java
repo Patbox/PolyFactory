@@ -183,7 +183,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
         protected void configure(RegistryWrapper.WrapperLookup arg) {
             this.getOrCreateTagBuilder(FactoryItemTags.ALLOWED_IN_MINER)
                     .addOptionalTag(ItemTags.TOOLS)
-                    .add(FactoryItems.STEEL_COG)
+                    .add(FactoryItems.STEEL_GEAR)
             ;
 
             this.copy(FactoryBlockTags.STRIPPED_LOGS, FactoryItemTags.STRIPPED_LOGS);
@@ -248,7 +248,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             var dyes = (List<DyeItem>) (Object) List.of(Items.BLACK_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.CYAN_DYE, Items.GRAY_DYE, Items.GREEN_DYE, Items.LIGHT_BLUE_DYE, Items.LIGHT_GRAY_DYE, Items.LIME_DYE, Items.MAGENTA_DYE, Items.ORANGE_DYE, Items.PINK_DYE, Items.PURPLE_DYE, Items.RED_DYE, Items.YELLOW_DYE, Items.WHITE_DYE);
 
             ShapelessRecipeJsonBuilder.create(RecipeCategory.TOOLS, FactoryItems.STEEL_ALLOY_MIXTURE)
-                    .input(Items.IRON_INGOT, 2).input(Items.COAL).input(Items.REDSTONE)
+                    .input(Items.IRON_INGOT, 2).input(FactoryItems.COAL_DUST).input(Items.REDSTONE)
                     .criterion("get_iron", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
                     .offerTo(exporter);
 
@@ -257,6 +257,11 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                             Ingredient.ofItems(FactoryItems.STEEL_ALLOY_MIXTURE), RecipeCategory.MISC, FactoryItems.STEEL_INGOT, 0.4f, 80)
                     .criterion("get_steel_mixture", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_ALLOY_MIXTURE))
                     .offerTo(exporter);
+
+            CookingRecipeJsonBuilder.createBlasting(
+                            Ingredient.ofItems(FactoryItems.STEEL_ALLOY_MIXTURE), RecipeCategory.MISC, FactoryItems.STEEL_INGOT, 0.4f, 40)
+                    .criterion("get_steel_mixture", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_ALLOY_MIXTURE))
+                    .offerTo(exporter, id("steel_ingot_blasting"));
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.METAL_GRID_BLOCK, 1)
                     .pattern(" w ")
@@ -273,18 +278,58 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .input('i', Items.STONE_SLAB)
                     .input('w', Items.SMOOTH_STONE_SLAB)
                     .input('p', ItemTags.PLANKS)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.GENERIC_MACHINE_PART, 1)
+                    .pattern("sss")
+                    .pattern("g g")
+                    .pattern("s s")
+                    .input('s', FactoryItems.STEEL_INGOT)
+                    .input('g', FactoryItems.STEEL_GEAR)
                     .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                     .offerTo(exporter);
 
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.MIXER_BLOCK, 1)
+                    .pattern("g")
+                    .pattern("i")
+                    .pattern("c")
+                    .input('i', Items.IRON_SHOVEL)
+                    .input('c', Items.CAULDRON)
+                    .input('g', FactoryItems.GENERIC_MACHINE_PART)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.PRESS_BLOCK, 1)
+                    .pattern(" g ")
+                    .pattern("sis")
+                    .pattern("wcw")
+                    .input('i', Items.ANVIL)
+                    .input('c', Items.SMOOTH_STONE)
+                    .input('s', FactoryItems.STEEL_INGOT)
+                    .input('w', ItemTags.PLANKS)
+                    .input('g', FactoryItems.GENERIC_MACHINE_PART)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                    .offerTo(exporter);
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.MINER_BLOCK, 1)
                     .pattern(" i ")
                     .pattern("wsw")
                     .pattern("waw")
-                    .input('i', Items.IRON_INGOT).input('s', FactoryItems.STEEL_COG)
+                    .input('i', Items.IRON_INGOT).input('s', FactoryItems.STEEL_GEAR)
                     .input('w', FactoryItems.STEEL_PLATE).input('a', FactoryItems.AXLE_BLOCK)
                     .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                     .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEAM_ENGINE_BLOCK, 1)
+                    .pattern("www")
+                    .pattern("wbw")
+                    .pattern("aaa")
+                    .input('b', Items.BLAST_FURNACE)
+                    .input('w', FactoryItems.STEEL_PLATE).input('a', Items.DEEPSLATE_BRICKS)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                    .offerTo(exporter);
+
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.FAN_BLOCK, 1)
                     .pattern("iii")
@@ -334,7 +379,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .offerTo(exporter);
 
             ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STICKY_CONVEYOR_BLOCK)
-                    .input(FactoryItems.STICKY_CONVEYOR_BLOCK).input(Items.SLIME_BALL)
+                    .input(FactoryItems.CONVEYOR_BLOCK).input(Items.SLIME_BALL)
                     .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.CONVEYOR_BLOCK))
                     .offerTo(exporter);
 
@@ -347,23 +392,35 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                     .offerTo(exporter);
 
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.NIXIE_TUBE, 1)
+                    .pattern(" g ")
+                    .pattern("gsg")
+                    .pattern("cpc")
+                    .input('p', FactoryItems.WOODEN_PLATE)
+                    .input('c', Items.COPPER_INGOT)
+                    .input('s', FactoryItems.STEEL_INGOT)
+                    .input('g', Items.GLASS_PANE)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                    .offerTo(exporter);
+
             ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.GEARBOX_BLOCK, 1)
                     .pattern("gw ")
                     .pattern("sws")
                     .pattern(" wg")
                     .input('w', FactoryItems.AXLE_BLOCK).input('s', ItemTags.PLANKS)
-                    .input('g', FactoryItems.STEEL_COG)
+                    .input('g', FactoryItems.STEEL_GEAR)
                     .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.AXLE_BLOCK))
                     .offerTo(exporter);
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.HAND_CRANK_BLOCK)
                     .pattern("ip")
-                    .pattern("a ")
-                    .input('a', FactoryItems.AXLE_BLOCK).input('p', ItemTags.PLANKS).input('i', FactoryItems.STEEL_INGOT)
-                    .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.AXLE_BLOCK))
+                    .pattern("l ")
+                    .input('l', FactoryItemTags.STRIPPED_LOGS).input('p', ItemTags.PLANKS).input('i', Items.IRON_INGOT)
+                    .criterion("get_axle", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
                     .offerTo(exporter);
 
             of(exporter, GrindingRecipe.CODEC,
+                    GrindingRecipe.of("coal_dust", Ingredient.ofItems(Items.COAL), 3, 5, 15, FactoryItems.COAL_DUST),
                     GrindingRecipe.of("stone_to_cobblestone", Ingredient.ofItems(Items.STONE), 2, 5, 15, Items.COBBLESTONE),
                     GrindingRecipe.of("cobblestone_to_gravel", Ingredient.ofItems(Items.COBBLESTONE), 4, 6, 15, Items.GRAVEL),
                     GrindingRecipe.of("gravel_to_sand", Ingredient.ofItems(Items.GRAVEL), 4, 3, 15, Items.SAND),
@@ -408,7 +465,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             of(exporter, PressRecipe.CODEC,
                     PressRecipe.of("iron_ingot", Ingredient.ofItems(Items.IRON_NUGGET), 9, 10f, Items.IRON_INGOT),
                     PressRecipe.of("gold_ingot", Ingredient.ofItems(Items.GOLD_NUGGET), 9, 8f, Items.GOLD_INGOT),
-                    PressRecipe.of("steel_plate", Ingredient.ofItems(FactoryItems.STEEL_INGOT), 1, 12f, new ItemStack(FactoryItems.STEEL_PLATE, 2))
+                    PressRecipe.of("steel_plate", Ingredient.ofItems(FactoryItems.STEEL_INGOT), 1, 12f, new ItemStack(FactoryItems.STEEL_PLATE, 1))
             );
 
             for (var dye : dyes) {
@@ -463,36 +520,37 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             );
 
             of(exporter, GenericMixingRecipe.CODEC,
+                    GenericMixingRecipe.of("packed_mud",
+                            List.of(Ingredient.ofItems(Items.WHEAT), Ingredient.ofItems(Items.MUD)), 2, 4, 10, new ItemStack(Items.PACKED_MUD)),
                     GenericMixingRecipe.ofCounted("cake",
                             List.of(CountedIngredient.ofItems(3, Items.WHEAT), CountedIngredient.ofItems(2, Items.SUGAR),
                                     CountedIngredient.ofItems(1, Items.EGG),
                                     CountedIngredient.ofItemsRemainder(3, Items.MILK_BUCKET, Items.BUCKET)),
-                            2, 1, 10, new ItemStack(Items.CAKE)),
+                            2, 4, 10, new ItemStack(Items.CAKE)),
                     GenericMixingRecipe.ofCounted("cookie",
                             List.of(CountedIngredient.ofItems(2, Items.WHEAT), CountedIngredient.ofItems(1, Items.COCOA_BEANS)),
-                            2, 1, 10, new ItemStack(Items.COOKIE, 8)),
+                            2, 4, 10, new ItemStack(Items.COOKIE, 8)),
                     GenericMixingRecipe.ofCounted("bread",
                             List.of(CountedIngredient.ofItems(3, Items.WHEAT)),
-                            2, 1, 10, new ItemStack(Items.BREAD, 1 )),
+                            2, 4, 10, new ItemStack(Items.BREAD, 1 )),
                     GenericMixingRecipe.ofCounted("steel_alloy_mixture",
-                            List.of(CountedIngredient.ofItems(2, Items.IRON_INGOT), CountedIngredient.ofItems(1, Items.COAL),
+                            List.of(CountedIngredient.ofItems(3, Items.IRON_INGOT), CountedIngredient.ofItems(2, FactoryItems.COAL_DUST),
                                     CountedIngredient.ofItems(1, Items.REDSTONE)),
-                            2, 1, 15, new ItemStack(FactoryItems.STEEL_ALLOY_MIXTURE)),
+                            2, 4, 15, new ItemStack(FactoryItems.STEEL_ALLOY_MIXTURE, 2)),
                     GenericMixingRecipe.ofCounted("tnt",
                             List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS), CountedIngredient.ofItems(5, Items.GUNPOWDER)),
-                            2, 1, 16, new ItemStack(Items.TNT)),
+                            2, 4, 16, new ItemStack(Items.TNT)),
                     GenericMixingRecipe.ofCounted("redstone_to_glowstone",
                             List.of(CountedIngredient.ofItems(8, Items.REDSTONE), CountedIngredient.ofItems(1, Items.BLAZE_POWDER)),
-                            8, 1, 16, new ItemStack(Items.GLOWSTONE_DUST, 12))
+                            8, 4, 16, new ItemStack(Items.GLOWSTONE_DUST, 12))
 
             );
 
-            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_COG)
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_GEAR)
                     .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
-                    .pattern(" p ")
-                    .pattern("pip")
-                    .pattern(" p ")
-                    .input('p', FactoryItems.STEEL_PLATE)
+                    .pattern(" i ")
+                    .pattern("i i")
+                    .pattern(" i ")
                     .input('i', FactoryItems.STEEL_INGOT)
                     .offerTo(exporter);
 

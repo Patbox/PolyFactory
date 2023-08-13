@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "f": {
+      "item": "polyfactory:funnel"
+    },
+    "s": {
+      "item": "polyfactory:steel_plate"
+    }
+  },
+  "pattern": [
+    "sss",
+    "f f",
+    "sss"
+  ],
+  "result": {
+    "item": "polyfactory:splitter"
+  },
+  "show_notification": true
+}
