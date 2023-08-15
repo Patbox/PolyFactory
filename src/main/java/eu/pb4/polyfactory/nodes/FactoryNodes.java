@@ -7,6 +7,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.nodes.electric.EnergyData;
 import eu.pb4.polyfactory.nodes.generic.*;
 import eu.pb4.polyfactory.nodes.mechanical.*;
 import org.jetbrains.annotations.NotNull;
@@ -32,10 +33,11 @@ public class FactoryNodes {
             }
             return List.of();
         });
+        addSimpleNodes(universe);
 
         universe.addNodeType(ConveyorNode.TYPE);
+        universe.addNodeType(AxleWithGearMechanicalNode.TYPE);
         universe.addGraphEntityType(RotationData.TYPE);
-        addSimpleNodes(universe);
 
         universe.register();
         return universe;
@@ -53,6 +55,7 @@ public class FactoryNodes {
         });
 
         addSimpleNodes(universe);
+        universe.addGraphEntityType(EnergyData.TYPE);
         universe.register();
         return universe;
     }

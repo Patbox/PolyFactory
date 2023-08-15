@@ -68,8 +68,12 @@ dependencies {
 	modImplementation include('eu.pb4:common-protection-api:1.0.0')
 	//modImplementation include('eu.pb4:sidebar-api:0.1.2+1.19.3')
 	modImplementation include('eu.pb4:sgui:1.2.2+1.20')
-	modImplementation include('com.kneelawk:graphlib:1.0.0+1.20')
-	modCompileOnly 'maven.modrinth:polydex:1.0.0-beta.1.1+1.20.1'
+	modImplementation include('com.kneelawk:graphlib:1.2.0+1.20')
+	modCompileOnly 'maven.modrinth:polydex:1.0.0-beta.2.2+1.20.1'
+	modCompileOnly('teamreborn:energy:3.0.0') {
+		exclude(group: "net.fabricmc.fabric-api")
+	}
+	modCompileOnly 'maven.modrinth:power-networks:2.0.1+mc.1.20.1'
 	include(implementation(annotationProcessor("com.llamalad7.mixinextras:mixinextras-fabric:0.2.0-beta.9")))
 
 	modCompileOnly("maven.modrinth:htm:1.1.9")

@@ -1,4 +1,4 @@
-// 1.20.1	2023-08-13T11:09:02.537731697	PolyFactory/Recipes
+// 1.20.1	2023-08-13T12:16:43.381822875	PolyFactory/Recipes
 b426d992b7ff87219de4703e8707ae9e15ab11e7 data/polyfactory/advancements/recipes/redstone/sticky_conveyor.json
 e09b1b65ee49b4d13a8743d91bec30b3f96626c9 data/polyfactory/recipes/grinding/allium_to_dye.json
 62af52e4858d217c044ec364ed293f4ff487feb1 data/polyfactory/recipes/grinding/blue_concrete_to_powder.json
@@ -142,7 +142,7 @@ e37efb1a5f1ddd2cf7cee8eac8108c5c5c4a7c70 data/polyfactory/recipes/grinding/iron_
 b221e52883ca4754b4ee73d1779749661f037bcd data/polyfactory/recipes/windmill_sail/wool/purple.json
 7f0e614b5dde1fdbc0306634876b559b14c29a58 data/polyfactory/recipes/mixing/purple_concrete_direct.json
 c6699bf9a1295c2608010f56a47ab04d54672370 data/polyfactory/recipes/windmill_sail/wool/pink.json
-09089962642587d878974e0bed25e71206f3e14c data/polyfactory/recipes/grinding/coal_dust.json
+e8081cb67623ceb21c12ba7694fd41a42439d3ee data/polyfactory/recipes/grinding/coal_dust.json
 095555afc7abcba830e034fca283be07f1cf3614 data/polyfactory/recipes/mixing/orange_concrete_from_powder.json
 73a11601dc9e212271bcd328662c4fb054a64de0 data/polyfactory/recipes/mixing/white_concrete_powder.json
 d9c597587b8f802b00d080ec8701cd0c34ee776b data/polyfactory/recipes/mixing/orange_concrete_direct.json

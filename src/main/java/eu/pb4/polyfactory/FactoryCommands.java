@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.pb4.polyfactory.item.GearItem;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.DebugData;
@@ -42,6 +43,11 @@ public class FactoryCommands {
                                         .executes(FactoryCommands::enableLod)
                                 )
                         )
+                        .then(literal("enable_gears")
+                                .then(argument("enable", BoolArgumentType.bool())
+                                        .executes(FactoryCommands::enableGears)
+                                )
+                        )
                 )
         );
     }
@@ -50,6 +56,12 @@ public class FactoryCommands {
         LodItemDisplayElement.isEnabled = BoolArgumentType.getBool(context, "enable");;
         LodItemDisplayElement.isDisabled = !LodItemDisplayElement.isEnabled;
         context.getSource().sendFeedback(() -> Text.literal("Model LOD: " + LodItemDisplayElement.isEnabled), false);
+        return 0;
+    }
+
+    private static int enableGears(CommandContext<ServerCommandSource> context) {
+        GearItem.enable = BoolArgumentType.getBool(context, "enable");
+        context.getSource().sendFeedback(() -> Text.literal("Gear Item: " + GearItem.enable), false);
         return 0;
     }
 

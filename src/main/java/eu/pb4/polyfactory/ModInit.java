@@ -1,7 +1,9 @@
 package eu.pb4.polyfactory;
 
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
+import eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
+import eu.pb4.polyfactory.compat.power_networks.PowerNetworksInit;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
 import eu.pb4.polyfactory.models.ConveyorModel;
 import eu.pb4.polyfactory.models.GenericParts;
@@ -29,6 +31,7 @@ public class ModInit implements ModInitializer {
     public static final boolean DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
     @SuppressWarnings("PointlessBooleanExpression")
 	public static final boolean DYNAMIC_ASSETS = true && DEV;
+	//public static final boolean ENABLE_GEARS_ON_AXLE = false;
 
     public static Identifier id(String path) {
 		return new Identifier(ID, path);
@@ -50,6 +53,7 @@ public class ModInit implements ModInitializer {
 		FactoryRecipeSerializers.register();
 		AxleBlock.Model.ITEM_MODEL.getItem();
 		WindmillBlock.Model.MODEL.getItem();
+		AxleWithGearBlock.Model.ITEM_MODEL_GEAR.getItem();
 		FactoryLootTables.register();
 		FactoryCommands.register();
 		GenericParts.SMALL_GEAR.isEmpty();
@@ -62,5 +66,9 @@ public class ModInit implements ModInitializer {
 		PolydexCompat.register();
 		PolymerResourcePackUtils.addModAssets(ID);
 		PolymerResourcePackUtils.markAsRequired();
+
+		if (FabricLoader.getInstance().isModLoaded("power_networks")) {
+			PowerNetworksInit.register();
+		}
 	}
 }

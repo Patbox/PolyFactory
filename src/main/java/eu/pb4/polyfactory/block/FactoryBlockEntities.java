@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.block;
 import com.google.common.collect.ImmutableSet;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlockEntity;
-import eu.pb4.polyfactory.block.creative.CreativeMotorBlockEntity;
+import eu.pb4.polyfactory.block.electric.ElectricMotorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.*;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
@@ -67,11 +67,13 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<NixieTubeBlockEntity> NIXIE_TUBES = register("nixie_tube",
             FabricBlockEntityTypeBuilder.create(NixieTubeBlockEntity::new).addBlock(FactoryBlocks.NIXIE_TUBE));
 
+    public static final BlockEntityType<ElectricMotorBlockEntity> ELECTRIC_MOTOR = register("electric_motor",
+            FabricBlockEntityTypeBuilder.create(ElectricMotorBlockEntity::new).addBlock(FactoryBlocks.ELECTRIC_MOTOR));
     public static final BlockEntityType<CreativeContainerBlockEntity> CREATIVE_CONTAINER = register("creative_container",
             FabricBlockEntityTypeBuilder.create(CreativeContainerBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_CONTAINER));
 
-    public static final BlockEntityType<CreativeMotorBlockEntity> CREATIVE_MOTOR = register("creative_motor",
-            FabricBlockEntityTypeBuilder.create(CreativeMotorBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_MOTOR));
+    public static final BlockEntityType<CreativeContainerBlockEntity> CREATIVE_MOTOR = register("creative_motor",
+            FabricBlockEntityTypeBuilder.create(CreativeContainerBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_MOTOR));
 
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;

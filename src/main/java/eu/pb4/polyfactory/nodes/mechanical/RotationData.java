@@ -66,7 +66,7 @@ public class RotationData implements GraphEntity<RotationData> {
         for (var entries : list) {
             var blockState = world.getBlockState(entries.getBlockPos());
 
-            if (blockState.getBlock() instanceof RotationUser rotationalSource) {
+            if (entries.getNode().getTargetFunctional(world, entries.getBlockPos(), blockState) instanceof RotationUser rotationalSource) {
                 rotationalSource.updateRotationalData(state, blockState, world, entries.getBlockPos());
             }
         }

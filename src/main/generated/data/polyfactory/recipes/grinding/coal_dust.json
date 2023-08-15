@@ -4,12 +4,12 @@
     "item": "minecraft:coal"
   },
   "minimum_speed": 5.0,
-  "optimal_speed": 15.0,
+  "optimal_speed": 8.0,
   "output": {
     "item": {
       "Count": 1,
       "id": "polyfactory:coal_dust"
     }
   },
-  "time": 3.0
+  "time": 1.0
 }

@@ -224,7 +224,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             this.addDrop(FactoryBlocks.HAND_CRANK);
             this.addDrop(FactoryBlocks.CONVEYOR);
             this.addDrop(FactoryBlocks.STICKY_CONVEYOR);
-            this.addDrop(FactoryBlocks.MOTOR);
+            this.addDrop(FactoryBlocks.ELECTRIC_MOTOR);
             this.addDrop(FactoryBlocks.FUNNEL);
             this.addDrop(FactoryBlocks.AXLE);
             this.addDrop(FactoryBlocks.GEARBOX);
@@ -420,7 +420,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .offerTo(exporter);
 
             of(exporter, GrindingRecipe.CODEC,
-                    GrindingRecipe.of("coal_dust", Ingredient.ofItems(Items.COAL), 3, 5, 15, FactoryItems.COAL_DUST),
+                    GrindingRecipe.of("coal_dust", Ingredient.ofItems(Items.COAL), 1, 5, 8, FactoryItems.COAL_DUST),
                     GrindingRecipe.of("stone_to_cobblestone", Ingredient.ofItems(Items.STONE), 2, 5, 15, Items.COBBLESTONE),
                     GrindingRecipe.of("cobblestone_to_gravel", Ingredient.ofItems(Items.COBBLESTONE), 4, 6, 15, Items.GRAVEL),
                     GrindingRecipe.of("gravel_to_sand", Ingredient.ofItems(Items.GRAVEL), 4, 3, 15, Items.SAND),

@@ -22,7 +22,7 @@ public class FactoryItems {
     public static final WrenchItem WRENCH = register("wrench", new WrenchItem());
     public static final Item CONVEYOR_BLOCK = register("conveyor", new ModeledBlockItem(FactoryBlocks.CONVEYOR, new Item.Settings()));
     public static final Item STICKY_CONVEYOR_BLOCK = register("sticky_conveyor", new ModeledBlockItem(FactoryBlocks.STICKY_CONVEYOR, new Item.Settings()));
-    public static final Item MOTOR_BLOCK = register("electric_motor", new ModeledBlockItem(FactoryBlocks.MOTOR, new Item.Settings()));
+    public static final Item ELECTRIC_MOTOR_BLOCK = register("electric_motor", new ModeledBlockItem(FactoryBlocks.ELECTRIC_MOTOR, new Item.Settings()));
     public static final Item FUNNEL_BLOCK = register("funnel", new ModeledBlockItem(FactoryBlocks.FUNNEL, new Item.Settings()));
     public static final Item SPLITTER_BLOCK = register("splitter", new ModeledBlockItem(FactoryBlocks.SPLITTER, new Item.Settings()));
     public static final Item FAN_BLOCK = register("fan", new ModeledBlockItem(FactoryBlocks.FAN, new Item.Settings()));
@@ -44,7 +44,7 @@ public class FactoryItems {
     public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
     public static final Item STEEL_INGOT = register("steel_ingot", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
     public static final Item STEEL_PLATE = register("steel_plate", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
-    public static final Item STEEL_GEAR = register("steel_gear", new ModeledItem(Items.IRON_NUGGET, new Item.Settings()));
+    public static final Item STEEL_GEAR = register("steel_gear", new GearItem(new Item.Settings()));
     public static final Item GENERIC_MACHINE_PART = register("generic_machine_part", new ModeledItem(Items.IRON_NUGGET, new Item.Settings()));
 
     public static final Item WOODEN_PLATE = register("wooden_plate", new ModeledItem(Items.PAPER, new Item.Settings()));
@@ -92,7 +92,7 @@ public class FactoryItems {
                     entries.add(ITEM_FILTER);
                     
                     // Electrical machines (tier 2)
-                    entries.add(MOTOR_BLOCK);
+                    //entries.add(ELECTRIC_MOTOR_BLOCK);
                     //entries.add(CABLE_PLATE_BLOCK);
 
                     // Materials
