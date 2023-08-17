@@ -11,6 +11,7 @@ import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.electric.EnergyData;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
+import eu.pb4.polyfactory.util.StateNameProvider;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -32,6 +33,7 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -46,7 +48,7 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
-public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider, RotationUser, EnergyUser {
+public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider, RotationUser, EnergyUser, StateNameProvider {
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty GENERATOR = BooleanProperty.of("generator");
 
@@ -141,6 +143,11 @@ public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, Bl
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return ElectricMotorBlockEntity::ticker;
+    }
+
+    @Override
+    public Text getName(ServerWorld world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
+        return state.get(GENERATOR) ? Text.translatable(this.getTranslationKey() + ".generator") : this.getName();
     }
 
     private final class Model extends BaseModel {

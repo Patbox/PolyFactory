@@ -3,7 +3,8 @@ package eu.pb4.polyfactory.block.mechanical.source;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.polyfactory.block.network.RotationalNetworkBlock;
+import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
+import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
@@ -39,6 +40,7 @@ import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
@@ -61,6 +63,14 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(FACING).add(SAIL_COUNT).add(BIG);
+    }
+
+    @Override
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+        if (world.getBlockEntity(pos) instanceof WindmillBlockEntity be) {
+            return be.getSails().isEmpty() ? FactoryItems.WINDMILL_SAIL.getDefaultStack() : be.getSails().get(0).copyWithCount(1);
+        }
+        return FactoryItems.WINDMILL_SAIL.getDefaultStack();
     }
 
     @Nullable

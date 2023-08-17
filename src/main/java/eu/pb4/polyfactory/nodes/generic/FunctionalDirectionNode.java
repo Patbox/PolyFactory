@@ -37,12 +37,6 @@ public record FunctionalDirectionNode(Direction direction) implements Functional
         return self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.direction))
                 .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).toList();
     }
-
-    @Override
-    public boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
-        return DirectionNode.canConnect(this, self, other);
-    }
-
     @Override
     public void onConnectionsChanged(@NotNull NodeHolder<BlockNode> self) {
 

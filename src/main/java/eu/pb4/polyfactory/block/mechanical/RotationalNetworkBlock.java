@@ -1,6 +1,8 @@
-package eu.pb4.polyfactory.block.network;
+package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.network.NetworkBlock;
+import eu.pb4.polyfactory.block.network.NetworkComponent;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;

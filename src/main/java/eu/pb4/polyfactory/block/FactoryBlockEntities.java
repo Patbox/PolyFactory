@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block;
 import com.google.common.collect.ImmutableSet;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlockEntity;
+import eu.pb4.polyfactory.block.data.ProviderDataCacheBlockEntity;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.*;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
@@ -16,7 +17,7 @@ import eu.pb4.polyfactory.block.mechanical.FanBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlockEntity;
 import eu.pb4.polyfactory.block.other.ContainerBlockEntity;
-import eu.pb4.polyfactory.block.other.NixieTubeBlockEntity;
+import eu.pb4.polyfactory.block.data.display.NixieTubeBlockEntity;
 import eu.pb4.polyfactory.mixin.BlockEntityTypeAccessor;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -74,6 +75,8 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<CreativeContainerBlockEntity> CREATIVE_MOTOR = register("creative_motor",
             FabricBlockEntityTypeBuilder.create(CreativeContainerBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_MOTOR));
+    public static final BlockEntityType<ProviderDataCacheBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache", FabricBlockEntityTypeBuilder
+            .create(ProviderDataCacheBlockEntity::new).addBlock(FactoryBlocks.INVENTORY_COUNT_WATCHER));
 
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;

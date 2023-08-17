@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.other.LockableBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.ui.TagLimitedSlot;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.FactoryPlayer;
 import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
@@ -112,7 +113,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
 
     @Override
     protected void createGui(ServerPlayerEntity playerEntity) {
-        new Gui(player);
+        new Gui(playerEntity);
     }
 
     public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
@@ -199,14 +200,13 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.HOPPER, player, false);
             this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(MinerBlockEntity.this.getCachedState().getBlock().getName()));
-            this.setSlotRedirect(2, new Slot(MinerBlockEntity.this, 0, 0, 0));
+            this.setSlotRedirect(2, new TagLimitedSlot(MinerBlockEntity.this, 0, FactoryItemTags.ALLOWED_IN_MINER));
             this.open();
         }
 
         @Override
         public void onClose() {
             super.onClose();
-            System.out.println("Close");
         }
 
         @Override

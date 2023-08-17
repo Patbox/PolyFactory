@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.polydex;
 
+import eu.pb4.polydex.api.v1.hover.HoverDisplayBuilder;
 import eu.pb4.polydex.api.v1.recipe.*;
 import eu.pb4.polyfactory.polydex.pages.GrindingRecipePage;
 import eu.pb4.polyfactory.polydex.pages.MixerRecipePage;
@@ -11,6 +12,7 @@ import eu.pb4.polyfactory.recipe.PressRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
+import eu.pb4.polyfactory.util.StateNameProvider;
 import eu.pb4.sgui.api.elements.GuiElement;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.text.Text;
@@ -23,6 +25,15 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(PressRecipe.class, PressRecipePage::new);
         PolydexPage.registerRecipeViewer(GenericMixingRecipe.class, MixerRecipePage::new);
         PolydexPage.registerRecipeViewer(GrindingRecipe.class, GrindingRecipePage::new);
+
+        HoverDisplayBuilder.register(PolydexCompatImpl::stateAccurateNames);
+    }
+
+    private static void stateAccurateNames(HoverDisplayBuilder hoverDisplayBuilder) {
+        var target = hoverDisplayBuilder.getTarget();
+        if (target.hasTarget() && target.entity() == null && target.blockState().getBlock() instanceof StateNameProvider provider) {
+            hoverDisplayBuilder.setComponent(HoverDisplayBuilder.NAME, provider.getName(target.player().getServerWorld(), target.pos(), target.blockState(), target.blockEntity()));
+        }
     }
 
     public static GuiElement getButton(RecipeType<?> type) {

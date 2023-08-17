@@ -43,11 +43,6 @@ public record FunctionalAxisNode(Direction.Axis axis) implements FunctionalNode,
     }
 
     @Override
-    public boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
-        return  AxisNode.canConnect(this, self, other);
-    }
-
-    @Override
     public void onConnectionsChanged(@NotNull NodeHolder<BlockNode> self) {
 
     }

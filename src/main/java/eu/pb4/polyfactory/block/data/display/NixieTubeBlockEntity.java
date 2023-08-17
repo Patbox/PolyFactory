@@ -1,8 +1,8 @@
-package eu.pb4.polyfactory.block.other;
+package eu.pb4.polyfactory.block.data.display;
 
 import eu.pb4.polyfactory.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -16,11 +16,13 @@ import java.util.ArrayList;
 
 public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtraListener {
     private String value = "";
+    private char padding = ' ';
     private int positiveIndex = 0;
     private int negativeIndex = 0;
     private int connectionSize = 1;
     private int color = 0xff6e19;
     private NixieTubeBlock.Model model;
+    private int channel;
 
     public NixieTubeBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.NIXIE_TUBES, pos, state);
@@ -34,6 +36,8 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
         nbt.putInt("NIndex", this.negativeIndex);
         nbt.putInt("ConnSize", this.connectionSize);
         nbt.putInt("Color", this.color);
+        nbt.putInt("Padding", this.padding);
+        nbt.putInt("Channel", this.channel);
     }
 
     @Override
@@ -43,6 +47,8 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
         this.negativeIndex = nbt.getInt("NIndex");
         this.color = nbt.getInt("Color");
         this.connectionSize = nbt.getInt("ConnSize");
+        this.padding = (char) nbt.getInt("Padding");
+        setChannel(nbt.getInt("Channel"));
         this.updateText();
     }
 
@@ -71,12 +77,22 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
         this.updateText();
     }
 
-    public void pushText(String string) {
+    public void pushText(String string, char padding, boolean forceRight) {
+        if (forceRight) {
+            var length = this.connectionSize * 2;
+            if (string.length() > length) {
+                string.substring(string.length() - length, string.length());
+            } else {
+                string = Character.toString(padding).repeat(length - string.length()) + string;
+            }
+        }
+
         var axis = this.getCachedState().get(NixieTubeBlock.AXIS);
         var dir = Direction.get(Direction.AxisDirection.NEGATIVE, axis);
         if (!this.setText(string)) {
             return;
         }
+        this.padding = padding;
         this.updateText();
         var mut = this.pos.mutableCopy();
 
@@ -86,6 +102,7 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
                 if (world.getBlockEntity(mut.move(dir)) instanceof NixieTubeBlockEntity tube
                         && tube.getCachedState().get(NixieTubeBlock.AXIS) == axis && tube.getCachedState().get(NixieTubeBlock.POSITIVE_CONNECTED)) {
                     if (tube.setText(string)) {
+                        tube.padding = padding;
                         tube.updateText();
                         if (tube.getCachedState().get(NixieTubeBlock.NEGATIVE_CONNECTED)) {
                             continue;
@@ -104,6 +121,7 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
                         && tube.getCachedState().get(NixieTubeBlock.AXIS) == axis && tube.getCachedState().get(NixieTubeBlock.NEGATIVE_CONNECTED)) {
 
                     if (tube.setText(string)) {
+                        tube.padding = padding;
                         tube.updateText();
                         if (tube.getCachedState().get(NixieTubeBlock.POSITIVE_CONNECTED)) {
                             continue;
@@ -132,7 +150,7 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
     }
 
     private char getCharSafe(int i) {
-        return i >= 0 && i < this.value.length() ? this.value.charAt(i) : ' ';
+        return i >= 0 && i < this.value.length() ? this.value.charAt(i) : this.padding;
     }
 
     public void updatePositions(World world, BlockPos pos, BlockState newState) {
@@ -181,6 +199,18 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
             if (dirty) {
                 entry.updateText();
             }
+        }
+    }
+
+    public int channel() {
+        return this.channel;
+    }
+
+    public void setChannel(int channel) {
+        this.channel = channel;
+        if (this.hasWorld()) {
+            this.markDirty();
+            NetworkComponent.Data.updateDataAt(this.world, this.pos);
         }
     }
 }

@@ -1,4 +1,4 @@
-// 1.20.1	2023-08-13T12:16:43.38326453	PolyFactory/Block Loot Tables
+// 1.20.1	2023-08-17T17:55:04.267958325	PolyFactory/Block Loot Tables
 6335e7f66a3d3e9dccbbad715afdf4db6d4a1e24 data/polyfactory/loot_tables/blocks/mixer.json
 d4726d94a302b7f008129d37d2161340c33df586 data/polyfactory/loot_tables/blocks/sticky_conveyor.json
 5a97961b97af9600f7bf750abee92dca0eb47d5f data/polyfactory/loot_tables/blocks/fan.json
@@ -7,12 +7,14 @@ d4726d94a302b7f008129d37d2161340c33df586 data/polyfactory/loot_tables/blocks/sti
 6b0b6a9cb3c9893475c32dc514e9610faeb17c69 data/polyfactory/loot_tables/blocks/gearbox.json
 21d4d4bda469eef27cc6294ce2836a626c6e9da4 data/polyfactory/loot_tables/blocks/windmill.json
 70adeaf5434500398f76bcbff48bb820d33c748f data/polyfactory/loot_tables/blocks/grinder.json
+362a1a5bfd731010a2b426be96cee805f63d31bf data/polyfactory/loot_tables/blocks/cable.json
 d66138c2b490a4ece3ccfe987b5cf7e0ffe39486 data/polyfactory/loot_tables/blocks/conveyor.json
 167e0dcdf80c5daa48795be652511cb3b23e2328 data/polyfactory/loot_tables/blocks/hand_crank.json
 55f073bd1c52fc8d4601550922a8141cd5fb791e data/polyfactory/loot_tables/blocks/funnel.json
 14ca5757283c0d83f784782ee275c1e136b56c76 data/polyfactory/loot_tables/blocks/nixie_tube.json
 0dac6e5e23535b5c6cfd029ba1372bf06131c219 data/polyfactory/loot_tables/blocks/electric_motor.json
 a5006c168b4b2d9de16dcf2a30f44c37a91e388e data/polyfactory/loot_tables/blocks/splitter.json
+9dafe551c8cd8710bf0347ff7373e5e7142ba424 data/polyfactory/loot_tables/blocks/inventory_count_watcher.json
 f4d1c84b0fcb999bd2c4af4a66eda00017d1d7ba data/polyfactory/loot_tables/blocks/press.json
 f4f0270353436d31bedc3121819e8597cf08dfe1 data/polyfactory/loot_tables/blocks/wooden_container.json
 4bc984c28ef2961e01ed25e7ebde1f525ebada2c data/polyfactory/loot_tables/blocks/metal_grid.json

@@ -1,10 +1,14 @@
-package eu.pb4.polyfactory.block.other;
+package eu.pb4.polyfactory.block.data.display;
 
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.block.data.DataReceiver;
+import eu.pb4.polyfactory.block.data.DataNetworkBlock;
+import eu.pb4.polyfactory.data.FactoryData;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -13,7 +17,6 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -37,16 +40,16 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class NixieTubeBlock extends DataNetworkBlock implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker, DataReceiver {
     public static Property<Direction.Axis> AXIS = Properties.AXIS;
     public static BooleanProperty POSITIVE_CONNECTED = BooleanProperty.of("positive_connected");
     public static BooleanProperty NEGATIVE_CONNECTED = BooleanProperty.of("negative_connected");
@@ -78,7 +81,7 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityPr
             var name = stack.hasCustomName() ? stack.getName().getString() : "";
 
             if (world.getBlockEntity(pos) instanceof NixieTubeBlockEntity be) {
-                be.pushText(name);
+                be.pushText(name, ' ', false);
                 return ActionResult.SUCCESS;
             }
         } else if (stack.getItem() instanceof DyeItem dye) {
@@ -136,6 +139,25 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityPr
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new NixieTubeBlockEntity(pos, state);
+    }
+
+    @Override
+    public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, FactoryData data) {
+        if (world.getBlockEntity(selfPos) instanceof NixieTubeBlockEntity be && channel == be.channel()) {
+            be.pushText(data.asString(), data.padding(), data.forceRight());
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        var be = world.getBlockEntity(pos);
+        int channel = 0;
+        if (be instanceof NixieTubeBlockEntity blockEntity) {
+            channel = blockEntity.channel();
+        }
+        return List.of(new ChannelReceiverDirectionNode(state.get(HALF) == BlockHalf.TOP ? Direction.UP : Direction.DOWN, channel));
     }
 
     public final class Model extends BaseModel {

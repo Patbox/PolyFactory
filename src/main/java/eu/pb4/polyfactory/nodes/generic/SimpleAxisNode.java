@@ -34,11 +34,8 @@ public record SimpleAxisNode(Direction.Axis axis) implements AxisNode {
     @Override
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
         var list = new ArrayList<HalfLink>();
-        self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.axis,1))
-                .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).forEach(list::add);
-        self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.axis,-1))
-                .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).forEach(list::add);
-
+        FactoryNodes.findNodes(self, self.getBlockPos().offset(this.axis,1)).forEach(list::add);
+        FactoryNodes.findNodes(self, self.getBlockPos().offset(this.axis,-1)).forEach(list::add);
         return list;
     }
 

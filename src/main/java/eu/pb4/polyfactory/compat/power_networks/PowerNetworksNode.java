@@ -51,11 +51,6 @@ public record PowerNetworksNode(Direction direction) implements FunctionalNode, 
     }
 
     @Override
-    public boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
-        return DirectionNode.canConnect(this, self, other);
-    }
-
-    @Override
     public Object getTargetFunctional(ServerWorld world, BlockPos pos, BlockState state) {
         return this;
     }

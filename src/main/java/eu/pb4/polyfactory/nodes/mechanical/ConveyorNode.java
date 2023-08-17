@@ -95,7 +95,7 @@ public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue val
 
     @Override
     public boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
-        return ((other.other().getNode() instanceof ConveyorNode conv && conv.direction == this.direction) || AxisNode.canConnect(this, self, other));
+        return ((other.other().getNode() instanceof ConveyorNode conv && conv.direction == this.direction) || AxisNode.super.canConnect(self, other));
     }
 
     @Override

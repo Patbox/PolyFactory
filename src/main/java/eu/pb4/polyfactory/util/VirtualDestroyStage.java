@@ -73,7 +73,7 @@ public class VirtualDestroyStage extends ElementHolder {
         }
 
         this.state = i;
-        this.main.setItem(i == -1 ? ItemStack.EMPTY : MODELS[Math.min(i, MODELS.length - 1)]);
+        this.main.setItem(i < 0 ? ItemStack.EMPTY : MODELS[Math.min(i, MODELS.length - 1)]);
         this.tick();
     }
 

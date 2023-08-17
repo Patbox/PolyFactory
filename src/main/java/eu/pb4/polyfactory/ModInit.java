@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.compat.power_networks.PowerNetworksInit;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
+import eu.pb4.polyfactory.models.CableModel;
 import eu.pb4.polyfactory.models.ConveyorModel;
 import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
@@ -60,6 +61,7 @@ public class ModInit implements ModInitializer {
 		DebugData.register();
 
 		ConveyorModel.registerAssetsEvents();
+		CableModel.registerAssetsEvents();
 		VirtualDestroyStage.setup();
 		UiResourceCreator.setup();
 		GuiTextures.register();

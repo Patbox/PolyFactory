@@ -1,0 +1,4 @@
+{
+	"_parent": "polyfactory:block/inventory_count_watcher",
+	"parent": "minecraft:block/observer"
+}

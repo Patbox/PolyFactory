@@ -7,8 +7,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.NotNull;
 
-public interface AxisNode extends BlockNode {
-    static boolean canConnect(AxisNode self, NodeHolder<BlockNode> holder, HalfLink other) {
+public interface AxisNode extends DirectionCheckingNode {
+    /*static boolean canConnect(AxisNode self, NodeHolder<BlockNode> holder, HalfLink other) {
         var tmp = other.other().getBlockPos().subtract(holder.getBlockPos());
         if (tmp.getSquaredDistance(Vec3i.ZERO) == 1 && tmp.getComponentAlongAxis(self.axis()) != 0) {
             if (other.other().getNode() instanceof DirectionNode axisNode) {
@@ -21,12 +21,12 @@ public interface AxisNode extends BlockNode {
         }
 
         return false;
-    }
-
-    @Override
-    default boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
-        return AxisNode.canConnect(this, self, other);
-    }
+    }*/
 
     Direction.Axis axis();
+
+    @Override
+    default boolean canConnectDir(Direction direction) {
+        return this.axis() == direction.getAxis();
+    }
 }

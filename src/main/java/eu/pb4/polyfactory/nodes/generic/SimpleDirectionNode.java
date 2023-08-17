@@ -32,12 +32,7 @@ public record SimpleDirectionNode(Direction direction) implements DirectionNode 
 
     @Override
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
-        return self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.direction)).filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).toList();
-    }
-
-    @Override
-    public boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
-        return DirectionNode.canConnect(this, self, other);
+        return FactoryNodes.findNodes(self, self.getBlockPos().offset(this.direction)).toList();
     }
 
     @Override

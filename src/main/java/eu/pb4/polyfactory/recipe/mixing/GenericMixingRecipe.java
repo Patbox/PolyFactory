@@ -40,6 +40,10 @@ public record GenericMixingRecipe(Identifier identifier, String group, List<Coun
         return new GenericMixingRecipe(FactoryUtil.id("mixing/" + string), "", ingredient, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f);
     }
 
+    public static GenericMixingRecipe ofCounted(String string, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStack output) {
+        return new GenericMixingRecipe(FactoryUtil.id("mixing/" + string), "", ingredient, output, mixingTime, minimumSpeed, optimalSpeed, minTemperature, 2f);
+    }
+
     public static GenericMixingRecipe ofCounted(String string, String group, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
         return new GenericMixingRecipe(FactoryUtil.id("mixing/" + string), group, ingredient, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f);
     }

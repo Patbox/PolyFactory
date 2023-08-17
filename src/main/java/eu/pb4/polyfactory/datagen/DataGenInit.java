@@ -4,10 +4,12 @@ import com.google.common.hash.HashCode;
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.block.data.CableBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.models.CableModel;
 import eu.pb4.polyfactory.models.ConveyorModel;
 import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
@@ -34,7 +36,16 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.loot.LootPool;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
+import net.minecraft.loot.condition.SurvivesExplosionLootCondition;
+import net.minecraft.loot.entry.ItemEntry;
+import net.minecraft.loot.entry.LootPoolEntry;
+import net.minecraft.loot.function.LootFunction;
+import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.predicate.StatePredicate;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.book.RecipeCategory;
@@ -86,6 +97,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             };
             return CompletableFuture.runAsync(() -> {
                 ConveyorModel.generateModels(assetWriter);
+                CableModel.generateModels(assetWriter);
                 UiResourceCreator.generateAssets(assetWriter);
             }, Util.getMainWorkerExecutor());
         }
@@ -233,7 +245,26 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             this.addDrop(FactoryBlocks.METAL_GRID);
             this.addDrop(FactoryBlocks.MINER);
             this.addDrop(FactoryBlocks.STEAM_ENGINE);
+            this.addDrop(FactoryBlocks.INVENTORY_COUNT_WATCHER);
             this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE_BLOCK);
+
+
+            {
+                var builder = LootTable.builder();
+
+                for (var property : CableBlock.FACING_PROPERTIES.values()) {
+                    builder.pool(
+                            LootPool.builder()
+                                    .rolls(ConstantLootNumberProvider.create(1))
+                                    .with(ItemEntry.builder(FactoryItems.CABLE_BLOCK))
+                                    .conditionally(SurvivesExplosionLootCondition.builder())
+                                    .conditionally(BlockStatePropertyLootCondition.builder(FactoryBlocks.CABLE)
+                                            .properties(StatePredicate.Builder.create().exactMatch(property, true)))
+                    );
+                }
+
+                this.addDrop(FactoryBlocks.CABLE, builder);
+            }
         }
     }
 
@@ -421,6 +452,8 @@ public class DataGenInit implements DataGeneratorEntrypoint {
 
             of(exporter, GrindingRecipe.CODEC,
                     GrindingRecipe.of("coal_dust", Ingredient.ofItems(Items.COAL), 1, 5, 8, FactoryItems.COAL_DUST),
+                    GrindingRecipe.of("planks_saw_dust", Ingredient.fromTag(ItemTags.PLANKS), 1, 5, 6, OutputStack.of(FactoryItems.SAW_DUST, 0.6f, 3)),
+                    GrindingRecipe.of("logs_saw_dust", Ingredient.fromTag(ItemTags.LOGS), 1, 5, 6, OutputStack.of(FactoryItems.SAW_DUST, 0.8f, 6)),
                     GrindingRecipe.of("stone_to_cobblestone", Ingredient.ofItems(Items.STONE), 2, 5, 15, Items.COBBLESTONE),
                     GrindingRecipe.of("cobblestone_to_gravel", Ingredient.ofItems(Items.COBBLESTONE), 4, 6, 15, Items.GRAVEL),
                     GrindingRecipe.of("gravel_to_sand", Ingredient.ofItems(Items.GRAVEL), 4, 3, 15, Items.SAND),
@@ -465,7 +498,8 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             of(exporter, PressRecipe.CODEC,
                     PressRecipe.of("iron_ingot", Ingredient.ofItems(Items.IRON_NUGGET), 9, 10f, Items.IRON_INGOT),
                     PressRecipe.of("gold_ingot", Ingredient.ofItems(Items.GOLD_NUGGET), 9, 8f, Items.GOLD_INGOT),
-                    PressRecipe.of("steel_plate", Ingredient.ofItems(FactoryItems.STEEL_INGOT), 1, 12f, new ItemStack(FactoryItems.STEEL_PLATE, 1))
+                    PressRecipe.of("steel_plate", Ingredient.ofItems(FactoryItems.STEEL_INGOT), 1, 12f, new ItemStack(FactoryItems.STEEL_PLATE, 1)),
+                    PressRecipe.of("wooden_plate", Ingredient.ofItems(FactoryItems.SAW_DUST), 2, 5f, new ItemStack(FactoryItems.WOODEN_PLATE, 1))
             );
 
             for (var dye : dyes) {
@@ -520,6 +554,8 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             );
 
             of(exporter, GenericMixingRecipe.CODEC,
+                    GenericMixingRecipe.ofCounted("treated_dried_kelp", List.of(CountedIngredient.ofItems(16, Items.KELP), CountedIngredient.ofItems(1, Items.BLACK_DYE)), 2, 1, 6f, 0.2f, new ItemStack(FactoryItems.TREATED_DRIED_KELP, 16)),
+
                     GenericMixingRecipe.of("packed_mud",
                             List.of(Ingredient.ofItems(Items.WHEAT), Ingredient.ofItems(Items.MUD)), 2, 4, 10, new ItemStack(Items.PACKED_MUD)),
                     GenericMixingRecipe.ofCounted("cake",

@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.item.tool.WrenchItem;
 import eu.pb4.polyfactory.item.util.AutoModeledPolymerItem;
 import eu.pb4.polyfactory.item.util.ModeledBlockItem;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Items;
@@ -40,6 +41,7 @@ public class FactoryItems {
     public static final Item WINDMILL_SAIL = register("windmill_sail", new WindmillSailItem(new Item.Settings()));
     public static final Item METAL_GRID_BLOCK = register("metal_grid", new ModeledBlockItem(FactoryBlocks.METAL_GRID, new Item.Settings()));
 
+    public static final Item SAW_DUST = register("saw_dust", new ModeledItem(Items.STICK, new Item.Settings()));
     public static final Item COAL_DUST = register("coal_dust", new ModeledItem(Items.COAL, new Item.Settings()));
     public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
     public static final Item STEEL_INGOT = register("steel_ingot", new ModeledItem(Items.IRON_INGOT, new Item.Settings()));
@@ -57,18 +59,32 @@ public class FactoryItems {
 
     public static final Item ROTATION_DEBUG_BLOCK = register("rot_debug", new ModeledBlockItem(FactoryBlocks.ROTATION_DEBUG, new Item.Settings()));
     public static final Item GREEN_SCREEN_BLOCK = register("green_screen", new ModeledBlockItem(FactoryBlocks.GREEN_SCREEN, new Item.Settings()));
+    public static final Item INVENTORY_COUNT_WATCHER = register("inventory_count_watcher", new ModeledBlockItem(FactoryBlocks.INVENTORY_COUNT_WATCHER, new Item.Settings()));
+    public static final Item CABLE_BLOCK = register("cable", new CableItem(new Item.Settings()));
 
 
     public static void register() {
+        FuelRegistry.INSTANCE.add(SAW_DUST, 60);
+        FuelRegistry.INSTANCE.add(COAL_DUST, 160);
+
         PolymerItemGroupUtils.registerPolymerItemGroup(new Identifier(ModInit.ID, "group"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
-                .icon(() -> WRENCH.getDefaultStack())
+                .icon(WINDMILL_SAIL::getDefaultStack)
                 .displayName(Text.translatable("itemgroup." + ModInit.ID))
                 .entries(((context, entries) -> {
                     //entries.add(WRENCH);
 
                     // Rotational machines (tier 1)
 
-                    // Movement/Storage
+                    // Rotation transmision
+                    entries.add(AXLE_BLOCK);
+                    entries.add(GEARBOX_BLOCK);
+
+                    // Rotation Generation
+                    entries.add(HAND_CRANK_BLOCK);
+                    entries.add(WINDMILL_SAIL);
+                    entries.add(STEAM_ENGINE_BLOCK);
+
+                    // Item Movement/Storage
                     entries.add(CONVEYOR_BLOCK);
                     entries.add(STICKY_CONVEYOR_BLOCK);
                     entries.add(FAN_BLOCK);
@@ -76,26 +92,25 @@ public class FactoryItems {
                     entries.add(FUNNEL_BLOCK);
                     entries.add(SPLITTER_BLOCK);
                     entries.add(CONTAINER_BLOCK);
-                    entries.add(NIXIE_TUBE);
+                    entries.add(ITEM_FILTER);
 
+                    // Crafting/Machines
                     entries.add(GRINDER_BLOCK);
                     entries.add(PRESS_BLOCK);
                     entries.add(MIXER_BLOCK);
                     entries.add(MINER_BLOCK);
 
-                    entries.add(AXLE_BLOCK);
-                    entries.add(GEARBOX_BLOCK);
-                    entries.add(HAND_CRANK_BLOCK);
-                    entries.add(WINDMILL_SAIL);
-                    entries.add(STEAM_ENGINE_BLOCK);
+                    // Data
+                    entries.add(CABLE_BLOCK);
+                    entries.add(NIXIE_TUBE);
+                    entries.add(INVENTORY_COUNT_WATCHER);
 
-                    entries.add(ITEM_FILTER);
-                    
                     // Electrical machines (tier 2)
                     //entries.add(ELECTRIC_MOTOR_BLOCK);
                     //entries.add(CABLE_PLATE_BLOCK);
 
-                    // Materials
+                    // Generic Materials
+                    entries.add(SAW_DUST);
                     entries.add(COAL_DUST);
                     entries.add(STEEL_ALLOY_MIXTURE);
                     entries.add(STEEL_INGOT);
@@ -105,13 +120,13 @@ public class FactoryItems {
                     entries.add(TREATED_DRIED_KELP);
                     entries.add(GENERIC_MACHINE_PART);
 
-
-
+                    // Creative
                     entries.add(CREATIVE_MOTOR_BLOCK);
                     entries.add(CREATIVE_CONTAINER_BLOCK);
 
+
+                    // Remove this
                     if (ModInit.DEV) {
-                        // Creative stuff
                         entries.add(ROTATION_DEBUG_BLOCK);
                         entries.add(GREEN_SCREEN_BLOCK);
                     }
