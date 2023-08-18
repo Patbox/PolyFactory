@@ -1,10 +1,10 @@
-// 1.20.1	2023-08-18T22:11:10.946288493	PolyFactory/Recipes
+// 1.20.1	2023-08-18T22:55:01.466154616	PolyFactory/Recipes
 b426d992b7ff87219de4703e8707ae9e15ab11e7 data/polyfactory/advancements/recipes/redstone/sticky_conveyor.json
 e09b1b65ee49b4d13a8743d91bec30b3f96626c9 data/polyfactory/recipes/grinding/allium_to_dye.json
 62af52e4858d217c044ec364ed293f4ff487feb1 data/polyfactory/recipes/grinding/blue_concrete_to_powder.json
 1e9b3395ba1d896e5386164131178fc844811d6b data/polyfactory/recipes/press/wooden_plate.json
-7ce982086b3b6fa1977ad0efc287dc93f0832a61 data/polyfactory/recipes/mixing/red_concrete_direct.json
 f14a3a5467a730354b5ab62fe1c62ef69ad91891 data/polyfactory/advancements/recipes/redstone/windmill_sail/wool/yellow.json
+7ce982086b3b6fa1977ad0efc287dc93f0832a61 data/polyfactory/recipes/mixing/red_concrete_direct.json
 7ada84f0ebce1682939360cba1c5aa58125c1ee3 data/polyfactory/recipes/windmill_sail/wool/blue.json
 e1b40c768719aa769aa6bcb17858e63c76e8c80a data/polyfactory/recipes/press/steel_plate.json
 dfe4e20370f7e05d6533ab2184c6177bfa83619a data/polyfactory/advancements/recipes/redstone/generic_machine_part.json

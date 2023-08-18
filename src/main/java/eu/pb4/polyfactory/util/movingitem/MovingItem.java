@@ -25,7 +25,7 @@ public class MovingItem implements VirtualElement, StackReference {
     private ItemStack stack;
     private ItemStack stackCurrent;
     private final ItemDisplayElement itemDisplay[] = new ItemDisplayElement[4];
-    private final GenericEntityElement riddenBase = new MarkerElement() {
+    private final GenericEntityElement riddenBase = new ItemDisplayElement() {
         @Override
         protected Packet<ClientPlayPacketListener> createSpawnPacket(ServerPlayerEntity player) {
             return new EntitySpawnS2CPacket(this.getEntityId(), this.getUuid(), pos.x, pos.y, pos.z, 0, 0, this.getEntityType(), 0, Vec3d.ZERO, 0);

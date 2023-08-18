@@ -11,7 +11,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "polyfactory:inventory_count_watcher"
+          "name": "polyfactory:block_data_provider"
         }
       ],
       "rolls": 1.0
