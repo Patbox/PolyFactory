@@ -41,8 +41,6 @@ import net.minecraft.loot.LootTable;
 import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
 import net.minecraft.loot.condition.SurvivesExplosionLootCondition;
 import net.minecraft.loot.entry.ItemEntry;
-import net.minecraft.loot.entry.LootPoolEntry;
-import net.minecraft.loot.function.LootFunction;
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.predicate.StatePredicate;
@@ -245,7 +243,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
             this.addDrop(FactoryBlocks.METAL_GRID);
             this.addDrop(FactoryBlocks.MINER);
             this.addDrop(FactoryBlocks.STEAM_ENGINE);
-            this.addDrop(FactoryBlocks.INVENTORY_COUNT_WATCHER);
+            this.addDrop(FactoryBlocks.BLOCK_DATA_PROVIDER);
             this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE_BLOCK);
 
 

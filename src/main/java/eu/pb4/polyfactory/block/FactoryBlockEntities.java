@@ -76,7 +76,7 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<CreativeContainerBlockEntity> CREATIVE_MOTOR = register("creative_motor",
             FabricBlockEntityTypeBuilder.create(CreativeContainerBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_MOTOR));
     public static final BlockEntityType<ProviderDataCacheBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache", FabricBlockEntityTypeBuilder
-            .create(ProviderDataCacheBlockEntity::new).addBlock(FactoryBlocks.INVENTORY_COUNT_WATCHER));
+            .create(ProviderDataCacheBlockEntity::new).addBlock(FactoryBlocks.BLOCK_DATA_PROVIDER));
 
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;

@@ -4,7 +4,7 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlock;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
 import eu.pb4.polyfactory.block.data.CableBlock;
-import eu.pb4.polyfactory.block.data.InventoryCountWatcherBlock;
+import eu.pb4.polyfactory.block.data.BlockDataProviderBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.MinerBlock;
@@ -53,9 +53,9 @@ public class FactoryBlocks {
     public static final WindmillBlock WINDMILL = register("windmill", new WindmillBlock(Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD).strength(2.5F).nonOpaque()));
     public static final ContainerBlock CONTAINER = register("wooden_container", new ContainerBlock(Block.Settings.copy(Blocks.CHEST).nonOpaque()));
     public static final NixieTubeBlock NIXIE_TUBE = register("nixie_tube", new NixieTubeBlock(Block.Settings.copy(Blocks.GLASS).nonOpaque()));
-    public static final CableBlock CABLE = register("cable", new CableBlock(Block.Settings.copy(Blocks.GLASS).nonOpaque()));
+    public static final CableBlock CABLE = register("cable", new CableBlock(Block.Settings.copy(Blocks.GLASS).breakInstantly().nonOpaque()));
 
-    public static final InventoryCountWatcherBlock INVENTORY_COUNT_WATCHER = register("inventory_count_watcher", new InventoryCountWatcherBlock(AbstractBlock.Settings.copy(SPLITTER)));
+    public static final BlockDataProviderBlock BLOCK_DATA_PROVIDER = register("block_data_provider", new BlockDataProviderBlock(AbstractBlock.Settings.copy(SPLITTER)));
     public static final CreativeMotorBlock CREATIVE_MOTOR = register("creative_motor", new CreativeMotorBlock(AbstractBlock.Settings.create().strength(-1, -1).nonOpaque()));
     public static final CreativeContainerBlock CREATIVE_CONTAINER = register("creative_container", new CreativeContainerBlock(AbstractBlock.Settings.create().strength(-1, -1).nonOpaque()));
 

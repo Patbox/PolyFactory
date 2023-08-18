@@ -59,7 +59,7 @@ public class FactoryItems {
 
     public static final Item ROTATION_DEBUG_BLOCK = register("rot_debug", new ModeledBlockItem(FactoryBlocks.ROTATION_DEBUG, new Item.Settings()));
     public static final Item GREEN_SCREEN_BLOCK = register("green_screen", new ModeledBlockItem(FactoryBlocks.GREEN_SCREEN, new Item.Settings()));
-    public static final Item INVENTORY_COUNT_WATCHER = register("inventory_count_watcher", new ModeledBlockItem(FactoryBlocks.INVENTORY_COUNT_WATCHER, new Item.Settings()));
+    public static final Item BLOCK_DATA_PROVIDER = register("block_data_provider", new ModeledBlockItem(FactoryBlocks.BLOCK_DATA_PROVIDER, new Item.Settings()));
     public static final Item CABLE_BLOCK = register("cable", new CableItem(new Item.Settings()));
 
 
@@ -103,7 +103,7 @@ public class FactoryItems {
                     // Data
                     entries.add(CABLE_BLOCK);
                     entries.add(NIXIE_TUBE);
-                    entries.add(INVENTORY_COUNT_WATCHER);
+                    entries.add(BLOCK_DATA_PROVIDER);
 
                     // Electrical machines (tier 2)
                     //entries.add(ELECTRIC_MOTOR_BLOCK);

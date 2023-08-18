@@ -1,0 +1,10 @@
+{
+	"parent": "minecraft:block/observer",
+	"textures": {
+		"bottom": "polyfactory:block/steel_plate_connection",
+		"side": "polyfactory:block/steel_plate_base",
+		"top": "polyfactory:block/steel_plate_arrow",
+		"front": "polyfactory:block/block_data_provider_face",
+		"particle": "polyfactory:block/steel_plate_base"
+	}
+}

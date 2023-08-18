@@ -20,7 +20,7 @@
   "block.polyfactory.windmill": "Windmill",
   "block.polyfactory.electric_motor": "Electric Motor",
   "block.polyfactory.electric_motor.generator": "Electric Generator",
-  "block.polyfactory.inventory_count_watcher": "Inventory Count Watcher",
+  "block.polyfactory.block_data_provider": "Block Data Provider",
   "block.polyfactory.cable": "Data Cable",
   "block.polyfactory.creative_motor": "Creative Motor",
   "block.polyfactory.creative_container": "Creative Container",

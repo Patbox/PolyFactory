@@ -1,22 +1,18 @@
 package eu.pb4.polyfactory.mixin;
 
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.data.InventoryCountWatcherBlock;
+import eu.pb4.polyfactory.block.data.BlockDataProviderBlock;
 import eu.pb4.polyfactory.data.FactoryData;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Interface;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -48,8 +44,8 @@ public abstract class WorldMixin implements WorldAccess {
             for (var dir : Direction.values()) {
                 var selfPos = pos.offset(dir);
                 var state = this.getBlockState(selfPos);
-                if (state.isOf(FactoryBlocks.INVENTORY_COUNT_WATCHER) && state.get(InventoryCountWatcherBlock.FACING) == dir.getOpposite()) {
-                    FactoryBlocks.INVENTORY_COUNT_WATCHER.sendData(world, selfPos, FactoryData.of(count));
+                if (state.isOf(FactoryBlocks.BLOCK_DATA_PROVIDER) && state.get(BlockDataProviderBlock.FACING) == dir.getOpposite()) {
+                    FactoryBlocks.BLOCK_DATA_PROVIDER.sendData(world, selfPos, FactoryData.of(count));
                 }
             }
         }

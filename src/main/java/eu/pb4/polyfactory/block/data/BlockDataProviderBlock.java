@@ -31,9 +31,9 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
-public class InventoryCountWatcherBlock extends DataNetworkBlock implements PolymerBlock, VirtualDestroyStage.Marker, BlockEntityProvider, BlockWithElementHolder, DataProvider {
+public class BlockDataProviderBlock extends DataNetworkBlock implements PolymerBlock, VirtualDestroyStage.Marker, BlockEntityProvider, BlockWithElementHolder, DataProvider {
     public static DirectionProperty FACING = Properties.FACING;
-    public InventoryCountWatcherBlock(Settings settings) {
+    public BlockDataProviderBlock(Settings settings) {
         super(settings);
     }
 
@@ -90,7 +90,7 @@ public class InventoryCountWatcherBlock extends DataNetworkBlock implements Poly
         private final LodItemDisplayElement base;
 
         private Model(BlockState state) {
-            this.base = LodItemDisplayElement.createSimple(FactoryItems.INVENTORY_COUNT_WATCHER);
+            this.base = LodItemDisplayElement.createSimple(FactoryItems.BLOCK_DATA_PROVIDER);
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);
