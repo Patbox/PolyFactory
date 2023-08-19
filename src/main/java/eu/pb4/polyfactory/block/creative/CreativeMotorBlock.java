@@ -112,7 +112,7 @@ public class CreativeMotorBlock extends RotationalNetworkBlock implements Polyme
         private final LodItemDisplayElement base;
 
         private Model(BlockState state) {
-            this.axle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, 4);
+            this.axle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, 4, 0.3f, 0.6f);
             this.base = LodItemDisplayElement.createSimple(FactoryItems.CREATIVE_MOTOR_BLOCK);
             this.base.setScale(new Vector3f(2));
 

@@ -51,8 +51,8 @@ public class ElectricMotorBlockEntity extends LockableBlockEntity {
     public void updateEnergyData(EnergyData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
         if (state.get(ElectricMotorBlock.GENERATOR)) {
             if (this.storedPower > 0) {
-                modifier.provide(110);
-                this.storedPower -= 110;
+                modifier.provide(150);
+                this.storedPower -= 100;
             }
         } else {
             modifier.use(100);
