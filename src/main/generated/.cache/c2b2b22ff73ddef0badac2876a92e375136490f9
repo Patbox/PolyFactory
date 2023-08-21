@@ -1,10 +1,10 @@
-// 1.20.1	2023-08-18T22:55:01.466154616	PolyFactory/Recipes
+// 1.20.1	2023-08-21T23:23:35.288954551	PolyFactory/Recipes
 b426d992b7ff87219de4703e8707ae9e15ab11e7 data/polyfactory/advancements/recipes/redstone/sticky_conveyor.json
 e09b1b65ee49b4d13a8743d91bec30b3f96626c9 data/polyfactory/recipes/grinding/allium_to_dye.json
 62af52e4858d217c044ec364ed293f4ff487feb1 data/polyfactory/recipes/grinding/blue_concrete_to_powder.json
 1e9b3395ba1d896e5386164131178fc844811d6b data/polyfactory/recipes/press/wooden_plate.json
-f14a3a5467a730354b5ab62fe1c62ef69ad91891 data/polyfactory/advancements/recipes/redstone/windmill_sail/wool/yellow.json
 7ce982086b3b6fa1977ad0efc287dc93f0832a61 data/polyfactory/recipes/mixing/red_concrete_direct.json
+f14a3a5467a730354b5ab62fe1c62ef69ad91891 data/polyfactory/advancements/recipes/redstone/windmill_sail/wool/yellow.json
 7ada84f0ebce1682939360cba1c5aa58125c1ee3 data/polyfactory/recipes/windmill_sail/wool/blue.json
 e1b40c768719aa769aa6bcb17858e63c76e8c80a data/polyfactory/recipes/press/steel_plate.json
 dfe4e20370f7e05d6533ab2184c6177bfa83619a data/polyfactory/advancements/recipes/redstone/generic_machine_part.json
@@ -80,8 +80,8 @@ f5843ee31e63a6fbe5173eac4830d5e8fda1a0db data/polyfactory/recipes/grinding/coppe
 c0ce95a7294c1689668943aeadf411003d836e93 data/polyfactory/recipes/mixing/blue_concrete_direct.json
 6400fdef706aa9ecdc6f276318181a24cea0a53c data/polyfactory/recipes/mixing/tnt.json
 c2e00861d8c9f5df8904bc7b5de2036fd4e4bc4c data/polyfactory/recipes/mixing/cyan_concrete_direct.json
-ef803b305dc834bdda549f40011563cc5ec69247 data/polyfactory/recipes/funnel.json
 325b365f5d70a387c4a82652508435ff6ea2ba01 data/polyfactory/recipes/gearbox.json
+ef803b305dc834bdda549f40011563cc5ec69247 data/polyfactory/recipes/funnel.json
 6229c7a43c46e6900e6d0d35e481fe39e540a631 data/polyfactory/recipes/grinding/sunflower_to_dye.json
 5554eeaaea4e57c7f5ac010cf5cf4a455b00e75d data/polyfactory/advancements/recipes/redstone/windmill_sail/wool/magenta.json
 9d710411a9b89da2c0784c4055bd3d8bf51ab6d9 data/polyfactory/recipes/press/iron_ingot.json

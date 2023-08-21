@@ -34,9 +34,15 @@ public class MovingItem implements VirtualElement, StackReference {
     private Vec3d pos;
     private float globalScale = 1;
 
+    @Deprecated
     public MovingItem(ItemStack stack) {
+        this(stack, Vec3d.ZERO);
+    }
+
+    public MovingItem(ItemStack stack, Vec3d pos) {
         this.stack = stack.copy();
         this.stackCurrent = stack.copy();
+        this.pos = pos;
 
         for (var i = 0; i < 4; i++) {
             this.itemDisplay[i] = new LodItemDisplayElement();
@@ -95,7 +101,6 @@ public class MovingItem implements VirtualElement, StackReference {
 
     public void setPos(Vec3d vec3d) {
         if (this.getHolder() != null) {
-            //this.getHolder().sendPacket(VirtualEntityUtils.createSimpleMovePacket(this.riddenBase.getEntityId(), vec3d, (byte) 0, (byte) 0));
             this.riddenBase.notifyMove(this.pos, vec3d, vec3d.subtract(this.pos));
         }
         this.pos = vec3d;
