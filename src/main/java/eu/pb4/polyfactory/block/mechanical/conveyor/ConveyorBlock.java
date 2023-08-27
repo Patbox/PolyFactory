@@ -632,6 +632,11 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
 
         @Override
         public void pushAndAttach(MovingItem container) {
+            if (container == null) {
+                clearContainer();
+                return;
+            }
+
             if (this.movingItemContainer != null) {
                 this.removeElement(this.movingItemContainer);
             }

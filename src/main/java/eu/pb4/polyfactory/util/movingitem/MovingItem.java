@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 public class MovingItem implements VirtualElement, StackReference {
     private ItemStack stack;
     private ItemStack stackCurrent;
-    private final ItemDisplayElement itemDisplay[] = new ItemDisplayElement[4];
+    private final ItemDisplayElement[] itemDisplay = new ItemDisplayElement[4];
     private final GenericEntityElement riddenBase = new ItemDisplayElement() {
         @Override
         protected Packet<ClientPlayPacketListener> createSpawnPacket(ServerPlayerEntity player) {

@@ -187,7 +187,10 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
             nextConveyor.setDelta(1);
         }
 
-        nextConveyor.pushAndAttach(this.pullAndRemove());
+        var x = this.pullAndRemove();
+        if (x != null) {
+            nextConveyor.pushAndAttach(x);
+        }
         return true;
     }
 

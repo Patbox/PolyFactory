@@ -89,7 +89,11 @@ public class SimpleContainer implements ContainerHolder {
             this.removed.accept(this.movingItem, true);
         }
         this.movingItem = container;
-        this.added.accept(this.id, container, false);
+        if (container != null) {
+            this.added.accept(this.id, container, false);
+        } else {
+            this.setContainer(null);
+        }
     }
 
     public NbtCompound writeNbt() {
