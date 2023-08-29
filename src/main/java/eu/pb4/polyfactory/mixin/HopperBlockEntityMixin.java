@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.block.other.CustomBlockEntityCalls;
 import eu.pb4.polyfactory.block.other.FilteredBlockEntity;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.models.HopperModel;
+import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
@@ -31,7 +32,7 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
     @Unique
     private ItemStack polyfactory$filterStack = ItemStack.EMPTY;
     @Unique
-    private FilterItem.Data polyfactory$filter = FilterItem.createData(ItemStack.EMPTY, true);
+    private FilterData polyfactory$filter = FilterData.EMPTY_TRUE;
     @Nullable
     @Unique
     private HopperModel polyfactory$model;
@@ -90,13 +91,14 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
     @Override
     public void polyfactory$setFilter(ItemStack stack) {
         this.polyfactory$filterStack = stack;
-        this.polyfactory$filter = FilterItem.createData(stack, true);
-        if (this.polyfactory$model == null) {
+        this.polyfactory$filter = FilterData.of(stack, true);
+
+        if (this.polyfactory$model == null && !this.polyfactory$filterStack.isEmpty()) {
             this.polyfactory$createModel();
-        } else if (this.polyfactory$filterStack.isEmpty()) {
+        } else if (this.polyfactory$model != null && this.polyfactory$filterStack.isEmpty()) {
             this.polyfactory$model.destroy();
             this.polyfactory$model = null;
-        } else {
+        } else if (this.polyfactory$model != null) {
             this.polyfactory$model.setItem(this.polyfactory$filter.icon());
             this.polyfactory$model.tick();
         }

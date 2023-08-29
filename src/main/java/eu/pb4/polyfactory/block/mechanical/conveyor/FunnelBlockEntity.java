@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 import eu.pb4.polyfactory.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.item.tool.FilterItem;
+import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -23,7 +24,7 @@ public class FunnelBlockEntity extends BlockEntity implements BlockEntityExtraLi
     }
 
     private ItemStack filterStack = ItemStack.EMPTY;
-    private FilterItem.Data filter = FilterItem.createData(ItemStack.EMPTY, true);
+    private FilterData filter = FilterData.of(ItemStack.EMPTY, true);
 
     @Override
     protected void writeNbt(NbtCompound nbt) {
@@ -47,7 +48,7 @@ public class FunnelBlockEntity extends BlockEntity implements BlockEntityExtraLi
     @Override
     public void readNbt(NbtCompound nbt) {
         this.filterStack = ItemStack.fromNbt(nbt.getCompound("FilterStack"));
-        this.filter = FilterItem.createData(this.filterStack, true);
+        this.filter = FilterData.of(this.filterStack, true);
     }
 
     public boolean matches(ItemStack stack) {
@@ -56,7 +57,7 @@ public class FunnelBlockEntity extends BlockEntity implements BlockEntityExtraLi
 
     public void setFilter(ItemStack stack) {
         this.filterStack = stack;
-        this.filter = FilterItem.createData(stack, true);
+        this.filter =  FilterData.of(stack, true);
         this.markDirty();
         this.updateHologram();
     }

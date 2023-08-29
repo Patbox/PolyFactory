@@ -37,19 +37,23 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 
+import java.util.List;
+
 
 public class SplitterBlock extends Block implements PolymerBlock, MovingItemConsumer, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
+    public static final BooleanProperty DISTRIBUTE = BooleanProperty.of("distribute");
+    public static final BooleanProperty BLOCKING = BooleanProperty.of("blocking");
 
     public SplitterBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(ENABLED, true));
+        this.setDefaultState(this.getDefaultState().with(ENABLED, true).with(DISTRIBUTE, true).with(BLOCKING, true));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING, ENABLED);
+        builder.add(FACING, ENABLED, DISTRIBUTE, BLOCKING);
     }
 
     @Override
@@ -62,28 +66,44 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
             return false;
         }
         if (self.getBlockEntity() instanceof SplitterBlockEntity blockEntity) {
-            Direction direction;
-            if (blockEntity.matchesLeft(item.get())) {
-                direction = dir.rotateYCounterclockwise();
+            List<Direction> dirs;
+
+            var stack = item.get();
+
+            if (blockEntity.filtersEmpty()) {
+                dirs = List.of(dir.rotateYCounterclockwise(), dir, dir.rotateYClockwise());
+            } else if (blockEntity.matchesSides(stack)) {
+                dirs = List.of(dir.rotateYCounterclockwise(), dir.rotateYClockwise());
+            } else if (blockEntity.matchesLeft(item.get())) {
+                dirs = List.of(dir.rotateYCounterclockwise());
             } else if (blockEntity.matchesRight(item.get())) {
-                direction = dir.rotateYClockwise();
-            } else {
+                dirs = List.of(dir.rotateYClockwise());
+            } else if (blockEntity.isLeftFilterEmpty()) {
+                dirs = List.of(dir.rotateYCounterclockwise(), dir);
+            } else if (blockEntity.isRightFilterEmpty()) {
+                dirs = List.of(dir.rotateYClockwise(), dir);
+            } else  {
                 return false;
             }
 
-            var x = FactoryUtil.tryInsertingMovable(conveyor, self.getWorld(), conveyorPos,
-                    conveyorPos.offset(direction), direction, direction, FactoryBlockTags.SPLITTER_SIDE_OUTPUT);
-
-            if (x != FactoryUtil.MovableResult.FAILURE) {
-                return true;
+            if (selfState.get(DISTRIBUTE) && dirs.size() > 1) {
+                dirs = List.of(dirs.get(blockEntity.pos(dirs.size())));
             }
 
-            x = FactoryUtil.tryInsertingMovable(conveyor, self.getWorld(), conveyorPos, conveyorPos.offset(direction).up(), direction, direction, FactoryBlockTags.SPLITTER_SIDE_OUTPUT);
-            if (x != FactoryUtil.MovableResult.FAILURE) {
-                return true;
-            }
+            for (var direction : dirs) {
+                var x = FactoryUtil.tryInsertingMovable(conveyor, self.getWorld(), conveyorPos,
+                        conveyorPos.offset(direction), direction, direction, FactoryBlockTags.SPLITTER_SIDE_OUTPUT);
 
-            return true;
+                if (x != FactoryUtil.MovableResult.FAILURE) {
+                    return true;
+                }
+
+                x = FactoryUtil.tryInsertingMovable(conveyor, self.getWorld(), conveyorPos, conveyorPos.offset(direction).up(), direction, direction, FactoryBlockTags.SPLITTER_SIDE_OUTPUT);
+                if (x != FactoryUtil.MovableResult.FAILURE) {
+                    return true;
+                }
+            }
+            return !selfState.get(BLOCKING);
         }
 
         return false;

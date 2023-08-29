@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.item.tool;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ModeledItem;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.GuiHelpers;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
@@ -50,10 +51,6 @@ public class FilterItem extends ModeledItem {
         return Text.translatable(this.getTranslationKey() + (filter.isEmpty() ? ".empty" : ".with"), filter.getName());
     }
 
-    public static Data createData(ItemStack stack, boolean defaultValue) {
-        return new Data(createPredicate(stack, defaultValue), getStack(stack));
-    }
-
     public static ItemStack getStack(ItemStack stack) {
         if (stack.hasNbt() && stack.getNbt().contains("item", NbtElement.COMPOUND_TYPE)) {
             return ItemStack.fromNbt(stack.getNbt().getCompound("item"));
@@ -76,17 +73,6 @@ public class FilterItem extends ModeledItem {
         }
 
         filter.getOrCreateNbt().put("item", target.copyWithCount(1).writeNbt(new NbtCompound()));
-    }
-
-    public static Predicate<ItemStack> createPredicate(ItemStack stack, boolean defaultValue) {
-        if (stack.isEmpty()) {
-            return x -> defaultValue;
-        } else if (stack.isOf(FactoryItems.ITEM_FILTER) && stack.hasNbt() && stack.getNbt().contains("item", NbtElement.COMPOUND_TYPE)) {
-            var decodedStack = ItemStack.fromNbt(stack.getNbt().getCompound("item"));
-            return x -> ItemStack.canCombine(x, decodedStack);
-        } else {
-            return x -> ItemStack.canCombine(x, stack);
-        }
     }
 
     @Override
@@ -136,12 +122,6 @@ public class FilterItem extends ModeledItem {
             }
 
             return super.onAnyClick(index, type, action);
-        }
-    }
-
-    public record Data(Predicate<ItemStack> predicate, ItemStack icon) {
-        public boolean test(ItemStack stack) {
-            return predicate.test(stack);
         }
     }
 }
