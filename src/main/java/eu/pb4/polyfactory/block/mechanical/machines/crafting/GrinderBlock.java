@@ -181,7 +181,6 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
             MODEL_STONE_WHEEL.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_STONE_WHEEL.getItem(), FactoryUtil.id("block/grindstone_wheel")).value());
         }
 
-        private final Matrix4f mat = new Matrix4f();
         private final ItemDisplayElement stoneWheel;
         private final ItemDisplayElement main;
 

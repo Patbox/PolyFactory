@@ -268,7 +268,6 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
     public final class Model extends BaseModel {
         private static final ItemStack MODEL_IN = new ItemStack(Items.CANDLE);
         private static final ItemStack MODEL_OUT = new ItemStack(Items.CANDLE);
-        private final Matrix4f mat = new Matrix4f();
         private final ItemDisplayElement mainElement;
         final ItemDisplayElement filterElement;
 

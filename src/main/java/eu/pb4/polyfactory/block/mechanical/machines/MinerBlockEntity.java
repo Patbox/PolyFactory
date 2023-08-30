@@ -10,6 +10,8 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.TagLimitedSlot;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.FactoryPlayer;
+import eu.pb4.polyfactory.util.ServerPlayNetExt;
+import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
@@ -131,6 +133,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
             self.process = 0;
             self.targetState = stateFront;
             world.setBlockBreakingInfo(self.getFakePlayer().getId(), blockPos, -1);
+            VirtualDestroyStage.stageUpdate(self.getFakePlayer(), blockPos, stateFront, -1);
             return;
         }
         var player = self.getFakePlayer();
@@ -167,7 +170,9 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
 
         self.model.rotate((float) speed);
 
-        world.setBlockBreakingInfo(player.getId(), blockPos, (int) (self.process * 10.0F));
+        var value = (int) (self.process * 10.0F);
+        world.setBlockBreakingInfo(player.getId(), blockPos, value);
+        VirtualDestroyStage.stageUpdate(player, blockPos, stateFront, value);
 
         if (self.process >= 1) {
             self.process = 0;
@@ -189,6 +194,14 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
                 }
             }
             world.updateComparators(pos, state.getBlock());
+        }
+    }
+
+    @Override
+    public void markRemoved() {
+        super.markRemoved();
+        if (this.player != null) {
+            ((ServerPlayNetExt) player.networkHandler).polyFactory$getVirtualDestroyStage().destroy();
         }
     }
 

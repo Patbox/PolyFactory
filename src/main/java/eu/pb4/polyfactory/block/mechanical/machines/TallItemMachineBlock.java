@@ -172,7 +172,7 @@ public abstract class TallItemMachineBlock extends RotationalNetworkBlock implem
 
     @Override
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
-        if (world.getBlockEntity(pos) instanceof TallItemMachineBlockEntity be) {
+        if (world.getBlockEntity(state.get(PART) == Part.MAIN ? pos : pos.down()) instanceof TallItemMachineBlockEntity be) {
             modifier.stress(be.getStress());
         }
     }

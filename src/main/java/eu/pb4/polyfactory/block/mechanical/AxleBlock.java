@@ -110,7 +110,6 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
     public final class Model extends BaseModel {
         public static final ItemStack ITEM_MODEL = new ItemStack(Items.PAPER);
         public static final ItemStack ITEM_MODEL_SHORT = new ItemStack(Items.PAPER);
-        private final Matrix4f mat = new Matrix4f();
         private final ItemDisplayElement mainElement;
         private final Set<ServerPlayNetworkHandler> viewingClose = new ObjectOpenCustomHashSet<>(Util.identityHashStrategy());
         private final List<ServerPlayNetworkHandler> sentRod = new ArrayList<>();

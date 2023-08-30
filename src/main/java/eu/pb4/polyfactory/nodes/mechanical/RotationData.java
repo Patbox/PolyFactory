@@ -29,6 +29,7 @@ public class RotationData implements GraphEntity<RotationData> {
     private float rotation;
     private int lastTick = -1;
     private double stressCapacity;
+    private double stressUsage;
     private GraphEntityContext ctx;
 
     public RotationData() {
@@ -46,6 +47,10 @@ public class RotationData implements GraphEntity<RotationData> {
         return stressCapacity;
     }
 
+    public double stressUsage() {
+        return this.stressUsage;
+    }
+
     public void update(ServerWorld world, BlockGraph graph) {
         var currentTick = world.getServer().getTicks();
         if (this.lastTick == currentTick) {
@@ -56,7 +61,7 @@ public class RotationData implements GraphEntity<RotationData> {
 
         var list = graph.getCachedNodes(FunctionalDirectionNode.CACHE);
 
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             this.speed = 0;
             this.stressCapacity = 0;
             return;
@@ -73,12 +78,14 @@ public class RotationData implements GraphEntity<RotationData> {
 
         if (state.count == 0) {
             this.stressCapacity = 0;
+            this.stressUsage = 0;
             this.speed = 0;
             return;
         }
+        this.stressCapacity = state.stressCapacity;
+        this.stressUsage = state.stressUsed;
 
-        if (state.stressCapacity < 0) {
-            this.stressCapacity = 0;
+        if (state.stressCapacity - stressUsage < 0) {
             this.speed = 0;
 
             for (var entry : list) {
@@ -89,7 +96,6 @@ public class RotationData implements GraphEntity<RotationData> {
             return;
         } else {
             this.speed = state.speed / state.count;
-            this.stressCapacity = state.stressCapacity;
         }
 
         var r = (float) (Math.min(this.speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.MAX_ROTATION_PER_TICK_4 * delta) + this.rotation);
@@ -154,6 +160,7 @@ public class RotationData implements GraphEntity<RotationData> {
     public static class State {
         protected double speed;
         protected double stressCapacity;
+        protected double stressUsed;
         protected int count;
 
         public void provide(double speed, double stressCapacity) {
@@ -163,7 +170,7 @@ public class RotationData implements GraphEntity<RotationData> {
         }
 
         public void stress(double stress) {
-            this.stressCapacity -= stress;
+            this.stressUsed += stress;
         }
     }
 }

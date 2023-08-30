@@ -139,8 +139,6 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
 
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement fan;
-
-        private final Matrix4f mat = new Matrix4f();
         private float rotation = 0;
 
         private Model(BlockState state) {

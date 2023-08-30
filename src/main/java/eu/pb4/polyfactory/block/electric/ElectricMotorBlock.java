@@ -151,7 +151,6 @@ public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, Bl
     }
 
     private final class Model extends BaseModel {
-        private final Matrix4f mat = new Matrix4f();
         private final ItemDisplayElement axle;
         private final LodItemDisplayElement base;
 

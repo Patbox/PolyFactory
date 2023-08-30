@@ -107,7 +107,6 @@ public class CreativeMotorBlock extends RotationalNetworkBlock implements Polyme
     }
 
     private final class Model extends BaseModel {
-        private final Matrix4f mat = new Matrix4f();
         private final ItemDisplayElement axle;
         private final LodItemDisplayElement base;
 

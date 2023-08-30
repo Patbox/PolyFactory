@@ -93,7 +93,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     @Override
     public int[] getAvailableSlots(Direction side) {
         var facing = this.getCachedState().get(GrinderBlock.INPUT_FACING);
-        return facing.getOpposite() == side ? INPUT_SLOTS : (facing == side ? OUTPUT_SLOTS : new int[0]);
+        return facing.getOpposite() == side ? OUTPUT_SLOTS : INPUT_SLOTS;
     }
 
     @Override

@@ -158,7 +158,6 @@ public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, 
     }
 
     public final class Model extends BaseModel {
-        private final Matrix4f mat = new Matrix4f();
         private final ItemDisplayElement item;
         private final ItemDisplayElement main;
         private float rotation = 0;

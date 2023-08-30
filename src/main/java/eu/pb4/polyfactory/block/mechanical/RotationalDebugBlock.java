@@ -45,7 +45,6 @@ public class RotationalDebugBlock extends RotationalNetworkBlock implements Poly
     }
 
     public final class Model extends BaseModel {
-        private final Matrix4f mat = new Matrix4f();
         private final TextDisplayElement mainElement;
         private final ServerWorld world;
         private final BlockPos pos;
@@ -66,8 +65,8 @@ public class RotationalDebugBlock extends RotationalNetworkBlock implements Poly
 
             this.mainElement.setText(Text.translatable("""
                     Speed: %s
-                    Stress: %s
-                    Rotation: %s""", rotation.speed(), rotation.stressCapacity(), rotation.rotation()));
+                    Stress: %s / %s
+                    Rotation: %s""", rotation.speed(), rotation.stressUsage(), rotation.stressCapacity(), rotation.rotation()));
         }
     }
 }

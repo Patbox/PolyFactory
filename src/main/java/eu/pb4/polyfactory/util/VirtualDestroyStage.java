@@ -45,7 +45,7 @@ public class VirtualDestroyStage extends ElementHolder {
         });
     }
 
-    private static boolean stageUpdate(ServerPlayerEntity player, BlockPos pos, BlockState state, int i) {
+    public static boolean stageUpdate(ServerPlayerEntity player, BlockPos pos, BlockState state, int i) {
         var self = ((ServerPlayNetExt) player.networkHandler).polyFactory$getVirtualDestroyStage();
 
         if (i == -1 || !(state.getBlock() instanceof Marker)) {

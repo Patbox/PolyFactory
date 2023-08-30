@@ -329,6 +329,15 @@ public class DataGenInit implements DataGeneratorEntrypoint {
                     .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                     .offerTo(exporter);
 
+            ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.CABLE_BLOCK, 8)
+                    .pattern("iii")
+                    .pattern("ccc")
+                    .pattern("iii")
+                    .input('i', FactoryItems.TREATED_DRIED_KELP)
+                    .input('c', Items.COPPER_INGOT)
+                    .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.TREATED_DRIED_KELP))
+                    .offerTo(exporter);
+
             ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.PRESS_BLOCK, 1)
                     .pattern(" g ")
                     .pattern("sis")

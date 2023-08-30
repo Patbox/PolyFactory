@@ -16,6 +16,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
@@ -50,6 +51,8 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
     private boolean active;
     private Item currentItem2;
     private int currentItemCount2;
+    @Nullable
+    private ItemStack delayedOutput;
 
     public PressBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.PRESS, pos, state);
@@ -65,6 +68,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             self.containers[0].maybeAdd(self.model);
             self.containers[2].maybeAdd(self.model);
         }
+
         var stack = self.containers[0];
         var stack2 = self.containers[1];
 
@@ -74,6 +78,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             self.process += speed / 120;
             self.model.updatePiston(self.process);
             self.active = true;
+            self.delayedOutput = null;
             self.model.tick();
             return;
         }
@@ -84,6 +89,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             }
             self.process = 0;
             self.active = false;
+            self.delayedOutput = null;
             self.model.tick();
             return;
         }
@@ -95,6 +101,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             }
             self.process = 0;
             self.model.tick();
+            self.delayedOutput = null;
             self.active = false;
             return;
         }
@@ -104,6 +111,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
                 self.model.updatePiston(0);
             }
             self.process = 0;
+            self.delayedOutput = null;
             self.currentItem = stack.getStack().getItem();
             self.currentItem2 = stack2.getStack().getItem();
             self.currentItemCount = stack.getStack().getCount();
@@ -118,19 +126,32 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
         }
 
         self.active = true;
-        if (self.process >= 1) {
-            if (self.getStack(OUTPUT_SLOT).isEmpty()) {
+        if (self.process >= 1 || self.delayedOutput != null) {
+            var nextOut = self.delayedOutput != null ? self.delayedOutput : self.currentRecipe.craft(self, self.world.getRegistryManager());
+            var currentOut =  self.getStack(OUTPUT_SLOT);
+
+            boolean success = false;
+
+            if (currentOut.isEmpty()) {
+                success = true;
+                self.setStack(OUTPUT_SLOT, nextOut);
+            } else if (ItemStack.canCombine(currentOut, nextOut) && currentOut.getCount() + nextOut.getCount() <= currentOut.getMaxCount()) {
+                success = true;
+                currentOut.increment(nextOut.getCount());
+            }
+
+            if (success) {
                 self.process = -0.3;
                 stack.getStack().decrement(self.currentRecipe.inputA().count());
                 stack2.getStack().decrement(self.currentRecipe.inputB().count());
-                var out = self.currentRecipe.craft(self, self.world.getRegistryManager());
-
-                self.setStack(OUTPUT_SLOT, out);
+                self.delayedOutput = null;
+            } else {
+                self.delayedOutput = nextOut;
             }
         } else {
             var speed = Math.max(Math.abs(RotationUser.getRotation((ServerWorld) world, pos.up(1)).speed()), 0);
 
-            if (speed >= self.currentRecipe.minimumSpeed() && self.getStack(OUTPUT_SLOT).isEmpty()) {
+            if (speed >= self.currentRecipe.minimumSpeed()) {
                 self.process += speed / 100;
                 self.model.updatePiston(self.process);
             }
@@ -162,6 +183,9 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
     protected void writeNbt(NbtCompound nbt) {
         this.writeInventoryNbt(nbt);
         nbt.putDouble("Progress", this.process);
+        if (this.delayedOutput != null) {
+            nbt.put("DelayedOutput", this.delayedOutput.writeNbt(new NbtCompound()));
+        }
         super.writeNbt(nbt);
     }
 
@@ -169,6 +193,12 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
     public void readNbt(NbtCompound nbt) {
         this.readInventoryNbt(nbt);
         this.process = nbt.getDouble("Progress");
+        if (nbt.contains("DelayedOutput", NbtElement.COMPOUND_TYPE)) {
+            this.delayedOutput = ItemStack.fromNbt(nbt.getCompound("DelayedOutput"));
+            if (this.delayedOutput.isEmpty()) {
+                this.delayedOutput = null;
+            }
+        }
         super.readNbt(nbt);
     }
 

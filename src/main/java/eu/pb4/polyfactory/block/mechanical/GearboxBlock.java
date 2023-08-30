@@ -60,8 +60,6 @@ public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock
         private final ItemDisplayElement yAxle;
         private final ItemDisplayElement zAxle;
 
-        private final Matrix4f mat = new Matrix4f();
-
         private Model() {
             this.mainElement = LodItemDisplayElement.createSimple(FactoryItems.GEARBOX_BLOCK);
             this.mainElement.setScale(new Vector3f(2));

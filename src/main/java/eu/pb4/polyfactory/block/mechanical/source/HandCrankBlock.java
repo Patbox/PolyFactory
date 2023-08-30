@@ -125,7 +125,6 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
     }
 
     public final class Model extends BaseModel {
-        private final Matrix4f mat = new Matrix4f();
         private final ItemDisplayElement mainElement;
 
         private Model(ServerWorld world, BlockState state) {

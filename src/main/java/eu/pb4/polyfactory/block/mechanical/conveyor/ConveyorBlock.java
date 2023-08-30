@@ -467,7 +467,6 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
     }
 
     public final class Model extends BaseModel implements ContainerHolder {
-        private final Matrix4f mat = new Matrix4f();
         private final FastItemDisplayElement base;
         private double speed;
         private Direction direction;
@@ -558,11 +557,11 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
 
             if (movingItemContainer != null) {
                 movingItemContainer.setPos(calculatePos(newDelta));
-                var base = new Quaternionf().rotateY(MathHelper.HALF_PI * this.direction.getHorizontal());
+                var base = new Quaternionf().rotateY(this.direction.asRotation() * MathHelper.RADIANS_PER_DEGREE);
                 if (this.value.stack) {
                     base.rotateX(MathHelper.HALF_PI);
                 } else if (this.value.value != 0) {
-                    base.rotateX(MathHelper.HALF_PI / 2 * -this.value.value);
+                    base.rotateX( (this.direction.getAxis() == Direction.Axis.X ? -1 : 1 ) * MathHelper.HALF_PI / 2 * -this.value.value);
                 }
                 movingItemContainer.setRotation(base);
             }
