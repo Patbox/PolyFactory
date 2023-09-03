@@ -26,7 +26,6 @@ import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.decoration.Brightness;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -45,7 +44,6 @@ import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -84,11 +82,14 @@ public class NixieTubeBlock extends DataNetworkBlock implements PolymerBlock, Bl
                 be.pushText(name, ' ', false);
                 return ActionResult.SUCCESS;
             }
-        } else if (stack.getItem() instanceof DyeItem dye) {
-            var color = DyeColorExtra.getColor(dye.getColor());
+        }
+
+        var color = DyeColorExtra.getColor(stack);
+
+        if (color != -1) {
             if (world.getBlockEntity(pos) instanceof NixieTubeBlockEntity be) {
                 if (be.setColor(color)) {
-                    be.updateText();
+                    be.updateTextDisplay();
                     if (!player.isCreative()) {
                         stack.decrement(1);
                     }

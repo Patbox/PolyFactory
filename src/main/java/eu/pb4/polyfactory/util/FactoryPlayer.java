@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.util;
 
 import com.mojang.authlib.GameProfile;
-import eu.pb4.polyfactory.mixin.PlayerEntityAccessor;
+import eu.pb4.polyfactory.mixin.player.PlayerEntityAccessor;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EquipmentSlot;
@@ -13,7 +13,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class FactoryPlayer extends FakePlayer {
     private final StackReference toolReference;

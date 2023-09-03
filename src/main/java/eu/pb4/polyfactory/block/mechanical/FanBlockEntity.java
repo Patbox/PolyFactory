@@ -3,11 +3,14 @@ package eu.pb4.polyfactory.block.mechanical;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.item.FactoryEnchantments;
 import eu.pb4.polyfactory.util.FactoryEntityTags;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -58,6 +61,10 @@ public class FanBlockEntity extends BlockEntity {
         }
 
         for (var entity : world.getEntitiesByClass(Entity.class, box, EntityPredicates.EXCEPT_SPECTATOR)) {
+            if (entity instanceof LivingEntity livingEntity
+                    && EnchantmentHelper.getEquipmentLevel(FactoryEnchantments.IGNORE_MOVEMENT, livingEntity) != 0) {
+                continue;
+            }
             var l = entity.getBoundingBox().getCenter().squaredDistanceTo(center);
             var x = speed * Math.pow(0.98, l);
             if (x > 0.05) {

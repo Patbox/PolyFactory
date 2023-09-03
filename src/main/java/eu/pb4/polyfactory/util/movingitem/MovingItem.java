@@ -25,14 +25,16 @@ public class MovingItem implements VirtualElement, StackReference {
     private ItemStack stack;
     private ItemStack stackCurrent;
     private final ItemDisplayElement[] itemDisplay = new ItemDisplayElement[4];
-    private final GenericEntityElement riddenBase = new ItemDisplayElement() {
+    private final GenericEntityElement riddenBase = new MarkerElement() {
         @Override
         protected Packet<ClientPlayPacketListener> createSpawnPacket(ServerPlayerEntity player) {
             return new EntitySpawnS2CPacket(this.getEntityId(), this.getUuid(), pos.x, pos.y, pos.z, 0, 0, this.getEntityType(), 0, Vec3d.ZERO, 0);
         }
     };
     private Vec3d pos;
+    private Vec3d lastPos;
     private float globalScale = 1;
+    private int tick;
 
     @Deprecated
     public MovingItem(ItemStack stack) {
@@ -100,8 +102,8 @@ public class MovingItem implements VirtualElement, StackReference {
     }
 
     public void setPos(Vec3d vec3d) {
-        if (this.getHolder() != null) {
-            this.riddenBase.notifyMove(this.pos, vec3d, vec3d.subtract(this.pos));
+        if (this.lastPos == null) {
+            this.lastPos = vec3d;
         }
         this.pos = vec3d;
     }
@@ -151,10 +153,18 @@ public class MovingItem implements VirtualElement, StackReference {
 
     @Override
     public void tick() {
+        if (this.tick++ % 2 == 1) {
+            return;
+        }
+
         for (var x : this.itemDisplay) {
             if (x.isDirty()) {
                 x.tick();
             }
+        }
+        if (!this.pos.equals(this.lastPos)) {
+            this.riddenBase.notifyMove(this.lastPos, this.pos, this.lastPos.subtract(this.pos));
+            this.lastPos = this.pos;
         }
     }
 
@@ -170,9 +180,14 @@ public class MovingItem implements VirtualElement, StackReference {
     }
 
     public void setRotation(Quaternionf quaternionf) {
+        var tr = quaternionf.mul(Direction.NORTH.getRotationQuaternion(), new Quaternionf());
+
+        if (tr.equals(this.itemDisplay[0].getLeftRotation(), 0.05f)) {
+            return;
+        }
+
         for (var i = 0; i < 4; i++) {
             var display = this.itemDisplay[i];
-            var tr = quaternionf.mul(Direction.NORTH.getRotationQuaternion(), new Quaternionf());
             display.setLeftRotation(tr);
             var e = i % 2 == 1;
             display.setTranslation(new Vector3f( (e ? i : -i) * 0.01f, i * 0.03f, (e ? i : -i) * 0.01f).rotate(quaternionf));

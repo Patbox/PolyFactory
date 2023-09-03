@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.mixin;
+package eu.pb4.polyfactory.mixin.util;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntityType;

@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.mixin;
+package eu.pb4.polyfactory.mixin.player;
 
 import eu.pb4.polyfactory.util.FactoryPlayer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -10,8 +10,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin {
+    @SuppressWarnings("ConstantValue")
     @Inject(method = "moveToSpawn", at = @At("HEAD"), cancellable = true)
-    private void polyfactory$dontMoveFakePlayers(ServerWorld world, CallbackInfo ci) {
+    private void dontMoveFakePlayers(ServerWorld world, CallbackInfo ci) {
         if (((Object) this) instanceof FactoryPlayer) {
             ci.cancel();
         }

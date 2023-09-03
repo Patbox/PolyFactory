@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.recipe;
 
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.recipe.mixing.ArtificialDyeMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import net.minecraft.recipe.Recipe;
@@ -15,6 +16,7 @@ public class FactoryRecipeSerializers {
     public static final CodecRecipeSerializer<PressRecipe> PRESS = register("press", PressRecipe.CODEC);
     public static final CodecRecipeSerializer<GenericMixingRecipe> MIXING_GENERIC = register("mixing/generic", GenericMixingRecipe.CODEC);
     public static final CodecRecipeSerializer<FireworkStarMixingRecipe> MIXING_FIREWORK = register("mixing/firework", FireworkStarMixingRecipe.CODEC);
+    public static final CodecRecipeSerializer<ArtificialDyeMixingRecipe> MIXING_ARTIFICIAL_DYE = register("mixing/artificial_dye", ArtificialDyeMixingRecipe.CODEC);
 
     public static void register() {
 

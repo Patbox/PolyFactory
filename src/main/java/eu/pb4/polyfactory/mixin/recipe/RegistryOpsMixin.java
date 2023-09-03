@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.mixin;
+package eu.pb4.polyfactory.mixin.recipe;
 
 import eu.pb4.polyfactory.util.Attachable;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;

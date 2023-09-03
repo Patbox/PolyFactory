@@ -3,17 +3,21 @@ package eu.pb4.polyfactory.util;
 import eu.pb4.polyfactory.ModInit;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.util.Util;
 
+import java.util.Collection;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class DebugData {
     public static boolean enabled = false;
     private static int tick;
-    private static Object2IntMap<Class<?>> CURRENT_CALL_MAP = new Object2IntOpenCustomHashMap<>(Util.identityHashStrategy());
-    private static Object2IntMap<Class<?>> PREVIOUS_CALL_MAP = new Object2IntOpenCustomHashMap<>(Util.identityHashStrategy());
+    private static Object2ObjectMap<Class<?>, Object2IntMap<Class<?>>> CURRENT_CALL_MAP = new Object2ObjectOpenCustomHashMap<>(Util.identityHashStrategy());
+    private static Object2ObjectMap<Class<?>, Object2IntMap<Class<?>>> PREVIOUS_CALL_MAP = new Object2ObjectOpenCustomHashMap<>(Util.identityHashStrategy());
 
     public static void register() {
         enabled = ModInit.DEV;
@@ -28,15 +32,20 @@ public class DebugData {
         });
     }
 
-    public static void addPacketCall(Object source) {
+    public static void addPacketCall(Object source, Object packet) {
         if (enabled) {
-            CURRENT_CALL_MAP.put(source.getClass(), CURRENT_CALL_MAP.getInt(source.getClass()) + 1);
+            var classBound = CURRENT_CALL_MAP.get(source.getClass());
+            if (classBound == null) {
+                classBound = new Object2IntOpenCustomHashMap<>(Util.identityHashStrategy());
+                CURRENT_CALL_MAP.put(source.getClass(), classBound);
+            }
+            classBound.put(packet.getClass(), classBound.getInt(packet.getClass()) + 1);
         }
     }
 
-    public static void printPacketCalls(BiConsumer<Class<?>, Integer> consumer) {
+    public static void printPacketCalls(BiConsumer<Class<?>, Collection<Object2IntMap.Entry<Class<?>>>> consumer) {
         if (enabled) {
-            PREVIOUS_CALL_MAP.forEach(consumer);
+            PREVIOUS_CALL_MAP.forEach((a, b) -> consumer.accept(a, b.object2IntEntrySet()));
         }
     }
 }

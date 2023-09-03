@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.mixin;
+package eu.pb4.polyfactory.mixin.player;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;

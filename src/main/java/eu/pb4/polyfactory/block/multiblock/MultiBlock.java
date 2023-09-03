@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.block.multiblock;
 
-import eu.pb4.polyfactory.mixin.ItemUsageContextAccessor;
+import eu.pb4.polyfactory.mixin.player.ItemUsageContextAccessor;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

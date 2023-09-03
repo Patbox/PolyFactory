@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.mixin;
+package eu.pb4.polyfactory.mixin.player;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -14,7 +14,7 @@ public class ServerPlayerInteractionManagerMixin {
             method = "interactBlock",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;shouldCancelInteraction()Z")
     )
-    private boolean polyfactory$dontCancelForSome(boolean original, @Local BlockState state) {
+    private boolean dontCancelForSome(boolean original, @Local BlockState state) {
         return !(state.getBlock() instanceof SneakBypassingBlock) && original;
     }
 }

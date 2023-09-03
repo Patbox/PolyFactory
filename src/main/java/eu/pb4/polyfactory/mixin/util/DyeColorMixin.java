@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.mixin;
+package eu.pb4.polyfactory.mixin.util;
 
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.minecraft.block.MapColor;

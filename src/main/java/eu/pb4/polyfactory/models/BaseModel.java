@@ -31,8 +31,7 @@ public class BaseModel extends ElementHolder {
     @Override
     public void sendPacket(Packet<ClientPlayPacketListener> packet) {
         super.sendPacket(packet);
-        DebugData.addPacketCall(packet);
-        DebugData.addPacketCall(this);
+        DebugData.addPacketCall(this, packet);
     }
 
     protected double getSquaredDistance(ServerPlayNetworkHandler player) {

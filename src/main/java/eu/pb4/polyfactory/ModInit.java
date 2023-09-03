@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.compat.power_networks.PowerNetworksInit;
+import eu.pb4.polyfactory.item.FactoryEnchantments;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
 import eu.pb4.polyfactory.models.CableModel;
 import eu.pb4.polyfactory.models.ConveyorModel;
@@ -48,6 +49,7 @@ public class ModInit implements ModInitializer {
 
 		FactoryBlocks.register();
 		FactoryBlockEntities.register();
+		FactoryEnchantments.register();
 		FactoryItems.register();
 		FactoryNodes.register();
 		FactoryRecipeTypes.register();

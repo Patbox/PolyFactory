@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtraListener {
     private String value = "";
@@ -49,7 +50,7 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
         this.connectionSize = nbt.getInt("ConnSize");
         this.padding = (char) nbt.getInt("Padding");
         setChannel(nbt.getInt("Channel"));
-        this.updateText();
+        this.updateTextDisplay();
     }
 
     public boolean setIndex(int positive, int negative) {
@@ -74,7 +75,7 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
     @Override
     public void onListenerUpdate(WorldChunk chunk) {
         this.model = BlockBoundAttachment.get(chunk, this.getPos()).holder() instanceof NixieTubeBlock.Model model ? model : null;
-        this.updateText();
+        this.updateTextDisplay();
     }
 
     public void pushText(String string, char padding, boolean forceRight) {
@@ -87,13 +88,30 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
             }
         }
 
+        String finalString = string;
+        pushUpdate((tube) -> {
+            var b = tube.setText(finalString);
+            if (b) {
+                tube.padding = padding;
+                tube.updateTextDisplay();
+            }
+            return b;
+        });
+    }
+    public void pushChannelUpdate(int channel) {
+        pushUpdate((tube) -> {
+            tube.setChannel(channel);
+            return true;
+        });
+    }
+
+    public void pushUpdate(Predicate<NixieTubeBlockEntity> modifierAndPredicate) {
         var axis = this.getCachedState().get(NixieTubeBlock.AXIS);
         var dir = Direction.get(Direction.AxisDirection.NEGATIVE, axis);
-        if (!this.setText(string)) {
+        if (!modifierAndPredicate.test(this)) {
             return;
         }
-        this.padding = padding;
-        this.updateText();
+        this.updateTextDisplay();
         var mut = this.pos.mutableCopy();
 
         if (this.getCachedState().get(NixieTubeBlock.NEGATIVE_CONNECTED)) {
@@ -101,9 +119,7 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
                 assert world != null;
                 if (world.getBlockEntity(mut.move(dir)) instanceof NixieTubeBlockEntity tube
                         && tube.getCachedState().get(NixieTubeBlock.AXIS) == axis && tube.getCachedState().get(NixieTubeBlock.POSITIVE_CONNECTED)) {
-                    if (tube.setText(string)) {
-                        tube.padding = padding;
-                        tube.updateText();
+                    if (modifierAndPredicate.test(tube)) {
                         if (tube.getCachedState().get(NixieTubeBlock.NEGATIVE_CONNECTED)) {
                             continue;
                         }
@@ -120,9 +136,7 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
                 if (world.getBlockEntity(mut.move(dir)) instanceof NixieTubeBlockEntity tube
                         && tube.getCachedState().get(NixieTubeBlock.AXIS) == axis && tube.getCachedState().get(NixieTubeBlock.NEGATIVE_CONNECTED)) {
 
-                    if (tube.setText(string)) {
-                        tube.padding = padding;
-                        tube.updateText();
+                    if (modifierAndPredicate.test(tube)) {
                         if (tube.getCachedState().get(NixieTubeBlock.POSITIVE_CONNECTED)) {
                             continue;
                         }
@@ -133,7 +147,7 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
         }
     }
 
-    public void updateText() {
+    public void updateTextDisplay() {
         if (this.model == null) {
             return;
         }
@@ -197,7 +211,7 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
             dirty |= entry.setText(this.value);
             entry.connectionSize = list.size();
             if (dirty) {
-                entry.updateText();
+                entry.updateTextDisplay();
             }
         }
     }

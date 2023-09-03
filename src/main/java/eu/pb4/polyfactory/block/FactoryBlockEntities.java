@@ -19,7 +19,7 @@ import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlockEntity;
 import eu.pb4.polyfactory.block.other.ContainerBlockEntity;
 import eu.pb4.polyfactory.block.data.display.NixieTubeBlockEntity;
-import eu.pb4.polyfactory.mixin.BlockEntityTypeAccessor;
+import eu.pb4.polyfactory.mixin.util.BlockEntityTypeAccessor;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.Block;

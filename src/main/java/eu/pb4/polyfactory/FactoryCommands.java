@@ -98,9 +98,14 @@ public class FactoryCommands {
     }
 
     private static int printPacketInfo(CommandContext<ServerCommandSource> context) {
-        DebugData.printPacketCalls(((aClass, integer) -> {
+        DebugData.printPacketCalls(((aClass, entries) -> {
             var x = aClass.getName().split("\\.");
-            context.getSource().sendFeedback(() -> Text.literal(x[x.length - 1]).append(" - ").append(integer.toString()), false);
+            context.getSource().sendFeedback(() -> Text.literal(x[x.length - 1]).append(":"), false);
+            for (var entry : entries) {
+                var y = entry.getKey().getName().split("\\.");
+
+                context.getSource().sendFeedback(() -> Text.literal("- ").append(y[y.length - 1]).append(" - ").append(entry.getIntValue() + ""), false);
+            }
         }));
         return 0;
     };

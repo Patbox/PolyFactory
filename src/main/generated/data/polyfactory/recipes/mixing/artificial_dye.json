@@ -1,0 +1,6 @@
+{
+  "type": "polyfactory:mixing/artificial_dye",
+  "minimum_speed": 4.0,
+  "optimal_speed": 15.0,
+  "time": 3.0
+}

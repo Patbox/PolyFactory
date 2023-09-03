@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.mixin.nbtrecipe;
+package eu.pb4.polyfactory.mixin.recipe;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;

@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.mixin;
+package eu.pb4.polyfactory.mixin.player;
 
 import eu.pb4.polyfactory.block.AbovePlacingLimiter;
 import net.minecraft.block.BlockState;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(BlockItem.class)
 public class BlockItemMixin {
     @Inject(method = "canPlace", at = @At("HEAD"), cancellable = true)
-    private void polyfactory$canPlace(ItemPlacementContext context, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+    private void canPlace(ItemPlacementContext context, BlockState state, CallbackInfoReturnable<Boolean> cir) {
         var stateBelow = context.getWorld().getBlockState(context.getBlockPos().down());
 
         if (stateBelow.getBlock() instanceof AbovePlacingLimiter limiter && !limiter.canPlaceAbove(stateBelow, context, state)) {

@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
+import eu.pb4.polyfactory.item.FactoryEnchantments;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.ConveyorModel;
 import eu.pb4.polyfactory.models.FastItemDisplayElement;
@@ -26,8 +27,10 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -201,6 +204,11 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
                     entity.discard();
                 }
             }
+            return;
+        }
+
+        if (entity instanceof LivingEntity livingEntity
+                && EnchantmentHelper.getEquipmentLevel(FactoryEnchantments.IGNORE_MOVEMENT, livingEntity) != 0) {
             return;
         }
 
@@ -523,7 +531,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
 
         @Override
         protected void onTick() {
-            if (this.movingItemContainer != null) {
+            if (this.movingItemContainer != null && this.getTick() % 2 == 0) {
                 this.movingItemContainer.checkItems();
             }
         }
@@ -561,8 +569,9 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
                 if (this.value.stack) {
                     base.rotateX(MathHelper.HALF_PI);
                 } else if (this.value.value != 0) {
-                    base.rotateX( (this.direction.getAxis() == Direction.Axis.X ? -1 : 1 ) * MathHelper.HALF_PI / 2 * -this.value.value);
+                    base.rotateX( (this.direction.getAxis() == Direction.Axis.X ? -1 : 1) * MathHelper.HALF_PI / 2 * -this.value.value);
                 }
+
                 movingItemContainer.setRotation(base);
             }
         }
@@ -643,6 +652,9 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
             this.movingItemContainer = container;
             updateDelta(-1, this.delta);
             this.addElementWithoutUpdates(container);
+        }
+
+        public void tryTick() {
         }
     }
 }

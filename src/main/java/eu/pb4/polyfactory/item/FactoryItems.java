@@ -1,5 +1,7 @@
 package eu.pb4.polyfactory.item;
 
+import eu.pb4.polyfactory.item.block.CableItem;
+import eu.pb4.polyfactory.item.block.WindmillSailItem;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.item.util.ModeledItem;
 import eu.pb4.polyfactory.item.util.MultiBlockItem;
@@ -11,6 +13,8 @@ import eu.pb4.polyfactory.item.util.AutoModeledPolymerItem;
 import eu.pb4.polyfactory.item.util.ModeledBlockItem;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
+import net.minecraft.enchantment.EnchantmentLevelEntry;
+import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.Items;
@@ -61,6 +65,9 @@ public class FactoryItems {
     public static final Item GREEN_SCREEN_BLOCK = register("green_screen", new ModeledBlockItem(FactoryBlocks.GREEN_SCREEN, new Item.Settings()));
     public static final Item BLOCK_DATA_PROVIDER = register("block_data_provider", new ModeledBlockItem(FactoryBlocks.BLOCK_DATA_PROVIDER, new Item.Settings()));
     public static final Item CABLE_BLOCK = register("cable", new CableItem(new Item.Settings()));
+
+
+    public static final Item ARTIFICIAL_DYE = register("artificial_dye", new ArtificialDyeItem(new Item.Settings()));
 
 
     public static void register() {
@@ -119,6 +126,17 @@ public class FactoryItems {
                     entries.add(WOODEN_PLATE);
                     entries.add(TREATED_DRIED_KELP);
                     entries.add(GENERIC_MACHINE_PART);
+
+                    // Fancy dyes
+                    entries.add(ArtificialDyeItem.of(0xFF0000));
+                    entries.add(ArtificialDyeItem.of(0xFFFF00));
+                    entries.add(ArtificialDyeItem.of(0x00FF00));
+                    entries.add(ArtificialDyeItem.of(0x00FFFF));
+                    entries.add(ArtificialDyeItem.of(0x0000FF));
+                    entries.add(ArtificialDyeItem.of(0xFF00FF));
+
+                    // Enchantments
+                    entries.add(EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(FactoryEnchantments.IGNORE_MOVEMENT, 1)));
 
                     // Creative
                     entries.add(CREATIVE_MOTOR_BLOCK);

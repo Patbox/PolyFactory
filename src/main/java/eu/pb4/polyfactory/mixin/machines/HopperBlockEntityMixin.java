@@ -1,8 +1,7 @@
-package eu.pb4.polyfactory.mixin;
+package eu.pb4.polyfactory.mixin.machines;
 
 import eu.pb4.polyfactory.block.other.CustomBlockEntityCalls;
 import eu.pb4.polyfactory.block.other.FilteredBlockEntity;
-import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.models.HopperModel;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
@@ -18,9 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.SoftOverride;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -30,29 +27,29 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(HopperBlockEntity.class)
 public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntity implements FilteredBlockEntity, CustomBlockEntityCalls {
     @Unique
-    private ItemStack polyfactory$filterStack = ItemStack.EMPTY;
+    private ItemStack filterStack = ItemStack.EMPTY;
     @Unique
-    private FilterData polyfactory$filter = FilterData.EMPTY_TRUE;
+    private FilterData filter = FilterData.EMPTY_TRUE;
     @Nullable
     @Unique
-    private HopperModel polyfactory$model;
+    private HopperModel model;
 
     protected HopperBlockEntityMixin(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
     }
 
     @Inject(method = "writeNbt", at = @At("TAIL"))
-    private void polyfactory$writeFilterNbt(NbtCompound nbt, CallbackInfo ci) {
-        nbt.put("polydex:filter", this.polyfactory$filterStack.writeNbt(new NbtCompound()));
+    private void writeFilterNbt(NbtCompound nbt, CallbackInfo ci) {
+        nbt.put("polydex:filter", this.filterStack.writeNbt(new NbtCompound()));
     }
 
     @Inject(method = "readNbt", at = @At("TAIL"))
-    private void polyfactory$readFilterNbt(NbtCompound nbt, CallbackInfo ci) {
+    private void readFilterNbt(NbtCompound nbt, CallbackInfo ci) {
         polyfactory$setFilter(ItemStack.fromNbt(nbt.getCompound("polydex:filter")));
     }
 
     @Inject(method = "transfer(Lnet/minecraft/inventory/Inventory;Lnet/minecraft/inventory/Inventory;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/math/Direction;)Lnet/minecraft/item/ItemStack;", at = @At("HEAD"), cancellable = true)
-    private static void polyfactory$cancelUnfiltered(Inventory from, Inventory to, ItemStack stack, Direction side, CallbackInfoReturnable<ItemStack> cir) {
+    private static void cancelUnfiltered(Inventory from, Inventory to, ItemStack stack, Direction side, CallbackInfoReturnable<ItemStack> cir) {
         if (to instanceof FilteredBlockEntity filteredHopper) {
             if (!filteredHopper.polyfactory$matchesFilter(stack)) {
                 cir.setReturnValue(stack);
@@ -61,63 +58,63 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
     }
 
     @Inject(method = "serverTick", at = @At("HEAD"))
-    private static void polyfactory$setupModel(World world, BlockPos pos, BlockState state, HopperBlockEntity blockEntity, CallbackInfo ci) {
+    private static void setupModel(World world, BlockPos pos, BlockState state, HopperBlockEntity blockEntity, CallbackInfo ci) {
         var self = (HopperBlockEntityMixin) (Object) blockEntity;
-        if (self.polyfactory$model == null && !self.polyfactory$filterStack.isEmpty()) {
-            self.polyfactory$createModel();
+        if (self.model == null && !self.filterStack.isEmpty()) {
+            self.createModel();
         }
     }
 
     @Override
     public void polyfactory$markRemoved() {
-        if (this.polyfactory$model != null) {
-            this.polyfactory$model.destroy();
-            this.polyfactory$model = null;
+        if (this.model != null) {
+            this.model.destroy();
+            this.model = null;
         }
     }
 
     @Override
     public void polyfactory$setCachedState(BlockState state) {
-        if (this.polyfactory$model != null) {
-            this.polyfactory$model.updateRotation(state);
+        if (this.model != null) {
+            this.model.updateRotation(state);
         }
     }
 
     @Override
     public ItemStack polyfactory$getFilter() {
-        return this.polyfactory$filterStack;
+        return this.filterStack;
     }
 
     @Override
     public void polyfactory$setFilter(ItemStack stack) {
-        this.polyfactory$filterStack = stack;
-        this.polyfactory$filter = FilterData.of(stack, true);
+        this.filterStack = stack;
+        this.filter = FilterData.of(stack, true);
 
-        if (this.polyfactory$model == null && !this.polyfactory$filterStack.isEmpty()) {
-            this.polyfactory$createModel();
-        } else if (this.polyfactory$model != null && this.polyfactory$filterStack.isEmpty()) {
-            this.polyfactory$model.destroy();
-            this.polyfactory$model = null;
-        } else if (this.polyfactory$model != null) {
-            this.polyfactory$model.setItem(this.polyfactory$filter.icon());
-            this.polyfactory$model.tick();
+        if (this.model == null && !this.filterStack.isEmpty()) {
+            this.createModel();
+        } else if (this.model != null && this.filterStack.isEmpty()) {
+            this.model.destroy();
+            this.model = null;
+        } else if (this.model != null) {
+            this.model.setItem(this.filter.icon());
+            this.model.tick();
         }
         this.markDirty();
     }
 
-    private void polyfactory$createModel() {
+    private void createModel() {
         if (!(this.world instanceof ServerWorld serverWorld)) {
             return;
         }
         var model = new HopperModel(this.getCachedState());
-        model.setItem(this.polyfactory$filter.icon());
+        model.setItem(this.filter.icon());
         ChunkAttachment.of(model, serverWorld, this.pos);
-        this.polyfactory$model = model;
+        this.model = model;
     }
 
     @Override
     public boolean polyfactory$matchesFilter(ItemStack itemStack) {
-        return polyfactory$filter.test(itemStack);
+        return filter.test(itemStack);
     }
 
 }

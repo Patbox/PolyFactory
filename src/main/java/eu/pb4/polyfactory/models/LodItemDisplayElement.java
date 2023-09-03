@@ -154,8 +154,7 @@ public class LodItemDisplayElement extends ItemDisplayElement {
                 player.sendPacket(nearPacket);
             }
 
-            DebugData.addPacketCall(this.getHolder());
-            DebugData.addPacketCall(nearPacket);
+            DebugData.addPacketCall(this.getHolder(), nearPacket);
         } else {
             Packet<ClientPlayPacketListener> mediumPacket = null;
             if (this.nearTracker.isDirty()) {
@@ -188,8 +187,7 @@ public class LodItemDisplayElement extends ItemDisplayElement {
             }
 
             if (sendOnce) {
-                DebugData.addPacketCall(this.getHolder());
-                DebugData.addPacketCall(nearPacket != null ? nearPacket : mediumPacket);
+                DebugData.addPacketCall(this.getHolder(), nearPacket != null ? nearPacket : mediumPacket);
             }
         }
     }

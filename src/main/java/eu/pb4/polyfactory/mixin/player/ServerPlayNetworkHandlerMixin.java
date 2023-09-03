@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.mixin;
+package eu.pb4.polyfactory.mixin.player;
 
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
@@ -15,7 +15,7 @@ public class ServerPlayNetworkHandlerMixin implements ServerPlayNetExt {
     @Shadow private int vehicleFloatingTicks;
 
     @Unique
-    private final VirtualDestroyStage polyfactory$virtualDestroyStage = new VirtualDestroyStage();
+    private final VirtualDestroyStage virtualDestroyStage = new VirtualDestroyStage();
 
     @Override
     public void polyFactory$resetFloating() {
@@ -25,6 +25,6 @@ public class ServerPlayNetworkHandlerMixin implements ServerPlayNetExt {
 
     @Override
     public VirtualDestroyStage polyFactory$getVirtualDestroyStage() {
-        return this.polyfactory$virtualDestroyStage;
+        return this.virtualDestroyStage;
     }
 }

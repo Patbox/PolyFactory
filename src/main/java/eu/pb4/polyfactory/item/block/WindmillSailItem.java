@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.item;
+package eu.pb4.polyfactory.item.block;
 
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;

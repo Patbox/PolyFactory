@@ -1,10 +1,9 @@
-package eu.pb4.polyfactory.mixin.nbtrecipe;
+package eu.pb4.polyfactory.mixin.recipe;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
 import net.minecraft.recipe.ShapedRecipe;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

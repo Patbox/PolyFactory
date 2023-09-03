@@ -64,9 +64,6 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
             }
 
             if (self.isContainerEmpty()) {
-                if (itemChanged) {
-                    self.model.tick();
-                }
                 return;
             }
         }
