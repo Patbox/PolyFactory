@@ -1,8 +1,8 @@
 package eu.pb4.polyfactory.mixin.machines;
 
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.data.BlockDataProviderBlock;
-import eu.pb4.polyfactory.data.FactoryData;
+import eu.pb4.polyfactory.block.data.providers.DataProviderBlock;
+import eu.pb4.polyfactory.data.DataContainer;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -44,8 +44,8 @@ public abstract class WorldMixin implements WorldAccess {
             for (var dir : Direction.values()) {
                 var selfPos = pos.offset(dir);
                 var state = this.getBlockState(selfPos);
-                if (state.isOf(FactoryBlocks.BLOCK_DATA_PROVIDER) && state.get(BlockDataProviderBlock.FACING) == dir.getOpposite()) {
-                    FactoryBlocks.BLOCK_DATA_PROVIDER.sendData(world, selfPos, FactoryData.of(count));
+                if (state.isOf(FactoryBlocks.ITEM_COUNTER) && state.get(DataProviderBlock.FACING) == dir.getOpposite()) {
+                    FactoryBlocks.ITEM_COUNTER.sendData(world, selfPos, DataContainer.of(count));
                 }
             }
         }

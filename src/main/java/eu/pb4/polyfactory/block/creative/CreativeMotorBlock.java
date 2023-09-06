@@ -34,7 +34,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.Collection;
@@ -112,7 +111,7 @@ public class CreativeMotorBlock extends RotationalNetworkBlock implements Polyme
 
         private Model(BlockState state) {
             this.axle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, 4, 0.3f, 0.6f);
-            this.base = LodItemDisplayElement.createSimple(FactoryItems.CREATIVE_MOTOR_BLOCK);
+            this.base = LodItemDisplayElement.createSimple(FactoryItems.CREATIVE_MOTOR);
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);

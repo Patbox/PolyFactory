@@ -18,7 +18,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.Collection;
@@ -61,7 +60,7 @@ public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock
         private final ItemDisplayElement zAxle;
 
         private Model() {
-            this.mainElement = LodItemDisplayElement.createSimple(FactoryItems.GEARBOX_BLOCK);
+            this.mainElement = LodItemDisplayElement.createSimple(FactoryItems.GEARBOX);
             this.mainElement.setScale(new Vector3f(2));
             this.addElement(this.mainElement);
 

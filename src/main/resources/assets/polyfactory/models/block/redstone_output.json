@@ -1,0 +1,9 @@
+{
+	"parent": "polyfactory:block/item_counter",
+	"textures": {
+		"2": "polyfactory:block/redstone_output_side",
+		"particle": "polyfactory:block/redstone_output_side",
+		"front": "polyfactory:block/redstone_output_front",
+		"back": "polyfactory:block/steel_plate_connection"
+	}
+}

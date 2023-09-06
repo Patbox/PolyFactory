@@ -14,6 +14,9 @@
     "polyfactory:splitter",
     "polyfactory:mixer",
     "polyfactory:steam_engine",
+    "polyfactory:item_counter",
+    "polyfactory:redstone_input",
+    "polyfactory:redstone_output",
     "polyfactory:metal_grid"
   ]
 }

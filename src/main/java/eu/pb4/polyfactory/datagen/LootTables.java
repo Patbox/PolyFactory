@@ -40,8 +40,10 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.METAL_GRID);
         this.addDrop(FactoryBlocks.MINER);
         this.addDrop(FactoryBlocks.STEAM_ENGINE);
-        this.addDrop(FactoryBlocks.BLOCK_DATA_PROVIDER);
-        this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE_BLOCK);
+        this.addDrop(FactoryBlocks.ITEM_COUNTER);
+        this.addDrop(FactoryBlocks.REDSTONE_INPUT);
+        this.addDrop(FactoryBlocks.REDSTONE_OUTPUT);
+        this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE);
 
 
         {
@@ -51,7 +53,7 @@ class LootTables extends FabricBlockLootTableProvider {
                 builder.pool(
                         LootPool.builder()
                                 .rolls(ConstantLootNumberProvider.create(1))
-                                .with(ItemEntry.builder(FactoryItems.CABLE_BLOCK))
+                                .with(ItemEntry.builder(FactoryItems.CABLE))
                                 .conditionally(SurvivesExplosionLootCondition.builder())
                                 .conditionally(BlockStatePropertyLootCondition.builder(FactoryBlocks.CABLE)
                                         .properties(StatePredicate.Builder.create().exactMatch(property, true)))

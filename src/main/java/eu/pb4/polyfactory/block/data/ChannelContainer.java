@@ -6,5 +6,5 @@ import net.minecraft.util.math.BlockPos;
 
 public interface ChannelContainer {
     int channel();
-    void setChannel();
+    void setChannel(int i);
 }

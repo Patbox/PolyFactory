@@ -1,12 +1,10 @@
-package eu.pb4.polyfactory.block.data;
+package eu.pb4.polyfactory.block.data.util;
 
-import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.data.FactoryData;
-import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.block.data.ChannelContainer;
+import eu.pb4.polyfactory.block.data.util.DataCacheBlockEntity;
+import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
-import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -28,12 +26,9 @@ import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import java.util.Collection;
-import java.util.List;
-
-public class BlockDataProviderBlock extends DataNetworkBlock implements PolymerBlock, VirtualDestroyStage.Marker, BlockEntityProvider, BlockWithElementHolder, DataProvider {
+public abstract class GenericDirectionalDataBlock extends DataNetworkBlock implements PolymerBlock, VirtualDestroyStage.Marker, BlockEntityProvider, BlockWithElementHolder {
     public static DirectionProperty FACING = Properties.FACING;
-    public BlockDataProviderBlock(Settings settings) {
+    public GenericDirectionalDataBlock(Settings settings) {
         super(settings);
     }
 
@@ -59,38 +54,24 @@ public class BlockDataProviderBlock extends DataNetworkBlock implements PolymerB
         return new Model(initialBlockState);
     }
 
-    @Override
-    public Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new ChannelProviderDirectionNode(state.get(FACING).getOpposite(), 0));
-    }
-
-    @Override
-    public @Nullable FactoryData provideData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel) {
-        if (world.getBlockEntity(selfPos) instanceof ProviderDataCacheBlockEntity be && be.channel() == channel) {
-            return be.lastData;
-        }
-        return null;
-    }
-
-    public void sendData(ServerWorld world, BlockPos selfPos, FactoryData data) {
-        if (world.getBlockEntity(selfPos) instanceof ProviderDataCacheBlockEntity be) {
-            be.lastData = data;
-            NetworkComponent.Data.getLogic(world, selfPos).pushDataUpdate(be.channel(), data);
-
-        }
-    }
-
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new ProviderDataCacheBlockEntity(pos, state);
+        return new DataCacheBlockEntity(pos, state);
+    }
+
+    protected int getChannel(ServerWorld world, BlockPos pos) {
+        if (world.getBlockEntity(pos) instanceof ChannelContainer container) {
+            return container.channel();
+        }
+        return 0;
     }
 
     private final class Model extends BaseModel {
         private final LodItemDisplayElement base;
 
         private Model(BlockState state) {
-            this.base = LodItemDisplayElement.createSimple(FactoryItems.BLOCK_DATA_PROVIDER);
+            this.base = LodItemDisplayElement.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);

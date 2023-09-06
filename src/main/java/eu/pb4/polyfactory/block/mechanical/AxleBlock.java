@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.models.BaseItemProvider;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -19,7 +20,6 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.block.*;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -34,7 +34,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 
 import java.util.*;
 
@@ -95,7 +94,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
 
     @Override
     public void onPolymerBlockSend(BlockState blockState, BlockPos.Mutable pos, ServerPlayerEntity player) {
-        if (pos.getSquaredDistanceFromCenter(player.getX(), player.getY(), player.getZ()) < 32 * 32) {
+        if (pos.getSquaredDistanceFromCenter(player.getX(), player.getY(), player.getZ()) < 16 * 16) {
             player.networkHandler.sendPacket(new BlockUpdateS2CPacket(pos.toImmutable(), Blocks.LIGHTNING_ROD.getDefaultState().with(Properties.FACING, Direction.from(blockState.get(AXIS), Direction.AxisDirection.POSITIVE)).with(LightningRodBlock.POWERED, true)));
             //noinspection UnstableApiUsage
             PolymerServerProtocol.sendBlockUpdate(player.networkHandler, pos, blockState);
@@ -108,8 +107,8 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
     }
 
     public final class Model extends BaseModel {
-        public static final ItemStack ITEM_MODEL = new ItemStack(Items.PAPER);
-        public static final ItemStack ITEM_MODEL_SHORT = new ItemStack(Items.PAPER);
+        public static final ItemStack ITEM_MODEL = new ItemStack(FactoryItems.AXLE.getPolymerItem());
+        public static final ItemStack ITEM_MODEL_SHORT = new ItemStack(BaseItemProvider.requestSimpleItem());
         private final ItemDisplayElement mainElement;
         private final Set<ServerPlayNetworkHandler> viewingClose = new ObjectOpenCustomHashSet<>(Util.identityHashStrategy());
         private final List<ServerPlayNetworkHandler> sentRod = new ArrayList<>();
@@ -165,7 +164,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
             for (var player : this.getWatchingPlayers()) {
                 var d = this.getSquaredDistance(player);
 
-                if (d < 32 * 32) {
+                if (d < 16 * 16) {
                     if (!this.viewingClose.contains(player)) {
                         this.sentRod.add(player);
                         this.viewingClose.add(player);
@@ -188,7 +187,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
         }
 
         static {
-            ITEM_MODEL.getOrCreateNbt().putInt("CustomModelData", SimpleModeledPolymerItem.MODELS.get(FactoryItems.AXLE_BLOCK).value());
+            ITEM_MODEL.getOrCreateNbt().putInt("CustomModelData", SimpleModeledPolymerItem.MODELS.get(FactoryItems.AXLE).value());
             ITEM_MODEL_SHORT.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(ITEM_MODEL_SHORT.getItem(), FactoryUtil.id("block/axle_short")).value());
         }
     }

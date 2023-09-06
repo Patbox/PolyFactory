@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.models.BaseItemProvider;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -39,7 +40,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.Collection;
@@ -135,14 +135,14 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
     }
 
     public final class Model extends BaseModel {
-        public static final ItemStack ITEM_MODEL = new ItemStack(Items.PAPER);
+        public static final ItemStack ITEM_MODEL = new ItemStack(BaseItemProvider.requestSimpleItem());
 
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement fan;
         private float rotation = 0;
 
         private Model(BlockState state) {
-            this.mainElement = new LodItemDisplayElement(FactoryItems.FAN_BLOCK.getDefaultStack());
+            this.mainElement = new LodItemDisplayElement(FactoryItems.FAN.getDefaultStack());
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
             this.mainElement.setScale(new Vector3f(2f));

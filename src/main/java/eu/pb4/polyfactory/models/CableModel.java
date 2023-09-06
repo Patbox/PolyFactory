@@ -30,22 +30,22 @@ public class CableModel {
 
     public static final ItemStack[] MODELS_BY_ID = new ItemStack[SIZE];
     private static final Item[] MODEL_ITEMS = new Item[]{
-            Items.WHITE_CARPET,
-            Items.ORANGE_CARPET,
-            Items.MAGENTA_CARPET,
-            Items.LIGHT_BLUE_CARPET,
-            Items.YELLOW_CARPET,
-            Items.LIME_CARPET,
-            Items.PINK_CARPET,
-            Items.GRAY_CARPET,
-            Items.LIGHT_GRAY_CARPET,
-            Items.CYAN_CARPET,
-            Items.PURPLE_CARPET,
-            Items.BLUE_CARPET,
-            Items.BROWN_CARPET,
-            Items.GREEN_CARPET,
-            Items.RED_CARPET,
-            Items.BLACK_CARPET
+            Items.WHITE_WOOL,
+            Items.ORANGE_WOOL,
+            Items.MAGENTA_WOOL,
+            Items.LIGHT_BLUE_WOOL,
+            Items.YELLOW_WOOL,
+            Items.LIME_WOOL,
+            Items.PINK_WOOL,
+            Items.GRAY_WOOL,
+            Items.LIGHT_GRAY_WOOL,
+            Items.CYAN_WOOL,
+            Items.PURPLE_WOOL,
+            Items.BLUE_WOOL,
+            Items.BROWN_WOOL,
+            Items.GREEN_WOOL,
+            Items.RED_WOOL,
+            Items.BLACK_WOOL
     };
     private static int currentItemIndex;
 

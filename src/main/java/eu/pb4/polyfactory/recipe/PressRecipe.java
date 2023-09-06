@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.recipe;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
@@ -97,6 +96,6 @@ public record PressRecipe(Identifier identifier, CountedIngredient inputA, Count
 
     @Override
     public ItemStack createIcon() {
-        return FactoryItems.PRESS_BLOCK.getDefaultStack();
+        return FactoryItems.PRESS.getDefaultStack();
     }
 }

@@ -20,6 +20,9 @@ public record OutputStack(ItemStack stack, float chance, int roll) {
     public static final Codec<List<OutputStack>> LIST_CODEC = Codec.either(CODEC, Codec.list(CODEC))
             .xmap(x -> x.map(y -> List.of(y), y -> y), x -> x.size() == 1 ? Either.left(x.get(0)) : Either.right(x));
 
+    public static OutputStack of(ItemConvertible stick) {
+        return new OutputStack(stick.asItem().getDefaultStack(), 1, 1);
+    }
     public static OutputStack of(ItemConvertible stick, float chance, int roll) {
         return new OutputStack(stick.asItem().getDefaultStack(), chance, roll);
     }

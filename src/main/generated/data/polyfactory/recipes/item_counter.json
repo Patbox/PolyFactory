@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "c": {
+      "item": "minecraft:copper_ingot"
+    },
+    "p": {
+      "item": "polyfactory:wooden_plate"
+    },
+    "s": {
+      "item": "polyfactory:steel_plate"
+    }
+  },
+  "pattern": [
+    "ppp",
+    "scs",
+    "scs"
+  ],
+  "result": {
+    "item": "polyfactory:item_counter"
+  },
+  "show_notification": true
+}

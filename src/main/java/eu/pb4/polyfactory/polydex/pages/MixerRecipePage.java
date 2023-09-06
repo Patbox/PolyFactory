@@ -4,11 +4,9 @@ import eu.pb4.polydex.api.v1.recipe.*;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
-import eu.pb4.polyfactory.recipe.PressRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class MixerRecipePage extends AbstractRecipePolydexPage<GenericMixingRecipe> {
-    private static final ItemStack ICON = FactoryItems.MIXER_BLOCK.getDefaultStack();
+    private static final ItemStack ICON = FactoryItems.MIXER.getDefaultStack();
     private final List<PolydexIngredient<?>> ingredients;
 
     @Override

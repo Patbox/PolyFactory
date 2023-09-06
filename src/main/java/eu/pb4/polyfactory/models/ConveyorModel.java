@@ -48,7 +48,23 @@ public class ConveyorModel {
             Items.BROWN_CARPET,
             Items.GREEN_CARPET,
             Items.RED_CARPET,
-            Items.BLACK_CARPET
+            Items.BLACK_CARPET,
+            Items.WHITE_TERRACOTTA,
+            Items.ORANGE_TERRACOTTA,
+            Items.MAGENTA_TERRACOTTA,
+            Items.LIGHT_BLUE_TERRACOTTA,
+            Items.YELLOW_TERRACOTTA,
+            Items.LIME_TERRACOTTA,
+            Items.PINK_TERRACOTTA,
+            Items.GRAY_TERRACOTTA,
+            Items.LIGHT_GRAY_TERRACOTTA,
+            Items.CYAN_TERRACOTTA,
+            Items.PURPLE_TERRACOTTA,
+            Items.BLUE_TERRACOTTA,
+            Items.BROWN_TERRACOTTA,
+            Items.GREEN_TERRACOTTA,
+            Items.RED_TERRACOTTA,
+            Items.BLACK_TERRACOTTA
     };
     private static final String MODEL_JSON = """
             {

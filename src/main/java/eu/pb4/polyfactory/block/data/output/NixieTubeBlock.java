@@ -1,10 +1,10 @@
-package eu.pb4.polyfactory.block.data.display;
+package eu.pb4.polyfactory.block.data.output;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.DataReceiver;
-import eu.pb4.polyfactory.block.data.DataNetworkBlock;
-import eu.pb4.polyfactory.data.FactoryData;
+import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
+import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
@@ -143,7 +143,7 @@ public class NixieTubeBlock extends DataNetworkBlock implements PolymerBlock, Bl
     }
 
     @Override
-    public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, FactoryData data) {
+    public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data) {
         if (world.getBlockEntity(selfPos) instanceof NixieTubeBlockEntity be && channel == be.channel()) {
             be.pushText(data.asString(), data.padding(), data.forceRight());
             return true;

@@ -38,7 +38,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 
 import java.util.Collection;
 import java.util.List;
@@ -163,7 +162,7 @@ public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, 
         private float rotation = 0;
 
         private Model(ServerWorld world, BlockState state) {
-            this.main = LodItemDisplayElement.createSimple(FactoryItems.MINER_BLOCK);
+            this.main = LodItemDisplayElement.createSimple(FactoryItems.MINER);
             this.item = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 1, 0.5f);
 
             this.updateAnimation(state.get(FACING));

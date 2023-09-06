@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.block.data.display;
+package eu.pb4.polyfactory.block.data.output;
 
 import eu.pb4.polyfactory.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;

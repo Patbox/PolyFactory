@@ -1,23 +1,25 @@
 package eu.pb4.polyfactory.item.util;
 
+import eu.pb4.polyfactory.models.BaseItemProvider;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public class ModeledBlockItem extends BlockItem implements SimpleModeledPolymerItem {
 
+    private final Item polymerItem;
+
     public <T extends Block & PolymerBlock> ModeledBlockItem(T block, Settings settings) {
         super(block, settings);
+        this.polymerItem = BaseItemProvider.requestSimpleItem();
     }
 
     @Override
@@ -35,7 +37,7 @@ public class ModeledBlockItem extends BlockItem implements SimpleModeledPolymerI
     }
 
     @Override
-    public Item getPolymerItem() {
-        return Items.PAPER;
+    public final Item getPolymerItem() {
+        return this.polymerItem;
     }
 }

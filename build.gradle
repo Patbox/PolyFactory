@@ -61,9 +61,9 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modImplementation include('eu.pb4:polymer-core:0.5.14+1.20.1')
-	modImplementation include('eu.pb4:polymer-resource-pack:0.5.14+1.20.1')
-	modImplementation include('eu.pb4:polymer-autohost:0.5.14+1.20.1')
-	modImplementation include('eu.pb4:polymer-virtual-entity:0.5.14+1.20.1')
+	modImplementation include('eu.pb4:polymer-resource-pack:0.5.15+1.20.1')
+	modImplementation include('eu.pb4:polymer-autohost:0.5.15+1.20.1')
+	modImplementation include('eu.pb4:polymer-virtual-entity:0.5.15+1.20.1')
 	modImplementation include('eu.pb4:map-canvas-api:0.2.2+1.19.4')
 	modImplementation include('eu.pb4:common-protection-api:1.0.0')
 	//modImplementation include('eu.pb4:sidebar-api:0.1.2+1.19.3')

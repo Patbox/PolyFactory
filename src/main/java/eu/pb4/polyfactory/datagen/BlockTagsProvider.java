@@ -74,6 +74,9 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                         FactoryBlocks.SPLITTER)
                 .add(FactoryBlocks.MIXER)
                 .add(FactoryBlocks.STEAM_ENGINE)
+                .add(FactoryBlocks.ITEM_COUNTER)
+                .add(FactoryBlocks.REDSTONE_INPUT)
+                .add(FactoryBlocks.REDSTONE_OUTPUT)
                 .add(FactoryBlocks.METAL_GRID)
         ;
 

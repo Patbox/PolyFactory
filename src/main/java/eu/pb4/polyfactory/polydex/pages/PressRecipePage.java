@@ -1,8 +1,6 @@
 package eu.pb4.polyfactory.polydex.pages;
 
 import eu.pb4.polydex.api.v1.recipe.*;
-import eu.pb4.polydex.impl.PolydexImplUtils;
-import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
@@ -16,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class PressRecipePage extends AbstractRecipePolydexPage<PressRecipe> {
-    private static final ItemStack ICON = FactoryItems.PRESS_BLOCK.getDefaultStack();
+    private static final ItemStack ICON = FactoryItems.PRESS.getDefaultStack();
     private final List<PolydexIngredient<?>> ingredients;
     private final PolydexStack<?>[] output;
 

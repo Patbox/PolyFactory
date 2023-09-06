@@ -38,7 +38,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 
 import java.util.Collection;
 import java.util.List;
@@ -53,6 +52,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (hand == Hand.MAIN_HAND && world.getBlockEntity(pos) instanceof HandCrankBlockEntity be && be.lastTick != world.getServer().getTicks()) {
+            player.addExhaustion(0.1f);
             be.lastTick = world.getServer().getTicks();
             return ActionResult.SUCCESS;
         }
@@ -128,7 +128,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
         private final ItemDisplayElement mainElement;
 
         private Model(ServerWorld world, BlockState state) {
-            this.mainElement = LodItemDisplayElement.createSimple(FactoryItems.HAND_CRANK_BLOCK, 4);
+            this.mainElement = LodItemDisplayElement.createSimple(FactoryItems.HAND_CRANK, 4);
             this.updateAnimation(0, state.get(FACING));
             this.addElement(this.mainElement);
         }

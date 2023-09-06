@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.block.data;
+package eu.pb4.polyfactory.block.data.util;
 
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;

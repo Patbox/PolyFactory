@@ -184,7 +184,7 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
         private final LodItemDisplayElement axle;
 
         private Model(BlockState state) {
-            this.main = LodItemDisplayElement.createSimple(state.get(LIT) ? ACTIVE : FactoryItems.STEAM_ENGINE_BLOCK.getDefaultStack(), 0);
+            this.main = LodItemDisplayElement.createSimple(state.get(LIT) ? ACTIVE : FactoryItems.STEAM_ENGINE.getDefaultStack(), 0);
             this.main.setScale(new Vector3f(2));
             var facing = state.get(FACING);
             var offset = new Vec3d(
@@ -220,7 +220,7 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
             var direction = state.get(FACING);
 
             this.main.setYaw(direction.asRotation());
-            this.main.setItem(state.get(LIT) ? ACTIVE : FactoryItems.STEAM_ENGINE_BLOCK.getDefaultStack());
+            this.main.setItem(state.get(LIT) ? ACTIVE : FactoryItems.STEAM_ENGINE.getDefaultStack());
             this.axle.setYaw(direction.asRotation());
             this.rotatingA.setYaw(direction.asRotation());
             this.rotatingB.setYaw(direction.asRotation());

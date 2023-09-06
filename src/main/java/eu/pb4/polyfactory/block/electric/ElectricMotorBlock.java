@@ -42,7 +42,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.Collection;
@@ -156,7 +155,7 @@ public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, Bl
 
         private Model(BlockState state) {
             this.axle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, 4, 0.3f, 0.6f);
-            this.base = LodItemDisplayElement.createSimple(FactoryItems.ELECTRIC_MOTOR_BLOCK);
+            this.base = LodItemDisplayElement.createSimple(FactoryItems.ELECTRIC_MOTOR);
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);

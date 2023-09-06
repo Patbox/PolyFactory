@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.IdentityHashMap;
 
 public interface SimpleModeledPolymerItem extends AutoModeledPolymerItem {
-    IdentityHashMap<SimpleModeledPolymerItem, PolymerModelData> MODELS = new IdentityHashMap<>();
+    IdentityHashMap<Object, PolymerModelData> MODELS = new IdentityHashMap<>();
 
 
     Item getPolymerItem();

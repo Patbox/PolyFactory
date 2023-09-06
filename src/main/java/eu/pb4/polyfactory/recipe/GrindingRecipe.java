@@ -107,6 +107,6 @@ public record GrindingRecipe(Identifier identifier, String group, Ingredient inp
 
     @Override
     public ItemStack createIcon() {
-        return FactoryItems.GRINDER_BLOCK.getDefaultStack();
+        return FactoryItems.GRINDER.getDefaultStack();
     }
 }

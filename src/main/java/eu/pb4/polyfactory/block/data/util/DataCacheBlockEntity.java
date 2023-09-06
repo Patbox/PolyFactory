@@ -1,28 +1,31 @@
-package eu.pb4.polyfactory.block.data;
+package eu.pb4.polyfactory.block.data.util;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.block.other.LockableBlockEntity;
-import eu.pb4.polyfactory.data.FactoryData;
+import eu.pb4.polyfactory.data.DataContainer;
+import eu.pb4.polyfactory.data.StringData;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 
-public class ProviderDataCacheBlockEntity extends LockableBlockEntity {
-    public FactoryData lastData;
+public class DataCacheBlockEntity extends LockableBlockEntity implements ChannelContainer {
+    public DataContainer lastData = StringData.EMPTY;
     private int channel;
 
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
-        setChannel(nbt.getInt("Channel"));
+        this.lastData = DataContainer.fromNbt(nbt.getCompound("data"));
+        setChannel(nbt.getInt("channel"));
     }
 
     @Override
     protected void writeNbt(NbtCompound nbt) {
         super.writeNbt(nbt);
-        nbt.putInt("Channel", this.channel);
+        nbt.putInt("channel", this.channel);
+        nbt.put("data", this.lastData.createNbt());
     }
 
     public int channel() {
@@ -37,7 +40,7 @@ public class ProviderDataCacheBlockEntity extends LockableBlockEntity {
         }
     }
 
-    public ProviderDataCacheBlockEntity(BlockPos pos, BlockState state) {
+    public DataCacheBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.PROVIDER_DATA_CACHE, pos, state);
     }
 }

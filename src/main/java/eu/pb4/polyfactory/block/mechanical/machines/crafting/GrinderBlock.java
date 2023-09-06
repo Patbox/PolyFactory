@@ -41,7 +41,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 
 import java.util.Collection;
 import java.util.List;
@@ -186,7 +185,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
 
         private Model(ServerWorld world, BlockState state) {
 
-            this.main = LodItemDisplayElement.createSimple(FactoryItems.GRINDER_BLOCK);
+            this.main = LodItemDisplayElement.createSimple(FactoryItems.GRINDER);
             this.stoneWheel = LodItemDisplayElement.createSimple(MODEL_STONE_WHEEL, 4, 0.6f, 0.6f);
 
             this.updateAnimation(0, state.get(INPUT_FACING));

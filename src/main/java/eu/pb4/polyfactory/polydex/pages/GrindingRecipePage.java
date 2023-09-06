@@ -5,17 +5,14 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
-import eu.pb4.polyfactory.recipe.PressRecipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 public class GrindingRecipePage extends AbstractRecipePolydexPage<GrindingRecipe> {
-    private static final ItemStack ICON = FactoryItems.GRINDER_BLOCK.getDefaultStack();
+    private static final ItemStack ICON = FactoryItems.GRINDER.getDefaultStack();
     private final PolydexStack<?>[] output;
 
     public GrindingRecipePage(GrindingRecipe recipe) {

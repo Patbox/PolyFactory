@@ -7,9 +7,7 @@ import com.kneelawk.graphlib.api.graph.user.*;
 import com.kneelawk.graphlib.api.util.LinkPos;
 import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.DataReceiver;
-import eu.pb4.polyfactory.block.electric.EnergyUser;
-import eu.pb4.polyfactory.data.FactoryData;
-import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
+import eu.pb4.polyfactory.data.DataContainer;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.world.ServerWorld;
@@ -33,7 +31,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
     private final Int2ObjectOpenHashMap<Set<BlockPos>> receivers = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectOpenHashMap<Set<BlockPos>> providers = new Int2ObjectOpenHashMap<>();
 
-    private final Int2ObjectOpenHashMap<FactoryData> currentData = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectOpenHashMap<DataContainer> currentData = new Int2ObjectOpenHashMap<>();
     private GraphEntityContext ctx;
     private long lastTick;
 
@@ -41,7 +39,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
     }
 
     @Nullable
-    public FactoryData getData(int channel) {
+    public DataContainer getData(int channel) {
         if (!(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
             return null;
         }
@@ -76,7 +74,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
         return null;
     }
 
-    public void pushDataUpdate(int channel, FactoryData data) {
+    public void pushDataUpdate(int channel, DataContainer data) {
         if (!(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
             return;
         }

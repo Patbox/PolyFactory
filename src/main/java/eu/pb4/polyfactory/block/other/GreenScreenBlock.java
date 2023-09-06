@@ -37,7 +37,7 @@ public class GreenScreenBlock extends Block implements PolymerBlock, BlockWithEl
         private final ItemDisplayElement mainElement;
 
         private Model(ServerWorld world, BlockPos pos, BlockState state) {
-            this.mainElement = new ItemDisplayElement(FactoryItems.GREEN_SCREEN_BLOCK);
+            this.mainElement = new ItemDisplayElement(FactoryItems.GREEN_SCREEN);
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
             this.mainElement.setScale(new Vector3f(2));
