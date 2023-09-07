@@ -1,19 +1,17 @@
 package eu.pb4.polyfactory.item;
 
+import eu.pb4.polyfactory.item.util.FireworkStarColoredItem;
 import eu.pb4.polyfactory.item.util.ModeledItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.SignChangingItem;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
@@ -26,11 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ArtificialDyeItem extends ModeledItem implements SignChangingItem {
+public class ArtificialDyeItem extends ModeledItem implements SignChangingItem, FireworkStarColoredItem {
     public static final ThreadLocal<List<ItemStack>> CURRENT_DYES = ThreadLocal.withInitial(ArrayList::new);
 
     public ArtificialDyeItem(Settings settings) {
-        super(Items.LEATHER_HORSE_ARMOR, settings);
+        super(Items.FIREWORK_STAR, settings);
     }
 
 
@@ -48,18 +46,14 @@ public class ArtificialDyeItem extends ModeledItem implements SignChangingItem {
         return 0xFFFFFF;
     }
 
+    @Override
+    public int getItemColor(ItemStack stack) {
+        return getColor(stack);
+    }
+
     public static boolean hasColor(ItemStack stack) {
         return stack.hasNbt() && stack.getNbt().contains("color", NbtElement.NUMBER_TYPE);
     }
-
-    /*@Override
-    public Text getName(ItemStack stack) {
-        if (hasColor(stack)) {
-            var color = getColor(stack);
-            return Text.translatable(this.getTranslationKey() + ".named", Text.literal(String.format(Locale.ROOT, "#%06X", color)).setStyle(Style.EMPTY.withColor(color)));
-        }
-        return super.getName(stack);
-    }*/
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
@@ -70,10 +64,6 @@ public class ArtificialDyeItem extends ModeledItem implements SignChangingItem {
         super.appendTooltip(stack, world, tooltip, context);
     }
 
-    @Override
-    public int getPolymerArmorColor(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        return getColor(itemStack);
-    }
 
     @Override
     public boolean useOnSign(World world, SignBlockEntity signBlockEntity, boolean front, PlayerEntity player) {

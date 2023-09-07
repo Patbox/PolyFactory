@@ -8,12 +8,15 @@
     "p": {
       "item": "polyfactory:wooden_plate"
     },
+    "q": {
+      "item": "minecraft:quartz"
+    },
     "s": {
       "item": "polyfactory:steel_plate"
     }
   },
   "pattern": [
-    "ppp",
+    "pqp",
     "scs",
     "scs"
   ],
