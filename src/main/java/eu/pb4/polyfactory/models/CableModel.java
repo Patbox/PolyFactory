@@ -29,7 +29,7 @@ public class CableModel {
     public static final int SIZE = (int) Math.pow(2, 6);
 
     public static final ItemStack[] MODELS_BY_ID = new ItemStack[SIZE];
-    private static final Item[] MODEL_ITEMS = new Item[]{
+    /*private static final Item[] MODEL_ITEMS = new Item[]{
             Items.WHITE_WOOL,
             Items.ORANGE_WOOL,
             Items.MAGENTA_WOOL,
@@ -46,6 +46,14 @@ public class CableModel {
             Items.GREEN_WOOL,
             Items.RED_WOOL,
             Items.BLACK_WOOL
+    };*/
+
+    private static final Item[] MODEL_ITEMS = new Item[]{
+            Items.LEATHER_HELMET,
+            Items.LEATHER_CHESTPLATE,
+            Items.LEATHER_LEGGINGS,
+            Items.LEATHER_BOOTS,
+            Items.LEATHER_HORSE_ARMOR
     };
     private static int currentItemIndex;
 

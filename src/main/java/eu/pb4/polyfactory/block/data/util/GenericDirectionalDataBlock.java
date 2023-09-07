@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.data.util;
 
+import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.block.data.util.DataCacheBlockEntity;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
@@ -23,10 +24,11 @@ import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-public abstract class GenericDirectionalDataBlock extends DataNetworkBlock implements PolymerBlock, VirtualDestroyStage.Marker, BlockEntityProvider, BlockWithElementHolder {
+public abstract class GenericDirectionalDataBlock extends DataNetworkBlock implements PolymerBlock, VirtualDestroyStage.Marker, BlockEntityProvider, BlockWithElementHolder, CableConnectable {
     public static DirectionProperty FACING = Properties.FACING;
     public GenericDirectionalDataBlock(Settings settings) {
         super(settings);
@@ -42,6 +44,11 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         return super.getPlacementState(ctx).with(FACING, ctx.getSide().getOpposite());
+    }
+
+    @Override
+    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+        return state.get(FACING).getOpposite() == dir;
     }
 
     @Override

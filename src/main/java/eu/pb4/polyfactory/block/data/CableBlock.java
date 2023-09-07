@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
+import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.CableModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
@@ -16,9 +17,14 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -26,11 +32,13 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class CableBlock extends DataNetworkBlock implements PolymerBlock, VirtualDestroyStage.Marker, BlockWithElementHolder {
+public class CableBlock extends DataNetworkBlock implements PolymerBlock, BlockEntityProvider, VirtualDestroyStage.Marker, BlockWithElementHolder, CableConnectable {
     public static final BooleanProperty NORTH;
     public static final BooleanProperty EAST;
     public static final BooleanProperty SOUTH;
@@ -51,10 +59,53 @@ public class CableBlock extends DataNetworkBlock implements PolymerBlock, Virtua
         builder.add(NORTH, SOUTH, EAST, WEST, UP, DOWN);
     }
 
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        if (world.getBlockEntity(pos) instanceof CableBlockEntity be) {
+            be.setColor(FactoryItems.CABLE.getItemColor(itemStack));
+
+            var newState = state;
+            for (var dir : Direction.values()) {
+                var newPos = pos.offset(dir);
+                var block = world.getBlockState(newPos);
+                if (canConnectTo(world, be.getColor(), newPos, block, dir.getOpposite())) {
+                    newState = newState.with(FACING_PROPERTIES.get(dir), true);
+                }
+            }
+
+            if (state != newState) {
+                world.setBlockState(pos, newState);
+            }
+        }
+
+        super.onPlaced(world, pos, state, placer, itemStack);
+    }
+
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING_PROPERTIES.get(ctx.getSide().getOpposite()), true);
+        var state = this.getDefaultState();
+        for (var dir : Direction.values()) {
+            var pos = ctx.getBlockPos().offset(dir);
+            var block = ctx.getWorld().getBlockState(pos);
+            if (canConnectTo(ctx.getWorld(), -1, pos, block, dir.getOpposite())) {
+                state = state.with(FACING_PROPERTIES.get(dir), true);
+            }
+        }
+
+        return state;
+    }
+
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        if (world.getBlockEntity(pos) instanceof CableBlockEntity be) {
+            return state.with(FACING_PROPERTIES.get(direction), canConnectTo(world, be.getColor(), neighborPos, neighborState, direction.getOpposite()));
+        }
+        return state;
+    }
+
+    private boolean canConnectTo(WorldAccess world, int ownColor, BlockPos neighborPos, BlockState neighborState, Direction direction) {
+        return neighborState.getBlock() instanceof CableConnectable connectable && connectable.canCableConnect(world, ownColor, neighborPos, neighborState, direction);
     }
 
     @Override
@@ -71,7 +122,7 @@ public class CableBlock extends DataNetworkBlock implements PolymerBlock, Virtua
             }
         }
 
-        return EnumSet.copyOf(list);
+        return list.isEmpty() ? EnumSet.noneOf(Direction.class) :  EnumSet.copyOf(list);
     }
 
     @Override
@@ -121,13 +172,29 @@ public class CableBlock extends DataNetworkBlock implements PolymerBlock, Virtua
         }));
     }
 
+    @Override
+    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+        if (world.getBlockEntity(pos) instanceof CableBlockEntity be) {
+            return be.getColor() == cableColor;
+        }
+        return false;
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new CableBlockEntity(pos, state);
+    }
+
     public final class Model extends BaseModel {
         private final ItemDisplayElement main;
+        private int color;
+        private BlockState state;
 
         private Model(BlockState state) {
             this.main = LodItemDisplayElement.createSimple();
             this.main.setViewRange(0.5f);
-            this.setState(state);
+            this.state = state;
             this.addElement(this.main);
         }
 
@@ -136,12 +203,26 @@ public class CableBlock extends DataNetworkBlock implements PolymerBlock, Virtua
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 this.setState(BlockBoundAttachment.get(this).getBlockState());
-                this.tick();
             }
         }
 
         private void setState(BlockState blockState) {
-            this.main.setItem(CableModel.MODELS_BY_ID[getModelId(blockState)]);
+            this.state = blockState;
+            updateModel();
+        }
+
+        private void updateModel() {
+            var stack = CableModel.MODELS_BY_ID[getModelId(state)].copy();
+            var display = new NbtCompound();
+            display.putInt("color", this.color);
+            stack.getOrCreateNbt().put("display", display);
+            this.main.setItem(stack);
+            this.tick();
+        }
+
+        public void setColor(int color) {
+            this.color = color;
+            updateModel();
         }
     }
 }

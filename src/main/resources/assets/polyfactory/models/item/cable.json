@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "polyfactory:item/cable"
+    "layer0": "polyfactory:item/cable",
+    "layer1": "polyfactory:item/cable_overlay"
   }
 }

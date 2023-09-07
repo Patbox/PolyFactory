@@ -66,7 +66,7 @@ public class FactoryItems {
     public static final Item ITEM_COUNTER = register("item_counter", new ModeledBlockItem(FactoryBlocks.ITEM_COUNTER, new Item.Settings()));
     public static final Item REDSTONE_INPUT = register("redstone_input", new ModeledBlockItem(FactoryBlocks.REDSTONE_INPUT, new Item.Settings()));
     public static final Item REDSTONE_OUTPUT = register("redstone_output", new ModeledBlockItem(FactoryBlocks.REDSTONE_OUTPUT, new Item.Settings()));
-    public static final Item CABLE = register("cable", new CableItem(new Item.Settings()));
+    public static final CableItem CABLE = register("cable", new CableItem(new Item.Settings()));
 
 
     public static final Item ARTIFICIAL_DYE = register("artificial_dye", new ArtificialDyeItem(new Item.Settings()));

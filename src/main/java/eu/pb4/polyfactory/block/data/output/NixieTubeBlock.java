@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.data.output;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
 import eu.pb4.polyfactory.data.DataContainer;
@@ -47,7 +48,7 @@ import org.joml.Matrix4fStack;
 import java.util.Collection;
 import java.util.List;
 
-public class NixieTubeBlock extends DataNetworkBlock implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker, DataReceiver {
+public class NixieTubeBlock extends DataNetworkBlock implements PolymerBlock, CableConnectable, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker, DataReceiver {
     public static Property<Direction.Axis> AXIS = Properties.AXIS;
     public static BooleanProperty POSITIVE_CONNECTED = BooleanProperty.of("positive_connected");
     public static BooleanProperty NEGATIVE_CONNECTED = BooleanProperty.of("negative_connected");
@@ -159,6 +160,11 @@ public class NixieTubeBlock extends DataNetworkBlock implements PolymerBlock, Bl
             channel = blockEntity.channel();
         }
         return List.of(new ChannelReceiverDirectionNode(state.get(HALF) == BlockHalf.TOP ? Direction.UP : Direction.DOWN, channel));
+    }
+
+    @Override
+    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+        return (state.get(HALF) == BlockHalf.TOP ? Direction.UP : Direction.DOWN) == dir;
     }
 
     public final class Model extends BaseModel {
