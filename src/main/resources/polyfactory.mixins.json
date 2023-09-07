@@ -26,6 +26,7 @@
     "util.BlockEntityTypeAccessor",
     "util.DyeColorMixin",
     "util.DyeItemMixin",
+    "util.RedstoneWireBlockMixin",
     "util.WorldChunkMixin"
   ],
   "client": [

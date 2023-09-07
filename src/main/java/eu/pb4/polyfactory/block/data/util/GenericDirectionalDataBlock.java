@@ -67,7 +67,7 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
         return 0;
     }
 
-    private final class Model extends BaseModel {
+    public static class Model extends BaseModel {
         private final LodItemDisplayElement base;
 
         private Model(BlockState state) {

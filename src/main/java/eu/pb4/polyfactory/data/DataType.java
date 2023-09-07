@@ -13,6 +13,7 @@ public record DataType(String id, Function<NbtCompound, DataContainer> nbtReader
         TYPES.put(id, this);
     }
 
+    public static final DataType BOOL = new DataType("bool", BoolData::fromNbt);
     public static final DataType LONG = new DataType("long", LongData::fromNbt);
     public static final DataType STRING = new DataType("string", StringData::fromNbt);
     public static final DataType GAME_EVENT = new DataType("game_event", GameEventData::fromNbt);

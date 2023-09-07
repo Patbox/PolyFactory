@@ -174,10 +174,11 @@ class RecipesProvider extends FabricRecipeProvider {
                 .offerTo(exporter);
 
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.ITEM_COUNTER)
-                .pattern("ppp")
+                .pattern("pqp")
                 .pattern("scs")
                 .pattern("scs")
                 .input('s', FactoryItems.STEEL_PLATE).input('c', Items.COPPER_INGOT).input('p', FactoryItems.WOODEN_PLATE)
+                .input('q', Items.QUARTZ)
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                 .offerTo(exporter);
 

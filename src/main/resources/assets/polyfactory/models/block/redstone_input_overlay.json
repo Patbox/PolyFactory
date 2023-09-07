@@ -1,0 +1,9 @@
+{
+	"parent": "polyfactory:block/redstone_output_overlay",
+	"textures": {
+		"2": "polyfactory:block/redstone_input_side_overlay",
+		"particle": "polyfactory:block/redstone_input_side",
+		"front": "polyfactory:block/redstone_input_front_overlay",
+		"back": "polyfactory:block/empty"
+	}
+}

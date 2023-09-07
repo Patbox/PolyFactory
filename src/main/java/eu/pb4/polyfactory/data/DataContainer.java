@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.data;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.MathHelper;
 
 public interface DataContainer {
     static DataContainer of(long count) {
@@ -12,6 +13,10 @@ public interface DataContainer {
     String asString();
     long asLong();
     double asDouble();
+
+    default int asRedstoneOutput() {
+        return (int) MathHelper.clamp(asLong(), 0, 15);
+    };
     default char padding() {
         return ' ';
     }

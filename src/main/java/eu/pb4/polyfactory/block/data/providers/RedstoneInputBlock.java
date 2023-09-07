@@ -1,7 +1,9 @@
 package eu.pb4.polyfactory.block.data.providers;
 
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
+import eu.pb4.polyfactory.block.other.RedstoneConnectable;
 import eu.pb4.polyfactory.data.LongData;
+import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -10,11 +12,12 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class RedstoneInputBlock extends DataProviderBlock {
+public class RedstoneInputBlock extends DataProviderBlock implements RedstoneConnectable {
     public static final IntProperty POWER = RedstoneOutputBlock.POWER;
 
     public RedstoneInputBlock(AbstractBlock.Settings settings) {
@@ -35,7 +38,7 @@ public class RedstoneInputBlock extends DataProviderBlock {
 
     @Nullable
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return super.getPlacementState(ctx).with(POWER, clamp(ctx.getWorld().getReceivedRedstonePower(ctx.getBlockPos())));
+        return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection()).with(POWER, clamp(ctx.getWorld().getReceivedRedstonePower(ctx.getBlockPos())));
     }
 
     private int clamp(int receivedRedstonePower) {
@@ -52,5 +55,15 @@ public class RedstoneInputBlock extends DataProviderBlock {
                 sendData((ServerWorld) world, pos, new LongData(input));
             }
         }
+    }
+
+    @Override
+    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return new RedstoneOutputBlock.Model(initialBlockState);
+    }
+
+    @Override
+    public boolean canRedstoneConnect(BlockState state, @Nullable Direction dir) {
+        return state.get(FACING).getOpposite() == dir;
     }
 }

@@ -63,7 +63,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
 
         for (var x : providers) {
             var state = world.getBlockState(x);
-            if (x instanceof DataProvider provider) {
+            if (state.getBlock() instanceof DataProvider provider) {
                 current = provider.provideData(world, x, state, channel);
                 if (current != null) {
                     this.currentData.put(channel, current);
@@ -106,6 +106,25 @@ public class DataStorage implements GraphEntity<DataStorage> {
         GraphEntity.super.onNodeCreated(node, nodeEntity);
 
         storeReceiverOrProvider(node);
+        if (node.getBlockWorld() instanceof ServerWorld serverWorld) {
+            if (node.getNode() instanceof DataProviderNode providerNode) {
+                var state = node.getBlockWorld().getBlockState(node.getBlockPos());
+                if (state.getBlock() instanceof DataProvider provider) {
+                    var data = provider.provideData(serverWorld, node.getBlockPos(), state, providerNode.channel());
+                    if (data != null) {
+                        pushDataUpdate(providerNode.channel(), data);
+                    }
+                }
+            } else if (node.getNode() instanceof DataReceiverNode receiverNode) {
+                var state = node.getBlockWorld().getBlockState(node.getBlockPos());
+                if (state.getBlock() instanceof DataReceiver receiver) {
+                    var data = this.getData(receiverNode.channel());
+                    if (data != null) {
+                        receiver.receiveData(serverWorld, node.getBlockPos(), state, receiverNode.channel(), data);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -172,6 +191,18 @@ public class DataStorage implements GraphEntity<DataStorage> {
     public void merge(@NotNull DataStorage other) {
         mergeMap(this.providers, other.providers);
         mergeMap(this.receivers, other.receivers);
+
+        for (var channel : this.receivers.keySet()) {
+            var data = getData(channel);
+            if (data != null) {
+                for (var x : this.receivers.get(channel)) {
+                    var state = this.ctx.getBlockWorld().getBlockState(x);
+                    if (state.getBlock() instanceof DataReceiver receiver) {
+                        receiver.receiveData((ServerWorld) this.ctx.getBlockWorld(), x, state, channel, data);
+                    }
+                }
+            }
+        }
     }
 
     private static void mergeMap(Int2ObjectOpenHashMap<Set<BlockPos>> into, Int2ObjectOpenHashMap<Set<BlockPos>> from) {

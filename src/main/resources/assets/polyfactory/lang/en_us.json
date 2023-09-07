@@ -28,6 +28,7 @@
   "block.polyfactory.creative_motor": "Creative Motor",
   "block.polyfactory.creative_container": "Creative Container",
   "block.polyfactory.inverted_redstone_lamp": "Inverted Redstone Lamp",
+  "item.polyfactory.wrench": "Wrench",
   "item.polyfactory.windmill_sail": "Windmill Sail",
   "item.polyfactory.item_filter": "Item Filter",
   "item.polyfactory.item_filter.empty": "Empty Item Filter",
