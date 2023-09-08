@@ -193,7 +193,7 @@ public class CableBlock extends DataNetworkBlock implements PolymerBlock, BlockE
     @Override
     public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         if (world.getBlockEntity(pos) instanceof CableBlockEntity be) {
-            return be.getColor() == cableColor;
+            return be.getColor() == cableColor || be.isDefaultColor() || cableColor == 0xbbbbbb;
         }
         return false;
     }
