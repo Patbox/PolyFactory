@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.mixin.recipe;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import eu.pb4.polyfactory.item.ArtificialDyeItem;
+import eu.pb4.polyfactory.item.ColoredItem;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;
@@ -24,7 +25,7 @@ public interface DyeableItemMixin {
         var i = maxValue.get();
         var c = 0;
         for (var itemStack : ArtificialDyeItem.CURRENT_DYES.get()) {
-            var color = ArtificialDyeItem.getColor(itemStack);
+            var color = ColoredItem.getColor(itemStack);
             var r = ColorHelper.Argb.getRed(color);
             var g = ColorHelper.Argb.getGreen(color);
             var b = ColorHelper.Argb.getBlue(color);

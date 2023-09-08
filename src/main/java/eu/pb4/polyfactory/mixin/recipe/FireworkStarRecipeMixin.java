@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import eu.pb4.polyfactory.item.ArtificialDyeItem;
+import eu.pb4.polyfactory.item.ColoredItem;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
 import net.minecraft.inventory.RecipeInputInventory;
@@ -35,7 +36,7 @@ public class FireworkStarRecipeMixin {
     private void addColor(RecipeInputInventory recipeInputInventory, DynamicRegistryManager dynamicRegistryManager, CallbackInfoReturnable<ItemStack> cir,
                           @Local(ordinal = 1) ItemStack stack, @Local(ordinal = 0) List<Integer> colors) {
         if (stack.isOf(FactoryItems.ARTIFICIAL_DYE)) {
-            colors.add(ArtificialDyeItem.getColor(stack));
+            colors.add(ColoredItem.getColor(stack));
         }
     }
 }

@@ -2,6 +2,8 @@ package eu.pb4.polyfactory.block.data;
 
 import eu.pb4.polyfactory.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -10,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
 
-public class CableBlockEntity extends BlockEntity implements BlockEntityExtraListener {
+public class CableBlockEntity extends BlockEntity implements BlockEntityExtraListener, ColorProvider {
     private int color = -2;
     @Nullable
     private CableBlock.Model model;
@@ -32,6 +34,7 @@ public class CableBlockEntity extends BlockEntity implements BlockEntityExtraLis
         setColor(nbt.getInt("color"));
     }
 
+    @Override
     public void setColor(int color) {
         if (this.color != color) {
             this.color = color;
@@ -42,6 +45,8 @@ public class CableBlockEntity extends BlockEntity implements BlockEntityExtraLis
         }
     }
 
+    @Override
+
     public int getColor() {
         return this.color;
     }
@@ -50,5 +55,10 @@ public class CableBlockEntity extends BlockEntity implements BlockEntityExtraLis
     public void onListenerUpdate(WorldChunk chunk) {
         this.model = (CableBlock.Model) BlockBoundAttachment.get(chunk, this.getPos()).holder();
         this.model.setColor(this.color);
+    }
+
+    @Override
+    public boolean isDefaultColor() {
+        return this.color == FactoryItems.CABLE.getDefaultColor();
     }
 }

@@ -1,4 +1,4 @@
-// 1.20.1	2023-09-07T19:06:20.307918307	PolyFactory/Recipes
+// 1.20.1	2023-09-08T10:40:53.678607045	PolyFactory/Recipes
 b426d992b7ff87219de4703e8707ae9e15ab11e7 data/polyfactory/advancements/recipes/redstone/sticky_conveyor.json
 e09b1b65ee49b4d13a8743d91bec30b3f96626c9 data/polyfactory/recipes/grinding/allium_to_dye.json
 62af52e4858d217c044ec364ed293f4ff487feb1 data/polyfactory/recipes/grinding/blue_concrete_to_powder.json
@@ -13,8 +13,8 @@ e04e12d6e384b253e4d55ce1f5b743fa5f37b8a3 data/polyfactory/advancements/recipes/r
 3edfdbbf3997bb38ee24afe733c86af8c6a05684 data/polyfactory/recipes/mixing/firework_star.json
 4878f6bd9bf7c543820a1655660eb686240843f8 data/polyfactory/recipes/grinding/gold_ore_to_raw.json
 63b52b9906c310a520ce340c12055e87e98cc3a2 data/polyfactory/recipes/windmill_sail/wool/brown.json
-84df97705049d980b83c40631c6265e57aff6df6 data/polyfactory/recipes/grinding/wither_rose_to_dye.json
 d2089029638744d50da5d53e988ca739277a2cfa data/polyfactory/recipes/grinding/cornflower_to_dye.json
+84df97705049d980b83c40631c6265e57aff6df6 data/polyfactory/recipes/grinding/wither_rose_to_dye.json
 a67ef3e7874dc175026e308aa4f3de27e2dfacd1 data/polyfactory/recipes/grinding/cactus_to_dye.json
 ef26164be35143019a1abd2bf4922da41576e7be data/polyfactory/recipes/press.json
 9d112e2cc22b45c2f215378c5a32038beedc4a1b data/polyfactory/recipes/mixing/pink_concrete_from_powder.json
@@ -37,6 +37,7 @@ e9211d34db028f39d02fb65139a86668e6096483 data/polyfactory/advancements/recipes/r
 4007044ae18d8ec63a4a362a464128562de417e5 data/polyfactory/recipes/mixing/redstone_to_glowstone.json
 c46f6433b8b8dde3a4f84f737573662d00cb1390 data/polyfactory/recipes/grinding/gray_concrete_to_powder.json
 15db41be0e7c0b8d2d2dc8cb7621e01b90ca8a57 data/polyfactory/advancements/recipes/redstone/steel_gear.json
+7ebb81fb19794dede9de5f6db4db566617950c8a data/polyfactory/recipes/mixing/cable_color.json
 16a1fec67531730622d0fc823eb80ee8dd7defe4 data/polyfactory/recipes/sticky_conveyor.json
 1a9218103d3e307d82f05e6014842eb8f215959b data/polyfactory/recipes/grinding/bone_to_bone_meal.json
 dd4bf72b450ba3465054cbe1187b00781ec10d34 data/polyfactory/recipes/mixing/gray_concrete_direct.json
@@ -61,6 +62,7 @@ c2e00861d8c9f5df8904bc7b5de2036fd4e4bc4c data/polyfactory/recipes/mixing/cyan_co
 ac1fb70aaf396554dd215005e34df3c0eb45c28c data/polyfactory/recipes/mixing/bread.json
 b2b572d41c04fb184927262887dc5093b268f578 data/polyfactory/advancements/recipes/redstone/windmill_sail/wool/pink.json
 ba3b65f90390892c988fa82227385ddf4e5e273c data/polyfactory/recipes/generic_machine_part.json
+51f6cd2a557421c5d675bb63f68a67f9a3500edf data/polyfactory/recipes/crafting/cable_color.json
 1698dead5c464c1094a67ba8ad2e1127cc4bee3c data/polyfactory/recipes/grinding/light_blue_concrete_to_powder.json
 ac0d610eb9fee80822a97426d14e60a94c7d8e4f data/polyfactory/recipes/mixing/magenta_concrete_from_powder.json
 5698484f3f9119d3287280b6eab16521b7965b4f data/polyfactory/advancements/recipes/redstone/grinder.json

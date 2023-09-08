@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ArtificialDyeItem extends ModeledItem implements SignChangingItem, FireworkStarColoredItem {
+public class ArtificialDyeItem extends ModeledItem implements SignChangingItem, FireworkStarColoredItem, ColoredItem {
     public static final ThreadLocal<List<ItemStack>> CURRENT_DYES = ThreadLocal.withInitial(ArrayList::new);
 
     public ArtificialDyeItem(Settings settings) {
@@ -34,31 +34,24 @@ public class ArtificialDyeItem extends ModeledItem implements SignChangingItem, 
 
     public static ItemStack of(int rgb) {
         var stack = new ItemStack(FactoryItems.ARTIFICIAL_DYE);
-        stack.getOrCreateNbt().putInt("color", rgb);
+        ColoredItem.setColor(stack, rgb);
         return stack;
-    }
-
-    public static int getColor(ItemStack stack) {
-        if (hasColor(stack)) {
-            return stack.getNbt().getInt("color");
-        }
-
-        return 0xFFFFFF;
     }
 
     @Override
     public int getItemColor(ItemStack stack) {
-        return getColor(stack);
+        return ColoredItem.getColor(stack);
     }
 
-    public static boolean hasColor(ItemStack stack) {
-        return stack.hasNbt() && stack.getNbt().contains("color", NbtElement.NUMBER_TYPE);
+    @Override
+    public int getDefaultColor() {
+        return 0xFFFFFF;
     }
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        if (hasColor(stack)) {
-            tooltip.add(Text.translatable("item.color", String.format(Locale.ROOT, "#%06X", getColor(stack))).formatted(Formatting.GRAY));
+        if (ColoredItem.hasColor(stack)) {
+            tooltip.add(Text.translatable("item.color", ColoredItem.getHexName(ColoredItem.getColor(stack))).formatted(Formatting.GRAY));
         }
 
         super.appendTooltip(stack, world, tooltip, context);
@@ -69,7 +62,7 @@ public class ArtificialDyeItem extends ModeledItem implements SignChangingItem, 
     public boolean useOnSign(World world, SignBlockEntity signBlockEntity, boolean front, PlayerEntity player) {
         if (signBlockEntity.changeText((text) -> {
             var itemInHand = player.getStackInHand(Hand.MAIN_HAND).isOf(FactoryItems.ARTIFICIAL_DYE) ? player.getMainHandStack() : player.getOffHandStack();
-            var color = getColor(itemInHand);
+            var color = ColoredItem.getColor(itemInHand);
             {
                 var current = text.getMessage(0, false).getStyle().getColor();
                 if (current != null && current.getRgb() == color) {

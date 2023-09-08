@@ -17,6 +17,7 @@ public class DyeColorMixin implements DyeColorExtra {
     @Inject(method = "<init>", at = @At("TAIL"))
     private void polyfactory$storeColor(String string, int i, int id, String name, int color, MapColor mapColor, int fireworkColor, int signColor, CallbackInfo ci) {
         this.polyfactory$color = color;
+        DyeColorExtra.BY_COLOR.put(color, (DyeColor) (Object) this);
     }
 
     @Override

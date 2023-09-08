@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.polyfactory.recipe.mixing.ArtificialDyeMixingRecipe;
+import eu.pb4.polyfactory.recipe.mixing.ColoringMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
@@ -253,6 +254,9 @@ class RecipesProvider extends FabricRecipeProvider {
                 .input('l', FactoryItemTags.STRIPPED_LOGS).input('p', ItemTags.PLANKS).input('i', Items.IRON_INGOT)
                 .criterion("get_axle", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
                 .offerTo(exporter);
+
+        of(exporter, ColoringCraftingRecipe.CODEC, ColoringCraftingRecipe.of("cable_color", FactoryItems.CABLE));
+        of(exporter, ColoringMixingRecipe.CODEC, ColoringMixingRecipe.of("cable_color", FactoryItems.CABLE, 2, 6, 10));
 
         of(exporter, GrindingRecipe.CODEC,
                 GrindingRecipe.of("coal_dust", Ingredient.ofItems(Items.COAL), 1, 5, 8, FactoryItems.COAL_DUST),

@@ -1,0 +1,9 @@
+{
+  "type": "polyfactory:mixing/coloring",
+  "input": "polyfactory:cable",
+  "max_temperature": 0.0,
+  "minimal_temperature": 0.0,
+  "minimum_speed": 0.0,
+  "optimal_speed": 0.0,
+  "time": 0.0
+}

@@ -4,11 +4,15 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
+import eu.pb4.polyfactory.item.ColoredItem;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.block.CableItem;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.CableModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.generic.SelectiveSideNode;
+import eu.pb4.polyfactory.util.DyeColorExtra;
+import eu.pb4.polyfactory.util.StateNameProvider;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -21,24 +25,29 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class CableBlock extends DataNetworkBlock implements PolymerBlock, BlockEntityProvider, VirtualDestroyStage.Marker, BlockWithElementHolder, CableConnectable {
+public class CableBlock extends DataNetworkBlock implements PolymerBlock, BlockEntityProvider, VirtualDestroyStage.Marker, BlockWithElementHolder, CableConnectable, StateNameProvider {
     public static final BooleanProperty NORTH;
     public static final BooleanProperty EAST;
     public static final BooleanProperty SOUTH;
@@ -57,6 +66,15 @@ public class CableBlock extends DataNetworkBlock implements PolymerBlock, BlockE
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
         builder.add(NORTH, SOUTH, EAST, WEST, UP, DOWN);
+    }
+
+    @Override
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+        var stack = super.getPickStack(world, pos, state);
+        if (world.getBlockEntity(pos) instanceof CableBlockEntity be && !be.isDefaultColor()) {
+            ColoredItem.setColor(stack, be.getColor());
+        }
+        return stack;
     }
 
     @Override
@@ -184,6 +202,19 @@ public class CableBlock extends DataNetworkBlock implements PolymerBlock, BlockE
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new CableBlockEntity(pos, state);
+    }
+
+    @Override
+    public Text getName(ServerWorld world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
+        if (blockEntity instanceof CableBlockEntity be && !be.isDefaultColor()) {
+            if (DyeColorExtra.BY_COLOR.get(be.getColor()) == null) {
+                return Text.translatable("block.polyfactory.cable.colored.full",
+                        ColoredItem.getColorName(be.getColor()), ColoredItem.getHexName(be.getColor()));
+            } else {
+                return Text.translatable("block.polyfactory.cable.colored", ColoredItem.getColorName(be.getColor()));
+            }
+        }
+        return this.getName();
     }
 
     public final class Model extends BaseModel {

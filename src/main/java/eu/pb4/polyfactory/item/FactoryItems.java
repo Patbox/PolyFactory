@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.item.block.WindmillSailItem;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.item.util.ModeledItem;
 import eu.pb4.polyfactory.item.util.MultiBlockItem;
+import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.FactoryBlocks;
@@ -21,6 +22,7 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
 public class FactoryItems {
@@ -112,6 +114,9 @@ public class FactoryItems {
 
                     // Data
                     entries.add(CABLE);
+                    entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.RED)));
+                    entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.GREEN)));
+                    entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.BLUE)));
                     entries.add(NIXIE_TUBE);
                     entries.add(REDSTONE_OUTPUT);
                     entries.add(REDSTONE_INPUT);
