@@ -12,8 +12,8 @@ public class GenericParts {
     public static final ItemStack FILTER_MESH = create(id("block/filter_mesh"));
 
     private static ItemStack create(Identifier id) {
-        var stack = new ItemStack(Items.MAGENTA_CANDLE);
-        stack.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(Items.MAGENTA_CANDLE, id).value());
+        var stack = new ItemStack(BaseItemProvider.requestModel());
+        stack.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(stack.getItem(), id).value());
         return stack;
     }
 }

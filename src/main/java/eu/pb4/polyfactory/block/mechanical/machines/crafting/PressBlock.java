@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.models.BaseItemProvider;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
@@ -141,8 +142,8 @@ public class PressBlock extends TallItemMachineBlock {
         return Blocks.ANVIL.getDefaultState();
     }
 
-    public final class Model extends BaseModel {
-        public static final ItemStack MODEL_PISTON = new ItemStack(Items.CANDLE);
+    public static final class Model extends BaseModel {
+        public static final ItemStack MODEL_PISTON = new ItemStack(BaseItemProvider.requestModel());
 
         static {
             MODEL_PISTON.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_PISTON.getItem(), FactoryUtil.id("block/press_piston")).value());

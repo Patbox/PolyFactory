@@ -17,7 +17,7 @@ public interface RotationUser extends NetworkComponent.Rotational {
                 var graph = FactoryNodes.ROTATIONAL.getGraphView(world).getGraph(o.get().getGraphId());
                 var ent = graph.getGraphEntity(RotationData.TYPE);
 
-                ent.update(world, graph);
+                ent.update(world);
 
                 return ent;
             }

@@ -45,7 +45,7 @@ public class CreativeMotorBlockEntity extends LockableBlockEntity {
 
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {
         if (this.stress > 0) {
-            modifier.provide(this.speed, this.stress);
+            modifier.provide(this.speed, this.stress, false);
         } else {
             modifier.stress(-this.stress);
         }

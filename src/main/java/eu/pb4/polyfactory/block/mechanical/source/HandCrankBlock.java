@@ -54,6 +54,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
         if (hand == Hand.MAIN_HAND && world.getBlockEntity(pos) instanceof HandCrankBlockEntity be && be.lastTick != world.getServer().getTicks()) {
             player.addExhaustion(0.1f);
             be.lastTick = world.getServer().getTicks();
+            be.negative = player.isSneaking() != (state.get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
             return ActionResult.SUCCESS;
         }
 
@@ -78,7 +79,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
             var stress = MathHelper.lerp(MathHelper.clamp(((world.getServer().getTicks() - be.lastTick) / 2d - 5) / 5d, 0, 1), RotationConstants.HAND_CRANK_STRESS, 0);
 
             if (speed > 0) {
-                modifier.provide(speed, stress);
+                modifier.provide(speed, stress, be.negative);
             }
         }
     }

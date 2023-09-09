@@ -26,7 +26,6 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -135,7 +134,7 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
     }
 
     public final class Model extends BaseModel {
-        public static final ItemStack ITEM_MODEL = new ItemStack(BaseItemProvider.requestSimpleItem());
+        public static final ItemStack ITEM_MODEL = new ItemStack(BaseItemProvider.requestModel());
 
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement fan;
@@ -179,7 +178,7 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
         }
 
         private void updateAnimation(double speed) {
-            this.rotation += Math.min(speed * MathHelper.RADIANS_PER_DEGREE * 3, RotationConstants.MAX_ROTATION_PER_TICK_2);
+            this.rotation += (float) Math.min(speed * MathHelper.RADIANS_PER_DEGREE * 3, RotationConstants.MAX_ROTATION_PER_TICK_2);
             if (this.rotation > MathHelper.TAU) {
                 this.rotation -= MathHelper.TAU;
             }

@@ -106,9 +106,9 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
         return true;
     }
 
-    public final class Model extends BaseModel {
+    public static final class Model extends BaseModel {
         public static final ItemStack ITEM_MODEL = new ItemStack(FactoryItems.AXLE.getPolymerItem());
-        public static final ItemStack ITEM_MODEL_SHORT = new ItemStack(BaseItemProvider.requestSimpleItem());
+        public static final ItemStack ITEM_MODEL_SHORT = new ItemStack(BaseItemProvider.requestItem());
         private final ItemDisplayElement mainElement;
         private final Set<ServerPlayNetworkHandler> viewingClose = new ObjectOpenCustomHashSet<>(Util.identityHashStrategy());
         private final List<ServerPlayNetworkHandler> sentRod = new ArrayList<>();

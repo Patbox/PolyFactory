@@ -39,7 +39,7 @@ public class ElectricMotorBlockEntity extends LockableBlockEntity {
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {
         if (!state.get(ElectricMotorBlock.GENERATOR)) {
             if (this.storedPower > 0) {
-                modifier.provide(10, 8);
+                modifier.provide(10, 8, false);
                 this.storedPower -= 100;
             }
         } else {

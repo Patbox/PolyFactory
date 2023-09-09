@@ -132,6 +132,6 @@ public class WindmillBlockEntity extends BlockEntity {
             speed *= 1.1;
         }
 
-        modifier.provide(speed, MathHelper.clamp(speed * 0.15 * sails * 3, 2, 20));
+        modifier.provide(speed, MathHelper.clamp(speed * 0.15 * sails * 3, 2, 20), false);
     }
 }

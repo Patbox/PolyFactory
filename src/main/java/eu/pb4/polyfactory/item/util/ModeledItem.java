@@ -1,9 +1,6 @@
 package eu.pb4.polyfactory.item.util;
 
 import eu.pb4.polyfactory.models.BaseItemProvider;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 
 public class ModeledItem extends Item implements SimpleModeledPolymerItem {
@@ -15,7 +12,7 @@ public class ModeledItem extends Item implements SimpleModeledPolymerItem {
     }
 
     public ModeledItem(Settings settings) {
-        this(BaseItemProvider.requestSimpleItem(), settings);
+        this(BaseItemProvider.requestItem(), settings);
     }
 
     @Override

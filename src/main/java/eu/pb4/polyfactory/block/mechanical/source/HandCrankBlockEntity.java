@@ -14,6 +14,8 @@ import net.minecraft.world.World;
 
 public class HandCrankBlockEntity extends BlockEntity {
     public long lastTick = -1;
+    public boolean negative;
+
     public HandCrankBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.HAND_CRANK, pos, state);
     }

@@ -3,7 +3,6 @@ package eu.pb4.polyfactory.block.network;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.data.DataStorage;
-import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -20,6 +19,16 @@ public interface NetworkComponent {
         }
 
         Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos);
+    }
+
+    interface RotationalConnector extends NetworkComponent {
+        static void updateRotationalConnectorAt(WorldAccess world, BlockPos pos) {
+            if (world instanceof ServerWorld serverWorld) {
+                FactoryNodes.ROTATIONAL_CONNECTOR.getServerGraphWorld(serverWorld).updateNodes(pos);
+            }
+        }
+
+        Collection<BlockNode> createRotationalConnectorNodes(BlockState state, ServerWorld world, BlockPos pos);
     }
 
     interface Data extends NetworkComponent {

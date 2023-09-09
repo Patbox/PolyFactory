@@ -18,13 +18,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class FactoryNodes {
     public static final GraphUniverse ROTATIONAL = registerRotational();
+    public static final GraphUniverse ROTATIONAL_CONNECTOR = registerRotationalConnector();
     public static final GraphUniverse ENERGY = registerEnergy();
     public static final GraphUniverse DATA = registerData();
 
@@ -70,7 +70,6 @@ public class FactoryNodes {
         universe.register();
         return universe;
     }
-
     private static GraphUniverse registerEnergy() {
         var universe = GraphUniverse.builder().build(id("energy"));
         universe.addDiscoverer((world, pos) -> {
@@ -88,6 +87,23 @@ public class FactoryNodes {
         return universe;
     }
 
+    private static GraphUniverse registerRotationalConnector() {
+        var universe = GraphUniverse.builder().build(id("rotation_connector"));
+        universe.addDiscoverer((world, pos) -> {
+            var blockState = world.getBlockState(pos);
+
+            if (blockState.getBlock() instanceof NetworkComponent.RotationalConnector rotational) {
+                return rotational.createRotationalConnectorNodes(blockState, world, pos);
+            }
+            return List.of();
+        });
+
+        addSimpleNodes(universe);
+        universe.register();
+        return universe;
+    }
+
+
     private static void addSimpleNodes(GraphUniverse universe) {
         universe.addNodeType(FunctionalDirectionNode.TYPE);
         universe.addNodeType(FunctionalAxisNode.TYPE);
@@ -95,6 +111,7 @@ public class FactoryNodes {
         universe.addNodeType(SimpleAxisNode.TYPE);
         universe.addNodeType(AllSideNode.TYPE);
         universe.addNodeType(SelectiveSideNode.TYPE);
+        universe.addNodeType(NotAxisNode.TYPE);
 
         universe.addCacheCategory(FunctionalNode.CACHE);
     }

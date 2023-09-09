@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.multiblock.MultiBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.models.BaseItemProvider;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
@@ -27,7 +28,6 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -167,14 +167,14 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
     }
 
     public final class Model extends BaseModel {
-        public static final ItemStack AXLE = new ItemStack(Items.CANDLE);
-        public static final ItemStack ACTIVE = new ItemStack(Items.CANDLE);
-        public static final ItemStack LINK = new ItemStack(Items.CANDLE);
+        public static final ItemStack AXLE = new ItemStack(BaseItemProvider.requestModel());
+        public static final ItemStack LIT = new ItemStack(BaseItemProvider.requestModel());
+        public static final ItemStack LINK = new ItemStack(BaseItemProvider.requestModel());
 
         static {
             AXLE.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(AXLE.getItem(), FactoryUtil.id("block/steam_engine_axle")).value());
             LINK.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(LINK.getItem(), FactoryUtil.id("block/steam_engine_link")).value());
-            ACTIVE.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(ACTIVE.getItem(), FactoryUtil.id("block/steam_engine_lit")).value());
+            LIT.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(LIT.getItem(), FactoryUtil.id("block/steam_engine_lit")).value());
         }
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
@@ -184,7 +184,7 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
         private final LodItemDisplayElement axle;
 
         private Model(BlockState state) {
-            this.main = LodItemDisplayElement.createSimple(state.get(LIT) ? ACTIVE : FactoryItems.STEAM_ENGINE.getDefaultStack(), 0);
+            this.main = LodItemDisplayElement.createSimple(state.get(SteamEngineBlock.LIT) ? LIT : FactoryItems.STEAM_ENGINE.getDefaultStack(), 0);
             this.main.setScale(new Vector3f(2));
             var facing = state.get(FACING);
             var offset = new Vec3d(
@@ -220,7 +220,7 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
             var direction = state.get(FACING);
 
             this.main.setYaw(direction.asRotation());
-            this.main.setItem(state.get(LIT) ? ACTIVE : FactoryItems.STEAM_ENGINE.getDefaultStack());
+            this.main.setItem(state.get(SteamEngineBlock.LIT) ? LIT : FactoryItems.STEAM_ENGINE.getDefaultStack());
             this.axle.setYaw(direction.asRotation());
             this.rotatingA.setYaw(direction.asRotation());
             this.rotatingB.setYaw(direction.asRotation());

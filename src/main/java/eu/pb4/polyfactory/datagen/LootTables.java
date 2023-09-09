@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;
+import net.minecraft.loot.condition.SurvivesExplosionLootCondition;
 import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.function.CopyNbtLootFunction;
 import net.minecraft.loot.provider.nbt.ContextLootNbtProvider;
@@ -44,11 +45,24 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.REDSTONE_OUTPUT);
         this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE);
 
+        this.addDrop(FactoryBlocks.AXLE_WITH_GEAR, LootTable.builder()
+                .pool(LootPool.builder()
+                        .conditionally(SurvivesExplosionLootCondition.builder())
+                        .rolls(ConstantLootNumberProvider.create(1.0F))
+                        .with(ItemEntry.builder(FactoryBlocks.AXLE)))
+                .pool(LootPool.builder()
+                        .conditionally(SurvivesExplosionLootCondition.builder())
+                        .rolls(ConstantLootNumberProvider.create(1.0F))
+                        .with(ItemEntry.builder(FactoryItems.STEEL_GEAR)))
+        );
+
+
         this.addDrop(FactoryBlocks.CABLE, LootTable.builder()
-                .pool(this.addSurvivesExplosionCondition(FactoryBlocks.CABLE, LootPool.builder()
+                .pool(LootPool.builder()
+                        .conditionally(SurvivesExplosionLootCondition.builder())
                         .rolls(ConstantLootNumberProvider.create(1.0F))
                         .with(ItemEntry.builder(FactoryBlocks.CABLE)
                                 .apply(() -> CopyColorLootFunction.INSTANCE)
-                        ))));
+                        )));
     }
 }

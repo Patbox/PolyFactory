@@ -6,7 +6,6 @@ import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -25,7 +24,7 @@ public class ModeledBlockItem extends BlockItem implements SimpleModeledPolymerI
 
     public <T extends Block & PolymerBlock> ModeledBlockItem(T block, Settings settings) {
         super(block, settings);
-        this.polymerItem = BaseItemProvider.requestSimpleItem();
+        this.polymerItem = BaseItemProvider.requestItem();
     }
 
     @Override

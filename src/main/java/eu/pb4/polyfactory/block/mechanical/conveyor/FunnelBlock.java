@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
+import eu.pb4.polyfactory.models.BaseItemProvider;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -265,9 +266,9 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
         return new Model(world, pos, initialBlockState);
     }
 
-    public final class Model extends BaseModel {
-        private static final ItemStack MODEL_IN = new ItemStack(Items.CANDLE);
-        private static final ItemStack MODEL_OUT = new ItemStack(Items.CANDLE);
+    public static final class Model extends BaseModel {
+        private static final ItemStack MODEL_IN = new ItemStack(BaseItemProvider.requestModel());
+        private static final ItemStack MODEL_OUT = new ItemStack(BaseItemProvider.requestModel());
         private final ItemDisplayElement mainElement;
         final ItemDisplayElement filterElement;
 
@@ -323,8 +324,8 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
 
 
         static {
-            MODEL_IN.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(Items.CANDLE, FactoryUtil.id("block/funnel_in")).value());
-            MODEL_OUT.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(Items.CANDLE, FactoryUtil.id("block/funnel_out")).value());
+            MODEL_IN.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_IN.getItem(), FactoryUtil.id("block/funnel_in")).value());
+            MODEL_OUT.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_OUT.getItem(), FactoryUtil.id("block/funnel_out")).value());
         }
     }
 

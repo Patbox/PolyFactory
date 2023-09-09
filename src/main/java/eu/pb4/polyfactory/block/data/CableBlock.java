@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
+import eu.pb4.polyfactory.block.network.NetworkBlock;
+import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.ColoredItem;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.block.CableItem;
@@ -47,7 +49,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class CableBlock extends DataNetworkBlock implements PolymerBlock, BlockEntityProvider, VirtualDestroyStage.Marker, BlockWithElementHolder, CableConnectable, StateNameProvider {
+public class CableBlock extends NetworkBlock implements PolymerBlock, BlockEntityProvider, VirtualDestroyStage.Marker, BlockWithElementHolder, CableConnectable, StateNameProvider, NetworkComponent.Data, NetworkComponent.Energy {
     public static final BooleanProperty NORTH;
     public static final BooleanProperty EAST;
     public static final BooleanProperty SOUTH;
@@ -99,6 +101,17 @@ public class CableBlock extends DataNetworkBlock implements PolymerBlock, BlockE
         super.onPlaced(world, pos, state, placer, itemStack);
     }
 
+    @Override
+    protected void updateNetworkAt(WorldAccess world, BlockPos pos) {
+        NetworkComponent.Data.updateDataAt(world, pos);
+        NetworkComponent.Energy.updateEnergyAt(world, pos);
+    }
+
+    @Override
+    protected boolean isSameNetworkType(Block block) {
+        return block instanceof NetworkComponent.Data || block instanceof NetworkComponent.Energy;
+    }
+
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
@@ -131,6 +144,11 @@ public class CableBlock extends DataNetworkBlock implements PolymerBlock, BlockE
         return List.of(new SelectiveSideNode(this.getDirections(state)));
     }
 
+    @Override
+    public Collection<BlockNode> createEnergyNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        return createDataNodes(state, world, pos);
+    }
+
     public EnumSet<Direction> getDirections(BlockState state) {
         var list = new ArrayList<Direction>(6);
 
@@ -140,7 +158,7 @@ public class CableBlock extends DataNetworkBlock implements PolymerBlock, BlockE
             }
         }
 
-        return list.isEmpty() ? EnumSet.noneOf(Direction.class) :  EnumSet.copyOf(list);
+        return list.isEmpty() ? EnumSet.noneOf(Direction.class) : EnumSet.copyOf(list);
     }
 
     @Override

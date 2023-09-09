@@ -219,7 +219,7 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
         return new Model(world, pos, initialBlockState);
     }
 
-    public final class Model extends ElementHolder {
+    public static final class Model extends ElementHolder {
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement leftLockElement;

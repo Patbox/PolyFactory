@@ -4,7 +4,6 @@ import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
-import eu.pb4.polyfactory.compat.power_networks.PowerNetworksInit;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
 import eu.pb4.polyfactory.models.CableModel;
@@ -34,7 +33,6 @@ public class ModInit implements ModInitializer {
     public static final boolean DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
     @SuppressWarnings("PointlessBooleanExpression")
 	public static final boolean DYNAMIC_ASSETS = true && DEV;
-	//public static final boolean ENABLE_GEARS_ON_AXLE = false;
 
     public static Identifier id(String path) {
 		return new Identifier(ID, path);
@@ -57,7 +55,7 @@ public class ModInit implements ModInitializer {
 		FactoryRecipeSerializers.register();
 		AxleBlock.Model.ITEM_MODEL.getItem();
 		WindmillBlock.Model.MODEL.getItem();
-		AxleWithGearBlock.Model.ITEM_MODEL_GEAR.getItem();
+		AxleWithGearBlock.Model.ITEM_MODEL_1.getItem();
 		RedstoneOutputBlock.Model.OUTPUT_OVERLAY.item();
 		FactoryLootTables.register();
 		FactoryCommands.register();
@@ -72,9 +70,5 @@ public class ModInit implements ModInitializer {
 		PolydexCompat.register();
 		PolymerResourcePackUtils.addModAssets(ID);
 		PolymerResourcePackUtils.markAsRequired();
-
-		if (FabricLoader.getInstance().isModLoaded("power_networks")) {
-			PowerNetworksInit.register();
-		}
 	}
 }
