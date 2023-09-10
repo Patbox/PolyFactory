@@ -2,8 +2,6 @@ package eu.pb4.polyfactory.block.data.util;
 
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
-import eu.pb4.polyfactory.block.data.util.DataCacheBlockEntity;
-import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
@@ -64,7 +62,7 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new DataCacheBlockEntity(pos, state);
+        return new ChanneledDataBlockEntity(pos, state);
     }
 
     protected int getChannel(ServerWorld world, BlockPos pos) {

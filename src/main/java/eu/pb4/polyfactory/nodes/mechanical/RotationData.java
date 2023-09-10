@@ -79,8 +79,12 @@ public class RotationData implements GraphEntity<RotationData> {
             var dirMap = new Long2BooleanOpenHashMap();
             var clogged = new MutableBoolean();
             var checked = new LongOpenHashSet();
+            var checked2 = new LongOpenHashSet();
             var rotationDataList = new ArrayList<RotationData>();
-            collectGraphs(connectors, dirMap, clogged, checked, rotationDataList);
+            collectGraphs(connectors, dirMap, clogged, checked, checked2, rotationDataList);
+            if (rotationDataList.isEmpty()) {
+                return;
+            }
 
             if (clogged.booleanValue()) {
                 for (var rot : rotationDataList) {
@@ -112,29 +116,24 @@ public class RotationData implements GraphEntity<RotationData> {
 
             var speed = this.speed != 0 ? this.speed * Math.signum(state.speed) : 0;
 
-            var r = (float) (Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.MAX_ROTATION_PER_TICK_4 * delta) + this.rotation);
-            while (r > MathHelper.TAU * 2) {
-                r -= MathHelper.TAU;
-            }
-            while (r < MathHelper.TAU * -2) {
-                r += MathHelper.TAU;
-            }
-            if (Float.isNaN(r)) {
-                r = 0;
-            }
+            float r;
 
-            var alt = -r;
+            if (speed == 0) {
+                r = this.rotation;
+            } else {
+                r = (float) ((Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.MAX_ROTATION_PER_TICK_4 * delta) + this.rotation) % MathHelper.TAU);
+            }
 
             for (var data : rotationDataList) {
-                data.rotation = dirMap.get(data.getContext().getGraph().getId()) ? alt : r;
+                data.rotation = dirMap.get(data.getContext().getGraph().getId()) ? -r : r;
             }
         }
     }
 
-    private static void collectGraphs(Collection<NodeHolder<AxleWithGearMechanicalNode>> connectors, Long2BooleanOpenHashMap dirMap, MutableBoolean clogged, LongOpenHashSet checked, ArrayList<RotationData> data) {
+    private static void collectGraphs(Collection<NodeHolder<AxleWithGearMechanicalNode>> connectors, Long2BooleanOpenHashMap dirMap, MutableBoolean clogged, LongOpenHashSet checked, LongOpenHashSet checked2, ArrayList<RotationData> data) {
         for (var connection : connectors) {
             var connectGraph = FactoryNodes.ROTATIONAL_CONNECTOR.getSidedGraphView(connection.getBlockWorld()).getAllGraphsAt(connection.getBlockPos()).findFirst();
-            if (connectGraph.isPresent()) {
+            if (connectGraph.isPresent() && checked2.add(connectGraph.get().getId())) {
                 var iterator = connectGraph.get().getNodes().iterator();
                 while (iterator.hasNext()) {
                     var x = iterator.next();
@@ -146,7 +145,6 @@ public class RotationData implements GraphEntity<RotationData> {
 
                     var distance = x.getBlockPos().getManhattanDistance(connection.getBlockPos());
                     var targetGraph = optionalGraph.get();
-                    checked.add(targetGraph.getId());
                     data.add(targetGraph.getGraphEntity(TYPE));
 
                     if (dirMap.containsKey(targetGraph.getId()) && dirMap.get(targetGraph.getId()) == (distance % 2 == 1)) {
@@ -155,7 +153,7 @@ public class RotationData implements GraphEntity<RotationData> {
                     dirMap.put(targetGraph.getId(), (distance % 2 == 1));
                     var subConnectors = targetGraph.getCachedNodes(AxleWithGearMechanicalNode.CACHE);
                     if (!subConnectors.isEmpty()) {
-                        collectGraphs(subConnectors, dirMap, clogged, checked, data);
+                        collectGraphs(subConnectors, dirMap, clogged, checked, checked2, data);
                     }
                 }
             }
@@ -212,18 +210,7 @@ public class RotationData implements GraphEntity<RotationData> {
             }
         }
 
-        var r = (float) (Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.MAX_ROTATION_PER_TICK_4 * delta) + this.rotation);
-        while (r > MathHelper.TAU * 2) {
-            r -= MathHelper.TAU;
-        }
-        while (r < MathHelper.TAU * -2) {
-            r += MathHelper.TAU;
-        }
-        if (Float.isNaN(r)) {
-            r = 0;
-        }
-
-        this.rotation = r;
+        this.rotation = (float) ((Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.MAX_ROTATION_PER_TICK_4 * delta) + this.rotation) % MathHelper.TAU);
     }
 
     @Override

@@ -247,9 +247,9 @@ public class PressBlock extends TallItemMachineBlock {
 
         public void updatePiston(double i) {
             if (i < 0) {
-                this.value = (float) Math.min(-i * 5f, 1);
+                this.value = (float) Math.min(-i * 1.7f, 1);
             } else {
-                this.value = (float) Math.min(i * 1.3, 1);
+                this.value = (float) Math.min(i * 2.2, 1);
             }
         }
 

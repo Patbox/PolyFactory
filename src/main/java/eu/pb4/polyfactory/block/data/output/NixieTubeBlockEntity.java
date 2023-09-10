@@ -23,10 +23,12 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
     private int connectionSize = 1;
     private int color = 0xff6e19;
     private NixieTubeBlock.Model model;
-    private int channel;
-
     public NixieTubeBlockEntity(BlockPos pos, BlockState state) {
-        super(FactoryBlockEntities.NIXIE_TUBES, pos, state);
+        super(FactoryBlockEntities.NIXIE_TUBE, pos, state);
+    }
+
+    public int connectionSize() {
+        return connectionSize;
     }
 
     @Override
@@ -38,7 +40,6 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
         nbt.putInt("ConnSize", this.connectionSize);
         nbt.putInt("Color", this.color);
         nbt.putInt("Padding", this.padding);
-        nbt.putInt("Channel", this.channel);
     }
 
     @Override
@@ -49,7 +50,6 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
         this.color = nbt.getInt("Color");
         this.connectionSize = nbt.getInt("ConnSize");
         this.padding = (char) nbt.getInt("Padding");
-        setChannel(nbt.getInt("Channel"));
         this.updateTextDisplay();
     }
 
@@ -78,16 +78,7 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
         this.updateTextDisplay();
     }
 
-    public void pushText(String string, char padding, boolean forceRight) {
-        if (forceRight) {
-            var length = this.connectionSize * 2;
-            if (string.length() > length) {
-                string.substring(string.length() - length, string.length());
-            } else {
-                string = Character.toString(padding).repeat(length - string.length()) + string;
-            }
-        }
-
+    public void pushText(String string, char padding) {
         String finalString = string;
         pushUpdate((tube) -> {
             var b = tube.setText(finalString);
@@ -98,13 +89,6 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
             return b;
         });
     }
-    public void pushChannelUpdate(int channel) {
-        pushUpdate((tube) -> {
-            tube.setChannel(channel);
-            return true;
-        });
-    }
-
     public void pushUpdate(Predicate<NixieTubeBlockEntity> modifierAndPredicate) {
         var axis = this.getCachedState().get(NixieTubeBlock.AXIS);
         var dir = Direction.get(Direction.AxisDirection.NEGATIVE, axis);
@@ -213,18 +197,6 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
             if (dirty) {
                 entry.updateTextDisplay();
             }
-        }
-    }
-
-    public int channel() {
-        return this.channel;
-    }
-
-    public void setChannel(int channel) {
-        this.channel = channel;
-        if (this.hasWorld()) {
-            this.markDirty();
-            NetworkComponent.Data.updateDataAt(this.world, this.pos);
         }
     }
 }

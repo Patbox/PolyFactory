@@ -124,31 +124,10 @@ public record ColoringMixingRecipe(Identifier identifier, String group, Item inp
                 count -= removable;
                 stack.decrement(count);
             }
+
+            if (stack.isEmpty() && stack != ItemStack.EMPTY) {
+                inventory.setStack(i, ItemStack.EMPTY);
+            }
         }
-    }
-
-    @Override
-    public double optimalSpeed() {
-        return 0;
-    }
-
-    @Override
-    public double minimumSpeed() {
-        return 0;
-    }
-
-    @Override
-    public float minimumTemperature() {
-        return 0;
-    }
-
-    @Override
-    public float maxTemperature() {
-        return 0;
-    }
-
-    @Override
-    public double time() {
-        return 0;
     }
 }

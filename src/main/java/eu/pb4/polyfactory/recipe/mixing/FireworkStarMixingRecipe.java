@@ -36,7 +36,13 @@ public record FireworkStarMixingRecipe(Identifier identifier, double time,
     @Override
     public void applyRecipeUse(MixerBlockEntity inventory, World world) {
         for (int i = 0; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            inventory.getStack(i).decrement(1);
+            var stack = inventory.getStack(i);
+            if (!stack.isEmpty()) {
+                stack.decrement(1);
+                if (stack.isEmpty()) {
+                    inventory.setStack(i, ItemStack.EMPTY);
+                }
+            }
         }
     }
 

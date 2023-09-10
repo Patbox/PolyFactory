@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block.data.providers;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import eu.pb4.polyfactory.block.data.util.DataCacheBlockEntity;
+import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
 import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.util.GenericDirectionalDataBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -27,17 +28,16 @@ public class DataProviderBlock extends GenericDirectionalDataBlock implements Da
 
     @Override
     public @Nullable DataContainer provideData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel) {
-        if (world.getBlockEntity(selfPos) instanceof DataCacheBlockEntity be && be.channel() == channel) {
-            return be.lastData;
+        if (world.getBlockEntity(selfPos) instanceof ChanneledDataCache be && be.channel() == channel) {
+            return be.getCachedData();
         }
         return null;
     }
 
-    public void sendData(ServerWorld world, BlockPos selfPos, DataContainer data) {
-        if (world.getBlockEntity(selfPos) instanceof DataCacheBlockEntity be) {
-            be.lastData = data;
-            NetworkComponent.Data.getLogic(world, selfPos).pushDataUpdate(be.channel(), data);
-
+    public void sendData(World world, BlockPos selfPos, DataContainer data) {
+        if (world instanceof ServerWorld serverWorld && world.getBlockEntity(selfPos) instanceof ChanneledDataCache be) {
+            be.setCachedData(data);
+            NetworkComponent.Data.getLogic(serverWorld, selfPos).pushDataUpdate(be.channel(), data);
         }
     }
 }

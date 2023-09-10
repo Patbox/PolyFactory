@@ -13,9 +13,9 @@
     }
   },
   "pattern": [
-    "gw ",
-    "sws",
-    " wg"
+    "sgs",
+    "gwg",
+    "sgs"
   ],
   "result": {
     "item": "polyfactory:gearbox"

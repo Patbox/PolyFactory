@@ -75,7 +75,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
     }
 
     public void pushDataUpdate(int channel, DataContainer data) {
-        if (!(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
+        if (this.ctx == null || !(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
             return;
         }
 

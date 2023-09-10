@@ -168,7 +168,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         self.inventoryChanged = false;
 
 
-        if (self.temperature < self.currentRecipe.minimumTemperature() && self.temperature > self.currentRecipe.maxTemperature()) {
+        if (self.temperature < self.currentRecipe.minimumTemperature() || self.temperature > self.currentRecipe.maxTemperature()) {
             self.active = false;
             self.model.setActive(false);
             self.model.tick();
@@ -223,7 +223,6 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
                     ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5, remainder);
                 }
             }
-
 
             self.markDirty();
         } else {
@@ -283,6 +282,10 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             this.recipeInputProvider = WrappingRecipeInputInventory.of(this, INPUT_FIRST, OUTPUT_FIRST, 2, 3);
         }
         return this.recipeInputProvider;
+    }
+
+    public float temperature() {
+        return this.temperature;
     }
 
     private class Gui extends SimpleGui {

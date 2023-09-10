@@ -156,8 +156,12 @@ public record ArtificialDyeMixingRecipe(Identifier identifier, double time,
                     || stack.isOf(Items.REDSTONE) || stack.isOf(Items.SLIME_BALL) || stack.isOf(Items.LAPIS_LAZULI)
                     || stack.isOf(FactoryItems.COAL_DUST) || stack.isOf(Items.BONE_MEAL)
             ) {
-                inventory.getStack(i).decrement(1);
+                stack.decrement(1);
+                if (stack.isEmpty()) {
+                    inventory.setStack(i, ItemStack.EMPTY);
+                }
             }
+
         }
     }
 

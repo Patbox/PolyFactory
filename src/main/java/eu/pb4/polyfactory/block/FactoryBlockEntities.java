@@ -5,7 +5,9 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlockEntity;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlockEntity;
 import eu.pb4.polyfactory.block.data.CableBlockEntity;
-import eu.pb4.polyfactory.block.data.util.DataCacheBlockEntity;
+import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlockEntity;
+import eu.pb4.polyfactory.block.data.providers.BookReaderBlockEntity;
+import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.*;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
@@ -67,9 +69,11 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<MixerBlockEntity> MIXER = register("mixer",
             FabricBlockEntityTypeBuilder.create(MixerBlockEntity::new).addBlock(FactoryBlocks.MIXER));
 
-    public static final BlockEntityType<NixieTubeBlockEntity> NIXIE_TUBES = register("nixie_tube",
+    public static final BlockEntityType<NixieTubeBlockEntity> NIXIE_TUBE = register("nixie_tube",
             FabricBlockEntityTypeBuilder.create(NixieTubeBlockEntity::new).addBlock(FactoryBlocks.NIXIE_TUBE));
 
+    public static final BlockEntityType<NixieTubeControllerBlockEntity> NIXIE_TUBE_CONTROLLER = register("nixie_tube_controller",
+            FabricBlockEntityTypeBuilder.create(NixieTubeControllerBlockEntity::new).addBlock(FactoryBlocks.NIXIE_TUBE_CONTROLLER));
     public static final BlockEntityType<ElectricMotorBlockEntity> ELECTRIC_MOTOR = register("electric_motor",
             FabricBlockEntityTypeBuilder.create(ElectricMotorBlockEntity::new).addBlock(FactoryBlocks.ELECTRIC_MOTOR));
     public static final BlockEntityType<CreativeContainerBlockEntity> CREATIVE_CONTAINER = register("creative_container",
@@ -77,11 +81,13 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<CreativeMotorBlockEntity> CREATIVE_MOTOR = register("creative_motor",
             FabricBlockEntityTypeBuilder.create(CreativeMotorBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_MOTOR));
-    public static final BlockEntityType<DataCacheBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache", FabricBlockEntityTypeBuilder
-            .create(DataCacheBlockEntity::new).addBlock(FactoryBlocks.ITEM_COUNTER));
+    public static final BlockEntityType<ChanneledDataBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache", FabricBlockEntityTypeBuilder
+            .create(ChanneledDataBlockEntity::new).addBlocks(FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT));
 
     public static final BlockEntityType<CableBlockEntity> CABLE = register("cable", FabricBlockEntityTypeBuilder
             .create(CableBlockEntity::new).addBlock(FactoryBlocks.CABLE));
+    public static final BlockEntityType<BookReaderBlockEntity> BOOK_READER = register("book_reader", FabricBlockEntityTypeBuilder
+            .create(BookReaderBlockEntity::new).addBlock(FactoryBlocks.BOOK_READER));
 
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;

@@ -7,7 +7,9 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
@@ -31,14 +33,15 @@ public class RedstoneInputBlock extends DataProviderBlock implements RedstoneCon
         builder.add(POWER);
     }
 
-    @Override
-    public boolean emitsRedstonePower(BlockState state) {
-        return true;
-    }
-
     @Nullable
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection()).with(POWER, clamp(ctx.getWorld().getReceivedRedstonePower(ctx.getBlockPos())));
+    }
+
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.onPlaced(world, pos, state, placer, itemStack);
+        sendData((ServerWorld) world, pos, new LongData(state.get(POWER)));
     }
 
     private int clamp(int receivedRedstonePower) {

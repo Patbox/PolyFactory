@@ -220,7 +220,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(Items.REDSTONE_LAMP))
                 .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.AXLE, 12)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.AXLE, 8)
                 .pattern("www")
                 .pattern("sss")
                 .pattern("www")
@@ -240,9 +240,9 @@ class RecipesProvider extends FabricRecipeProvider {
                 .offerTo(exporter);
 
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.GEARBOX, 1)
-                .pattern("gw ")
-                .pattern("sws")
-                .pattern(" wg")
+                .pattern("sgs")
+                .pattern("gwg")
+                .pattern("sgs")
                 .input('w', FactoryItems.AXLE).input('s', ItemTags.PLANKS)
                 .input('g', FactoryItems.STEEL_GEAR)
                 .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.AXLE))
@@ -304,6 +304,7 @@ class RecipesProvider extends FabricRecipeProvider {
         );
 
         of(exporter, PressRecipe.CODEC,
+                PressRecipe.of("paper", Ingredient.ofItems(Items.SUGAR_CANE), 3, 5f, new ItemStack(Items.PAPER, 4)),
                 PressRecipe.of("iron_ingot", Ingredient.ofItems(Items.IRON_NUGGET), 9, 10f, Items.IRON_INGOT),
                 PressRecipe.of("gold_ingot", Ingredient.ofItems(Items.GOLD_NUGGET), 9, 8f, Items.GOLD_INGOT),
                 PressRecipe.of("steel_plate", Ingredient.ofItems(FactoryItems.STEEL_INGOT), 1, 12f, new ItemStack(FactoryItems.STEEL_PLATE, 1)),

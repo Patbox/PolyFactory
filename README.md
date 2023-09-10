@@ -2,6 +2,6 @@
 
 # PolyFactory
 
-PolyFactory is a fully server-side, content-tech mod designed around automation, crafting and utility.
+PolyFactory is a fully server-side, content/tech mod designed around automation, crafting and utility.
 
 // Todo, write actual readme once more stuff is done

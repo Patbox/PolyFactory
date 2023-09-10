@@ -1,0 +1,9 @@
+{
+	"parent": "polyfactory:block/item_counter",
+	"textures": {
+		"2": "polyfactory:block/nixie_tube_controller_side",
+		"particle": "polyfactory:block/nixie_tube_controller_side",
+		"front": "polyfactory:block/nixie_tube_controller_front",
+		"back": "polyfactory:block/steel_plate_connection"
+	}
+}

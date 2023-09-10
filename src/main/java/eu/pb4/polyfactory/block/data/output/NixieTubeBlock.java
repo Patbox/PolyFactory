@@ -48,7 +48,7 @@ import org.joml.Matrix4fStack;
 import java.util.Collection;
 import java.util.List;
 
-public class NixieTubeBlock extends DataNetworkBlock implements PolymerBlock, CableConnectable, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker, DataReceiver {
+public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static Property<Direction.Axis> AXIS = Properties.AXIS;
     public static BooleanProperty POSITIVE_CONNECTED = BooleanProperty.of("positive_connected");
     public static BooleanProperty NEGATIVE_CONNECTED = BooleanProperty.of("negative_connected");
@@ -80,7 +80,7 @@ public class NixieTubeBlock extends DataNetworkBlock implements PolymerBlock, Ca
             var name = stack.hasCustomName() ? stack.getName().getString() : "";
 
             if (world.getBlockEntity(pos) instanceof NixieTubeBlockEntity be) {
-                be.pushText(name, ' ', false);
+                be.pushText(name, ' ');
                 return ActionResult.SUCCESS;
             }
         }
@@ -143,7 +143,9 @@ public class NixieTubeBlock extends DataNetworkBlock implements PolymerBlock, Ca
         return new NixieTubeBlockEntity(pos, state);
     }
 
+    /*
     @Override
+
     public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data) {
         if (world.getBlockEntity(selfPos) instanceof NixieTubeBlockEntity be && channel == be.channel()) {
             be.pushText(data.asString(), data.padding(), data.forceRight());
@@ -160,12 +162,12 @@ public class NixieTubeBlock extends DataNetworkBlock implements PolymerBlock, Ca
             channel = blockEntity.channel();
         }
         return List.of(new ChannelReceiverDirectionNode(state.get(HALF) == BlockHalf.TOP ? Direction.UP : Direction.DOWN, channel));
-    }
+    }*/
 
-    @Override
+    /*@Override
     public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         return (state.get(HALF) == BlockHalf.TOP ? Direction.UP : Direction.DOWN) == dir;
-    }
+    }*/
 
     public final class Model extends BaseModel {
         private static final Brightness MAX_BRIGHTNESS = new Brightness(15, 15);

@@ -17,11 +17,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -53,6 +56,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
     private int currentItemCount2;
     @Nullable
     private ItemStack delayedOutput;
+    private boolean playedSound;
 
     public PressBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.PRESS, pos, state);
@@ -126,6 +130,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
         }
 
         self.active = true;
+
         if (self.process >= 1 || self.delayedOutput != null) {
             var nextOut = self.delayedOutput != null ? self.delayedOutput : self.currentRecipe.craft(self, self.world.getRegistryManager());
             var currentOut =  self.getStack(OUTPUT_SLOT);
@@ -141,10 +146,15 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             }
 
             if (success) {
-                self.process = -0.3;
+                self.process = -0.6;
+                self.model.updatePiston(self.process);
+                ((ServerWorld) world).spawnParticles(ParticleTypes.CLOUD,
+                        pos.getX() + 0.5, pos.getY() + 0.9, pos.getZ() + 0.5, 0,
+                        (Math.random() - 0.5) * 0.2, 0, (Math.random() - 0.5) * 0.2, 0.2);
                 stack.getStack().decrement(self.currentRecipe.inputA().count());
                 stack2.getStack().decrement(self.currentRecipe.inputB().count());
                 self.delayedOutput = null;
+                self.playedSound = false;
             } else {
                 self.delayedOutput = nextOut;
             }
@@ -154,6 +164,11 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             if (speed >= self.currentRecipe.minimumSpeed()) {
                 self.process += speed / 100;
                 self.model.updatePiston(self.process);
+
+                if (self.process >= 0.4 && !self.playedSound) {
+                    world.playSound(null, pos, SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 0.1f, 1.2f);
+                    self.playedSound = true;
+                }
             }
         }
         self.model.tick();

@@ -68,7 +68,7 @@ dependencies {
 	modImplementation include('eu.pb4:common-protection-api:1.0.0')
 	//modImplementation include('eu.pb4:sidebar-api:0.1.2+1.19.3')
 	modImplementation include('eu.pb4:sgui:1.2.2+1.20')
-	modImplementation include('com.kneelawk:graphlib:1.2.0+1.20')
+	modImplementation include('com.kneelawk:graphlib:1.3.1+1.20')
 	annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.2.0-rc.1")
 
 	modCompileOnly 'maven.modrinth:polydex:1.0.0-beta.2.2+1.20.1'
