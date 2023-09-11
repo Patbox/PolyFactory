@@ -1,9 +1,9 @@
 {
 	"textures": {
-		"2": "polyfactory:block/book_reader_side",
+		"2": "polyfactory:block/item_reader_side",
 		"3": "block/lectern_top",
-		"particle": "polyfactory:block/book_reader_side",
-		"front": "polyfactory:block/book_reader_front",
+		"particle": "polyfactory:block/item_reader_side",
+		"front": "polyfactory:block/item_reader_front",
 		"back": "polyfactory:block/steel_plate_connection"
 	},
 	"elements": [

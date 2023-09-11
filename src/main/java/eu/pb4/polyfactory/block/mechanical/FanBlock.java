@@ -2,6 +2,8 @@ package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseItemProvider;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
@@ -46,7 +48,7 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
-public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider, VirtualDestroyStage.Marker {
+public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider, VirtualDestroyStage.Marker, WrenchableBlock {
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
 
@@ -131,6 +133,11 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
     @Override
     public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return true;
+    }
+
+    @Override
+    public List<WrenchAction> getWrenchActions() {
+        return List.of(WrenchAction.FACING);
     }
 
     public final class Model extends BaseModel {

@@ -4,7 +4,7 @@ import eu.pb4.polydex.api.v1.recipe.*;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
-import eu.pb4.polyfactory.recipe.PressRecipe;
+import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -13,12 +13,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class PressRecipePage extends AbstractRecipePolydexPage<PressRecipe> {
+public class PressRecipePage extends AbstractRecipePolydexPage<GenericPressRecipe> {
     private static final ItemStack ICON = FactoryItems.PRESS.getDefaultStack();
     private final List<PolydexIngredient<?>> ingredients;
     private final PolydexStack<?>[] output;
 
-    public PressRecipePage(PressRecipe recipe) {
+    public PressRecipePage(GenericPressRecipe recipe) {
         super(recipe);
         this.ingredients = PolydexCompatImpl.createIngredients(this.recipe.inputA(), this.recipe.inputB());
         this.output = PolydexCompatImpl.createOutput(this.recipe.output());

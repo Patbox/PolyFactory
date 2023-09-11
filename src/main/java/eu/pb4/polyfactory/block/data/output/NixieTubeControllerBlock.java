@@ -15,7 +15,10 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,9 +28,10 @@ import java.util.List;
 public class NixieTubeControllerBlock extends GenericDirectionalDataBlock implements DataReceiver {
     public static final BooleanProperty TOP_CONNECTOR = BooleanProperty.of("top_connector");
     public static final BooleanProperty BOTTOM_CONNECTOR = BooleanProperty.of("bottom_connector");
+    public static final BooleanProperty POWERED = Properties.POWERED;
     public NixieTubeControllerBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(TOP_CONNECTOR, false).with(BOTTOM_CONNECTOR, false));
+        this.setDefaultState(this.getDefaultState().with(TOP_CONNECTOR, false).with(BOTTOM_CONNECTOR, false).with(POWERED, false));
     }
 
     @Override
@@ -35,6 +39,17 @@ public class NixieTubeControllerBlock extends GenericDirectionalDataBlock implem
         super.appendProperties(builder);
         builder.add(TOP_CONNECTOR);
         builder.add(BOTTOM_CONNECTOR);
+        builder.add(POWERED);
+    }
+
+    @Override
+    public boolean emitsRedstonePower(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        return state.get(POWERED) ? 15 : 0;
     }
 
     @Override

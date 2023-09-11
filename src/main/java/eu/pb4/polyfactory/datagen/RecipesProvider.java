@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.recipe.mixing.ArtificialDyeMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.ColoringMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
+import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
@@ -155,9 +156,10 @@ class RecipesProvider extends FabricRecipeProvider {
 
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.SPLITTER, 1)
                 .pattern("sss")
-                .pattern("f f")
+                .pattern("fxf")
                 .pattern("sss")
                 .input('f', FactoryItems.FUNNEL).input('s', FactoryItems.STEEL_PLATE)
+                .input('x', FactoryItems.INTEGRATED_CIRCUIT)
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.FUNNEL))
                 .offerTo(exporter);
 
@@ -196,8 +198,10 @@ class RecipesProvider extends FabricRecipeProvider {
                 .pattern("r-r")
                 .pattern("sbs")
                 .pattern("scs")
-                .input('s', FactoryItems.STEEL_PLATE).input('c', Items.COPPER_INGOT)
-                .input('-', Items.SMOOTH_STONE_SLAB).input('r', Items.REDSTONE)
+                .input('s', FactoryItems.STEEL_PLATE)
+                .input('c', Items.COPPER_INGOT)
+                .input('-', Items.SMOOTH_STONE_SLAB)
+                .input('r', Items.REDSTONE)
                 .input('b', Items.REDSTONE_BLOCK)
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                 .offerTo(exporter);
@@ -239,6 +243,28 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .offerTo(exporter);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.NIXIE_TUBE_CONTROLLER)
+                .pattern("csc")
+                .pattern("sbs")
+                .pattern("scs")
+                .input('s', FactoryItems.STEEL_PLATE)
+                .input('c', Items.COPPER_INGOT)
+                .input('b', FactoryItems.INTEGRATED_CIRCUIT)
+                .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
+                .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.ITEM_READER)
+                .pattern("plp")
+                .pattern("sbs")
+                .pattern("scs")
+                .input('s', FactoryItems.STEEL_PLATE)
+                .input('c', Items.COPPER_INGOT)
+                .input('l', Items.LECTERN)
+                .input('p', FactoryItems.WOODEN_PLATE)
+                .input('b', FactoryItems.INTEGRATED_CIRCUIT)
+                .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
+                .offerTo(exporter);
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.GEARBOX, 1)
                 .pattern("sgs")
                 .pattern("gwg")
@@ -254,6 +280,20 @@ class RecipesProvider extends FabricRecipeProvider {
                 .input('l', FactoryItemTags.STRIPPED_LOGS).input('p', ItemTags.PLANKS).input('i', Items.IRON_INGOT)
                 .criterion("get_axle", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
                 .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.INTEGRATED_CIRCUIT)
+                .pattern("rtr")
+                .pattern("cpq")
+                .pattern("ggg")
+                .input('g', Items.GOLD_NUGGET)
+                .input('q', Items.QUARTZ)
+                .input('c', Items.COPPER_INGOT)
+                .input('r', Items.REDSTONE)
+                .input('t', FactoryItems.TREATED_DRIED_KELP)
+                .input('p', FactoryItems.WOODEN_PLATE)
+                .criterion("get_axle", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
+                .offerTo(exporter);
+
 
         of(exporter, ColoringCraftingRecipe.CODEC, ColoringCraftingRecipe.of("cable_color", FactoryItems.CABLE));
         of(exporter, ColoringMixingRecipe.CODEC, ColoringMixingRecipe.of("cable_color", FactoryItems.CABLE, 2, 6, 10));
@@ -303,15 +343,15 @@ class RecipesProvider extends FabricRecipeProvider {
                 GrindingRecipe.of("cactus_to_dye", "dye", Ingredient.ofItems(Items.CACTUS), 1, 6, new ItemStack(Items.GREEN_DYE, 3))
         );
 
-        of(exporter, PressRecipe.CODEC,
-                PressRecipe.of("paper", Ingredient.ofItems(Items.SUGAR_CANE), 3, 5f, new ItemStack(Items.PAPER, 4)),
-                PressRecipe.of("iron_ingot", Ingredient.ofItems(Items.IRON_NUGGET), 9, 10f, Items.IRON_INGOT),
-                PressRecipe.of("gold_ingot", Ingredient.ofItems(Items.GOLD_NUGGET), 9, 8f, Items.GOLD_INGOT),
-                PressRecipe.of("steel_plate", Ingredient.ofItems(FactoryItems.STEEL_INGOT), 1, 12f, new ItemStack(FactoryItems.STEEL_PLATE, 1)),
-                PressRecipe.of("wooden_plate", Ingredient.ofItems(FactoryItems.SAW_DUST), 2, 5f, new ItemStack(FactoryItems.WOODEN_PLATE, 1)),
-                PressRecipe.of("golden_carrot", CountedIngredient.ofItems(1, Items.CARROT), CountedIngredient.ofItems(8, Items.GOLD_NUGGET),
+        of(exporter, GenericPressRecipe.CODEC,
+                GenericPressRecipe.of("paper", Ingredient.ofItems(Items.SUGAR_CANE), 3, 5f, new ItemStack(Items.PAPER, 4)),
+                GenericPressRecipe.of("iron_ingot", Ingredient.ofItems(Items.IRON_NUGGET), 9, 10f, Items.IRON_INGOT),
+                GenericPressRecipe.of("gold_ingot", Ingredient.ofItems(Items.GOLD_NUGGET), 9, 8f, Items.GOLD_INGOT),
+                GenericPressRecipe.of("steel_plate", Ingredient.ofItems(FactoryItems.STEEL_INGOT), 1, 12f, new ItemStack(FactoryItems.STEEL_PLATE, 1)),
+                GenericPressRecipe.of("wooden_plate", Ingredient.ofItems(FactoryItems.SAW_DUST), 2, 5f, new ItemStack(FactoryItems.WOODEN_PLATE, 1)),
+                GenericPressRecipe.of("golden_carrot", CountedIngredient.ofItems(1, Items.CARROT), CountedIngredient.ofItems(8, Items.GOLD_NUGGET),
                         5, OutputStack.of(Items.GOLDEN_CARROT)),
-                PressRecipe.of("golden_apple", CountedIngredient.ofItems(1, Items.APPLE), CountedIngredient.ofItems(8, Items.GOLD_INGOT),
+                GenericPressRecipe.of("golden_apple", CountedIngredient.ofItems(1, Items.APPLE), CountedIngredient.ofItems(8, Items.GOLD_INGOT),
                         5, OutputStack.of(Items.GOLDEN_APPLE))
         );
 

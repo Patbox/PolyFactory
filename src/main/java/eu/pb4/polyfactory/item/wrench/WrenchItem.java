@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.item.tool;
+package eu.pb4.polyfactory.item.wrench;
 
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.item.util.SimpleModeledPolymerItem;
@@ -6,6 +6,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -16,18 +17,14 @@ import net.minecraft.world.World;
 
 public class WrenchItem extends Item implements SimpleModeledPolymerItem {
     public WrenchItem() {
-        super(new Settings().maxCount(1).maxDamage(1000));
+        super(new Settings().maxCount(1));
     }
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
-        if (context.getWorld().getBlockState(context.getBlockPos()).getBlock() instanceof Wrenchable wrenchable) {
-            return wrenchable.useWithWrench(context);
+        if (context.getPlayer() instanceof ServerPlayerEntity player) {
+            return WrenchHandler.of(player).useAction(player, context.getWorld(), context.getBlockPos(), context.getSide());
         }
-        var data = RotationUser.getRotation((ServerWorld) context.getWorld(), context.getBlockPos());
-
-        context.getPlayer().sendMessage(Text.translatable("Speed: %s | Stress: %s | Rotation: %s", data.speed(), data.stressCapacity(), data.rotation()));
-
         return ActionResult.FAIL;
     }
 
@@ -37,21 +34,11 @@ public class WrenchItem extends Item implements SimpleModeledPolymerItem {
     }
 
     public ActionResult handleBlockAttack(PlayerEntity player, World world, Hand hand, BlockPos pos, Direction direction) {
-        if (player.getStackInHand(hand).isOf(this)) {
-            if (world.getBlockState(pos).getBlock() instanceof Wrenchable wrenchable) {
-                wrenchable.attackWithWrench(player, world, hand, pos, direction);
-            }
-
+        if (player.getStackInHand(hand).isOf(this) && player instanceof ServerPlayerEntity player1) {
+            WrenchHandler.of(player1).attackAction(player1, world, pos, direction);
             return ActionResult.FAIL;
         }
         return ActionResult.PASS;
     }
 
-    public interface Wrenchable {
-        default ActionResult useWithWrench(ItemUsageContext context) {
-            return ActionResult.FAIL;
-        };
-
-        default void attackWithWrench(PlayerEntity player, World world, Hand hand, BlockPos pos, Direction direction) {};
-    }
 }

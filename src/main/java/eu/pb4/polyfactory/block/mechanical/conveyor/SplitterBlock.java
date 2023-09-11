@@ -3,6 +3,8 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.FilterItem;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
@@ -40,7 +42,7 @@ import org.joml.Matrix4fStack;
 import java.util.List;
 
 
-public class SplitterBlock extends Block implements PolymerBlock, MovingItemConsumer, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class SplitterBlock extends Block implements PolymerBlock, MovingItemConsumer, WrenchableBlock, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
     public static final BooleanProperty DISTRIBUTE = BooleanProperty.of("distribute");
@@ -217,6 +219,11 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
     @Override
     public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return new Model(world, pos, initialBlockState);
+    }
+
+    @Override
+    public List<WrenchAction> getWrenchActions() {
+        return List.of(WrenchAction.FACING_HORIZONTAL);
     }
 
     public static final class Model extends ElementHolder {

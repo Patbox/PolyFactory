@@ -6,7 +6,7 @@ import eu.pb4.polyfactory.block.creative.CreativeContainerBlockEntity;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlockEntity;
 import eu.pb4.polyfactory.block.data.CableBlockEntity;
 import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlockEntity;
-import eu.pb4.polyfactory.block.data.providers.BookReaderBlockEntity;
+import eu.pb4.polyfactory.block.data.providers.ItemReaderBlockEntity;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.*;
@@ -86,8 +86,8 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<CableBlockEntity> CABLE = register("cable", FabricBlockEntityTypeBuilder
             .create(CableBlockEntity::new).addBlock(FactoryBlocks.CABLE));
-    public static final BlockEntityType<BookReaderBlockEntity> BOOK_READER = register("book_reader", FabricBlockEntityTypeBuilder
-            .create(BookReaderBlockEntity::new).addBlock(FactoryBlocks.BOOK_READER));
+    public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader", FabricBlockEntityTypeBuilder
+            .create(ItemReaderBlockEntity::new).addBlock(FactoryBlocks.ITEM_READER));
 
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;

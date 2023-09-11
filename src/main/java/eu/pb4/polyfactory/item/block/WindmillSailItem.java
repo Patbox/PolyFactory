@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
+import eu.pb4.polyfactory.item.util.FireworkStarColoredItem;
 import eu.pb4.polyfactory.item.util.ModeledItem;
 import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;
@@ -15,9 +16,9 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
-public class WindmillSailItem extends ModeledItem implements DyeableItem {
+public class WindmillSailItem extends ModeledItem implements DyeableItem, FireworkStarColoredItem {
     public WindmillSailItem(Settings settings) {
-        super(Items.LEATHER_HORSE_ARMOR, settings);
+        super(Items.FIREWORK_STAR, settings);
     }
 
     @Override
@@ -60,9 +61,8 @@ public class WindmillSailItem extends ModeledItem implements DyeableItem {
 
         return super.useOnBlock(context);
     }
-
     @Override
-    public int getPolymerArmorColor(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
+    public int getItemColor(ItemStack itemStack) {
         if (itemStack.hasNbt() && itemStack.getNbt().contains("display", NbtElement.COMPOUND_TYPE)) {
             var d = itemStack.getNbt().getCompound("display");
 

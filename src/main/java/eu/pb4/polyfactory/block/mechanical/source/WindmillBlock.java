@@ -5,6 +5,8 @@ import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
@@ -48,7 +50,7 @@ import org.joml.Matrix4fStack;
 import java.util.Collection;
 import java.util.List;
 
-public class WindmillBlock extends RotationalNetworkBlock implements PolymerBlock, RotationUser, BlockWithElementHolder, BlockEntityProvider, VirtualDestroyStage.Marker {
+public class WindmillBlock extends RotationalNetworkBlock implements PolymerBlock, RotationUser, BlockWithElementHolder, WrenchableBlock, BlockEntityProvider, VirtualDestroyStage.Marker {
     public static final int MAX_SAILS = 8;
     public static final BooleanProperty BIG = BooleanProperty.of("deco_big");
     public static final IntProperty SAIL_COUNT = IntProperty.of("sails", 1, MAX_SAILS);
@@ -136,6 +138,11 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
         if (world.getBlockEntity(pos) instanceof WindmillBlockEntity blockEntity) {
             blockEntity.updateRotationalData(modifier, state, world, pos);
         }
+    }
+
+    @Override
+    public List<WrenchAction> getWrenchActions() {
+        return List.of(WrenchAction.FACING_HORIZONTAL);
     }
 
     public final class Model extends BaseModel {

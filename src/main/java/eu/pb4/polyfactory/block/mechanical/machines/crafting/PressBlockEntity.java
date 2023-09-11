@@ -6,7 +6,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
-import eu.pb4.polyfactory.recipe.PressRecipe;
+import eu.pb4.polyfactory.recipe.press.PressRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -151,8 +151,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
                 ((ServerWorld) world).spawnParticles(ParticleTypes.CLOUD,
                         pos.getX() + 0.5, pos.getY() + 0.9, pos.getZ() + 0.5, 0,
                         (Math.random() - 0.5) * 0.2, 0, (Math.random() - 0.5) * 0.2, 0.2);
-                stack.getStack().decrement(self.currentRecipe.inputA().count());
-                stack2.getStack().decrement(self.currentRecipe.inputB().count());
+                self.currentRecipe.applyRecipeUse(self, world);
                 self.delayedOutput = null;
                 self.playedSound = false;
             } else {

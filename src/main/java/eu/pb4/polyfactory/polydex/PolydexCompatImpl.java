@@ -8,7 +8,7 @@ import eu.pb4.polyfactory.polydex.pages.PressRecipePage;
 import eu.pb4.polyfactory.recipe.CountedIngredient;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import eu.pb4.polyfactory.recipe.OutputStack;
-import eu.pb4.polyfactory.recipe.PressRecipe;
+import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
@@ -22,7 +22,7 @@ import java.util.List;
 
 public class PolydexCompatImpl {
     public static void register() {
-        PolydexPage.registerRecipeViewer(PressRecipe.class, PressRecipePage::new);
+        PolydexPage.registerRecipeViewer(GenericPressRecipe.class, PressRecipePage::new);
         PolydexPage.registerRecipeViewer(GenericMixingRecipe.class, MixerRecipePage::new);
         PolydexPage.registerRecipeViewer(GrindingRecipe.class, GrindingRecipePage::new);
 

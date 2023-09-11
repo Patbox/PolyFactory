@@ -66,6 +66,9 @@ public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
             this.scrollPoint = 0;
             this.text = string;
             nixieTube.pushText(string, data.padding());
+            if (this.getCachedState().get(NixieTubeControllerBlock.POWERED)) {
+                this.world.setBlockState(pos, this.getCachedState().with(NixieTubeControllerBlock.POWERED, false));
+            }
             this.markDirty();
         }
 
@@ -92,6 +95,10 @@ public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
                 var length = nixieTube.connectionSize() * 2;
                 var string = data.asString();
                 if ((string.length() < length && !self.scrollLoop) || string.isEmpty()) {
+                    if (!state.get(NixieTubeControllerBlock.POWERED)) {
+                        world.setBlockState(pos, state.with(NixieTubeControllerBlock.POWERED, true));
+                    }
+
                     return;
                 }
 
@@ -113,6 +120,12 @@ public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
 
                 if (string.length() - self.scrollPoint < length && self.scrollLoop) {
                     string = string.repeat(Math.max(2, MathHelper.ceilDiv(length, string.length())));
+                }
+
+                if ((self.scrollLoop || (string.length() - self.scrollPoint >= length)) && state.get(NixieTubeControllerBlock.POWERED)) {
+                    world.setBlockState(pos, state.with(NixieTubeControllerBlock.POWERED, false));
+                } else if (!self.scrollLoop && (string.length() - self.scrollPoint < length) && !state.get(NixieTubeControllerBlock.POWERED)) {
+                    world.setBlockState(pos, state.with(NixieTubeControllerBlock.POWERED, true));
                 }
 
                 self.text = string.substring(Math.min(self.scrollPoint, string.length()), Math.min(self.scrollPoint + length, string.length()));

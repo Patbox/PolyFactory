@@ -1,5 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseItemProvider;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
@@ -41,12 +43,16 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
+import java.util.List;
 
-public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsumer, MovingItemProvider, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
+
+public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsumer, MovingItemProvider, WrenchableBlock, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
     public static final EnumProperty<ConveyorLikeDirectional.TransferMode> MODE = EnumProperty.of("mode", ConveyorLikeDirectional.TransferMode.class,
             ConveyorLikeDirectional.TransferMode.FROM_CONVEYOR, ConveyorLikeDirectional.TransferMode.TO_CONVEYOR);
+
+    private static final WrenchAction MODE_ACTION = WrenchAction.of("mode", MODE);
 
     public FunnelBlock(Settings settings) {
         super(settings);
@@ -264,6 +270,11 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
     @Override
     public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return new Model(world, pos, initialBlockState);
+    }
+
+    @Override
+    public List<WrenchAction> getWrenchActions() {
+        return List.of(WrenchAction.FACING, MODE_ACTION);
     }
 
     public static final class Model extends BaseModel {

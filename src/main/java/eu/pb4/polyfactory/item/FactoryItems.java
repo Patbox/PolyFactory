@@ -8,11 +8,10 @@ import eu.pb4.polyfactory.item.util.ModeledItem;
 import eu.pb4.polyfactory.item.util.MultiBlockItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.item.tool.WrenchItem;
+import eu.pb4.polyfactory.item.wrench.WrenchItem;
 import eu.pb4.polyfactory.item.util.AutoModeledPolymerItem;
 import eu.pb4.polyfactory.item.util.ModeledBlockItem;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
@@ -50,7 +49,6 @@ public class FactoryItems {
     public static final Item NIXIE_TUBE = register(FactoryBlocks.NIXIE_TUBE);
     public static final Item WINDMILL_SAIL = register("windmill_sail", new WindmillSailItem(new Item.Settings()));
     public static final Item METAL_GRID = register(FactoryBlocks.METAL_GRID);
-
     public static final Item SAW_DUST = register("saw_dust", new ModeledItem(Items.STICK, new Item.Settings()));
     public static final Item COAL_DUST = register("coal_dust", new ModeledItem(Items.COAL, new Item.Settings()));
     public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", new ModeledItem(new Item.Settings()));
@@ -72,7 +70,7 @@ public class FactoryItems {
     public static final Item ITEM_COUNTER = register(FactoryBlocks.ITEM_COUNTER);
     public static final Item REDSTONE_INPUT = register(FactoryBlocks.REDSTONE_INPUT);
     public static final Item REDSTONE_OUTPUT = register(FactoryBlocks.REDSTONE_OUTPUT);
-    public static final Item BOOK_READER = register(FactoryBlocks.BOOK_READER);
+    public static final Item ITEM_READER = register(FactoryBlocks.ITEM_READER);
     public static final Item NIXIE_TUBE_CONTROLLER = register(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
     public static final CableItem CABLE = register("cable", new CableItem(new Item.Settings()));
 
@@ -127,10 +125,9 @@ public class FactoryItems {
                     entries.add(REDSTONE_OUTPUT);
                     entries.add(REDSTONE_INPUT);
                     entries.add(ITEM_COUNTER);
-                    entries.add(BOOK_READER);
+                    entries.add(ITEM_READER);
                     entries.add(NIXIE_TUBE_CONTROLLER);
                     entries.add(NIXIE_TUBE);
-
 
                     // Rest
 
@@ -149,6 +146,7 @@ public class FactoryItems {
                     entries.add(WOODEN_PLATE);
                     entries.add(TREATED_DRIED_KELP);
                     entries.add(GENERIC_MACHINE_PART);
+                    entries.add(INTEGRATED_CIRCUIT);
 
                     // Fancy dyes
                     entries.add(ArtificialDyeItem.of(0xFF0000));

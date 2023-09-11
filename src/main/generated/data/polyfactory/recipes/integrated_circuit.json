@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "c": {
+      "item": "minecraft:copper_ingot"
+    },
+    "g": {
+      "item": "minecraft:gold_nugget"
+    },
+    "p": {
+      "item": "polyfactory:wooden_plate"
+    },
+    "q": {
+      "item": "minecraft:quartz"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "t": {
+      "item": "polyfactory:treated_dried_kelp"
+    }
+  },
+  "pattern": [
+    "rtr",
+    "cpq",
+    "ggg"
+  ],
+  "result": {
+    "item": "polyfactory:integrated_circuit"
+  },
+  "show_notification": true
+}

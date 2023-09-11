@@ -8,35 +8,38 @@ import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.StringData;
 import eu.pb4.polyfactory.ui.GuiTextures;
-import eu.pb4.polyfactory.ui.TagLimitedSlot;
 import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.block.BlockState;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.MusicDiscItem;
 import net.minecraft.item.WrittenBookItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.WorldChunk;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
-public class BookReaderBlockEntity extends ChanneledDataBlockEntity implements SingleStackInventory, ChanneledDataCache, BlockEntityExtraListener {
+public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements SingleStackInventory, ChanneledDataCache, BlockEntityExtraListener {
     private static final String[] NO_DATA = new String[] { "" };
     private ItemStack stack = ItemStack.EMPTY;
     private int page = 0;
     private String[] lines = NO_DATA;
-    private BookReaderBlock.Model model;
+    private ItemReaderBlock.Model model;
 
-    public BookReaderBlockEntity(BlockPos blockPos, BlockState blockState) {
-        super(FactoryBlockEntities.BOOK_READER, blockPos, blockState);
+    public ItemReaderBlockEntity(BlockPos blockPos, BlockState blockState) {
+        super(FactoryBlockEntities.ITEM_READER, blockPos, blockState);
     }
 
     @Override
@@ -102,13 +105,26 @@ public class BookReaderBlockEntity extends ChanneledDataBlockEntity implements S
                 }
                 this.lines = list.toArray(new String[0]);
             }
+        } else if (this.stack.getItem() instanceof MusicDiscItem disc) {
+            this.lines = new String[] { disc.getDescription().getString() };
+        } else if (!this.stack.isEmpty()) {
+            this.lines = new String[] { this.stack.getName().getString() };
         } else {
             this.lines = NO_DATA;
         }
 
         this.page = this.page % this.lines.length;
         this.lastData = new StringData(this.lines[this.page]);
-        FactoryBlocks.BOOK_READER.sendData(this.world, this.pos, this.lastData);
+        FactoryBlocks.ITEM_READER.sendData(this.world, this.pos, this.lastData);
+    }
+    @Override
+    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+        return this.stack.isEmpty();
+    }
+
+    @Override
+    public int getMaxCountPerStack() {
+        return 1;
     }
 
     public DataContainer nextPage() {
@@ -124,15 +140,15 @@ public class BookReaderBlockEntity extends ChanneledDataBlockEntity implements S
 
     @Override
     public void onListenerUpdate(WorldChunk chunk) {
-        this.model = (BookReaderBlock.Model) BlockBoundAttachment.get(chunk, this.pos).holder();
+        this.model = (ItemReaderBlock.Model) BlockBoundAttachment.get(chunk, this.pos).holder();
         this.model.setItem(this.stack);
     }
 
     private class Gui extends SimpleGui {
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.HOPPER, player, false);
-            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(BookReaderBlockEntity.this.getCachedState().getBlock().getName()));
-            this.setSlotRedirect(2, new TagLimitedSlot(BookReaderBlockEntity.this, 0, ItemTags.LECTERN_BOOKS));
+            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(ItemReaderBlockEntity.this.getCachedState().getBlock().getName()));
+            this.setSlotRedirect(2, new Slot(ItemReaderBlockEntity.this, 0, 0, 0));
             this.open();
         }
 
@@ -143,7 +159,7 @@ public class BookReaderBlockEntity extends ChanneledDataBlockEntity implements S
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(BookReaderBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(ItemReaderBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();

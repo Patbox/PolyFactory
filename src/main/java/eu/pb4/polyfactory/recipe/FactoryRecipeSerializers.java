@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.recipe.mixing.ArtificialDyeMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.ColoringMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
+import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.Registries;
@@ -14,7 +15,7 @@ import net.minecraft.util.Identifier;
 
 public class FactoryRecipeSerializers {
     public static final CodecRecipeSerializer<GrindingRecipe> GRINDING = register("grinding", GrindingRecipe.CODEC);
-    public static final CodecRecipeSerializer<PressRecipe> PRESS = register("press", PressRecipe.CODEC);
+    public static final CodecRecipeSerializer<GenericPressRecipe> PRESS_GENERIC = register("press/generic", GenericPressRecipe.CODEC);
     public static final CodecRecipeSerializer<ColoringMixingRecipe> MIXING_COLORING = register("mixing/coloring", ColoringMixingRecipe.CODEC);
 
     public static final CodecRecipeSerializer<GenericMixingRecipe> MIXING_GENERIC = register("mixing/generic", GenericMixingRecipe.CODEC);

@@ -1,5 +1,5 @@
 {
-  "type": "polyfactory:press",
+  "type": "polyfactory:press/generic",
   "input_a": {
     "base": {
       "item": "minecraft:apple"

@@ -46,6 +46,7 @@ public class FactoryNodes {
         universe.addNodeType(ConveyorNode.TYPE);
         universe.addNodeType(AxleWithGearMechanicalNode.TYPE);
         universe.addGraphEntityType(RotationData.TYPE);
+        universe.addCacheCategory(AxleWithGearMechanicalNode.CACHE);
 
         universe.register();
         return universe;
@@ -112,7 +113,6 @@ public class FactoryNodes {
         universe.addNodeType(AllSideNode.TYPE);
         universe.addNodeType(SelectiveSideNode.TYPE);
         universe.addNodeType(NotAxisNode.TYPE);
-
         universe.addCacheCategory(FunctionalNode.CACHE);
     }
 

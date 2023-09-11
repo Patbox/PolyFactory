@@ -27,17 +27,17 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-public class BookReaderBlock extends DataProviderBlock {
+public class ItemReaderBlock extends DataProviderBlock {
     public static final BooleanProperty POWERED = Properties.POWERED;
 
-    public BookReaderBlock(Settings settings) {
+    public ItemReaderBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(POWERED, false));
     }
 
     @Override
     public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection()).with(POWERED, ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos()));
+        return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection().getOpposite()).with(POWERED, ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos()));
     }
 
     @Override
@@ -48,7 +48,7 @@ public class BookReaderBlock extends DataProviderBlock {
 
     @Override
     public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new BookReaderBlockEntity(pos, state);
+        return new ItemReaderBlockEntity(pos, state);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class BookReaderBlock extends DataProviderBlock {
             if (powered != world.isReceivingRedstonePower(pos)) {
                 world.setBlockState(pos, state.with(POWERED, !powered), Block.NOTIFY_LISTENERS);
 
-                if (!powered && world.getBlockEntity(pos) instanceof BookReaderBlockEntity be) {
+                if (!powered && world.getBlockEntity(pos) instanceof ItemReaderBlockEntity be) {
                     sendData(world, pos, be.nextPage());
                 }
             }
@@ -79,7 +79,7 @@ public class BookReaderBlock extends DataProviderBlock {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (!player.isSneaking() && player instanceof ServerPlayerEntity serverPlayer && hand == Hand.MAIN_HAND && world.getBlockEntity(pos) instanceof BookReaderBlockEntity be) {
+        if (!player.isSneaking() && state.get(FACING).getOpposite() != hit.getSide() && player instanceof ServerPlayerEntity serverPlayer && hand == Hand.MAIN_HAND && world.getBlockEntity(pos) instanceof ItemReaderBlockEntity be) {
             be.openGui(serverPlayer);
             return ActionResult.SUCCESS;
         }
@@ -133,6 +133,8 @@ public class BookReaderBlock extends DataProviderBlock {
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 updateStatePos(BlockBoundAttachment.get(this).getBlockState());
+                this.base.tick();
+                this.book.tick();
             }
         }
 

@@ -2,15 +2,15 @@
   "type": "polyfactory:press/generic",
   "input_a": {
     "base": {
-      "item": "polyfactory:saw_dust"
+      "item": "minecraft:sugar_cane"
     },
-    "count": 2
+    "count": 3
   },
   "minimum_speed": 5.0,
   "output": {
     "item": {
-      "Count": 1,
-      "id": "polyfactory:wooden_plate"
+      "Count": 4,
+      "id": "minecraft:paper"
     }
   }
 }

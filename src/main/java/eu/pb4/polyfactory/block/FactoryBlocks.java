@@ -6,7 +6,7 @@ import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
 import eu.pb4.polyfactory.block.data.CableBlock;
 import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlock;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
-import eu.pb4.polyfactory.block.data.providers.BookReaderBlock;
+import eu.pb4.polyfactory.block.data.providers.ItemReaderBlock;
 import eu.pb4.polyfactory.block.data.providers.DataProviderBlock;
 import eu.pb4.polyfactory.block.data.providers.RedstoneInputBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
@@ -62,7 +62,7 @@ public class FactoryBlocks {
     public static final DataProviderBlock ITEM_COUNTER = register("item_counter", new DataProviderBlock(AbstractBlock.Settings.copy(SPLITTER)));
     public static final RedstoneInputBlock REDSTONE_INPUT = register("redstone_input", new RedstoneInputBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
     public static final RedstoneOutputBlock REDSTONE_OUTPUT = register("redstone_output", new RedstoneOutputBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
-    public static final BookReaderBlock BOOK_READER = register("book_reader", new BookReaderBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
+    public static final ItemReaderBlock ITEM_READER = register("item_reader", new ItemReaderBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
 
     public static final NixieTubeBlock NIXIE_TUBE = register("nixie_tube", new NixieTubeBlock(Block.Settings.copy(Blocks.GLASS).nonOpaque()));
 

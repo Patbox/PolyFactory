@@ -4,6 +4,8 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -42,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 
-public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, RotationUser, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, RotationUser, WrenchableBlock, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static final Property<Direction> FACING = Properties.FACING;
 
     public MinerBlock(Settings settings) {
@@ -154,6 +156,11 @@ public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, 
         if (world.getBlockEntity(pos) instanceof MinerBlockEntity be) {
             modifier.stress(be.getStress());
         }
+    }
+
+    @Override
+    public List<WrenchAction> getWrenchActions() {
+        return List.of(WrenchAction.FACING);
     }
 
     public final class Model extends BaseModel {

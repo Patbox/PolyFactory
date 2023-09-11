@@ -4,6 +4,8 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.mechanical.RotationConstants;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -42,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 
-public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlock, RotationUser, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlock, RotationUser, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker, WrenchableBlock {
     public static final DirectionProperty FACING = Properties.FACING;
 
     public HandCrankBlock(Settings settings) {
@@ -123,6 +125,11 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
     @Override
     public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return new Model(world, initialBlockState);
+    }
+
+    @Override
+    public List<WrenchAction> getWrenchActions() {
+        return List.of(WrenchAction.FACING);
     }
 
     public final class Model extends BaseModel {

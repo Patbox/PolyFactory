@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "b": {
+      "item": "polyfactory:integrated_circuit"
+    },
+    "c": {
+      "item": "minecraft:copper_ingot"
+    },
+    "l": {
+      "item": "minecraft:lectern"
+    },
+    "p": {
+      "item": "polyfactory:wooden_plate"
+    },
+    "s": {
+      "item": "polyfactory:steel_plate"
+    }
+  },
+  "pattern": [
+    "plp",
+    "sbs",
+    "scs"
+  ],
+  "result": {
+    "item": "polyfactory:item_reader"
+  },
+  "show_notification": true
+}

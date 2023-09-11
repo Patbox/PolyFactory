@@ -7,6 +7,8 @@ import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
 import eu.pb4.polyfactory.util.DyeColorExtra;
@@ -48,7 +50,7 @@ import org.joml.Matrix4fStack;
 import java.util.Collection;
 import java.util.List;
 
-public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityProvider, WrenchableBlock, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static Property<Direction.Axis> AXIS = Properties.AXIS;
     public static BooleanProperty POSITIVE_CONNECTED = BooleanProperty.of("positive_connected");
     public static BooleanProperty NEGATIVE_CONNECTED = BooleanProperty.of("negative_connected");
@@ -67,6 +69,11 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityPr
     @Override
     public Block getPolymerBlock(BlockState state) {
         return Blocks.BARRIER;
+    }
+
+    @Override
+    public List<WrenchAction> getWrenchActions() {
+        return List.of(WrenchAction.AXIS, WrenchAction.HALF);
     }
 
     @Override

@@ -2,6 +2,8 @@ package eu.pb4.polyfactory.block.data.util;
 
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
@@ -26,7 +28,9 @@ import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-public abstract class GenericDirectionalDataBlock extends DataNetworkBlock implements PolymerBlock, VirtualDestroyStage.Marker, BlockEntityProvider, BlockWithElementHolder, CableConnectable {
+import java.util.List;
+
+public abstract class GenericDirectionalDataBlock extends DataNetworkBlock implements PolymerBlock, WrenchableBlock, VirtualDestroyStage.Marker, BlockEntityProvider, BlockWithElementHolder, CableConnectable {
     public static DirectionProperty FACING = Properties.FACING;
     public GenericDirectionalDataBlock(Settings settings) {
         super(settings);
@@ -52,6 +56,11 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
     @Override
     public Block getPolymerBlock(BlockState state) {
         return Blocks.BARRIER;
+    }
+
+    @Override
+    public List<WrenchAction> getWrenchActions() {
+        return List.of(WrenchAction.FACING);
     }
 
     @Override

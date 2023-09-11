@@ -99,11 +99,6 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
     }
 
     @Override
-    public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
-        return this.currentTool.isEmpty() && stack.isIn(FactoryItemTags.ALLOWED_IN_MINER);
-    }
-
-    @Override
     public int getMaxCountPerStack() {
         return 1;
     }

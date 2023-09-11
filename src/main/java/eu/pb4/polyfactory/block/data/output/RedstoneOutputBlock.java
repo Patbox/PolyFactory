@@ -25,6 +25,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -38,7 +39,7 @@ import java.util.List;
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
 public class RedstoneOutputBlock extends GenericDirectionalDataBlock implements DataReceiver, RedstoneConnectable {
-    public static final IntProperty POWER = IntProperty.of("power", 0, 15);
+    public static final IntProperty POWER = Properties.POWER;
 
     public RedstoneOutputBlock(Settings settings) {
         super(settings);
@@ -145,6 +146,7 @@ public class RedstoneOutputBlock extends GenericDirectionalDataBlock implements 
                 updateStatePos(state);
                 this.overlay.setItem(createOverlay(state));
                 //this.overlay.setBrightness(new Brightness(state.get(POWER), 0));
+                this.base.tick();
                 this.overlay.tick();
             }
         }
