@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.item.wrench;
 
+import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import eu.pb4.sidebars.api.Sidebar;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenCustomHashMap;
@@ -17,14 +18,17 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class WrenchHandler {
-    private static final Text TITLE = Text.translatable("item.polyfactory.wrench.title").setStyle(Style.EMPTY.withColor(Formatting.GOLD));
-    private final Sidebar sidebar = new Sidebar(TITLE, Sidebar.Priority.HIGH);
-    private BlockState state = Blocks.AIR.getDefaultState();
+    private final Sidebar sidebar = new Sidebar(Sidebar.Priority.HIGH);
     private final Object2ObjectLinkedOpenCustomHashMap<Block, String> currentAction = new Object2ObjectLinkedOpenCustomHashMap<>(Util.identityHashStrategy());
+    private BlockState state = Blocks.AIR.getDefaultState();
+    @Nullable
+    private BlockPos pos;
+
     private List<WrenchAction> actions = List.of();
 
     public WrenchHandler(ServerPlayNetworkHandler handler) {
@@ -36,18 +40,21 @@ public class WrenchHandler {
     }
 
     public void tick(ServerPlayerEntity player) {
-        var hit = player.raycast(7, 0,false);
-
-        if (hit instanceof BlockHitResult blockHitResult) {
+        if (player.getMainHandStack().isOf(FactoryItems.WRENCH) && player.raycast(7, 0, false) instanceof BlockHitResult blockHitResult) {
             var state = player.getWorld().getBlockState(blockHitResult.getBlockPos());
-            if (state == this.state) {
+            if (state == this.state && blockHitResult.getBlockPos().equals(this.pos)) {
                 return;
             }
 
             this.state = state;
+            this.pos = blockHitResult.getBlockPos();
             if (this.state.getBlock() instanceof WrenchableBlock wrenchableBlock) {
                 this.actions = wrenchableBlock.getWrenchActions();
                 var selected = this.currentAction.get(this.state.getBlock());
+                this.sidebar.setTitle(Text.translatable("item.polyfactory.wrench.title",
+                        Text.empty().append(this.state.getBlock().getName())
+                                .setStyle(Style.EMPTY.withColor(Formatting.YELLOW).withBold(false)))
+                        .setStyle(Style.EMPTY.withColor(Formatting.GOLD).withBold(true)));
                 this.sidebar.set((b) -> {
                     int size = Math.min(this.actions.size(), 15);
                     for (var i = 0; i < size; i++) {
@@ -56,12 +63,13 @@ public class WrenchHandler {
                         var t = Text.empty();
 
                         if ((selected == null && i == 0) || action.id().equals(selected)) {
-                            t.append(Text.literal("> ").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+                            t.append(Text.literal("» ").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
                         } else {
-                            t.append("  ");
+                            t.append("   ");
                         }
 
-                        t.append(action.name()).append(": ").append(action.value().getDisplayValue(player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state));
+                        t.append(action.name()).append(": ").append(
+                                Text.literal(action.value().getDisplayValue(player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state)).formatted(Formatting.GRAY));
 
                         b.add(t);
                     }
@@ -73,6 +81,7 @@ public class WrenchHandler {
             }
         } else {
             this.state = Blocks.AIR.getDefaultState();
+            this.pos = null;
             this.sidebar.hide();
         }
     }
@@ -95,6 +104,7 @@ public class WrenchHandler {
         for (var action : actions) {
             if (action.id().equals(current)) {
                 action.action().applyAction(world, pos, side, state, !player.isSneaking());
+                this.pos = null;
                 return ActionResult.SUCCESS;
             }
         }
@@ -122,7 +132,7 @@ public class WrenchHandler {
         for (var action : actions) {
             if (next) {
                 this.currentAction.put(state.getBlock(), action.id());
-                this.state = Blocks.CAVE_AIR.getDefaultState();
+                this.pos = null;
                 return;
             }
             if (action.id().equals(current)) {
@@ -132,7 +142,7 @@ public class WrenchHandler {
 
         if (next) {
             this.currentAction.put(state.getBlock(), this.actions.get(0).id());
-            this.state = Blocks.CAVE_AIR.getDefaultState();
+            this.pos = null;
         }
     }
 }

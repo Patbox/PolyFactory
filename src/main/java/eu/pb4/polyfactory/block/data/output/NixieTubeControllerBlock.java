@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
 import eu.pb4.polyfactory.block.data.util.GenericDirectionalDataBlock;
 import eu.pb4.polyfactory.data.DataContainer;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -18,6 +19,7 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +31,16 @@ public class NixieTubeControllerBlock extends GenericDirectionalDataBlock implem
     public static final BooleanProperty TOP_CONNECTOR = BooleanProperty.of("top_connector");
     public static final BooleanProperty BOTTOM_CONNECTOR = BooleanProperty.of("bottom_connector");
     public static final BooleanProperty POWERED = Properties.POWERED;
+
+    public static final WrenchAction SCROLL_LOOP = WrenchAction.ofBlockEntity("scroll_loop", NixieTubeControllerBlockEntity.class,
+            x -> "" + x.scrollLoop(),
+            (x, n) -> x.setScrollLoop(!x.scrollLoop())
+    );
+    public static final WrenchAction SCROLL_SPEED = WrenchAction.ofBlockEntity("scroll_speed", NixieTubeControllerBlockEntity.class,
+            x -> "" + x.scrollSpeed(),
+            (x, n) -> x.setScrollSpeed((40 + x.scrollSpeed() + (n ? 1 : -1)) % 40)
+    );
+
     public NixieTubeControllerBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(TOP_CONNECTOR, false).with(BOTTOM_CONNECTOR, false).with(POWERED, false));
@@ -42,6 +54,15 @@ public class NixieTubeControllerBlock extends GenericDirectionalDataBlock implem
         builder.add(POWERED);
     }
 
+    @Override
+    public List<WrenchAction> getWrenchActions() {
+        return List.of(
+                WrenchAction.CHANNEL,
+                SCROLL_SPEED,
+                SCROLL_LOOP,
+                WrenchAction.FACING
+        );
+    }
     @Override
     public boolean emitsRedstonePower(BlockState state) {
         return true;

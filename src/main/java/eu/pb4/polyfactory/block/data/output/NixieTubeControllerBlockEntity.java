@@ -138,4 +138,22 @@ public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
             self.tick++;
         }
     }
+
+    public boolean scrollLoop() {
+        return this.scrollLoop;
+    }
+
+    public int scrollSpeed() {
+        return this.scrollSpeed;
+    }
+
+    public void setScrollLoop(boolean scrollLoop) {
+        this.scrollLoop = scrollLoop;
+        this.markDirty();
+    }
+
+    public void setScrollSpeed(int scrollSpeed) {
+        this.scrollSpeed = scrollSpeed;
+        this.markDirty();
+    }
 }

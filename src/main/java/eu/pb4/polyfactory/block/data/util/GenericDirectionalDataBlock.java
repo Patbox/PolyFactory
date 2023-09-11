@@ -60,7 +60,10 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
 
     @Override
     public List<WrenchAction> getWrenchActions() {
-        return List.of(WrenchAction.FACING);
+        return List.of(
+                WrenchAction.CHANNEL,
+                WrenchAction.FACING
+        );
     }
 
     @Override

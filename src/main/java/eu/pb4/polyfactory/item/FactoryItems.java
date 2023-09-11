@@ -87,7 +87,7 @@ public class FactoryItems {
                 .icon(WINDMILL_SAIL::getDefaultStack)
                 .displayName(Text.translatable("itemgroup." + ModInit.ID))
                 .entries(((context, entries) -> {
-                    //entries.add(WRENCH);
+                    entries.add(WRENCH);
 
                     // Rotational machines (tier 1)
 
