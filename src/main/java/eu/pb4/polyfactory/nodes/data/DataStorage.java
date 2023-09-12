@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.data.DataContainer;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;

@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -22,6 +23,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
@@ -84,6 +86,11 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
         return 0;
     }
 
+    @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.transform(state, rotation::rotate, FACING);
+    }
+
     public static class Model extends BaseModel {
         private final LodItemDisplayElement base;
 
@@ -116,6 +123,7 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 updateStatePos(BlockBoundAttachment.get(this).getBlockState());
+                this.base.tick();
             }
         }
     }

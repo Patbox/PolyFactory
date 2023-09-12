@@ -1,0 +1,16 @@
+{
+  "type": "polyfactory:press/generic",
+  "input_a": {
+    "base": {
+      "item": "minecraft:honeycomb"
+    },
+    "count": 4
+  },
+  "minimum_speed": 4.0,
+  "output": {
+    "item": {
+      "Count": 1,
+      "id": "minecraft:honeycomb"
+    }
+  }
+}

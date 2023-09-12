@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.item.wrench;
 
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.item.util.ModeledItem;
 import eu.pb4.polyfactory.item.util.SimpleModeledPolymerItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -15,7 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class WrenchItem extends Item implements SimpleModeledPolymerItem {
+public class WrenchItem extends ModeledItem {
     public WrenchItem() {
         super(new Settings().maxCount(1));
     }
@@ -26,11 +27,6 @@ public class WrenchItem extends Item implements SimpleModeledPolymerItem {
             return WrenchHandler.of(player).useAction(player, context.getWorld(), context.getBlockPos(), context.getSide());
         }
         return ActionResult.FAIL;
-    }
-
-    @Override
-    public Item getPolymerItem() {
-        return Items.STONE_HOE;
     }
 
     public ActionResult handleBlockAttack(PlayerEntity player, World world, Hand hand, BlockPos pos, Direction direction) {

@@ -1,0 +1,16 @@
+{
+  "type": "polyfactory:press/generic",
+  "input_a": {
+    "base": {
+      "item": "minecraft:red_sand"
+    },
+    "count": 4
+  },
+  "minimum_speed": 5.0,
+  "output": {
+    "item": {
+      "Count": 1,
+      "id": "minecraft:red_sandstone"
+    }
+  }
+}

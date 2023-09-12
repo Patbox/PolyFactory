@@ -30,6 +30,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.LightType;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -142,10 +143,10 @@ public class RedstoneOutputBlock extends GenericDirectionalDataBlock implements 
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                var state = BlockBoundAttachment.get(this).getBlockState();
+                var attachment = BlockBoundAttachment.get(this);
+                var state = attachment.getBlockState();
                 updateStatePos(state);
                 this.overlay.setItem(createOverlay(state));
-                //this.overlay.setBrightness(new Brightness(state.get(POWER), 0));
                 this.base.tick();
                 this.overlay.tick();
             }

@@ -2,23 +2,23 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "f": {
-      "item": "polyfactory:funnel"
+    "i": {
+      "item": "polyfactory:steel_ingot"
     },
-    "s": {
+    "p": {
       "item": "polyfactory:steel_plate"
     },
-    "x": {
-      "item": "polyfactory:integrated_circuit"
+    "t": {
+      "item": "polyfactory:treated_dried_kelp"
     }
   },
   "pattern": [
-    "sss",
-    "fxf",
-    "sss"
+    " i ",
+    " ti",
+    "p  "
   ],
   "result": {
-    "item": "polyfactory:splitter"
+    "item": "polyfactory:wrench"
   },
   "show_notification": true
 }

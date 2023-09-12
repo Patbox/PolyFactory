@@ -1,0 +1,21 @@
+{
+  "type": "polyfactory:press/generic",
+  "input_a": {
+    "base": {
+      "item": "minecraft:glass_bottle"
+    }
+  },
+  "input_b": {
+    "base": {
+      "item": "minecraft:sculk"
+    },
+    "count": 8
+  },
+  "minimum_speed": 10.0,
+  "output": {
+    "item": {
+      "Count": 1,
+      "id": "minecraft:experience_bottle"
+    }
+  }
+}

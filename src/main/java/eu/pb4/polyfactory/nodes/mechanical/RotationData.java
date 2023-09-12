@@ -81,7 +81,10 @@ public class RotationData implements GraphEntity<RotationData> {
             var checked = new LongOpenHashSet();
             var checked2 = new LongOpenHashSet();
             var rotationDataList = new ArrayList<RotationData>();
-            collectGraphs(connectors, dirMap, clogged, checked, checked2, rotationDataList);
+            dirMap.put(this.ctx.getGraph().getId(), false);
+            checked.add(this.ctx.getGraph().getId());
+            rotationDataList.add(this);
+            collectGraphs(connectors, dirMap, clogged, checked, checked2, rotationDataList, false);
             if (rotationDataList.isEmpty()) {
                 return;
             }
@@ -114,7 +117,10 @@ public class RotationData implements GraphEntity<RotationData> {
                 data.negative = dirMap.get(data.getContext().getGraph().getId()) != negative;
             }
 
-            var speed = this.speed != 0 ? this.speed * Math.signum(state.speed) : 0;
+            var speed = this.speed;
+            if (this.negative) {
+                speed = -speed;
+            }
 
             float r;
 
@@ -123,14 +129,19 @@ public class RotationData implements GraphEntity<RotationData> {
             } else {
                 r = (float) ((Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.MAX_ROTATION_PER_TICK_4 * delta) + this.rotation) % MathHelper.TAU);
             }
+            if (this.negative) {
+                r = -r;
+            }
+
 
             for (var data : rotationDataList) {
-                data.rotation = dirMap.get(data.getContext().getGraph().getId()) ? -r : r;
+                data.rotation = data.negative ? -r : r;
             }
         }
     }
 
-    private static void collectGraphs(Collection<NodeHolder<AxleWithGearMechanicalNode>> connectors, Long2BooleanOpenHashMap dirMap, MutableBoolean clogged, LongOpenHashSet checked, LongOpenHashSet checked2, ArrayList<RotationData> data) {
+    private static void collectGraphs(Collection<NodeHolder<AxleWithGearMechanicalNode>> connectors, Long2BooleanOpenHashMap dirMap, MutableBoolean clogged,
+                                      LongOpenHashSet checked, LongOpenHashSet checked2, ArrayList<RotationData> data, boolean currentDirection) {
         for (var connection : connectors) {
             var connectGraph = FactoryNodes.ROTATIONAL_CONNECTOR.getSidedGraphView(connection.getBlockWorld()).getAllGraphsAt(connection.getBlockPos()).findFirst();
             if (connectGraph.isPresent() && checked2.add(connectGraph.get().getId())) {
@@ -139,21 +150,23 @@ public class RotationData implements GraphEntity<RotationData> {
                     var x = iterator.next();
                     var optionalGraph = connection.getGraphWorld().getAllGraphsAt(x.getBlockPos()).findFirst();
 
-                    if (optionalGraph.isEmpty() || checked.contains(optionalGraph.get().getId())) {
+                    if (optionalGraph.isEmpty() || !checked.add(optionalGraph.get().getId())) {
                         return;
                     }
 
-                    var distance = x.getBlockPos().getManhattanDistance(connection.getBlockPos());
                     var targetGraph = optionalGraph.get();
                     data.add(targetGraph.getGraphEntity(TYPE));
 
-                    if (dirMap.containsKey(targetGraph.getId()) && dirMap.get(targetGraph.getId()) == (distance % 2 == 1)) {
-                        clogged.setTrue();
+                    if (dirMap.containsKey(targetGraph.getId())) {
+                        if (dirMap.get(targetGraph.getId()) == currentDirection) {
+                            clogged.setTrue();
+                        }
+                    } else {
+                        dirMap.put(targetGraph.getId(), !currentDirection);
                     }
-                    dirMap.put(targetGraph.getId(), (distance % 2 == 1));
                     var subConnectors = targetGraph.getCachedNodes(AxleWithGearMechanicalNode.CACHE);
                     if (!subConnectors.isEmpty()) {
-                        collectGraphs(subConnectors, dirMap, clogged, checked, checked2, data);
+                        collectGraphs(subConnectors, dirMap, clogged, checked, checked2, data, !currentDirection);
                     }
                 }
             }

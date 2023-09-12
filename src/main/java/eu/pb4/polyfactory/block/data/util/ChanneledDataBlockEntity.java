@@ -27,7 +27,9 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
-        this.lastData = DataContainer.fromNbt(nbt.getCompound("data"));
+        if (nbt.contains("data")) {
+            this.lastData = DataContainer.fromNbt(nbt.getCompound("data"));
+        }
         setChannel(nbt.getInt("channel"));
     }
 

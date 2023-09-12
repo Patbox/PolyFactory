@@ -150,32 +150,6 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityPr
         return new NixieTubeBlockEntity(pos, state);
     }
 
-    /*
-    @Override
-
-    public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data) {
-        if (world.getBlockEntity(selfPos) instanceof NixieTubeBlockEntity be && channel == be.channel()) {
-            be.pushText(data.asString(), data.padding(), data.forceRight());
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        var be = world.getBlockEntity(pos);
-        int channel = 0;
-        if (be instanceof NixieTubeBlockEntity blockEntity) {
-            channel = blockEntity.channel();
-        }
-        return List.of(new ChannelReceiverDirectionNode(state.get(HALF) == BlockHalf.TOP ? Direction.UP : Direction.DOWN, channel));
-    }*/
-
-    /*@Override
-    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
-        return (state.get(HALF) == BlockHalf.TOP ? Direction.UP : Direction.DOWN) == dir;
-    }*/
-
     public final class Model extends BaseModel {
         private static final Brightness MAX_BRIGHTNESS = new Brightness(15, 15);
         private final Matrix4fStack mat = new Matrix4fStack(2);

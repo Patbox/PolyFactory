@@ -52,9 +52,7 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
         super.readNbt(nbt);
         this.stack = ItemStack.fromNbt(nbt.getCompound("stack"));
         this.page = nbt.getInt("page");
-        if (this.world != null) {
-            forceUpdate();
-        }
+        forceUpdate();
     }
 
     @Override
@@ -115,7 +113,9 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
 
         this.page = this.page % this.lines.length;
         this.lastData = new StringData(this.lines[this.page]);
-        FactoryBlocks.ITEM_READER.sendData(this.world, this.pos, this.lastData);
+        if (this.world != null) {
+            FactoryBlocks.ITEM_READER.sendData(this.world, this.pos, this.lastData);
+        }
     }
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {

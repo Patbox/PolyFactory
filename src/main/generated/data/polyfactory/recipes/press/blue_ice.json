@@ -1,0 +1,16 @@
+{
+  "type": "polyfactory:press/generic",
+  "input_a": {
+    "base": {
+      "item": "minecraft:packed_ice"
+    },
+    "count": 8
+  },
+  "minimum_speed": 8.0,
+  "output": {
+    "item": {
+      "Count": 1,
+      "id": "minecraft:blue_ice"
+    }
+  }
+}
