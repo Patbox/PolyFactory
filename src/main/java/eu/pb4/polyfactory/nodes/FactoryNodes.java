@@ -13,6 +13,8 @@ import eu.pb4.polyfactory.nodes.data.DataStorage;
 import eu.pb4.polyfactory.nodes.electric.EnergyData;
 import eu.pb4.polyfactory.nodes.generic.*;
 import eu.pb4.polyfactory.nodes.mechanical.*;
+import eu.pb4.polyfactory.nodes.mechanical_connectors.LargeGearNode;
+import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
@@ -100,6 +102,8 @@ public class FactoryNodes {
         });
 
         addSimpleNodes(universe);
+        universe.addNodeType(LargeGearNode.TYPE);
+        universe.addNodeType(SmallGearNode.TYPE);
         universe.register();
         return universe;
     }

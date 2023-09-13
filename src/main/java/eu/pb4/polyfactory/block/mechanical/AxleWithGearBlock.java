@@ -8,6 +8,8 @@ import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.generic.NotAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.AxleWithGearMechanicalNode;
+import eu.pb4.polyfactory.nodes.mechanical_connectors.LargeGearNode;
+import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -18,6 +20,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -35,6 +39,11 @@ import static eu.pb4.polyfactory.util.FactoryUtil.id;
 public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.RotationalConnector {
     public AxleWithGearBlock(Settings settings) {
         super(settings);
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        super.appendProperties(builder);
     }
 
     @Override
@@ -62,7 +71,7 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
 
     @Override
     public Collection<BlockNode> createRotationalConnectorNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new NotAxisNode(state.get(AXIS)));
+        return List.of(new SmallGearNode(state.get(AXIS)));
     }
 
     @Override
@@ -82,10 +91,10 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement mainElement;
-        private float offset;
-
         private Model(ServerWorld world, BlockState state, BlockPos pos) {
-            this.mainElement = LodItemDisplayElement.createSimple((pos.getX() + pos.getY() + pos.getZ()) % 2 == 0 ? ITEM_MODEL_2 : ITEM_MODEL_1, 4, 0.3f, 0.6f);
+            this.mainElement = LodItemDisplayElement.createSimple(
+                    ((pos.getX() + pos.getY() + pos.getZ()) % 2 == 0) ? ITEM_MODEL_2 : ITEM_MODEL_1,
+                    4, 0.3f, 0.6f);
             this.mainElement.setViewRange(0.7f);
             this.updateAnimation(0,  state.get(AXIS));
             this.addElement(this.mainElement);
@@ -100,25 +109,18 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
 
             mat.rotateY(rotation);
             mat.scale(2, 2.005f, 2);
+
             this.mainElement.setTransformation(mat);
         }
 
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                //var x = BlockBoundAttachment.get(this);
-                ///assert x != null;
-                //var pos = x.getBlockPos();
-                //this.offset = (pos.getManhattanDistance(Vec3i.ZERO) - pos.getComponentAlongAxis(x.getBlockState().get(AXIS))) % 8 * MathHelper.PI / 4;
+                var x = BlockBoundAttachment.get(this);
+                assert x != null;
+                var pos = x.getBlockPos();
+                this.mainElement.setItem(((pos.getX() + pos.getY() + pos.getZ()) % 2 == 0) ? ITEM_MODEL_2 : ITEM_MODEL_1);
             }
-        }
-
-        @Override
-        public boolean stopWatching(ServerPlayNetworkHandler player) {
-            if (super.stopWatching(player)) {
-                return true;
-            }
-            return false;
         }
 
         @Override

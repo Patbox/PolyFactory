@@ -120,7 +120,6 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
         private final Set<ServerPlayNetworkHandler> viewingClose = new ObjectOpenCustomHashSet<>(Util.identityHashStrategy());
         private final List<ServerPlayNetworkHandler> sentRod = new ArrayList<>();
         private final List<ServerPlayNetworkHandler> sentBarrier = new ArrayList<>();
-
         private Model(ServerWorld world, BlockState state) {
             this.mainElement = LodItemDisplayElement.createSimple(ITEM_MODEL, 4, 0.3f, 0.6f);
             this.mainElement.setViewRange(0.7f);
@@ -185,7 +184,8 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
             var tick = this.getAttachment().getWorld().getTime();
 
             if (tick % 4 == 0) {
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
+                var rot = RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos());
+                this.updateAnimation(rot.rotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(AXIS));
                 if (this.mainElement.isDirty()) {
                     this.mainElement.startInterpolation();

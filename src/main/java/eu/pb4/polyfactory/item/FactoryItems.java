@@ -54,7 +54,8 @@ public class FactoryItems {
     public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", new ModeledItem(new Item.Settings()));
     public static final Item STEEL_INGOT = register("steel_ingot", new ModeledItem(new Item.Settings()));
     public static final Item STEEL_PLATE = register("steel_plate", new ModeledItem(new Item.Settings()));
-    public static final Item STEEL_GEAR = register("steel_gear", new GearItem(new Item.Settings()));
+    public static final Item STEEL_GEAR = register("steel_gear", new GearItem(FactoryBlocks.AXLE_WITH_GEAR, new Item.Settings()));
+    public static final Item LARGE_STEEL_GEAR = register("large_steel_gear", new GearItem(FactoryBlocks.AXLE_WITH_LARGE_GEAR, new Item.Settings()));
     public static final Item GENERIC_MACHINE_PART = register("generic_machine_part", new ModeledItem(new Item.Settings()));
     public static final Item WOODEN_PLATE = register("wooden_plate", new ModeledItem(Items.STICK, new Item.Settings()));
     public static final Item TREATED_DRIED_KELP = register("treated_dried_kelp", new ModeledItem(new Item.Settings()));

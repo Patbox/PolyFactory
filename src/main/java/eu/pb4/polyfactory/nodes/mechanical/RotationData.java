@@ -2,19 +2,25 @@ package eu.pb4.polyfactory.nodes.mechanical;
 
 import com.kneelawk.graphlib.api.graph.BlockGraph;
 import com.kneelawk.graphlib.api.graph.GraphEntityContext;
+import com.kneelawk.graphlib.api.graph.GraphView;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.graph.user.GraphEntity;
 import com.kneelawk.graphlib.api.graph.user.GraphEntityType;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationConstants;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
+import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
 import it.unimi.dsi.fastutil.longs.Long2BooleanOpenHashMap;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.Long2FloatOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -23,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
@@ -41,7 +48,6 @@ public class RotationData implements GraphEntity<RotationData> {
     private double stressUsage;
     private GraphEntityContext ctx;
     private boolean negative;
-
     public RotationData() {
     }
 
@@ -77,16 +83,25 @@ public class RotationData implements GraphEntity<RotationData> {
             this.updateSelf(world, delta);
         } else {
             var dirMap = new Long2BooleanOpenHashMap();
+            var speedMap = new Long2FloatOpenHashMap();
             var clogged = new MutableBoolean();
-            var checked = new LongOpenHashSet();
-            var checked2 = new LongOpenHashSet();
             var rotationDataList = new ArrayList<RotationData>();
-            dirMap.put(this.ctx.getGraph().getId(), false);
-            checked.add(this.ctx.getGraph().getId());
-            rotationDataList.add(this);
-            collectGraphs(connectors, dirMap, clogged, checked, checked2, rotationDataList, false);
+
+            var checkedNodes = new ObjectOpenHashSet<BlockPos>();
+            collectGraphs(connectors, checkedNodes, dirMap, speedMap, clogged,  rotationDataList, false, 1);
+            /*{
+                var first = connectors.stream().findFirst().get();
+
+                DebugInfoSender.addGameTestMarker((ServerWorld) first.getBlockWorld(), first.getBlockPos(),
+                        "Start: " + first.getBlockWorld().getServer().getTicks() + " Size: " + rotationDataList.size(), (int) (0x8844FF44 + (first.getBlockWorld().getTime() % 16)), 50 * 4 * 20);
+            }*/
+
             if (rotationDataList.isEmpty()) {
+                updateSelf(world, delta);
                 return;
+            }
+            for (var data : rotationDataList) {
+                data.lastTick = currentTick;
             }
 
             if (clogged.booleanValue()) {
@@ -105,16 +120,23 @@ public class RotationData implements GraphEntity<RotationData> {
 
             var state = new State();
             for (var data : rotationDataList) {
-                data.lastTick = currentTick;
                 state.flip = dirMap.get(data.getContext().getGraph().getId());
+                state.multiplier = speedMap.get(data.getContext().getGraph().getId());
                 data.calculateState(world, state);
             }
 
             var negative = state.speed < 0;
 
+            float biggest = 1;
             for (var data : rotationDataList) {
-                data.applyState(state);
                 data.negative = dirMap.get(data.getContext().getGraph().getId()) != negative;
+                state.multiplier = speedMap.get(data.getContext().getGraph().getId());
+                biggest = Math.max(biggest, state.multiplier);
+                data.applyState(state);
+            }
+
+            if (this.speed == 0) {
+                return;
             }
 
             var speed = this.speed;
@@ -122,53 +144,79 @@ public class RotationData implements GraphEntity<RotationData> {
                 speed = -speed;
             }
 
-            float r;
-
-            if (speed == 0) {
-                r = this.rotation;
-            } else {
-                r = (float) ((Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.MAX_ROTATION_PER_TICK_4 * delta) + this.rotation) % MathHelper.TAU);
-            }
+            float r = (float) ((Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.MAX_ROTATION_PER_TICK_4 * delta) + this.rotation) % (MathHelper.TAU * biggest));
             if (this.negative) {
                 r = -r;
             }
-
+            r = Math.abs(r);
 
             for (var data : rotationDataList) {
-                data.rotation = data.negative ? -r : r;
+                data.rotation = (data.negative ? -r : r) / speedMap.get(data.getContext().getGraph().getId());
             }
         }
     }
 
-    private static void collectGraphs(Collection<NodeHolder<AxleWithGearMechanicalNode>> connectors, Long2BooleanOpenHashMap dirMap, MutableBoolean clogged,
-                                      LongOpenHashSet checked, LongOpenHashSet checked2, ArrayList<RotationData> data, boolean currentDirection) {
+    private static void collectGraphs(Collection<NodeHolder<AxleWithGearMechanicalNode>> connectors, ObjectOpenHashSet<BlockPos> checkedNodes,
+                                      Long2BooleanOpenHashMap dirMap, Long2FloatOpenHashMap speedMap, MutableBoolean clogged, ArrayList<RotationData> data,
+                                      boolean currentDirection, float speed) {
         for (var connection : connectors) {
-            var connectGraph = FactoryNodes.ROTATIONAL_CONNECTOR.getSidedGraphView(connection.getBlockWorld()).getAllGraphsAt(connection.getBlockPos()).findFirst();
-            if (connectGraph.isPresent() && checked2.add(connectGraph.get().getId())) {
-                var iterator = connectGraph.get().getNodes().iterator();
-                while (iterator.hasNext()) {
-                    var x = iterator.next();
-                    var optionalGraph = connection.getGraphWorld().getAllGraphsAt(x.getBlockPos()).findFirst();
+            //DebugInfoSender.addGameTestMarker((ServerWorld) connection.getBlockWorld(), connection.getBlockPos(), "Alt", 0x88FFFF66, 50 * 4 * 20);
 
-                    if (optionalGraph.isEmpty() || !checked.add(optionalGraph.get().getId())) {
-                        return;
-                    }
-
-                    var targetGraph = optionalGraph.get();
-                    data.add(targetGraph.getGraphEntity(TYPE));
-
-                    if (dirMap.containsKey(targetGraph.getId())) {
-                        if (dirMap.get(targetGraph.getId()) == currentDirection) {
-                            clogged.setTrue();
-                        }
-                    } else {
-                        dirMap.put(targetGraph.getId(), !currentDirection);
-                    }
-                    var subConnectors = targetGraph.getCachedNodes(AxleWithGearMechanicalNode.CACHE);
-                    if (!subConnectors.isEmpty()) {
-                        collectGraphs(subConnectors, dirMap, clogged, checked, checked2, data, !currentDirection);
-                    }
+            var connectGraph = Objects.requireNonNull(FactoryNodes.ROTATIONAL_CONNECTOR.getSidedGraphView(connection.getBlockWorld()))
+                    .getAllGraphsAt(connection.getBlockPos()).findFirst();
+            if (connectGraph.isPresent() /*&& checked2.add(connectGraph.get().getId())*/) {
+                var self = connectGraph.get().getNodesAt(connection.getBlockPos()).findFirst();
+                if (self.isPresent()) {
+                    iterateConnectedNodes(self.get(), connection.getGraphWorld(), checkedNodes, dirMap, speedMap, clogged, data, currentDirection, speed);
                 }
+            }
+        }
+    }
+
+    private static void iterateConnectedNodes(NodeHolder<BlockNode> blockNodeNodeHolder, GraphView graphWorld, ObjectOpenHashSet<BlockPos> checkedSelf,
+                                              Long2BooleanOpenHashMap dirMap, Long2FloatOpenHashMap speedMap, MutableBoolean clogged, ArrayList<RotationData> data,
+                                              boolean currentDirection, float speed) {
+        if (!checkedSelf.add(blockNodeNodeHolder.getBlockPos())) {
+            //DebugInfoSender.addGameTestMarker((ServerWorld) graphWorld.getWorld(), blockNodeNodeHolder.getBlockPos(), "Dupe: " + blockNodeNodeHolder.getBlockPos().toShortString(), 0x88FF8888, 100);
+            return;
+        }
+
+        for (var conn : blockNodeNodeHolder.getConnections()) {
+            var x = conn.other(blockNodeNodeHolder);
+            //DebugInfoSender.addGameTestMarker((ServerWorld) graphWorld.getWorld(), x.getBlockPos(), "Conn: " + blockNodeNodeHolder.getBlockPos().toShortString(), 0x88FFFFFF, 50 * 4 * 20);
+
+            var nextGearSpeed = speed;
+            if (blockNodeNodeHolder.getNode().getClass() != x.getNode().getClass()) {
+                if (blockNodeNodeHolder.getNode() instanceof SmallGearNode) {
+                    nextGearSpeed *= 2;
+                } else {
+                    nextGearSpeed /= 2;
+                }
+            }
+
+            iterateConnectedNodes(x, graphWorld, checkedSelf, dirMap, speedMap, clogged, data, !currentDirection, nextGearSpeed);
+
+            var optionalGraph = graphWorld.getAllGraphsAt(x.getBlockPos()).findFirst();
+            if (optionalGraph.isEmpty()) {
+                return;
+            }
+
+            var targetGraph = optionalGraph.get();
+
+            if (dirMap.containsKey(targetGraph.getId())) {
+                if (dirMap.get(targetGraph.getId()) == currentDirection
+                        || !MathHelper.approximatelyEquals(speedMap.get(targetGraph.getId()), nextGearSpeed)) {
+                    clogged.setTrue();
+                }
+            } else {
+                dirMap.put(targetGraph.getId(), !currentDirection);
+                speedMap.put(targetGraph.getId(), nextGearSpeed);
+                data.add(targetGraph.getGraphEntity(TYPE));
+            }
+
+            var subConnectors = targetGraph.getCachedNodes(AxleWithGearMechanicalNode.CACHE);
+            if (!subConnectors.isEmpty()) {
+                collectGraphs(subConnectors, checkedSelf, dirMap, speedMap, clogged, data, !currentDirection, nextGearSpeed);
             }
         }
     }
@@ -196,13 +244,13 @@ public class RotationData implements GraphEntity<RotationData> {
             this.speed = 0;
             return;
         }
-        this.stressCapacity = Math.abs(state.stressCapacity);
-        this.stressUsage = state.stressUsed;
+        this.stressCapacity = Math.abs(state.finalStressCapacity());
+        this.stressUsage = state.finalStressUsed();
 
         if (this.stressCapacity - stressUsage < 0) {
             this.speed = 0;
         } else {
-            this.speed = Math.abs(state.speed / state.count);
+            this.speed = Math.abs(state.finalSpeed() / state.count);
         }
     }
 
@@ -279,6 +327,7 @@ public class RotationData implements GraphEntity<RotationData> {
     public static class State {
         public static final State EMPTY = new State();
         public boolean flip = false;
+        public float multiplier = 1;
         protected double speed;
         protected double stressCapacity;
         protected double stressUsed;
@@ -288,20 +337,32 @@ public class RotationData implements GraphEntity<RotationData> {
             this.count++;
 
             if (this.flip == negative) {
-                this.speed += speed;
-                this.stressCapacity += stressCapacity;
+                this.speed += speed * this.multiplier;
+                this.stressCapacity += stressCapacity * this.multiplier;
             } else {
-                this.speed -= speed;
-                this.stressCapacity -= stressCapacity;
+                this.speed -= speed * this.multiplier;
+                this.stressCapacity -= stressCapacity * this.multiplier;
             }
         }
 
         public void stress(double stress) {
-            this.stressUsed += stress;
+            this.stressUsed += stress * this.multiplier;
         }
 
         public void provide(float speed, float stressCapacity, Direction.AxisDirection direction) {
             provide(speed, stressCapacity, direction == Direction.AxisDirection.NEGATIVE);
+        }
+
+        public double finalStressCapacity() {
+            return this.stressCapacity / this.multiplier;
+        }
+
+        public double finalStressUsed() {
+            return this.stressUsed / this.multiplier;
+        }
+
+        public double finalSpeed() {
+            return this.speed / this.multiplier;
         }
     }
 }

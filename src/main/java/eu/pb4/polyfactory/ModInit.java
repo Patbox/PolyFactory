@@ -3,6 +3,7 @@ package eu.pb4.polyfactory;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock;
+import eu.pb4.polyfactory.block.mechanical.AxleWithLargeGearBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
@@ -56,6 +57,7 @@ public class ModInit implements ModInitializer {
 		AxleBlock.Model.ITEM_MODEL.getItem();
 		WindmillBlock.Model.MODEL.getItem();
 		AxleWithGearBlock.Model.ITEM_MODEL_1.getItem();
+		AxleWithLargeGearBlock.Model.GEAR_MODEL.getItem();
 		RedstoneOutputBlock.Model.OUTPUT_OVERLAY.item();
 		FactoryLootTables.register();
 		FactoryCommands.register();
