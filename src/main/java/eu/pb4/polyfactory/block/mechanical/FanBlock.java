@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.models.BaseItemProvider;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.SimpleDirectionNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
@@ -140,7 +141,7 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
         return List.of(WrenchAction.FACING);
     }
 
-    public final class Model extends BaseModel {
+    public final class Model extends RotationAwareModel {
         public static final ItemStack ITEM_MODEL = new ItemStack(BaseItemProvider.requestModel());
 
         private final ItemDisplayElement mainElement;
@@ -199,7 +200,7 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
         @Override
         protected void onTick() {
             if (this.getTick() % 2 == 0) {
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).speed());
+                this.updateAnimation(this.getRotationData().speed());
                 if (this.fan.isDirty()) {
                     this.fan.startInterpolation();
                 }

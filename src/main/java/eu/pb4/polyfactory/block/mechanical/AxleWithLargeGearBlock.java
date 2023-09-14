@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseItemProvider;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
+import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.LargeGearNode;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -31,7 +32,7 @@ public class AxleWithLargeGearBlock extends AxleWithGearBlock {
 
     @Override
     public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
-        return FactoryItems.STEEL_GEAR.getDefaultStack();
+        return FactoryItems.LARGE_STEEL_GEAR.getDefaultStack();
     }
 
     @Override
@@ -44,7 +45,7 @@ public class AxleWithLargeGearBlock extends AxleWithGearBlock {
         return List.of(new LargeGearNode(state.get(AXIS)));
     }
 
-    public static final class Model extends BaseModel {
+    public static final class Model extends RotationAwareModel {
         public static final ItemStack GEAR_MODEL = new ItemStack(BaseItemProvider.requestModel());
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
@@ -52,9 +53,9 @@ public class AxleWithLargeGearBlock extends AxleWithGearBlock {
         private final LodItemDisplayElement gear;
         private boolean offset;
         private Model(ServerWorld world, BlockState state, BlockPos pos) {
-            this.mainElement = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, 4, 0.3f, 0.6f);
+            this.mainElement = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
             this.mainElement.setViewRange(0.7f);
-            this.gear = LodItemDisplayElement.createSimple(GEAR_MODEL, 4, 0.3f, 0.6f);
+            this.gear = LodItemDisplayElement.createSimple(GEAR_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
             this.gear.setViewRange(0.7f);
             this.offset = ((pos.getX() + pos.getY() + pos.getZ()) % 2 == 0);
             this.updateAnimation(0,  state.get(AXIS));
@@ -81,8 +82,8 @@ public class AxleWithLargeGearBlock extends AxleWithGearBlock {
         protected void onTick() {
             var tick = this.getAttachment().getWorld().getTime();
 
-            if (tick % 4 == 0) {
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
+            if (tick % this.getUpdateRate() == 0) {
+                this.updateAnimation(this.getRotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(AXIS));
                 if (this.mainElement.isDirty()) {
                     this.mainElement.startInterpolation();

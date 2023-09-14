@@ -1,12 +1,14 @@
 package eu.pb4.polyfactory.block.creative;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
+import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -82,7 +84,7 @@ public class CreativeMotorBlock extends RotationalNetworkBlock implements Polyme
 
     @Override
     public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(initialBlockState);
+        return new ElectricMotorBlock.Model(initialBlockState);
     }
 
     @Override
@@ -103,70 +105,5 @@ public class CreativeMotorBlock extends RotationalNetworkBlock implements Polyme
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new CreativeMotorBlockEntity(pos, state);
-    }
-
-    private final class Model extends BaseModel {
-        private final ItemDisplayElement axle;
-        private final LodItemDisplayElement base;
-
-        private Model(BlockState state) {
-            this.axle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, 4, 0.3f, 0.6f);
-            this.base = LodItemDisplayElement.createSimple(FactoryItems.CREATIVE_MOTOR);
-            this.base.setScale(new Vector3f(2));
-
-            updateStatePos(state);
-            this.updateAnimation(0, state.get(FACING));
-            this.addElement(this.axle);
-            this.addElement(this.base);
-        }
-
-        private void updateAnimation(float speed, Direction facing) {
-            mat.identity();
-            mat.rotate(facing.getOpposite().getRotationQuaternion());
-            mat.rotateY(((float) ((facing.getDirection() == Direction.AxisDirection.NEGATIVE) ? speed : -speed)));
-
-            mat.scale(2f);
-            this.axle.setTransformation(mat);
-        }
-
-        @Override
-        protected void onTick() {
-            var tick = this.getAttachment().getWorld().getTime();
-
-            if (tick % 4 == 0) {
-                var facing = ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(FACING);
-
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(), facing);
-                if (this.axle.isDirty()) {
-                    this.axle.startInterpolation();
-                }
-            }
-        }
-
-        private void updateStatePos(BlockState state) {
-            var dir = state.get(FACING);
-            float p = -90;
-            float y = 0;
-
-            if (dir.getAxis() != Direction.Axis.Y) {
-                p = 0;
-                y = dir.asRotation();
-            } else if (dir == Direction.DOWN) {
-                p = 90;
-            }
-
-
-            this.base.setYaw(y);
-            this.base.setPitch(p);
-            //this.axle.setYaw(y);
-            //this.axle.setPitch(p);
-        }
-
-        @Override
-        public void notifyUpdate(HolderAttachment.UpdateType updateType) {
-            if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                updateStatePos(BlockBoundAttachment.get(this).getBlockState());
-            }
-        }
     }
 }

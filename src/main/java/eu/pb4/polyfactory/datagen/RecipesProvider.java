@@ -86,6 +86,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .offerTo(exporter);
 
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.MIXER, 1)
                 .pattern("g")
                 .pattern("i")
@@ -269,7 +270,8 @@ class RecipesProvider extends FabricRecipeProvider {
                 .pattern("sgs")
                 .pattern("gwg")
                 .pattern("sgs")
-                .input('w', FactoryItems.AXLE).input('s', ItemTags.PLANKS)
+                .input('w', FactoryItems.AXLE)
+                .input('s', ItemTags.PLANKS)
                 .input('g', FactoryItems.STEEL_GEAR)
                 .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.AXLE))
                 .offerTo(exporter);
@@ -490,6 +492,16 @@ class RecipesProvider extends FabricRecipeProvider {
                 .pattern(" i ")
                 .input('i', FactoryItems.STEEL_INGOT)
                 .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.LARGE_STEEL_GEAR)
+                .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                .pattern(" i ")
+                .pattern("igi")
+                .pattern(" i ")
+                .input('i', FactoryItems.STEEL_INGOT)
+                .input('g', FactoryItems.STEEL_GEAR)
+                .offerTo(exporter);
+
 
     }
 

@@ -4,11 +4,9 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseItemProvider;
-import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
-import eu.pb4.polyfactory.nodes.generic.NotAxisNode;
+import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.mechanical.AxleWithGearMechanicalNode;
-import eu.pb4.polyfactory.nodes.mechanical_connectors.LargeGearNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -85,7 +83,7 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
         NetworkComponent.RotationalConnector.updateRotationalConnectorAt(world, pos);
     }
 
-    public static final class Model extends BaseModel {
+    public static final class Model extends RotationAwareModel {
         public static final ItemStack ITEM_MODEL_1 = new ItemStack(BaseItemProvider.requestModel());
         public static final ItemStack ITEM_MODEL_2 = new ItemStack(BaseItemProvider.requestModel());
 
@@ -94,7 +92,7 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
         private Model(ServerWorld world, BlockState state, BlockPos pos) {
             this.mainElement = LodItemDisplayElement.createSimple(
                     ((pos.getX() + pos.getY() + pos.getZ()) % 2 == 0) ? ITEM_MODEL_2 : ITEM_MODEL_1,
-                    4, 0.3f, 0.6f);
+                    this.getUpdateRate(), 0.3f, 0.6f);
             this.mainElement.setViewRange(0.7f);
             this.updateAnimation(0,  state.get(AXIS));
             this.addElement(this.mainElement);
@@ -128,8 +126,8 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
 
             var tick = this.getAttachment().getWorld().getTime();
 
-            if (tick % 4 == 0) {
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
+            if (tick % this.getUpdateRate() == 0) {
+                this.updateAnimation(this.getRotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(AXIS));
                 if (this.mainElement.isDirty()) {
                     this.mainElement.startInterpolation();

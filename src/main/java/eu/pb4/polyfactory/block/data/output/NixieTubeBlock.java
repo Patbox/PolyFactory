@@ -280,11 +280,11 @@ for (int i = 0; i < 4; i += 2) {
             this.mainElement.setTransformation(mat);
             mat.popMatrix();
 
-            var yPos = up ? -0.1f : -0.4f;
+            var yPos = up ? -0.2f : -0.4f;
 
             mat.pushMatrix();
-            mat.translate(-0.25f, yPos, 0);
-            mat.scale(1.5f);
+            mat.translate(-4 / 16f, yPos, 0);
+            mat.scale(1.7f);
             mat.rotateY(MathHelper.PI);
             this.display[0].setTransformation(mat);
             mat.rotateY(MathHelper.PI);
@@ -292,16 +292,13 @@ for (int i = 0; i < 4; i += 2) {
             mat.popMatrix();
 
             mat.pushMatrix();
-            mat.translate(0.25f, yPos, 0);
-            mat.scale(1.5f);
-
+            mat.translate(4 / 16f, yPos, 0);
+            mat.scale(1.7f);
             mat.rotateY(MathHelper.PI);
             this.display[2].setTransformation(mat);
             mat.rotateY(MathHelper.PI);
             this.display[1].setTransformation(mat);
             mat.popMatrix();
-
-
             this.tick();
         }
 

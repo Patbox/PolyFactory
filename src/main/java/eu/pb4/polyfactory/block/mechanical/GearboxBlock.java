@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.AllSideNode;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -53,7 +54,7 @@ public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock
         return true;
     }
 
-    public final class Model extends BaseModel {
+    public final class Model extends RotationAwareModel {
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement xAxle;
         private final ItemDisplayElement yAxle;
@@ -64,9 +65,9 @@ public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock
             this.mainElement.setScale(new Vector3f(2));
             this.addElement(this.mainElement);
 
-            this.xAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, 4, 0.3f, 0.6f);
-            this.yAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, 4, 0.3f, 0.6f);
-            this.zAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, 4, 0.3f, 0.6f);
+            this.xAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
+            this.yAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
+            this.zAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
             this.xAxle.setViewRange(0.5f);
             this.yAxle.setViewRange(0.5f);
             this.zAxle.setViewRange(0.5f);
@@ -102,8 +103,8 @@ public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock
         protected void onTick() {
             var tick = this.getAttachment().getWorld().getTime();
 
-            if (tick % 4 == 0) {
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation());
+            if (tick % this.getUpdateRate() == 0) {
+                this.updateAnimation(this.getRotation());
                 if (this.xAxle.isDirty()) {
                     this.xAxle.startInterpolation();
                     this.yAxle.startInterpolation();

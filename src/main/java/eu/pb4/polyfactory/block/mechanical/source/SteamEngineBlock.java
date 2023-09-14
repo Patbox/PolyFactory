@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseItemProvider;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
+import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -166,7 +167,7 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
         return true;
     }
 
-    public final class Model extends BaseModel {
+    public final class Model extends RotationAwareModel {
         public static final ItemStack AXLE = new ItemStack(BaseItemProvider.requestModel());
         public static final ItemStack LIT = new ItemStack(BaseItemProvider.requestModel());
         public static final ItemStack LINK = new ItemStack(BaseItemProvider.requestModel());
@@ -258,9 +259,9 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
 
         @Override
         protected void onTick() {
-            if (this.getTick() % 4 == 0) {
+            if (this.getTick() % this.getUpdateRate() == 0) {
                 var dir = BlockBoundAttachment.get(this).getBlockState().get(FACING);
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos().up()).rotation(),
+                this.updateAnimation(this.getRotation(),
                         (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
                 //if (this.whisk.isDirty()) {
                 //    this.whisk.startInterpolation();

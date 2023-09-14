@@ -11,8 +11,11 @@ import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationConstants;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
+import eu.pb4.polyfactory.nodes.generic.FunctionalNode;
+import eu.pb4.polyfactory.nodes.mechanical_connectors.LargeGearNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
 import it.unimi.dsi.fastutil.longs.Long2BooleanOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2FloatOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.nbt.NbtCompound;
@@ -110,23 +113,47 @@ public class RotationData implements GraphEntity<RotationData> {
                     rot.speed = 0;
                     rot.stressUsage = 0;
                     rot.stressCapacity = 0;
-                    rot.getContext().getGraph().getNodes().forEach((entry) -> {
-                        var pos = entry.getBlockPos();
-                        world.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.3, 0.3, 0.3, 0.2);
-                    });
+                    rot.getContext().getGraph().getNodes().forEach(this::spawnSmoke);
                 }
                 return;
             }
+
+            var usage = new Long2DoubleOpenHashMap();
 
             var state = new State();
             for (var data : rotationDataList) {
                 state.flip = dirMap.get(data.getContext().getGraph().getId());
                 state.multiplier = speedMap.get(data.getContext().getGraph().getId());
                 data.calculateState(world, state);
+                usage.put(data.getContext().getGraph().getId(), state.stressUsed);
+                state.stressUsed = 0;
             }
+            double fullStress = 0;
+
+            boolean overloaded = false;
+
+            for (var data : rotationDataList) {
+                state.multiplier = speedMap.get(data.getContext().getGraph().getId());
+                var stress = usage.get(data.getContext().getGraph().getId());
+                if (Math.abs(state.finalStressCapacity()) - stress < 0) {
+                    overloaded = true;
+                }
+                fullStress += stress / state.multiplier;
+            }
+            state.multiplier = 1;
+            if (overloaded || Math.abs(state.stressCapacity) - fullStress < 0) {
+                for (var rot : rotationDataList) {
+                    rot.lastTick = currentTick;
+                    rot.speed = 0;
+                    rot.stressUsage = 0;
+                    rot.stressCapacity = 0;
+                    rot.getContext().getGraph().getNodes().forEach(this::spawnSmoke);
+                }
+                return;
+            }
+            state.stressUsed = fullStress;
 
             var negative = state.speed < 0;
-
             float biggest = 1;
             for (var data : rotationDataList) {
                 data.negative = dirMap.get(data.getContext().getGraph().getId()) != negative;
@@ -144,7 +171,7 @@ public class RotationData implements GraphEntity<RotationData> {
                 speed = -speed;
             }
 
-            float r = (float) ((Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.MAX_ROTATION_PER_TICK_4 * delta) + this.rotation) % (MathHelper.TAU * biggest));
+            float r = (float) ((Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.VISUAL_UPDATE_RATE * delta) + this.rotation) % (MathHelper.TAU * biggest));
             if (this.negative) {
                 r = -r;
             }
@@ -153,6 +180,14 @@ public class RotationData implements GraphEntity<RotationData> {
             for (var data : rotationDataList) {
                 data.rotation = (data.negative ? -r : r) / speedMap.get(data.getContext().getGraph().getId());
             }
+        }
+    }
+
+    private void spawnSmoke(NodeHolder<BlockNode> entry) {
+        if (entry.getNode() instanceof FunctionalNode) {
+            var world = (ServerWorld) this.ctx.getBlockWorld();
+            var pos = entry.getBlockPos();
+            world.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.3, 0.3, 0.3, 0.2);
         }
     }
 
@@ -186,15 +221,23 @@ public class RotationData implements GraphEntity<RotationData> {
             //DebugInfoSender.addGameTestMarker((ServerWorld) graphWorld.getWorld(), x.getBlockPos(), "Conn: " + blockNodeNodeHolder.getBlockPos().toShortString(), 0x88FFFFFF, 50 * 4 * 20);
 
             var nextGearSpeed = speed;
+            boolean nextDirection;
             if (blockNodeNodeHolder.getNode().getClass() != x.getNode().getClass()) {
                 if (blockNodeNodeHolder.getNode() instanceof SmallGearNode) {
                     nextGearSpeed *= 2;
                 } else {
                     nextGearSpeed /= 2;
                 }
+                nextDirection = !currentDirection;
+            } else if (blockNodeNodeHolder.getNode() instanceof LargeGearNode a) {
+                var delta = blockNodeNodeHolder.getBlockPos().subtract(x.getBlockPos());
+
+                nextDirection = (delta.getComponentAlongAxis(a.axis()) == delta.getComponentAlongAxis(((LargeGearNode) x.getNode()).axis())) == currentDirection;
+            } else {
+                nextDirection = !currentDirection;
             }
 
-            iterateConnectedNodes(x, graphWorld, checkedSelf, dirMap, speedMap, clogged, data, !currentDirection, nextGearSpeed);
+            iterateConnectedNodes(x, graphWorld, checkedSelf, dirMap, speedMap, clogged, data, nextDirection, nextGearSpeed);
 
             var optionalGraph = graphWorld.getAllGraphsAt(x.getBlockPos()).findFirst();
             if (optionalGraph.isEmpty()) {
@@ -204,19 +247,19 @@ public class RotationData implements GraphEntity<RotationData> {
             var targetGraph = optionalGraph.get();
 
             if (dirMap.containsKey(targetGraph.getId())) {
-                if (dirMap.get(targetGraph.getId()) == currentDirection
+                if (dirMap.get(targetGraph.getId()) == !nextDirection
                         || !MathHelper.approximatelyEquals(speedMap.get(targetGraph.getId()), nextGearSpeed)) {
                     clogged.setTrue();
                 }
             } else {
-                dirMap.put(targetGraph.getId(), !currentDirection);
+                dirMap.put(targetGraph.getId(), nextDirection);
                 speedMap.put(targetGraph.getId(), nextGearSpeed);
                 data.add(targetGraph.getGraphEntity(TYPE));
             }
 
             var subConnectors = targetGraph.getCachedNodes(AxleWithGearMechanicalNode.CACHE);
             if (!subConnectors.isEmpty()) {
-                collectGraphs(subConnectors, checkedSelf, dirMap, speedMap, clogged, data, !currentDirection, nextGearSpeed);
+                collectGraphs(subConnectors, checkedSelf, dirMap, speedMap, clogged, data, nextDirection, nextGearSpeed);
             }
         }
     }
@@ -244,8 +287,8 @@ public class RotationData implements GraphEntity<RotationData> {
             this.speed = 0;
             return;
         }
-        this.stressCapacity = Math.abs(state.finalStressCapacity());
-        this.stressUsage = state.finalStressUsed();
+        this.stressCapacity = Math.abs(state.stressCapacity);
+        this.stressUsage = state.stressUsed;
 
         if (this.stressCapacity - stressUsage < 0) {
             this.speed = 0;
@@ -271,7 +314,7 @@ public class RotationData implements GraphEntity<RotationData> {
             }
         }
 
-        this.rotation = (float) ((Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.MAX_ROTATION_PER_TICK_4 * delta) + this.rotation) % MathHelper.TAU);
+        this.rotation = (float) ((Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.VISUAL_MAX_ROTATION * delta) + this.rotation) % MathHelper.TAU);
     }
 
     @Override
@@ -338,15 +381,15 @@ public class RotationData implements GraphEntity<RotationData> {
 
             if (this.flip == negative) {
                 this.speed += speed * this.multiplier;
-                this.stressCapacity += stressCapacity * this.multiplier;
+                this.stressCapacity += stressCapacity / this.multiplier;
             } else {
                 this.speed -= speed * this.multiplier;
-                this.stressCapacity -= stressCapacity * this.multiplier;
+                this.stressCapacity -= stressCapacity / this.multiplier;
             }
         }
 
         public void stress(double stress) {
-            this.stressUsed += stress * this.multiplier;
+            this.stressUsed += stress;
         }
 
         public void provide(float speed, float stressCapacity, Direction.AxisDirection direction) {
@@ -354,11 +397,11 @@ public class RotationData implements GraphEntity<RotationData> {
         }
 
         public double finalStressCapacity() {
-            return this.stressCapacity / this.multiplier;
+            return this.stressCapacity * this.multiplier;
         }
 
         public double finalStressUsed() {
-            return this.stressUsed / this.multiplier;
+            return this.stressUsed;
         }
 
         public double finalSpeed() {

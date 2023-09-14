@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.models.BaseItemProvider;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -174,7 +175,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
         }
     }
 
-    public static final class Model extends BaseModel {
+    public static final class Model extends RotationAwareModel {
         public static final ItemStack MODEL_STONE_WHEEL = new ItemStack(BaseItemProvider.requestModel());
 
         static {
@@ -187,7 +188,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
         private Model(ServerWorld world, BlockState state) {
 
             this.main = LodItemDisplayElement.createSimple(FactoryItems.GRINDER);
-            this.stoneWheel = LodItemDisplayElement.createSimple(MODEL_STONE_WHEEL, 4, 0.6f, 0.6f);
+            this.stoneWheel = LodItemDisplayElement.createSimple(MODEL_STONE_WHEEL, this.getUpdateRate(), 0.6f, 0.6f);
 
             this.updateAnimation(0, state.get(INPUT_FACING));
             this.addElement(this.main);
@@ -209,8 +210,8 @@ public class GrinderBlock extends RotationalNetworkBlock implements PolymerBlock
 
         @Override
         protected void onTick() {
-            if (this.getTick() % 4 == 0) {
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
+            if (this.getTick() % this.getUpdateRate() == 0) {
+                this.updateAnimation(this.getRotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(INPUT_FACING));
                 if (this.stoneWheel.isDirty()) {
                     this.stoneWheel.startInterpolation();

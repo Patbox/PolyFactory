@@ -35,9 +35,11 @@ public record LargeGearNode(Direction.Axis axis) implements BlockNode {
         for (var dir : Direction.values()) {
             if (dir.getAxis() != axis) {
                 FactoryNodes.findNodes(self, self.getBlockPos().offset(dir).offset(dir.rotateClockwise(axis)), (self2, other) -> other.getNode() instanceof SmallGearNode).forEach(list::add);
+
+                FactoryNodes.findNodes(self, self.getBlockPos().offset(dir).offset(this.axis, 1), (self2, other) -> other.getNode() instanceof LargeGearNode largeGearNode && largeGearNode.axis == dir.getAxis()).forEach(list::add);
+                FactoryNodes.findNodes(self, self.getBlockPos().offset(dir).offset(this.axis, -1), (self2, other) -> other.getNode() instanceof LargeGearNode largeGearNode && largeGearNode.axis == dir.getAxis()).forEach(list::add);
             }
         }
-        //FactoryNodes.findNodes(self, self.getBlockPos().offset(dir), (self2, other) -> other.getNode() instanceof LargeGearNode).forEach(list::add);
 
         return list;
     }

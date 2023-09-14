@@ -4,10 +4,7 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.models.BaseItemProvider;
-import eu.pb4.polyfactory.models.BaseModel;
-import eu.pb4.polyfactory.models.GenericParts;
-import eu.pb4.polyfactory.models.LodItemDisplayElement;
+import eu.pb4.polyfactory.models.*;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
@@ -125,7 +122,7 @@ public class MixerBlock extends TallItemMachineBlock {
         }*/
     }
 
-    public static final class Model extends BaseModel {
+    public static final class Model extends RotationAwareModel {
         public static final ItemStack MODEL_PISTON = new ItemStack(BaseItemProvider.requestModel());
 
         static {
@@ -145,8 +142,8 @@ public class MixerBlock extends TallItemMachineBlock {
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.whisk = LodItemDisplayElement.createSimple(MODEL_PISTON, 2, 0.4f, 0.8f);
-            this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4, 0.3f, 0.5f);
-            this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, 4, 0.3f, 0.5f);
+            this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, this.getUpdateRate(), 0.3f, 0.5f);
+            this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, this.getUpdateRate(), 0.3f, 0.5f);
 
             this.whisk.setViewRange(0.4f);
             this.gearA.setViewRange(0.4f);
@@ -198,7 +195,7 @@ public class MixerBlock extends TallItemMachineBlock {
         @Override
         protected void onTick() {
             if (this.getTick() % 2 == 0) {
-                var b = this.getTick() % 4 == 0;
+                var b = this.getTick() % this.getUpdateRate() == 0;
 
                 var dir = BlockBoundAttachment.get(this).getBlockState().get(INPUT_FACING);
                 this.updateAnimation(b,

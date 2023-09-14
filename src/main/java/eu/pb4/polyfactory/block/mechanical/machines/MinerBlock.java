@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -163,7 +164,7 @@ public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, 
         return List.of(WrenchAction.FACING);
     }
 
-    public final class Model extends BaseModel {
+    public final class Model extends RotationAwareModel {
         private final ItemDisplayElement item;
         private final ItemDisplayElement main;
         private float rotation = 0;

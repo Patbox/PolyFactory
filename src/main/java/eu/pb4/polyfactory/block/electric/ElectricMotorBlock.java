@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
+import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.electric.EnergyData;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -149,13 +150,13 @@ public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, Bl
         return state.get(GENERATOR) ? Text.translatable(this.getTranslationKey() + ".generator") : this.getName();
     }
 
-    private final class Model extends BaseModel {
+    public static final class Model extends RotationAwareModel {
         private final ItemDisplayElement axle;
         private final LodItemDisplayElement base;
 
-        private Model(BlockState state) {
-            this.axle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, 4, 0.3f, 0.6f);
-            this.base = LodItemDisplayElement.createSimple(FactoryItems.ELECTRIC_MOTOR);
+        public Model(BlockState state) {
+            this.axle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, this.getUpdateRate(), 0.3f, 0.6f);
+            this.base = LodItemDisplayElement.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);
@@ -177,10 +178,10 @@ public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, Bl
         protected void onTick() {
             var tick = this.getAttachment().getWorld().getTime();
 
-            if (tick % 4 == 0) {
+            if (tick % this.getUpdateRate() == 0) {
                 var facing = ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(FACING);
 
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(), facing);
+                this.updateAnimation(this.getRotation(), facing);
                 if (this.axle.isDirty()) {
                     this.axle.startInterpolation();
                 }

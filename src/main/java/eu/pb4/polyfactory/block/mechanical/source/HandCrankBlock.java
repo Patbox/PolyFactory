@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -132,11 +133,11 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
         return List.of(WrenchAction.FACING);
     }
 
-    public final class Model extends BaseModel {
+    public final class Model extends RotationAwareModel {
         private final ItemDisplayElement mainElement;
 
         private Model(ServerWorld world, BlockState state) {
-            this.mainElement = LodItemDisplayElement.createSimple(FactoryItems.HAND_CRANK, 4);
+            this.mainElement = LodItemDisplayElement.createSimple(FactoryItems.HAND_CRANK, this.getUpdateRate());
             this.updateAnimation(0, state.get(FACING));
             this.addElement(this.mainElement);
         }
@@ -154,8 +155,8 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
         protected void onTick() {
             var tick = this.getAttachment().getWorld().getTime();
 
-            if (tick % 4 == 0) {
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
+            if (tick % this.getUpdateRate() == 0) {
+                this.updateAnimation(this.getRotation(),
                         ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(FACING));
                 if (this.mainElement.isDirty()) {
                     this.mainElement.startInterpolation();
