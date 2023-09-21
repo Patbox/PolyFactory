@@ -15,13 +15,13 @@ public record CountedIngredient(Ingredient ingredient, int count, ItemStack left
     public static final CountedIngredient EMPTY = new CountedIngredient(Ingredient.EMPTY, 0, ItemStack.EMPTY);
 
     public static final Codec<CountedIngredient> CODEC_SELF = RecordCodecBuilder.create(x -> x.group(
-                    CodecRecipeSerializer.INGREDIENT_CODEC.fieldOf("base").forGetter(CountedIngredient::ingredient),
+                    LazyRecipeSerializer.INGREDIENT_CODEC.fieldOf("base").forGetter(CountedIngredient::ingredient),
                     Codec.INT.optionalFieldOf("count", 1).forGetter(CountedIngredient::count),
                     ItemStack.CODEC.optionalFieldOf("leftover", ItemStack.EMPTY).forGetter(CountedIngredient::leftOver)
             ).apply(x, CountedIngredient::new)
     );
 
-    public static final Codec<CountedIngredient> CODEC = Codec.either(CODEC_SELF, CodecRecipeSerializer.INGREDIENT_CODEC)
+    public static final Codec<CountedIngredient> CODEC = Codec.either(CODEC_SELF, LazyRecipeSerializer.INGREDIENT_CODEC)
             .xmap(x -> x.map(y -> y, y -> new CountedIngredient(y, 1, tryGettingLeftover(y))), Either::left);
 
     public static ItemStack tryGettingLeftover(Ingredient y) {

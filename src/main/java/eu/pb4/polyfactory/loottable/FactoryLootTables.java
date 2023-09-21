@@ -12,7 +12,6 @@ import net.minecraft.util.Identifier;
 
 public class FactoryLootTables {
     public static void register() {
-        register("number_from_state", IntStateLootNumberProvider.TYPE);
         register("copy_color", CopyColorLootFunction.TYPE);
     }
 

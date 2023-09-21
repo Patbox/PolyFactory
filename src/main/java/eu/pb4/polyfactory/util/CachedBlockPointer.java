@@ -10,7 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public final class CachedBlockPointer implements BlockPointer {
+public final class CachedBlockPointer {
     private final ServerWorld world;
     private final BlockPos pos;
     private BlockState blockState;
@@ -24,27 +24,22 @@ public final class CachedBlockPointer implements BlockPointer {
         this.pos = pos;
     }
 
-    @Override
     public double getX() {
         return this.pos.getX() + 0.5;
     }
 
-    @Override
     public double getY() {
         return this.pos.getY() + 0.5;
     }
 
-    @Override
     public double getZ() {
         return this.pos.getZ() + 0.5;
     }
 
-    @Override
     public BlockPos getPos() {
         return this.pos;
     }
 
-    @Override
     public BlockState getBlockState() {
         if (this.blockState == null) {
             this.blockState = this.world.getBlockState(this.pos);
@@ -52,7 +47,6 @@ public final class CachedBlockPointer implements BlockPointer {
         return this.blockState;
     }
 
-    @Override
     public <T extends BlockEntity> T getBlockEntity() {
         if (this.requireBlockEntityCheck) {
             this.blockEntity = this.world.getBlockEntity(this.pos);
@@ -61,12 +55,10 @@ public final class CachedBlockPointer implements BlockPointer {
         return (T) this.blockEntity;
     }
 
-    @Override
     public ServerWorld getWorld() {
         return this.world;
     }
 
-    @Nullable
     public Inventory getInventory() {
         if (this.requireInventoryCheck) {
             if (this.getBlockState().getBlock() instanceof InventoryProvider provider) {

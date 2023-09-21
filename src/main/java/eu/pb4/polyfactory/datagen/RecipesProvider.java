@@ -13,16 +13,14 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
-import net.minecraft.data.server.recipe.CookingRecipeJsonBuilder;
-import net.minecraft.data.server.recipe.RecipeJsonProvider;
-import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
-import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
+import net.minecraft.data.server.recipe.*;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.ItemTags;
@@ -39,7 +37,7 @@ class RecipesProvider extends FabricRecipeProvider {
     }
 
     @Override
-    public void generate(Consumer<RecipeJsonProvider> exporter) {
+    public void generate(RecipeExporter exporter) {
         //noinspection unchecked
         var dyes = (List<DyeItem>) (Object) List.of(Items.BLACK_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.CYAN_DYE, Items.GRAY_DYE, Items.GREEN_DYE, Items.LIGHT_BLUE_DYE, Items.LIGHT_GRAY_DYE, Items.LIME_DYE, Items.MAGENTA_DYE, Items.ORANGE_DYE, Items.PINK_DYE, Items.PURPLE_DYE, Items.RED_DYE, Items.YELLOW_DYE, Items.WHITE_DYE);
 
@@ -266,6 +264,17 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                 .offerTo(exporter);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.BLOCK_OBSERVER)
+                .pattern("sos")
+                .pattern("sbs")
+                .pattern("scs")
+                .input('s', FactoryItems.STEEL_PLATE)
+                .input('c', Items.COPPER_INGOT)
+                .input('o', Items.OBSERVER)
+                .input('b', FactoryItems.INTEGRATED_CIRCUIT)
+                .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
+                .offerTo(exporter);
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.GEARBOX, 1)
                 .pattern("sgs")
                 .pattern("gwg")
@@ -436,11 +445,11 @@ class RecipesProvider extends FabricRecipeProvider {
         }
 
         of(exporter, FireworkStarMixingRecipe.CODEC,
-                new FireworkStarMixingRecipe(id("mixing/firework_star"), 4, 4, 17)
+                new RecipeEntry<>(id("mixing/firework_star"), new FireworkStarMixingRecipe(4, 4, 17))
         );
 
         of(exporter, ArtificialDyeMixingRecipe.CODEC,
-                new ArtificialDyeMixingRecipe(id("mixing/artificial_dye"), 3, 4, 15)
+                new RecipeEntry<>(id("mixing/artificial_dye"), new ArtificialDyeMixingRecipe(3, 4, 15))
         );
 
         of(exporter, GenericMixingRecipe.CODEC,
@@ -505,7 +514,7 @@ class RecipesProvider extends FabricRecipeProvider {
 
     }
 
-    public <T extends Recipe<?>> void of(Consumer<RecipeJsonProvider> exporter, Codec<T> codec, T... recipes) {
+    public <T extends Recipe<?>> void of(RecipeExporter exporter, Codec<T> codec, RecipeEntry<T>... recipes) {
         for (var recipe : recipes) {
             exporter.accept(new CodecRecipeJsonProvider<>(codec, recipe));
         }

@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.util.CachedBlockPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
@@ -31,7 +32,6 @@ import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -59,7 +59,7 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
     }
 
     @Override
-    public boolean pushItemTo(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public boolean pushItemTo(CachedBlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         var selfState = self.getBlockState();
         var dir = selfState.get(FACING);
         var item = conveyor.getContainer();

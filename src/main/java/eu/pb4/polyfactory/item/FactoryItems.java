@@ -72,6 +72,7 @@ public class FactoryItems {
     public static final Item REDSTONE_INPUT = register(FactoryBlocks.REDSTONE_INPUT);
     public static final Item REDSTONE_OUTPUT = register(FactoryBlocks.REDSTONE_OUTPUT);
     public static final Item ITEM_READER = register(FactoryBlocks.ITEM_READER);
+    public static final Item BLOCK_OBSERVER = register(FactoryBlocks.BLOCK_OBSERVER);
     public static final Item NIXIE_TUBE_CONTROLLER = register(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
     public static final CableItem CABLE = register("cable", new CableItem(new Item.Settings()));
 
@@ -96,6 +97,7 @@ public class FactoryItems {
                     entries.add(AXLE);
                     entries.add(GEARBOX);
                     entries.add(STEEL_GEAR);
+                    entries.add(LARGE_STEEL_GEAR);
 
                     // Rotation Generation
                     entries.add(HAND_CRANK);
@@ -127,6 +129,7 @@ public class FactoryItems {
                     entries.add(REDSTONE_INPUT);
                     entries.add(ITEM_COUNTER);
                     entries.add(ITEM_READER);
+                    entries.add(BLOCK_OBSERVER);
                     entries.add(NIXIE_TUBE_CONTROLLER);
                     entries.add(NIXIE_TUBE);
 

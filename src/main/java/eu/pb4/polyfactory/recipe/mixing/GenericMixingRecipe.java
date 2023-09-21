@@ -7,9 +7,9 @@ import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
-import it.unimi.dsi.fastutil.objects.ObjectIntMutablePair;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -20,11 +20,10 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.List;
 
-public record GenericMixingRecipe(Identifier identifier, String group, List<CountedIngredient> input, ItemStack output, double time,
+public record GenericMixingRecipe(String group, List<CountedIngredient> input, ItemStack output, double time,
                                   double minimumSpeed,
                                   double optimalSpeed, float minimumTemperature, float maxTemperature) implements MixingRecipe {
     public static final Codec<GenericMixingRecipe> CODEC = RecordCodecBuilder.create(x -> x.group(
-                    CodecRecipeSerializer.idCodec(),
                     Codec.STRING.optionalFieldOf("group", "").forGetter(GenericMixingRecipe::group),
                     CountedIngredient.LIST_CODEC.fieldOf("input").forGetter(GenericMixingRecipe::input),
                     ItemStack.CODEC.fieldOf("output").forGetter(GenericMixingRecipe::output),
@@ -36,29 +35,29 @@ public record GenericMixingRecipe(Identifier identifier, String group, List<Coun
             ).apply(x, GenericMixingRecipe::new)
     );
 
-    public static GenericMixingRecipe ofCounted(String string, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
-        return new GenericMixingRecipe(FactoryUtil.id("mixing/" + string), "", ingredient, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f);
+    public static RecipeEntry<GenericMixingRecipe> ofCounted(String string, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
+        return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe("", ingredient, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
     }
 
-    public static GenericMixingRecipe ofCounted(String string, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStack output) {
-        return new GenericMixingRecipe(FactoryUtil.id("mixing/" + string), "", ingredient, output, mixingTime, minimumSpeed, optimalSpeed, minTemperature, 2f);
+    public static RecipeEntry<GenericMixingRecipe> ofCounted(String string, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStack output) {
+        return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe("", ingredient, output, mixingTime, minimumSpeed, optimalSpeed, minTemperature, 2f));
     }
 
-    public static GenericMixingRecipe ofCounted(String string, String group, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
-        return new GenericMixingRecipe(FactoryUtil.id("mixing/" + string), group, ingredient, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f);
+    public static RecipeEntry<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
+        return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe(group, ingredient, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
     }
 
     public Iterable<ItemStack> remainders() {
         return () -> Iterators.transform(this.input.iterator(), (a) -> a.leftOver().copy());
     }
 
-    public static GenericMixingRecipe of(String string, List<Ingredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
+    public static RecipeEntry<GenericMixingRecipe> of(String string, List<Ingredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
         List<CountedIngredient> list = new ArrayList<>();
         for (Ingredient x : ingredient) {
             CountedIngredient countedIngredient = new CountedIngredient(x, 1, CountedIngredient.tryGettingLeftover(x));
             list.add(countedIngredient);
         }
-        return new GenericMixingRecipe(FactoryUtil.id("mixing/" + string),"", list, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f);
+        return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe("", list, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
     }
 
     @Override
@@ -149,15 +148,9 @@ public record GenericMixingRecipe(Identifier identifier, String group, List<Coun
     }
 
     @Override
-    public ItemStack getOutput(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(DynamicRegistryManager registryManager) {
         return this.output;
     }
-
-    @Override
-    public Identifier getId() {
-        return this.identifier;
-    }
-
     @Override
     public RecipeSerializer<?> getSerializer() {
         return FactoryRecipeSerializers.MIXING_GENERIC;

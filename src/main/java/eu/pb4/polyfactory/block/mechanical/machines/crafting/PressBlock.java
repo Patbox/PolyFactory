@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.*;
+import eu.pb4.polyfactory.util.CachedBlockPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
@@ -18,10 +19,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -37,7 +36,7 @@ public class PressBlock extends TallItemMachineBlock {
     }
 
     @Override
-    public boolean pushItemTo(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public boolean pushItemTo(CachedBlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         if (self.getBlockState().get(INPUT_FACING) == pushDirection || self.getBlockState().get(PART) == Part.TOP) {
             return false;
         }
@@ -92,7 +91,7 @@ public class PressBlock extends TallItemMachineBlock {
     }
 
     @Override
-    public void getItemFrom(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public void getItemFrom(CachedBlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         var inputDir = self.getBlockState().get(INPUT_FACING);
         if (!conveyor.isContainerEmpty() || pushDirection == inputDir || inputDir.getOpposite() != relative || self.getBlockState().get(PART) == Part.TOP) {
             return;

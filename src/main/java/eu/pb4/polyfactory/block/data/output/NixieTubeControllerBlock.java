@@ -37,8 +37,8 @@ public class NixieTubeControllerBlock extends GenericDirectionalDataBlock implem
             (x, n) -> x.setScrollLoop(!x.scrollLoop())
     );
     public static final WrenchAction SCROLL_SPEED = WrenchAction.ofBlockEntity("scroll_speed", NixieTubeControllerBlockEntity.class,
-            x -> "" + x.scrollSpeed(),
-            (x, n) -> x.setScrollSpeed((40 + x.scrollSpeed() + (n ? 1 : -1)) % 40)
+            x -> String.format("%.2f char/sec", (20f / x.scrollSpeed())),
+            (x, n) -> x.setScrollSpeed(n ? (x.scrollSpeed() + 1 > 30 ? 5 : x.scrollSpeed() + 1) : (x.scrollSpeed() - 1 < 5 ? 30 : x.scrollSpeed() - 1))
     );
 
     public NixieTubeControllerBlock(Settings settings) {

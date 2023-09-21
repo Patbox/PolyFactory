@@ -27,6 +27,7 @@
   "block.polyfactory.redstone_input": "Redstone Input",
   "block.polyfactory.redstone_output": "Redstone Output",
   "block.polyfactory.item_reader": "Item Reader",
+  "block.polyfactory.block_observer": "Block Observer",
   "block.polyfactory.cable": "Cable",
   "block.polyfactory.cable.colored": "%s Cable",
   "block.polyfactory.cable.colored.full": "%s Cable (%s)",

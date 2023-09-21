@@ -8,10 +8,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.PolymerRecipe;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.*;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -19,11 +16,10 @@ import net.minecraft.world.World;
 import java.util.Arrays;
 import java.util.List;
 
-public record GrindingRecipe(Identifier identifier, String group, Ingredient input, List<OutputStack> output, double grindTime, double minimumSpeed, double optimalSpeed) implements Recipe<GrinderBlockEntity>, PolymerRecipe {
+public record GrindingRecipe(String group, Ingredient input, List<OutputStack> output, double grindTime, double minimumSpeed, double optimalSpeed) implements Recipe<GrinderBlockEntity>, PolymerRecipe {
     public static final Codec<GrindingRecipe> CODEC = RecordCodecBuilder.create(x -> x.group(
-                    CodecRecipeSerializer.idCodec(),
                     Codec.STRING.optionalFieldOf("group", "").forGetter(GrindingRecipe::group),
-                    CodecRecipeSerializer.INGREDIENT_CODEC.fieldOf("input").forGetter(GrindingRecipe::input),
+                    LazyRecipeSerializer.INGREDIENT_CODEC.fieldOf("input").forGetter(GrindingRecipe::input),
                     OutputStack.LIST_CODEC.fieldOf("output").forGetter(GrindingRecipe::output),
                     Codec.DOUBLE.fieldOf("time").forGetter(GrindingRecipe::grindTime),
                     Codec.DOUBLE.optionalFieldOf("minimum_speed", 0d).forGetter(GrindingRecipe::minimumSpeed),
@@ -31,36 +27,36 @@ public record GrindingRecipe(Identifier identifier, String group, Ingredient inp
             ).apply(x, GrindingRecipe::new)
     );
 
-    public static GrindingRecipe of(String string, Ingredient ingredient, double grindTime, double minimumSpeed, double optimalSpeed, OutputStack... outputs) {
-        return new GrindingRecipe(FactoryUtil.id("grinding/" + string), "", ingredient, List.of(outputs), grindTime, minimumSpeed, optimalSpeed);
+    public static RecipeEntry<GrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double minimumSpeed, double optimalSpeed, OutputStack... outputs) {
+        return new RecipeEntry<>(FactoryUtil.id("grinding/" + string), new GrindingRecipe( "", ingredient, List.of(outputs), grindTime, minimumSpeed, optimalSpeed));
     }
 
-    public static GrindingRecipe of(String string, Ingredient ingredient, double grindTime, double optimalSpeed, OutputStack... outputs) {
-        return new GrindingRecipe(FactoryUtil.id("grinding/" + string), "", ingredient, List.of(outputs), grindTime, 0, optimalSpeed);
+    public static RecipeEntry<GrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double optimalSpeed, OutputStack... outputs) {
+        return new RecipeEntry<>(FactoryUtil.id("grinding/" + string), new GrindingRecipe( "", ingredient, List.of(outputs), grindTime, 0, optimalSpeed));
     }
 
-    public static GrindingRecipe of(String string, Ingredient ingredient, double grindTime, double optimalSpeed, ItemStack... outputs) {
-        return new GrindingRecipe(FactoryUtil.id("grinding/" + string), "", ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x, 1, 1)).toList(), grindTime, 0, optimalSpeed);
+    public static RecipeEntry<GrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double optimalSpeed, ItemStack... outputs) {
+        return new RecipeEntry<>(FactoryUtil.id("grinding/" + string), new GrindingRecipe( "", ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x, 1, 1)).toList(), grindTime, 0, optimalSpeed));
     }
 
-    public static GrindingRecipe of(String string, String group, Ingredient ingredient, double grindTime, double optimalSpeed, ItemStack... outputs) {
-        return new GrindingRecipe(FactoryUtil.id("grinding/" + string), group, ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x, 1, 1)).toList(), grindTime, 0, optimalSpeed);
+    public static RecipeEntry<GrindingRecipe> of(String string, String group, Ingredient ingredient, double grindTime, double optimalSpeed, ItemStack... outputs) {
+        return new RecipeEntry<>(FactoryUtil.id("grinding/" + string), new GrindingRecipe( group, ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x, 1, 1)).toList(), grindTime, 0, optimalSpeed));
     }
 
-    public static GrindingRecipe of(String string, Ingredient ingredient, double grindTime, double minimumSpeed, double optimalSpeed, ItemStack... outputs) {
-        return new GrindingRecipe(FactoryUtil.id("grinding/" + string), "", ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x, 1, 1)).toList(), grindTime, minimumSpeed, optimalSpeed);
+    public static RecipeEntry<GrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double minimumSpeed, double optimalSpeed, ItemStack... outputs) {
+        return new RecipeEntry<>(FactoryUtil.id("grinding/" + string), new GrindingRecipe( "", ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x, 1, 1)).toList(), grindTime, minimumSpeed, optimalSpeed));
     }
 
-    public static GrindingRecipe of(String string, Ingredient ingredient, double grindTime, double minimumSpeed, double optimalSpeed, ItemConvertible... outputs) {
-        return new GrindingRecipe(FactoryUtil.id("grinding/" + string), "", ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x.asItem().getDefaultStack(), 1, 1)).toList(), grindTime, minimumSpeed, optimalSpeed);
+    public static RecipeEntry<GrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double minimumSpeed, double optimalSpeed, ItemConvertible... outputs) {
+        return new RecipeEntry<>(FactoryUtil.id("grinding/" + string), new GrindingRecipe( "", ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x.asItem().getDefaultStack(), 1, 1)).toList(), grindTime, minimumSpeed, optimalSpeed));
     }
 
-    public static GrindingRecipe of(String string, Ingredient ingredient, double grindTime, double optimalSpeed, ItemConvertible... outputs) {
+    public static RecipeEntry<GrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double optimalSpeed, ItemConvertible... outputs) {
         return of(string, "", ingredient, grindTime, optimalSpeed, outputs);
     }
 
-    public static GrindingRecipe of(String string, String group, Ingredient ingredient, double grindTime, double optimalSpeed, ItemConvertible... outputs) {
-        return new GrindingRecipe(FactoryUtil.id("grinding/" + string), group, ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x.asItem().getDefaultStack(), 1, 1)).toList(), grindTime, 0, optimalSpeed);
+    public static RecipeEntry<GrindingRecipe> of(String string, String group, Ingredient ingredient, double grindTime, double optimalSpeed, ItemConvertible... outputs) {
+        return new RecipeEntry<>(FactoryUtil.id("grinding/" + string), new GrindingRecipe( group, ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x.asItem().getDefaultStack(), 1, 1)).toList(), grindTime, 0, optimalSpeed));
     }
 
     @Override
@@ -86,13 +82,8 @@ public record GrindingRecipe(Identifier identifier, String group, Ingredient inp
 
     @Deprecated
     @Override
-    public ItemStack getOutput(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(DynamicRegistryManager registryManager) {
         return ItemStack.EMPTY;
-    }
-
-    @Override
-    public Identifier getId() {
-        return this.identifier;
     }
 
     @Override

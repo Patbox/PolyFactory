@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -15,7 +16,7 @@ public class GrindingRecipePage extends AbstractRecipePolydexPage<GrindingRecipe
     private static final ItemStack ICON = FactoryItems.GRINDER.getDefaultStack();
     private final PolydexStack<?>[] output;
 
-    public GrindingRecipePage(GrindingRecipe recipe) {
+    public GrindingRecipePage(RecipeEntry<GrindingRecipe> recipe) {
         super(recipe);
         this.output = PolydexCompatImpl.createOutput(this.recipe.output());
     }

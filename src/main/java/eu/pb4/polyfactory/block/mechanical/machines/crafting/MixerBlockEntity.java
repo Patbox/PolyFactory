@@ -21,6 +21,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.screen.ScreenHandlerType;
@@ -48,7 +49,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     protected double process = 0;
     protected float temperature = 0;
     @Nullable
-    protected MixingRecipe currentRecipe = null;
+    protected RecipeEntry<MixingRecipe> currentRecipe = null;
     private boolean active;
     private final SimpleContainer[] containers = SimpleContainer.createArray(9, this::addMoving, this::removeMoving);
     private MixerBlock.Model model;
@@ -153,7 +154,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             return;
         }
 
-        if (self.inventoryChanged && (self.currentRecipe == null || !self.currentRecipe.matches(self, world))) {
+        if (self.inventoryChanged && (self.currentRecipe == null || !self.currentRecipe.value().matches(self, world))) {
             self.process = 0;
             self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.MIXER, self, world).orElse(null);
 
@@ -168,7 +169,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         self.inventoryChanged = false;
 
 
-        if (self.temperature < self.currentRecipe.minimumTemperature() || self.temperature > self.currentRecipe.maxTemperature()) {
+        if (self.temperature < self.currentRecipe.value().minimumTemperature() || self.temperature > self.currentRecipe.value().maxTemperature()) {
             self.active = false;
             self.model.setActive(false);
             self.model.tick();
@@ -181,9 +182,9 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         self.model.rotate((float) fullSpeed);
         self.model.tick();
 
-        if (self.process >= self.currentRecipe.time()) {
+        if (self.process >= self.currentRecipe.value().time()) {
             var currentOutput = self.getStack(OUTPUT_FIRST);
-            var output = self.currentRecipe.craft(self, world.getRegistryManager());
+            var output = self.currentRecipe.value().craft(self, world.getRegistryManager());
             {
                 if (!currentOutput.isEmpty() && (!ItemStack.canCombine(currentOutput, output) || output.getCount() + currentOutput.getCount() > output.getMaxCount())) {
                     return;
@@ -191,7 +192,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             }
             self.process = 0;
 
-            self.currentRecipe.applyRecipeUse(self, world);
+            self.currentRecipe.value().applyRecipeUse(self, world);
 
             if (currentOutput.isEmpty()) {
                 self.setStack(OUTPUT_FIRST, output);
@@ -199,7 +200,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
                 currentOutput.increment(output.getCount());
             }
 
-            for (var remainder : self.currentRecipe.remainders()) {
+            for (var remainder : self.currentRecipe.value().remainders()) {
                 if (remainder.isEmpty()) {
                     continue;
                 }
@@ -226,8 +227,8 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
 
             self.markDirty();
         } else {
-            var d = Math.max(self.currentRecipe.optimalSpeed() - self.currentRecipe.minimumSpeed(), 1);
-            var speed = Math.min(Math.max(Math.abs(fullSpeed) - self.currentRecipe.minimumSpeed(), 0), d) / d / 20;
+            var d = Math.max(self.currentRecipe.value().optimalSpeed() - self.currentRecipe.value().minimumSpeed(), 1);
+            var speed = Math.min(Math.max(Math.abs(fullSpeed) - self.currentRecipe.value().minimumSpeed(), 0), d) / d / 20;
             if (speed > 0) {
                 self.process += speed;
                 markDirty(world, pos, self.getCachedState());
@@ -256,7 +257,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
 
     public double getStress() {
         if (this.active) {
-            return this.currentRecipe != null ? this.currentRecipe.optimalSpeed() * 0.6 : 4;
+            return this.currentRecipe != null ? this.currentRecipe.value().optimalSpeed() * 0.6 : 4;
         }
         return 0;
     }
@@ -310,7 +311,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
 
         private float progress() {
             return MixerBlockEntity.this.currentRecipe != null
-                    ? (float) MathHelper.clamp(MixerBlockEntity.this.process / MixerBlockEntity.this.currentRecipe.time(), 0, 1)
+                    ? (float) MathHelper.clamp(MixerBlockEntity.this.process / MixerBlockEntity.this.currentRecipe.value().time(), 0, 1)
                     : 0;
         }
 

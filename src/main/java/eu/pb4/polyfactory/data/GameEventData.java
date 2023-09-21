@@ -15,7 +15,7 @@ public record GameEventData(GameEvent event, Vec3d pos, double distance) impleme
 
     @Override
     public String asString() {
-        return event.getId();
+        return Registries.GAME_EVENT.getId(event).toString();
     }
 
     @Override
@@ -30,7 +30,7 @@ public record GameEventData(GameEvent event, Vec3d pos, double distance) impleme
 
     @Override
     public void writeNbt(NbtCompound compound) {
-        compound.putString("event", event.getId());
+        compound.putString("event", Registries.GAME_EVENT.getId(event).toString());
         compound.putDouble("pos_x", this.pos.x);
         compound.putDouble("pos_y", this.pos.y);
         compound.putDouble("pos_z", this.pos.z);

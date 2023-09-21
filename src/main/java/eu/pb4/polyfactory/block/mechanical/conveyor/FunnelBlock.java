@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.FilterItem;
+import eu.pb4.polyfactory.util.CachedBlockPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
@@ -29,7 +30,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -41,7 +41,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 
 import java.util.List;
 
@@ -76,7 +75,7 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
     }
 
     @Override
-    public boolean pushItemTo(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public boolean pushItemTo(CachedBlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         var selfState = self.getBlockState();
         if (!selfState.get(ENABLED)) {
             return false;
@@ -109,7 +108,7 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
 
     @SuppressWarnings("UnstableApiUsage")
     @Override
-    public void getItemFrom(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public void getItemFrom(CachedBlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         if (relative != Direction.DOWN || !conveyor.isContainerEmpty()) {
             return;
         }

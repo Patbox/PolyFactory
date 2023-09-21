@@ -4,17 +4,14 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.item.ColoredItem;
-import eu.pb4.polyfactory.recipe.CodecRecipeSerializer;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
-import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.CraftingRecipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
@@ -22,12 +19,11 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public record ColoringMixingRecipe(Identifier identifier, String group, Item input, int maxCount, double time,
+public record ColoringMixingRecipe(String group, Item input, int maxCount, double time,
                                    double minimumSpeed,
                                    double optimalSpeed, float minimumTemperature,
                                    float maxTemperature) implements MixingRecipe {
     public static final Codec<ColoringMixingRecipe> CODEC = RecordCodecBuilder.create(x -> x.group(
-                    CodecRecipeSerializer.idCodec(),
                     Codec.STRING.optionalFieldOf("group", "").forGetter(ColoringMixingRecipe::group),
                     Registries.ITEM.getCodec().fieldOf("input").forGetter(ColoringMixingRecipe::input),
                     Codec.INT.optionalFieldOf("max_count", 12).forGetter(ColoringMixingRecipe::maxCount),
@@ -40,8 +36,8 @@ public record ColoringMixingRecipe(Identifier identifier, String group, Item inp
     );
 
 
-    public static ColoringMixingRecipe of(String id, Item item, double mixingTime, double minimumSpeed, double optimalSpeed) {
-        return new ColoringMixingRecipe(FactoryUtil.id("mixing/" + id), "", item, 12, mixingTime, minimumSpeed, optimalSpeed, -1, 2);
+    public static RecipeEntry<ColoringMixingRecipe> of(String id, Item item, double mixingTime, double minimumSpeed, double optimalSpeed) {
+        return new RecipeEntry<>(FactoryUtil.id("mixing/" + id), new ColoringMixingRecipe("", item, 12, mixingTime, minimumSpeed, optimalSpeed, -1, 2));
     }
 
 
@@ -90,13 +86,8 @@ public record ColoringMixingRecipe(Identifier identifier, String group, Item inp
     }
 
     @Override
-    public ItemStack getOutput(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(DynamicRegistryManager registryManager) {
         return input.getDefaultStack();
-    }
-
-    @Override
-    public Identifier getId() {
-        return identifier;
     }
 
     @Override

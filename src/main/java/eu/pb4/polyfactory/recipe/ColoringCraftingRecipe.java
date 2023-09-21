@@ -3,8 +3,6 @@ package eu.pb4.polyfactory.recipe;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.item.ColoredItem;
-import eu.pb4.polyfactory.item.FactoryItemTags;
-import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
@@ -12,18 +10,16 @@ import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
-import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
-public record ColoringCraftingRecipe(Identifier identifier, String group, Item input, int maxCount) implements CraftingRecipe {
+public record ColoringCraftingRecipe(String group, Item input, int maxCount) implements CraftingRecipe {
     public static final Codec<ColoringCraftingRecipe> CODEC = RecordCodecBuilder.create(x -> x.group(
-                    CodecRecipeSerializer.idCodec(),
                     Codec.STRING.optionalFieldOf("group", "").forGetter(ColoringCraftingRecipe::group),
                     Registries.ITEM.getCodec().fieldOf("input").forGetter(ColoringCraftingRecipe::input),
                     Codec.INT.optionalFieldOf("max_count", 8).forGetter(ColoringCraftingRecipe::maxCount)
@@ -31,8 +27,8 @@ public record ColoringCraftingRecipe(Identifier identifier, String group, Item i
     );
 
 
-    public static ColoringCraftingRecipe of(String id, Item item) {
-        return new ColoringCraftingRecipe(FactoryUtil.id("crafting/" + id), "", item, 8);
+    public static RecipeEntry<ColoringCraftingRecipe> of(String id, Item item) {
+        return new RecipeEntry<>(FactoryUtil.id("crafting/" + id), new ColoringCraftingRecipe("", item, 8));
     }
 
     @Override
@@ -83,14 +79,10 @@ public record ColoringCraftingRecipe(Identifier identifier, String group, Item i
     }
 
     @Override
-    public ItemStack getOutput(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(DynamicRegistryManager registryManager) {
         return input.getDefaultStack();
     }
 
-    @Override
-    public Identifier getId() {
-        return identifier;
-    }
 
     @Override
     public RecipeSerializer<?> getSerializer() {

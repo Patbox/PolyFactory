@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +23,7 @@ public class MixerRecipePage extends AbstractRecipePolydexPage<GenericMixingReci
         return PolydexTextures.MIXER;
     }
 
-    public MixerRecipePage(GenericMixingRecipe recipe) {
+    public MixerRecipePage(RecipeEntry<GenericMixingRecipe> recipe) {
         super(recipe);
         this.ingredients = PolydexCompatImpl.createIngredients(this.recipe.input());
     }

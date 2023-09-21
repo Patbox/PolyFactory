@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlock;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.polyfactory.block.data.providers.ItemReaderBlock;
 import eu.pb4.polyfactory.block.data.providers.DataProviderBlock;
+import eu.pb4.polyfactory.block.data.providers.BlockObserverBlock;
 import eu.pb4.polyfactory.block.data.providers.RedstoneInputBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlock;
@@ -64,6 +65,7 @@ public class FactoryBlocks {
     public static final RedstoneInputBlock REDSTONE_INPUT = register("redstone_input", new RedstoneInputBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
     public static final RedstoneOutputBlock REDSTONE_OUTPUT = register("redstone_output", new RedstoneOutputBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
     public static final ItemReaderBlock ITEM_READER = register("item_reader", new ItemReaderBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
+    public static final BlockObserverBlock BLOCK_OBSERVER = register("block_observer", new BlockObserverBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
 
     public static final NixieTubeBlock NIXIE_TUBE = register("nixie_tube", new NixieTubeBlock(Block.Settings.copy(Blocks.GLASS).nonOpaque()));
 

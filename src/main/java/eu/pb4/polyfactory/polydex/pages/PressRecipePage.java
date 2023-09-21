@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -18,7 +19,7 @@ public class PressRecipePage extends AbstractRecipePolydexPage<GenericPressRecip
     private final List<PolydexIngredient<?>> ingredients;
     private final PolydexStack<?>[] output;
 
-    public PressRecipePage(GenericPressRecipe recipe) {
+    public PressRecipePage(RecipeEntry<GenericPressRecipe> recipe) {
         super(recipe);
         this.ingredients = PolydexCompatImpl.createIngredients(this.recipe.inputA(), this.recipe.inputB());
         this.output = PolydexCompatImpl.createOutput(this.recipe.output());

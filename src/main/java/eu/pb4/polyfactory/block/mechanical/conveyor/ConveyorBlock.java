@@ -11,6 +11,7 @@ import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.ConveyorModel;
 import eu.pb4.polyfactory.models.FastItemDisplayElement;
 import eu.pb4.polyfactory.nodes.mechanical.ConveyorNode;
+import eu.pb4.polyfactory.util.CachedBlockPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
@@ -49,7 +50,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldEvents;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.Collection;
@@ -412,7 +412,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
     }
 
     @Override
-    public boolean pushItemTo(BlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public boolean pushItemTo(CachedBlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         var state = self.getBlockState();
         var vert = state.get(VERTICAL);
         if (!state.isOf(FactoryBlocks.STICKY_CONVEYOR) && vert.stack) {

@@ -51,10 +51,12 @@ import java.util.Collection;
 import java.util.List;
 
 public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityProvider, WrenchableBlock, BlockWithElementHolder, VirtualDestroyStage.Marker {
-    public static Property<Direction.Axis> AXIS = Properties.AXIS;
+    public static Property<Direction.Axis> AXIS = EnumProperty.of("axis", Direction.Axis.class, Direction.Axis.X, Direction.Axis.Z);
     public static BooleanProperty POSITIVE_CONNECTED = BooleanProperty.of("positive_connected");
     public static BooleanProperty NEGATIVE_CONNECTED = BooleanProperty.of("negative_connected");
     public static EnumProperty<BlockHalf> HALF = Properties.BLOCK_HALF;
+
+    public static final WrenchAction AXIS_ACTION = WrenchAction.of("axis", AXIS);
 
 
     public NixieTubeBlock(Settings settings) {
@@ -73,7 +75,7 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityPr
 
     @Override
     public List<WrenchAction> getWrenchActions() {
-        return List.of(WrenchAction.AXIS, WrenchAction.HALF);
+        return List.of(AXIS_ACTION, WrenchAction.HALF);
     }
 
     @Override
@@ -283,20 +285,29 @@ for (int i = 0; i < 4; i += 2) {
             var yPos = up ? -0.2f : -0.4f;
 
             mat.pushMatrix();
-            mat.translate(-4 / 16f, yPos, 0);
+            mat.translate(-3.5f / 16f, yPos, 0);
             mat.scale(1.7f);
             mat.rotateY(MathHelper.PI);
             this.display[0].setTransformation(mat);
+            mat.popMatrix();
+
+            mat.pushMatrix();
+            mat.translate(4.5f / 16f, yPos, 0);
+            mat.scale(1.7f);
             mat.rotateY(MathHelper.PI);
+            this.display[2].setTransformation(mat);
+            mat.popMatrix();
+
+
+            mat.pushMatrix();
+            mat.translate(-4.5f / 16f, yPos, 0);
+            mat.scale(1.7f);
             this.display[3].setTransformation(mat);
             mat.popMatrix();
 
             mat.pushMatrix();
-            mat.translate(4 / 16f, yPos, 0);
+            mat.translate(3.5f / 16f, yPos, 0);
             mat.scale(1.7f);
-            mat.rotateY(MathHelper.PI);
-            this.display[2].setTransformation(mat);
-            mat.rotateY(MathHelper.PI);
             this.display[1].setTransformation(mat);
             mat.popMatrix();
             this.tick();

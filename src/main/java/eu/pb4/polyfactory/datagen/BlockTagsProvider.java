@@ -79,6 +79,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.REDSTONE_OUTPUT)
                 .add(FactoryBlocks.METAL_GRID)
                 .add(FactoryBlocks.ITEM_READER)
+                .add(FactoryBlocks.BLOCK_OBSERVER)
                 .add(FactoryBlocks.NIXIE_TUBE_CONTROLLER)
         ;
 

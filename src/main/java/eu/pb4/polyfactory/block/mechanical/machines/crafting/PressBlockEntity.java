@@ -18,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
@@ -46,7 +47,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
     };
     protected double process = 0;
     @Nullable
-    protected PressRecipe currentRecipe = null;
+    protected RecipeEntry<PressRecipe> currentRecipe = null;
     @Nullable
     protected Item currentItem = null;
     protected int currentItemCount = -1;
@@ -110,7 +111,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             return;
         }
 
-        if (self.currentRecipe == null || !self.currentRecipe.matches(self, world)) {
+        if (self.currentRecipe == null || !self.currentRecipe.value().matches(self, world)) {
             if (self.process != 0) {
                 self.model.updatePiston(0);
             }
@@ -132,7 +133,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
         self.active = true;
 
         if (self.process >= 1 || self.delayedOutput != null) {
-            var nextOut = self.delayedOutput != null ? self.delayedOutput : self.currentRecipe.craft(self, self.world.getRegistryManager());
+            var nextOut = self.delayedOutput != null ? self.delayedOutput : self.currentRecipe.value().craft(self, self.world.getRegistryManager());
             var currentOut =  self.getStack(OUTPUT_SLOT);
 
             boolean success = false;
@@ -151,7 +152,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
                 ((ServerWorld) world).spawnParticles(ParticleTypes.CLOUD,
                         pos.getX() + 0.5, pos.getY() + 0.9, pos.getZ() + 0.5, 0,
                         (Math.random() - 0.5) * 0.2, 0, (Math.random() - 0.5) * 0.2, 0.2);
-                self.currentRecipe.applyRecipeUse(self, world);
+                self.currentRecipe.value().applyRecipeUse(self, world);
                 self.delayedOutput = null;
                 self.playedSound = false;
             } else {
@@ -160,7 +161,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
         } else {
             var speed = Math.max(Math.abs(RotationUser.getRotation((ServerWorld) world, pos.up(1)).speed()), 0);
 
-            if (speed >= self.currentRecipe.minimumSpeed()) {
+            if (speed >= self.currentRecipe.value().minimumSpeed()) {
                 self.process += speed / 100;
                 self.model.updatePiston(self.process);
 
@@ -180,7 +181,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
 
     public double getStress() {
         if (this.active) {
-            return this.currentRecipe != null ? this.currentRecipe.minimumSpeed() * 0.8 : 4;
+            return this.currentRecipe != null ? this.currentRecipe.value().minimumSpeed() * 0.8 : 4;
         }
         return 0;
     }

@@ -5,27 +5,21 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.item.ArtificialDyeItem;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.recipe.CodecRecipeSerializer;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.minecraft.item.*;
-import net.minecraft.recipe.FireworkStarRecipe;
 import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.world.World;
 
 import java.util.Collections;
-import java.util.Iterator;
 
-public record ArtificialDyeMixingRecipe(Identifier identifier, double time,
+public record ArtificialDyeMixingRecipe(double time,
                                         double minimumSpeed,
                                         double optimalSpeed) implements MixingRecipe {
 
     public static final Codec<ArtificialDyeMixingRecipe> CODEC = RecordCodecBuilder.create(x -> x.group(
-                    CodecRecipeSerializer.idCodec(),
                     Codec.DOUBLE.fieldOf("time").forGetter(ArtificialDyeMixingRecipe::time),
                     Codec.DOUBLE.optionalFieldOf("minimum_speed", 1d).forGetter(ArtificialDyeMixingRecipe::minimumSpeed),
                     Codec.DOUBLE.optionalFieldOf("optimal_speed", 1d).forGetter(ArtificialDyeMixingRecipe::optimalSpeed)
@@ -171,13 +165,8 @@ public record ArtificialDyeMixingRecipe(Identifier identifier, double time,
     }
 
     @Override
-    public ItemStack getOutput(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(DynamicRegistryManager registryManager) {
         return FactoryItems.ARTIFICIAL_DYE.getDefaultStack();
-    }
-
-    @Override
-    public Identifier getId() {
-        return this.identifier;
     }
 
     @Override
