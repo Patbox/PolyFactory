@@ -91,6 +91,10 @@ public class WindmillBlockEntity extends BlockEntity {
     }
 
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {
+        if (state.get(WindmillBlock.WATERLOGGED)) {
+            return;
+        }
+
         var baseHeight = this.sample;
         if (baseHeight == Integer.MIN_VALUE) {
             baseHeight = serverWorld.getChunkManager().getChunkGenerator()

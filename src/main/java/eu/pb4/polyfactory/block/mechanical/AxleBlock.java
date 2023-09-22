@@ -1,6 +1,8 @@
 package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.BarrierBasedWaterloggable;
+import eu.pb4.polyfactory.block.QuickWaterloggable;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseItemProvider;
@@ -21,6 +23,8 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.block.*;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
@@ -28,6 +32,7 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.BlockRotation;
@@ -36,26 +41,35 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker, WrenchableBlock {
+public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker, WrenchableBlock, BarrierBasedWaterloggable {
     public static final Property<Direction.Axis> AXIS = Properties.AXIS;
+    public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
 
     public AxleBlock(Settings settings) {
         super(settings);
+        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(AXIS);
+        builder.add(AXIS).add(WATERLOGGED);
+    }
+
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        tickWater(state, world, pos);
+        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
 
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return super.getPlacementState(ctx).with(AXIS, ctx.getSide().getAxis());
+        return waterlog(ctx, super.getPlacementState(ctx).with(AXIS, ctx.getSide().getAxis()));
     }
 
     @Override
@@ -98,10 +112,17 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
     @Override
     public void onPolymerBlockSend(BlockState blockState, BlockPos.Mutable pos, ServerPlayerEntity player) {
         if (pos.getSquaredDistanceFromCenter(player.getX(), player.getY(), player.getZ()) < 16 * 16) {
-            player.networkHandler.sendPacket(new BlockUpdateS2CPacket(pos.toImmutable(), Blocks.LIGHTNING_ROD.getDefaultState().with(Properties.FACING, Direction.from(blockState.get(AXIS), Direction.AxisDirection.POSITIVE)).with(LightningRodBlock.POWERED, true)));
+            player.networkHandler.sendPacket(new BlockUpdateS2CPacket(pos.toImmutable(), Blocks.LIGHTNING_ROD.getDefaultState()
+                    .with(Properties.FACING, Direction.from(blockState.get(AXIS), Direction.AxisDirection.POSITIVE))
+                    .with(LightningRodBlock.POWERED, true).with(WATERLOGGED, blockState.get(WATERLOGGED))));
             //noinspection UnstableApiUsage
             PolymerServerProtocol.sendBlockUpdate(player.networkHandler, pos, blockState);
         }
+    }
+
+    @Override
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState().with(WATERLOGGED, state.get(WATERLOGGED));
     }
 
     @Override
@@ -112,6 +133,12 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
     @Override
     public List<WrenchAction> getWrenchActions() {
         return List.of(WrenchAction.AXIS);
+    }
+
+
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
     }
 
     public static final class Model extends RotationAwareModel {
@@ -152,7 +179,9 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
 
         @Override
         protected void onTick() {
-            var rodState = Blocks.LIGHTNING_ROD.getDefaultState().with(Properties.FACING, Direction.from(BlockBoundAttachment.get(this).getBlockState().get(AXIS), Direction.AxisDirection.POSITIVE)).with(LightningRodBlock.POWERED, true);
+            var rodState = Blocks.LIGHTNING_ROD.getDefaultState()
+                    .with(Properties.FACING, Direction.from(BlockBoundAttachment.get(this).getBlockState().get(AXIS),
+                            Direction.AxisDirection.POSITIVE)).with(LightningRodBlock.POWERED, true).with(WATERLOGGED, BlockBoundAttachment.get(this).getBlockState().get(WATERLOGGED));
             var pos = BlockBoundAttachment.get(this).getBlockPos();
             var state = BlockBoundAttachment.get(this).getBlockState();
             for (var player : this.sentRod) {
@@ -162,7 +191,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
             }
             this.sentRod.clear();
             for (var player : this.sentBarrier) {
-                player.sendPacket(new BlockUpdateS2CPacket(pos, Blocks.BARRIER.getDefaultState()));
+                player.sendPacket(new BlockUpdateS2CPacket(pos, Blocks.BARRIER.getDefaultState().with(WATERLOGGED, BlockBoundAttachment.get(this).getBlockState().get(WATERLOGGED))));
                 //noinspection UnstableApiUsage
                 PolymerServerProtocol.sendBlockUpdate(player, pos, state);
             }

@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.polyfactory.block.AttackableBlock;
+import eu.pb4.polyfactory.block.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.SneakBypassingBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseModel;
@@ -21,6 +22,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -36,21 +39,30 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 
 
-public class ContainerBlock extends Block implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder, AttackableBlock, SneakBypassingBlock, VirtualDestroyStage.Marker {
+public class ContainerBlock extends Block implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder, AttackableBlock, SneakBypassingBlock, VirtualDestroyStage.Marker, BarrierBasedWaterloggable {
     public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     public ContainerBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState());
+        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        super.appendProperties(builder);
         builder.add(FACING);
+        builder.add(WATERLOGGED);
+    }
+
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        tickWater(state, world, pos);
+        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
 
     @Override
@@ -132,7 +144,12 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+        return waterlog(ctx, this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite()));
+    }
+
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
     }
 
     @Override

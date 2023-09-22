@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.source;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.mechanical.RotationConstants;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
@@ -25,6 +26,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -40,16 +43,41 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
 
-public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlock, RotationUser, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker, WrenchableBlock {
+public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlock, RotationUser, BlockEntityProvider, BlockWithElementHolder, BarrierBasedWaterloggable, VirtualDestroyStage.Marker, WrenchableBlock {
     public static final DirectionProperty FACING = Properties.FACING;
 
     public HandCrankBlock(Settings settings) {
         super(settings);
+        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        super.appendProperties(builder);
+        builder.add(FACING);
+        builder.add(WATERLOGGED);
+    }
+
+    @Nullable
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return waterlog(ctx, this.getDefaultState().with(FACING, ctx.getSide().getOpposite()));
+    }
+
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+    }
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        tickWater(state, world, pos);
+        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
 
     @Override
@@ -65,24 +93,13 @@ public class HandCrankBlock extends RotationalNetworkBlock implements PolymerBlo
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
-    }
-
-    @Nullable
-    @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getSide().getOpposite());
-    }
-
-    @Override
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof HandCrankBlockEntity be) {
             var speed = MathHelper.lerp(MathHelper.clamp(((world.getServer().getTicks() - be.lastTick) / 2d - 5) / 5d, 0, 1), RotationConstants.HAND_CRANK_SPEED, 0);
             var stress = MathHelper.lerp(MathHelper.clamp(((world.getServer().getTicks() - be.lastTick) / 2d - 5) / 5d, 0, 1), RotationConstants.HAND_CRANK_STRESS, 0);
 
             if (speed > 0) {
-                modifier.provide(speed, stress, be.negative);
+                modifier.provide(state.get(WATERLOGGED) ? speed / 2 : speed, stress, be.negative);
             }
         }
     }

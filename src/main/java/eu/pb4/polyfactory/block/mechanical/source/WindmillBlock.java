@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.source;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
@@ -26,6 +27,8 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -45,27 +48,41 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 
 import java.util.Collection;
 import java.util.List;
 
-public class WindmillBlock extends RotationalNetworkBlock implements PolymerBlock, RotationUser, BlockWithElementHolder, WrenchableBlock, BlockEntityProvider, VirtualDestroyStage.Marker {
+public class WindmillBlock extends RotationalNetworkBlock implements PolymerBlock, RotationUser, BlockWithElementHolder, WrenchableBlock, BlockEntityProvider, BarrierBasedWaterloggable, VirtualDestroyStage.Marker {
     public static final int MAX_SAILS = 8;
     public static final BooleanProperty BIG = BooleanProperty.of("deco_big");
     public static final IntProperty SAIL_COUNT = IntProperty.of("sails", 1, MAX_SAILS);
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+    }
     public WindmillBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(SAIL_COUNT, 4).with(BIG, false));
         Model.MODEL.getItem();
+        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        super.appendProperties(builder);
         builder.add(FACING).add(SAIL_COUNT).add(BIG);
+        builder.add(WATERLOGGED);
+    }
+
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        tickWater(state, world, pos);
+        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
 
     @Override
@@ -79,7 +96,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements PolymerBloc
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getSide().getOpposite());
+        return waterlog(ctx, this.getDefaultState().with(FACING, ctx.getSide().getOpposite()));
     }
 
     @Override

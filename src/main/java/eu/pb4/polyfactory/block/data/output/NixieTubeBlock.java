@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.data.output;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.DataReceiver;
@@ -29,6 +30,8 @@ import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.decoration.Brightness;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -50,7 +53,7 @@ import org.joml.Matrix4fStack;
 import java.util.Collection;
 import java.util.List;
 
-public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityProvider, WrenchableBlock, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityProvider, WrenchableBlock, BlockWithElementHolder, VirtualDestroyStage.Marker, BarrierBasedWaterloggable {
     public static Property<Direction.Axis> AXIS = EnumProperty.of("axis", Direction.Axis.class, Direction.Axis.X, Direction.Axis.Z);
     public static BooleanProperty POSITIVE_CONNECTED = BooleanProperty.of("positive_connected");
     public static BooleanProperty NEGATIVE_CONNECTED = BooleanProperty.of("negative_connected");
@@ -61,11 +64,12 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityPr
 
     public NixieTubeBlock(Settings settings) {
         super(settings);
+        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(AXIS, HALF, POSITIVE_CONNECTED, NEGATIVE_CONNECTED);
+        builder.add(AXIS, HALF, POSITIVE_CONNECTED, NEGATIVE_CONNECTED, WATERLOGGED);
     }
 
     @Override
@@ -78,6 +82,10 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityPr
         return List.of(AXIS_ACTION, WrenchAction.HALF);
     }
 
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+    }
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!player.canModifyBlocks()) {
@@ -114,12 +122,13 @@ public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityPr
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(POSITIVE_CONNECTED, false).with(NEGATIVE_CONNECTED, false).with(AXIS, ctx.getHorizontalPlayerFacing().rotateYClockwise().getAxis()).with(HALF,
-                ((ctx.getSide().getAxis() == Direction.Axis.Y && ctx.getSide() == Direction.DOWN) || (ctx.getSide().getAxis() != Direction.Axis.Y && ctx.getHitPos().y - ctx.getBlockPos().getY() > 0.5)) ? BlockHalf.TOP : BlockHalf.BOTTOM);
+        return waterlog(ctx, this.getDefaultState().with(POSITIVE_CONNECTED, false).with(NEGATIVE_CONNECTED, false).with(AXIS, ctx.getHorizontalPlayerFacing().rotateYClockwise().getAxis()).with(HALF,
+                ((ctx.getSide().getAxis() == Direction.Axis.Y && ctx.getSide() == Direction.DOWN) || (ctx.getSide().getAxis() != Direction.Axis.Y && ctx.getHitPos().y - ctx.getBlockPos().getY() > 0.5)) ? BlockHalf.TOP : BlockHalf.BOTTOM));
     }
 
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        tickWater(state, world, pos);
         if (state.get(AXIS) != direction.getAxis()) {
             return state;
         }

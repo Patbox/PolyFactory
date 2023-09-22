@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
@@ -25,6 +26,8 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -40,23 +43,42 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
 
-public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, RotationUser, WrenchableBlock, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, RotationUser, WrenchableBlock, BlockWithElementHolder, VirtualDestroyStage.Marker, BarrierBasedWaterloggable {
     public static final Property<Direction> FACING = Properties.FACING;
 
     public MinerBlock(Settings settings) {
         super(settings);
+        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        super.appendProperties(builder);
         builder.add(FACING);
+        builder.add(WATERLOGGED);
     }
 
+    @Nullable
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return waterlog(ctx, this.getDefaultState().with(FACING, ctx.getSide().getOpposite()));
+    }
+
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+    }
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        tickWater(state, world, pos);
+        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    }
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
         return List.of(new FunctionalDirectionNode(state.get(FACING).getOpposite()));
@@ -90,12 +112,6 @@ public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, 
         }
 
         super.onPlaced(world, pos, state, placer, itemStack);
-    }
-
-    @Nullable
-    @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getSide().getOpposite());
     }
 
     @Override

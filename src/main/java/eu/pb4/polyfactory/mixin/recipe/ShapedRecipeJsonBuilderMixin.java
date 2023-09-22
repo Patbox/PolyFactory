@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.mixin.recipe;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import eu.pb4.polyfactory.recipe.NbtRecipe;
+import net.minecraft.data.server.recipe.RecipeJsonProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.Nullable;
@@ -24,8 +25,8 @@ public class ShapedRecipeJsonBuilderMixin implements NbtRecipe {
         polyfactory$nbt = nbt;
     }
 
-    @ModifyArg(method = "offerTo", at = @At(value = "INVOKE", target = "Ljava/util/function/Consumer;accept(Ljava/lang/Object;)V"))
-    private Object polyfactory$passNbt(Object t) {
+    @ModifyArg(method = "offerTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/data/server/recipe/RecipeExporter;accept(Lnet/minecraft/data/server/recipe/RecipeJsonProvider;)V"))
+    private RecipeJsonProvider polyfactory$passNbt(RecipeJsonProvider t) {
         ((NbtRecipe) t).polyfactory$setNbt(this.polyfactory$nbt);
         return t;
     }

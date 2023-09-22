@@ -39,6 +39,7 @@ public class WindmillSailItem extends ModeledItem implements DyeableItem, Firewo
 
             context.getWorld()
                     .setBlockState(context.getBlockPos(), FactoryBlocks.WINDMILL.getDefaultState()
+                            .with(WindmillBlock.WATERLOGGED, oldState.get(AxleBlock.WATERLOGGED))
                             .with(WindmillBlock.FACING, Direction.from(axis, val)).with(WindmillBlock.SAIL_COUNT, 1));
 
             if (context.getWorld().getBlockEntity(context.getBlockPos()) instanceof WindmillBlockEntity be) {

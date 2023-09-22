@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
+import eu.pb4.polyfactory.block.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseItemProvider;
@@ -27,6 +28,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -40,12 +43,13 @@ import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 
-public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsumer, MovingItemProvider, WrenchableBlock, BlockEntityProvider, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsumer, MovingItemProvider, WrenchableBlock, BlockEntityProvider, BarrierBasedWaterloggable, BlockWithElementHolder, VirtualDestroyStage.Marker {
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
     public static final EnumProperty<ConveyorLikeDirectional.TransferMode> MODE = EnumProperty.of("mode", ConveyorLikeDirectional.TransferMode.class,
@@ -57,11 +61,20 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
         super(settings);
         this.setDefaultState(this.getDefaultState().with(ENABLED, true));
         Model.MODEL_OUT.isEmpty();
+        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        super.appendProperties(builder);
         builder.add(FACING, MODE, ENABLED);
+        builder.add(WATERLOGGED);
+    }
+
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        tickWater(state, world, pos);
+        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
 
     @Override
@@ -184,6 +197,11 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
         }
     }
 
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+    }
+
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
@@ -207,7 +225,7 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
         var mode = below.getBlock() instanceof ConveyorLikeDirectional directional
                 ? directional.getTransferMode(below, dir.getOpposite())
                 : ConveyorLikeDirectional.TransferMode.TO_CONVEYOR;
-        return this.getDefaultState().with(FACING, dir).with(MODE, mode);
+        return waterlog(ctx, this.getDefaultState().with(FACING, dir).with(MODE, mode));
     }
 
     @Override

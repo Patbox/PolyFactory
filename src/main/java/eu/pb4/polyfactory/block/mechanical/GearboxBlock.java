@@ -1,6 +1,8 @@
 package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.BarrierBasedWaterloggable;
+import eu.pb4.polyfactory.block.QuickWaterloggable;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -15,18 +17,47 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.WorldAccess;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
 
-public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker, BarrierBasedWaterloggable {
     public GearboxBlock(Settings settings) {
         super(settings);
+        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
+    }
+
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+    }
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        super.appendProperties(builder);
+        builder.add(WATERLOGGED);
+    }
+
+    @Nullable
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return waterlog(ctx, super.getPlacementState(ctx));
+    }
+
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        tickWater(state, world, pos);
+        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
 
     @Override
