@@ -63,6 +63,9 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<MinerBlockEntity> MINER = register("miner",
             FabricBlockEntityTypeBuilder.create(MinerBlockEntity::new).addBlock(FactoryBlocks.MINER));
 
+    public static final BlockEntityType<PlanterBlockEntity> PLANTER = register("planter",
+            FabricBlockEntityTypeBuilder.create(PlanterBlockEntity::new).addBlock(FactoryBlocks.PLANTER));
+
     public static final BlockEntityType<PressBlockEntity> PRESS = register("press",
             FabricBlockEntityTypeBuilder.create(PressBlockEntity::new).addBlock(FactoryBlocks.PRESS));
 

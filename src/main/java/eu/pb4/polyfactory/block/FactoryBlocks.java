@@ -11,6 +11,8 @@ import eu.pb4.polyfactory.block.data.providers.DataProviderBlock;
 import eu.pb4.polyfactory.block.data.providers.BlockObserverBlock;
 import eu.pb4.polyfactory.block.data.providers.RedstoneInputBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.MinerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
@@ -54,6 +56,7 @@ public class FactoryBlocks {
     public static final PressBlock PRESS = register("press", new PressBlock(Block.Settings.copy(SPLITTER)));
     public static final MixerBlock MIXER = register("mixer", new MixerBlock(Block.Settings.copy(SPLITTER)));
     public static final MinerBlock MINER = register("miner", new MinerBlock(Block.Settings.copy(SPLITTER)));
+    public static final PlanterBlock PLANTER = register("planter", new PlanterBlock(Block.Settings.copy(SPLITTER)));
     public static final AxleBlock AXLE = register("axle", new AxleBlock(Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD).strength(2.5F).nonOpaque()));
     public static final AxleWithGearBlock AXLE_WITH_GEAR = register("axle_with_gear", new AxleWithGearBlock(Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD).strength(2.5F).nonOpaque()));
     public static final AxleWithLargeGearBlock AXLE_WITH_LARGE_GEAR = register("axle_with_large_gear", new AxleWithLargeGearBlock(Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD).strength(2.5F).nonOpaque()));

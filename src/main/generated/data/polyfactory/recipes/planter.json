@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "b": {
+      "item": "polyfactory:integrated_circuit"
+    },
+    "g": {
+      "item": "polyfactory:steel_gear"
+    },
+    "p": {
+      "tag": "minecraft:planks"
+    },
+    "s": {
+      "item": "polyfactory:steel_plate"
+    }
+  },
+  "pattern": [
+    "sgs",
+    "pbp",
+    "sgs"
+  ],
+  "result": {
+    "item": "polyfactory:planter"
+  },
+  "show_notification": true
+}

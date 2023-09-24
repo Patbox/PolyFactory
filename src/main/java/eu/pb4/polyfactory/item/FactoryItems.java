@@ -15,13 +15,11 @@ import eu.pb4.polyfactory.item.wrench.WrenchItem;
 import eu.pb4.polyfactory.item.util.AutoModeledPolymerItem;
 import eu.pb4.polyfactory.item.util.ModeledBlockItem;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
-import net.minecraft.item.EnchantedBookItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
@@ -43,6 +41,7 @@ public class FactoryItems {
     public static final Item PRESS = register(FactoryBlocks.PRESS);
     public static final Item MIXER = register(FactoryBlocks.MIXER);
     public static final Item MINER = register(FactoryBlocks.MINER);
+    public static final Item PLANTER = register(FactoryBlocks.PLANTER);
     public static final ModeledBlockItem AXLE = register(FactoryBlocks.AXLE);
     public static final Item GEARBOX = register(FactoryBlocks.GEARBOX);
     public static final Item CONTAINER = register( FactoryBlocks.CONTAINER);
@@ -119,6 +118,7 @@ public class FactoryItems {
                     entries.add(PRESS);
                     entries.add(MIXER);
                     entries.add(MINER);
+                    entries.add(PLANTER);
 
                     // Data
                     entries.add(CABLE);
@@ -175,7 +175,6 @@ public class FactoryItems {
                     }
                 })).build()
         );
-
 
         AttackBlockCallback.EVENT.register(WRENCH::handleBlockAttack);
     }

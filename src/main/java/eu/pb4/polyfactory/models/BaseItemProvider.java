@@ -1,7 +1,10 @@
 package eu.pb4.polyfactory.models;
 
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.util.Identifier;
 
 public class BaseItemProvider {
     private static final Item[] ITEMS = new Item[] {
@@ -52,5 +55,11 @@ public class BaseItemProvider {
 
     public static Item requestModel() {
         return MODELS[currentModels++ % MODELS.length];
+    }
+
+    public static ItemStack requestModel(Identifier model) {
+        var stack = new ItemStack(requestModel());
+        stack.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(stack.getItem(), model).value());
+        return stack;
     }
 }

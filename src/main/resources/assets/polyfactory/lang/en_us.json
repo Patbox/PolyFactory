@@ -8,8 +8,9 @@
   "block.polyfactory.splitter": "Item Splitter",
   "block.polyfactory.grinder": "Grinder",
   "block.polyfactory.press": "Mechanical Press",
-  "block.polyfactory.miner": "Block Miner",
+  "block.polyfactory.miner": "Mechanical Miner",
   "block.polyfactory.mixer": "Mechanical Mixer",
+  "block.polyfactory.planter": "Mechanical Planter",
   "block.polyfactory.axle": "Axle",
   "block.polyfactory.axle_with_gear": "Axle with Gear",
   "block.polyfactory.axle_with_large_gear": "Axle with Large Gear",
@@ -60,11 +61,17 @@
   "item.polyfactory.wrench.action.channel": "Channel",
   "item.polyfactory.wrench.action.scroll_speed": "Scroll Speed",
   "item.polyfactory.wrench.action.scroll_loop": "Scroll Loop",
+  "item.polyfactory.wrench.action.reverse": "Reverse",
 
   "enchantment.polyfactory.ignore_movement": "Stable Ground",
   "text.polyfactory.artificial_color": "Artificially Colored",
   "text.polyfactory.recipes": "Recipes",
   "recipe_type.polyfactory.press": "Press",
   "recipe_type.polyfactory.mixer": "Mixer",
-  "recipe_type.polyfactory.grinding": "Grinder"
+  "recipe_type.polyfactory.grinding": "Grinder",
+
+  "advancements.polyfactory.root.title": "PolyFactory",
+  "advancements.polyfactory.root.description": "Welcome to the factory!",
+  "advancements.polyfactory.hand_crank.title": "Hand-powered",
+  "advancements.polyfactory.hand_crank.description": "Power a machine by using an Hand Crank"
 }

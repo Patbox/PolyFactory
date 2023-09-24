@@ -5,13 +5,23 @@
   },
   "minimum_speed": 5.0,
   "optimal_speed": 6.0,
-  "output": {
-    "chance": 0.8,
-    "item": {
-      "Count": 1,
-      "id": "polyfactory:saw_dust"
+  "output": [
+    {
+      "chance": 0.8,
+      "item": {
+        "Count": 1,
+        "id": "polyfactory:saw_dust"
+      },
+      "roll": 6
     },
-    "roll": 6
-  },
+    {
+      "chance": 0.4,
+      "item": {
+        "Count": 1,
+        "id": "minecraft:stick"
+      },
+      "roll": 10
+    }
+  ],
   "time": 1.0
 }

@@ -1,4 +1,4 @@
-// 1.20.1	2023-09-13T08:08:43.431316595	PolyFactory/Block Loot Tables
+// 1.20.2	2023-09-24T20:40:45.383062542	PolyFactory/Block Loot Tables
 21d4d4bda469eef27cc6294ce2836a626c6e9da4 data/polyfactory/loot_tables/blocks/windmill.json
 70adeaf5434500398f76bcbff48bb820d33c748f data/polyfactory/loot_tables/blocks/grinder.json
 d66138c2b490a4ece3ccfe987b5cf7e0ffe39486 data/polyfactory/loot_tables/blocks/conveyor.json
@@ -21,6 +21,8 @@ ac1ca0b690037d16a87c1ca876e58bb9c5b2427e data/polyfactory/loot_tables/blocks/ite
 167e0dcdf80c5daa48795be652511cb3b23e2328 data/polyfactory/loot_tables/blocks/hand_crank.json
 da431a16ebd601df56169c0e81e040455705a69f data/polyfactory/loot_tables/blocks/axle_with_gear.json
 14ca5757283c0d83f784782ee275c1e136b56c76 data/polyfactory/loot_tables/blocks/nixie_tube.json
+1b9d93d764b4eb6dea0dfe45ce8a68ec5ec3af26 data/polyfactory/loot_tables/blocks/block_observer.json
 c413ee8c2679765ad8dd30c3132ec2fbd131434f data/polyfactory/loot_tables/blocks/redstone_input.json
 f4d1c84b0fcb999bd2c4af4a66eda00017d1d7ba data/polyfactory/loot_tables/blocks/press.json
 f4f0270353436d31bedc3121819e8597cf08dfe1 data/polyfactory/loot_tables/blocks/wooden_container.json
+bf1e10e712aa8d684609e552646d7e1d02f241ed data/polyfactory/loot_tables/blocks/planter.json

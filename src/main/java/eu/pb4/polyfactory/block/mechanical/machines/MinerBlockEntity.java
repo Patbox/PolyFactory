@@ -57,23 +57,23 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
 
     @Override
     protected void writeNbt(NbtCompound nbt) {
-        nbt.put("Tool", this.currentTool.writeNbt(new NbtCompound()));
-        nbt.putDouble("Progress", this.process);
-        nbt.put("BlockState", NbtHelper.fromBlockState(this.targetState));
+        nbt.put("tool", this.currentTool.writeNbt(new NbtCompound()));
+        nbt.putDouble("progress", this.process);
+        nbt.put("block_state", NbtHelper.fromBlockState(this.targetState));
         if (this.owner != null) {
-            nbt.put("Owner", NbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+            nbt.put("owner", NbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
         super.writeNbt(nbt);
     }
 
     @Override
     public void readNbt(NbtCompound nbt) {
-        this.currentTool = ItemStack.fromNbt(nbt.getCompound("Tool"));
-        this.process = nbt.getDouble("Progress");
-        if (nbt.contains("Owner")) {
-            this.owner = NbtHelper.toGameProfile(nbt.getCompound("Owner"));
+        this.currentTool = ItemStack.fromNbt(nbt.getCompound("tool"));
+        this.process = nbt.getDouble("progress");
+        if (nbt.contains("owner")) {
+            this.owner = NbtHelper.toGameProfile(nbt.getCompound("owner"));
         }
-        this.targetState = NbtHelper.toBlockState(Registries.BLOCK.getReadOnlyWrapper(), nbt.getCompound("BlockState"));
+        this.targetState = NbtHelper.toBlockState(Registries.BLOCK.getReadOnlyWrapper(), nbt.getCompound("block_state"));
         super.readNbt(nbt);
     }
 
@@ -188,7 +188,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
                     stateFront.getBlock().afterBreak(world, player, blockPos, stateFront, blockEntity, itemStack2);
                 }
             }
-            world.updateComparators(pos, state.getBlock());
+           self.markDirty();
         }
     }
 

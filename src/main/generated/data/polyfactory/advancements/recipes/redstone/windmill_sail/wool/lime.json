@@ -22,8 +22,8 @@
   },
   "requirements": [
     [
-      "get_axle",
-      "has_the_recipe"
+      "has_the_recipe",
+      "get_axle"
     ]
   ],
   "rewards": {

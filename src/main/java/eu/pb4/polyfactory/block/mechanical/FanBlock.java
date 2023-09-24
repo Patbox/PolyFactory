@@ -52,10 +52,13 @@ import static eu.pb4.polyfactory.util.FactoryUtil.id;
 public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider, VirtualDestroyStage.Marker, WrenchableBlock {
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
+    public static final BooleanProperty REVERSE = BooleanProperty.of("reverse");
+
+    public static final WrenchAction REVERSE_ACTION = WrenchAction.of("reverse", REVERSE);
 
     public FanBlock(Settings settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(ENABLED, true));
+        setDefaultState(getDefaultState().with(ENABLED, true).with(REVERSE, false));
         Model.ITEM_MODEL.getItem();
     }
 
@@ -86,7 +89,7 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING, ENABLED);
+        builder.add(FACING, ENABLED, REVERSE);
     }
 
     @Override
@@ -138,7 +141,7 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
 
     @Override
     public List<WrenchAction> getWrenchActions() {
-        return List.of(WrenchAction.FACING);
+        return List.of(REVERSE_ACTION, WrenchAction.FACING);
     }
 
     public final class Model extends RotationAwareModel {
@@ -147,6 +150,7 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement fan;
         private float rotation = 0;
+        private boolean reverse;
 
         private Model(BlockState state) {
             this.mainElement = new LodItemDisplayElement(FactoryItems.FAN.getDefaultStack());
@@ -167,6 +171,7 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
         }
 
         private void updateStatePos(BlockState state) {
+            this.reverse = state.get(REVERSE);
             var dir = state.get(FACING);
             float p = 0;
             float y = 0;
@@ -186,10 +191,7 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
         }
 
         private void updateAnimation(double speed) {
-            this.rotation += (float) Math.min(speed * MathHelper.RADIANS_PER_DEGREE * 3, RotationConstants.MAX_ROTATION_PER_TICK_2);
-            if (this.rotation > MathHelper.TAU) {
-                this.rotation -= MathHelper.TAU;
-            }
+            this.rotation += ((float) Math.min((this.reverse ? -speed : speed) * MathHelper.RADIANS_PER_DEGREE * 3, RotationConstants.MAX_ROTATION_PER_TICK_2)) % MathHelper.TAU;
 
             mat.identity();
             mat.rotateY(this.rotation);

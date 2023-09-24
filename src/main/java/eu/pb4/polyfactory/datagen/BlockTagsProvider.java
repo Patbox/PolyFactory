@@ -73,6 +73,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                         FactoryBlocks.MINER,
                         FactoryBlocks.SPLITTER)
                 .add(FactoryBlocks.MIXER)
+                .add(FactoryBlocks.PLANTER)
                 .add(FactoryBlocks.STEAM_ENGINE)
                 .add(FactoryBlocks.ITEM_COUNTER)
                 .add(FactoryBlocks.REDSTONE_INPUT)

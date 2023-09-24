@@ -22,8 +22,8 @@
   },
   "requirements": [
     [
-      "get_steel",
-      "has_the_recipe"
+      "has_the_recipe",
+      "get_steel"
     ]
   ],
   "rewards": {

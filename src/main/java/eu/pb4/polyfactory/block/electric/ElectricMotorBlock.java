@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.electric;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
@@ -48,7 +49,7 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
-public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider, RotationUser, EnergyUser, StateNameProvider {
+public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider, CableConnectable, RotationUser, EnergyUser, StateNameProvider {
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty GENERATOR = BooleanProperty.of("generator");
 
@@ -148,6 +149,11 @@ public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, Bl
     @Override
     public Text getName(ServerWorld world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
         return state.get(GENERATOR) ? Text.translatable(this.getTranslationKey() + ".generator") : this.getName();
+    }
+
+    @Override
+    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+        return state.get(FACING) == dir.getOpposite();
     }
 
     public static final class Model extends RotationAwareModel {

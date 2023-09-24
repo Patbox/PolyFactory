@@ -1,0 +1,43 @@
+{
+	"textures": {
+		"0": "polyfactory:block/planter_side",
+		"particle": "polyfactory:block/planter_side"
+	},
+	"elements": [
+		{
+			"from": [6.5, 10, 5],
+			"to": [9.5, 11, 10],
+			"rotation": {"angle": 22.5, "axis": "x", "origin": [0, 0, 0]},
+			"faces": {
+				"north": {"uv": [1, 5, 2, 6], "texture": "#0"},
+				"east": {"uv": [0, 0, 5, 1], "texture": "#0"},
+				"south": {"uv": [1, 5, 2, 6], "texture": "#0"},
+				"west": {"uv": [0, 0, 5, 1], "texture": "#0"},
+				"up": {"uv": [1, 5, 2, 6], "texture": "#0"},
+				"down": {"uv": [13, 4, 16, 9], "rotation": 180, "texture": "#0"}
+			}
+		},
+		{
+			"from": [6.5, 11, 5],
+			"to": [9.5, 10, 10],
+			"rotation": {"angle": 22.5, "axis": "x", "origin": [0, 0, 0]},
+			"faces": {
+				"north": {"uv": [1, 5, 2, 6], "texture": "#0"},
+				"east": {"uv": [0, 0, 5, 1], "texture": "#0"},
+				"south": {"uv": [1, 5, 2, 6], "texture": "#0"},
+				"west": {"uv": [0, 0, 5, 1], "texture": "#0"},
+				"up": {"uv": [13, 4, 16, 9], "texture": "#0"},
+				"down": {"uv": [1, 5, 2, 6], "rotation": 180, "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "group",
+			"origin": [0, 0, 0],
+			"color": 0,
+			"nbt": "{}",
+			"children": [0, 1]
+		}
+	]
+}

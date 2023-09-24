@@ -22,8 +22,8 @@
   },
   "requirements": [
     [
-      "steel_ingot",
-      "has_the_recipe"
+      "has_the_recipe",
+      "steel_ingot"
     ]
   ],
   "rewards": {

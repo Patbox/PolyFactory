@@ -13,12 +13,14 @@
     "polyfactory:miner",
     "polyfactory:splitter",
     "polyfactory:mixer",
+    "polyfactory:planter",
     "polyfactory:steam_engine",
     "polyfactory:item_counter",
     "polyfactory:redstone_input",
     "polyfactory:redstone_output",
     "polyfactory:metal_grid",
     "polyfactory:item_reader",
+    "polyfactory:block_observer",
     "polyfactory:nixie_tube_controller"
   ]
 }

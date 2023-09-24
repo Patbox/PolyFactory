@@ -1,4 +1,6 @@
-// 1.20.1	2023-09-13T08:08:43.431065961	PolyFactory/Tags for minecraft:item
+// 1.20.2	2023-09-24T20:40:45.382789191	PolyFactory/Tags for minecraft:item
+1157a4680ef4dac69ddbe3d24f9f397853060d97 data/polyfactory/tags/items/allowed_in_planter.json
+91ac7c820bd051324c34d48d4baca16b3002a18e data/polyfactory/tags/items/root_advancement.json
 4373f64d66ad735820913eaab22fe02fd72a3dde data/polyfactory/tags/items/stripped_logs.json
 797f7329d5288487472a37e47cbe30c273e69630 data/polyfactory/tags/items/allowed_in_miner.json
 907e676549003864a6e9bc5fd73f9933cfcb0bfd data/c/tags/items/dyes.json

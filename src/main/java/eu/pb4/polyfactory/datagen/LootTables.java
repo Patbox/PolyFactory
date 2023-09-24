@@ -24,6 +24,7 @@ class LootTables extends FabricBlockLootTableProvider {
     public void generate() {
         this.addDrop(FactoryBlocks.SPLITTER);
         this.addDrop(FactoryBlocks.MINER);
+        this.addDrop(FactoryBlocks.PLANTER);
         this.addDrop(FactoryBlocks.FAN);
         this.addDrop(FactoryBlocks.GRINDER);
         this.addDrop(FactoryBlocks.PRESS, (block) -> this.dropsWithProperty(block, PressBlock.PART, PressBlock.Part.MAIN));

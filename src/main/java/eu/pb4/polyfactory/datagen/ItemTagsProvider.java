@@ -24,9 +24,25 @@ class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
                 .add(FactoryItems.STEEL_GEAR)
         ;
 
+        this.getOrCreateTagBuilder(FactoryItemTags.ALLOWED_IN_PLANTER)
+                .addOptionalTag(ItemTags.VILLAGER_PLANTABLE_SEEDS)
+                .addOptionalTag(ItemTags.SAPLINGS)
+        ;
+
         this.getOrCreateTagBuilder(ConventionalItemTags.DYES)
                 .add(FactoryItems.ARTIFICIAL_DYE)
         ;
+
+        this.getOrCreateTagBuilder(FactoryItemTags.ROOT_ADVANCEMENT)
+                .add(FactoryItems.GRINDER)
+                .add(FactoryItems.METAL_GRID)
+                .add(FactoryItems.STEEL_GEAR)
+                .add(FactoryItems.STEEL_INGOT)
+                .add(FactoryItems.STEEL_ALLOY_MIXTURE)
+                .add(FactoryItems.CABLE)
+                .add(FactoryItems.WINDMILL_SAIL)
+                .add(FactoryItems.AXLE)
+                ;
 
         this.copy(FactoryBlockTags.STRIPPED_LOGS, FactoryItemTags.STRIPPED_LOGS);
     }
