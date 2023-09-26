@@ -1,20 +1,16 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
-import eu.pb4.polyfactory.block.BlockEntityExtraListener;
+import eu.pb4.polyfactory.block.base.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-
-import java.util.function.Predicate;
 
 public class FunnelBlockEntity extends BlockEntity implements BlockEntityExtraListener {
     private FunnelBlock.Model model;

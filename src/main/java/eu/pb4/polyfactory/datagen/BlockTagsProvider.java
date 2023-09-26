@@ -82,6 +82,8 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.ITEM_READER)
                 .add(FactoryBlocks.BLOCK_OBSERVER)
                 .add(FactoryBlocks.NIXIE_TUBE_CONTROLLER)
+                .add(FactoryBlocks.ELECTRIC_MOTOR)
+                .add(FactoryBlocks.ELECTRIC_GENERATOR)
         ;
 
         this.getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)

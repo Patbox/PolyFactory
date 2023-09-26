@@ -2,9 +2,11 @@ package eu.pb4.polyfactory.models;
 
 import eu.pb4.polyfactory.util.DebugData;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.util.math.Direction;
 import org.joml.Matrix4f;
 
 public class BaseModel extends ElementHolder {
@@ -36,5 +38,9 @@ public class BaseModel extends ElementHolder {
 
     protected double getSquaredDistance(ServerPlayNetworkHandler player) {
         return this.getPos().squaredDistanceTo(player.player.getPos());
+    }
+
+    protected BlockBoundAttachment blockBound() {
+        return BlockBoundAttachment.get(this);
     }
 }

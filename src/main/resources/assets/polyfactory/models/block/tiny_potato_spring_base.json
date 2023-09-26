@@ -1,0 +1,20 @@
+{
+	"textures": {
+		"0": "polyfactory:block/tiny_potato_spring",
+		"particle": "polyfactory:block/tiny_potato_spring"
+	},
+	"elements": [
+		{
+			"from": [5, 0, 5],
+			"to": [11, 2, 11],
+			"faces": {
+				"north": {"uv": [6, 11, 12, 13], "texture": "#0"},
+				"east": {"uv": [6, 11, 12, 13], "texture": "#0"},
+				"south": {"uv": [6, 11, 12, 13], "texture": "#0"},
+				"west": {"uv": [6, 11, 12, 13], "texture": "#0"},
+				"up": {"uv": [6, 9, 12, 15], "texture": "#0"},
+				"down": {"uv": [6, 9, 12, 15], "texture": "#0"}
+			}
+		}
+	]
+}

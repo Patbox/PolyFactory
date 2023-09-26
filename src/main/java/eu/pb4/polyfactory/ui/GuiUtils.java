@@ -29,12 +29,12 @@ public class GuiUtils {
     private static void drawNumberInternal(SlotGuiInterface gui, int position, int value, int size, int color, boolean leadingZero, IntFunction<GuiElementBuilder>[] numbers) {
         for (int i = size - 1; i >= 0; i--)  {
             if (!leadingZero && value == 0 && i != size -1) {
-                gui.setSlot(position + 1, EMPTY);
+                gui.setSlot(position + i, EMPTY);
                 continue;
             }
             var number = value % 10;
             value /= 10;
-            gui.setSlot(position + i,  numbers[number].apply(color));
+            gui.setSlot(position + i,  numbers[Math.abs(number)].apply(color));
         }
     }
 }

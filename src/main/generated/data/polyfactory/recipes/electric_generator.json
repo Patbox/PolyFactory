@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "a": {
+      "item": "polyfactory:axle"
+    },
+    "c": {
+      "item": "minecraft:copper_block"
+    },
+    "i": {
+      "item": "polyfactory:steel_ingot"
+    },
+    "s": {
+      "item": "polyfactory:steel_plate"
+    }
+  },
+  "pattern": [
+    "scs",
+    "aia",
+    "scs"
+  ],
+  "result": {
+    "item": "polyfactory:electric_generator"
+  },
+  "show_notification": true
+}

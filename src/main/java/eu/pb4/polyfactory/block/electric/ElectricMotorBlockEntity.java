@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.block.electric;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.polyfactory.block.other.LockableBlockEntity;
+import eu.pb4.polyfactory.block.base.LockableBlockEntity;
 import eu.pb4.polyfactory.nodes.electric.EnergyData;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import net.minecraft.block.BlockState;
@@ -14,7 +14,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class ElectricMotorBlockEntity extends LockableBlockEntity {
-    long storedPower;
+    private float speed = 10;
+    private float stress = 10;
 
     public ElectricMotorBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.ELECTRIC_MOTOR, pos, state);
@@ -28,55 +29,29 @@ public class ElectricMotorBlockEntity extends LockableBlockEntity {
     @Override
     protected void writeNbt(NbtCompound nbt) {
         super.writeNbt(nbt);
+        nbt.putFloat("speed", this.speed);
+        nbt.putFloat("stress", this.stress);
     }
 
 
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
+        this.speed = nbt.getFloat("speed");
+        this.stress = nbt.getFloat("stress");
     }
 
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {
-        if (!state.get(ElectricMotorBlock.GENERATOR)) {
-            if (this.storedPower > 0) {
-                modifier.provide(10, 8, false);
-                this.storedPower -= 100;
-            }
-        } else {
-            modifier.stress(10);
-            EnergyUser.getEnergy(serverWorld, pos);
+        var energy = EnergyUser.getEnergy(serverWorld, pos);
+
+        if (energy.current() > 0) {
+            modifier.provide(this.speed, this.stress, false);
         }
     }
 
     public void updateEnergyData(EnergyData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
-        if (state.get(ElectricMotorBlock.GENERATOR)) {
-            if (this.storedPower > 0) {
-                modifier.provide(150);
-                this.storedPower -= 100;
-            }
-        } else {
-            modifier.use(100);
-        }
+        modifier.use((long) (this.speed * (this.stress * 1.2f)));
     }
-
-    public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
-        if (!(t instanceof ElectricMotorBlockEntity be) || !(world instanceof ServerWorld serverWorld)) {
-            return;
-        }
-
-        if (state.get(ElectricMotorBlock.GENERATOR)) {
-            var rot = RotationUser.getRotation(serverWorld, pos);
-            if (rot.speed() > 0) {
-                be.storedPower = Math.min(be.storedPower + 110, 300);
-            }
-        } else {
-            var rot = EnergyUser.getEnergy(serverWorld, pos);
-            if (rot.current() > 0) {
-                be.storedPower = Math.min(be.storedPower + 110, 300);
-            }
-        }
-    }
-
 
 
     /*private class Gui extends SimpleGui {

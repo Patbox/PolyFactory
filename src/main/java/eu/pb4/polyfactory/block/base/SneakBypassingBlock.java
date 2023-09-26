@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.block;
+package eu.pb4.polyfactory.block.base;
 
 public interface SneakBypassingBlock {
 }

@@ -1,9 +1,8 @@
 package eu.pb4.polyfactory.block.other;
 
-import eu.pb4.polyfactory.block.AttackableBlock;
-import eu.pb4.polyfactory.block.BarrierBasedWaterloggable;
-import eu.pb4.polyfactory.block.SneakBypassingBlock;
-import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.block.base.AttackableBlock;
+import eu.pb4.polyfactory.block.base.BarrierBasedWaterloggable;
+import eu.pb4.polyfactory.block.base.SneakBypassingBlock;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -29,7 +28,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;

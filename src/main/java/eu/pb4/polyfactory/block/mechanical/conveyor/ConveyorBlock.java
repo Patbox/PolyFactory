@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.block.base.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
@@ -56,7 +57,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider, ConveyorLikeDirectional, MovingItemConsumer, VirtualDestroyStage.Marker {
+public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, ConveyorLikeDirectional, MovingItemConsumer {
     public static final DirectionProperty DIRECTION = DirectionProperty.of("direction", Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
     public static final EnumProperty<DirectionValue> VERTICAL = EnumProperty.of("vertical", DirectionValue.class);
 
@@ -286,7 +287,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements PolymerBloc
 
         if (upState.isOf(this) && upState.get(DIRECTION) == direction) {
             if (upState.get(VERTICAL).value != 0) {
-                var vert = state.get(VERTICAL);
+                var vert = upState.get(VERTICAL);
                 state = state.with(VERTICAL, switch (vert) {
                     case POSITIVE, POSITIVE_STACK -> DirectionValue.POSITIVE_STACK;
                     case NEGATIVE, NEGATIVE_STACK -> DirectionValue.NEGATIVE_STACK;

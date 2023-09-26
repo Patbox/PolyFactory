@@ -1,8 +1,9 @@
 package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import eu.pb4.polyfactory.block.BarrierBasedWaterloggable;
+import eu.pb4.polyfactory.block.base.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.base.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -51,7 +52,7 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
-public class PlanterBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, RotationUser, BlockWithElementHolder, VirtualDestroyStage.Marker, BarrierBasedWaterloggable {
+public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, BarrierBasedWaterloggable {
     public PlanterBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
@@ -174,8 +175,10 @@ public class PlanterBlock extends RotationalNetworkBlock implements PolymerBlock
 
         private Model(ServerWorld world, BlockState state) {
             this.main = LodItemDisplayElement.createSimple(FactoryItems.PLANTER);
-            this.output1 = LodItemDisplayElement.createSimple(OUTPUT_1, 5, 0.5f);
-            this.output2 = LodItemDisplayElement.createSimple(OUTPUT_2, 5, 0.5f);
+            this.output1 = LodItemDisplayElement.createSimple(OUTPUT_1, 5, 0.3f);
+            this.output2 = LodItemDisplayElement.createSimple(OUTPUT_2, 5, 0.3f);
+            this.output1.setViewRange(0.5f);
+            this.output2.setViewRange(0.5f);
 
             this.updateAnimation();
             this.addElement(this.main);

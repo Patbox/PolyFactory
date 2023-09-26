@@ -52,8 +52,8 @@ public class WrenchHandler {
                 this.actions = wrenchableBlock.getWrenchActions();
                 var selected = this.currentAction.get(this.state.getBlock());
                 this.sidebar.setTitle(Text.translatable("item.polyfactory.wrench.title",
-                        Text.empty().append(this.state.getBlock().getName())
-                                .setStyle(Style.EMPTY.withColor(Formatting.YELLOW).withBold(false)))
+                        Text.empty()/*.append(this.state.getBlock().getName())
+                                .setStyle(Style.EMPTY.withColor(Formatting.YELLOW).withBold(false))*/)
                         .setStyle(Style.EMPTY.withColor(Formatting.GOLD).withBold(true)));
                 this.sidebar.set((b) -> {
                     int size = Math.min(this.actions.size(), 15);

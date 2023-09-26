@@ -1,18 +1,16 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
-import eu.pb4.polyfactory.block.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
+import eu.pb4.polyfactory.block.base.BarrierBasedWaterloggable;
+import eu.pb4.polyfactory.block.base.FactoryBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.util.CachedBlockPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -46,11 +44,11 @@ import org.joml.Matrix4fStack;
 import java.util.List;
 
 
-public class SplitterBlock extends Block implements PolymerBlock, MovingItemConsumer, WrenchableBlock, BlockEntityProvider, BarrierBasedWaterloggable, BlockWithElementHolder, VirtualDestroyStage.Marker {
-    public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+public class SplitterBlock extends Block implements FactoryBlock, MovingItemConsumer, WrenchableBlock, BlockEntityProvider, BarrierBasedWaterloggable {
     public static final BooleanProperty ENABLED = Properties.ENABLED;
     public static final BooleanProperty DISTRIBUTE = BooleanProperty.of("distribute");
     public static final BooleanProperty BLOCKING = BooleanProperty.of("blocking");
+    public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     public SplitterBlock(Settings settings) {
         super(settings);
@@ -97,7 +95,7 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
                 dirs = List.of(dir.rotateYCounterclockwise(), dir);
             } else if (blockEntity.isRightFilterEmpty()) {
                 dirs = List.of(dir.rotateYClockwise(), dir);
-            } else  {
+            } else {
                 return false;
             }
 
@@ -106,8 +104,7 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
             }
 
             for (var direction : dirs) {
-                var x = FactoryUtil.tryInsertingMovable(conveyor, self.getWorld(), conveyorPos,
-                        conveyorPos.offset(direction), direction, direction, FactoryBlockTags.SPLITTER_SIDE_OUTPUT);
+                var x = FactoryUtil.tryInsertingMovable(conveyor, self.getWorld(), conveyorPos, conveyorPos.offset(direction), direction, direction, FactoryBlockTags.SPLITTER_SIDE_OUTPUT);
 
                 if (x != FactoryUtil.MovableResult.FAILURE) {
                     return true;
@@ -167,8 +164,8 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (!state.isOf(newState.getBlock())) {
             if (world.getBlockEntity(pos) instanceof SplitterBlockEntity be) {
-                ItemScatterer.spawn(world, pos.getX()  + 0.5, pos.getY()  + 0.5, pos.getZ() + 0.5, be.getFilterRight());
-                ItemScatterer.spawn(world, pos.getX()  + 0.5, pos.getY()  + 0.5, pos.getZ() + 0.5, be.getFilterLeft());
+                ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, be.getFilterRight());
+                ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, be.getFilterLeft());
             }
         }
         super.onStateReplaced(state, world, pos, newState, moved);
@@ -245,6 +242,9 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
     }
 
     public static final class Model extends ElementHolder {
+        static {
+        }
+
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement leftLockElement;
@@ -317,9 +317,6 @@ public class SplitterBlock extends Block implements PolymerBlock, MovingItemCons
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 this.updateFacing(BlockBoundAttachment.get(this).getBlockState());
             }
-        }
-
-        static {
         }
     }
 }

@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.polyfactory.block.other.LockableBlockEntity;
+import eu.pb4.polyfactory.block.base.LockableBlockEntity;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;

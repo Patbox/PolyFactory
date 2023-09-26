@@ -1,8 +1,7 @@
 package eu.pb4.polyfactory.block.data.output;
 
-import eu.pb4.polyfactory.block.BlockEntityExtraListener;
+import eu.pb4.polyfactory.block.base.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

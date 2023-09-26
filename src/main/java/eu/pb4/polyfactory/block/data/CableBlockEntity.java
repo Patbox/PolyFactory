@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.block.data;
 
-import eu.pb4.polyfactory.block.BlockEntityExtraListener;
+import eu.pb4.polyfactory.block.base.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.ColorProvider;

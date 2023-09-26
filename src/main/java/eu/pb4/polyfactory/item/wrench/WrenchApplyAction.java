@@ -9,6 +9,7 @@ import net.minecraft.world.World;
 
 import java.util.Collection;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public interface WrenchApplyAction {
@@ -31,6 +32,15 @@ public interface WrenchApplyAction {
                 var elements = (Collection) property.getValues();
                 var current = (Object) state.get(property);
                 world.setBlockState(pos, state.with((Property) property, (Comparable) (!next ? Util.previous(elements, current) : Util.next(elements, current))));
+            }
+        };
+    }
+
+    static <T extends Comparable<T>> WrenchApplyAction ofProperty(Property<T> property, BiFunction<T, Boolean, T> function) {
+        return (world, pos, side, state, next) -> {
+            if (state.contains(property)) {
+                var current = state.get(property);
+                world.setBlockState(pos, state.with(property, function.apply(current, next)));
             }
         };
     }

@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleWithLargeGearBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
+import eu.pb4.polyfactory.block.other.TinyPotatoSpringBlock;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
 import eu.pb4.polyfactory.models.CableModel;
@@ -55,24 +56,30 @@ public class ModInit implements ModInitializer {
 		FactoryNodes.register();
 		FactoryRecipeTypes.register();
 		FactoryRecipeSerializers.register();
-		AxleBlock.Model.ITEM_MODEL.getItem();
-		WindmillBlock.Model.MODEL.getItem();
-		AxleWithGearBlock.Model.ITEM_MODEL_1.getItem();
-		AxleWithLargeGearBlock.Model.GEAR_MODEL.getItem();
-		PlanterBlock.Model.OUTPUT_1.getItem();
-		RedstoneOutputBlock.Model.OUTPUT_OVERLAY.item();
 		FactoryLootTables.register();
 		FactoryCommands.register();
-		GenericParts.SMALL_GEAR.isEmpty();
 		DebugData.register();
 
 		ConveyorModel.registerAssetsEvents();
 		CableModel.registerAssetsEvents();
+		initModels();
 		VirtualDestroyStage.setup();
 		UiResourceCreator.setup();
 		GuiTextures.register();
 		PolydexCompat.register();
 		PolymerResourcePackUtils.addModAssets(ID);
 		PolymerResourcePackUtils.markAsRequired();
+	}
+
+	@SuppressWarnings("ResultOfMethodCallIgnored")
+	private void initModels() {
+		AxleBlock.Model.ITEM_MODEL.getItem();
+		WindmillBlock.Model.MODEL.getItem();
+		AxleWithGearBlock.Model.ITEM_MODEL_1.getItem();
+		AxleWithLargeGearBlock.Model.GEAR_MODEL.getItem();
+		PlanterBlock.Model.OUTPUT_1.getItem();
+		TinyPotatoSpringBlock.Model.BASE_MODEL.getItem();
+		RedstoneOutputBlock.Model.OUTPUT_OVERLAY.item();
+		GenericParts.SMALL_GEAR.isEmpty();
 	}
 }

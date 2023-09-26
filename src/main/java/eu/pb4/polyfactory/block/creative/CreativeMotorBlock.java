@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.creative;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.base.FactoryBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
@@ -41,7 +42,7 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
-public class CreativeMotorBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider, RotationUser {
+public class CreativeMotorBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser {
     public static final DirectionProperty FACING = Properties.FACING;
 
     public CreativeMotorBlock(Settings settings) {

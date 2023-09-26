@@ -3,7 +3,6 @@ package eu.pb4.polyfactory.mixin.util;
 import eu.pb4.polyfactory.block.other.CustomBlockEntityCalls;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

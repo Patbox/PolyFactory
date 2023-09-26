@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.mixin.player;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import eu.pb4.polyfactory.block.SneakBypassingBlock;
+import eu.pb4.polyfactory.block.base.SneakBypassingBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.network.ServerPlayerEntity;

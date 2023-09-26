@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.block.other;
 
-import eu.pb4.polyfactory.block.BarrierBasedWaterloggable;
+import eu.pb4.polyfactory.block.base.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.FactoryEntityTags;
@@ -14,7 +14,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;

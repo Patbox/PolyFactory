@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.data.output;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.base.FactoryBlock;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.block.data.util.GenericDirectionalDataBlock;
@@ -21,7 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.Collection;
 import java.util.List;
 
-public class NixieTubeConnectorBlock extends Block implements PolymerBlock, VirtualDestroyStage.Marker, BlockWithElementHolder {
+public class NixieTubeConnectorBlock extends Block implements FactoryBlock {
     public static final BooleanProperty TOP_CONNECTOR = BooleanProperty.of("top_connector");
     public static final BooleanProperty BOTTOM_CONNECTOR = BooleanProperty.of("bottom_connector");
     public NixieTubeConnectorBlock(Settings settings) {

@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
-import eu.pb4.polyfactory.block.BarrierBasedWaterloggable;
+import eu.pb4.polyfactory.block.base.BarrierBasedWaterloggable;
+import eu.pb4.polyfactory.block.base.FactoryBlock;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseItemProvider;
@@ -49,7 +50,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 
-public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsumer, MovingItemProvider, WrenchableBlock, BlockEntityProvider, BarrierBasedWaterloggable, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsumer, MovingItemProvider, WrenchableBlock, BlockEntityProvider, BarrierBasedWaterloggable {
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
     public static final EnumProperty<ConveyorLikeDirectional.TransferMode> MODE = EnumProperty.of("mode", ConveyorLikeDirectional.TransferMode.class,
@@ -332,7 +333,7 @@ public class FunnelBlock extends Block implements PolymerBlock, MovingItemConsum
             mat.identity();
             mat.rotate(rot).rotateY(MathHelper.PI);
             if (outModel) {
-                mat.rotateX(22.5f * MathHelper.RADIANS_PER_DEGREE);
+                mat.rotateX(-22.5f * MathHelper.RADIANS_PER_DEGREE);
                 mat.translate(0, 0.50f, 0.008f);
             } else {
                 mat.translate(0, 0.555f, 0.025f);

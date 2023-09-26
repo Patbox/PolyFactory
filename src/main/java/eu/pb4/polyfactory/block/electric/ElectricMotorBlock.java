@@ -1,12 +1,15 @@
 package eu.pb4.polyfactory.block.electric;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.base.FactoryBlock;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.models.RotationAwareModel;
@@ -49,13 +52,11 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
-public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider, CableConnectable, RotationUser, EnergyUser, StateNameProvider {
+public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, BlockEntityProvider, CableConnectable, RotationUser, EnergyUser, WrenchableBlock {
     public static final DirectionProperty FACING = Properties.FACING;
-    public static final BooleanProperty GENERATOR = BooleanProperty.of("generator");
 
     public ElectricMotorBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(GENERATOR, false));
     }
 
     @Override
@@ -86,7 +87,7 @@ public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, Bl
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(FACING).add(GENERATOR);
+        builder.add(FACING);
     }
 
     @Nullable
@@ -122,10 +123,10 @@ public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, Bl
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (!player.isSneaking() && hand == Hand.MAIN_HAND && hit.getSide() != state.get(FACING) && player.isCreative() && world.getBlockEntity(pos) instanceof ElectricMotorBlockEntity be && player instanceof ServerPlayerEntity serverPlayer) {
-            be.openGui(serverPlayer);
-            return ActionResult.SUCCESS;
-        }
+        //if (!player.isSneaking() && hand == Hand.MAIN_HAND && hit.getSide() != state.get(FACING) && player.isCreative() && world.getBlockEntity(pos) instanceof ElectricMotorBlockEntity be && player instanceof ServerPlayerEntity serverPlayer) {
+        //    be.openGui(serverPlayer);
+        //    return ActionResult.SUCCESS;
+        //}
         return ActionResult.PASS;
     }
 
@@ -140,20 +141,14 @@ public class ElectricMotorBlock extends NetworkBlock implements PolymerBlock, Bl
         return List.of(new FunctionalDirectionNode(state.get(FACING).getOpposite()));
     }
 
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return ElectricMotorBlockEntity::ticker;
-    }
-
-    @Override
-    public Text getName(ServerWorld world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
-        return state.get(GENERATOR) ? Text.translatable(this.getTranslationKey() + ".generator") : this.getName();
-    }
-
     @Override
     public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         return state.get(FACING) == dir.getOpposite();
+    }
+
+    @Override
+    public List<WrenchAction> getWrenchActions() {
+        return List.of(WrenchAction.FACING);
     }
 
     public static final class Model extends RotationAwareModel {

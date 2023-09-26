@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.block.multiblock;
+package eu.pb4.polyfactory.block.base;
 
 import eu.pb4.polyfactory.mixin.player.ItemUsageContextAccessor;
 import eu.pb4.polymer.core.api.block.PolymerBlock;

@@ -132,6 +132,13 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
         BlockPos next;
         if (vert.stack) {
             next = pos.up(vert.value);
+            if (vert.value == -1) {
+                var maybeNext = next.offset(dir);
+                var possibleNext = world.getBlockState(maybeNext);
+                if (possibleNext.isIn(FactoryBlockTags.CONVEYORS)) {
+                    next = maybeNext;
+                }
+            }
         } else if (vert.value == 0 || vert.value == 1) {
             next = pos.offset(dir);
             var possibleNext = world.getBlockState(next);
@@ -180,9 +187,9 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
             nextConveyor.setDelta(0.8);
         }
 
-        if (vert.stack && vert.value == -1 && nextState.get(ConveyorBlock.VERTICAL) == ConveyorBlock.DirectionValue.NONE) {
+        /*if (vert.stack && vert.value == -1 && nextState.get(ConveyorBlock.VERTICAL) == ConveyorBlock.DirectionValue.NONE) {
             nextConveyor.setDelta(1);
-        }
+        }*/
 
         var x = this.pullAndRemove();
         if (x != null) {

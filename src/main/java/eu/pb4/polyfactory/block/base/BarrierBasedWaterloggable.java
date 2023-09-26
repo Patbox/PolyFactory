@@ -1,5 +1,6 @@
-package eu.pb4.polyfactory.block;
+package eu.pb4.polyfactory.block.base;
 
+import eu.pb4.polyfactory.block.base.QuickWaterloggable;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

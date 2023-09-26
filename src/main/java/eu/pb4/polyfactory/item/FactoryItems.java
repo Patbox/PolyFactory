@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.item;
 
-import eu.pb4.polyfactory.block.multiblock.MultiBlock;
+import eu.pb4.polyfactory.block.base.MultiBlock;
 import eu.pb4.polyfactory.item.block.CableItem;
 import eu.pb4.polyfactory.item.block.WindmillSailItem;
 import eu.pb4.polyfactory.item.tool.FilterItem;
@@ -15,7 +15,6 @@ import eu.pb4.polyfactory.item.wrench.WrenchItem;
 import eu.pb4.polyfactory.item.util.AutoModeledPolymerItem;
 import eu.pb4.polyfactory.item.util.ModeledBlockItem;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
@@ -30,7 +29,6 @@ public class FactoryItems {
     public static final WrenchItem WRENCH = register("wrench", new WrenchItem());
     public static final Item CONVEYOR = register(FactoryBlocks.CONVEYOR);
     public static final Item STICKY_CONVEYOR = register(FactoryBlocks.STICKY_CONVEYOR);
-    public static final Item ELECTRIC_MOTOR = register(FactoryBlocks.ELECTRIC_MOTOR);
     public static final Item FUNNEL = register(FactoryBlocks.FUNNEL);
     public static final Item SPLITTER = register(FactoryBlocks.SPLITTER);
     public static final Item FAN = register(FactoryBlocks.FAN);
@@ -75,9 +73,12 @@ public class FactoryItems {
     public static final Item NIXIE_TUBE_CONTROLLER = register(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
     public static final CableItem CABLE = register("cable", new CableItem(new Item.Settings()));
 
+    public static final Item ELECTRIC_MOTOR = register(FactoryBlocks.ELECTRIC_MOTOR);
+    public static final Item ELECTRIC_GENERATOR = register(FactoryBlocks.ELECTRIC_GENERATOR);
 
     public static final Item ARTIFICIAL_DYE = register("artificial_dye", new ArtificialDyeItem(new Item.Settings()));
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
+    public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING);
 
 
     public static void register() {
@@ -122,9 +123,13 @@ public class FactoryItems {
 
                     // Data
                     entries.add(CABLE);
-                    entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.RED)));
-                    entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.GREEN)));
-                    entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.BLUE)));
+                    entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.RED)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                    entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.GREEN)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                    entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.BLUE)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                    for (var dye : DyeColor.values()) {
+                        entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(dye)), ItemGroup.StackVisibility.SEARCH_TAB_ONLY);
+                    }
+
                     entries.add(REDSTONE_OUTPUT);
                     entries.add(REDSTONE_INPUT);
                     entries.add(ITEM_COUNTER);
@@ -133,12 +138,14 @@ public class FactoryItems {
                     entries.add(NIXIE_TUBE_CONTROLLER);
                     entries.add(NIXIE_TUBE);
 
+                    // Electrical machines (tier 2)
+                    entries.add(ELECTRIC_GENERATOR);
+                    entries.add(ELECTRIC_MOTOR);
+
                     // Rest
 
                     entries.add(INVERTED_REDSTONE_LAMP);
-
-                    // Electrical machines (tier 2)
-                    //entries.add(ELECTRIC_MOTOR_BLOCK);
+                    entries.add(TINY_POTATO_SPRING);
 
                     // Generic Materials
                     entries.add(SAW_DUST);

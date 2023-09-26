@@ -286,6 +286,29 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                 .offerTo(exporter);
 
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.ELECTRIC_GENERATOR)
+                .pattern("scs")
+                .pattern("aia")
+                .pattern("scs")
+                .input('s', FactoryItems.STEEL_PLATE)
+                .input('a', FactoryItems.AXLE)
+                .input('i', FactoryItems.STEEL_INGOT)
+                .input('c', Items.COPPER_BLOCK)
+                .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
+                .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.ELECTRIC_MOTOR)
+                .pattern("scs")
+                .pattern("cia")
+                .pattern("scs")
+                .input('s', FactoryItems.STEEL_PLATE)
+                .input('a', FactoryItems.AXLE)
+                .input('i', FactoryItems.STEEL_INGOT)
+                .input('c', Items.COPPER_BLOCK)
+                .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
+                .offerTo(exporter);
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.GEARBOX, 1)
                 .pattern("sgs")
                 .pattern("gwg")
@@ -324,6 +347,16 @@ class RecipesProvider extends FabricRecipeProvider {
                 .input('i', FactoryItems.STEEL_INGOT)
                 .input('t', FactoryItems.TREATED_DRIED_KELP)
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, FactoryItems.TINY_POTATO_SPRING)
+                .pattern(" p ")
+                .pattern(" s ")
+                .pattern(" w ")
+                .input('p', Items.POTATO)
+                .input('s', FactoryItems.STEEL_INGOT)
+                .input('w', FactoryItems.WOODEN_PLATE)
+                .criterion("get_item", InventoryChangedCriterion.Conditions.items(Items.DRAGON_EGG))
                 .offerTo(exporter);
 
         of(exporter, ColoringCraftingRecipe.CODEC, ColoringCraftingRecipe.of("cable_color", FactoryItems.CABLE));

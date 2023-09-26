@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.block.other;
+package eu.pb4.polyfactory.block.base;
 
 import eu.pb4.polyfactory.block.mechanical.machines.MinerBlockEntity;
 import net.minecraft.block.BlockState;

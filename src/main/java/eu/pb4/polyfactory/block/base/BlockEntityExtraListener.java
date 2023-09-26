@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.block;
+package eu.pb4.polyfactory.block.base;
 
 import net.minecraft.world.chunk.WorldChunk;
 

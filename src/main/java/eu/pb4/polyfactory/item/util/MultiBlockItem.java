@@ -1,8 +1,7 @@
 package eu.pb4.polyfactory.item.util;
 
-import eu.pb4.polyfactory.block.multiblock.MultiBlock;
+import eu.pb4.polyfactory.block.base.MultiBlock;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemPlacementContext;
 

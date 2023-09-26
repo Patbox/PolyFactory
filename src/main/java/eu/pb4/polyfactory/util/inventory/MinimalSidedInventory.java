@@ -51,12 +51,14 @@ public interface MinimalSidedInventory extends SidedInventory {
 
     @Override
     default ItemStack removeStack(int slot) {
+        this.markDirty();
         return Inventories.removeStack(this.getStacks(), slot);
     }
 
     @Override
     default void setStack(int slot, ItemStack stack) {
         this.getStacks().set(slot, stack);
+        this.markDirty();
     }
 
 

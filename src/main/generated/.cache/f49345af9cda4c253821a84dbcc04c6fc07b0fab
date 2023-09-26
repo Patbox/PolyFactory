@@ -1,6 +1,7 @@
-// 1.20.2	2023-09-24T20:40:45.383062542	PolyFactory/Block Loot Tables
+// 1.20.2	2023-09-26T21:18:17.029989732	PolyFactory/Block Loot Tables
 21d4d4bda469eef27cc6294ce2836a626c6e9da4 data/polyfactory/loot_tables/blocks/windmill.json
 70adeaf5434500398f76bcbff48bb820d33c748f data/polyfactory/loot_tables/blocks/grinder.json
+ae2bd50e4d2e635e867c2e39a8a22a1f8f35a20f data/polyfactory/loot_tables/blocks/inverted_redstone_lamp.json
 d66138c2b490a4ece3ccfe987b5cf7e0ffe39486 data/polyfactory/loot_tables/blocks/conveyor.json
 02250adb5de068ef1162a0f261c567c2b104d089 data/polyfactory/loot_tables/blocks/nixie_tube_controller.json
 d34e6e8307578cc25967b8152d08137c25434cc7 data/polyfactory/loot_tables/blocks/redstone_output.json
@@ -13,12 +14,14 @@ a5006c168b4b2d9de16dcf2a30f44c37a91e388e data/polyfactory/loot_tables/blocks/spl
 6335e7f66a3d3e9dccbbad715afdf4db6d4a1e24 data/polyfactory/loot_tables/blocks/mixer.json
 d4726d94a302b7f008129d37d2161340c33df586 data/polyfactory/loot_tables/blocks/sticky_conveyor.json
 5a97961b97af9600f7bf750abee92dca0eb47d5f data/polyfactory/loot_tables/blocks/fan.json
+78c85be111087d3fa104bb68d3069823cb6141ad data/polyfactory/loot_tables/blocks/tiny_potato_spring.json
 21d4d4bda469eef27cc6294ce2836a626c6e9da4 data/polyfactory/loot_tables/blocks/axle.json
 6dc05a0e23c8113656481d2756f456247ed5b6c3 data/polyfactory/loot_tables/blocks/steam_engine.json
 6b0b6a9cb3c9893475c32dc514e9610faeb17c69 data/polyfactory/loot_tables/blocks/gearbox.json
 ac1ca0b690037d16a87c1ca876e58bb9c5b2427e data/polyfactory/loot_tables/blocks/item_reader.json
 88fb45615a681f5307d72d87d53611d7d90fcccd data/polyfactory/loot_tables/blocks/cable.json
 167e0dcdf80c5daa48795be652511cb3b23e2328 data/polyfactory/loot_tables/blocks/hand_crank.json
+8f760a99e1ed67fcb20c8c60fd3b28a52a4ded15 data/polyfactory/loot_tables/blocks/electric_generator.json
 da431a16ebd601df56169c0e81e040455705a69f data/polyfactory/loot_tables/blocks/axle_with_gear.json
 14ca5757283c0d83f784782ee275c1e136b56c76 data/polyfactory/loot_tables/blocks/nixie_tube.json
 1b9d93d764b4eb6dea0dfe45ce8a68ec5ec3af26 data/polyfactory/loot_tables/blocks/block_observer.json

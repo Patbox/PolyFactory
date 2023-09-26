@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.block.data.util;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.block.other.LockableBlockEntity;
+import eu.pb4.polyfactory.block.base.LockableBlockEntity;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.StringData;
 import net.minecraft.block.BlockState;

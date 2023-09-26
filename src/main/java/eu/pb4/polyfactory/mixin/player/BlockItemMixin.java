@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.mixin.player;
 
-import eu.pb4.polyfactory.block.AbovePlacingLimiter;
+import eu.pb4.polyfactory.block.base.AbovePlacingLimiter;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;

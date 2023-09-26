@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.data.util;
 
+import eu.pb4.polyfactory.block.base.FactoryBlock;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
@@ -32,7 +33,7 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
-public abstract class GenericDirectionalDataBlock extends DataNetworkBlock implements PolymerBlock, WrenchableBlock, VirtualDestroyStage.Marker, BlockEntityProvider, BlockWithElementHolder, CableConnectable {
+public abstract class GenericDirectionalDataBlock extends DataNetworkBlock implements FactoryBlock, WrenchableBlock, BlockEntityProvider, CableConnectable {
     public static DirectionProperty FACING = Properties.FACING;
     public GenericDirectionalDataBlock(Settings settings) {
         super(settings);

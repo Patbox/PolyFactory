@@ -21,7 +21,6 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -147,7 +146,9 @@ public class RotationData implements GraphEntity<RotationData> {
                     rot.speed = 0;
                     rot.stressUsage = 0;
                     rot.stressCapacity = 0;
-                    rot.getContext().getGraph().getNodes().forEach(this::spawnSmoke);
+                    if (state.providerCount != 0) {
+                        rot.getContext().getGraph().getNodes().forEach(this::spawnSmoke);
+                    }
                 }
                 return;
             }
@@ -281,7 +282,7 @@ public class RotationData implements GraphEntity<RotationData> {
     }
 
     private void applyState(State state) {
-        if (state.count == 0) {
+        if (state.providerCount == 0) {
             this.stressCapacity = 0;
             this.stressUsage = 0;
             this.speed = 0;
@@ -293,7 +294,7 @@ public class RotationData implements GraphEntity<RotationData> {
         if (this.stressCapacity - stressUsage < 0) {
             this.speed = 0;
         } else {
-            this.speed = Math.abs(state.finalSpeed() / state.count);
+            this.speed = Math.abs(state.finalSpeed() / state.providerCount);
         }
     }
 
@@ -374,10 +375,11 @@ public class RotationData implements GraphEntity<RotationData> {
         protected double speed;
         protected double stressCapacity;
         protected double stressUsed;
-        protected int count;
+        protected int providerCount;
+        protected int userCount;
 
         public void provide(double speed, double stressCapacity, boolean negative) {
-            this.count++;
+            this.providerCount++;
 
             if (this.flip == negative) {
                 this.speed += speed * this.multiplier;
@@ -390,6 +392,7 @@ public class RotationData implements GraphEntity<RotationData> {
 
         public void stress(double stress) {
             this.stressUsed += stress;
+            this.userCount++;
         }
 
         public void provide(float speed, float stressCapacity, Direction.AxisDirection direction) {

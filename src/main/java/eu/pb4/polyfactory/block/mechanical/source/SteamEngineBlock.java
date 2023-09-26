@@ -1,12 +1,12 @@
 package eu.pb4.polyfactory.block.mechanical.source;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.base.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.polyfactory.block.multiblock.MultiBlock;
+import eu.pb4.polyfactory.block.base.MultiBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseItemProvider;
-import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
@@ -53,7 +53,7 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
-public class SteamEngineBlock extends MultiBlock implements BlockWithElementHolder, BlockEntityProvider, InventoryProvider, RotationUser, VirtualDestroyStage.Marker {
+public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockEntityProvider, InventoryProvider, RotationUser {
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty LIT = Properties.LIT;
 
@@ -261,7 +261,7 @@ public class SteamEngineBlock extends MultiBlock implements BlockWithElementHold
         protected void onTick() {
             if (this.getTick() % this.getUpdateRate() == 0) {
                 var dir = BlockBoundAttachment.get(this).getBlockState().get(FACING);
-                this.updateAnimation(this.getRotation(),
+                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos().up()).rotation(),
                         (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
                 //if (this.whisk.isDirty()) {
                 //    this.whisk.startInterpolation();

@@ -1,17 +1,12 @@
 package eu.pb4.polyfactory.block.data.output;
 
-import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import eu.pb4.polyfactory.block.BarrierBasedWaterloggable;
+import eu.pb4.polyfactory.block.base.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.data.CableConnectable;
-import eu.pb4.polyfactory.block.data.DataReceiver;
-import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
-import eu.pb4.polyfactory.data.DataContainer;
+import eu.pb4.polyfactory.block.base.FactoryBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseModel;
-import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -50,10 +45,9 @@ import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 
-import java.util.Collection;
 import java.util.List;
 
-public class NixieTubeBlock extends Block implements PolymerBlock, BlockEntityProvider, WrenchableBlock, BlockWithElementHolder, VirtualDestroyStage.Marker, BarrierBasedWaterloggable {
+public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityProvider, WrenchableBlock, BarrierBasedWaterloggable {
     public static Property<Direction.Axis> AXIS = EnumProperty.of("axis", Direction.Axis.class, Direction.Axis.X, Direction.Axis.Z);
     public static BooleanProperty POSITIVE_CONNECTED = BooleanProperty.of("positive_connected");
     public static BooleanProperty NEGATIVE_CONNECTED = BooleanProperty.of("negative_connected");

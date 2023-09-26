@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.data;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.base.FactoryBlock;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
@@ -49,7 +50,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class CableBlock extends NetworkBlock implements PolymerBlock, BlockEntityProvider, VirtualDestroyStage.Marker, BlockWithElementHolder, CableConnectable, StateNameProvider, NetworkComponent.Data, NetworkComponent.Energy {
+public class CableBlock extends NetworkBlock implements FactoryBlock, BlockEntityProvider, CableConnectable, StateNameProvider, NetworkComponent.Data, NetworkComponent.Energy {
     public static final BooleanProperty NORTH;
     public static final BooleanProperty EAST;
     public static final BooleanProperty SOUTH;
