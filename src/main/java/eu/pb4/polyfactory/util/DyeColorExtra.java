@@ -1,7 +1,6 @@
 package eu.pb4.polyfactory.util;
 
-import eu.pb4.polyfactory.item.ArtificialDyeItem;
-import eu.pb4.polyfactory.item.ColoredItem;
+import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.item.FactoryItems;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;

@@ -1,0 +1,32 @@
+{
+  "parent": "polyfactory:main/rotation/hand_crank",
+  "criteria": {
+    "use": {
+      "conditions": {
+        "trigger": "polyfactory:construct_working_windmill"
+      },
+      "trigger": "polyfactory:trigger"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.polyfactory.windmill.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "polyfactory:windmill_sail"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.polyfactory.windmill.title"
+    }
+  },
+  "requirements": [
+    [
+      "use"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

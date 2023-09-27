@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.HopperBlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
@@ -159,6 +160,10 @@ public class FactoryUtil {
 
     public static <T extends Comparable<T>> BlockState transform(BlockState input, Function<T, T> transform, Property<T> property) {
         return input.withIfExists(property, transform.apply(input.get(property)));
+    }
+
+    public static PlayerEntity getClosestPlayer(World world, BlockPos pos, double distance) {
+        return world.getClosestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, distance, false);
     }
 
     public enum MovableResult {

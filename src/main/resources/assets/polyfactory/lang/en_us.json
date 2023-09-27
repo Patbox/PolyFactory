@@ -36,6 +36,7 @@
   "block.polyfactory.creative_container": "Creative Container",
   "block.polyfactory.inverted_redstone_lamp": "Inverted Redstone Lamp",
   "block.polyfactory.tiny_potato_spring": "Potato on a Spring",
+  "item.polyfactory.mod_icon": "Mod Icon",
   "item.polyfactory.windmill_sail": "Windmill Sail",
   "item.polyfactory.item_filter": "Item Filter",
   "item.polyfactory.item_filter.empty": "Empty Item Filter",
@@ -73,6 +74,14 @@
 
   "advancements.polyfactory.root.title": "PolyFactory",
   "advancements.polyfactory.root.description": "Welcome to the factory!",
+
   "advancements.polyfactory.hand_crank.title": "Hand-powered",
-  "advancements.polyfactory.hand_crank.description": "Power a machine by using an Hand Crank"
+  "advancements.polyfactory.hand_crank.description": "Power a machine by using an Hand Crank",
+  "advancements.polyfactory.windmill.title": "Energy of the skies",
+  "advancements.polyfactory.windmill.description": "Construct working Windmill, high above the ground",
+  "advancements.polyfactory.steam_engine.title": "Industrial Revolution",
+  "advancements.polyfactory.steam_engine.description": "Put fuel into the Steam Engine",
+
+  "advancements.polyfactory.wrench.title": "Configured",
+  "advancements.polyfactory.wrench.description": "Use Wrench to change properties of a machine."
 }

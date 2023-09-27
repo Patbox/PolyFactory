@@ -1,23 +1,16 @@
 package eu.pb4.polyfactory.item.block;
 
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.data.CableBlock;
-import eu.pb4.polyfactory.item.ColoredItem;
+import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.item.util.FireworkStarColoredItem;
 import eu.pb4.polyfactory.item.util.ModeledBlockItem;
-import eu.pb4.polyfactory.mixin.player.ItemUsageContextAccessor;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.item.DyeableItem;
-import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.world.World;

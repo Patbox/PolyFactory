@@ -1,11 +1,14 @@
 package eu.pb4.polyfactory.item.block;
 
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
 import eu.pb4.polyfactory.item.util.FireworkStarColoredItem;
 import eu.pb4.polyfactory.item.util.ModeledItem;
+import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -52,9 +55,19 @@ public class WindmillSailItem extends ModeledItem implements DyeableItem, Firewo
             if (count > WindmillBlock.MAX_SAILS) {
                 return ActionResult.FAIL;
             } else {
-                context.getWorld().setBlockState(context.getBlockPos(), oldState.with(WindmillBlock.SAIL_COUNT, count));
+                var state =  oldState.with(WindmillBlock.SAIL_COUNT, count);
+                context.getWorld().setBlockState(context.getBlockPos(), state);
                 if (context.getWorld().getBlockEntity(context.getBlockPos()) instanceof WindmillBlockEntity be) {
                     be.addSail(count, context.getStack());
+
+                    if (context.getPlayer() instanceof ServerPlayerEntity player) {
+                        be.updateRotationalData(RotationData.State.SPECIAL, state, player.getServerWorld(), context.getBlockPos());
+                        if (RotationData.State.SPECIAL.finalSpeed() > 0) {
+                            TriggerCriterion.trigger(player, FactoryTriggers.CONSTRUCT_WORKING_WINDMILL);
+                        }
+
+                        RotationData.State.SPECIAL.clear();
+                    }
                 }
                 return ActionResult.SUCCESS;
             }

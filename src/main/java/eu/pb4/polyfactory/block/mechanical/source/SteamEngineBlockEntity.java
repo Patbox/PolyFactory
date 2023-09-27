@@ -1,5 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.source;
 
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.base.LockableBlockEntity;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -137,6 +139,8 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
     }
 
     private class Gui extends SimpleGui {
+        private boolean active;
+
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X2, player, false);
             this.setTitle(GuiTextures.STEAM_ENGINE.apply(SteamEngineBlockEntity.this.getCachedState().getBlock().getName()));
@@ -144,6 +148,7 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
             this.setSlotRedirect(9 + 4, new FuelSlot(SteamEngineBlockEntity.this, 1, 1, 0));
             this.setSlotRedirect(9 + 5, new FuelSlot(SteamEngineBlockEntity.this, 2, 2, 0));
             this.setSlot(4, GuiTextures.FLAME.get(progress()));
+            this.active = SteamEngineBlockEntity.this.fuelTicks > 0;
             this.open();
         }
 
@@ -157,6 +162,12 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
         public void onTick() {
             if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(SteamEngineBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
+            }
+
+            var active =  SteamEngineBlockEntity.this.fuelTicks > 0;
+            if (!this.active && active) {
+                this.active = true;
+                TriggerCriterion.trigger(this.player, FactoryTriggers.FUEL_STEAM_ENGINE);
             }
             this.setSlot(4, GuiTextures.FLAME.get(progress()));
             super.onTick();

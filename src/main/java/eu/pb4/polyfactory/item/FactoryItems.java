@@ -2,18 +2,16 @@ package eu.pb4.polyfactory.item;
 
 import eu.pb4.polyfactory.block.base.MultiBlock;
 import eu.pb4.polyfactory.item.block.CableItem;
+import eu.pb4.polyfactory.item.block.GearItem;
 import eu.pb4.polyfactory.item.block.WindmillSailItem;
 import eu.pb4.polyfactory.item.tool.FilterItem;
-import eu.pb4.polyfactory.item.util.ModeledItem;
-import eu.pb4.polyfactory.item.util.MultiBlockItem;
+import eu.pb4.polyfactory.item.util.*;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.wrench.WrenchItem;
-import eu.pb4.polyfactory.item.util.AutoModeledPolymerItem;
-import eu.pb4.polyfactory.item.util.ModeledBlockItem;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.block.Block;
@@ -26,6 +24,7 @@ import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
 public class FactoryItems {
+    public static final Item MOD_ICON = register("mod_icon", new ModeledItem(new Item.Settings()));
     public static final WrenchItem WRENCH = register("wrench", new WrenchItem());
     public static final Item CONVEYOR = register(FactoryBlocks.CONVEYOR);
     public static final Item STICKY_CONVEYOR = register(FactoryBlocks.STICKY_CONVEYOR);
@@ -83,6 +82,7 @@ public class FactoryItems {
 
     public static void register() {
         FuelRegistry.INSTANCE.add(SAW_DUST, 60);
+        FuelRegistry.INSTANCE.add(WOODEN_PLATE, 120);
         FuelRegistry.INSTANCE.add(COAL_DUST, 160);
 
         PolymerItemGroupUtils.registerPolymerItemGroup(new Identifier(ModInit.ID, "group"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)

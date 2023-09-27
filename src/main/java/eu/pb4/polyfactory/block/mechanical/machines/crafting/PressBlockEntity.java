@@ -8,9 +8,11 @@ import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.press.PressRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.Item;
@@ -32,6 +34,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class PressBlockEntity extends TallItemMachineBlockEntity {
     public static final int INPUT_SLOT = 0;
@@ -147,6 +151,10 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             }
 
             if (success) {
+                if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity player) {
+                    Criteria.RECIPE_CRAFTED.trigger(player, self.currentRecipe.id(), List.of(stack.getStack(), stack2.getStack()));
+                }
+
                 self.process = -0.6;
                 self.model.updatePiston(self.process);
                 ((ServerWorld) world).spawnParticles(ParticleTypes.CLOUD,

@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import eu.pb4.polyfactory.item.ColoredItem;
+import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
@@ -15,7 +15,6 @@ import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 public record ColoringCraftingRecipe(String group, Item input, int maxCount) implements CraftingRecipe {

@@ -10,6 +10,8 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.advancement.criterion.Criteria;
+import net.minecraft.advancement.criterion.RecipeCraftedCriterion;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventories;
@@ -146,6 +148,11 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
                     }
                 }
             }
+
+            if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity player) {
+                Criteria.RECIPE_CRAFTED.trigger(player, self.currentRecipe.id(), self.stacks.subList(0, 1));
+            }
+
             var sound = stack.getItem() instanceof BlockItem blockItem ? blockItem.getBlock().getSoundGroup(blockItem.getBlock().getDefaultState()).getBreakSound() : SoundEvents.BLOCK_STONE_BREAK;
             world.playSound(null, pos, sound, SoundCategory.BLOCKS, 0.6f, 0.5f);
             self.process = 0;

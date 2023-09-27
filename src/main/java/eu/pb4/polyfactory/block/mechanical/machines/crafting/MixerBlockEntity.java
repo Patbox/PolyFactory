@@ -8,10 +8,12 @@ import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.WrappingRecipeInputInventory;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -191,6 +193,10 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
                 }
             }
             self.process = 0;
+
+            if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity player) {
+                Criteria.RECIPE_CRAFTED.trigger(player, self.currentRecipe.id(), self.asRecipeInputProvider().getInputStacks());
+            }
 
             self.currentRecipe.value().applyRecipeUse(self, world);
 

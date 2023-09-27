@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "any_item": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "polyfactory:root_advancement"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "polyfactory:textures/advancements/background.png",
+    "description": {
+      "translate": "advancements.polyfactory.root.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "polyfactory:windmill_sail"
+    },
+    "show_toast": false,
+    "title": {
+      "translate": "advancements.polyfactory.root.title"
+    }
+  },
+  "requirements": [
+    [
+      "any_item"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -13,7 +13,7 @@ public class DataGenInit implements DataGeneratorEntrypoint {
         pack.addProvider(EntityTagsProvider::new);
         pack.addProvider(LootTables::new);
         pack.addProvider(RecipesProvider::new);
-        //pack.addProvider(AdvancementsProvider::new);
+        pack.addProvider(AdvancementsProvider::new);
         pack.addProvider(AssetProvider::new);
     }
 }

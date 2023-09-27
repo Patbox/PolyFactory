@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.loottable;
 
 import com.mojang.serialization.Codec;
-import eu.pb4.polyfactory.item.ColoredItem;
+import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.ColorProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContext;

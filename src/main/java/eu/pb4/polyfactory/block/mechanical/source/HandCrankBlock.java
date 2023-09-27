@@ -1,6 +1,8 @@
 package eu.pb4.polyfactory.block.mechanical.source;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.base.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.base.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationConstants;
@@ -12,6 +14,7 @@ import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
+import eu.pb4.polyfactory.nodes.generic.FunctionalNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
@@ -86,6 +89,11 @@ public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlo
             player.addExhaustion(0.1f);
             be.lastTick = world.getServer().getTicks();
             be.negative = player.isSneaking() != (state.get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
+            var rot = RotationUser.getRotation(world, pos);
+            if (player instanceof ServerPlayerEntity serverPlayer && rot.getContext().getGraph().getCachedNodes(FunctionalNode.CACHE).size() > 1) {
+                TriggerCriterion.trigger(serverPlayer, FactoryTriggers.POWER_HAND_CRANK);
+            }
+
             return ActionResult.SUCCESS;
         }
 

@@ -1,13 +1,11 @@
-package eu.pb4.polyfactory.item;
+package eu.pb4.polyfactory.item.util;
 
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
-import net.minecraft.util.Formatting;
 
 import java.util.Locale;
 

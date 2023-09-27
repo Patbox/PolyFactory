@@ -370,6 +370,7 @@ public class RotationData implements GraphEntity<RotationData> {
 
     public static class State {
         public static final State EMPTY = new State();
+        public static final State SPECIAL = new State();
         public boolean flip = false;
         public float multiplier = 1;
         protected double speed;
@@ -409,6 +410,17 @@ public class RotationData implements GraphEntity<RotationData> {
 
         public double finalSpeed() {
             return this.speed / this.multiplier;
+        }
+
+        public void clear() {
+            this.speed = 0;
+            this.userCount = 0;
+            this.flip = false;
+            this.multiplier = 1;
+            this.stressCapacity = 0;
+            this.stressUsed = 0;
+            this.providerCount = 0;
+
         }
     }
 }

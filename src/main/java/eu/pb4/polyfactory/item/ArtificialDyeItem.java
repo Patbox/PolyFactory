@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.item;
 
+import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.item.util.FireworkStarColoredItem;
 import eu.pb4.polyfactory.item.util.ModeledItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
@@ -9,7 +10,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.SignChangingItem;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class ArtificialDyeItem extends ModeledItem implements SignChangingItem, FireworkStarColoredItem, ColoredItem {
     public static final ThreadLocal<List<ItemStack>> CURRENT_DYES = ThreadLocal.withInitial(ArrayList::new);

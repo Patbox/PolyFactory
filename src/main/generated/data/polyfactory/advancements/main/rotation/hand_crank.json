@@ -1,0 +1,32 @@
+{
+  "parent": "polyfactory:main/root",
+  "criteria": {
+    "use": {
+      "conditions": {
+        "trigger": "polyfactory:power_hand_crank"
+      },
+      "trigger": "polyfactory:trigger"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.polyfactory.hand_crank.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "polyfactory:hand_crank"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.polyfactory.hand_crank.title"
+    }
+  },
+  "requirements": [
+    [
+      "use"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

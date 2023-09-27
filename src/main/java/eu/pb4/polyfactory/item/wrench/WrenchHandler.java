@@ -1,5 +1,7 @@
 package eu.pb4.polyfactory.item.wrench;
 
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import eu.pb4.sidebars.api.Sidebar;
@@ -105,6 +107,7 @@ public class WrenchHandler {
             if (action.id().equals(current)) {
                 action.action().applyAction(world, pos, side, state, !player.isSneaking());
                 this.pos = null;
+                TriggerCriterion.trigger(player, FactoryTriggers.WRENCH);
                 return ActionResult.SUCCESS;
             }
         }

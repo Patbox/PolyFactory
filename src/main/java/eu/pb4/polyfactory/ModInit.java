@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory;
 
+import eu.pb4.polyfactory.advancement.FactoryAdvancementCriteria;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock;
@@ -58,6 +59,7 @@ public class ModInit implements ModInitializer {
 		FactoryRecipeSerializers.register();
 		FactoryLootTables.register();
 		FactoryCommands.register();
+		FactoryAdvancementCriteria.register();
 		DebugData.register();
 
 		ConveyorModel.registerAssetsEvents();
