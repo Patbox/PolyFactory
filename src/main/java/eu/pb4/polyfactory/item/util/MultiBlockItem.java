@@ -5,7 +5,7 @@ import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemPlacementContext;
 
-public class MultiBlockItem extends ModeledBlockItem {
+public class MultiBlockItem extends FactoryBlockItem {
     private final MultiBlock multiBlock;
 
     public <T extends MultiBlock & PolymerBlock> MultiBlockItem(T block, Settings settings) {

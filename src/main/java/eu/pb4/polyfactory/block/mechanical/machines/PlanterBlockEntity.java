@@ -2,6 +2,8 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.mojang.authlib.GameProfile;
 import eu.pb4.common.protection.api.CommonProtection;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.base.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
@@ -139,6 +141,9 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
             self.stack.decrement(1);
             world.playSound(null, pos, placableState.getSoundGroup().getPlaceSound(), SoundCategory.BLOCKS, 0.5f, 1.0f);
             world.emitGameEvent(GameEvent.BLOCK_PLACE, mut.toImmutable(), GameEvent.Emitter.of(placableState));
+            if (self.owner != null && world.getPlayerByUuid(self.owner.getId()) instanceof ServerPlayerEntity serverPlayer) {
+                TriggerCriterion.trigger(serverPlayer, FactoryTriggers.PLANTER_PLANTS);
+            }
             self.markDirty();
         }
     }

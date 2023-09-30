@@ -10,6 +10,9 @@ import net.minecraft.util.DyeColor;
 import java.util.Locale;
 
 public interface ColoredItem {
+    static ItemStack stack(Item input, int count, DyeColor color) {
+        return stackCrafting(input, count, DyeColorExtra.getColor(color));
+    }
     static ItemStack stack(Item input, int count, int color) {
         var stack = new ItemStack(input, count);
         setColor(stack, color);

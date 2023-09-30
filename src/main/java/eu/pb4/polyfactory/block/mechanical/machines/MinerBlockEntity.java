@@ -2,6 +2,8 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.mojang.authlib.GameProfile;
 import eu.pb4.common.protection.api.CommonProtection;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.base.LockableBlockEntity;
@@ -180,6 +182,9 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
                 self.currentTool.postMine(world, stateFront, blockPos, player);
                 if (bl && bl2) {
                     stateFront.getBlock().afterBreak(world, player, blockPos, stateFront, blockEntity, itemStack2);
+                    if (self.owner != null && world.getPlayerByUuid(self.owner.getId()) instanceof ServerPlayerEntity serverPlayer) {
+                        TriggerCriterion.trigger(serverPlayer, FactoryTriggers.MINER_MINES);
+                    }
                 }
             }
            self.markDirty();

@@ -1,11 +1,12 @@
 package eu.pb4.polyfactory.block.mechanical;
 
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
-import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
 import eu.pb4.polyfactory.mixin.FallingBlockAccessor;
-import eu.pb4.polyfactory.util.FactoryEntityTags;
+import eu.pb4.polyfactory.util.LastFanEffectedTickConsumer;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FallingBlock;
@@ -33,7 +34,7 @@ public class FanBlockEntity extends BlockEntity {
         }
 
         var reverse = state.get(FanBlock.REVERSE);
-        var speed = RotationUser.getRotation((ServerWorld) world, pos).speed() * MathHelper.RADIANS_PER_DEGREE;
+        var speed = RotationUser.getRotation(world, pos).speed() * MathHelper.RADIANS_PER_DEGREE * 2;
 
         if (speed == 0) {
             return;
@@ -44,15 +45,18 @@ public class FanBlockEntity extends BlockEntity {
         int length = 0;
 
         var testState = world.getBlockState(mut);
-        while ((!testState.isSideSolidFullSquare(world, mut, dir) || testState.isIn(FactoryBlockTags.WIND_PASSTHROUGH)) && length < 32) {
+        while ((!testState.isSideSolidFullSquare(world, mut, dir) || testState.isIn(FactoryBlockTags.WIND_PASSTHROUGH)) && length < speed * 20 * Math.pow(0.98, length)) {
             mut.move(dir);
             testState = world.getBlockState(mut);
             length++;
         }
 
-        if (testState.getBlock() instanceof FallingBlock fallingBlock && mut.isWithinDistance(pos, speed * 20)) {
+        if (testState.getBlock() instanceof FallingBlock fallingBlock && speed * length / (length + 1) * Math.pow(0.98, length) > 0.05) {
             var fallingBlockEntity = FallingBlockEntity.spawnFromBlock(world, mut.toImmutable(), testState);
             ((FallingBlockAccessor) fallingBlock).callConfigureFallingBlockEntity(fallingBlockEntity);
+            if (fallingBlockEntity instanceof LastFanEffectedTickConsumer consumer) {
+                consumer.polyfactory$setLastFanTick();
+            }
         }
 
         if (length == 0) {
@@ -65,10 +69,10 @@ public class FanBlockEntity extends BlockEntity {
 
         var box = new Box(Math.min(pos.getX(), mut.getX()), Math.min(pos.getY(), mut.getY()), Math.min(pos.getZ(), mut.getZ()), Math.max(pos.getX(), mut.getX()) + 1, Math.max(pos.getY(), mut.getY()) + 1, Math.max(pos.getZ(), mut.getZ()) + 1);
 
-        if ((world.getTime() + pos.getX() * 3 + pos.getY() * 7 + pos.getZ() * 5) % MathHelper.clamp(Math.round(2 / speed), 8, 16) == 0) {
+        if ((world.getTime() + pos.getX() * 3L + pos.getY() * 7L + pos.getZ() * 5L) % MathHelper.clamp(Math.round(2 / speed), 8, 16) == 0) {
             var a = center.offset(dir, 1f);
             if (reverse) {
-                a = a.offset(dir, speed * 20);
+                a = a.offset(dir, length);
                 var alt = Vec3d.ofCenter(mut);
                 a = center.squaredDistanceTo(a) < center.squaredDistanceTo(alt) ? a : alt;
             }
@@ -80,27 +84,36 @@ public class FanBlockEntity extends BlockEntity {
                     && EnchantmentHelper.getEquipmentLevel(FactoryEnchantments.IGNORE_MOVEMENT, livingEntity) != 0) {
                 continue;
             }
-            var l = entity.getBoundingBox().getCenter().squaredDistanceTo(center);
-            var x = speed * Math.pow(0.98, l);
-            if (x > 0.05) {
-                if (reverse) {
-                    x = -x;
-                }
-                var base = entity.getVelocity().getComponentAlongAxis(dir.getAxis());
-                entity.setVelocity(entity.getVelocity().withAxis(dir.getAxis(), base * 0.8f).add(Vec3d.of(dir.getVector()).multiply(x)));
 
-                if (dir == Direction.UP) {
-                    entity.fallDistance = 0;
-                }
+            if (entity instanceof LastFanEffectedTickConsumer consumer) {
+                consumer.polyfactory$setLastFanTick();
+            }
 
-                if (entity instanceof ServerPlayerEntity player) {
-                    if (player.age % 2 == 0) {
-                        entity.velocityModified = true;
-                    }
-                    ((ServerPlayNetExt) player.networkHandler).polyFactory$resetFloating();
-                } else {
+            var l = entity.getBoundingBox().getCenter().distanceTo(center);
+            var x = speed * (length - l) / (length + 1) * Math.pow(0.98, length);
+            if (reverse) {
+                x = -x;
+            }
+
+            var base = entity.getVelocity().getComponentAlongAxis(dir.getAxis());
+            entity.setVelocity(entity.getVelocity().withAxis(dir.getAxis(), base * 0.8f).add(Vec3d.of(dir.getVector()).multiply(x)));
+
+            if (dir.getAxis() == Direction.Axis.Y && dir.getDirection() == Direction.AxisDirection.NEGATIVE == reverse) {
+                entity.fallDistance = 0;
+            }
+
+            if (entity instanceof ServerPlayerEntity player) {
+                ((ServerPlayNetExt) player.networkHandler).polyFactory$resetFloating();
+                if (x > 0.05 || x < -0.05) {
                     entity.velocityModified = true;
+                    TriggerCriterion.trigger(player, FactoryTriggers.MOVED_BY_FAN);
+                    var alt = (LastFanEffectedTickConsumer) player;
+                    if (dir == Direction.UP && !player.isOnGround() && player.age - alt.polyfactory$getLastOnGround() > 10 && player.getY() - alt.polyfactory$getLastY() > 32 && player.getVelocity().getY() > 0.5) {
+                        TriggerCriterion.trigger(player, FactoryTriggers.MOVED_BY_FAN_A_LOT);
+                    }
                 }
+            } else {
+                entity.velocityModified = true;
             }
         }
     }

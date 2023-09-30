@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.item.block;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.item.util.FireworkStarColoredItem;
-import eu.pb4.polyfactory.item.util.ModeledBlockItem;
+import eu.pb4.polyfactory.item.util.FactoryBlockItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.Block;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class CableItem extends ModeledBlockItem implements FireworkStarColoredItem, ColoredItem {
+public class CableItem extends FactoryBlockItem implements FireworkStarColoredItem, ColoredItem {
     public <T extends Block & PolymerBlock> CableItem(Settings settings) {
         super(FactoryBlocks.CABLE, settings, Items.FIREWORK_STAR);
     }

@@ -1,6 +1,23 @@
-// 1.20.2	2023-09-27T22:53:38.599705233	PolyFactory/Advancements
-f0729bb7e51ec160c84addbced914aa4d1e33a7c data/polyfactory/advancements/main/rotation/hand_crank.json
-5711fa17e3ca5f4365ecae227600220436d58a39 data/polyfactory/advancements/main/tools/wrench.json
+// 1.20.2	2023-10-01T00:02:28.294523637	PolyFactory/Advancements
+98b1f392d601bc0fd0a82224e7bff1d1fd1f064e data/polyfactory/advancements/main/taters/1023.json
+a28d0793f67c27961c12426375545403e688d8c4 data/polyfactory/advancements/main/machines/miner.json
+56d100a22bcec8d5b5eb1bd47a52825e37ca3c37 data/polyfactory/advancements/main/data/cable.json
+0b1f81080eae85c923115f0875048dc6045ebf19 data/polyfactory/advancements/main/machines/grinder_dust.json
 63471412b1fa7b57ee495cdbb5c9a23105c6a322 data/polyfactory/advancements/main/root.json
+f0729bb7e51ec160c84addbced914aa4d1e33a7c data/polyfactory/advancements/main/rotation/hand_crank.json
+468cc2bfc34e6676e24687d91cb642eefba244f4 data/polyfactory/advancements/main/machine/mixer.json
+c0c7a57639619aa8b5b1a6f1dc8d636e19953072 data/polyfactory/advancements/main/machines/planter.json
 14d25e565491edf22aef9044051a4de9a064950f data/polyfactory/advancements/main/rotation/windmill.json
+f3381e4f3ac3ed50e1cac1696ea55c0d880dcf17 data/polyfactory/advancements/main/taters/16.json
 1001ea3a0d4548b8f5a267c1caa2324f9de42197 data/polyfactory/advancements/main/rotation/steam_engine.json
+2a18e22f03a705252176a8f1960660006e2c7665 data/polyfactory/advancements/main/machines/fan_sky.json
+ea645f21f5e7eddc4f7b8991aa6462fcc00671c5 data/polyfactory/advancements/main/machine/cake.json
+b5b349e813e873b2c10bc755d3e57275b06567ca data/polyfactory/advancements/main/machines/container.json
+2c08e2e0075e4277e4cd2196fb9b87a33678c26b data/polyfactory/advancements/main/data/item_reader.json
+6c962ec15ee3a3cfa98b9703ad5d69412d9cf5ad data/polyfactory/advancements/main/machine/artificial_dye.json
+64ac49b18f26362c9a45ba2ee8f2a0595ccfc5aa data/polyfactory/advancements/main/machines/gravel.json
+62de9eb60e76c8ad98b015b4bdc29c5c05320e15 data/polyfactory/advancements/main/taters/128.json
+5711fa17e3ca5f4365ecae227600220436d58a39 data/polyfactory/advancements/main/tools/wrench.json
+143786de88a7c96b709637d043ac89f9d69e381d data/polyfactory/advancements/main/machine/press.json
+5fab12ad624242247784d9bcb5fdc4efd066dc5e data/polyfactory/advancements/main/machines/fan.json
+7b73fddec40084a38e05bdd23bc28b39302e4d58 data/polyfactory/advancements/main/machines/steel_ingot.json

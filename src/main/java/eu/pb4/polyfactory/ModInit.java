@@ -19,6 +19,7 @@ import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.DebugData;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
@@ -59,6 +60,7 @@ public class ModInit implements ModInitializer {
 		FactoryRecipeSerializers.register();
 		FactoryLootTables.register();
 		FactoryCommands.register();
+		FactoryUtil.register();
 		FactoryAdvancementCriteria.register();
 		DebugData.register();
 

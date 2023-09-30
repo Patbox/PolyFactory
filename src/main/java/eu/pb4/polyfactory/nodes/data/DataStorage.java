@@ -9,7 +9,6 @@ import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.data.DataContainer;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -75,9 +74,9 @@ public class DataStorage implements GraphEntity<DataStorage> {
         return null;
     }
 
-    public void pushDataUpdate(int channel, DataContainer data) {
+    public int pushDataUpdate(int channel, DataContainer data) {
         if (this.ctx == null || !(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
-            return;
+            return 0;
         }
 
         var tick = world.getTime();
@@ -91,7 +90,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
 
         var receivers = this.receivers.get(channel);
         if (receivers == null) {
-            return;
+            return 0;
         }
 
         for (var x : receivers) {
@@ -100,6 +99,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 receiver.receiveData(world, x, state, channel, data);
             }
         }
+        return receivers.size();
     }
 
     @Override
@@ -241,5 +241,13 @@ public class DataStorage implements GraphEntity<DataStorage> {
 
     private static DataStorage decode(@Nullable NbtElement nbtElement) {
         return new DataStorage();
+    }
+
+    public boolean hasReceivers() {
+        return !this.receivers.isEmpty();
+    }
+
+    public boolean hasProviders() {
+        return !this.providers.isEmpty();
     }
 }

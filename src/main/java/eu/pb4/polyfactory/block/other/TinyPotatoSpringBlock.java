@@ -1,37 +1,39 @@
 package eu.pb4.polyfactory.block.other;
 
-import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.models.BaseItemProvider;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
+import eu.pb4.polymer.core.api.other.PolymerStat;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
-import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.entity.decoration.Brightness;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.stat.StatFormatter;
+import net.minecraft.stat.StatType;
+import net.minecraft.stat.Stats;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -40,6 +42,7 @@ import org.joml.Vector3f;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class TinyPotatoSpringBlock extends Block implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker {
+    public static final Identifier STATISTIC = PolymerStat.registerStat(id("taters_clicked"), StatFormatter.DEFAULT);
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     public TinyPotatoSpringBlock(Settings settings) {
@@ -76,6 +79,15 @@ public class TinyPotatoSpringBlock extends Block implements PolymerBlock, BlockW
 
             if (holder != null && holder.holder() instanceof Model x) {
                 x.interact(player.getYaw());
+            }
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                player.incrementStat(STATISTIC);
+
+                switch (serverPlayer.getStatHandler().getStat(Stats.CUSTOM, STATISTIC)) {
+                    case 16 -> TriggerCriterion.trigger(serverPlayer, FactoryTriggers.TATER_16);
+                    case 128 -> TriggerCriterion.trigger(serverPlayer, FactoryTriggers.TATER_128);
+                    case 1024 -> TriggerCriterion.trigger(serverPlayer, FactoryTriggers.TATER_1024);
+                }
             }
 
             return ActionResult.SUCCESS;

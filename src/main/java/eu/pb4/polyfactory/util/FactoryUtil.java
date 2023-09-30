@@ -4,6 +4,8 @@ import com.mojang.authlib.GameProfile;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
@@ -15,6 +17,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
@@ -35,6 +38,26 @@ public class FactoryUtil {
     public static final List<Direction> REORDERED_DIRECTIONS = List.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
     public static final GameProfile GENERIC_PROFILE = new GameProfile(Util.NIL_UUID, "[PolyFactory]");
     public static final Vec3d HALF_BELOW = new Vec3d(0, -0.5, 0);
+
+    private static final List<Runnable> RUN_NEXT_TICK = new ArrayList<>();
+
+    public static void runNextTick(Runnable runnable) {
+        RUN_NEXT_TICK.add(runnable);
+    }
+
+    public static void register() {
+        ServerTickEvents.START_SERVER_TICK.register(FactoryUtil::onTick);
+        ServerLifecycleEvents.SERVER_STOPPED.register(FactoryUtil::onServerStopped);
+    }
+
+    private static void onServerStopped(MinecraftServer server) {
+        RUN_NEXT_TICK.clear();
+    }
+
+    private static void onTick(MinecraftServer server) {
+        RUN_NEXT_TICK.forEach(Runnable::run);
+        RUN_NEXT_TICK.clear();
+    }
 
     public static Identifier id(String path) {
         return new Identifier(ModInit.ID, path);

@@ -1,0 +1,32 @@
+{
+  "parent": "polyfactory:main/root",
+  "criteria": {
+    "use": {
+      "conditions": {
+        "trigger": "polyfactory:tater_16"
+      },
+      "trigger": "polyfactory:trigger"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.polyfactory.tater_16.description"
+    },
+    "frame": "goal",
+    "hidden": true,
+    "icon": {
+      "item": "minecraft:potato"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.polyfactory.tater_16.title"
+    }
+  },
+  "requirements": [
+    [
+      "use"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

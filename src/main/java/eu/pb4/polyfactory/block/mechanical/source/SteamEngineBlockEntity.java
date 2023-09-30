@@ -110,7 +110,7 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
 
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {
         if (this.state > 0) {
-            modifier.provide(20 * this.state, 100 * this.state, state.get(SteamEngineBlock.FACING).getDirection());
+            modifier.provide(25 * this.state, 100 * this.state, state.get(SteamEngineBlock.FACING).getDirection());
         }
     }
 

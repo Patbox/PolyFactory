@@ -1,0 +1,39 @@
+{
+  "parent": "polyfactory:main/machines/steel_ingot",
+  "criteria": {
+    "use": {
+      "conditions": {
+        "recipe_id": "polyfactory:press/steel_plate"
+      },
+      "trigger": "minecraft:recipe_crafted"
+    },
+    "use2": {
+      "conditions": {
+        "recipe_id": "polyfactory:press/wooden_plate"
+      },
+      "trigger": "minecraft:recipe_crafted"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.polyfactory.press.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "polyfactory:press"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.polyfactory.press.title"
+    }
+  },
+  "requirements": [
+    [
+      "use",
+      "use2"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

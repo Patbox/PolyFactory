@@ -13,16 +13,16 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Vec3d;
 
-public class ModeledBlockItem extends BlockItem implements SimpleModeledPolymerItem {
+public class FactoryBlockItem extends BlockItem implements SimpleModeledPolymerItem {
 
     private final Item polymerItem;
 
-    public <T extends Block & PolymerBlock> ModeledBlockItem(T block, Settings settings, Item item) {
+    public <T extends Block & PolymerBlock> FactoryBlockItem(T block, Settings settings, Item item) {
         super(block, settings);
         this.polymerItem = item;
     }
 
-    public <T extends Block & PolymerBlock> ModeledBlockItem(T block, Settings settings) {
+    public <T extends Block & PolymerBlock> FactoryBlockItem(T block, Settings settings) {
         super(block, settings);
         this.polymerItem = BaseItemProvider.requestItem();
     }

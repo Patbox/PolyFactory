@@ -9,4 +9,18 @@ public interface FactoryTriggers {
     Identifier CONSTRUCT_WORKING_WINDMILL = id("construct_working_windmill");
     Identifier FUEL_STEAM_ENGINE = id("fuel_steam_engine");
     Identifier WRENCH = id("wrench");
+    Identifier MINER_MINES = id("miner_mines");
+    Identifier PLANTER_PLANTS = id("planter_plants");
+    Identifier CABLE_CONNECT = id("cable_connect_2_or_more");
+    Identifier REDSTONE_IN_OUT = id("redstone_in_out");
+    Identifier ITEM_READER = id("item_reader");
+
+    Identifier MOVED_BY_FAN = id("moved_by_fan");
+    Identifier MOVED_BY_FAN_A_LOT = id("moved_by_fan_a_lot");
+    Identifier CONTAINER_ADD_ITEM = id("container_add_item");
+    Identifier MIXER_CRAFTS = id("mixer_crafts");
+
+    Identifier TATER_16 = id("tater_16");
+    Identifier TATER_128 = id("tater_128");
+    Identifier TATER_1024 = id("tater_1024");
 }

@@ -1,0 +1,32 @@
+{
+  "parent": "polyfactory:main/machine/press",
+  "criteria": {
+    "use": {
+      "conditions": {
+        "trigger": "polyfactory:container_add_item"
+      },
+      "trigger": "polyfactory:trigger"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.polyfactory.container.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "polyfactory:wooden_container"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.polyfactory.container.title"
+    }
+  },
+  "requirements": [
+    [
+      "use"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,50 @@
+{
+  "parent": "polyfactory:main/machines/grinder_dust",
+  "criteria": {
+    "use": {
+      "conditions": {
+        "recipe_id": "polyfactory:grinding/cobblestone_to_gravel"
+      },
+      "trigger": "minecraft:recipe_crafted"
+    },
+    "use1": {
+      "conditions": {
+        "recipe_id": "polyfactory:grinding/stone_to_cobblestone"
+      },
+      "trigger": "minecraft:recipe_crafted"
+    },
+    "use2": {
+      "conditions": {
+        "recipe_id": "polyfactory:grinding/gravel_to_sand"
+      },
+      "trigger": "minecraft:recipe_crafted"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.polyfactory.gravel.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "item": "minecraft:gravel"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.polyfactory.gravel.title"
+    }
+  },
+  "requirements": [
+    [
+      "use"
+    ],
+    [
+      "use1"
+    ],
+    [
+      "use2"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

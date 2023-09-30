@@ -39,7 +39,7 @@ public class FactoryItems {
     public static final Item MIXER = register(FactoryBlocks.MIXER);
     public static final Item MINER = register(FactoryBlocks.MINER);
     public static final Item PLANTER = register(FactoryBlocks.PLANTER);
-    public static final ModeledBlockItem AXLE = register(FactoryBlocks.AXLE);
+    public static final FactoryBlockItem AXLE = register(FactoryBlocks.AXLE);
     public static final Item GEARBOX = register(FactoryBlocks.GEARBOX);
     public static final Item CONTAINER = register( FactoryBlocks.CONTAINER);
     public static final Item NIXIE_TUBE = register(FactoryBlocks.NIXIE_TUBE);
@@ -195,13 +195,13 @@ public class FactoryItems {
         return item;
     }
 
-    public static <E extends Block & PolymerBlock> ModeledBlockItem register(E block) {
+    public static <E extends Block & PolymerBlock> FactoryBlockItem register(E block) {
         var id = Registries.BLOCK.getId(block);
-        ModeledBlockItem item;
+        FactoryBlockItem item;
         if (block instanceof MultiBlock multiBlock) {
             item = new MultiBlockItem(multiBlock, new Item.Settings());
         } else {
-            item = new ModeledBlockItem(block, new Item.Settings());
+            item = new FactoryBlockItem(block, new Item.Settings());
         }
 
         Registry.register(Registries.ITEM, id, item);

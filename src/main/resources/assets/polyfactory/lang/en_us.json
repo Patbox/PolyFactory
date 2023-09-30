@@ -72,6 +72,8 @@
   "recipe_type.polyfactory.mixer": "Mixer",
   "recipe_type.polyfactory.grinding": "Grinder",
 
+  "stat.polyfactory.taters_clicked": "Potatoes Clicked",
+
   "advancements.polyfactory.root.title": "PolyFactory",
   "advancements.polyfactory.root.description": "Welcome to the factory!",
 
@@ -82,6 +84,58 @@
   "advancements.polyfactory.steam_engine.title": "Industrial Revolution",
   "advancements.polyfactory.steam_engine.description": "Put fuel into the Steam Engine",
 
+  "advancements.polyfactory.grinder.title": "Fine powder",
+  "advancements.polyfactory.grinder.description": "Use Grinder to craft Coal Dust or Saw Dust",
+
+  "advancements.polyfactory.gravel.title": "Artificial Erosion",
+  "advancements.polyfactory.gravel.description": "Convert Stone to Cobblestone, then to Gravel and then to Sand",
+
+  "advancements.polyfactory.steel_ingot.title": "Steelworks",
+  "advancements.polyfactory.steel_ingot.description": "Smelt Steel Alloy Mixture into Steel Ingot",
+
+  "advancements.polyfactory.press.title": "Better with Plates",
+  "advancements.polyfactory.press.description": "Use Mechanical Press to craft Steel Plate or Wooden Plate",
+
+  "advancements.polyfactory.container.title": "Alternative Storage",
+  "advancements.polyfactory.container.description": "Put item into Wooden Container",
+
+  "advancements.polyfactory.fan.title": "Moving with the wind",
+  "advancements.polyfactory.fan.description": "Get pushed by a Fan!",
+
+  "advancements.polyfactory.fan_sky.title": "Like a Feather",
+  "advancements.polyfactory.fan_sky.description": "Jump into upward-facing, fast-moving Fan",
+
+  "advancements.polyfactory.miner.title": "Remote Mining",
+  "advancements.polyfactory.miner.description": "Use Mechanical Miner to break block remotely",
+
+  "advancements.polyfactory.planter.title": "Automated Farming",
+  "advancements.polyfactory.planter.description": "Use Mechanical Planter to plant a sapling/seed",
+
+  "advancements.polyfactory.mixer.title": "Mix and match",
+  "advancements.polyfactory.mixer.description": "Use Mechanical Mixer to craft anything!",
+
+  "advancements.polyfactory.cake.title": "The Lie",
+  "advancements.polyfactory.cake.description": "Use Mechanical Mixer to craft a Cake!",
+
+  "advancements.polyfactory.artificial_dye.title": "Any color you want!",
+  "advancements.polyfactory.artificial_dye.description": "Craft an Artificial Dye with Saw Dust, dyes and some heat!",
+
+  "advancements.polyfactory.cable.title": "Connected!",
+  "advancements.polyfactory.cable.description": "Connect Data Provider to an Receiver with Cable",
+
+  "advancements.polyfactory.redstone.title": "Redstone in, Redstone out",
+  "advancements.polyfactory.redstone.description": "Connect Redstone Input and Redstone Output together",
+
+  "advancements.polyfactory.item_reader.title": "Just read it",
+  "advancements.polyfactory.item_reader.description": "Read name of any item with Item Reader",
+
   "advancements.polyfactory.wrench.title": "Configured",
-  "advancements.polyfactory.wrench.description": "Use Wrench to change properties of a machine."
+  "advancements.polyfactory.wrench.description": "Use Wrench to change properties of a machine.",
+
+  "advancements.polyfactory.tater_16.title": "Potato Beginner",
+  "advancements.polyfactory.tater_16.description": "Click Potato on a Spring 16 times...",
+  "advancements.polyfactory.tater_128.title": "2 stacks of taters",
+  "advancements.polyfactory.tater_128.description": "Click Potato on a Spring 128 times...",
+  "advancements.polyfactory.tater_1024.title": "The Potato Master",
+  "advancements.polyfactory.tater_1024.description": "Click Potato on a Spring 1024 times. The End! Nothing more"
 }

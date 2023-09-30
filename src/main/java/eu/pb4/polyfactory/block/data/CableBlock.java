@@ -3,6 +3,8 @@ package eu.pb4.polyfactory.block.data;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.base.FactoryBlock;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
@@ -11,8 +13,10 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.CableModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
+import eu.pb4.polyfactory.nodes.data.DataReceiverNode;
 import eu.pb4.polyfactory.nodes.generic.SelectiveSideNode;
 import eu.pb4.polyfactory.util.DyeColorExtra;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.StateNameProvider;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -27,6 +31,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -74,6 +79,8 @@ public class CableBlock extends NetworkBlock implements FactoryBlock, BlockEntit
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        var hasReceivers = false;
+        var hasProviders = false;
         if (world.getBlockEntity(pos) instanceof CableBlockEntity be) {
             be.setColor(FactoryItems.CABLE.getItemColor(itemStack));
 
@@ -83,12 +90,25 @@ public class CableBlock extends NetworkBlock implements FactoryBlock, BlockEntit
                 var block = world.getBlockState(newPos);
                 if (canConnectTo(world, be.getColor(), newPos, block, dir.getOpposite())) {
                     newState = newState.with(FACING_PROPERTIES.get(dir), true);
+                    if (placer instanceof ServerPlayerEntity serverPlayer && (!hasReceivers || !hasProviders)) {
+                        var net = NetworkComponent.Data.getLogic(serverPlayer.getServerWorld(), newPos);
+                        if (net.hasReceivers()) {
+                            hasReceivers = true;
+                        }
+
+                        if (net.hasProviders()) {
+                            hasProviders = true;
+                        }
+                    }
                 }
             }
 
             if (state != newState) {
                 world.setBlockState(pos, newState);
             }
+        }
+        if (hasReceivers && hasProviders) {
+            TriggerCriterion.trigger((ServerPlayerEntity) placer, FactoryTriggers.CABLE_CONNECT);
         }
 
         super.onPlaced(world, pos, state, placer, itemStack);

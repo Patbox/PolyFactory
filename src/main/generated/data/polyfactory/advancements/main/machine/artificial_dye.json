@@ -1,0 +1,32 @@
+{
+  "parent": "polyfactory:main/machine/mixer",
+  "criteria": {
+    "use": {
+      "conditions": {
+        "recipe_id": "polyfactory:mixing/artificial_dye"
+      },
+      "trigger": "minecraft:recipe_crafted"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.polyfactory.artificial_dye.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "item": "polyfactory:mixer"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.polyfactory.artificial_dye.title"
+    }
+  },
+  "requirements": [
+    [
+      "use"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

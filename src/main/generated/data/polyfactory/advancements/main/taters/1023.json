@@ -1,0 +1,32 @@
+{
+  "parent": "polyfactory:main/taters/128",
+  "criteria": {
+    "use": {
+      "conditions": {
+        "trigger": "polyfactory:tater_1024"
+      },
+      "trigger": "polyfactory:trigger"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.polyfactory.tater_1024.description"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "item": "polyfactory:tiny_potato_spring"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.polyfactory.tater_1024.title"
+    }
+  },
+  "requirements": [
+    [
+      "use"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

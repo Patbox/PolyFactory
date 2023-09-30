@@ -1,5 +1,7 @@
 package eu.pb4.polyfactory.block.other;
 
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.base.AttackableBlock;
 import eu.pb4.polyfactory.block.base.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.base.SneakBypassingBlock;
@@ -72,6 +74,9 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
                 if (stack.isEmpty()) {
                     return ActionResult.FAIL;
                 } else {
+                    if (player instanceof ServerPlayerEntity serverPlayer) {
+                        TriggerCriterion.trigger(serverPlayer, FactoryTriggers.CONTAINER_ADD_ITEM);
+                    }
                     var count = player.isSneaking() ? stack.getCount() : 1;
                     if (be.getItemStack().isEmpty()) {
                         be.setItemStack(stack);

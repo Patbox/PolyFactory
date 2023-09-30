@@ -44,6 +44,7 @@ public class RotationData implements GraphEntity<RotationData> {
     public static final GraphEntityType<RotationData> TYPE = GraphEntityType.of(id("rotation_info"), RotationData::new, RotationData::decode, RotationData::split);
 
     private double speed;
+    private float rotationValue;
     private float rotation;
     private int lastTick = -1;
     private double stressCapacity;
@@ -172,14 +173,24 @@ public class RotationData implements GraphEntity<RotationData> {
                 speed = -speed;
             }
 
-            float r = (float) ((Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.VISUAL_UPDATE_RATE * delta) + this.rotation) % (MathHelper.TAU * biggest));
+            var baseDelta = Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.VISUAL_UPDATE_RATE * delta);
+            float r = (float) ((baseDelta + this.rotationValue) % (MathHelper.TAU * biggest));
             if (this.negative) {
                 r = -r;
             }
             r = Math.abs(r);
 
+            var rotMax = RotationConstants.MAX_ROTATION_PER_TICK_3 * delta - 0.1f;
+
             for (var data : rotationDataList) {
-                data.rotation = (data.negative ? -r : r) / speedMap.get(data.getContext().getGraph().getId());
+                var div = speedMap.get(data.getContext().getGraph().getId());
+                data.rotationValue = (data.negative ? -r : r) / div;
+
+                if (Math.abs(baseDelta / div) < rotMax) {
+                    data.rotation = data.rotationValue;
+                } else {
+                    data.rotation = (data.rotation + (data.negative ? -rotMax : rotMax)) % MathHelper.TAU;
+                }
             }
         }
     }
@@ -315,7 +326,8 @@ public class RotationData implements GraphEntity<RotationData> {
             }
         }
 
-        this.rotation = (float) ((Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.VISUAL_MAX_ROTATION * delta) + this.rotation) % MathHelper.TAU);
+        this.rotationValue = (float) ((Math.min(speed * MathHelper.RADIANS_PER_DEGREE * delta, RotationConstants.VISUAL_MAX_ROTATION * delta) + this.rotationValue) % MathHelper.TAU);
+        this.rotation = this.rotationValue;
     }
 
     @Override
@@ -337,6 +349,7 @@ public class RotationData implements GraphEntity<RotationData> {
     public @Nullable NbtElement toTag() {
         var nbt = new NbtCompound();
         nbt.putFloat("Rot", this.rotation);
+        nbt.putFloat("RotVal", this.rotationValue);
         return nbt;
     }
 
@@ -349,12 +362,14 @@ public class RotationData implements GraphEntity<RotationData> {
     public void merge(@NotNull RotationData other) {
         if (this.speed < other.speed) {
             this.rotation = other.rotation;
+            this.rotationValue = other.rotationValue;
         }
     }
 
     private @NotNull RotationData split(@NotNull BlockGraph originalGraph, @NotNull BlockGraph newGraph) {
         var data = new RotationData();
         data.rotation = this.rotation;
+        data.rotationValue = this.rotationValue;
         data.speed = this.speed;
         return data;
     }
@@ -363,6 +378,7 @@ public class RotationData implements GraphEntity<RotationData> {
         var rotation = new RotationData();
         if (nbtElement instanceof NbtCompound compound) {
             rotation.rotation = compound.getFloat("Rot");
+            rotation.rotationValue = compound.getFloat("RotVal");
         }
 
         return rotation;

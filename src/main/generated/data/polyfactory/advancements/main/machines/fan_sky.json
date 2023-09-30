@@ -1,0 +1,32 @@
+{
+  "parent": "polyfactory:main/machines/fan",
+  "criteria": {
+    "use": {
+      "conditions": {
+        "trigger": "polyfactory:moved_by_fan_a_lot"
+      },
+      "trigger": "polyfactory:trigger"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.polyfactory.fan_sky.description"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "item": "minecraft:feather"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.polyfactory.fan_sky.title"
+    }
+  },
+  "requirements": [
+    [
+      "use"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

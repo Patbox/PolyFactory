@@ -1,0 +1,32 @@
+{
+  "parent": "polyfactory:main/machine/mixer",
+  "criteria": {
+    "use": {
+      "conditions": {
+        "recipe_id": "polyfactory:mixing/cake"
+      },
+      "trigger": "minecraft:recipe_crafted"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.polyfactory.cake.description"
+    },
+    "frame": "task",
+    "hidden": true,
+    "icon": {
+      "item": "polyfactory:mixer"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.polyfactory.cake.title"
+    }
+  },
+  "requirements": [
+    [
+      "use"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
