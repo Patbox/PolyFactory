@@ -1,5 +1,7 @@
 package eu.pb4.polyfactory.datagen;
 
+import eu.pb4.polyfactory.advancement.ExtraItemPredicate;
+import eu.pb4.polyfactory.advancement.FactoryItemPredicates;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.item.FactoryItemTags;
@@ -17,7 +19,9 @@ import net.minecraft.item.Items;
 import net.minecraft.predicate.item.ItemPredicate;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.Identifier;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
@@ -46,10 +50,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 ))
                 .build(exporter, "polyfactory:main/root");
 
-        this.rotationBase(root, exporter);
-        this.tools(root, exporter);
-        this.machines(root, exporter);
-        this.data(root, exporter);
+        this.base(root, exporter);
         this.taters(root, exporter);
     }
 
@@ -100,56 +101,26 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .build(exporter, "polyfactory:main/taters/1023");
     }
 
-    private void data(AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
-        var cable = Advancement.Builder.create()
+    private void base(AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
+        // Start
+
+        var handCrank = Advancement.Builder.create()
                 .parent(root)
                 .display(
-                        ColoredItem.stack(FactoryItems.CABLE, 1, DyeColor.RED),
-                        Text.translatable("advancements.polyfactory.cable.title"),
-                        Text.translatable("advancements.polyfactory.cable.description"),
+                        FactoryItems.HAND_CRANK,
+                        Text.translatable("advancements.polyfactory.hand_crank.title"),
+                        Text.translatable("advancements.polyfactory.hand_crank.description"),
                         null,
                         AdvancementFrame.TASK,
                         true,
                         true,
                         false
                 )
-                .criterion("use", TriggerCriterion.of(FactoryTriggers.CABLE_CONNECT))
-                .build(exporter, "polyfactory:main/data/cable");
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.POWER_HAND_CRANK))
+                .build(exporter, "polyfactory:main/base/hand_crank");
 
-         /*var redstone = Advancement.Builder.create()
-                .parent(cable)
-                .display(
-                        FactoryItems.REDSTONE_OUTPUT,
-                        Text.translatable("advancements.polyfactory.redstone.title"),
-                        Text.translatable("advancements.polyfactory.redstone.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("use", TriggerCriterion.of(FactoryTriggers.REDSTONE_IN_OUT))
-                .build(exporter, "polyfactory:main/data/redstone");*/
-
-        var itemReader = Advancement.Builder.create()
-                .parent(cable)
-                .display(
-                        FactoryItems.ITEM_READER,
-                        Text.translatable("advancements.polyfactory.item_reader.title"),
-                        Text.translatable("advancements.polyfactory.item_reader.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("use", TriggerCriterion.of(FactoryTriggers.ITEM_READER))
-                .build(exporter, "polyfactory:main/data/item_reader");
-    }
-
-    private void machines(AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
         var grinder = Advancement.Builder.create()
-                .parent(root)
+                .parent(handCrank)
                 .display(
                         FactoryItems.GRINDER,
                         Text.translatable("advancements.polyfactory.grinder.title"),
@@ -164,24 +135,9 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .criterion("use2", RecipeCraftedCriterion.Conditions.create(id("grinding/planks_saw_dust")))
                 .criterion("use3", RecipeCraftedCriterion.Conditions.create(id("grinding/logs_saw_dust")))
                 .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
-                .build(exporter, "polyfactory:main/machines/grinder_dust");
+                .build(exporter, "polyfactory:main/base/grinder_dust");
 
-        var steel = Advancement.Builder.create()
-                .parent(grinder)
-                .display(
-                        FactoryItems.STEEL_INGOT,
-                        Text.translatable("advancements.polyfactory.steel_ingot.title"),
-                        Text.translatable("advancements.polyfactory.steel_ingot.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("steel_ingot")))
-                .criterion("use2", RecipeCraftedCriterion.Conditions.create(id("steel_ingot_blasting")))
-                .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
-                .build(exporter, "polyfactory:main/machines/steel_ingot");
+        // Grinder -> Gravel
 
         var gravel = Advancement.Builder.create()
                 .parent(grinder)
@@ -199,7 +155,57 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .criterion("use1", RecipeCraftedCriterion.Conditions.create(id("grinding/stone_to_cobblestone")))
                 .criterion("use2", RecipeCraftedCriterion.Conditions.create(id("grinding/gravel_to_sand")))
                 .criteriaMerger(AdvancementRequirements.CriterionMerger.AND)
-                .build(exporter, "polyfactory:main/machines/gravel");
+                .build(exporter, "polyfactory:main/base/gravel");
+
+        // Grinder -> Steel
+
+        var steel = Advancement.Builder.create()
+                .parent(grinder)
+                .display(
+                        FactoryItems.STEEL_INGOT,
+                        Text.translatable("advancements.polyfactory.steel_ingot.title"),
+                        Text.translatable("advancements.polyfactory.steel_ingot.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("steel_ingot")))
+                .criterion("use2", RecipeCraftedCriterion.Conditions.create(id("steel_ingot_blasting")))
+                .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
+                .build(exporter, "polyfactory:main/base/steel_ingot");
+
+        var windmill = Advancement.Builder.create()
+                .parent(steel)
+                .display(
+                        FactoryItems.WINDMILL_SAIL,
+                        Text.translatable("advancements.polyfactory.windmill.title"),
+                        Text.translatable("advancements.polyfactory.windmill.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.CONSTRUCT_WORKING_WINDMILL))
+                .build(exporter, "polyfactory:main/base/windmill");
+
+        var wrench = Advancement.Builder.create()
+                .parent(steel)
+                .display(
+                        FactoryItems.WRENCH,
+                        Text.translatable("advancements.polyfactory.wrench.title"),
+                        Text.translatable("advancements.polyfactory.wrench.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.WRENCH))
+                .build(exporter, "polyfactory:main/base/wrench");
+
 
         var mixer = Advancement.Builder.create()
                 .parent(steel)
@@ -214,7 +220,9 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         false
                 )
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.MIXER_CRAFTS))
-                .build(exporter, "polyfactory:main/machine/mixer");
+                .build(exporter, "polyfactory:main/base/mixer");
+
+        // Steel -> Mixer
 
         var cake = Advancement.Builder.create()
                 .parent(mixer)
@@ -229,7 +237,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true
                 )
                 .criterion("use", RecipeCraftedCriterion.Conditions.create(id("mixing/cake")))
-                .build(exporter, "polyfactory:main/machine/cake");
+                .build(exporter, "polyfactory:main/base/cake");
 
         var dye = Advancement.Builder.create()
                 .parent(mixer)
@@ -244,8 +252,73 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         false
                 )
                 .criterion("use", RecipeCraftedCriterion.Conditions.create(id("mixing/artificial_dye")))
-                .build(exporter, "polyfactory:main/machine/artificial_dye");
+                .build(exporter, "polyfactory:main/base/mixer/artificial_dye");
 
+        var firework = Advancement.Builder.create()
+                .parent(dye)
+                .display(
+                        Items.FIREWORK_ROCKET,
+                        Text.translatable("advancements.polyfactory.firework.title"),
+                        Text.translatable("advancements.polyfactory.firework.description"),
+                        null,
+                        AdvancementFrame.GOAL,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(new Identifier("firework_rocket"), List.of(
+                        ExtraItemPredicate.withStatic(ItemPredicate.Builder.create(), FactoryItemPredicates.CUSTOM_FIREWORK_COLOR))))
+                .build(exporter, "polyfactory:main/base/mixer/firework");
+
+
+        var cable = Advancement.Builder.create()
+                .parent(mixer)
+                .display(
+                        ColoredItem.stack(FactoryItems.CABLE, 1, DyeColor.RED),
+                        Text.translatable("advancements.polyfactory.cable.title"),
+                        Text.translatable("advancements.polyfactory.cable.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.CABLE_CONNECT))
+                .build(exporter, "polyfactory:main/base/cable");
+
+        // Mixer -> Cable
+
+        var itemReader = Advancement.Builder.create()
+                .parent(cable)
+                .display(
+                        FactoryItems.ITEM_READER,
+                        Text.translatable("advancements.polyfactory.item_reader.title"),
+                        Text.translatable("advancements.polyfactory.item_reader.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.ITEM_READER))
+                .build(exporter, "polyfactory:main/base/item_reader");
+
+        var nixieTubes = Advancement.Builder.create()
+                .parent(cable)
+                .display(
+                        FactoryItems.NIXIE_TUBE,
+                        Text.translatable("advancements.polyfactory.nixie_tube.title"),
+                        Text.translatable("advancements.polyfactory.nixie_tube.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.NIXIE_TUBE_CONNECTED_3_OR_MORE))
+                .build(exporter, "polyfactory:main/base/nixie_tube");
+
+        // Steel
 
         var press = Advancement.Builder.create()
                 .parent(steel)
@@ -262,7 +335,24 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .criterion("use", RecipeCraftedCriterion.Conditions.create(id("press/steel_plate")))
                 .criterion("use2", RecipeCraftedCriterion.Conditions.create(id("press/wooden_plate")))
                 .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
-                .build(exporter, "polyfactory:main/machine/press");
+                .build(exporter, "polyfactory:main/base/press");
+
+        // Steel -> Press
+
+        var steamEngine = Advancement.Builder.create()
+                .parent(press)
+                .display(
+                        FactoryItems.STEAM_ENGINE,
+                        Text.translatable("advancements.polyfactory.steam_engine.title"),
+                        Text.translatable("advancements.polyfactory.steam_engine.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.FUEL_STEAM_ENGINE))
+                .build(exporter, "polyfactory:main/base/steam_engine");
 
         var container = Advancement.Builder.create()
                 .parent(press)
@@ -277,7 +367,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         false
                 )
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.CONTAINER_ADD_ITEM))
-                .build(exporter, "polyfactory:main/machines/container");
+                .build(exporter, "polyfactory:main/base/container");
 
         var fan = Advancement.Builder.create()
                 .parent(press)
@@ -292,7 +382,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         false
                 )
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.MOVED_BY_FAN))
-                .build(exporter, "polyfactory:main/machines/fan");
+                .build(exporter, "polyfactory:main/base/fan");
 
         var fanSky = Advancement.Builder.create()
                 .parent(fan)
@@ -307,7 +397,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true
                 )
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.MOVED_BY_FAN_A_LOT))
-                .build(exporter, "polyfactory:main/machines/fan_sky");
+                .build(exporter, "polyfactory:main/base/fan_sky");
 
         var miner = Advancement.Builder.create()
                 .parent(press)
@@ -322,7 +412,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         false
                 )
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.MINER_MINES))
-                .build(exporter, "polyfactory:main/machines/miner");
+                .build(exporter, "polyfactory:main/base/miner");
 
         var planter = Advancement.Builder.create()
                 .parent(miner)
@@ -337,71 +427,6 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         false
                 )
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.PLANTER_PLANTS))
-                .build(exporter, "polyfactory:main/machines/planter");
-    }
-
-    private void tools(AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
-        var wrench = Advancement.Builder.create()
-                .parent(root)
-                .display(
-                        FactoryItems.WRENCH,
-                        Text.translatable("advancements.polyfactory.wrench.title"),
-                        Text.translatable("advancements.polyfactory.wrench.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("use", TriggerCriterion.of(FactoryTriggers.WRENCH))
-                .build(exporter, "polyfactory:main/tools/wrench");
-    }
-
-    private void rotationBase(AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
-        var handPowered = Advancement.Builder.create()
-                .parent(root)
-                .display(
-                        FactoryItems.HAND_CRANK,
-                        Text.translatable("advancements.polyfactory.hand_crank.title"),
-                        Text.translatable("advancements.polyfactory.hand_crank.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("use", TriggerCriterion.of(FactoryTriggers.POWER_HAND_CRANK))
-                .build(exporter, "polyfactory:main/rotation/hand_crank");
-
-        var windmill = Advancement.Builder.create()
-                .parent(handPowered)
-                .display(
-                        FactoryItems.WINDMILL_SAIL,
-                        Text.translatable("advancements.polyfactory.windmill.title"),
-                        Text.translatable("advancements.polyfactory.windmill.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("use", TriggerCriterion.of(FactoryTriggers.CONSTRUCT_WORKING_WINDMILL))
-                .build(exporter, "polyfactory:main/rotation/windmill");
-
-
-        var steamEngine = Advancement.Builder.create()
-                .parent(windmill)
-                .display(
-                        FactoryItems.STEAM_ENGINE,
-                        Text.translatable("advancements.polyfactory.steam_engine.title"),
-                        Text.translatable("advancements.polyfactory.steam_engine.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("use", TriggerCriterion.of(FactoryTriggers.FUEL_STEAM_ENGINE))
-                .build(exporter, "polyfactory:main/rotation/steam_engine");
+                .build(exporter, "polyfactory:main/base/planter");
     }
 }

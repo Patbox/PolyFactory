@@ -1,9 +1,9 @@
 {
-  "parent": "polyfactory:main/machines/fan",
+  "parent": "polyfactory:main/base/miner",
   "criteria": {
     "use": {
       "conditions": {
-        "trigger": "polyfactory:moved_by_fan_a_lot"
+        "trigger": "polyfactory:planter_plants"
       },
       "trigger": "polyfactory:trigger"
     }
@@ -11,16 +11,16 @@
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.polyfactory.fan_sky.description"
+      "translate": "advancements.polyfactory.planter.description"
     },
-    "frame": "challenge",
-    "hidden": true,
+    "frame": "task",
+    "hidden": false,
     "icon": {
-      "item": "minecraft:feather"
+      "item": "polyfactory:planter"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.polyfactory.fan_sky.title"
+      "translate": "advancements.polyfactory.planter.title"
     }
   },
   "requirements": [

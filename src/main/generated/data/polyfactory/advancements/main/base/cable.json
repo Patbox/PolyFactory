@@ -1,9 +1,9 @@
 {
-  "parent": "polyfactory:main/machine/press",
+  "parent": "polyfactory:main/base/mixer",
   "criteria": {
     "use": {
       "conditions": {
-        "trigger": "polyfactory:container_add_item"
+        "trigger": "polyfactory:cable_connect_2_or_more"
       },
       "trigger": "polyfactory:trigger"
     }
@@ -11,16 +11,17 @@
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.polyfactory.container.description"
+      "translate": "advancements.polyfactory.cable.description"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "polyfactory:wooden_container"
+      "item": "polyfactory:cable",
+      "nbt": "{color:11546150}"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.polyfactory.container.title"
+      "translate": "advancements.polyfactory.cable.title"
     }
   },
   "requirements": [

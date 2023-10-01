@@ -5,7 +5,7 @@
       "base": {
         "item": "minecraft:wheat"
       },
-      "count": 3
+      "count": 2
     },
     {
       "base": {
@@ -22,9 +22,9 @@
       "base": {
         "item": "minecraft:milk_bucket"
       },
-      "count": 3,
+      "count": 2,
       "leftover": {
-        "Count": 3,
+        "Count": 2,
         "id": "minecraft:bucket"
       }
     }

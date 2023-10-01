@@ -1,9 +1,9 @@
 {
-  "parent": "polyfactory:main/machines/miner",
+  "parent": "polyfactory:main/base/steel_ingot",
   "criteria": {
     "use": {
       "conditions": {
-        "trigger": "polyfactory:planter_plants"
+        "trigger": "polyfactory:wrench"
       },
       "trigger": "polyfactory:trigger"
     }
@@ -11,16 +11,16 @@
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.polyfactory.planter.description"
+      "translate": "advancements.polyfactory.wrench.description"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "polyfactory:planter"
+      "item": "polyfactory:wrench"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.polyfactory.planter.title"
+      "translate": "advancements.polyfactory.wrench.title"
     }
   },
   "requirements": [

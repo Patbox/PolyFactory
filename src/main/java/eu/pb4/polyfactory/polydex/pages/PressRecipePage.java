@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class PressRecipePage extends AbstractRecipePolydexPage<GenericPressRecipe> {
+public class PressRecipePage extends PrioritizedRecipePage<GenericPressRecipe> {
     private static final ItemStack ICON = FactoryItems.PRESS.getDefaultStack();
     private final List<PolydexIngredient<?>> ingredients;
     private final PolydexStack<?>[] output;

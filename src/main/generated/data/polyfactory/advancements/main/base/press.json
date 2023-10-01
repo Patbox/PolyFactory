@@ -1,15 +1,15 @@
 {
-  "parent": "polyfactory:main/machines/grinder_dust",
+  "parent": "polyfactory:main/base/steel_ingot",
   "criteria": {
     "use": {
       "conditions": {
-        "recipe_id": "polyfactory:steel_ingot"
+        "recipe_id": "polyfactory:press/steel_plate"
       },
       "trigger": "minecraft:recipe_crafted"
     },
     "use2": {
       "conditions": {
-        "recipe_id": "polyfactory:steel_ingot_blasting"
+        "recipe_id": "polyfactory:press/wooden_plate"
       },
       "trigger": "minecraft:recipe_crafted"
     }
@@ -17,16 +17,16 @@
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.polyfactory.steel_ingot.description"
+      "translate": "advancements.polyfactory.press.description"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "polyfactory:steel_ingot"
+      "item": "polyfactory:press"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.polyfactory.steel_ingot.title"
+      "translate": "advancements.polyfactory.press.title"
     }
   },
   "requirements": [

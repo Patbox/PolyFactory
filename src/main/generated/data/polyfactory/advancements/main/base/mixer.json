@@ -1,26 +1,26 @@
 {
-  "parent": "polyfactory:main/machine/mixer",
+  "parent": "polyfactory:main/base/steel_ingot",
   "criteria": {
     "use": {
       "conditions": {
-        "recipe_id": "polyfactory:mixing/artificial_dye"
+        "trigger": "polyfactory:mixer_crafts"
       },
-      "trigger": "minecraft:recipe_crafted"
+      "trigger": "polyfactory:trigger"
     }
   },
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.polyfactory.artificial_dye.description"
+      "translate": "advancements.polyfactory.mixer.description"
     },
-    "frame": "goal",
+    "frame": "task",
     "hidden": false,
     "icon": {
       "item": "polyfactory:mixer"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.polyfactory.artificial_dye.title"
+      "translate": "advancements.polyfactory.mixer.title"
     }
   },
   "requirements": [

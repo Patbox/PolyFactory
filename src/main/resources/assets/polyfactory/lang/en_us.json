@@ -120,6 +120,9 @@
   "advancements.polyfactory.artificial_dye.title": "Any color you want!",
   "advancements.polyfactory.artificial_dye.description": "Craft an Artificial Dye with Saw Dust, dyes and some heat!",
 
+  "advancements.polyfactory.firework.title": "Colorful show!",
+  "advancements.polyfactory.firework.description": "Craft an Firework Rocket with Artificial Dye!",
+
   "advancements.polyfactory.cable.title": "Connected!",
   "advancements.polyfactory.cable.description": "Connect Data Provider to an Receiver with Cable",
 
@@ -128,6 +131,10 @@
 
   "advancements.polyfactory.item_reader.title": "Just read it",
   "advancements.polyfactory.item_reader.description": "Read name of any item with Item Reader",
+
+  "advancements.polyfactory.nixie_tube.title": "Vintage Displays",
+  "advancements.polyfactory.nixie_tube.description": "Connect at least 3 Nixie Tubes together",
+
 
   "advancements.polyfactory.wrench.title": "Configured",
   "advancements.polyfactory.wrench.description": "Use Wrench to change properties of a machine.",

@@ -1,9 +1,9 @@
 {
-  "parent": "polyfactory:main/machines/steel_ingot",
+  "parent": "polyfactory:main/base/press",
   "criteria": {
     "use": {
       "conditions": {
-        "trigger": "polyfactory:mixer_crafts"
+        "trigger": "polyfactory:fuel_steam_engine"
       },
       "trigger": "polyfactory:trigger"
     }
@@ -11,16 +11,16 @@
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.polyfactory.mixer.description"
+      "translate": "advancements.polyfactory.steam_engine.description"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "polyfactory:mixer"
+      "item": "polyfactory:steam_engine"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.polyfactory.mixer.title"
+      "translate": "advancements.polyfactory.steam_engine.title"
     }
   },
   "requirements": [

@@ -169,7 +169,7 @@ public class PressBlock extends TallItemMachineBlock {
 
             updateStatePos(state);
             var dir = state.get(INPUT_FACING);
-            this.updateAnimation(true, 0, (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
+            this.updateAnimation(true, true, 0, (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
             this.addElement(this.piston);
             this.addElement(this.pistonItem);
             this.addElement(this.main);
@@ -187,7 +187,7 @@ public class PressBlock extends TallItemMachineBlock {
             this.gearB.setYaw(direction.asRotation());
         }
 
-        private void updateAnimation(boolean b, float rotation, boolean negative) {
+        private void updateAnimation(boolean b, boolean c, float rotation, boolean negative) {
             mat.identity();
             mat.translate(0, 0.5f, 0);
             if (b) {
@@ -200,37 +200,39 @@ public class PressBlock extends TallItemMachineBlock {
                 this.gearB.setTransformation(mat);
                 mat.popMatrix();
             }
-            mat.scale(2f);
 
-            mat.translate(0, 0.5f - this.value * 0.3f, 0);
-            this.piston.setTransformation(mat);
-            mat.translate(0,  -0.25f, 0);
-            mat.scale(0.2f);
-            mat.rotateX(MathHelper.HALF_PI);
-            this.pistonItem.setTransformation(mat);
+            if (c) {
+                mat.scale(2f);
+
+                mat.translate(0, 0.5f - this.value * 0.3f, 0);
+                this.piston.setTransformation(mat);
+                mat.translate(0, -0.25f, 0);
+                mat.scale(0.2f);
+                mat.rotateX(MathHelper.HALF_PI);
+                this.pistonItem.setTransformation(mat);
+            }
         }
 
         @Override
         protected void onTick() {
             var tick = this.getTick();
+            var b = tick % this.getUpdateRate() == 0;
+            var c = tick % 2 == 0;
+            var dir = BlockBoundAttachment.get(this).getBlockState().get(INPUT_FACING);
 
-            if (tick % 2 == 0) {
-                var b = tick % this.getUpdateRate() == 0;
 
-                var dir = BlockBoundAttachment.get(this).getBlockState().get(INPUT_FACING);
-                this.updateAnimation(b,
-                        b ? RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos().up()).rotation() : 0,
-                        (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
+            this.updateAnimation(b, c,
+                    b ? RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos().up()).rotation() : 0,
+                    (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
 
-                if (this.piston.isDirty()) {
-                    this.piston.startInterpolation();
-                    this.pistonItem.startInterpolation();
-                }
+            if (c && this.piston.isDirty()) {
+                this.piston.startInterpolation();
+                this.pistonItem.startInterpolation();
+            }
 
-                if (this.gearA.isDirty()) {
-                    this.gearA.startInterpolation();
-                    this.gearB.startInterpolation();
-                }
+            if (b && this.gearA.isDirty()) {
+                this.gearA.startInterpolation();
+                this.gearB.startInterpolation();
             }
         }
 

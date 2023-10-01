@@ -1,9 +1,9 @@
 {
-  "parent": "polyfactory:main/data/cable",
+  "parent": "polyfactory:main/base/fan",
   "criteria": {
     "use": {
       "conditions": {
-        "trigger": "polyfactory:item_reader"
+        "trigger": "polyfactory:moved_by_fan_a_lot"
       },
       "trigger": "polyfactory:trigger"
     }
@@ -11,16 +11,16 @@
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.polyfactory.item_reader.description"
+      "translate": "advancements.polyfactory.fan_sky.description"
     },
-    "frame": "task",
-    "hidden": false,
+    "frame": "challenge",
+    "hidden": true,
     "icon": {
-      "item": "polyfactory:item_reader"
+      "item": "minecraft:feather"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.polyfactory.item_reader.title"
+      "translate": "advancements.polyfactory.fan_sky.title"
     }
   },
   "requirements": [

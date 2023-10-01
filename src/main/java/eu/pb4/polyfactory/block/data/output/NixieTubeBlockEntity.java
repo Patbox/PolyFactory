@@ -1,11 +1,15 @@
 package eu.pb4.polyfactory.block.data.output;
 
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.base.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -196,6 +200,9 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
             if (dirty) {
                 entry.updateTextDisplay();
             }
+        }
+        if (list.size() >= 3 && FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity player) {
+            TriggerCriterion.trigger(player, FactoryTriggers.NIXIE_TUBE_CONNECTED_3_OR_MORE);
         }
     }
 }

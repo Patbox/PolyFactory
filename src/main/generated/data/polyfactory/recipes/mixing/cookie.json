@@ -16,7 +16,7 @@
   "minimum_speed": 4.0,
   "optimal_speed": 10.0,
   "output": {
-    "Count": 8,
+    "Count": 10,
     "id": "minecraft:cookie"
   },
   "time": 2.0

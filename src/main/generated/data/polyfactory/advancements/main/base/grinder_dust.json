@@ -1,21 +1,21 @@
 {
-  "parent": "polyfactory:main/machines/grinder_dust",
+  "parent": "polyfactory:main/base/hand_crank",
   "criteria": {
     "use": {
       "conditions": {
-        "recipe_id": "polyfactory:grinding/cobblestone_to_gravel"
-      },
-      "trigger": "minecraft:recipe_crafted"
-    },
-    "use1": {
-      "conditions": {
-        "recipe_id": "polyfactory:grinding/stone_to_cobblestone"
+        "recipe_id": "polyfactory:grinding/coal_dust"
       },
       "trigger": "minecraft:recipe_crafted"
     },
     "use2": {
       "conditions": {
-        "recipe_id": "polyfactory:grinding/gravel_to_sand"
+        "recipe_id": "polyfactory:grinding/planks_saw_dust"
+      },
+      "trigger": "minecraft:recipe_crafted"
+    },
+    "use3": {
+      "conditions": {
+        "recipe_id": "polyfactory:grinding/logs_saw_dust"
       },
       "trigger": "minecraft:recipe_crafted"
     }
@@ -23,27 +23,23 @@
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.polyfactory.gravel.description"
+      "translate": "advancements.polyfactory.grinder.description"
     },
-    "frame": "goal",
+    "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "minecraft:gravel"
+      "item": "polyfactory:grinder"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.polyfactory.gravel.title"
+      "translate": "advancements.polyfactory.grinder.title"
     }
   },
   "requirements": [
     [
-      "use"
-    ],
-    [
-      "use1"
-    ],
-    [
-      "use2"
+      "use",
+      "use2",
+      "use3"
     ]
   ],
   "sends_telemetry_event": true

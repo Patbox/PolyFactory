@@ -4,7 +4,10 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.models.*;
+import eu.pb4.polyfactory.models.BaseItemProvider;
+import eu.pb4.polyfactory.models.GenericParts;
+import eu.pb4.polyfactory.models.LodItemDisplayElement;
+import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.util.CachedBlockPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
@@ -150,7 +153,8 @@ public class MixerBlock extends TallItemMachineBlock {
 
             this.updateStatePos(state);
             var dir = state.get(INPUT_FACING);
-            this.updateAnimation(true, 0, (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));            this.addElement(this.whisk);
+            this.updateAnimation(true,  true, 0, (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
+            this.addElement(this.whisk);
             this.addElement(this.main);
             this.addElement(this.gearA);
             this.addElement(this.gearB);
@@ -165,7 +169,7 @@ public class MixerBlock extends TallItemMachineBlock {
             this.gearB.setYaw(direction.asRotation());
         }
 
-        private void updateAnimation(boolean b, float rotation, boolean negative) {
+        private void updateAnimation(boolean b, boolean c, float rotation, boolean negative) {
             mat.identity();
             mat.translate(0, 0.5f, 0);
             if (b) {
@@ -178,10 +182,13 @@ public class MixerBlock extends TallItemMachineBlock {
                 this.gearB.setTransformation(mat);
                 mat.popMatrix();
             }
-            mat.scale(2f);
-            mat.rotateY(this.rotation);
-            mat.translate(0, this.active ? -0.1f : 0.2f, 0);
-            this.whisk.setTransformation(mat);
+
+            if (c) {
+                mat.scale(2f);
+                mat.rotateY(this.rotation);
+                mat.translate(0, this.active ? -0.1f : 0.2f, 0);
+                this.whisk.setTransformation(mat);
+            }
         }
 
         @Override
@@ -193,21 +200,21 @@ public class MixerBlock extends TallItemMachineBlock {
 
         @Override
         protected void onTick() {
-            if (this.getTick() % 2 == 0) {
-                var b = this.getTick() % this.getUpdateRate() == 0;
+            var b = this.getTick() % this.getUpdateRate() == 0;
 
-                var dir = BlockBoundAttachment.get(this).getBlockState().get(INPUT_FACING);
-                this.updateAnimation(b,
-                        b ? RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos().up()).rotation() : 0,
-                        (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
-                if (this.whisk.isDirty()) {
-                    this.whisk.startInterpolation();
-                }
+            var c = this.getTick() % 2 == 0;
 
-                if (this.gearA.isDirty()) {
-                    this.gearA.startInterpolation();
-                    this.gearB.startInterpolation();
-                }
+            var dir = BlockBoundAttachment.get(this).getBlockState().get(INPUT_FACING);
+            this.updateAnimation(b, c,
+                    b ? RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos().up()).rotation() : 0,
+                    (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
+            if (this.whisk.isDirty()) {
+                this.whisk.startInterpolation();
+            }
+
+            if (this.gearA.isDirty()) {
+                this.gearA.startInterpolation();
+                this.gearB.startInterpolation();
             }
         }
 

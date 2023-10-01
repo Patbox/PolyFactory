@@ -1,9 +1,9 @@
 {
-  "parent": "polyfactory:main/root",
+  "parent": "polyfactory:main/base/press",
   "criteria": {
     "use": {
       "conditions": {
-        "trigger": "polyfactory:wrench"
+        "trigger": "polyfactory:moved_by_fan"
       },
       "trigger": "polyfactory:trigger"
     }
@@ -11,16 +11,16 @@
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.polyfactory.wrench.description"
+      "translate": "advancements.polyfactory.fan.description"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "polyfactory:wrench"
+      "item": "polyfactory:fan"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.polyfactory.wrench.title"
+      "translate": "advancements.polyfactory.fan.title"
     }
   },
   "requirements": [

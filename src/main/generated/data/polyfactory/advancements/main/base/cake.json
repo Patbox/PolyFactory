@@ -1,5 +1,5 @@
 {
-  "parent": "polyfactory:main/machine/mixer",
+  "parent": "polyfactory:main/base/mixer",
   "criteria": {
     "use": {
       "conditions": {
@@ -13,10 +13,10 @@
     "description": {
       "translate": "advancements.polyfactory.cake.description"
     },
-    "frame": "task",
+    "frame": "goal",
     "hidden": true,
     "icon": {
-      "item": "polyfactory:mixer"
+      "item": "minecraft:cake"
     },
     "show_toast": true,
     "title": {

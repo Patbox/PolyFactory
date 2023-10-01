@@ -1,9 +1,9 @@
 {
-  "parent": "polyfactory:main/rotation/windmill",
+  "parent": "polyfactory:main/base/steel_ingot",
   "criteria": {
     "use": {
       "conditions": {
-        "trigger": "polyfactory:fuel_steam_engine"
+        "trigger": "polyfactory:construct_working_windmill"
       },
       "trigger": "polyfactory:trigger"
     }
@@ -11,16 +11,16 @@
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.polyfactory.steam_engine.description"
+      "translate": "advancements.polyfactory.windmill.description"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "polyfactory:steam_engine"
+      "item": "polyfactory:windmill_sail"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.polyfactory.steam_engine.title"
+      "translate": "advancements.polyfactory.windmill.title"
     }
   },
   "requirements": [

@@ -1,9 +1,9 @@
 {
-  "parent": "polyfactory:main/machine/press",
+  "parent": "polyfactory:main/base/cable",
   "criteria": {
     "use": {
       "conditions": {
-        "trigger": "polyfactory:miner_mines"
+        "trigger": "polyfactory:item_reader"
       },
       "trigger": "polyfactory:trigger"
     }
@@ -11,16 +11,16 @@
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.polyfactory.miner.description"
+      "translate": "advancements.polyfactory.item_reader.description"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "polyfactory:miner"
+      "item": "polyfactory:item_reader"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.polyfactory.miner.title"
+      "translate": "advancements.polyfactory.item_reader.title"
     }
   },
   "requirements": [

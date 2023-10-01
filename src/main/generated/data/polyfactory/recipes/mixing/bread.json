@@ -4,7 +4,7 @@
     "base": {
       "item": "minecraft:wheat"
     },
-    "count": 3
+    "count": 2
   },
   "minimum_speed": 4.0,
   "optimal_speed": 10.0,

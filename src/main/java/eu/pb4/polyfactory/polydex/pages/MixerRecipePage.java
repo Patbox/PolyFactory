@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class MixerRecipePage extends AbstractRecipePolydexPage<GenericMixingRecipe> {
+public class MixerRecipePage extends PrioritizedRecipePage<GenericMixingRecipe> {
     private static final ItemStack ICON = FactoryItems.MIXER.getDefaultStack();
     private final List<PolydexIngredient<?>> ingredients;
 

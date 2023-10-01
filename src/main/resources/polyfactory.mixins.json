@@ -28,6 +28,8 @@
     "util.BlockEntityTypeAccessor",
     "util.DyeColorMixin",
     "util.DyeItemMixin",
+    "util.ItemPredicateBuilderMixin",
+    "util.ItemPredicateMixin",
     "util.RedstoneWireBlockMixin",
     "util.WorldChunkMixin"
   ],

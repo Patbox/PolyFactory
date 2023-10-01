@@ -12,7 +12,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
-public class GrindingRecipePage extends AbstractRecipePolydexPage<GrindingRecipe> {
+public class GrindingRecipePage extends PrioritizedRecipePage<GrindingRecipe> {
     private static final ItemStack ICON = FactoryItems.GRINDER.getDefaultStack();
     private final PolydexStack<?>[] output;
 
