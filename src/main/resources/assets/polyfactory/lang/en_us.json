@@ -45,6 +45,7 @@
   "item.polyfactory.steel_ingot": "Steel Ingot",
   "item.polyfactory.steel_plate": "Steel Plate",
   "item.polyfactory.steel_gear": "Steel Gear",
+  "item.polyfactory.steel_gear.tooltip": "Click [%s] on Axle to place",
   "item.polyfactory.large_steel_gear": "Large Steel Gear",
   "item.polyfactory.coal_dust": "Coal Dust",
   "item.polyfactory.saw_dust": "Saw Dust",
@@ -55,6 +56,8 @@
   "item.polyfactory.wooden_plate": "Wooden Plate",
   "item.polyfactory.treated_dried_kelp": "Treated Dried Kelp",
   "item.polyfactory.wrench": "Wrench",
+  "item.polyfactory.wrench.tooltip.1": "Use [%s] to change block",
+  "item.polyfactory.wrench.tooltip.2": "Use [%s] to change current setting",
   "item.polyfactory.wrench.title": "Wrench Actions: %s",
   "item.polyfactory.wrench.action.facing": "Facing",
   "item.polyfactory.wrench.action.axis": "Axis",
@@ -92,6 +95,9 @@
 
   "advancements.polyfactory.steel_ingot.title": "Steelworks",
   "advancements.polyfactory.steel_ingot.description": "Smelt Steel Alloy Mixture into Steel Ingot",
+
+  "advancements.polyfactory.steel_gear.title": "v=const, ω₁=v/r₁, ω₂=v/r₂",
+  "advancements.polyfactory.steel_gear.description": "Connect differently sized Steel Gears to change rotation speed",
 
   "advancements.polyfactory.press.title": "Better with Plates",
   "advancements.polyfactory.press.description": "Use Mechanical Press to craft Steel Plate or Wooden Plate",

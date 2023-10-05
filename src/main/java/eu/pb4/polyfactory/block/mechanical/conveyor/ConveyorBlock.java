@@ -171,9 +171,9 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
                 }
             }
 
-            return state.with(HAS_OUTPUT_TOP, world.getBlockState(pos.up()).isIn(FactoryBlockTags.CONVEYOR_TOP_OUTPUT)).with(direction == Direction.UP ? TOP_CONVEYOR : BOTTOM_CONVEYOR, isMatchingConveyor(neighborState, state.get(DIRECTION)));
+            return state.with(HAS_OUTPUT_TOP, world.getBlockState(pos.up()).isIn(FactoryBlockTags.CONVEYOR_TOP_OUTPUT)).with(direction == Direction.UP ? TOP_CONVEYOR : BOTTOM_CONVEYOR, isMatchingConveyor(neighborState, direction, state.get(DIRECTION), state.get(VERTICAL)));
         } else if (direction.getAxis() == state.get(DIRECTION).getAxis()) {
-            return state.with(direction == state.get(DIRECTION) ? NEXT_CONVEYOR : PREVIOUS_CONVEYOR, isMatchingConveyor(neighborState, state.get(DIRECTION)));
+            return state.with(direction == state.get(DIRECTION) ? NEXT_CONVEYOR : PREVIOUS_CONVEYOR, isMatchingConveyor(neighborState, direction, state.get(DIRECTION), state.get(VERTICAL)));
         }
         return state;
     }
@@ -264,10 +264,13 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         if (against.isOf(this)) {
             if (ctx.getSide().getAxis() == Direction.Axis.Y) {
                 var behind = ctx.getWorld().getBlockState(ctx.getBlockPos().offset(against.get(DIRECTION).getOpposite()));
-
                 state = this.getDefaultState().with(DIRECTION, against.get(DIRECTION)).with(VERTICAL, behind.isOf(this) ? DirectionValue.NEGATIVE : DirectionValue.POSITIVE);
             } else if (ctx.getSide().getAxis() == against.get(DIRECTION).getAxis()) {
                 state = this.getDefaultState().with(DIRECTION, against.get(DIRECTION));
+                var y = ctx.getHitPos().getY() - ctx.getBlockPos().getY();
+                if (y < 5 / 16f) {
+                    state = state.with(VERTICAL, ctx.getSide() == against.get(DIRECTION) ? DirectionValue.NEGATIVE : DirectionValue.POSITIVE);
+                }
             }
             direction = against.get(DIRECTION);
         }
@@ -298,14 +301,16 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
             }
         }
 
+        var value = state.get(VERTICAL);
+
         var bottom = ctx.getWorld().getBlockState(ctx.getBlockPos().down());
 
         return state
-                .with(NEXT_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().offset(direction)), direction))
-                .with(PREVIOUS_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().offset(direction, -1)), direction))
-                .with(TOP_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().up()), direction))
-                .with(BOTTOM_CONVEYOR, isMatchingConveyor(bottom, direction))
-                .with(HAS_OUTPUT_TOP, ctx.getWorld().getBlockState(ctx.getBlockPos().up()).isIn(FactoryBlockTags.CONVEYOR_TOP_OUTPUT));
+                .with(NEXT_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().offset(direction)), direction , direction, value))
+                .with(PREVIOUS_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().offset(direction, -1)), direction.getOpposite(), direction, value))
+                .with(TOP_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().up()),Direction.UP, direction, value))
+                .with(BOTTOM_CONVEYOR, isMatchingConveyor(bottom, Direction.DOWN, direction, value))
+                .with(HAS_OUTPUT_TOP, ctx.getWorld().getBlockState( ctx.getBlockPos().up()).isIn(FactoryBlockTags.CONVEYOR_TOP_OUTPUT));
     }
 
     public static int getModelId(BlockState state) {
@@ -345,8 +350,24 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         return (i & 8) != 0;
     }
 
-    private boolean isMatchingConveyor(BlockState blockState, Direction direction) {
-        return blockState.isOf(this) && blockState.get(DIRECTION) == direction;
+    @SuppressWarnings("RedundantIfStatement")
+    private boolean isMatchingConveyor(BlockState neighborState, Direction neighborDirection, Direction selfDirection, DirectionValue selfValue) {
+        if (!neighborState.isOf(this) || !(neighborState.get(DIRECTION) == selfDirection)) {
+            return false;
+        }
+
+        var neighborValue = neighborState.get(VERTICAL);
+        if (neighborValue == DirectionValue.POSITIVE && (neighborDirection == Direction.DOWN || neighborDirection == selfDirection)) {
+            return selfValue == DirectionValue.NEGATIVE;
+        } else if (neighborValue == DirectionValue.NEGATIVE && (neighborDirection == Direction.DOWN || neighborDirection == selfDirection.getOpposite())) {
+            return selfValue == DirectionValue.POSITIVE;
+        } else if (selfValue == DirectionValue.POSITIVE && (neighborDirection == Direction.UP || neighborDirection == selfDirection.getOpposite())) {
+            return neighborValue == DirectionValue.NEGATIVE;
+        } else if (selfValue == DirectionValue.NEGATIVE && (neighborDirection == Direction.UP || neighborDirection == selfDirection)) {
+            return neighborValue == DirectionValue.POSITIVE;
+        }
+
+        return true;
     }
 
     @Override

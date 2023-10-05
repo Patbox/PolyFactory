@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 public class ModInit implements ModInitializer {
 	public static final String ID = "polyfactory";
+	public static final String VERSION = FabricLoader.getInstance().getModContainer(ID).get().getMetadata().getVersion().getFriendlyString();
 	public static final Logger LOGGER = LoggerFactory.getLogger("PolyFactory");
     public static final boolean DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
     @SuppressWarnings("PointlessBooleanExpression")
@@ -46,11 +47,13 @@ public class ModInit implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		LOGGER.warn("=================================================");
-		LOGGER.warn("PolyFactory is still in pre-alpha state!");
-		LOGGER.warn("Don't expect any stability or playability");
-		LOGGER.warn("until official release!");
-		LOGGER.warn("=================================================");
+		if (VERSION.contains("-dev.")) {
+			LOGGER.warn("=====================================================");
+			LOGGER.warn("You are using development version of PolyFactory!");
+			LOGGER.warn("Support is limited, as features might be unfinished!");
+			LOGGER.warn("You are on your own!");
+			LOGGER.warn("=====================================================");
+		}
 
 		FactoryBlocks.register();
 		FactoryBlockEntities.register();

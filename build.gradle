@@ -8,8 +8,18 @@ sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version
 group = project.maven_group
+
+
+if (System.getenv("CI") != null) {
+	if (System.getenv("RELEASE") != null) {
+		version = project.mod_version
+	} else {
+		version = project.mod_version + "-dev.build." + System.getenv("GITHUB_RUN_NUMBER")
+	}
+} else {
+	version = project.mod_version + "-dev.local"
+}
 
 loom {
 	runs {
@@ -60,10 +70,10 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation include('eu.pb4:polymer-core:0.6.0+1.20.2')
-	modImplementation include('eu.pb4:polymer-resource-pack:0.6.0+1.20.2')
-	modImplementation include('eu.pb4:polymer-autohost:0.6.0+1.20.2')
-	modImplementation include('eu.pb4:polymer-virtual-entity:0.6.0+1.20.2')
+	modImplementation 'eu.pb4:polymer-core:0.6.0+1.20.2'
+	modImplementation 'eu.pb4:polymer-resource-pack:0.6.0+1.20.2'
+	modImplementation 'eu.pb4:polymer-autohost:0.6.0+1.20.2'
+	modImplementation 'eu.pb4:polymer-virtual-entity:0.6.0+1.20.2'
 	modImplementation include('eu.pb4:map-canvas-api:0.2.2+1.19.4')
 	modImplementation include('eu.pb4:common-protection-api:1.0.0')
 	modImplementation include('eu.pb4:sidebar-api:0.2.0+1.20.2')
@@ -136,9 +146,14 @@ if (System.getenv("MODRINTH")) {
 		versionNumber = "" + version // The version of the mod to upload.
 		versionType = "alpha"
 		uploadFile = remapJar // This links to a task that builds your mod jar and sets "uploadFile" to the mod jar.
-		gameVersions = [((String) project.minecraft_version)]
+		gameVersions ((String) project.minecraft_version)
 		changelog = System.getenv("CHANGELOG")
 		loaders = ["fabric", "quilt"]
+
+		dependencies {
+			required.project "polymer"
+			optional.project "polydex"
+		}
 	}
 
 	remapJar {

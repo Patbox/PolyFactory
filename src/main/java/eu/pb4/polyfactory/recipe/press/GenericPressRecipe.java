@@ -84,7 +84,7 @@ public record GenericPressRecipe(CountedIngredient inputA, CountedIngredient inp
     @Deprecated
     @Override
     public ItemStack getResult(DynamicRegistryManager registryManager) {
-        return ItemStack.EMPTY;
+        return this.output.isEmpty() ? ItemStack.EMPTY : this.output.get(0).stack();
     }
 
     @Override

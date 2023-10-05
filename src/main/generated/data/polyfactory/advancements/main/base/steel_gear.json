@@ -1,0 +1,32 @@
+{
+  "parent": "polyfactory:main/base/steel_ingot",
+  "criteria": {
+    "use": {
+      "conditions": {
+        "trigger": "polyfactory:shifting_gears"
+      },
+      "trigger": "polyfactory:trigger"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.polyfactory.steel_gear.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "polyfactory:steel_gear"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.polyfactory.steel_gear.title"
+    }
+  },
+  "requirements": [
+    [
+      "use"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

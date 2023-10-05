@@ -72,7 +72,7 @@ public record GrindingRecipe(String group, Ingredient input, List<OutputStack> o
     @Deprecated
     @Override
     public ItemStack craft(GrinderBlockEntity inventory, DynamicRegistryManager registryManager) {
-        return  ItemStack.EMPTY;
+        return this.output.isEmpty() ? ItemStack.EMPTY : this.output.get(0).stack();
     }
 
     @Override

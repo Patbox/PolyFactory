@@ -337,6 +337,22 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
                 .build(exporter, "polyfactory:main/base/press");
 
+        var gear = Advancement.Builder.create()
+                .parent(steel)
+                .display(
+                        FactoryItems.STEEL_GEAR,
+                        Text.translatable("advancements.polyfactory.steel_gear.title"),
+                        Text.translatable("advancements.polyfactory.steel_gear.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.CONNECT_DIFFERENT_GEARS))
+                .build(exporter, "polyfactory:main/base/steel_gear");
+
+
         // Steel -> Press
 
         var steamEngine = Advancement.Builder.create()

@@ -4,13 +4,13 @@
   "version": "${version}",
 
   "name": "PolyFactory",
-  "description": "Server side tech mod",
+  "description": "Let's build a factory! A tech mod for your Minecraft server!",
   "authors": [
     "Patbox"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://pb4.eu",
+    "sources": "https://github.com/Patbox/PolyFactory"
   },
 
   "license": "LGPLv3",
@@ -30,9 +30,12 @@
   ],
 
   "depends": {
-    "fabricloader": ">=0.14.11",
+    "fabricloader": ">=0.14.20",
     "fabric-api": "*",
-    "minecraft": ">=1.20",
+    "minecraft": "1.20.2",
+    "polymer-core": ">=0.6.0",
+    "polymer-resource-pack": ">=0.6.0",
+    "polymer-virtual-entity": ">=0.6.0",
     "java": ">=17"
   },
   "breaks": {
