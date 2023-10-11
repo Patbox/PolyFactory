@@ -18,6 +18,7 @@ import it.unimi.dsi.fastutil.longs.Long2BooleanOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2FloatOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
@@ -239,10 +240,10 @@ public class RotationData implements GraphEntity<RotationData> {
             }
             state.stressUsed = fullStress;
 
-            var negative = state.speed < 0;
+            var negative = state.speed == 0 ? TriState.DEFAULT : TriState.of(state.speed < 0);
             float biggest = 1;
             for (var data : rotationDataList) {
-                data.negative = dirMap.get(data.getContext().getGraph().getId()) != negative;
+                data.negative = negative == TriState.DEFAULT ? data.negative : dirMap.get(data.getContext().getGraph().getId()) != negative.get();
                 state.multiplier = speedMap.get(data.getContext().getGraph().getId());
                 biggest = Math.max(biggest, state.multiplier);
                 data.applyState(state);
@@ -326,7 +327,7 @@ public class RotationData implements GraphEntity<RotationData> {
         calculateState(world, state);
         applyState(state);
 
-        this.negative = state.speed < 0;
+        this.negative = state.speed == 0 ? this.negative : state.speed < 0;
 
         var speed = this.speed != 0 ? this.speed / Math.signum(state.speed) : 0;
 

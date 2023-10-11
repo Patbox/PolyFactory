@@ -71,7 +71,21 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
             if (be.checkUnlocked(player)) {
                 var stack = player.getStackInHand(hand);
 
-                if (stack.isEmpty()) {
+                if (player.isSneaking() && stack.isEmpty() && !be.getItemStack().isEmpty()) {
+                    var inv = player.getInventory().main;
+                    for (int i = 0; i < inv.size(); i++) {
+                        var curr = inv.get(i);
+                        if (be.matches(curr)) {
+                            curr.decrement(be.addItems(curr.getCount()));
+                            if (curr.isEmpty()) {
+                                inv.set(i, ItemStack.EMPTY);
+                            }
+                            if (curr.getCount() > 0) {
+                                break;
+                            }
+                        }
+                    }
+                } else if (stack.isEmpty()) {
                     return ActionResult.FAIL;
                 } else {
                     if (player instanceof ServerPlayerEntity serverPlayer) {
