@@ -177,6 +177,10 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
                     world.playSound(null, pos, SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 0.1f, 1.2f);
                     self.playedSound = true;
                 }
+            } else {
+                ((ServerWorld) world).spawnParticles(ParticleTypes.POOF,
+                        pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5, 0,
+                        (Math.random() - 0.5) * 0.2, 0.6, (Math.random() - 0.5) * 0.2, 0.2);
             }
         }
         self.model.tick();

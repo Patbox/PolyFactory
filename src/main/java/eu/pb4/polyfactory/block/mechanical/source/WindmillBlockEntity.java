@@ -118,7 +118,7 @@ public class WindmillBlockEntity extends BlockEntity {
             return;
         }
 
-        var speed = Math.min(Math.log(x) / LOG_BASE * 1.85, 8);
+        var speed = Math.min(Math.log(x) / LOG_BASE * 2, 10.5);
         if (speed <= 0) {
             return;
         }
@@ -129,7 +129,7 @@ public class WindmillBlockEntity extends BlockEntity {
         } else if (biome.isIn(ConventionalBiomeTags.BEACH)) {
             speed *= 1.3;
         } else if (biome.isIn(ConventionalBiomeTags.MOUNTAIN)) {
-            speed *= 1.2;
+            speed *= 1.25;
         }
 
         if (serverWorld.isRaining()) {

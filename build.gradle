@@ -21,6 +21,8 @@ if (System.getenv("CI") != null) {
 	version = project.mod_version + "-dev.local"
 }
 
+version = version + "+" + project.minecraft_version
+
 loom {
 	runs {
 		datagen {
