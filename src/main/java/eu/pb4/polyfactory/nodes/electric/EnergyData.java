@@ -122,6 +122,10 @@ public class EnergyData implements GraphEntity<EnergyData> {
         return new EnergyData();
     }
 
+    public boolean powered() {
+        return this.speed > 0;
+    }
+
     public static class State {
         public final EnergyData data;
         protected long power;

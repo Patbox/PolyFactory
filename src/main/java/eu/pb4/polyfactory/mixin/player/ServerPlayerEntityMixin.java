@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.mixin.player;
 
 import com.mojang.authlib.GameProfile;
-import eu.pb4.polyfactory.util.FactoryPlayer;
+import eu.pb4.polyfactory.entity.FactoryPlayer;
 import eu.pb4.polyfactory.util.LastFanEffectedTickConsumer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;

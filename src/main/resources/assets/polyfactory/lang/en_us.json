@@ -1,5 +1,6 @@
 {
   "itemgroup.polyfactory": "PolyFactory",
+  "itemgroup.polyfactory.experimental": "PolyFactory: Experimental",
   "block.polyfactory.conveyor": "Item Conveyor",
   "block.polyfactory.sticky_conveyor": "Sticky Item Conveyor",
   "block.polyfactory.funnel": "Funnel",
@@ -24,6 +25,7 @@
   "block.polyfactory.windmill": "Windmill",
   "block.polyfactory.electric_motor": "Electric Motor",
   "block.polyfactory.electric_generator": "Electric Generator",
+  "block.polyfactory.wither_skull_generator": "Wither Skull Generator",
   "block.polyfactory.item_counter": "Item Counter",
   "block.polyfactory.redstone_input": "Redstone Input",
   "block.polyfactory.redstone_output": "Redstone Output",

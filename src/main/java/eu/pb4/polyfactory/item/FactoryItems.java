@@ -75,6 +75,8 @@ public class FactoryItems {
     public static final Item ELECTRIC_MOTOR = register(FactoryBlocks.ELECTRIC_MOTOR);
     public static final Item ELECTRIC_GENERATOR = register(FactoryBlocks.ELECTRIC_GENERATOR);
 
+    public static final Item WITHER_SKULL_GENERATOR = register(FactoryBlocks.WITHER_SKULL_GENERATOR);
+
     public static final Item ARTIFICIAL_DYE = register("artificial_dye", new ArtificialDyeItem(new Item.Settings()));
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
     public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING);
@@ -173,8 +175,15 @@ public class FactoryItems {
                     // Creative
                     entries.add(CREATIVE_MOTOR);
                     entries.add(CREATIVE_CONTAINER);
+                })).build()
+        );
 
 
+        PolymerItemGroupUtils.registerPolymerItemGroup(new Identifier(ModInit.ID, "experimental"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
+                .icon(WITHER_SKULL_GENERATOR::getDefaultStack)
+                .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
+                .entries(((context, entries) -> {
+                    entries.add(WITHER_SKULL_GENERATOR);
                     // Remove this
                     if (ModInit.DEV) {
                         entries.add(ROTATION_DEBUG);

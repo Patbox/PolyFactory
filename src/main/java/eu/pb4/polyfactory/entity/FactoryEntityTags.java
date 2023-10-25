@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.util;
+package eu.pb4.polyfactory.entity;
 
 import eu.pb4.polyfactory.ModInit;
 import net.minecraft.entity.EntityType;

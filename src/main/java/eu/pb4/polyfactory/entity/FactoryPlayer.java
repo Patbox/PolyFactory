@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.util;
+package eu.pb4.polyfactory.entity;
 
 import com.mojang.authlib.GameProfile;
 import eu.pb4.polyfactory.mixin.player.PlayerEntityAccessor;

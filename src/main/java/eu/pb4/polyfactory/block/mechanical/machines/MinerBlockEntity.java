@@ -11,7 +11,7 @@ import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.TagLimitedSlot;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.FactoryPlayer;
+import eu.pb4.polyfactory.entity.FactoryPlayer;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.inventory.SingleStackInventory;

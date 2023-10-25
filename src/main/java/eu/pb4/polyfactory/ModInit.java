@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.block.mechanical.AxleWithLargeGearBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.other.TinyPotatoSpringBlock;
+import eu.pb4.polyfactory.entity.FactoryEntities;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
 import eu.pb4.polyfactory.models.CableModel;
@@ -59,6 +60,7 @@ public class ModInit implements ModInitializer {
 		FactoryBlockEntities.register();
 		FactoryEnchantments.register();
 		FactoryItems.register();
+		FactoryEntities.register();
 		FactoryNodes.register();
 		FactoryRecipeTypes.register();
 		FactoryRecipeSerializers.register();
