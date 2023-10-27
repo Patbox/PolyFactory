@@ -84,6 +84,8 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.NIXIE_TUBE_CONTROLLER)
                 .add(FactoryBlocks.ELECTRIC_MOTOR)
                 .add(FactoryBlocks.ELECTRIC_GENERATOR)
+                .add(FactoryBlocks.CRAFTER)
+                .add(FactoryBlocks.WITHER_SKULL_GENERATOR)
         ;
 
         this.getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)

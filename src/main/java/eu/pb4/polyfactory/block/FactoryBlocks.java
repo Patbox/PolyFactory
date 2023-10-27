@@ -17,6 +17,7 @@ import eu.pb4.polyfactory.block.electric.WitherSkullGeneratorBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.MinerBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.block.mechanical.*;
@@ -53,6 +54,7 @@ public class FactoryBlocks {
     public static final GrinderBlock GRINDER = register("grinder", new GrinderBlock(Block.Settings.copy(SPLITTER)));
     public static final PressBlock PRESS = register("press", new PressBlock(Block.Settings.copy(SPLITTER)));
     public static final MixerBlock MIXER = register("mixer", new MixerBlock(Block.Settings.copy(SPLITTER)));
+    public static final MCrafterBlock CRAFTER = register("crafter", new MCrafterBlock(Block.Settings.copy(SPLITTER)));
     public static final MinerBlock MINER = register("miner", new MinerBlock(Block.Settings.copy(SPLITTER)));
     public static final PlanterBlock PLANTER = register("planter", new PlanterBlock(Block.Settings.copy(SPLITTER)));
     public static final AxleBlock AXLE = register("axle", new AxleBlock(Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD).strength(2.5F).nonOpaque()));

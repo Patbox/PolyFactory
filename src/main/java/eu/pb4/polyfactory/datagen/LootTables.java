@@ -50,6 +50,8 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.INVERTED_REDSTONE_LAMP);
         this.addDrop(FactoryBlocks.ELECTRIC_GENERATOR);
         this.addDrop(FactoryBlocks.TINY_POTATO_SPRING);
+        this.addDrop(FactoryBlocks.WITHER_SKULL_GENERATOR);
+        this.addDrop(FactoryBlocks.CRAFTER);
         this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE);
 
         this.addDrop(FactoryBlocks.AXLE_WITH_GEAR, LootTable.builder()

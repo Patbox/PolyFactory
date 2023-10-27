@@ -101,6 +101,11 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
 
             if (!block) {
                 block = self.tryMovingConveyor(world, pos, state, vert, dir);
+
+                if (!block) {
+                    var blockerPos = pos.offset(dir).up();
+                    block = world.getBlockState(blockerPos).isSideSolidFullSquare(world, blockerPos, dir.getOpposite());
+                }
             }
 
             if (block) {
@@ -110,7 +115,6 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
                 }
                 return;
             }
-
 
             var stack = self.getStack(0);
             self.clearContainer();

@@ -13,6 +13,7 @@ import eu.pb4.polyfactory.block.electric.WitherSkullGeneratorBlock;
 import eu.pb4.polyfactory.block.electric.WitherSkullGeneratorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.*;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.source.HandCrankBlockEntity;
@@ -73,6 +74,9 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<MixerBlockEntity> MIXER = register("mixer",
             FabricBlockEntityTypeBuilder.create(MixerBlockEntity::new).addBlock(FactoryBlocks.MIXER));
+
+    public static final BlockEntityType<MCrafterBlockEntity> CRAFTER = register("crafter",
+            FabricBlockEntityTypeBuilder.create(MCrafterBlockEntity::new).addBlock(FactoryBlocks.CRAFTER));
 
     public static final BlockEntityType<NixieTubeBlockEntity> NIXIE_TUBE = register("nixie_tube",
             FabricBlockEntityTypeBuilder.create(NixieTubeBlockEntity::new).addBlock(FactoryBlocks.NIXIE_TUBE));

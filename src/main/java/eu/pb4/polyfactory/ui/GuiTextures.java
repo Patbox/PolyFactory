@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import static eu.pb4.polyfactory.ui.UiResourceCreator.*;
 
 public class GuiTextures {
+    public static final Function<Text, Text> CRAFTER = background("crafter");
     public static final Function<Text, Text> GRINDER = background("grinder");
     public static final Function<Text, Text> PRESS = background("press");
     public static final Function<Text, Text> MIXER = background("mixer");
@@ -22,10 +23,11 @@ public class GuiTextures {
     public static final Supplier<GuiElementBuilder> POLYDEX_BUTTON = icon32("polydex");
     public static final Supplier<GuiElementBuilder> PLUS_BUTTON = icon32("button/plus");
     public static final Supplier<GuiElementBuilder> MINUS_BUTTON = icon32("button/minus");
+    public static final Supplier<GuiElementBuilder> LOCKED_SLOT = icon32("locked_slot");
     public static final Progress FLAME = Progress.createVertical("flame", 1, 14, true);
     public static final Progress FLAME_OFFSET_RIGHT = Progress.createVertical32Right("flame_offset_right", 9, 22, true);
     public static final Progress PROGRESS_VERTICAL = Progress.createVertical("progress_vertical", 0, 15, false);
-    //public static final Progress PROGRESS_HORIZONTAL = Progress.createHorizontal("progress_horizontal", 0, 15, false);
+    public static final Progress PROGRESS_HORIZONTAL = Progress.createHorizontal("progress_horizontal", 0, 15, false);
     public static final Progress PROGRESS_HORIZONTAL_OFFSET_RIGHT = Progress.createHorizontal32Right("progress_horizontal_offset_right", 6, 26, false);
     public static final IntFunction<GuiElementBuilder>[] NUMBERS_FLAT = createNumbers("flat/");
     public static final IntFunction<GuiElementBuilder>[] NUMBERS_SHADOW = createNumbers("shadow/");

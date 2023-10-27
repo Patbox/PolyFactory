@@ -23,6 +23,8 @@
     "polyfactory:block_observer",
     "polyfactory:nixie_tube_controller",
     "polyfactory:electric_motor",
-    "polyfactory:electric_generator"
+    "polyfactory:electric_generator",
+    "polyfactory:crafter",
+    "polyfactory:wither_skull_generator"
   ]
 }

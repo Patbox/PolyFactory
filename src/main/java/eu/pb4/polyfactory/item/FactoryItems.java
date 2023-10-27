@@ -31,11 +31,11 @@ public class FactoryItems {
     public static final Item FUNNEL = register(FactoryBlocks.FUNNEL);
     public static final Item SPLITTER = register(FactoryBlocks.SPLITTER);
     public static final Item FAN = register(FactoryBlocks.FAN);
-    //public static final Item CABLE_PLATE_BLOCK = register("cable_plate", FactoryBlocks.CABLE_PLATE);
     public static final Item HAND_CRANK = register(FactoryBlocks.HAND_CRANK);
     public static final Item STEAM_ENGINE = register(FactoryBlocks.STEAM_ENGINE);
     public static final Item GRINDER = register(FactoryBlocks.GRINDER);
     public static final Item PRESS = register(FactoryBlocks.PRESS);
+    public static final Item CRAFTER = register(FactoryBlocks.CRAFTER);
     public static final Item MIXER = register(FactoryBlocks.MIXER);
     public static final Item MINER = register(FactoryBlocks.MINER);
     public static final Item PLANTER = register(FactoryBlocks.PLANTER);
@@ -103,7 +103,11 @@ public class FactoryItems {
 
                     // Rotation Generation
                     entries.add(HAND_CRANK);
-                    entries.add(WINDMILL_SAIL);
+                    entries.add(WINDMILL_SAIL, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+
+                    for (var dye : DyeColor.values()) {
+                        entries.add(ColoredItem.stack(WINDMILL_SAIL, 1, DyeColorExtra.getColor(dye)), ItemGroup.StackVisibility.SEARCH_TAB_ONLY);
+                    }
                     entries.add(STEAM_ENGINE);
 
                     // Item Movement/Storage
@@ -183,6 +187,7 @@ public class FactoryItems {
                 .icon(WITHER_SKULL_GENERATOR::getDefaultStack)
                 .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
                 .entries(((context, entries) -> {
+                    entries.add(CRAFTER);
                     entries.add(WITHER_SKULL_GENERATOR);
                     // Remove this
                     if (ModInit.DEV) {

@@ -11,6 +11,7 @@
   "block.polyfactory.press": "Mechanical Press",
   "block.polyfactory.miner": "Mechanical Miner",
   "block.polyfactory.mixer": "Mechanical Mixer",
+  "block.polyfactory.crafter": "Mechanical Crafter",
   "block.polyfactory.planter": "Mechanical Planter",
   "block.polyfactory.axle": "Axle",
   "block.polyfactory.axle_with_gear": "Axle with Gear",
@@ -78,6 +79,7 @@
   "recipe_type.polyfactory.grinding": "Grinder",
 
   "stat.polyfactory.taters_clicked": "Potatoes Clicked",
+  "subtitles.block.crafter.craft": "Crafter crafts",
 
   "advancements.polyfactory.root.title": "PolyFactory",
   "advancements.polyfactory.root.description": "Welcome to the factory!",
