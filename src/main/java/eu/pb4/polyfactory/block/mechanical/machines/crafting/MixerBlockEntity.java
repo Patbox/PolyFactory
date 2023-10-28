@@ -246,10 +246,10 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
                             pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0,
                             (Math.random() - 0.5) * 0.2, 0, (Math.random() - 0.5) * 0.2, 2);
                 }
-            } else {
-                ((ServerWorld) world).spawnParticles(ParticleTypes.POOF,
-                        pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5, 0,
-                        (Math.random() - 0.5) * 0.2, 0.6, (Math.random() - 0.5) * 0.2, 0.2);
+            } else if (world.getTime() % 5 == 0) {
+                ((ServerWorld) world).spawnParticles(ParticleTypes.SMOKE,
+                        pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, 0,
+                        (Math.random() - 0.5) * 0.2, 0.04, (Math.random() - 0.5) * 0.2, 0.3);
             }
         }
     }

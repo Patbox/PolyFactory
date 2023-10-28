@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
 import eu.pb4.polyfactory.util.inventory.WrappingRecipeInputInventory;
 import eu.pb4.sgui.api.ClickType;
@@ -46,7 +47,7 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, RecipeInputInventory {
+public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, CustomInsertInventory, RecipeInputInventory {
     private static final int[] INPUT_SLOTS = IntStream.range(0, 9).toArray();
     private static final int[] OUTPUT_SLOTS = IntStream.range(9, 9+9).toArray();
     private static final SoundEvent CRAFT_SOUND_EVENT = SoundEvent.of(new Identifier("minecraft:block.crafter.craft"));
@@ -106,6 +107,9 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalS
     }
 
     private int getLeastPopulatedInputSlot(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return -1;
+        }
         int slot = -1;
         int count = 9999;
 
@@ -247,10 +251,10 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalS
 
                 self.process += speed;
                 self.markDirty();
-            } else {
-                ((ServerWorld) world).spawnParticles(ParticleTypes.POOF,
+            } else if (world.getTime() % 5 == 0) {
+                ((ServerWorld) world).spawnParticles(ParticleTypes.SMOKE,
                         pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0,
-                        (Math.random() - 0.5) * 0.2, 0.02, (Math.random() - 0.5) * 0.2, 0.3);
+                        (Math.random() - 0.5) * 0.2, 0.04, (Math.random() - 0.5) * 0.2, 0.3);
             }
         }
     }
@@ -296,6 +300,29 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalS
     public void provideRecipeInputs(RecipeMatcher finder) {
         for (int i = 0; i < 9; i++) {
             finder.addUnenchantedInput(this.getStack(i));
+        }
+    }
+
+    @Override
+    public int insertStack(ItemStack itemStack, Direction direction) {
+        var init = itemStack.getCount();
+        while (true) {
+            if (itemStack.isEmpty()) {
+                return init;
+            }
+            var slot = this.getLeastPopulatedInputSlot(itemStack);
+            if (slot == -1) {
+                return init - itemStack.getCount();
+            }
+
+            var current = this.getStack(slot);
+            if (current.isEmpty()) {
+                this.setStack(slot, itemStack.copyWithCount(1));
+                itemStack.decrement(1);
+            } else {
+                current.increment(1);
+                itemStack.decrement(1);
+            }
         }
     }
 

@@ -207,10 +207,10 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
 
                 self.process += speed;
                 self.markDirty();
-            } else {
-                ((ServerWorld) world).spawnParticles(ParticleTypes.POOF,
-                        pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0,
-                        (Math.random() - 0.5) * 0.2, 0.02, (Math.random() - 0.5) * 0.2, 0.3);
+            } else if (world.getTime() % 5 == 0) {
+                ((ServerWorld) world).spawnParticles(ParticleTypes.SMOKE,
+                        pos.getX() + 0.5, pos.getY() + 1.3, pos.getZ() + 0.5, 0,
+                        (Math.random() - 0.5) * 0.2, 0.04, (Math.random() - 0.5) * 0.2, 0.3);
             }
         }
     }

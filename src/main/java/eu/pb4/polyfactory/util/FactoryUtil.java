@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.util;
 
 import com.mojang.authlib.GameProfile;
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -20,7 +21,6 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -85,7 +85,9 @@ public class FactoryUtil {
 
 
     public static int tryInsertingInv(Inventory inventory, ItemStack itemStack, Direction direction) {
-        if (inventory instanceof SidedInventory sidedInventory) {
+        if (inventory instanceof CustomInsertInventory customInsertInventory) {
+            return customInsertInventory.insertStack(itemStack, direction);
+        } else if (inventory instanceof SidedInventory sidedInventory) {
             return tryInsertingSided(sidedInventory, itemStack, direction);
         } else {
             return tryInsertingRegular(inventory, itemStack);
