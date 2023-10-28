@@ -2,8 +2,16 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 
 import eu.pb4.polyfactory.block.base.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.other.ContainerBlockEntity;
 import eu.pb4.polyfactory.util.filter.FilterData;
+import eu.pb4.polyfactory.util.inventory.FilteredRedirectedItemStorage;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.base.SingleItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
@@ -12,7 +20,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
+import java.util.Iterator;
+
 public class FunnelBlockEntity extends BlockEntity implements BlockEntityExtraListener {
+    @SuppressWarnings("UnstableApiUsage")
+    private final Storage<ItemVariant> storage = new FilteredRedirectedItemStorage<>(ItemStorage.SIDED,
+            this::getWorld, this::getPos, () -> this.getCachedState().get(FunnelBlock.FACING), (t) -> this.matches(t.toStack()));
+    static  {
+        //noinspection UnstableApiUsage
+        ItemStorage.SIDED.registerForBlockEntity((self, dir) -> self.storage, FactoryBlockEntities.FUNNEL);
+    }
     private FunnelBlock.Model model;
 
     public FunnelBlockEntity(BlockPos pos, BlockState state) {

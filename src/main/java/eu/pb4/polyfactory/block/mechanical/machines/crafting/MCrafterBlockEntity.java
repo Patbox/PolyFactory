@@ -212,7 +212,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalS
             items.addAll(remainder);
 
             for (var out : items) {
-                for (int i = 9; i < 9 + 6; i++) {
+                for (int i = 9; i < 9 + 9; i++) {
                     var c = self.getStack(i);
                     if (c.isEmpty()) {
                         self.setStack(i, out);
