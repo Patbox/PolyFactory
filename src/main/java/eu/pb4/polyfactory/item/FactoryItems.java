@@ -38,6 +38,7 @@ public class FactoryItems {
     public static final Item CRAFTER = register(FactoryBlocks.CRAFTER);
     public static final Item MIXER = register(FactoryBlocks.MIXER);
     public static final Item MINER = register(FactoryBlocks.MINER);
+    public static final Item PLACER = register(FactoryBlocks.PLACER);
     public static final Item PLANTER = register(FactoryBlocks.PLANTER);
     public static final FactoryBlockItem AXLE = register(FactoryBlocks.AXLE);
     public static final Item GEARBOX = register(FactoryBlocks.GEARBOX);
@@ -188,6 +189,7 @@ public class FactoryItems {
                 .icon(WITHER_SKULL_GENERATOR::getDefaultStack)
                 .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
                 .entries(((context, entries) -> {
+                    entries.add(PLACER);
                     entries.add(WITHER_SKULL_GENERATOR);
                     // Remove this
                     if (ModInit.DEV) {

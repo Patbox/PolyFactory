@@ -14,6 +14,7 @@ import eu.pb4.polyfactory.block.data.providers.RedstoneInputBlock;
 import eu.pb4.polyfactory.block.electric.ElectricGeneratorBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.electric.WitherSkullGeneratorBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.PlacerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.MinerBlock;
@@ -56,6 +57,7 @@ public class FactoryBlocks {
     public static final MixerBlock MIXER = register("mixer", new MixerBlock(Block.Settings.copy(SPLITTER)));
     public static final MCrafterBlock CRAFTER = register("crafter", new MCrafterBlock(Block.Settings.copy(SPLITTER)));
     public static final MinerBlock MINER = register("miner", new MinerBlock(Block.Settings.copy(SPLITTER)));
+    public static final PlacerBlock PLACER = register("placer", new PlacerBlock(Block.Settings.copy(SPLITTER)));
     public static final PlanterBlock PLANTER = register("planter", new PlanterBlock(Block.Settings.copy(SPLITTER)));
     public static final AxleBlock AXLE = register("axle", new AxleBlock(Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD).strength(2.5F).nonOpaque()));
     public static final AxleWithGearBlock AXLE_WITH_GEAR = register("axle_with_gear", new AxleWithGearBlock(Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD).strength(2.5F).nonOpaque()));

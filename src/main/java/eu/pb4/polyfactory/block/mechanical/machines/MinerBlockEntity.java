@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.base.LockableBlockEntity;
+import eu.pb4.polyfactory.block.other.OwnedBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.TagLimitedSlot;
@@ -38,7 +39,7 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class MinerBlockEntity extends LockableBlockEntity implements SingleStackInventory, SidedInventory {
+public class MinerBlockEntity extends LockableBlockEntity implements SingleStackInventory, SidedInventory, OwnedBlockEntity {
     private ItemStack currentTool = ItemStack.EMPTY;
     private BlockState targetState = Blocks.AIR.getDefaultState();
     protected GameProfile owner = null;
@@ -71,6 +72,17 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         }
         this.targetState = NbtHelper.toBlockState(Registries.BLOCK.getReadOnlyWrapper(), nbt.getCompound("block_state"));
         super.readNbt(nbt);
+    }
+
+    @Override
+    public GameProfile getOwner() {
+        return this.owner;
+    }
+
+    @Override
+    public void setOwner(GameProfile profile) {
+        this.owner = profile;
+        this.markDirty();
     }
 
     @Override

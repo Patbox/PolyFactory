@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.block.base.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.base.LockableBlockEntity;
+import eu.pb4.polyfactory.block.other.OwnedBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.TagLimitedSlot;
@@ -32,7 +33,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
-public class PlanterBlockEntity extends LockableBlockEntity implements SingleStackInventory, SidedInventory, BlockEntityExtraListener {
+public class PlanterBlockEntity extends LockableBlockEntity implements SingleStackInventory, SidedInventory, BlockEntityExtraListener, OwnedBlockEntity {
     private ItemStack stack = ItemStack.EMPTY;
     protected GameProfile owner = null;
     protected double process = 0;
@@ -61,6 +62,17 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
             this.owner = NbtHelper.toGameProfile(nbt.getCompound("owner"));
         }
         super.readNbt(nbt);
+    }
+
+    @Override
+    public GameProfile getOwner() {
+        return this.owner;
+    }
+
+    @Override
+    public void setOwner(GameProfile profile) {
+        this.owner = profile;
+        this.markDirty();
     }
 
     @Override

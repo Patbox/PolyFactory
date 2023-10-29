@@ -1,5 +1,6 @@
-- Added Mechanical Crafters.
+- Added Mechanical Crafters. A take on 1.21 Crafter, but designed to work with rest of the mod.
 - Hoppers can pull items from Funnels.
 - Conveyors dropping items can now be prevented by placing a block in front of where item would be dropped.
 
 - Added Wither Skull Generators (Experimental / Creative Only)
+- Added Mechanical Placer (Experimental / Creative Only)
