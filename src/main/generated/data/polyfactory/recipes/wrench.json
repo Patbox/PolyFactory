@@ -5,9 +5,6 @@
     "i": {
       "item": "polyfactory:steel_ingot"
     },
-    "p": {
-      "item": "polyfactory:steel_plate"
-    },
     "t": {
       "item": "polyfactory:treated_dried_kelp"
     }
@@ -15,7 +12,7 @@
   "pattern": [
     " i ",
     " ti",
-    "p  "
+    "i  "
   ],
   "result": {
     "item": "polyfactory:wrench"

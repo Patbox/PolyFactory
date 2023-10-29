@@ -1,0 +1,16 @@
+{
+  "type": "polyfactory:grinding",
+  "input": {
+    "item": "minecraft:charcoal"
+  },
+  "minimum_speed": 5.0,
+  "optimal_speed": 14.0,
+  "output": {
+    "chance": 0.8,
+    "item": {
+      "Count": 1,
+      "id": "polyfactory:coal_dust"
+    }
+  },
+  "time": 1.5
+}

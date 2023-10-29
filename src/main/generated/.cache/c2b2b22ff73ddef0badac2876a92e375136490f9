@@ -1,4 +1,4 @@
-// 1.20.2	2023-10-27T21:35:44.9165632	PolyFactory/Recipes
+// 1.20.2	2023-10-29T15:33:03.7061597	PolyFactory/Recipes
 ee8bcc548b21dff1dfba21dc501142b2d622bd5b data\polyfactory\recipes\press\bamboo_block.json
 e248c52458707de53bd35f23f5fc4f787a9d977f data\polyfactory\recipes\windmill_sail\wool\red.json
 fb7bb44c8a4e2c4560e41fb1f91faca0377db301 data\polyfactory\recipes\mixing\brown_concrete_from_powder.json
@@ -58,9 +58,10 @@ ba3b65f90390892c988fa82227385ddf4e5e273c data\polyfactory\recipes\generic_machin
 3742bd319e70f32c5cb652171f5c69b8f9c6e23a data\polyfactory\recipes\mixer.json
 e8081cb67623ceb21c12ba7694fd41a42439d3ee data\polyfactory\recipes\grinding\coal_dust.json
 6ce26814fe9f6e20caebd08cc9e2fbe80fca23a9 data\polyfactory\recipes\mixing\light_gray_concrete_powder.json
-4e94ec3955dfdb9674fff5230e65549107af1a61 data\polyfactory\recipes\wrench.json
+33e968bb2ad432263d60029cd94b9f0455890bca data\polyfactory\recipes\wrench.json
 9425239b06219bc22613c0d0d770cf67af82a365 data\polyfactory\advancements\recipes\redstone\large_steel_gear.json
 dd4bf72b450ba3465054cbe1187b00781ec10d34 data\polyfactory\recipes\mixing\gray_concrete_direct.json
+b65ff00ec9deb42450dcc1e1f4f5bd0557729b83 data\polyfactory\recipes\crafter.json
 407e21703523664525d11f5221569e503b2c259d data\polyfactory\recipes\grinding\daisy_to_dye.json
 577633e28c7af10833621c765e55b5daba7ced35 data\polyfactory\advancements\recipes\redstone\nixie_tube.json
 45c4599b53b90e9b5102f2f945001b22a3acc3f7 data\polyfactory\advancements\recipes\tools\steel_alloy_mixture.json
@@ -99,6 +100,7 @@ b1f10e03f7208343ba547203578e6d4ef7ba9aa4 data\polyfactory\recipes\item_counter.j
 da784ee3a3c9f673d988d9f7680c37285fb14b67 data\polyfactory\recipes\press\golden_carrot.json
 62af52e4858d217c044ec364ed293f4ff487feb1 data\polyfactory\recipes\grinding\blue_concrete_to_powder.json
 93e335c63294c255b42b249bec40c64e190baab2 data\polyfactory\recipes\mixing\treated_dried_kelp.json
+b0d4d2aea8bca61c241790ec894ec076646f4a81 data\polyfactory\advancements\recipes\redstone\crafter.json
 f4eefbc1e3ff2a6ea74f4eebdad54844e7cac539 data\polyfactory\advancements\recipes\redstone\steel_gear.json
 3350aedd4c014357a7c200eb7484e99d7d29b8ea data\polyfactory\recipes\inverted_redstone_lamp.json
 00b7f52ee4fe05f0d7b1f89f3a8f409364597677 data\polyfactory\recipes\steam_engine.json
@@ -241,4 +243,5 @@ ec98d119f20db7138b9f7e9defa75a4d02d0b031 data\polyfactory\advancements\recipes\r
 f57ff4693e2c74aa07a44b145781bfd58371a1a8 data\polyfactory\advancements\recipes\misc\tiny_potato_spring.json
 ac964240e3a330149b0c7f42ae48b2eb9ec1ae90 data\polyfactory\recipes\steel_gear.json
 b8134ab482cb3c39147748ed19236d4ba7f9c87e data\polyfactory\recipes\mixing\cyan_concrete_from_powder.json
+f8a6b19f63c19bc1feb36936def1fde31cee5232 data\polyfactory\recipes\grinding\coal_dust_charcoal.json
 2fc5616d2f0b72d0dc8270c5de7a1c6efd0cd05f data\polyfactory\recipes\grinding\blaze_rod_to_powder.json

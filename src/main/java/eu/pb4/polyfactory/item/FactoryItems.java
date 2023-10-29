@@ -124,6 +124,7 @@ public class FactoryItems {
                     entries.add(GRINDER);
                     entries.add(PRESS);
                     entries.add(MIXER);
+                    entries.add(CRAFTER);
                     entries.add(MINER);
                     entries.add(PLANTER);
 
@@ -187,7 +188,6 @@ public class FactoryItems {
                 .icon(WITHER_SKULL_GENERATOR::getDefaultStack)
                 .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
                 .entries(((context, entries) -> {
-                    entries.add(CRAFTER);
                     entries.add(WITHER_SKULL_GENERATOR);
                     // Remove this
                     if (ModInit.DEV) {

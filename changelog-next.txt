@@ -1,0 +1,5 @@
+- Added Mechanical Crafters.
+- Hoppers can pull items from Funnels.
+- Conveyors dropping items can now be prevented by placing a block in front of where item would be dropped.
+
+- Added Wither Skull Generators (Experimental / Creative Only)

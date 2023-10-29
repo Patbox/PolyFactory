@@ -144,6 +144,15 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .offerTo(exporter);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.CRAFTER, 1)
+                .pattern("iai")
+                .pattern("wsw")
+                .pattern("www")
+                .input('i', FactoryItems.STEEL_GEAR).input('s', Items.CRAFTING_TABLE)
+                .input('w', FactoryItems.STEEL_PLATE).input('a', FactoryItems.AXLE)
+                .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                .offerTo(exporter);
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.FUNNEL, 1)
                 .pattern("wp ")
                 .pattern(" o ")
@@ -342,8 +351,7 @@ class RecipesProvider extends FabricRecipeProvider {
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.WRENCH)
                 .pattern(" i ")
                 .pattern(" ti")
-                .pattern("p  ")
-                .input('p', FactoryItems.STEEL_PLATE)
+                .pattern("i  ")
                 .input('i', FactoryItems.STEEL_INGOT)
                 .input('t', FactoryItems.TREATED_DRIED_KELP)
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
@@ -364,6 +372,7 @@ class RecipesProvider extends FabricRecipeProvider {
 
         of(exporter, GrindingRecipe.CODEC,
                 GrindingRecipe.of("coal_dust", Ingredient.ofItems(Items.COAL), 1, 5, 8, FactoryItems.COAL_DUST),
+                GrindingRecipe.of("coal_dust_charcoal", Ingredient.ofItems(Items.CHARCOAL), 1.5, 5, 14, OutputStack.of(FactoryItems.COAL_DUST, 0.8f)),
                 GrindingRecipe.of("planks_saw_dust", Ingredient.fromTag(ItemTags.PLANKS), 1, 5, 6,
                         OutputStack.of(FactoryItems.SAW_DUST, 0.6f, 3), OutputStack.of(Items.STICK, 0.4f, 3)),
                 GrindingRecipe.of("logs_saw_dust", Ingredient.fromTag(ItemTags.LOGS), 1, 5, 6,
