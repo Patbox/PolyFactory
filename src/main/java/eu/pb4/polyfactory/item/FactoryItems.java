@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.item;
 
 import eu.pb4.polyfactory.block.base.MultiBlock;
-import eu.pb4.polyfactory.item.block.CableItem;
+import eu.pb4.polyfactory.item.block.ColoredDownsampledBlockItem;
 import eu.pb4.polyfactory.item.block.GearItem;
 import eu.pb4.polyfactory.item.block.WindmillSailItem;
 import eu.pb4.polyfactory.item.tool.FilterItem;
@@ -71,7 +71,9 @@ public class FactoryItems {
     public static final Item ITEM_READER = register(FactoryBlocks.ITEM_READER);
     public static final Item BLOCK_OBSERVER = register(FactoryBlocks.BLOCK_OBSERVER);
     public static final Item NIXIE_TUBE_CONTROLLER = register(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
-    public static final CableItem CABLE = register("cable", new CableItem(new Item.Settings()));
+    public static final ColoredDownsampledBlockItem CABLE = register("cable", new ColoredDownsampledBlockItem(FactoryBlocks.CABLE, 0xbbbbbb, new Item.Settings()));
+    public static final ColoredDownsampledBlockItem LAMP = register("colored_lamp", new ColoredDownsampledBlockItem(FactoryBlocks.LAMP, -1, new Item.Settings()));
+    public static final ColoredDownsampledBlockItem INVERTED_LAMP = register("inverted_colored_lamp", new ColoredDownsampledBlockItem(FactoryBlocks.INVERTED_LAMP, -1, new Item.Settings()));
 
     public static final Item ELECTRIC_MOTOR = register(FactoryBlocks.ELECTRIC_MOTOR);
     public static final Item ELECTRIC_GENERATOR = register(FactoryBlocks.ELECTRIC_GENERATOR);
@@ -189,12 +191,16 @@ public class FactoryItems {
                 .icon(WITHER_SKULL_GENERATOR::getDefaultStack)
                 .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
                 .entries(((context, entries) -> {
-                    entries.add(PLACER);
-                    entries.add(WITHER_SKULL_GENERATOR);
+                    for (var dye : DyeColor.values()) {
+                        entries.add(ColoredItem.stack(LAMP, 1, DyeColorExtra.getColor(dye)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(ColoredItem.stack(INVERTED_LAMP, 1, DyeColorExtra.getColor(dye)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                    }
+                    entries.add(PLACER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                    entries.add(WITHER_SKULL_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     // Remove this
                     if (ModInit.DEV) {
-                        entries.add(ROTATION_DEBUG);
-                        entries.add(GREEN_SCREEN);
+                        entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(GREEN_SCREEN, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     }
                 })).build()
         );

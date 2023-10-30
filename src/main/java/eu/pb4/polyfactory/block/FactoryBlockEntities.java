@@ -25,6 +25,7 @@ import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlockEntity;
 import eu.pb4.polyfactory.block.other.ContainerBlockEntity;
 import eu.pb4.polyfactory.block.data.output.NixieTubeBlockEntity;
+import eu.pb4.polyfactory.block.other.LampBlockEntity;
 import eu.pb4.polyfactory.mixin.util.BlockEntityTypeAccessor;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -102,6 +103,8 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<WitherSkullGeneratorBlockEntity> WITHER_SKULL_GENERATOR = register("wither_skull_generator", FabricBlockEntityTypeBuilder
             .create(WitherSkullGeneratorBlockEntity::new).addBlock(FactoryBlocks.WITHER_SKULL_GENERATOR));
 
+    public static final BlockEntityType<LampBlockEntity> LAMP = register("colored_lamp", FabricBlockEntityTypeBuilder
+            .create(LampBlockEntity::new).addBlock(FactoryBlocks.LAMP));
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;
         var set = ImmutableSet.<Block>builder();

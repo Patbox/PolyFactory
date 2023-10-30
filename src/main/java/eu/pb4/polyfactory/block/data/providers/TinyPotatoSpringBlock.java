@@ -1,10 +1,17 @@
-package eu.pb4.polyfactory.block.other;
+package eu.pb4.polyfactory.block.data.providers;
 
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.advancement.TriggerCriterion;
+import eu.pb4.polyfactory.block.data.CableConnectable;
+import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
+import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.data.StringData;
 import eu.pb4.polyfactory.models.BaseItemProvider;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.models.LodItemDisplayElement;
+import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
+import eu.pb4.polyfactory.util.PotatoWisdom;
 import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.core.api.other.PolymerStat;
@@ -34,19 +41,24 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.util.Collection;
+import java.util.List;
+
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class TinyPotatoSpringBlock extends Block implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker {
+public class TinyPotatoSpringBlock extends DataNetworkBlock implements PolymerBlock, BlockWithElementHolder, CableConnectable, VirtualDestroyStage.Marker {
     public static final Identifier STATISTIC = PolymerStat.registerStat(id("taters_clicked"), StatFormatter.DEFAULT);
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     public TinyPotatoSpringBlock(Settings settings) {
-        super(settings);
+        super(settings.ticksRandomly());
     }
 
     @Override
@@ -120,6 +132,21 @@ public class TinyPotatoSpringBlock extends Block implements PolymerBlock, BlockW
     @Override
     public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return true;
+    }
+
+    @Override
+    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+        return dir == Direction.DOWN;
+    }
+
+    @Override
+    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        NetworkComponent.Data.getLogic(world, pos).pushDataUpdate(0, new StringData(PotatoWisdom.get(random)));
+    }
+
+    @Override
+    public Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        return List.of(new ChannelProviderDirectionNode(Direction.DOWN, 0));
     }
 
     public static final class Model extends BaseModel {

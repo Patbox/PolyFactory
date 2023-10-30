@@ -4,9 +4,11 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.block.ColoredDownsampledBlockItem;
 import eu.pb4.polyfactory.loottable.CopyColorLootFunction;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
+import net.minecraft.block.Block;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.condition.SurvivesExplosionLootCondition;
@@ -65,12 +67,17 @@ class LootTables extends FabricBlockLootTableProvider {
                         .with(ItemEntry.builder(FactoryItems.STEEL_GEAR)))
         );
 
+        this.addColored(FactoryBlocks.CABLE);
+        this.addColored(FactoryBlocks.LAMP);
+        this.addColored(FactoryBlocks.INVERTED_LAMP);
+    }
 
-        this.addDrop(FactoryBlocks.CABLE, LootTable.builder()
+    private void addColored(Block block) {
+        this.addDrop(block, LootTable.builder()
                 .pool(LootPool.builder()
                         .conditionally(SurvivesExplosionLootCondition.builder())
                         .rolls(ConstantLootNumberProvider.create(1.0F))
-                        .with(ItemEntry.builder(FactoryBlocks.CABLE)
+                        .with(ItemEntry.builder(block)
                                 .apply(() -> CopyColorLootFunction.INSTANCE)
                         )));
     }

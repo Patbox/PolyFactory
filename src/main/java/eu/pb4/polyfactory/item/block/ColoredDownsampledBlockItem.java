@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.item.block;
 
-import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.item.util.FireworkStarColoredItem;
 import eu.pb4.polyfactory.item.util.FactoryBlockItem;
@@ -18,15 +17,18 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class CableItem extends FactoryBlockItem implements FireworkStarColoredItem, ColoredItem {
-    public <T extends Block & PolymerBlock> CableItem(Settings settings) {
-        super(FactoryBlocks.CABLE, settings, Items.FIREWORK_STAR);
+public class ColoredDownsampledBlockItem extends FactoryBlockItem implements FireworkStarColoredItem, ColoredItem {
+    private final int defaultColor;
+
+    public <T extends Block & PolymerBlock> ColoredDownsampledBlockItem(T block, int defaultColor, Settings settings) {
+        super(block, settings, Items.FIREWORK_STAR);
+        this.defaultColor = defaultColor;
     }
 
     @Override
     public Text getName(ItemStack stack) {
         if (ColoredItem.hasColor(stack)) {
-            return Text.translatable("block.polyfactory.cable.colored", ColoredItem.getColorName(ColoredItem.getColor(stack)));
+            return Text.translatable( this.getTranslationKey() + ".colored", ColoredItem.getColorName(ColoredItem.getColor(stack)));
         }
 
         return super.getName(stack);
@@ -66,6 +68,6 @@ public class CableItem extends FactoryBlockItem implements FireworkStarColoredIt
 
     @Override
     public int getDefaultColor() {
-        return 0xbbbbbb;
+        return this.defaultColor;
     }
 }

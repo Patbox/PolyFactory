@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.block.base.AttackableBlock;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlock;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
 import eu.pb4.polyfactory.block.data.CableBlock;
+import eu.pb4.polyfactory.block.data.providers.TinyPotatoSpringBlock;
 import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlock;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.polyfactory.block.data.providers.ItemReaderBlock;
@@ -86,6 +87,8 @@ public class FactoryBlocks {
             new InvertedRedstoneLampBlock(AbstractBlock.Settings.copy(Blocks.REDSTONE_LAMP).luminance((state) -> {
                 return (Boolean)state.get(Properties.LIT) ? 0 : 15;
             })));
+    public static final LampBlock LAMP = register("colored_lamp", new LampBlock(Block.Settings.copy(Blocks.REDSTONE_LAMP).nonOpaque(), false));
+    public static final LampBlock INVERTED_LAMP = register("inverted_colored_lamp", new LampBlock(Block.Settings.copy(INVERTED_REDSTONE_LAMP).nonOpaque(), true));
 
     public static final TinyPotatoSpringBlock TINY_POTATO_SPRING = register("tiny_potato_spring", new TinyPotatoSpringBlock(AbstractBlock.Settings.create().strength(1).nonOpaque()));
 

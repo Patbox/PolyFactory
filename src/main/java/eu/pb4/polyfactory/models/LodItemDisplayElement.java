@@ -45,7 +45,7 @@ public class LodItemDisplayElement extends ItemDisplayElement {
         return createSimple(getModel(model));
     }
 
-    private static ItemStack getModel(Item model) {
+    public static ItemStack getModel(Item model) {
         var stack = MODEL_MAP.get(model);
 
         if (stack == null) {

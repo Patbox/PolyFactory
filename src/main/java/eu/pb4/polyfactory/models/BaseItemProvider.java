@@ -58,7 +58,11 @@ public class BaseItemProvider {
     }
 
     public static ItemStack requestModel(Identifier model) {
-        var stack = new ItemStack(requestModel());
+        return requestModel(requestItem(), model);
+    }
+
+    public static ItemStack requestModel(Item item, Identifier model) {
+        var stack = new ItemStack(item);
         stack.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(stack.getItem(), model).value());
         return stack;
     }
