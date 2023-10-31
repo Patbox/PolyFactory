@@ -24,6 +24,7 @@
     "recipe.RegistryOpsMixin",
     "recipe.ShapedRecipeJsonBuilderMixin",
     "recipe.ShapedRecipeJsonBuilderMixin$ShapedRecipeJsonProviderMixin",
+    "recipe.ShapedRecipeMixin",
     "util.BlockEntityMixin",
     "util.BlockEntityTypeAccessor",
     "util.DyeColorMixin",

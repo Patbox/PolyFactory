@@ -1,4 +1,5 @@
 - Added Mechanical Crafters. A take on 1.21 Crafter, but designed to work with rest of the mod.
+- Added Colored Lamps.
 - Hoppers can pull items from Funnels.
 - Conveyors dropping items can now be prevented by placing a block in front of where item would be dropped.
 
