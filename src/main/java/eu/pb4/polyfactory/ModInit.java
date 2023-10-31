@@ -39,9 +39,10 @@ public class ModInit implements ModInitializer {
 	public static final String ID = "polyfactory";
 	public static final String VERSION = FabricLoader.getInstance().getModContainer(ID).get().getMetadata().getVersion().getFriendlyString();
 	public static final Logger LOGGER = LoggerFactory.getLogger("PolyFactory");
-    public static final boolean DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
+    public static final boolean DEV_ENV = FabricLoader.getInstance().isDevelopmentEnvironment();
+    public static final boolean DEV_MODE = VERSION.contains("-dev.") || DEV_ENV;
     @SuppressWarnings("PointlessBooleanExpression")
-	public static final boolean DYNAMIC_ASSETS = true && DEV;
+	public static final boolean DYNAMIC_ASSETS = true && DEV_ENV;
 
     public static Identifier id(String path) {
 		return new Identifier(ID, path);

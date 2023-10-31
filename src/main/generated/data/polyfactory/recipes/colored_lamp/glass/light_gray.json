@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "group": "polyfactory:colored_lamp",
+  "key": {
+    "g": {
+      "item": "minecraft:glowstone"
+    },
+    "p": {
+      "item": "minecraft:light_gray_stained_glass"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "pattern": [
+    " p ",
+    "rgr",
+    " p "
+  ],
+  "result": {
+    "item": "polyfactory:colored_lamp",
+    "polyfactory:nbt": {
+      "color": 10329495
+    }
+  },
+  "show_notification": true
+}

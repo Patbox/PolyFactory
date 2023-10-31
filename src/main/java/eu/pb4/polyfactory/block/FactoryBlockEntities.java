@@ -104,7 +104,7 @@ public class FactoryBlockEntities {
             .create(WitherSkullGeneratorBlockEntity::new).addBlock(FactoryBlocks.WITHER_SKULL_GENERATOR));
 
     public static final BlockEntityType<LampBlockEntity> LAMP = register("colored_lamp", FabricBlockEntityTypeBuilder
-            .create(LampBlockEntity::new).addBlock(FactoryBlocks.LAMP));
+            .create(LampBlockEntity::new).addBlocks(FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP));
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;
         var set = ImmutableSet.<Block>builder();

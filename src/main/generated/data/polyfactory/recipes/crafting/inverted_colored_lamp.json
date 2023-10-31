@@ -1,0 +1,16 @@
+{
+  "type": "polyfactory:crafting/shapeless_nbt_copy",
+  "category": "redstone",
+  "group": "lamp_invertion",
+  "ingredients": [
+    {
+      "item": "minecraft:redstone_torch"
+    }
+  ],
+  "result": {
+    "item": "polyfactory:inverted_colored_lamp"
+  },
+  "source": {
+    "item": "polyfactory:colored_lamp"
+  }
+}

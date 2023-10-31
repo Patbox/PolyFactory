@@ -12,6 +12,7 @@ import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.data.server.recipe.*;
 import net.minecraft.item.DyeItem;
@@ -21,10 +22,12 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -367,8 +370,16 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(Items.DRAGON_EGG))
                 .offerTo(exporter);
 
-        of(exporter, ColoringCraftingRecipe.CODEC, ColoringCraftingRecipe.of("cable_color", FactoryItems.CABLE));
-        of(exporter, ColoringMixingRecipe.CODEC, ColoringMixingRecipe.of("cable_color", FactoryItems.CABLE, 2, 6, 10));
+        of(exporter, ColoringCraftingRecipe.CODEC,
+                ColoringCraftingRecipe.of("cable_color", FactoryItems.CABLE),
+                ColoringCraftingRecipe.of("lamp_color", FactoryItems.LAMP),
+                ColoringCraftingRecipe.of("inverted_color", FactoryItems.INVERTED_LAMP)
+        );
+        of(exporter, ColoringMixingRecipe.CODEC,
+                ColoringMixingRecipe.of("cable_color", FactoryItems.CABLE, 2, 6, 10),
+                ColoringMixingRecipe.of("lamp_color", FactoryItems.LAMP, 2, 6, 10),
+                ColoringMixingRecipe.of("inverted_lamp_color", FactoryItems.INVERTED_LAMP, 2, 6, 10)
+        );
 
         of(exporter, GrindingRecipe.CODEC,
                 GrindingRecipe.of("coal_dust", Ingredient.ofItems(Items.COAL), 1, 5, 8, FactoryItems.COAL_DUST),
@@ -451,51 +462,111 @@ class RecipesProvider extends FabricRecipeProvider {
                         5, OutputStack.of(Items.GOLDEN_APPLE))
         );
 
-        for (var dye : dyes) {
-            var x = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.WINDMILL_SAIL, 1)
-                    .pattern(" sw")
-                    .pattern(" ws")
-                    .pattern("wsc")
-                    .input('w', FactoryItems.WOODEN_PLATE).input('s', Items.STICK)
-                    .input('c', Registries.ITEM.get(new Identifier(dye.getColor().getName() + "_wool")))
-                    .group("polyfactory:windmill_sail")
-                    .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.WOODEN_PLATE));
+        of(exporter, ShapelessNbtCopyRecipe.CODEC, new RecipeEntry<>(id("crafting/inverted_colored_lamp"),
+                new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
+                        FactoryItems.INVERTED_LAMP.getDefaultStack(),
+                        Ingredient.ofItems(FactoryItems.LAMP),
+                        DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(Items.REDSTONE_TORCH)))));
 
-            if (dye != Items.WHITE_DYE) {
-                var nbt = new NbtCompound();
+
+        {
+            var x = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
+                    .pattern("dp ")
+                    .pattern("rgr")
+                    .pattern(" p ")
+                    .input('r', Items.REDSTONE).input('g', Items.GLOWSTONE)
+                    .input('p', Items.GLASS).input('d', ConventionalItemTags.DYES)
+                    .group("polyfactory:colored_lamp")
+                    .criterion("get", InventoryChangedCriterion.Conditions.items(Items.GLOWSTONE));
+
+            var display = new NbtCompound();
+            display.putInt("color", -99);
+            ((NbtRecipe) x).polyfactory$setNbt(display);
+
+            x.offerTo(exporter, id("colored_lamp/glass/regular_a"));
+        }
+        {
+            var x = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
+                    .pattern(" p ")
+                    .pattern("rgr")
+                    .pattern("dp ")
+                    .input('r', Items.REDSTONE).input('g', Items.GLOWSTONE)
+                    .input('p', Items.GLASS).input('d', ConventionalItemTags.DYES)
+                    .group("polyfactory:colored_lamp")
+                    .criterion("get", InventoryChangedCriterion.Conditions.items(Items.GLOWSTONE));
+
+            var display = new NbtCompound();
+            display.putInt("color", -99);
+            ((NbtRecipe) x).polyfactory$setNbt(display);
+
+            x.offerTo(exporter, id("colored_lamp/glass/regular_b"));
+        }
+
+        for (var dye : dyes) {
+            {
+                var x = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
+                        .pattern(" p ")
+                        .pattern("rgr")
+                        .pattern(" p ")
+                        .input('r', Items.REDSTONE).input('g', Items.GLOWSTONE)
+                        .input('p', Registries.ITEM.get(new Identifier(dye.getColor().getName() + "_stained_glass")))
+                        .group("polyfactory:colored_lamp")
+                        .criterion("get", InventoryChangedCriterion.Conditions.items(Items.GLOWSTONE));
+
                 var display = new NbtCompound();
                 display.putInt("color", DyeColorExtra.getColor(dye.getColor()));
-                nbt.put("display", display);
+                ((NbtRecipe) x).polyfactory$setNbt(display);
 
-                ((NbtRecipe) x).polyfactory$setNbt(nbt);
+                x.offerTo(exporter, id("colored_lamp/glass/" + dye.getColor()));
             }
 
-            x.offerTo(exporter, id("windmill_sail/wool/" + dye.getColor()));
+            {
+                var x = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.WINDMILL_SAIL, 1)
+                        .pattern(" sw")
+                        .pattern(" ws")
+                        .pattern("wsc")
+                        .input('w', FactoryItems.WOODEN_PLATE).input('s', Items.STICK)
+                        .input('c', Registries.ITEM.get(new Identifier(dye.getColor().getName() + "_wool")))
+                        .group("polyfactory:windmill_sail")
+                        .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.WOODEN_PLATE));
 
+                if (dye != Items.WHITE_DYE) {
+                    var nbt = new NbtCompound();
+                    var display = new NbtCompound();
+                    display.putInt("color", DyeColorExtra.getColor(dye.getColor()));
+                    nbt.put("display", display);
 
-            var nameSolid = dye.getColor().getName() + "_concrete";
-            var namePowder = nameSolid + "_powder";
+                    ((NbtRecipe) x).polyfactory$setNbt(nbt);
+                }
 
-            var powder = Registries.ITEM.get(new Identifier(namePowder));
-            var solid = Registries.ITEM.get(new Identifier(nameSolid));
-            of(exporter, GrindingRecipe.CODEC, GrindingRecipe.of(nameSolid + "_to_powder", "concrete_to_powder",
-                    Ingredient.ofItems(solid), 3, 5, powder
-            ));
+                x.offerTo(exporter, id("windmill_sail/wool/" + dye.getColor()));
+            }
 
-            of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(namePowder, "concrete_powder",
-                    List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS), CountedIngredient.ofItems(4, Items.GRAVEL), CountedIngredient.ofItems(1, dye)),
-                    4, 1, 13, new ItemStack(powder, 8)));
+            {
+                var nameSolid = dye.getColor().getName() + "_concrete";
+                var namePowder = nameSolid + "_powder";
 
-            of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid + "_direct", "concrete_direct",
-                    List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS),
-                            CountedIngredient.ofItems(4, Items.GRAVEL),
-                            CountedIngredient.ofItems(0, Items.WATER_BUCKET),
-                            CountedIngredient.ofItems(1, dye)),
-                    5, 1, 15, new ItemStack(solid, 8)));
+                var powder = Registries.ITEM.get(new Identifier(namePowder));
+                var solid = Registries.ITEM.get(new Identifier(nameSolid));
+                of(exporter, GrindingRecipe.CODEC, GrindingRecipe.of(nameSolid + "_to_powder", "concrete_to_powder",
+                        Ingredient.ofItems(solid), 3, 5, powder
+                ));
 
-            of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder", "concrete_water",
-                    List.of(CountedIngredient.ofItems(1, powder), CountedIngredient.ofItems(0, Items.WATER_BUCKET)),
-                    1, 1, 4, new ItemStack(solid, 1)));
+                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(namePowder, "concrete_powder",
+                        List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS), CountedIngredient.ofItems(4, Items.GRAVEL), CountedIngredient.ofItems(1, dye)),
+                        4, 1, 13, new ItemStack(powder, 8)));
+
+                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid + "_direct", "concrete_direct",
+                        List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS),
+                                CountedIngredient.ofItems(4, Items.GRAVEL),
+                                CountedIngredient.ofItems(0, Items.WATER_BUCKET),
+                                CountedIngredient.ofItems(1, dye)),
+                        5, 1, 15, new ItemStack(solid, 8)));
+
+                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder", "concrete_water",
+                        List.of(CountedIngredient.ofItems(1, powder), CountedIngredient.ofItems(0, Items.WATER_BUCKET)),
+                        1, 1, 4, new ItemStack(solid, 1)));
+            }
         }
 
         of(exporter, FireworkStarMixingRecipe.CODEC,

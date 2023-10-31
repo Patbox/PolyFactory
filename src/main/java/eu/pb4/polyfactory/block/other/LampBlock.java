@@ -132,7 +132,7 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
         }
 
         private void updateModel() {
-            var stack = LodItemDisplayElement.getModel(this.state.get(LIT) == this.inverted ? FactoryItems.LAMP : FactoryItems.INVERTED_LAMP);
+            var stack = LodItemDisplayElement.getModel(this.state.get(LIT) == this.inverted ? FactoryItems.LAMP : FactoryItems.INVERTED_LAMP).copy();
             var ex = new NbtCompound();
             var c = new NbtIntArray(new int[] { this.color });
             ex.put("Colors", c);

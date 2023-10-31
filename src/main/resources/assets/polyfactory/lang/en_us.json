@@ -1,5 +1,6 @@
 {
   "itemgroup.polyfactory": "PolyFactory",
+  "itemgroup.polyfactory.color": "PolyFactory: Colored Variants",
   "itemgroup.polyfactory.experimental": "PolyFactory: Experimental",
   "block.polyfactory.conveyor": "Item Conveyor",
   "block.polyfactory.sticky_conveyor": "Sticky Item Conveyor",

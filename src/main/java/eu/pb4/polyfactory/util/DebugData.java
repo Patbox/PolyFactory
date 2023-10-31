@@ -9,9 +9,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.util.Util;
 
 import java.util.Collection;
-import java.util.Objects;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class DebugData {
     public static boolean enabled = false;
@@ -20,7 +18,7 @@ public class DebugData {
     private static Object2ObjectMap<Class<?>, Object2IntMap<Class<?>>> PREVIOUS_CALL_MAP = new Object2ObjectOpenCustomHashMap<>(Util.identityHashStrategy());
 
     public static void register() {
-        enabled = ModInit.DEV;
+        enabled = ModInit.DEV_ENV;
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             if (enabled && tick % 20 == 0) {
                 var old = PREVIOUS_CALL_MAP;

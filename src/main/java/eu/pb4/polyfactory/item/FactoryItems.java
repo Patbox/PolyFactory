@@ -44,7 +44,7 @@ public class FactoryItems {
     public static final Item GEARBOX = register(FactoryBlocks.GEARBOX);
     public static final Item CONTAINER = register( FactoryBlocks.CONTAINER);
     public static final Item NIXIE_TUBE = register(FactoryBlocks.NIXIE_TUBE);
-    public static final Item WINDMILL_SAIL = register("windmill_sail", new WindmillSailItem(new Item.Settings()));
+    public static final WindmillSailItem WINDMILL_SAIL = register("windmill_sail", new WindmillSailItem(new Item.Settings()));
     public static final Item METAL_GRID = register(FactoryBlocks.METAL_GRID);
     public static final Item SAW_DUST = register("saw_dust", new ModeledItem(Items.STICK, new Item.Settings()));
     public static final Item COAL_DUST = register("coal_dust", new ModeledItem(Items.COAL, new Item.Settings()));
@@ -90,7 +90,7 @@ public class FactoryItems {
         FuelRegistry.INSTANCE.add(WOODEN_PLATE, 120);
         FuelRegistry.INSTANCE.add(COAL_DUST, 160);
 
-        PolymerItemGroupUtils.registerPolymerItemGroup(new Identifier(ModInit.ID, "group"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
+        PolymerItemGroupUtils.registerPolymerItemGroup(new Identifier(ModInit.ID, "a_group"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
                 .icon(WINDMILL_SAIL::getDefaultStack)
                 .displayName(Text.translatable("itemgroup." + ModInit.ID))
                 .entries(((context, entries) -> {
@@ -106,11 +106,7 @@ public class FactoryItems {
 
                     // Rotation Generation
                     entries.add(HAND_CRANK);
-                    entries.add(WINDMILL_SAIL, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-
-                    for (var dye : DyeColor.values()) {
-                        entries.add(ColoredItem.stack(WINDMILL_SAIL, 1, DyeColorExtra.getColor(dye)), ItemGroup.StackVisibility.SEARCH_TAB_ONLY);
-                    }
+                    entries.add(WINDMILL_SAIL);
                     entries.add(STEAM_ENGINE);
 
                     // Item Movement/Storage
@@ -136,9 +132,6 @@ public class FactoryItems {
                     entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.RED)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.GREEN)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.BLUE)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                    for (var dye : DyeColor.values()) {
-                        entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(dye)), ItemGroup.StackVisibility.SEARCH_TAB_ONLY);
-                    }
 
                     entries.add(REDSTONE_OUTPUT);
                     entries.add(REDSTONE_INPUT);
@@ -155,6 +148,8 @@ public class FactoryItems {
                     // Rest
 
                     entries.add(INVERTED_REDSTONE_LAMP);
+                    entries.add(ColoredItem.stack(LAMP, 1, DyeColor.WHITE));
+                    entries.add(ColoredItem.stack(INVERTED_LAMP, 1, DyeColor.WHITE));
                     entries.add(TINY_POTATO_SPRING);
 
                     // Generic Materials
@@ -186,24 +181,45 @@ public class FactoryItems {
                 })).build()
         );
 
-
-        PolymerItemGroupUtils.registerPolymerItemGroup(new Identifier(ModInit.ID, "experimental"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
-                .icon(WITHER_SKULL_GENERATOR::getDefaultStack)
-                .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
+        PolymerItemGroupUtils.registerPolymerItemGroup(new Identifier(ModInit.ID, "color"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
+                .icon(() -> ColoredItem.stack(CABLE, 1, DyeColor.RED))
+                .displayName(Text.translatable("itemgroup." + ModInit.ID + ".color"))
                 .entries(((context, entries) -> {
+
                     for (var dye : DyeColor.values()) {
-                        entries.add(ColoredItem.stack(LAMP, 1, DyeColorExtra.getColor(dye)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(ColoredItem.stack(INVERTED_LAMP, 1, DyeColorExtra.getColor(dye)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        var stack = WINDMILL_SAIL.getDefaultStack();
+                        WINDMILL_SAIL.setColor(stack, DyeColorExtra.getColor(dye));
+                        entries.add(stack);
                     }
-                    entries.add(PLACER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                    entries.add(WITHER_SKULL_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                    // Remove this
-                    if (ModInit.DEV) {
-                        entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(GREEN_SCREEN, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+
+                    for (var dye : DyeColor.values()) {
+                        entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(dye)));
+                    }
+
+                    for (var dye : DyeColor.values()) {
+                        entries.add(ColoredItem.stack(LAMP, 1, DyeColorExtra.getColor(dye)));
+                    }
+                    for (var dye : DyeColor.values()) {
+                        entries.add(ColoredItem.stack(INVERTED_LAMP, 1, DyeColorExtra.getColor(dye)));
                     }
                 })).build()
         );
+
+        if (ModInit.DEV_MODE) {
+            PolymerItemGroupUtils.registerPolymerItemGroup(new Identifier(ModInit.ID, "experimental"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
+                    .icon(WITHER_SKULL_GENERATOR::getDefaultStack)
+                    .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
+                    .entries(((context, entries) -> {
+                        entries.add(PLACER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(WITHER_SKULL_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        // Remove this
+                        if (ModInit.DEV_ENV) {
+                            entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                            entries.add(GREEN_SCREEN, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        }
+                    })).build()
+            );
+        }
 
         AttackBlockCallback.EVENT.register(WRENCH::handleBlockAttack);
     }
