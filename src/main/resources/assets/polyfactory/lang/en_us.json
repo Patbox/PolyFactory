@@ -114,6 +114,12 @@
   "advancements.polyfactory.press.title": "Better with Plates",
   "advancements.polyfactory.press.description": "Use Mechanical Press to craft Steel Plate or Wooden Plate",
 
+  "advancements.polyfactory.crafter.title": "Automatic Crafting",
+  "advancements.polyfactory.crafter.description": "Craft something with Mechanical Crafter",
+
+  "advancements.polyfactory.crafter2.title": "Craftception",
+  "advancements.polyfactory.crafter2.description": "Craft Mechanical Crafter with Mechanical Crafter",
+
   "advancements.polyfactory.container.title": "Alternative Storage",
   "advancements.polyfactory.container.description": "Put item into Wooden Container",
 
@@ -152,7 +158,6 @@
 
   "advancements.polyfactory.nixie_tube.title": "Vintage Displays",
   "advancements.polyfactory.nixie_tube.description": "Connect at least 3 Nixie Tubes together",
-
 
   "advancements.polyfactory.wrench.title": "Configured",
   "advancements.polyfactory.wrench.description": "Use Wrench to change properties of a machine.",

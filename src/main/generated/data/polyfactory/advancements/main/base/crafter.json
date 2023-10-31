@@ -1,0 +1,32 @@
+{
+  "parent": "polyfactory:main/base/press",
+  "criteria": {
+    "use": {
+      "conditions": {
+        "trigger": "polyfactory:crafterd_crafts"
+      },
+      "trigger": "polyfactory:trigger"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.polyfactory.crafter.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "polyfactory:crafter"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.polyfactory.crafter.title"
+    }
+  },
+  "requirements": [
+    [
+      "use"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

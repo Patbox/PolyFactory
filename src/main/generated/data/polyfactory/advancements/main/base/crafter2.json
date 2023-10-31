@@ -1,0 +1,33 @@
+{
+  "parent": "polyfactory:main/base/crafter",
+  "criteria": {
+    "use": {
+      "conditions": {
+        "trigger": "polyfactory:crafterd_crafts_crafter"
+      },
+      "trigger": "polyfactory:trigger"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.polyfactory.crafter2.description"
+    },
+    "frame": "goal",
+    "hidden": true,
+    "icon": {
+      "item": "polyfactory:crafter",
+      "nbt": "{Enchantments:[{id:\"minecraft:luck_of_the_sea\",lvl:1s}],HideFlags:1b}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.polyfactory.crafter2.title"
+    }
+  },
+  "requirements": [
+    [
+      "use"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

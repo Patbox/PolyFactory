@@ -1,4 +1,4 @@
-// 1.20.2	2023-10-31T09:37:56.4812556	PolyFactory/Recipes
+// 1.20.2	2023-10-31T21:53:38.3805429	PolyFactory/Recipes
 6ed5304d1c376f2f172fdb00a63dc7dedf5d6359 data\polyfactory\advancements\recipes\redstone\colored_lamp\glass\yellow.json
 ee8bcc548b21dff1dfba21dc501142b2d622bd5b data\polyfactory\recipes\press\bamboo_block.json
 e248c52458707de53bd35f23f5fc4f787a9d977f data\polyfactory\recipes\windmill_sail\wool\red.json
@@ -9,7 +9,7 @@ ac0d610eb9fee80822a97426d14e60a94c7d8e4f data\polyfactory\recipes\mixing\magenta
 1befeb0aa2f062f110ea8a6e28c5fbeb1fc60d66 data\polyfactory\recipes\colored_lamp\glass\blue.json
 062992313f4eb9f835e2766ea11f3787d0672809 data\polyfactory\advancements\recipes\redstone\grinder.json
 5f030205f9b26d92215dcc339750b51d20894c7a data\polyfactory\advancements\recipes\redstone\block_observer.json
-e0c7246fd48e0d96e44e74019bc04e58b810bdea data\polyfactory\recipes\colored_lamp\glass\regular_b.json
+f75c3cb309686d866c72f72d8d67f3d84dfbb8f8 data\polyfactory\recipes\colored_lamp\glass\regular_b.json
 51f6cd2a557421c5d675bb63f68a67f9a3500edf data\polyfactory\recipes\crafting\cable_color.json
 8233a55ace329e5a8ed18305d72b780fef22452f data\polyfactory\recipes\mixing\green_concrete_powder.json
 f8b24003ac1b15a0a9a6e8bd10b1b8060c3585a7 data\polyfactory\advancements\recipes\redstone\windmill_sail\wool\white.json
@@ -146,7 +146,7 @@ b7f503d02e91cfb864dc6cf8a72ff647e0a1c094 data\polyfactory\recipes\mixing\pink_co
 624276a3b4920aebd69cdcb39bc7825d882f827b data\polyfactory\recipes\press\honeycomb.json
 0eb652e35342b5af5e67d3df6e5b1b1a49c98a26 data\polyfactory\recipes\mixing\green_concrete_direct.json
 160013b173abc081c9a6c6290da34884c9742a86 data\polyfactory\advancements\recipes\redstone\colored_lamp\glass\pink.json
-3fff97e12e9237bd65e396dd118e4def2ffd81c7 data\polyfactory\recipes\colored_lamp\glass\regular_a.json
+c67f244b5e617182c2e8be372586671a1d9b2f24 data\polyfactory\recipes\colored_lamp\glass\regular_a.json
 2ed4d34b3754cd6afbf0c5443c9e7e31cb2a64d4 data\polyfactory\recipes\redstone_input.json
 98a10457ef1344d6df8cc0b1fdcabce4ebbaf448 data\polyfactory\advancements\recipes\redstone\windmill_sail\wool\brown.json
 88be1059ac4fe94485d96823b5f57ed1c9e90ba1 data\polyfactory\recipes\gearbox.json

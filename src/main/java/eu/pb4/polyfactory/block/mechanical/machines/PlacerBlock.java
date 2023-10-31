@@ -203,19 +203,11 @@ public class PlacerBlock extends RotationalNetworkBlock implements PolymerBlock,
             this.main.setTransformation(mat);
 
             mat.rotateY(MathHelper.HALF_PI);
-            mat.scale(0.5f);
+            mat.scale(0.48f);
 
-
-            if (this.item.getItem().getItem() instanceof ToolItem) {
-                mat.translate(-0.1f, 0.25f, 0);
-                mat.translate(-0.25f, -0.25f, 0);
-                mat.rotateZ(this.rotation);
-                mat.translate(0.25f, 0.25f, 0);
-            } else {
-                mat.translate(-0.3f, 0, 0);
-                mat.rotateZ(this.rotation);
-            }
-
+            mat.translate((float) (-MathHelper.cos(this.rotation) * 0.15) - 0.3f, -MathHelper.sin(this.rotation) * 1.5f / 16f, 0);
+            mat.rotateZ(MathHelper.cos(this.rotation) / 4);
+            mat.rotateY(-MathHelper.HALF_PI);
             this.item.setTransformation(mat);
         }
 
@@ -232,10 +224,7 @@ public class PlacerBlock extends RotationalNetworkBlock implements PolymerBlock,
         }
 
         public void rotate(float value) {
-            this.rotation += value;
-            if (this.rotation > MathHelper.TAU) {
-                this.rotation -= MathHelper.TAU;
-            }
+            this.rotation = value;
         }
     }
 }

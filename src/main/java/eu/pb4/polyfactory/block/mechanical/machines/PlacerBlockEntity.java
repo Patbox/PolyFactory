@@ -105,10 +105,16 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
         var blockPos = pos.offset(state.get(PlacerBlock.FACING));
 
-        if (self.stack.isEmpty() || !(self.stack.getItem() instanceof BlockItem blockItem) || !CommonProtection.canPlaceBlock(world, blockPos, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner,null)) {
+        if (self.stack.isEmpty() || !(self.stack.getItem() instanceof BlockItem blockItem)) {
+            self.stress = 0;
+            self.model.setItem(ItemStack.EMPTY);
+            return;
+        }
+        if (!CommonProtection.canPlaceBlock(world, blockPos, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner,null)) {
             self.stress = 0;
             return;
         }
+
         var dir = state.get(PlacerBlock.FACING);
         var context = new AutomaticItemPlacementContext(world, blockPos, state.get(PlacerBlock.FACING), self.stack, dir.getOpposite()) {
             @Override
@@ -121,18 +127,17 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
         if (!context.canPlace()) {
             self.stress = 0;
-            self.model.rotate((float) speed);
             return;
         }
-        self.stress = 10;
+        self.stress = (float) Math.max(Math.min(8, Math.log(blockItem.getBlock().getHardness()) / Math.log(1.1)), 20);
 
         if (speed == 0) {
             return;
         }
 
-        self.process += speed / 80;
+        self.process += speed / 30;
 
-        self.model.rotate((float) speed);
+        self.model.rotate((float) (self.process * MathHelper.TAU));
 
         if (self.process >= 1) {
             self.process = 0;

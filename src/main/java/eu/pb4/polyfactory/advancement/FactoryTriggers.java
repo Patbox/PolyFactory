@@ -20,6 +20,8 @@ public interface FactoryTriggers {
     Identifier MOVED_BY_FAN_A_LOT = id("moved_by_fan_a_lot");
     Identifier CONTAINER_ADD_ITEM = id("container_add_item");
     Identifier MIXER_CRAFTS = id("mixer_crafts");
+    Identifier CRAFTER_CRAFTS = id("crafterd_crafts");
+    Identifier CRAFTER_CRAFTS_CRAFTER = id("crafterd_crafts_crafter");
 
     Identifier TATER_16 = id("tater_16");
     Identifier TATER_128 = id("tater_128");

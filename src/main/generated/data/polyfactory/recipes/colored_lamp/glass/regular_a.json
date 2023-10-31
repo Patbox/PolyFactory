@@ -24,7 +24,7 @@
   "result": {
     "item": "polyfactory:colored_lamp",
     "polyfactory:nbt": {
-      "color": -99
+      "color": "dyn"
     }
   },
   "show_notification": true

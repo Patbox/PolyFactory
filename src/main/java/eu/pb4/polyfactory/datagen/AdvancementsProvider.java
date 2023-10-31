@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ColoredItem;
+import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 import net.minecraft.advancement.Advancement;
@@ -354,6 +355,36 @@ class AdvancementsProvider extends FabricAdvancementProvider {
 
 
         // Steel -> Press
+
+        var crafter = Advancement.Builder.create()
+                .parent(press)
+                .display(
+                        FactoryItems.CRAFTER,
+                        Text.translatable("advancements.polyfactory.crafter.title"),
+                        Text.translatable("advancements.polyfactory.crafter.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.CRAFTER_CRAFTS))
+                .build(exporter, "polyfactory:main/base/crafter");
+
+        var crafter2 = Advancement.Builder.create()
+                .parent(crafter)
+                .display(
+                        new GuiElementBuilder(FactoryItems.CRAFTER).glow().asStack(),
+                        Text.translatable("advancements.polyfactory.crafter2.title"),
+                        Text.translatable("advancements.polyfactory.crafter2.description"),
+                        null,
+                        AdvancementFrame.GOAL,
+                        true,
+                        true,
+                        true
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.CRAFTER_CRAFTS_CRAFTER))
+                .build(exporter, "polyfactory:main/base/crafter2");
 
         var steamEngine = Advancement.Builder.create()
                 .parent(press)

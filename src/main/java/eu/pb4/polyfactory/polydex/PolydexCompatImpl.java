@@ -2,6 +2,8 @@ package eu.pb4.polyfactory.polydex;
 
 import eu.pb4.polydex.api.v1.hover.HoverDisplayBuilder;
 import eu.pb4.polydex.api.v1.recipe.*;
+import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.polydex.pages.GrindingRecipePage;
 import eu.pb4.polyfactory.polydex.pages.MixerRecipePage;
 import eu.pb4.polyfactory.polydex.pages.PressRecipePage;
@@ -12,10 +14,16 @@ import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
+import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.StateNameProvider;
 import eu.pb4.sgui.api.elements.GuiElement;
+import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionUtil;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +34,21 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(GenericMixingRecipe.class, MixerRecipePage::new);
         PolydexPage.registerRecipeViewer(GrindingRecipe.class, GrindingRecipePage::new);
 
+        PolydexEntry.registerEntryCreator(FactoryItems.CABLE, PolydexCompatImpl::seperateColoredItems);
+        PolydexEntry.registerEntryCreator(FactoryItems.LAMP, PolydexCompatImpl::seperateColoredItems);
+        PolydexEntry.registerEntryCreator(FactoryItems.INVERTED_LAMP, PolydexCompatImpl::seperateColoredItems);
+
         HoverDisplayBuilder.register(PolydexCompatImpl::stateAccurateNames);
+    }
+
+    private static PolydexEntry seperateColoredItems(ItemStack stack) {
+        var color = ColoredItem.getColor(stack);
+        var dye = DyeColorExtra.BY_COLOR.get(color);
+        Identifier baseId = Registries.ITEM.getId(stack.getItem());
+        if (dye != null) {
+            baseId = baseId.withSuffixedPath("/" + dye.asString());
+        }
+        return PolydexEntry.of(baseId, stack);
     }
 
     private static void stateAccurateNames(HoverDisplayBuilder hoverDisplayBuilder) {

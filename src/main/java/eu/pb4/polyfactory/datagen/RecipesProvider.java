@@ -480,7 +480,7 @@ class RecipesProvider extends FabricRecipeProvider {
                     .criterion("get", InventoryChangedCriterion.Conditions.items(Items.GLOWSTONE));
 
             var display = new NbtCompound();
-            display.putInt("color", -99);
+            display.putString("color", "dyn");
             ((NbtRecipe) x).polyfactory$setNbt(display);
 
             x.offerTo(exporter, id("colored_lamp/glass/regular_a"));
@@ -496,7 +496,7 @@ class RecipesProvider extends FabricRecipeProvider {
                     .criterion("get", InventoryChangedCriterion.Conditions.items(Items.GLOWSTONE));
 
             var display = new NbtCompound();
-            display.putInt("color", -99);
+            display.putString("color", "dyn");
             ((NbtRecipe) x).polyfactory$setNbt(display);
 
             x.offerTo(exporter, id("colored_lamp/glass/regular_b"));

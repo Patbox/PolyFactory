@@ -7,7 +7,6 @@ import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.recipe.ShapedRecipe;
-import net.minecraft.util.DyeColor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -15,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 public class ShapedRecipeMixin {
     @ModifyReturnValue(method = "craft", at = @At("RETURN"))
     private ItemStack modifyColors(ItemStack stack, RecipeInputInventory recipeInputInventory) {
-        if (stack.hasNbt() && stack.getNbt().contains("color", NbtElement.NUMBER_TYPE)
-                && stack.getNbt().getInt("color") == -99) {
+        if (stack.hasNbt() && stack.getNbt().contains("color", NbtElement.STRING_TYPE)
+                && stack.getNbt().getString("color").equals("dyn")) {
             for (var x : recipeInputInventory.getInputStacks()) {
                 if (x.isIn(ConventionalItemTags.DYES)) {
                     stack.getNbt().putInt("color", DyeColorExtra.getColor(x));

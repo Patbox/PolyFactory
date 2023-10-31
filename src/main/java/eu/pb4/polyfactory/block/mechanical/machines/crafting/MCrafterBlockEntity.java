@@ -1,8 +1,11 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.base.LockableBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
@@ -195,6 +198,10 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalS
             }
 
             if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity player) {
+                TriggerCriterion.trigger(player, FactoryTriggers.CRAFTER_CRAFTS);
+                if (output.isOf(FactoryItems.CRAFTER)) {
+                    TriggerCriterion.trigger(player, FactoryTriggers.CRAFTER_CRAFTS_CRAFTER);
+                }
                 Criteria.RECIPE_CRAFTED.trigger(player, self.currentRecipe.id(), self.stacks.subList(0, 9));
             }
 

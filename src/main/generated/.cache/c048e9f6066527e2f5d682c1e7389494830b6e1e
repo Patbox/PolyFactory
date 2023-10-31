@@ -1,10 +1,12 @@
-// 1.20.2	2023-10-31T09:37:56.4844047	PolyFactory/Advancements
+// 1.20.2	2023-10-31T21:53:38.3850791	PolyFactory/Advancements
 af1036a8011ae29e5515c8fd5bd2a2ff2deea112 data\polyfactory\advancements\main\base\cake.json
 d6d29007ed6eaf0c1200967e853bd32285277b02 data\polyfactory\advancements\main\base\steam_engine.json
 388c3c58bfa9822922d26cb515aa458a1c86011a data\polyfactory\advancements\main\base\windmill.json
 8435549f9da9812ff08a6dbd26856384d6bb0db6 data\polyfactory\advancements\main\base\mixer\firework.json
 f56401468843dc3bf370653e430fa907d9be29d9 data\polyfactory\advancements\main\base\mixer.json
 2bee9594536533b4609b69ce756f2ee27be2c6c6 data\polyfactory\advancements\main\base\container.json
+210bc7599a65896337c4c535323735d88be5f95a data\polyfactory\advancements\main\base\crafter2.json
+5e9636583a2f75ee891a3ff16bdc4fbb23ac7b1c data\polyfactory\advancements\main\base\crafter.json
 848336ed3680a42b9a86b0483ef5b920f9f61d30 data\polyfactory\advancements\main\base\planter.json
 f0729bb7e51ec160c84addbced914aa4d1e33a7c data\polyfactory\advancements\main\base\hand_crank.json
 91eefda65bc79daab7086a0bf0e10f5fe64df81c data\polyfactory\advancements\main\base\steel_ingot.json
