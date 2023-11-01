@@ -12,9 +12,6 @@ import eu.pb4.polyfactory.models.LodItemDisplayElement;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
-import eu.pb4.polyfactory.util.VirtualDestroyStage;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
@@ -67,7 +64,7 @@ public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterlog(ctx, this.getDefaultState());
+        return waterLog(ctx, this.getDefaultState());
     }
 
     @Override

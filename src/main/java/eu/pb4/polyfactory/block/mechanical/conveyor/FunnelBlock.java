@@ -11,13 +11,10 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.util.CachedBlockPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polyfactory.util.movingitem.MovingItemProvider;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
-import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -226,7 +223,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         var mode = below.getBlock() instanceof ConveyorLikeDirectional directional
                 ? directional.getTransferMode(below, dir.getOpposite())
                 : ConveyorLikeDirectional.TransferMode.TO_CONVEYOR;
-        return waterlog(ctx, this.getDefaultState().with(FACING, dir).with(MODE, mode));
+        return waterLog(ctx, this.getDefaultState().with(FACING, dir).with(MODE, mode));
     }
 
     @Override

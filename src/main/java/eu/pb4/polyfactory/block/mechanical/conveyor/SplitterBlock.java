@@ -152,7 +152,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
             dir = ctx.getHorizontalPlayerFacing();
         }
 
-        return waterlog(ctx, this.getDefaultState().with(FACING, dir));
+        return waterLog(ctx, this.getDefaultState().with(FACING, dir));
     }
 
     @Override

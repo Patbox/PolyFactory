@@ -82,7 +82,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
     public void setStack(ItemStack stack) {
         this.stack = stack;
         if (this.model != null) {
-            this.model.setItem(stack);
+            this.model.setItem(stack.copyWithCount(1));
         }
     }
     @Override
@@ -126,8 +126,11 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         var speed = Math.abs(RotationUser.getRotation((ServerWorld) world, pos).speed()) * MathHelper.RADIANS_PER_DEGREE * 2.5f;
 
         if (!context.canPlace()) {
+            self.model.setItem(ItemStack.EMPTY);
             self.stress = 0;
             return;
+        } else {
+            self.model.setItem(self.stack.copyWithCount(1));
         }
         self.stress = (float) Math.max(Math.min(8, Math.log(blockItem.getBlock().getHardness()) / Math.log(1.1)), 20);
 
@@ -137,7 +140,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
         self.process += speed / 30;
 
-        self.model.rotate((float) (self.process * MathHelper.TAU));
+        self.model.rotate((float) self.process);
 
         if (self.process >= 1) {
             self.process = 0;

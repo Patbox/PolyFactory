@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.data.providers;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.advancement.TriggerCriterion;
+import eu.pb4.polyfactory.block.base.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
@@ -24,14 +25,16 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.StatFormatter;
-import net.minecraft.stat.StatType;
 import net.minecraft.stat.Stats;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
@@ -53,17 +56,19 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class TinyPotatoSpringBlock extends DataNetworkBlock implements PolymerBlock, BlockWithElementHolder, CableConnectable, VirtualDestroyStage.Marker {
+public class TinyPotatoSpringBlock extends DataNetworkBlock implements PolymerBlock, BlockWithElementHolder, CableConnectable, BarrierBasedWaterloggable, VirtualDestroyStage.Marker {
     public static final Identifier STATISTIC = PolymerStat.registerStat(id("taters_clicked"), StatFormatter.DEFAULT);
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+    public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
 
     public TinyPotatoSpringBlock(Settings settings) {
         super(settings.ticksRandomly());
+        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, WATERLOGGED);
     }
 
     @Override
@@ -82,6 +87,11 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements PolymerBl
         if (holder != null && holder.holder() instanceof Model x) {
             x.interact(player.getYaw());
         }
+    }
+
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
     }
 
     @Override
@@ -111,7 +121,7 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements PolymerBl
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+        return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite()));
     }
 
     @Override
@@ -127,6 +137,12 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements PolymerBl
     @Override
     public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return new Model(world, pos, initialBlockState);
+    }
+
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        tickWater(state, world, pos);
+        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
 
     @Override

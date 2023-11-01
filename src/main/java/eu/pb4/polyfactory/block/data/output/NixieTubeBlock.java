@@ -8,9 +8,6 @@ import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.BaseModel;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import eu.pb4.polyfactory.util.VirtualDestroyStage;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -116,7 +113,7 @@ public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityPr
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterlog(ctx, this.getDefaultState().with(POSITIVE_CONNECTED, false).with(NEGATIVE_CONNECTED, false).with(AXIS, ctx.getHorizontalPlayerFacing().rotateYClockwise().getAxis()).with(HALF,
+        return waterLog(ctx, this.getDefaultState().with(POSITIVE_CONNECTED, false).with(NEGATIVE_CONNECTED, false).with(AXIS, ctx.getHorizontalPlayerFacing().rotateYClockwise().getAxis()).with(HALF,
                 ((ctx.getSide().getAxis() == Direction.Axis.Y && ctx.getSide() == Direction.DOWN) || (ctx.getSide().getAxis() != Direction.Axis.Y && ctx.getHitPos().y - ctx.getBlockPos().getY() > 0.5)) ? BlockHalf.TOP : BlockHalf.BOTTOM));
     }
 

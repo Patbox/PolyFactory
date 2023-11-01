@@ -161,7 +161,7 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterlog(ctx, this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite()));
+        return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite()));
     }
 
     @Override

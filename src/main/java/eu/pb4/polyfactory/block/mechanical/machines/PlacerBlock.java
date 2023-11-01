@@ -33,7 +33,6 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolItem;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -69,7 +68,7 @@ public class PlacerBlock extends RotationalNetworkBlock implements PolymerBlock,
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterlog(ctx, this.getDefaultState().with(FACING, ctx.getSide().getOpposite()));
+        return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getSide().getOpposite()));
     }
 
     @Override
@@ -189,7 +188,7 @@ public class PlacerBlock extends RotationalNetworkBlock implements PolymerBlock,
 
         private Model(ServerWorld world, BlockState state) {
             this.main = LodItemDisplayElement.createSimple(FactoryItems.PLACER);
-            this.item = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 1, 0.5f);
+            this.item = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 3, 0.5f);
 
             this.updateAnimation(state.get(FACING));
             this.addElement(this.main);
@@ -203,11 +202,14 @@ public class PlacerBlock extends RotationalNetworkBlock implements PolymerBlock,
             this.main.setTransformation(mat);
 
             mat.rotateY(MathHelper.HALF_PI);
-            mat.scale(0.48f);
+            mat.scale( 0.48f);
 
-            mat.translate((float) (-MathHelper.cos(this.rotation) * 0.15) - 0.3f, -MathHelper.sin(this.rotation) * 1.5f / 16f, 0);
+            mat.translate((float) (-MathHelper.cos(this.rotation) * 0.3) - 0.3f, -MathHelper.sin(this.rotation) * 4f / 16f - 2 / 16f, 0);
             mat.rotateZ(MathHelper.cos(this.rotation) / 4);
             mat.rotateY(-MathHelper.HALF_PI);
+            if (this.item.getItem().isEmpty()) {
+                mat.scale(0);
+            }
             this.item.setTransformation(mat);
         }
 
@@ -224,7 +226,11 @@ public class PlacerBlock extends RotationalNetworkBlock implements PolymerBlock,
         }
 
         public void rotate(float value) {
-            this.rotation = value;
+            if (value > 0.5) {
+                this.rotation = (float) (((value - 0.5) * 2 + 1) * MathHelper.PI);
+            } else {
+                this.rotation = MathHelper.PI;
+            }
         }
     }
 }

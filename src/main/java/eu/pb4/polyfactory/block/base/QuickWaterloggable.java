@@ -13,7 +13,7 @@ import net.minecraft.world.WorldAccess;
 public interface QuickWaterloggable extends Waterloggable {
     BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
 
-    default BlockState waterlog(ItemPlacementContext ctx, BlockState state) {
+    default BlockState waterLog(ItemPlacementContext ctx, BlockState state) {
         FluidState fluidState = ctx.getWorld().getFluidState(ctx.getBlockPos());
         boolean bl = fluidState.getFluid() == Fluids.WATER;
         return state.with(WATERLOGGED, bl);

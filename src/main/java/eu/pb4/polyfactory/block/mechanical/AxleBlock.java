@@ -67,7 +67,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterlog(ctx, super.getPlacementState(ctx).with(AXIS, ctx.getSide().getAxis()));
+        return waterLog(ctx, super.getPlacementState(ctx).with(AXIS, ctx.getSide().getAxis()));
     }
 
     @Override

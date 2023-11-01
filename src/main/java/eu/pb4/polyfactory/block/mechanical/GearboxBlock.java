@@ -48,7 +48,7 @@ public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterlog(ctx, super.getPlacementState(ctx));
+        return waterLog(ctx, super.getPlacementState(ctx));
     }
 
     @Override

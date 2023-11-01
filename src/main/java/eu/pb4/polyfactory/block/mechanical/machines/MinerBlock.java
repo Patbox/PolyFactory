@@ -66,7 +66,7 @@ public class MinerBlock extends RotationalNetworkBlock implements PolymerBlock, 
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterlog(ctx, this.getDefaultState().with(FACING, ctx.getSide().getOpposite()));
+        return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getSide().getOpposite()));
     }
 
     @Override
