@@ -70,6 +70,8 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addColored(FactoryBlocks.CABLE);
         this.addColored(FactoryBlocks.LAMP);
         this.addColored(FactoryBlocks.INVERTED_LAMP);
+        this.addColored(FactoryBlocks.CAGED_LAMP);
+        this.addColored(FactoryBlocks.INVERTED_CAGED_LAMP);
     }
 
     private void addColored(Block block) {

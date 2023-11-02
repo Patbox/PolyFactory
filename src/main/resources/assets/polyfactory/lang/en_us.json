@@ -66,6 +66,12 @@
   "block.polyfactory.inverted_colored_lamp": "Inverted Colored Lamp",
   "block.polyfactory.inverted_colored_lamp.colored": "Inverted %s Lamp",
   "block.polyfactory.inverted_colored_lamp.colored.full": "Inverted %s Lamp (%s)",
+  "block.polyfactory.caged_lamp": "Caged Lamp",
+  "block.polyfactory.caged_lamp.colored": "%s Caged Lamp",
+  "block.polyfactory.caged_lamp.colored.full": "%s Caged Lamp (%s)",
+  "block.polyfactory.inverted_caged_lamp": "Inverted Caged Lamp",
+  "block.polyfactory.inverted_caged_lamp.colored": "Inverted %s Caged Lamp",
+  "block.polyfactory.inverted_caged_lamp.colored.full": "Inverted %s Caged Lamp (%s)",
   "item.polyfactory.wrench": "Wrench",
   "item.polyfactory.wrench.tooltip.1": "Use [%s] to change block",
   "item.polyfactory.wrench.tooltip.2": "Use [%s] to change current setting",
@@ -167,5 +173,7 @@
   "advancements.polyfactory.tater_128.title": "2 stacks of taters",
   "advancements.polyfactory.tater_128.description": "Click Potato on a Spring 128 times...",
   "advancements.polyfactory.tater_1024.title": "The Potato Master",
-  "advancements.polyfactory.tater_1024.description": "Click Potato on a Spring 1024 times. The End! Nothing more"
+  "advancements.polyfactory.tater_1024.description": "Click Potato on a Spring 1024 times. The End! Nothing more",
+
+  "color.polyfactory.teal": "Teal"
 }

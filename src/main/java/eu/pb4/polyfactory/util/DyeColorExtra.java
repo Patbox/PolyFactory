@@ -10,6 +10,11 @@ import net.minecraft.util.DyeColor;
 
 public interface DyeColorExtra {
     Int2ObjectMap<DyeColor> BY_COLOR = new Int2ObjectOpenHashMap<>();
+
+    static boolean hasLang(int color) {
+        return FactoryColors.YTTR_TEAL == color || BY_COLOR.get(color) != null;
+    }
+
     int polyfactory$getColor();
 
     static int getColor(DyeColor color) {

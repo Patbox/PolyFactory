@@ -74,7 +74,8 @@ public class FactoryItems {
     public static final ColoredDownsampledBlockItem CABLE = register("cable", new ColoredDownsampledBlockItem(FactoryBlocks.CABLE, 0xbbbbbb, new Item.Settings()));
     public static final ColoredDownsampledBlockItem LAMP = register("colored_lamp", new ColoredDownsampledBlockItem(FactoryBlocks.LAMP, -1, new Item.Settings()));
     public static final ColoredDownsampledBlockItem INVERTED_LAMP = register("inverted_colored_lamp", new ColoredDownsampledBlockItem(FactoryBlocks.INVERTED_LAMP, -1, new Item.Settings()));
-
+    public static final ColoredDownsampledBlockItem CAGED_LAMP = register("caged_lamp", new ColoredDownsampledBlockItem(FactoryBlocks.CAGED_LAMP, -1, new Item.Settings()));
+    public static final ColoredDownsampledBlockItem INVERTED_CAGED_LAMP = register("inverted_caged_lamp", new ColoredDownsampledBlockItem(FactoryBlocks.INVERTED_CAGED_LAMP, -1, new Item.Settings()));
     public static final Item ELECTRIC_MOTOR = register(FactoryBlocks.ELECTRIC_MOTOR);
     public static final Item ELECTRIC_GENERATOR = register(FactoryBlocks.ELECTRIC_GENERATOR);
 
@@ -150,6 +151,8 @@ public class FactoryItems {
                     entries.add(INVERTED_REDSTONE_LAMP);
                     entries.add(ColoredItem.stack(LAMP, 1, DyeColor.WHITE));
                     entries.add(ColoredItem.stack(INVERTED_LAMP, 1, DyeColor.WHITE));
+                    entries.add(ColoredItem.stack(CAGED_LAMP, 1, DyeColor.WHITE));
+                    entries.add(ColoredItem.stack(INVERTED_CAGED_LAMP, 1, DyeColor.WHITE));
                     entries.add(TINY_POTATO_SPRING);
 
                     // Generic Materials
@@ -201,6 +204,12 @@ public class FactoryItems {
                     }
                     for (var dye : DyeColor.values()) {
                         entries.add(ColoredItem.stack(INVERTED_LAMP, 1, DyeColorExtra.getColor(dye)));
+                    }
+                    for (var dye : DyeColor.values()) {
+                        entries.add(ColoredItem.stack(CAGED_LAMP, 1, DyeColorExtra.getColor(dye)));
+                    }
+                    for (var dye : DyeColor.values()) {
+                        entries.add(ColoredItem.stack(INVERTED_CAGED_LAMP, 1, DyeColorExtra.getColor(dye)));
                     }
                 })).build()
         );

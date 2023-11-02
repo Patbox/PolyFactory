@@ -238,7 +238,7 @@ public class CableBlock extends NetworkBlock implements FactoryBlock, BlockEntit
     @Override
     public Text getName(ServerWorld world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
         if (blockEntity instanceof CableBlockEntity be && !be.isDefaultColor()) {
-            if (DyeColorExtra.BY_COLOR.get(be.getColor()) == null) {
+            if (!DyeColorExtra.hasLang(be.getColor())) {
                 return Text.translatable("block.polyfactory.cable.colored.full",
                         ColoredItem.getColorName(be.getColor()), ColoredItem.getHexName(be.getColor()));
             } else {
@@ -248,7 +248,7 @@ public class CableBlock extends NetworkBlock implements FactoryBlock, BlockEntit
         return this.getName();
     }
 
-    public final class Model extends BaseModel {
+    public static final class Model extends BaseModel {
         private final ItemDisplayElement main;
         private int color;
         private BlockState state;

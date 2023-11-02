@@ -20,16 +20,15 @@ import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
-import eu.pb4.polyfactory.util.DebugData;
-import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.PotatoWisdom;
-import eu.pb4.polyfactory.util.VirtualDestroyStage;
+import eu.pb4.polyfactory.util.*;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -83,6 +82,8 @@ public class ModInit implements ModInitializer {
 		PolydexCompat.register();
 		PolymerResourcePackUtils.addModAssets(ID);
 		PolymerResourcePackUtils.markAsRequired();
+
+		ServerPlayConnectionEvents.JOIN.register(FactorySecrets::onJoin);
 	}
 
 	@SuppressWarnings("ResultOfMethodCallIgnored")

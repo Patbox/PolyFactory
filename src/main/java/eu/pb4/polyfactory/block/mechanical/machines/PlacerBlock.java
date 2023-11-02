@@ -68,7 +68,7 @@ public class PlacerBlock extends RotationalNetworkBlock implements PolymerBlock,
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getSide().getOpposite()));
+        return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getPlayerLookDirection()));
     }
 
     @Override

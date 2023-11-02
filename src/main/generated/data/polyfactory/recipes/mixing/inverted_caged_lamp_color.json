@@ -1,0 +1,7 @@
+{
+  "type": "polyfactory:mixing/coloring",
+  "input": "polyfactory:inverted_caged_lamp",
+  "minimum_speed": 6.0,
+  "optimal_speed": 10.0,
+  "time": 2.0
+}

@@ -36,7 +36,7 @@ public class ColoredDownsampledBlockItem extends FactoryBlockItem implements Fir
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        if (ColoredItem.hasColor(stack) && DyeColorExtra.BY_COLOR.get(ColoredItem.getColor(stack)) == null) {
+        if (ColoredItem.hasColor(stack) && !DyeColorExtra.hasLang(ColoredItem.getColor(stack))) {
             tooltip.add(Text.translatable("item.color", ColoredItem.getHexName(ColoredItem.getColor(stack))).formatted(Formatting.GRAY));
         }
     }

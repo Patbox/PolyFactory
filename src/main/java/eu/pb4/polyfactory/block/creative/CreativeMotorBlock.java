@@ -65,7 +65,7 @@ public class CreativeMotorBlock extends RotationalNetworkBlock implements Factor
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getPlayer() != null && ctx.getPlayer().isSneaking() ? ctx.getSide() : ctx.getSide().getOpposite());
+        return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection());
     }
 
     @Override

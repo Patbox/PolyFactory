@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.item.util;
 
 import eu.pb4.polyfactory.util.DyeColorExtra;
+import eu.pb4.polyfactory.util.FactoryColors;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtElement;
@@ -77,7 +78,12 @@ public interface ColoredItem {
     }
 
     static Text getColorName(int color) {
+        if (color == FactoryColors.YTTR_TEAL) {
+            return Text.translatable("color.polyfactory.teal");
+        }
+
         DyeColor dyeColor = DyeColorExtra.BY_COLOR.get(color);
+
         return dyeColor == null ? Text.translatable("item.minecraft.firework_star.custom_color") : Text.translatable("item.minecraft.firework_star." + dyeColor.getName());
     }
 }

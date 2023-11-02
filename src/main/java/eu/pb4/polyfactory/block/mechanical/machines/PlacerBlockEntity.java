@@ -132,7 +132,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         } else {
             self.model.setItem(self.stack.copyWithCount(1));
         }
-        self.stress = (float) Math.max(Math.min(8, Math.log(blockItem.getBlock().getHardness()) / Math.log(1.1)), 20);
+        self.stress = (float) Math.min(Math.max(8, Math.log(blockItem.getBlock().getHardness()) / Math.log(1.1)), 18);
 
         if (speed == 0) {
             return;

@@ -5,4 +5,7 @@ public interface ColorProvider {
     void setColor(int color);
 
     boolean isDefaultColor();
+    interface Consumer {
+        void setColor(int color);
+    }
 }

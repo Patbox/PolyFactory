@@ -7,15 +7,14 @@ import eu.pb4.polymer.core.api.item.PolymerRecipe;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeCodecs;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.ShapelessRecipe;
+import net.minecraft.recipe.*;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.dynamic.Codecs;
+import org.jetbrains.annotations.Nullable;
 
 public class ShapelessNbtCopyRecipe extends ShapelessRecipe implements PolymerRecipe {
     private final ItemStack result;
@@ -40,12 +39,15 @@ public class ShapelessNbtCopyRecipe extends ShapelessRecipe implements PolymerRe
                         }, DataResult::success).forGetter(t -> t.ingredientsOg))
                 .apply(instance, ShapelessNbtCopyRecipe::new);
     });
+    private Recipe<?> vanilla;
 
     public ShapelessNbtCopyRecipe(String group, CraftingRecipeCategory category, ItemStack result, Ingredient source, DefaultedList<Ingredient> ingredients) {
         super(group, category, result, merge(ingredients, source));
         this.ingredientsOg = ingredients;
         this.result = result;
         this.source = source;
+
+        this.vanilla = new ShapelessRecipe(group, category, result, this.getIngredients());
     }
 
     private static DefaultedList<Ingredient> merge(DefaultedList<Ingredient> ingredients, Ingredient source) {
@@ -70,5 +72,10 @@ public class ShapelessNbtCopyRecipe extends ShapelessRecipe implements PolymerRe
     @Override
     public RecipeSerializer<?> getSerializer() {
         return FactoryRecipeSerializers.CRAFTING_SHAPELESS_NBT_COPY;
+    }
+
+    @Override
+    public @Nullable Recipe<?> getPolymerReplacement(ServerPlayerEntity player) {
+        return this.vanilla;
     }
 }

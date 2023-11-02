@@ -373,12 +373,16 @@ class RecipesProvider extends FabricRecipeProvider {
         of(exporter, ColoringCraftingRecipe.CODEC,
                 ColoringCraftingRecipe.of("cable_color", FactoryItems.CABLE),
                 ColoringCraftingRecipe.of("lamp_color", FactoryItems.LAMP),
-                ColoringCraftingRecipe.of("inverted_color", FactoryItems.INVERTED_LAMP)
+                ColoringCraftingRecipe.of("inverted_color", FactoryItems.INVERTED_LAMP),
+                ColoringCraftingRecipe.of("caged_lamp_color", FactoryItems.CAGED_LAMP),
+                ColoringCraftingRecipe.of("inverted_caged_color", FactoryItems.INVERTED_CAGED_LAMP)
         );
         of(exporter, ColoringMixingRecipe.CODEC,
                 ColoringMixingRecipe.of("cable_color", FactoryItems.CABLE, 2, 6, 10),
                 ColoringMixingRecipe.of("lamp_color", FactoryItems.LAMP, 2, 6, 10),
-                ColoringMixingRecipe.of("inverted_lamp_color", FactoryItems.INVERTED_LAMP, 2, 6, 10)
+                ColoringMixingRecipe.of("inverted_lamp_color", FactoryItems.INVERTED_LAMP, 2, 6, 10),
+                ColoringMixingRecipe.of("caged_lamp_color", FactoryItems.CAGED_LAMP, 2, 6, 10),
+                ColoringMixingRecipe.of("inverted_caged_lamp_color", FactoryItems.INVERTED_CAGED_LAMP, 2, 6, 10)
         );
 
         of(exporter, GrindingRecipe.CODEC,
@@ -466,7 +470,18 @@ class RecipesProvider extends FabricRecipeProvider {
                 new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
                         FactoryItems.INVERTED_LAMP.getDefaultStack(),
                         Ingredient.ofItems(FactoryItems.LAMP),
-                        DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(Items.REDSTONE_TORCH)))));
+                        DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(Items.REDSTONE_TORCH)))),
+                new RecipeEntry<>(id("crafting/inverted_caged_lamp"),
+                        new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
+                                FactoryItems.INVERTED_CAGED_LAMP.getDefaultStack(),
+                                Ingredient.ofItems(FactoryItems.CAGED_LAMP),
+                                DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(Items.REDSTONE_TORCH)))),
+                new RecipeEntry<>(id("crafting/caged_lamp"),
+                        new ShapelessNbtCopyRecipe("", CraftingRecipeCategory.REDSTONE,
+                                FactoryItems.CAGED_LAMP.getDefaultStack(),
+                                Ingredient.ofItems(FactoryItems.LAMP),
+                                DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(FactoryItems.METAL_GRID))))
+        );
 
 
         {

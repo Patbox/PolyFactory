@@ -48,7 +48,7 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return super.getPlacementState(ctx).with(FACING, ctx.getSide().getOpposite());
+        return super.getPlacementState(ctx).with(FACING, ctx.getPlayerLookDirection());
     }
 
     @Override

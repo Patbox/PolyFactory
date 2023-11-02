@@ -2,7 +2,6 @@ package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.base.BlockEntityExtraListener;
-import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
@@ -12,15 +11,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
 
-public class LampBlockEntity extends BlockEntity implements BlockEntityExtraListener, ColorProvider {
+public class ColorableBlockEntity extends BlockEntity implements BlockEntityExtraListener, ColorProvider {
     private int color = -2;
     @Nullable
-    private LampBlock.Model model;
+    private ColorProvider.Consumer model;
 
-    public LampBlockEntity(BlockPos pos, BlockState state) {
-        super(FactoryBlockEntities.LAMP, pos, state);
+    public ColorableBlockEntity(BlockPos pos, BlockState state) {
+        super(FactoryBlockEntities.COLOR_CONTAINER, pos, state);
     }
-
 
     @Override
     protected void writeNbt(NbtCompound nbt) {
@@ -53,7 +51,7 @@ public class LampBlockEntity extends BlockEntity implements BlockEntityExtraList
 
     @Override
     public void onListenerUpdate(WorldChunk chunk) {
-        this.model = (LampBlock.Model) BlockBoundAttachment.get(chunk, this.getPos()).holder();
+        this.model = (ColorProvider.Consumer) BlockBoundAttachment.get(chunk, this.getPos()).holder();
         this.model.setColor(this.color);
     }
 

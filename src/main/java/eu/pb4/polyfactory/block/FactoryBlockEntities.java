@@ -9,7 +9,6 @@ import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlockEntity;
 import eu.pb4.polyfactory.block.data.providers.ItemReaderBlockEntity;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlockEntity;
-import eu.pb4.polyfactory.block.electric.WitherSkullGeneratorBlock;
 import eu.pb4.polyfactory.block.electric.WitherSkullGeneratorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.*;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
@@ -25,7 +24,7 @@ import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlockEntity;
 import eu.pb4.polyfactory.block.other.ContainerBlockEntity;
 import eu.pb4.polyfactory.block.data.output.NixieTubeBlockEntity;
-import eu.pb4.polyfactory.block.other.LampBlockEntity;
+import eu.pb4.polyfactory.block.other.ColorableBlockEntity;
 import eu.pb4.polyfactory.mixin.util.BlockEntityTypeAccessor;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -103,8 +102,8 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<WitherSkullGeneratorBlockEntity> WITHER_SKULL_GENERATOR = register("wither_skull_generator", FabricBlockEntityTypeBuilder
             .create(WitherSkullGeneratorBlockEntity::new).addBlock(FactoryBlocks.WITHER_SKULL_GENERATOR));
 
-    public static final BlockEntityType<LampBlockEntity> LAMP = register("colored_lamp", FabricBlockEntityTypeBuilder
-            .create(LampBlockEntity::new).addBlocks(FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP));
+    public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container", FabricBlockEntityTypeBuilder
+            .create(ColorableBlockEntity::new).addBlocks(FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP));
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;
         var set = ImmutableSet.<Block>builder();
