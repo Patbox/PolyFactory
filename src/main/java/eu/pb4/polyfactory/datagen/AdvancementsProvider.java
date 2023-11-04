@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ColoredItem;
+import eu.pb4.polyfactory.util.FactoryColors;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
@@ -139,6 +140,23 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .build(exporter, "polyfactory:main/base/grinder_dust");
 
         // Grinder -> Gravel
+
+        var coloredLamp = Advancement.Builder.create()
+                .parent(grinder)
+                .display(
+                        ColoredItem.stack(FactoryItems.LAMP, 1, FactoryColors.YTTR_TEAL),
+                        Text.translatable("advancements.polyfactory.colored_lamp.title"),
+                        Text.translatable("advancements.polyfactory.colored_lamp.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", InventoryChangedCriterion.Conditions.items(FactoryItems.LAMP))
+                .criterion("use2", InventoryChangedCriterion.Conditions.items(FactoryItems.CAGED_LAMP))
+                .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
+                .build(exporter, "polyfactory:main/base/colored_lamp");
 
         var gravel = Advancement.Builder.create()
                 .parent(grinder)
@@ -460,6 +478,21 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 )
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.MINER_MINES))
                 .build(exporter, "polyfactory:main/base/miner");
+
+        var placer = Advancement.Builder.create()
+                .parent(miner)
+                .display(
+                        FactoryItems.PLACER,
+                        Text.translatable("advancements.polyfactory.placer.title"),
+                        Text.translatable("advancements.polyfactory.placer.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.PLACER_PLACES))
+                .build(exporter, "polyfactory:main/base/placer");
 
         var planter = Advancement.Builder.create()
                 .parent(miner)

@@ -1,21 +1,18 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "minecraft:crafting_shapeless",
   "category": "redstone",
-  "key": {
-    "g": {
-      "item": "polyfactory:steel_gear"
-    },
-    "i": {
+  "ingredients": [
+    {
       "item": "polyfactory:steel_ingot"
+    },
+    {
+      "item": "polyfactory:steel_ingot"
+    },
+    {
+      "item": "polyfactory:steel_gear"
     }
-  },
-  "pattern": [
-    " i ",
-    "igi",
-    " i "
   ],
   "result": {
     "item": "polyfactory:large_steel_gear"
-  },
-  "show_notification": true
+  }
 }

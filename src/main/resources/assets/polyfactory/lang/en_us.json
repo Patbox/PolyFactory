@@ -108,6 +108,9 @@
   "advancements.polyfactory.grinder.title": "Fine powder",
   "advancements.polyfactory.grinder.description": "Use Grinder to craft Coal Dust or Saw Dust",
 
+  "advancements.polyfactory.colored_lamp.title": "Light's Power of the Inspiration...",
+  "advancements.polyfactory.colored_lamp.description": "Create a Colored Lamp",
+
   "advancements.polyfactory.gravel.title": "Artificial Erosion",
   "advancements.polyfactory.gravel.description": "Convert Stone to Cobblestone, then to Gravel and then to Sand",
 
@@ -136,7 +139,10 @@
   "advancements.polyfactory.fan_sky.description": "Jump into upward-facing, fast-moving Fan",
 
   "advancements.polyfactory.miner.title": "Remote Mining",
-  "advancements.polyfactory.miner.description": "Use Mechanical Miner to break block remotely",
+  "advancements.polyfactory.miner.description": "Use Mechanical Miner to break a block remotely",
+
+  "advancements.polyfactory.placer.title": "Remote Placing",
+  "advancements.polyfactory.placer.description": "Use Mechanical Placer to place a block remotely",
 
   "advancements.polyfactory.planter.title": "Automated Farming",
   "advancements.polyfactory.planter.description": "Use Mechanical Planter to plant a sapling/seed",

@@ -126,6 +126,7 @@ public class FactoryItems {
                     entries.add(MIXER);
                     entries.add(CRAFTER);
                     entries.add(MINER);
+                    entries.add(PLACER);
                     entries.add(PLANTER);
 
                     // Data
@@ -219,7 +220,6 @@ public class FactoryItems {
                     .icon(WITHER_SKULL_GENERATOR::getDefaultStack)
                     .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
                     .entries(((context, entries) -> {
-                        entries.add(PLACER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(WITHER_SKULL_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         // Remove this
                         if (ModInit.DEV_ENV) {

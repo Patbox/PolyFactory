@@ -1,0 +1,32 @@
+{
+  "parent": "polyfactory:main/base/miner",
+  "criteria": {
+    "use": {
+      "conditions": {
+        "trigger": "polyfactory:placer_places"
+      },
+      "trigger": "polyfactory:trigger"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.polyfactory.placer.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "polyfactory:placer"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.polyfactory.placer.title"
+    }
+  },
+  "requirements": [
+    [
+      "use"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

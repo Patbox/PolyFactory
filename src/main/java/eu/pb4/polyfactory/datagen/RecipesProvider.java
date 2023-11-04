@@ -128,6 +128,18 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .offerTo(exporter);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.PLACER, 1)
+                .pattern("wsw")
+                .pattern("gig")
+                .pattern("waw")
+                .input('i', FactoryItems.INTEGRATED_CIRCUIT)
+                .input('s', FactoryItems.STEEL_GEAR)
+                .input('g', Items.GOLD_BLOCK)
+                .input('w', FactoryItems.STEEL_PLATE).input('a', FactoryItems.MINER)
+                .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                .offerTo(exporter);
+
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEAM_ENGINE, 1)
                 .pattern("www")
                 .pattern("wbw")
@@ -486,10 +498,11 @@ class RecipesProvider extends FabricRecipeProvider {
 
         {
             var x = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
-                    .pattern("dp ")
+                    .pattern("dps")
                     .pattern("rgr")
-                    .pattern(" p ")
+                    .pattern("sps")
                     .input('r', Items.REDSTONE).input('g', Items.GLOWSTONE)
+                    .input('s', FactoryItems.SAW_DUST)
                     .input('p', Items.GLASS).input('d', ConventionalItemTags.DYES)
                     .group("polyfactory:colored_lamp")
                     .criterion("get", InventoryChangedCriterion.Conditions.items(Items.GLOWSTONE));
@@ -502,10 +515,11 @@ class RecipesProvider extends FabricRecipeProvider {
         }
         {
             var x = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
-                    .pattern(" p ")
+                    .pattern("sps")
                     .pattern("rgr")
-                    .pattern("dp ")
+                    .pattern("dps")
                     .input('r', Items.REDSTONE).input('g', Items.GLOWSTONE)
+                    .input('s', FactoryItems.SAW_DUST)
                     .input('p', Items.GLASS).input('d', ConventionalItemTags.DYES)
                     .group("polyfactory:colored_lamp")
                     .criterion("get", InventoryChangedCriterion.Conditions.items(Items.GLOWSTONE));
@@ -520,10 +534,11 @@ class RecipesProvider extends FabricRecipeProvider {
         for (var dye : dyes) {
             {
                 var x = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
-                        .pattern(" p ")
+                        .pattern("sps")
                         .pattern("rgr")
-                        .pattern(" p ")
+                        .pattern("sps")
                         .input('r', Items.REDSTONE).input('g', Items.GLOWSTONE)
+                        .input('s', FactoryItems.SAW_DUST)
                         .input('p', Registries.ITEM.get(new Identifier(dye.getColor().getName() + "_stained_glass")))
                         .group("polyfactory:colored_lamp")
                         .criterion("get", InventoryChangedCriterion.Conditions.items(Items.GLOWSTONE));
@@ -642,13 +657,10 @@ class RecipesProvider extends FabricRecipeProvider {
                 .input('i', FactoryItems.STEEL_INGOT)
                 .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.LARGE_STEEL_GEAR)
+        ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.LARGE_STEEL_GEAR)
                 .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
-                .pattern(" i ")
-                .pattern("igi")
-                .pattern(" i ")
-                .input('i', FactoryItems.STEEL_INGOT)
-                .input('g', FactoryItems.STEEL_GEAR)
+                .input(FactoryItems.STEEL_INGOT, 2)
+                .input(FactoryItems.STEEL_GEAR)
                 .offerTo(exporter);
 
 

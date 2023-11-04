@@ -14,12 +14,15 @@
     },
     "r": {
       "item": "minecraft:redstone"
+    },
+    "s": {
+      "item": "polyfactory:saw_dust"
     }
   },
   "pattern": [
-    " p ",
+    "sps",
     "rgr",
-    "dp "
+    "dps"
   ],
   "result": {
     "item": "polyfactory:colored_lamp",

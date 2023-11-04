@@ -150,6 +150,10 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
             if (world.getBlockEntity(blockPos) instanceof OwnedBlockEntity ownedBlockEntity) {
                 ownedBlockEntity.setOwner(self.owner);
             }
+
+            if (self.owner != null && world.getPlayerByUuid(self.owner.getId()) instanceof ServerPlayerEntity serverPlayer) {
+                TriggerCriterion.trigger(serverPlayer, FactoryTriggers.PLACER_PLACES);
+            }
             self.markDirty();
         }
     }

@@ -1,7 +1,8 @@
 - Added Mechanical Crafters. A take on 1.21 Crafter, but designed to work with rest of the mod.
-- Added Colored Lamps Caged Colored Lamps (with inverted variants).
+- Added Mechanical Placer.
+- Added Colored Lamps and Caged Colored Lamps (with inverted variants).
 - Hoppers can pull items from Funnels.
 - Conveyors dropping items can now be prevented by placing a block in front of where item would be dropped.
+- Added Creative Tab for Colored Variants
 
-- Added Wither Skull Generators (Experimental / Creative Only)
-- Added Mechanical Placer (Experimental / Creative Only)
+- Added Wither Skull Generators (Experimental / Command Only)

@@ -87,6 +87,11 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
         return true;
     }
 
+    @Override
+    public boolean isTransparent(BlockState state, BlockView world, BlockPos pos) {
+        return true;
+    }
+
     public static final class Model extends BaseModel implements ColorProvider.Consumer {
         private final ItemDisplayElement main;
         private final boolean inverted;

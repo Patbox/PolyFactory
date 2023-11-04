@@ -22,6 +22,7 @@ public interface FactoryTriggers {
     Identifier MIXER_CRAFTS = id("mixer_crafts");
     Identifier CRAFTER_CRAFTS = id("crafterd_crafts");
     Identifier CRAFTER_CRAFTS_CRAFTER = id("crafterd_crafts_crafter");
+    Identifier PLACER_PLACES = id("placer_places");
 
     Identifier TATER_16 = id("tater_16");
     Identifier TATER_128 = id("tater_128");
