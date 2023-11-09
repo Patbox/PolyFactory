@@ -1,5 +1,7 @@
 package eu.pb4.polyfactory.models;
 
+import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
 import net.minecraft.client.render.model.json.ModelTransformationMode;

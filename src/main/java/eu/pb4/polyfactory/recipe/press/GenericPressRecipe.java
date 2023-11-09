@@ -2,6 +2,8 @@ package eu.pb4.polyfactory.recipe.press;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import eu.pb4.factorytools.api.recipe.CountedIngredient;
+import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.*;
@@ -12,7 +14,6 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 

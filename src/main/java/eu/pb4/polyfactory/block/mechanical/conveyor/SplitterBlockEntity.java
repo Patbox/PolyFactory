@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
-import eu.pb4.polyfactory.block.base.BlockEntityExtraListener;
+import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;

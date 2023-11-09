@@ -6,7 +6,7 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.item.util.ModeledItem;
+import eu.pb4.factorytools.api.item.ModeledItem;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;

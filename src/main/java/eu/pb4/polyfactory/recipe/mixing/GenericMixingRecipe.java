@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.recipe.mixing;
 import com.google.common.collect.Iterators;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -13,7 +14,6 @@ import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 

@@ -26,7 +26,8 @@
     ]
   },
   "mixins": [
-    "polyfactory.mixins.json"
+    "polyfactory.mixins.json",
+    "factorytools.mixins.json"
   ],
 
   "depends": {

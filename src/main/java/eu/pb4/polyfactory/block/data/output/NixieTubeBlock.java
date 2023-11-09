@@ -1,12 +1,12 @@
 package eu.pb4.polyfactory.block.data.output;
 
-import eu.pb4.polyfactory.block.base.BarrierBasedWaterloggable;
+import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.base.FactoryBlock;
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
-import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BaseModel;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;

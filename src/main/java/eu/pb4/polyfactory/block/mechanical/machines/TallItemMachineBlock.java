@@ -2,17 +2,14 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.base.FactoryBlock;
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polyfactory.util.movingitem.MovingItemProvider;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;

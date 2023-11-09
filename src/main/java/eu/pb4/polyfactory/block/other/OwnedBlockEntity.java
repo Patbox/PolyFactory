@@ -4,5 +4,5 @@ import com.mojang.authlib.GameProfile;
 
 public interface OwnedBlockEntity {
     GameProfile getOwner();
-    void  setOwner(GameProfile profile);
+    void setOwner(GameProfile profile);
 }

@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.recipe;
 
 import com.mojang.serialization.Codec;
+import eu.pb4.factorytools.api.recipe.LazyRecipeSerializer;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.recipe.mixing.ArtificialDyeMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.ColoringMixingRecipe;

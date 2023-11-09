@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.models;
 
+import eu.pb4.factorytools.api.virtualentity.BaseModel;
 import eu.pb4.polyfactory.block.mechanical.RotationConstants;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;

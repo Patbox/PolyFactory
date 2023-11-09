@@ -6,8 +6,8 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
-import eu.pb4.polyfactory.item.util.FireworkStarColoredItem;
-import eu.pb4.polyfactory.item.util.ModeledItem;
+import eu.pb4.factorytools.api.item.FireworkStarColoredItem;
+import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;
@@ -17,7 +17,6 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
-import org.jetbrains.annotations.Nullable;
 
 public class WindmillSailItem extends ModeledItem implements DyeableItem, FireworkStarColoredItem {
     public WindmillSailItem(Settings settings) {

@@ -1,5 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
+import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;

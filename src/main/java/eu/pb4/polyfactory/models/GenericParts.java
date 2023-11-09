@@ -1,8 +1,8 @@
 package eu.pb4.polyfactory.models;
 
+import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;

@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.mixin.player;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import eu.pb4.polyfactory.block.base.SneakBypassingBlock;
+import eu.pb4.factorytools.api.block.SneakBypassingBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -20,11 +20,10 @@ public class ServerPlayerInteractionManagerMixin {
             method = "interactBlock",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;shouldCancelInteraction()Z")
     )
-    private boolean dontCancelForSome(boolean original, @Local BlockState state) {
+    private boolean dontCancelForSome(boolean original) {
         if (this.player.getMainHandStack().isOf(FactoryItems.WRENCH)) {
             return true;
-        } else {
-            return !(state.getBlock() instanceof SneakBypassingBlock) && original;
         }
+        return original;
     }
 }

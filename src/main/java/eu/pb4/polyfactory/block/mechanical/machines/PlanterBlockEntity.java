@@ -4,7 +4,7 @@ import com.mojang.authlib.GameProfile;
 import eu.pb4.common.protection.api.CommonProtection;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.advancement.TriggerCriterion;
-import eu.pb4.polyfactory.block.base.BlockEntityExtraListener;
+import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.base.LockableBlockEntity;

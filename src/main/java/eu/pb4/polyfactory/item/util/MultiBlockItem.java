@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.item.util;
 
+import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.polyfactory.block.base.MultiBlock;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.BlockState;

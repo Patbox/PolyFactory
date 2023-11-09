@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block.data.providers;
 
-import eu.pb4.polyfactory.models.BaseModel;
-import eu.pb4.polyfactory.models.LodItemDisplayElement;
+import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;

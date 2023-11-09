@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.machines;
 
 import eu.pb4.polyfactory.block.base.LockableBlockEntity;
-import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BaseModel;
 import eu.pb4.polyfactory.util.movingitem.InventorySimpleContainerProvider;
 import eu.pb4.polyfactory.util.movingitem.MovingItem;
 import net.minecraft.block.BlockState;

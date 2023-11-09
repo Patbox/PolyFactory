@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block;
 
 import eu.pb4.polyfactory.ModInit;
-import eu.pb4.polyfactory.block.base.AttackableBlock;
+import eu.pb4.factorytools.api.block.AttackableBlock;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlock;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
 import eu.pb4.polyfactory.block.data.CableBlock;
@@ -101,15 +101,7 @@ public class FactoryBlocks {
 
 
     public static void register() {
-        AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
-            var state = world.getBlockState(pos);
 
-            if (state.getBlock() instanceof AttackableBlock attackableBlock && hand == Hand.MAIN_HAND) {
-                return attackableBlock.onPlayerAttack(state, player, world, pos, direction);
-            }
-
-            return ActionResult.PASS;
-        });
     }
 
 

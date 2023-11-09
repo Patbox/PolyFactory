@@ -22,10 +22,10 @@
     "sps"
   ],
   "result": {
-    "item": "polyfactory:colored_lamp",
-    "polyfactory:nbt": {
+    "factorytools:nbt": {
       "color": 3949738
-    }
+    },
+    "item": "polyfactory:colored_lamp"
   },
   "show_notification": true
 }

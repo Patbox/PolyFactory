@@ -5,7 +5,7 @@ import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
-import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BaseModel;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;

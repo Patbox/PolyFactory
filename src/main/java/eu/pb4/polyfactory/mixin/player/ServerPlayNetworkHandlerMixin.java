@@ -2,7 +2,6 @@ package eu.pb4.polyfactory.mixin.player;
 
 import eu.pb4.polyfactory.item.wrench.WrenchHandler;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
-import eu.pb4.polyfactory.util.VirtualDestroyStage;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,9 +20,6 @@ public abstract class ServerPlayNetworkHandlerMixin implements ServerPlayNetExt 
     @Shadow public abstract ServerPlayerEntity getPlayer();
 
     @Unique
-    private final VirtualDestroyStage virtualDestroyStage = new VirtualDestroyStage();
-
-    @Unique
     private final WrenchHandler wrenchHandler = new WrenchHandler((ServerPlayNetworkHandler) (Object) this);
 
     @Inject(method = "tick", at = @At("HEAD"))
@@ -35,11 +31,6 @@ public abstract class ServerPlayNetworkHandlerMixin implements ServerPlayNetExt 
     public void polyFactory$resetFloating() {
         this.floatingTicks = 0;
         this.vehicleFloatingTicks = 0;
-    }
-
-    @Override
-    public VirtualDestroyStage polyFactory$getVirtualDestroyStage() {
-        return this.virtualDestroyStage;
     }
 
     @Override

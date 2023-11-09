@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.base;
 
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchApplyAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;

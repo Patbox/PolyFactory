@@ -1,14 +1,14 @@
 package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import eu.pb4.polyfactory.block.base.BarrierBasedWaterloggable;
+import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.base.FactoryBlock;
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.models.BaseItemProvider;
-import eu.pb4.polyfactory.models.LodItemDisplayElement;
+import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;

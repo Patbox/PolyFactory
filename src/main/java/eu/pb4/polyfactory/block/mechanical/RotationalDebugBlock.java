@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import eu.pb4.polyfactory.models.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BaseModel;
 import eu.pb4.polyfactory.nodes.generic.AllSideNode;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -14,7 +14,6 @@ import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
-import org.joml.Matrix4f;
 
 import java.util.Collection;
 import java.util.List;

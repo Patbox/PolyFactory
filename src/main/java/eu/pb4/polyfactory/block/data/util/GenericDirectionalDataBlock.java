@@ -1,16 +1,13 @@
 package eu.pb4.polyfactory.block.data.util;
 
-import eu.pb4.polyfactory.block.base.FactoryBlock;
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
-import eu.pb4.polyfactory.models.BaseModel;
-import eu.pb4.polyfactory.models.LodItemDisplayElement;
+import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.VirtualDestroyStage;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;

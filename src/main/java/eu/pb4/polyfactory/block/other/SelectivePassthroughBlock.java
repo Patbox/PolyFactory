@@ -1,10 +1,10 @@
 package eu.pb4.polyfactory.block.other;
 
-import eu.pb4.polyfactory.block.base.BarrierBasedWaterloggable;
-import eu.pb4.polyfactory.models.BaseModel;
-import eu.pb4.polyfactory.models.LodItemDisplayElement;
+import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
+import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.entity.FactoryEntityTags;
-import eu.pb4.polyfactory.util.VirtualDestroyStage;
+import eu.pb4.factorytools.api.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;

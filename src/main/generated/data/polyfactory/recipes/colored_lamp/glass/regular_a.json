@@ -25,10 +25,10 @@
     "sps"
   ],
   "result": {
-    "item": "polyfactory:colored_lamp",
-    "polyfactory:nbt": {
+    "factorytools:nbt": {
       "color": "dyn"
-    }
+    },
+    "item": "polyfactory:colored_lamp"
   },
   "show_notification": true
 }

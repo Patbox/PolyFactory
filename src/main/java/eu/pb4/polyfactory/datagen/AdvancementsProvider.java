@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.datagen;
 
-import eu.pb4.polyfactory.advancement.ExtraItemPredicate;
+import eu.pb4.factorytools.impl.ExtraItemPredicate;
 import eu.pb4.polyfactory.advancement.FactoryItemPredicates;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.advancement.TriggerCriterion;

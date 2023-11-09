@@ -1,8 +1,8 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
 import eu.pb4.polyfactory.block.FactoryBlockTags;
-import eu.pb4.polyfactory.block.base.BarrierBasedWaterloggable;
-import eu.pb4.polyfactory.block.base.FactoryBlock;
+import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;

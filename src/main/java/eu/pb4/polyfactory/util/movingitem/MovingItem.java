@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.util.movingitem;
 
-import eu.pb4.polyfactory.models.LodItemDisplayElement;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.elements.*;

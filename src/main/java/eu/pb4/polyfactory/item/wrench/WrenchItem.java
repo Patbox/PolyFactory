@@ -1,16 +1,11 @@
 package eu.pb4.polyfactory.item.wrench;
 
-import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.polyfactory.item.util.ModeledItem;
-import eu.pb4.polyfactory.item.util.SimpleModeledPolymerItem;
+import eu.pb4.factorytools.api.item.ModeledItem;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;

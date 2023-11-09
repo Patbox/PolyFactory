@@ -5,7 +5,7 @@
       "conditions": {
         "ingredients": [
           {
-            "polyfactory:static_predicate": "polyfactory:custom_firework_color"
+            "factorytools:static_predicate": "polyfactory:custom_firework_color"
           }
         ],
         "recipe_id": "minecraft:firework_rocket"

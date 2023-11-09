@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory;
 
+import eu.pb4.factorytools.impl.DebugData;
 import eu.pb4.polyfactory.advancement.FactoryAdvancementCriteria;
 import eu.pb4.polyfactory.advancement.FactoryItemPredicates;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
@@ -27,7 +28,6 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
@@ -76,12 +76,14 @@ public class ModInit implements ModInitializer {
 		ConveyorModel.registerAssetsEvents();
 		CableModel.registerAssetsEvents();
 		initModels();
-		VirtualDestroyStage.setup();
 		UiResourceCreator.setup();
 		GuiTextures.register();
 		PolydexCompat.register();
 		PolymerResourcePackUtils.addModAssets(ID);
 		PolymerResourcePackUtils.markAsRequired();
+
+		// Todo: Move it out
+		(new eu.pb4.factorytools.impl.ModInit()).onInitialize();
 
 		ServerPlayConnectionEvents.JOIN.register(FactorySecrets::onJoin);
 	}

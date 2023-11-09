@@ -19,12 +19,12 @@
     "wsc"
   ],
   "result": {
-    "item": "polyfactory:windmill_sail",
-    "polyfactory:nbt": {
+    "factorytools:nbt": {
       "display": {
         "color": 4673362
       }
-    }
+    },
+    "item": "polyfactory:windmill_sail"
   },
   "show_notification": true
 }

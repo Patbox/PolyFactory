@@ -1,12 +1,10 @@
 package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.util.ModeledItem;
+import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.polyfactory.ui.GuiTextures;
-import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.GuiHelpers;
-import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
@@ -15,7 +13,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.screen.ScreenHandlerType;
@@ -29,7 +26,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 public class FilterItem extends ModeledItem {
     public FilterItem(Item item, Settings settings) {

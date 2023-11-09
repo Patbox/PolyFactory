@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.base.BlockEntityExtraListener;
+import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;

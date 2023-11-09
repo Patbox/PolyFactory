@@ -2,6 +2,8 @@ package eu.pb4.polyfactory.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import eu.pb4.factorytools.api.recipe.LazyRecipeSerializer;
+import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -10,7 +12,6 @@ import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.*;
 import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 import java.util.Arrays;
