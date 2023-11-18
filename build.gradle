@@ -35,7 +35,6 @@ loom {
 	}
 }
 
-assemble.dependsOn(runDatagen)
 
 sourceSets {
 	main {
