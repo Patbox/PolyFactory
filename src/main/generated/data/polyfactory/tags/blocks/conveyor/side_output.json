@@ -1,9 +1,0 @@
-{
-  "replace": false,
-  "values": [
-    "polyfactory:press",
-    "polyfactory:mixer",
-    "minecraft:hopper",
-    "minecraft:composter"
-  ]
-}

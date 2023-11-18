@@ -13,6 +13,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Util;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class FastItemDisplayElement extends LodItemDisplayElement {
@@ -61,7 +62,7 @@ public class FastItemDisplayElement extends LodItemDisplayElement {
     public void tick() {
         super.tick();
         if (isEnabled) {
-            for (var player : this.getHolder().getWatchingPlayers()) {
+            for (var player : Objects.requireNonNull(this.getHolder()).getWatchingPlayers()) {
                 var d = this.getSquaredDistance(player);
 
                 if (d > this.fastItemDistance) {

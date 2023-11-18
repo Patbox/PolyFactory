@@ -1,6 +1,0 @@
-{
-  "parent": "polyfactory:block/conveyor_up",
-  "textures": {
-    "1": "polyfactory:block/gen/sticky_conveyor_top_5"
-  }
-}

@@ -1,6 +1,0 @@
-{
-  "type": "polyfactory:mixing/firework",
-  "minimum_speed": 4.0,
-  "optimal_speed": 17.0,
-  "time": 4.0
-}

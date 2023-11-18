@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class LodItemDisplayElement extends ItemDisplayElement {
     private static final Map<Item, ItemStack> MODEL_MAP = new Object2ObjectOpenCustomHashMap<>(Util.identityHashStrategy());
@@ -193,6 +194,6 @@ public class LodItemDisplayElement extends ItemDisplayElement {
     }
 
     protected double getSquaredDistance(ServerPlayNetworkHandler player) {
-        return ((BaseModel) this.getHolder()).getSquaredDistance(player);
+        return ((BaseModel) Objects.requireNonNull(this.getHolder())).getSquaredDistance(player);
     }
 }
