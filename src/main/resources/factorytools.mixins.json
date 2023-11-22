@@ -9,6 +9,7 @@
     "ItemPredicateMixin",
     "RedstoneWireBlockMixin",
     "WorldChunkMixin",
+    "music_disc.JukeboxBlockEntityMixin",
     "player.BlockItemMixin",
     "player.PlayerEntityAccessor",
     "player.ServerPlayerEntityMixin",

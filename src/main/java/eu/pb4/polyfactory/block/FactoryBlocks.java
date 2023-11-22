@@ -31,20 +31,27 @@ import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.other.*;
 import eu.pb4.polyfactory.block.data.output.NixieTubeBlock;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.enums.Instrument;
+import net.minecraft.loot.LootTable;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FactoryBlocks {
+    private static final List<Block> BLOCKS = new ArrayList<>();
+
     public static final ConveyorBlock CONVEYOR = register("conveyor", new ConveyorBlock(Block.Settings.create().hardness(3).nonOpaque()));
     public static final ConveyorBlock STICKY_CONVEYOR = register("sticky_conveyor", new ConveyorBlock(Block.Settings.create().hardness(3).nonOpaque()));
     public static final FunnelBlock FUNNEL = register("funnel", new FunnelBlock(Block.Settings.copy(Blocks.SPRUCE_TRAPDOOR).nonOpaque()));
@@ -101,11 +108,25 @@ public class FactoryBlocks {
 
 
     public static void register() {
-
+        if (ModInit.DEV_MODE) {
+            ServerLifecycleEvents.SERVER_STARTED.register((FactoryBlocks::validateLootTables));
+            ServerLifecycleEvents.END_DATA_PACK_RELOAD.register(((server, resourceManager, success) -> {
+                validateLootTables(server);
+            }));
+        }
     }
 
+    private static void validateLootTables(MinecraftServer server) {
+        for (var block : BLOCKS) {
+            var lt = server.getLootManager().getLootTable(block.getLootTableId());
+            if (lt == LootTable.EMPTY) {
+                ModInit.LOGGER.warn("Missing loot table? " + block.getLootTableId());
+            }
+        }
+    }
 
     public static <T extends Block> T register(String path, T item) {
+        BLOCKS.add(item);
         return Registry.register(Registries.BLOCK, new Identifier(ModInit.ID, path), item);
     }
 }

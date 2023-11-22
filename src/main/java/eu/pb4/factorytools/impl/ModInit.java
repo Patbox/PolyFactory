@@ -1,6 +1,7 @@
 package eu.pb4.factorytools.impl;
 
 import eu.pb4.factorytools.api.block.AttackableBlock;
+import eu.pb4.factorytools.api.item.CustomMusicDiscItem;
 import eu.pb4.factorytools.api.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
@@ -38,5 +39,6 @@ public class ModInit implements ModInitializer {
         VirtualDestroyStage.destroy(null);
         //PolymerResourcePackUtils.addModAssets(ID);
         PolymerResourcePackUtils.markAsRequired();
+        CustomMusicDiscItem.registerResources();
     }
 }

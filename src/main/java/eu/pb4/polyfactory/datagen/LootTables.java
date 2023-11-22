@@ -4,11 +4,11 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.block.ColoredDownsampledBlockItem;
 import eu.pb4.polyfactory.loottable.CopyColorLootFunction;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.condition.SurvivesExplosionLootCondition;
@@ -29,6 +29,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.PLANTER);
         this.addDrop(FactoryBlocks.FAN);
         this.addDrop(FactoryBlocks.GRINDER);
+        this.addDrop(FactoryBlocks.PLACER);
         this.addDrop(FactoryBlocks.PRESS, (block) -> this.dropsWithProperty(block, PressBlock.PART, PressBlock.Part.MAIN));
         this.addDrop(FactoryBlocks.MIXER, (block) -> this.dropsWithProperty(block, MixerBlock.PART, MixerBlock.Part.MAIN));
         this.addDrop(FactoryBlocks.HAND_CRANK);
@@ -56,7 +57,18 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.CRAFTER);
         this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE);
 
-        this.addDrop(FactoryBlocks.AXLE_WITH_GEAR, LootTable.builder()
+        this.addAxle(FactoryBlocks.AXLE_WITH_LARGE_GEAR, FactoryItems.LARGE_STEEL_GEAR);
+        this.addAxle(FactoryBlocks.AXLE_WITH_GEAR, FactoryItems.STEEL_GEAR);
+
+        this.addColored(FactoryBlocks.CABLE);
+        this.addColored(FactoryBlocks.LAMP);
+        this.addColored(FactoryBlocks.INVERTED_LAMP);
+        this.addColored(FactoryBlocks.CAGED_LAMP);
+        this.addColored(FactoryBlocks.INVERTED_CAGED_LAMP);
+    }
+
+    private void addAxle(Block block, Item item) {
+        this.addDrop(block, LootTable.builder()
                 .pool(LootPool.builder()
                         .conditionally(SurvivesExplosionLootCondition.builder())
                         .rolls(ConstantLootNumberProvider.create(1.0F))
@@ -64,14 +76,8 @@ class LootTables extends FabricBlockLootTableProvider {
                 .pool(LootPool.builder()
                         .conditionally(SurvivesExplosionLootCondition.builder())
                         .rolls(ConstantLootNumberProvider.create(1.0F))
-                        .with(ItemEntry.builder(FactoryItems.STEEL_GEAR)))
+                        .with(ItemEntry.builder(item)))
         );
-
-        this.addColored(FactoryBlocks.CABLE);
-        this.addColored(FactoryBlocks.LAMP);
-        this.addColored(FactoryBlocks.INVERTED_LAMP);
-        this.addColored(FactoryBlocks.CAGED_LAMP);
-        this.addColored(FactoryBlocks.INVERTED_CAGED_LAMP);
     }
 
     private void addColored(Block block) {
