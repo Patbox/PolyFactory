@@ -7,6 +7,7 @@
   "mixins": [
     "ItemPredicateBuilderMixin",
     "ItemPredicateMixin",
+    "music_disc.PlaySoundFromEntityS2CPacketAccessor",
     "RedstoneWireBlockMixin",
     "WorldChunkMixin",
     "music_disc.JukeboxBlockEntityMixin",
