@@ -93,62 +93,62 @@
   "recipe_type.polyfactory.grinding": "Molinillo",
 
   "stat.polyfactory.taters_clicked": "Patatas clickadas",
-  "subtitles.block.crafter.craft": "El fabricador fabrica",
+  "subtitles.block.crafter.craft": "El fabricador fabrica.",
 
   "advancements.polyfactory.root.title": "PolyFactory",
   "advancements.polyfactory.root.description": "¡Bienvenido a la fábrica!",
 
   "advancements.polyfactory.hand_crank.title": "Accionado a mano",
-  "advancements.polyfactory.hand_crank.description": "Da energía usando la mano",
-  "advancements.polyfactory.windmill.title": "Energía de los cielos",
+  "advancements.polyfactory.hand_crank.description": "Da energía usando la mano.",
+  "advancements.polyfactory.windmill.title": "Energía de los cielos.",
   "advancements.polyfactory.windmill.description": "Construye un molinillo muy por encima del suelo",
-  "advancements.polyfactory.steam_engine.title": "Revolución industrial",
-  "advancements.polyfactory.steam_engine.description": "Pon combustible en el motor a vapor",
+  "advancements.polyfactory.steam_engine.title": "Revolución industrial.",
+  "advancements.polyfactory.steam_engine.description": "Pon combustible en el motor a vapor.",
 
   "advancements.polyfactory.grinder.title": "Polvo fino",
-  "advancements.polyfactory.grinder.description": "Usa el molinillo para fabricar polvo de carbón o serrín",
+  "advancements.polyfactory.grinder.description": "Usa el molinillo para fabricar polvo de carbón o serrín.",
 
   "advancements.polyfactory.colored_lamp.title": "Light's Power of the Inspiration...",
-  "advancements.polyfactory.colored_lamp.description": "Create a Colored Lamp",
+  "advancements.polyfactory.colored_lamp.description": "Create a Colored Lamp.",
 
   "advancements.polyfactory.gravel.title": "Erosión artificial_dye",
-  "advancements.polyfactory.gravel.description": "Convierte piedra a roca, después a grava y finalmente a arena",
+  "advancements.polyfactory.gravel.description": "Convierte piedra a roca, después a grava y finalmente a arena.",
 
   "advancements.polyfactory.steel_ingot.title": "Acería",
   "advancements.polyfactory.steel_ingot.description": "Funde una mezcla de aleación para obtener un lingote de acero.",
 
-  "advancements.polyfactory.steel_gear.title": "Acelerar, desacelerar",
-  "advancements.polyfactory.steel_gear.description": "Conecta diferentes engranajes de acero para cambiar la velocidad de rotación",
+  "advancements.polyfactory.steel_gear.title": "Acelerar, desacelerar.",
+  "advancements.polyfactory.steel_gear.description": "Conecta diferentes engranajes de acero para cambiar la velocidad de rotación.",
 
   "advancements.polyfactory.press.title": "Mejor con láminas",
-  "advancements.polyfactory.press.description": "Usa la prensa mecánica para fabricar placas de acero o de madera",
+  "advancements.polyfactory.press.description": "Usa la prensa mecánica para fabricar placas de acero o de madera.",
 
   "advancements.polyfactory.crafter.title": "Fabricación automática",
-  "advancements.polyfactory.crafter.description": "Fabrica algo con el fabricador mecánico",
+  "advancements.polyfactory.crafter.description": "Fabrica algo con el fabricador mecánico.",
 
   "advancements.polyfactory.crafter2.title": "Fabricacepción",
-  "advancements.polyfactory.crafter2.description": "Fabrica un fabricador mecánico con el fabricador mecánico",
+  "advancements.polyfactory.crafter2.description": "Fabrica un fabricador mecánico con el fabricador mecánico.",
 
   "advancements.polyfactory.container.title": "Almacenamiento alternativo",
   "advancements.polyfactory.container.description": "Pon un objeto en un recipiente de madera.",
 
   "advancements.polyfactory.fan.title": "Moviéndose con el viento",
-  "advancements.polyfactory.fan.description": "Sé empujado por un ventilador",
+  "advancements.polyfactory.fan.description": "Sé empujado por un ventilador.",
 
   "advancements.polyfactory.fan_sky.title": "Como una pluma",
   "advancements.polyfactory.fan_sky.description": "Salta al un ventilador que se mueve rápidamente y mira hacia arriba.",
 
   "advancements.polyfactory.miner.title": "Minería remota",
-  "advancements.polyfactory.miner.description": "Usa el minador mecánico para romper un bloque remotamente",
+  "advancements.polyfactory.miner.description": "Usa el minador mecánico para romper un bloque remotamente.",
 
   "advancements.polyfactory.placer.title": "Colocación remota",
-  "advancements.polyfactory.placer.description": "Use Mechanical Placer to place a block remotely",
+  "advancements.polyfactory.placer.description": "Usa el colocador mecánico para colocar un bloque remotamente.",
 
   "advancements.polyfactory.planter.title": "Agricultura automática",
   "advancements.polyfactory.planter.description": "Usa el plantador automático para plantar un arbol o semilla.",
 
   "advancements.polyfactory.mixer.title": "Mezclar y combinar",
-  "advancements.polyfactory.mixer.description": "Usa el mezclador automático para fabricar algo",
+  "advancements.polyfactory.mixer.description": "Usa el mezclador automático para fabricar algo.",
 
   "advancements.polyfactory.cake.title": "La mentira",
   "advancements.polyfactory.cake.description": "¡Usa el fabricador para construir una tarta!",
@@ -157,19 +157,19 @@
   "advancements.polyfactory.artificial_dye.description": "¡Haz un tinte artificial con serrín, tintes y algo de calor!",
 
   "advancements.polyfactory.firework.title": "¡Show de color!",
-  "advancements.polyfactory.firework.description": "Haz un cohete de fuegos artificiales con tinte artificial",
+  "advancements.polyfactory.firework.description": "Haz un cohete de fuegos artificiales con tinte artificial.",
 
   "advancements.polyfactory.cable.title": "¡Conectado!",
-  "advancements.polyfactory.cable.description": "Conecta un proveedor de datos a un recibidor con cable",
+  "advancements.polyfactory.cable.description": "Conecta un proveedor de datos a un recibidor con cable.",
 
   "advancements.polyfactory.redstone.title": "Redstone dentro, Redstone fuera",
-  "advancements.polyfactory.redstone.description": "Conecta la entrada de redstone y la salida de redstone",
+  "advancements.polyfactory.redstone.description": "Conecta la entrada de redstone y la salida de redstone.",
 
   "advancements.polyfactory.item_reader.title": "Sólo léelo",
-  "advancements.polyfactory.item_reader.description": "Lee el nombre de cualquier objeto con el lector de objetos",
+  "advancements.polyfactory.item_reader.description": "Lee el nombre de cualquier objeto con el lector de objetos.",
 
   "advancements.polyfactory.nixie_tube.title": "Exhibiciones antiguas",
-  "advancements.polyfactory.nixie_tube.description": "Conecta al menos tres tubos Nixie",
+  "advancements.polyfactory.nixie_tube.description": "Conecta al menos tres tubos Nixie.",
 
   "advancements.polyfactory.wrench.title": "Configurado",
   "advancements.polyfactory.wrench.description": "Usa la llave inglesa para cambiar las propiedades de una máquina.",
