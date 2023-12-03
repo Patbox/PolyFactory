@@ -9,7 +9,7 @@ import eu.pb4.factorytools.api.virtualentity.BaseModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.FilterItem;
-import eu.pb4.polyfactory.util.CachedBlockPointer;
+import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
@@ -86,7 +86,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
     }
 
     @Override
-    public boolean pushItemTo(CachedBlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         var selfState = self.getBlockState();
         if (!selfState.get(ENABLED)) {
             return false;
@@ -119,7 +119,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
 
     @SuppressWarnings("UnstableApiUsage")
     @Override
-    public void getItemFrom(CachedBlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public void getItemFrom(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         if (relative != Direction.DOWN || !conveyor.isContainerEmpty()) {
             return;
         }

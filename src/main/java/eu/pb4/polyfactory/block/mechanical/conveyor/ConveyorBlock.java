@@ -12,7 +12,7 @@ import eu.pb4.factorytools.api.virtualentity.BaseModel;
 import eu.pb4.polyfactory.models.ConveyorModel;
 import eu.pb4.factorytools.api.virtualentity.FastItemDisplayElement;
 import eu.pb4.polyfactory.nodes.mechanical.ConveyorNode;
-import eu.pb4.polyfactory.util.CachedBlockPointer;
+import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItem;
@@ -431,7 +431,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public boolean pushItemTo(CachedBlockPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         var state = self.getBlockState();
         var vert = state.get(VERTICAL);
         if (!state.isOf(FactoryBlocks.STICKY_CONVEYOR) && vert.stack) {

@@ -50,8 +50,11 @@ public class HopperBlockMixin {
         }
     }
 
-    @Inject(method = "onStateReplaced", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ItemScatterer;spawn(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/inventory/Inventory;)V"), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void polyfactory$dropFilter(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved, CallbackInfo ci, BlockEntity blockEntity) {
-        ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5,  ((FilteredBlockEntity) blockEntity).polyfactory$getFilter());
+    @Inject(method = "onStateReplaced", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ItemScatterer;onStateReplaced(Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"), locals = LocalCapture.CAPTURE_FAILSOFT)
+    private void polyfactory$dropFilter(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved, CallbackInfo ci) {
+        if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof FilteredBlockEntity blockEntity) {
+            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5, blockEntity.polyfactory$getFilter());
+            blockEntity.polyfactory$setFilter(ItemStack.EMPTY);
+        }
     }
 }

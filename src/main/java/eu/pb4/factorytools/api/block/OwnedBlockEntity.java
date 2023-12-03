@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.block.other;
+package eu.pb4.factorytools.api.block;
 
 import com.mojang.authlib.GameProfile;
 

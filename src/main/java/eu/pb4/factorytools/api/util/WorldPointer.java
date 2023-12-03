@@ -1,16 +1,14 @@
-package eu.pb4.polyfactory.util;
+package eu.pb4.factorytools.api.util;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
-public final class CachedBlockPointer {
+public final class WorldPointer {
     private final ServerWorld world;
     private final BlockPos pos;
     private BlockState blockState;
@@ -19,7 +17,7 @@ public final class CachedBlockPointer {
     private boolean requireBlockEntityCheck = true;
     private boolean requireInventoryCheck = true;
 
-    public CachedBlockPointer(World world, BlockPos pos) {
+    public WorldPointer(World world, BlockPos pos) {
         this.world = (ServerWorld) world;
         this.pos = pos;
     }

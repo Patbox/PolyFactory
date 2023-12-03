@@ -24,7 +24,7 @@ public class ShapelessNbtCopyRecipe extends ShapelessRecipe implements PolymerRe
         return instance.group(
                         Codecs.createStrictOptionalFieldCodec(Codec.STRING, "group", "").forGetter(ShapelessNbtCopyRecipe::getGroup),
                         CraftingRecipeCategory.CODEC.fieldOf("category").orElse(CraftingRecipeCategory.MISC).forGetter(ShapelessNbtCopyRecipe::getCategory),
-                        RecipeCodecs.CRAFTING_RESULT.fieldOf("result").forGetter(t -> t.result),
+                        ItemStack.RECIPE_RESULT_CODEC.fieldOf("result").forGetter(t -> t.result),
                         Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("source").forGetter(t -> t.source),
                         Ingredient.DISALLOW_EMPTY_CODEC.listOf().fieldOf("ingredients").flatXmap((ingredients) -> {
                             Ingredient[] ingredients2 = (Ingredient[]) ingredients.stream().filter((ingredient) -> {
@@ -60,7 +60,7 @@ public class ShapelessNbtCopyRecipe extends ShapelessRecipe implements PolymerRe
     @Override
     public ItemStack craft(RecipeInputInventory recipeInputInventory, DynamicRegistryManager dynamicRegistryManager) {
         var stack = super.craft(recipeInputInventory, dynamicRegistryManager);
-        for (var tmp : recipeInputInventory.getInputStacks()) {
+        for (var tmp : recipeInputInventory.getHeldStacks()) {
             if (this.source.test(tmp)) {
                 stack.setNbt(tmp.hasNbt() ? tmp.getNbt().copy() : null);
                 break;

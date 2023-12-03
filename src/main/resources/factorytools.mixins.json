@@ -16,9 +16,8 @@
     "player.ServerPlayerEntityMixin",
     "player.ServerPlayerInteractionManagerMixin",
     "player.ServerPlayNetworkHandlerMixin",
-    "recipe.RecipeCodecsMixin",
+    "recipe.ItemStackMixin",
     "recipe.ShapedRecipeJsonBuilderMixin",
-    "recipe.ShapedRecipeJsonBuilderMixin$ShapedRecipeJsonProviderMixin"
   ],
   "client": [
   ],

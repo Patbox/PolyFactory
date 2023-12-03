@@ -1,0 +1,10 @@
+{
+  "music_disc.ricochet": {
+    "sounds": [
+      {
+        "name": "polyfactory:music/ricochet",
+        "stream": true
+      }
+    ]
+  }
+}

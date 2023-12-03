@@ -1,20 +1,18 @@
 package eu.pb4.factorytools.impl;
 
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.*;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.util.Util;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 public class DebugData {
     public static boolean enabled = false;
     private static int tick;
-    private static Object2ObjectMap<Class<?>, Object2IntMap<Class<?>>> CURRENT_CALL_MAP = new Object2ObjectOpenCustomHashMap<>(Util.identityHashStrategy());
-    private static Object2ObjectMap<Class<?>, Object2IntMap<Class<?>>> PREVIOUS_CALL_MAP = new Object2ObjectOpenCustomHashMap<>(Util.identityHashStrategy());
+    private static Map<Class<?>, Reference2IntMap<Class<?>>> CURRENT_CALL_MAP = new Reference2ObjectOpenHashMap<>();
+    private static Map<Class<?>, Reference2IntMap<Class<?>>> PREVIOUS_CALL_MAP = new Reference2ObjectOpenHashMap<>();
 
     public static void register() {
         enabled = ModInit.DEV_ENV;
@@ -33,16 +31,16 @@ public class DebugData {
         if (enabled) {
             var classBound = CURRENT_CALL_MAP.get(source.getClass());
             if (classBound == null) {
-                classBound = new Object2IntOpenCustomHashMap<>(Util.identityHashStrategy());
+                classBound = new Reference2IntOpenHashMap<>();
                 CURRENT_CALL_MAP.put(source.getClass(), classBound);
             }
             classBound.put(packet.getClass(), classBound.getInt(packet.getClass()) + 1);
         }
     }
 
-    public static void printPacketCalls(BiConsumer<Class<?>, Collection<Object2IntMap.Entry<Class<?>>>> consumer) {
+    public static void printPacketCalls(BiConsumer<Class<?>, Collection<Reference2IntMap.Entry<Class<?>>>> consumer) {
         if (enabled) {
-            PREVIOUS_CALL_MAP.forEach((a, b) -> consumer.accept(a, b.object2IntEntrySet()));
+            PREVIOUS_CALL_MAP.forEach((a, b) -> consumer.accept(a, b.reference2IntEntrySet()));
         }
     }
 }

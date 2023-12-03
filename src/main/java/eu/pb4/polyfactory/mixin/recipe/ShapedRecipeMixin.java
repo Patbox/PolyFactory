@@ -16,7 +16,7 @@ public class ShapedRecipeMixin {
     private ItemStack modifyColors(ItemStack stack, RecipeInputInventory recipeInputInventory) {
         if (stack.hasNbt() && stack.getNbt().contains("color", NbtElement.STRING_TYPE)
                 && stack.getNbt().getString("color").equals("dyn")) {
-            for (var x : recipeInputInventory.getInputStacks()) {
+            for (var x : recipeInputInventory.getHeldStacks()) {
                 if (x.isIn(ConventionalItemTags.DYES)) {
                     stack.getNbt().putInt("color", DyeColorExtra.getColor(x));
                     break;

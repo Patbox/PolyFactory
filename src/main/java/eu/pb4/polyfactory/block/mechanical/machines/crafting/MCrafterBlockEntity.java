@@ -299,7 +299,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalS
     }
 
     @Override
-    public List<ItemStack> getInputStacks() {
+    public List<ItemStack> getHeldStacks() {
         return List.copyOf(this.stacks.subList(0, 9));
     }
 

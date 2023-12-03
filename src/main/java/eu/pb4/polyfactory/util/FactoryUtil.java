@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.util;
 
 import com.mojang.authlib.GameProfile;
+import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
@@ -100,7 +101,7 @@ public class FactoryUtil {
             return MovableResult.FAILURE;
         }
 
-        var pointer = new CachedBlockPointer(world, targetPos);
+        var pointer = new WorldPointer(world, targetPos);
         if (requiredTag != null && !pointer.getBlockState().isIn(requiredTag)) {
             return MovableResult.FAILURE;
         }

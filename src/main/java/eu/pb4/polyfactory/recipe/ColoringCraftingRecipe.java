@@ -40,7 +40,7 @@ public record ColoringCraftingRecipe(String group, Item input, int maxCount) imp
         boolean hasDye = false;
         int count = 0;
 
-        for (var stack : inventory.getInputStacks()) {
+        for (var stack : inventory.getHeldStacks()) {
             if (stack.isIn(ConventionalItemTags.DYES)) {
                 if (hasDye) {
                     return false;
@@ -61,7 +61,7 @@ public record ColoringCraftingRecipe(String group, Item input, int maxCount) imp
         int color = -1;
         int count = 0;
 
-        for (var stack : inventory.getInputStacks()) {
+        for (var stack : inventory.getHeldStacks()) {
             if (stack.isIn(ConventionalItemTags.DYES)) {
                 color = DyeColorExtra.getColor(stack);
             } else if (stack.isOf(this.input)) {

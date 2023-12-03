@@ -7,6 +7,7 @@ import eu.pb4.polymer.virtualentity.api.tracker.DataTrackerLike;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import eu.pb4.polymer.virtualentity.api.tracker.SimpleDataTracker;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -24,7 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class LodItemDisplayElement extends ItemDisplayElement {
-    private static final Map<Item, ItemStack> MODEL_MAP = new Object2ObjectOpenCustomHashMap<>(Util.identityHashStrategy());
+    private static final Map<Item, ItemStack> MODEL_MAP = new Reference2ObjectOpenHashMap<>();
     public static boolean isEnabled = true;
     public static boolean isDisabled = false;
     public final DataTrackerLike nearTracker = new SimpleDataTracker(this.getEntityType());

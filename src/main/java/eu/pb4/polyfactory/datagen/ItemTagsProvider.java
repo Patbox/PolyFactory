@@ -29,6 +29,11 @@ class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
                 .addOptionalTag(ItemTags.SAPLINGS)
         ;
 
+        this.getOrCreateTagBuilder(ItemTags.MUSIC_DISCS
+                )
+                .add(FactoryItems.MUSIC_DISC_RICOCHET)
+        ;
+
         this.getOrCreateTagBuilder(ConventionalItemTags.DYES)
                 .add(FactoryItems.ARTIFICIAL_DYE)
         ;

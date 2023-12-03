@@ -98,7 +98,7 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
             } else {
                 var list = new ArrayList<String>(lines.size());
                 for (var x : lines) {
-                    var text = Text.Serializer.fromLenientJson(x.asString());
+                    var text = Text.Serialization.fromLenientJson(x.asString());
                     if (text != null) {
                         list.add(text.getString());
                     }

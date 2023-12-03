@@ -384,14 +384,14 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(Items.DRAGON_EGG))
                 .offerTo(exporter);
 
-        of(exporter, ColoringCraftingRecipe.CODEC,
+        of(exporter,
                 ColoringCraftingRecipe.of("cable_color", FactoryItems.CABLE),
                 ColoringCraftingRecipe.of("lamp_color", FactoryItems.LAMP),
                 ColoringCraftingRecipe.of("inverted_color", FactoryItems.INVERTED_LAMP),
                 ColoringCraftingRecipe.of("caged_lamp_color", FactoryItems.CAGED_LAMP),
                 ColoringCraftingRecipe.of("inverted_caged_color", FactoryItems.INVERTED_CAGED_LAMP)
         );
-        of(exporter, ColoringMixingRecipe.CODEC,
+        of(exporter,
                 ColoringMixingRecipe.of("cable_color", FactoryItems.CABLE, 2, 6, 10),
                 ColoringMixingRecipe.of("lamp_color", FactoryItems.LAMP, 2, 6, 10),
                 ColoringMixingRecipe.of("inverted_lamp_color", FactoryItems.INVERTED_LAMP, 2, 6, 10),
@@ -399,7 +399,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 ColoringMixingRecipe.of("inverted_caged_lamp_color", FactoryItems.INVERTED_CAGED_LAMP, 2, 6, 10)
         );
 
-        of(exporter, GrindingRecipe.CODEC,
+        of(exporter,
                 GrindingRecipe.of("coal_dust", Ingredient.ofItems(Items.COAL), 1, 5, 8, FactoryItems.COAL_DUST),
                 GrindingRecipe.of("coal_dust_charcoal", Ingredient.ofItems(Items.CHARCOAL), 1.5, 5, 14, OutputStack.of(FactoryItems.COAL_DUST, 0.8f)),
                 GrindingRecipe.of("planks_saw_dust", Ingredient.fromTag(ItemTags.PLANKS), 1, 5, 6,
@@ -449,7 +449,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 GrindingRecipe.of("cactus_to_dye", "dye", Ingredient.ofItems(Items.CACTUS), 1, 6, new ItemStack(Items.GREEN_DYE, 3))
         );
 
-        of(exporter, GenericPressRecipe.CODEC,
+        of(exporter,
                 GenericPressRecipe.of("purpur_block", Ingredient.ofItems(Items.POPPED_CHORUS_FRUIT), 4, 5f, new ItemStack(Items.PURPUR_BLOCK, 1)),
                 GenericPressRecipe.of("sponge", Ingredient.ofItems(Items.WET_SPONGE), 1, 5f, new ItemStack(Items.SPONGE, 1)),
                 GenericPressRecipe.of("sand", Ingredient.ofItems(Items.SAND), 4, 5f, new ItemStack(Items.SANDSTONE, 1)),
@@ -480,7 +480,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         5, OutputStack.of(Items.GOLDEN_APPLE))
         );
 
-        of(exporter, ShapelessNbtCopyRecipe.CODEC, new RecipeEntry<>(id("crafting/inverted_colored_lamp"),
+        of(exporter, new RecipeEntry<>(id("crafting/inverted_colored_lamp"),
                 new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
                         FactoryItems.INVERTED_LAMP.getDefaultStack(),
                         Ingredient.ofItems(FactoryItems.LAMP),
@@ -580,36 +580,36 @@ class RecipesProvider extends FabricRecipeProvider {
 
                 var powder = Registries.ITEM.get(new Identifier(namePowder));
                 var solid = Registries.ITEM.get(new Identifier(nameSolid));
-                of(exporter, GrindingRecipe.CODEC, GrindingRecipe.of(nameSolid + "_to_powder", "concrete_to_powder",
+                of(exporter, GrindingRecipe.of(nameSolid + "_to_powder", "concrete_to_powder",
                         Ingredient.ofItems(solid), 3, 5, powder
                 ));
 
-                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(namePowder, "concrete_powder",
+                of(exporter,  GenericMixingRecipe.ofCounted(namePowder, "concrete_powder",
                         List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS), CountedIngredient.ofItems(4, Items.GRAVEL), CountedIngredient.ofItems(1, dye)),
                         4, 1, 13, new ItemStack(powder, 8)));
 
-                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid + "_direct", "concrete_direct",
+                of(exporter,  GenericMixingRecipe.ofCounted(nameSolid + "_direct", "concrete_direct",
                         List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS),
                                 CountedIngredient.ofItems(4, Items.GRAVEL),
                                 CountedIngredient.ofItems(0, Items.WATER_BUCKET),
                                 CountedIngredient.ofItems(1, dye)),
                         5, 1, 15, new ItemStack(solid, 8)));
 
-                of(exporter, GenericMixingRecipe.CODEC, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder", "concrete_water",
+                of(exporter,  GenericMixingRecipe.ofCounted(nameSolid + "_from_powder", "concrete_water",
                         List.of(CountedIngredient.ofItems(1, powder), CountedIngredient.ofItems(0, Items.WATER_BUCKET)),
                         1, 1, 4, new ItemStack(solid, 1)));
             }
         }
 
-        of(exporter, FireworkStarMixingRecipe.CODEC,
+        of(exporter, 
                 new RecipeEntry<>(id("mixing/firework_star"), new FireworkStarMixingRecipe(4, 4, 17))
         );
 
-        of(exporter, ArtificialDyeMixingRecipe.CODEC,
+        of(exporter, 
                 new RecipeEntry<>(id("mixing/artificial_dye"), new ArtificialDyeMixingRecipe(3, 4, 15))
         );
 
-        of(exporter, GenericMixingRecipe.CODEC,
+        of(exporter, 
                 GenericMixingRecipe.ofCounted("treated_dried_kelp", List.of(CountedIngredient.ofItems(16, Items.DRIED_KELP), CountedIngredient.ofItems(1, Items.BLACK_DYE)), 2, 1, 6f, 0.2f, new ItemStack(FactoryItems.TREATED_DRIED_KELP, 16)),
                 GenericMixingRecipe.ofCounted("fermented_spider_eye", List.of(CountedIngredient.ofItems(1, Items.SPIDER_EYE),
                                 CountedIngredient.ofItems(1, Items.SUGAR),
@@ -667,10 +667,9 @@ class RecipesProvider extends FabricRecipeProvider {
 
 
     }
-
-    public <T extends Recipe<?>> void of(RecipeExporter exporter, Codec<T> codec, RecipeEntry<T>... recipes) {
+    public void of(RecipeExporter exporter, RecipeEntry<?>... recipes) {
         for (var recipe : recipes) {
-            exporter.accept(new CodecRecipeJsonProvider<>(codec, recipe));
+            exporter.accept(recipe.id(), recipe.value(), null);
         }
     }
 }

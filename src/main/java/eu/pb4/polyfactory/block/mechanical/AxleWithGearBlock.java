@@ -23,7 +23,9 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.joml.Matrix4fStack;
 
 import java.util.Collection;
@@ -45,7 +47,7 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
     public void onPolymerBlockSend(BlockState blockState, BlockPos.Mutable pos, ServerPlayerEntity player) {}
 
     @Override
-    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         return FactoryItems.STEEL_GEAR.getDefaultStack();
     }
 

@@ -41,6 +41,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -67,7 +68,7 @@ public class CableBlock extends NetworkBlock implements FactoryBlock, BlockEntit
     }
 
     @Override
-    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         var stack = super.getPickStack(world, pos, state);
         if (world.getBlockEntity(pos) instanceof CableBlockEntity be && !be.isDefaultColor()) {
             ColoredItem.setColor(stack, be.getColor());

@@ -4,7 +4,7 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.polyfactory.util.CachedBlockPointer;
+import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.*;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -48,7 +48,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
 
         if (self.isContainerEmpty() && speed != 0) {
             if (state.get(ConveyorBlock.HAS_OUTPUT_TOP)) {
-                var pointer = new CachedBlockPointer(world, pos.up());
+                var pointer = new WorldPointer(world, pos.up());
 
                 if (pointer.getBlockState().getBlock() instanceof MovingItemProvider provider) {
                     provider.getItemFrom(pointer, dir, Direction.DOWN, pos, self);
@@ -56,7 +56,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
             }
 
             if (self.isContainerEmpty()) {
-                var pointer = new CachedBlockPointer(world, pos.offset(dir.getOpposite()));
+                var pointer = new WorldPointer(world, pos.offset(dir.getOpposite()));
 
                 if (pointer.getBlockState().getBlock() instanceof MovingItemProvider provider) {
                     provider.getItemFrom(pointer, dir, dir, pos, self);

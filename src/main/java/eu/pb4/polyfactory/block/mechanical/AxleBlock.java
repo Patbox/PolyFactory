@@ -12,6 +12,7 @@ import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.factorytools.api.util.VirtualDestroyStage;
+import eu.pb4.polymer.common.impl.CommonImplUtils;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.core.impl.networking.PolymerServerProtocol;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
@@ -143,7 +144,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
         public static final ItemStack ITEM_MODEL = new ItemStack(FactoryItems.AXLE.getPolymerItem());
         public static final ItemStack ITEM_MODEL_SHORT = new ItemStack(BaseItemProvider.requestItem());
         private final ItemDisplayElement mainElement;
-        private final Set<ServerPlayNetworkHandler> viewingClose = new ObjectOpenCustomHashSet<>(Util.identityHashStrategy());
+        private final Set<ServerPlayNetworkHandler> viewingClose = new ObjectOpenCustomHashSet<>(CommonImplUtils.IDENTITY_HASH);
         private final List<ServerPlayNetworkHandler> sentRod = new ArrayList<>();
         private final List<ServerPlayNetworkHandler> sentBarrier = new ArrayList<>();
         private Model(ServerWorld world, BlockState state) {

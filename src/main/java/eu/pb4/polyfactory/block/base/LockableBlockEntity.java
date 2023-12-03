@@ -40,7 +40,7 @@ public abstract class LockableBlockEntity extends BlockEntity {
         super.readNbt(nbt);
         this.lock = ContainerLock.fromNbt(nbt);
         if (nbt.contains("CustomName", 8)) {
-            this.customName = Text.Serializer.fromJson(nbt.getString("CustomName"));
+            this.customName = Text.Serialization.fromJson(nbt.getString("CustomName"));
         }
         this.readNbtMixin(nbt);
     }
@@ -51,7 +51,7 @@ public abstract class LockableBlockEntity extends BlockEntity {
         super.writeNbt(nbt);
         this.lock.writeNbt(nbt);
         if (this.customName != null) {
-            nbt.putString("CustomName", Text.Serializer.toJson(this.customName));
+            nbt.putString("CustomName", Text.Serialization.toJsonString(this.customName));
         }
         this.writeNbtMixin(nbt);
     }

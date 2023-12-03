@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.item;
 import eu.pb4.factorytools.api.item.AutoModeledPolymerItem;
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.factorytools.api.item.ModeledItem;
+import eu.pb4.factorytools.api.item.PolymerMusicDiscItem;
 import eu.pb4.polyfactory.block.base.MultiBlock;
 import eu.pb4.polyfactory.item.block.ColoredDownsampledBlockItem;
 import eu.pb4.polyfactory.item.block.GearItem;
@@ -22,9 +23,12 @@ import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
+
+import static eu.pb4.polyfactory.ModInit.id;
 
 public class FactoryItems {
     public static final Item MOD_ICON = register("mod_icon", new ModeledItem(new Item.Settings()));
@@ -87,6 +91,10 @@ public class FactoryItems {
     public static final Item ARTIFICIAL_DYE = register("artificial_dye", new ArtificialDyeItem(new Item.Settings()));
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
     public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING);
+
+    public static final Item MUSIC_DISC_RICOCHET = register("music_disc_ricochet", new PolymerMusicDiscItem(4,
+            SoundEvent.of(id("music_disc.ricochet")), new Item.Settings().maxCount(1), 94)
+    );
 
 
     public static void register() {
@@ -228,6 +236,7 @@ public class FactoryItems {
                         if (ModInit.DEV_ENV) {
                             entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                             entries.add(GREEN_SCREEN, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                            entries.add(MUSIC_DISC_RICOCHET, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         }
                     })).build()
             );

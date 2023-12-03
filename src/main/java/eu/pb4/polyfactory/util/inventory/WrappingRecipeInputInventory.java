@@ -25,7 +25,7 @@ public record WrappingRecipeInputInventory(Inventory source, int start, int size
     }
 
     @Override
-    public List<ItemStack> getInputStacks() {
+    public List<ItemStack> getHeldStacks() {
         var stacks = new ArrayList<ItemStack>(size);
         for (int i = 0; i < size; i++) {
             stacks.add(this.getStack(i));

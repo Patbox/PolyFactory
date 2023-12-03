@@ -33,7 +33,7 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity {
     @Unique
     private final ItemDisplayElement audioSource = new ItemDisplayElement();
 
-    @Shadow public abstract ItemStack getStack(int slot);
+    @Shadow public abstract ItemStack getStack();
     @Inject(method = "<init>", at = @At("TAIL"))
     private void handleInit(BlockPos pos, BlockState state, CallbackInfo ci) {
         var holder = new ElementHolder();
@@ -44,7 +44,7 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity {
     private void setRecord(CallbackInfo ci) {
         removeRecord(null);
 
-        if (this.getStack(0).getItem() instanceof PolymerMusicDiscItem c && this.getWorld() instanceof ServerWorld serverWorld) {
+        if (this.getStack().getItem() instanceof PolymerMusicDiscItem c && this.getWorld() instanceof ServerWorld serverWorld) {
             var pos = this.getPos();
             ChunkAttachment.of(this.audioSource.getHolder(), serverWorld, pos);
 

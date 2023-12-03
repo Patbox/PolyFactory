@@ -1,6 +1,7 @@
 package eu.pb4.factorytools.api.virtualentity;
 
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polymer.common.impl.CommonImplUtils;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.entity.data.DataTracker;
@@ -17,7 +18,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public class FastItemDisplayElement extends LodItemDisplayElement {
-    private final ObjectOpenCustomHashSet<ServerPlayNetworkHandler> fastPlayers = new ObjectOpenCustomHashSet<>(Util.identityHashStrategy());
+    private final ObjectOpenCustomHashSet<ServerPlayNetworkHandler> fastPlayers = new ObjectOpenCustomHashSet<>(CommonImplUtils.IDENTITY_HASH);
     private ItemStack fastItemStack = ItemStack.EMPTY;
     private int fastItemDistance = Integer.MAX_VALUE;
     private Packet<ClientPlayPacketListener> fastPacket;

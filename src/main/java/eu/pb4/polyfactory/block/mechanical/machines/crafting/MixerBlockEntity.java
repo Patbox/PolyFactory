@@ -192,7 +192,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             self.process = 0;
 
             if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity player) {
-                Criteria.RECIPE_CRAFTED.trigger(player, self.currentRecipe.id(), self.asRecipeInputProvider().getInputStacks());
+                Criteria.RECIPE_CRAFTED.trigger(player, self.currentRecipe.id(), self.asRecipeInputProvider().getHeldStacks());
                 TriggerCriterion.trigger(player, FactoryTriggers.MIXER_CRAFTS);
             }
 

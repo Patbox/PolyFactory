@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import eu.pb4.sidebars.api.Sidebar;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -23,10 +24,11 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 
 public class WrenchHandler {
     private final Sidebar sidebar = new Sidebar(Sidebar.Priority.HIGH);
-    private final Object2ObjectLinkedOpenCustomHashMap<Block, String> currentAction = new Object2ObjectLinkedOpenCustomHashMap<>(Util.identityHashStrategy());
+    private final Map<Block, String> currentAction = new Reference2ObjectOpenHashMap<>();
     private BlockState state = Blocks.AIR.getDefaultState();
     @Nullable
     private BlockPos pos;
