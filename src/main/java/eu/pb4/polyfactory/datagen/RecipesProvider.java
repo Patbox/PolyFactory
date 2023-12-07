@@ -1,8 +1,7 @@
 package eu.pb4.polyfactory.datagen;
 
-import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
-import eu.pb4.factorytools.api.recipe.NbtRecipe;
+import eu.pb4.factorytools.api.recipe.NbtRecipeBuilder;
 import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -23,7 +22,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.recipe.book.RecipeCategory;
@@ -511,7 +509,7 @@ class RecipesProvider extends FabricRecipeProvider {
 
             var display = new NbtCompound();
             display.putString("color", "dyn");
-            ((NbtRecipe) x).factorytools$setNbt(display);
+            ((NbtRecipeBuilder) x).factorytools$setNbt(display);
 
             x.offerTo(exporter, id("colored_lamp/glass/regular_a"));
         }
@@ -528,7 +526,7 @@ class RecipesProvider extends FabricRecipeProvider {
 
             var display = new NbtCompound();
             display.putString("color", "dyn");
-            ((NbtRecipe) x).factorytools$setNbt(display);
+            ((NbtRecipeBuilder) x).factorytools$setNbt(display);
 
             x.offerTo(exporter, id("colored_lamp/glass/regular_b"));
         }
@@ -547,7 +545,7 @@ class RecipesProvider extends FabricRecipeProvider {
 
                 var display = new NbtCompound();
                 display.putInt("color", DyeColorExtra.getColor(dye.getColor()));
-                ((NbtRecipe) x).factorytools$setNbt(display);
+                ((NbtRecipeBuilder) x).factorytools$setNbt(display);
 
                 x.offerTo(exporter, id("colored_lamp/glass/" + dye.getColor()));
             }
@@ -568,7 +566,7 @@ class RecipesProvider extends FabricRecipeProvider {
                     display.putInt("color", DyeColorExtra.getColor(dye.getColor()));
                     nbt.put("display", display);
 
-                    ((NbtRecipe) x).factorytools$setNbt(nbt);
+                    ((NbtRecipeBuilder) x).factorytools$setNbt(nbt);
                 }
 
                 x.offerTo(exporter, id("windmill_sail/wool/" + dye.getColor()));
