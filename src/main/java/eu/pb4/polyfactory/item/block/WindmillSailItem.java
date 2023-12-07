@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.item.block;
 
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
-import eu.pb4.polyfactory.advancement.TriggerCriterion;
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;

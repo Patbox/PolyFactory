@@ -13,7 +13,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Vec3d;
 
-public class FactoryBlockItem extends BlockItem implements SimpleModeledPolymerItem {
+public class FactoryBlockItem extends BlockItem implements AutoModeledPolymerItem {
 
     private final Item polymerItem;
 

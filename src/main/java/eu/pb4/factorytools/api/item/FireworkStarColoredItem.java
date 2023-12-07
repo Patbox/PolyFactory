@@ -9,10 +9,10 @@ import net.minecraft.nbt.NbtIntArray;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
-public interface FireworkStarColoredItem extends SimpleModeledPolymerItem {
+public interface FireworkStarColoredItem extends AutoModeledPolymerItem {
     @Override
     default ItemStack getPolymerItemStack(ItemStack itemStack, TooltipContext context, @Nullable ServerPlayerEntity player) {
-        var stack = SimpleModeledPolymerItem.super.getPolymerItemStack(itemStack, context, player);
+        var stack = AutoModeledPolymerItem.super.getPolymerItemStack(itemStack, context, player);
         var ex = new NbtCompound();
         var c = new NbtIntArray(new int[] { getItemColor(itemStack) });
         ex.put("Colors", c);

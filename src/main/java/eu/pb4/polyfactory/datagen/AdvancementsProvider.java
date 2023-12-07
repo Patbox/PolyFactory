@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.datagen;
 import eu.pb4.factorytools.impl.ExtraItemPredicate;
 import eu.pb4.polyfactory.advancement.FactoryItemPredicates;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
-import eu.pb4.polyfactory.advancement.TriggerCriterion;
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ColoredItem;

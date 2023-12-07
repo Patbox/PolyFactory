@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory;
 
 import eu.pb4.factorytools.impl.DebugData;
-import eu.pb4.polyfactory.advancement.FactoryAdvancementCriteria;
+import eu.pb4.factorytools.api.advancement.FactoryAdvancementCriteria;
 import eu.pb4.polyfactory.advancement.FactoryItemPredicates;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
@@ -69,7 +69,6 @@ public class ModInit implements ModInitializer {
 		FactoryCommands.register();
 		FactoryUtil.register();
 		FactoryItemPredicates.register();
-		FactoryAdvancementCriteria.register();
 		DebugData.register();
 		PotatoWisdom.load();
 

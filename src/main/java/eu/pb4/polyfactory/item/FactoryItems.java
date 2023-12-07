@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.item;
 
-import eu.pb4.factorytools.api.item.AutoModeledPolymerItem;
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.factorytools.api.item.PolymerMusicDiscItem;
@@ -248,9 +247,6 @@ public class FactoryItems {
 
     public static <T extends Item> T register(String path, T item) {
         Registry.register(Registries.ITEM, new Identifier(ModInit.ID, path), item);
-        if (item instanceof AutoModeledPolymerItem modeledPolymerItem) {
-            modeledPolymerItem.defineModels(new Identifier(ModInit.ID, path));
-        }
         return item;
     }
 
@@ -264,7 +260,7 @@ public class FactoryItems {
         }
 
         Registry.register(Registries.ITEM, id, item);
-        item.defineModels(id);
+        item.onRegistered(id);
         return item;
     }
 }

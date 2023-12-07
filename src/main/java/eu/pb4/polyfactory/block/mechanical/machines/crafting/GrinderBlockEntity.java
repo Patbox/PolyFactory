@@ -1,7 +1,5 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
-import eu.pb4.polyfactory.advancement.FactoryTriggers;
-import eu.pb4.polyfactory.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.base.LockableBlockEntity;
@@ -13,7 +11,6 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.advancement.criterion.RecipeCraftedCriterion;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventories;

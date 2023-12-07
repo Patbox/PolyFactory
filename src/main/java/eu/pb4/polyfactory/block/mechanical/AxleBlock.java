@@ -7,7 +7,7 @@ import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.factorytools.api.item.SimpleModeledPolymerItem;
+import eu.pb4.factorytools.api.item.AutoModeledPolymerItem;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -35,7 +35,6 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -221,7 +220,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
         }
 
         static {
-            ITEM_MODEL.getOrCreateNbt().putInt("CustomModelData", SimpleModeledPolymerItem.MODELS.get(FactoryItems.AXLE).value());
+            ITEM_MODEL.getOrCreateNbt().putInt("CustomModelData", AutoModeledPolymerItem.MODELS.get(FactoryItems.AXLE).value());
             ITEM_MODEL_SHORT.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(ITEM_MODEL_SHORT.getItem(), FactoryUtil.id("block/axle_short")).value());
         }
     }

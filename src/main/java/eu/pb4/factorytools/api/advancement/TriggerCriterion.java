@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.advancement;
+package eu.pb4.factorytools.api.advancement;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

@@ -31,6 +31,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -245,33 +246,33 @@ public class UiResourceCreator {
             var spaces = new JsonObject();
             spaces.addProperty("type", "space");
             var advances = new JsonObject();
-            SPACES.forEach((c, i) -> advances.addProperty(Character.toString(c), i));
+            SPACES.char2IntEntrySet().stream().sorted(Comparator.comparing(Char2IntMap.Entry::getCharKey)).forEach((c) -> advances.addProperty(Character.toString(c.getCharKey()), c.getIntValue()));
             spaces.add("advances", advances);
             providers.add(spaces);
         }
 
 
-        TEXTURES.forEach((character, id) -> {
+        TEXTURES.char2ObjectEntrySet().stream().sorted(Comparator.comparing(Char2ObjectMap.Entry::getCharKey)).forEach((entry) -> {
             var bitmap = new JsonObject();
             bitmap.addProperty("type", "bitmap");
-            bitmap.addProperty("file", id.toString() + ".png");
+            bitmap.addProperty("file", entry.getValue().toString() + ".png");
             bitmap.addProperty("ascent", 13);
             bitmap.addProperty("height", 256);
             var chars = new JsonArray();
-            chars.add(Character.toString(character));
+            chars.add(Character.toString(entry.getCharKey()));
             bitmap.add("chars", chars);
             providers.add(bitmap);
         });
 
-        TEXTURES_POLYDEX.forEach((characters, id) -> {
+        TEXTURES_POLYDEX.entrySet().stream().sorted(Comparator.comparing(x -> x.getKey().getLeft())).forEach((entry) -> {
             var bitmap = new JsonObject();
             bitmap.addProperty("type", "bitmap");
-            bitmap.addProperty("file", id.toString() + ".png");
+            bitmap.addProperty("file", entry.getValue().toString() + ".png");
             bitmap.addProperty("ascent", -4);
             bitmap.addProperty("height", 128);
             var chars = new JsonArray();
-            chars.add(Character.toString(characters.getLeft()));
-            chars.add(Character.toString(characters.getRight()));
+            chars.add(Character.toString(entry.getKey().getLeft()));
+            chars.add(Character.toString(entry.getKey().getRight()));
             bitmap.add("chars", chars);
             providers.add(bitmap);
         });
@@ -307,26 +308,4 @@ public class UiResourceCreator {
     }
 
     public record SlicedTexture(String path, int start, int stop, boolean reverse) {};
-
-    private record ImageCanvas(BufferedImage image) implements DrawableCanvas {
-        @Override
-        public byte getRaw(int x, int y) {
-            return CanvasUtils.findClosestRawColorARGB(image.getRGB(x, y));
-        }
-
-        @Override
-        public void setRaw(int x, int y, byte color) {
-            image.setRGB(x, y, CanvasColor.getFromRaw(color).getRgbColor());
-        }
-
-        @Override
-        public int getHeight() {
-            return this.image.getHeight();
-        }
-
-        @Override
-        public int getWidth() {
-            return this.image.getWidth();
-        }
-    }
 }

@@ -651,7 +651,7 @@ class RecipesProvider extends FabricRecipeProvider {
 
         );
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_GEAR)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_GEAR, 2)
                 .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .pattern(" i ")
                 .pattern("i i")

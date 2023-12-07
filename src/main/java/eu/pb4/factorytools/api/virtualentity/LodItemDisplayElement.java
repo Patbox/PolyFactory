@@ -1,12 +1,11 @@
 package eu.pb4.factorytools.api.virtualentity;
 
-import eu.pb4.factorytools.api.item.SimpleModeledPolymerItem;
+import eu.pb4.factorytools.api.item.AutoModeledPolymerItem;
 import eu.pb4.factorytools.impl.DebugData;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DataTrackerLike;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import eu.pb4.polymer.virtualentity.api.tracker.SimpleDataTracker;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.data.DataTracker;
@@ -17,7 +16,6 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -51,7 +49,7 @@ public class LodItemDisplayElement extends ItemDisplayElement {
         var stack = MODEL_MAP.get(model);
 
         if (stack == null) {
-            if (model instanceof SimpleModeledPolymerItem simpleModeledPolymerItem) {
+            if (model instanceof AutoModeledPolymerItem simpleModeledPolymerItem) {
                 stack = new ItemStack(simpleModeledPolymerItem.getPolymerItem());
                 stack.getOrCreateNbt().putInt("CustomModelData", simpleModeledPolymerItem.getPolymerCustomModelData());
             } else {
