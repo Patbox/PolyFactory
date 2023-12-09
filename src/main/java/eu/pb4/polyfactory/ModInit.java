@@ -81,9 +81,6 @@ public class ModInit implements ModInitializer {
 		PolymerResourcePackUtils.addModAssets(ID);
 		PolymerResourcePackUtils.markAsRequired();
 
-		// Todo: Move it out
-		(new eu.pb4.factorytools.impl.ModInit()).onInitialize();
-
 		ServerPlayConnectionEvents.JOIN.register(FactorySecrets::onJoin);
 	}
 

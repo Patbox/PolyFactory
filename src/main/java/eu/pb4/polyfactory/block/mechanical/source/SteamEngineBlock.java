@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.block.mechanical.source;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.polyfactory.block.base.MultiBlock;
+import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;

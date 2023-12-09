@@ -7,11 +7,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 public interface RotationUser extends NetworkComponent.Rotational {
-    void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos);
-
-    static RotationData getRotation(World world, BlockPos pos) {
+    @Nullable
+    static RotationData getNullableRotation(World world, BlockPos pos) {
         if (world instanceof ServerWorld serverWorld) {
             var o = FactoryNodes.ROTATIONAL.getGraphView(world).getNodesAt(pos).findFirst();
             if (o.isPresent()) {
@@ -22,6 +22,17 @@ public interface RotationUser extends NetworkComponent.Rotational {
 
                 return ent;
             }
+        }
+
+        return null;
+    }
+
+    void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos);
+
+    static RotationData getRotation(World world, BlockPos pos) {
+        var x = getNullableRotation(world, pos);
+        if (x != null) {
+            return x;
         }
         return RotationData.EMPTY;
     }

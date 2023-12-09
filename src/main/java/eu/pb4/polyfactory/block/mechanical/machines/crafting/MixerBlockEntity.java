@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;
@@ -54,6 +55,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     private MixerBlock.Model model;
     private boolean inventoryChanged = false;
     private RecipeInputInventory recipeInputProvider;
+    private double speedScale;
 
     public MixerBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.MIXER, pos, state);
@@ -120,7 +122,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
                 self.containers[i].maybeAdd(self.model);
             }
         }
-
+        self.state = null;
         var belowBlock = world.getBlockState(pos.down());
 
         if (belowBlock.isIn(BlockTags.CAMPFIRES)) {
@@ -139,6 +141,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
 
         if (self.isInputEmpty()) {
             self.process = 0;
+            self.speedScale = 0;
             self.active = false;
             self.model.setActive(false);
             self.model.tick();
@@ -147,14 +150,17 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
 
         if (self.currentRecipe == null && !self.inventoryChanged) {
             self.process = 0;
+            self.speedScale = 0;
             self.active = false;
             self.model.setActive(false);
             self.model.tick();
+            self.state = INCORRECT_ITEMS_TEXT;
             return;
         }
 
         if (self.inventoryChanged && (self.currentRecipe == null || !self.currentRecipe.value().matches(self, world))) {
             self.process = 0;
+            self.speedScale = 0;
             self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.MIXER, self, world).orElse(null);
 
             if (self.currentRecipe == null) {
@@ -162,6 +168,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
                 self.model.setActive(false);
                 self.model.tick();
                 self.inventoryChanged = false;
+                self.state = INCORRECT_ITEMS_TEXT;
                 return;
             }
         }
@@ -177,7 +184,8 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
 
         self.active = true;
         self.model.setActive(true);
-        var fullSpeed = RotationUser.getRotation((ServerWorld) world, pos.up()).speed();
+        var rot = RotationUser.getRotation((ServerWorld) world, pos.up());
+        var fullSpeed = rot.speed();
         self.model.rotate((float) fullSpeed);
         self.model.tick();
 
@@ -186,6 +194,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             var output = self.currentRecipe.value().craft(self, world.getRegistryManager());
             {
                 if (!currentOutput.isEmpty() && (!ItemStack.canCombine(currentOutput, output) || output.getCount() + currentOutput.getCount() > output.getMaxCount())) {
+                    self.state = MachineInfoProvider.OUTPUT_FULL_TEXT;
                     return;
                 }
             }
@@ -233,6 +242,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         } else {
             var d = Math.max(self.currentRecipe.value().optimalSpeed() - self.currentRecipe.value().minimumSpeed(), 1);
             var speed = Math.min(Math.max(Math.abs(fullSpeed) - self.currentRecipe.value().minimumSpeed(), 0), d) / d / 20;
+            self.speedScale = speed;
             if (speed > 0) {
                 self.process += speed;
                 markDirty(world, pos, self.getCachedState());
@@ -246,11 +256,15 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
                             pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0,
                             (Math.random() - 0.5) * 0.2, 0, (Math.random() - 0.5) * 0.2, 2);
                 }
+
+                return;
             } else if (world.getTime() % 5 == 0) {
                 ((ServerWorld) world).spawnParticles(ParticleTypes.SMOKE,
                         pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, 0,
                         (Math.random() - 0.5) * 0.2, 0.04, (Math.random() - 0.5) * 0.2, 0.3);
             }
+
+            self.state = rot.getStateTextOrElse(TOO_SLOW_TEXT);
         }
     }
 
@@ -265,7 +279,11 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
 
     public double getStress() {
         if (this.active) {
-            return this.currentRecipe != null ? this.currentRecipe.value().optimalSpeed() * 0.6 : 4;
+            return this.currentRecipe != null ?
+                    MathHelper.clamp(this.currentRecipe.value().optimalSpeed() * 0.6 * this.speedScale,
+                            this.currentRecipe.value().minimumSpeed() * 0.6,
+                            this.currentRecipe.value().optimalSpeed() * 0.6
+                    ) : 1;
         }
         return 0;
     }

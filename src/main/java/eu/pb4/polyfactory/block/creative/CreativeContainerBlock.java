@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class CreativeContainerBlock extends ContainerBlock {
     public CreativeContainerBlock(Settings settings) {
-        super(settings);
+        super(999, settings);
     }
 
     @Override

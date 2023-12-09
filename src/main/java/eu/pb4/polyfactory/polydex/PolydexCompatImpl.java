@@ -1,9 +1,16 @@
 package eu.pb4.polyfactory.polydex;
 
+import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polydex.api.v1.hover.HoverDisplayBuilder;
 import eu.pb4.polydex.api.v1.recipe.*;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
+import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ColoredItem;
+import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.polydex.pages.GrindingRecipePage;
 import eu.pb4.polyfactory.polydex.pages.MixerRecipePage;
 import eu.pb4.polyfactory.polydex.pages.PressRecipePage;
@@ -15,18 +22,28 @@ import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import eu.pb4.polyfactory.util.StateNameProvider;
+import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.sgui.api.elements.GuiElement;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static eu.pb4.polyfactory.ModInit.id;
+
 public class PolydexCompatImpl {
+    private static final HoverDisplayBuilder.ComponentType MACHINE_STATE = Util.make(() -> {
+        //noinspection ResultOfMethodCallIgnored
+        HoverDisplayBuilder.NAME.index();
+
+        return HoverDisplayBuilder.ComponentType.of(id("machine_state"), true);
+    });
     public static void register() {
         PolydexPage.registerRecipeViewer(GenericPressRecipe.class, PressRecipePage::new);
         PolydexPage.registerRecipeViewer(GenericMixingRecipe.class, MixerRecipePage::new);
@@ -52,9 +69,35 @@ public class PolydexCompatImpl {
 
     private static void stateAccurateNames(HoverDisplayBuilder hoverDisplayBuilder) {
         var target = hoverDisplayBuilder.getTarget();
-        if (target.hasTarget() && target.entity() == null && target.blockState().getBlock() instanceof StateNameProvider provider) {
+        if (target.hasTarget() && target.entity() == null
+                && target.blockState().getBlock() instanceof BlockStateNameProvider provider) {
             hoverDisplayBuilder.setComponent(HoverDisplayBuilder.NAME, provider.getName(target.player().getServerWorld(), target.pos(), target.blockState(), target.blockEntity()));
         }
+
+        if (target.blockState().getBlock() instanceof NetworkComponent.Rotational) {
+            var rot = RotationUser.getRotation(target.player().getServerWorld(), target.pos()).getStateText();
+            if (rot != null) {
+                hoverDisplayBuilder.setComponent(MACHINE_STATE, rot);
+            }
+        }
+
+        BlockEntity entity = target.blockEntity();
+        if (entity == null) {
+            if (target.blockState().getBlock() instanceof MultiBlock multiBlock) {
+                entity = target.player().getServerWorld().getBlockEntity(multiBlock.getCenter(target.blockState(), target.pos()));
+            } else if (target.blockState().getBlock() instanceof TallItemMachineBlock
+                    && target.blockState().get(TallItemMachineBlock.PART) == TallItemMachineBlock.Part.TOP) {
+                entity = target.player().getServerWorld().getBlockEntity(target.pos().down());
+            }
+        }
+
+        if (entity instanceof MachineInfoProvider provider) {
+            var text = provider.getCurrentState();
+            if (text != null) {
+                hoverDisplayBuilder.setComponent(MACHINE_STATE, text);
+            }
+        }
+
     }
 
     public static GuiElement getButton(RecipeType<?> type) {

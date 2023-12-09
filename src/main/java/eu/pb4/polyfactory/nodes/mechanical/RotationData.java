@@ -9,6 +9,7 @@ import com.kneelawk.graphlib.api.graph.user.GraphEntity;
 import com.kneelawk.graphlib.api.graph.user.GraphEntityType;
 import eu.pb4.polyfactory.block.mechanical.RotationConstants;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.generic.FunctionalNode;
@@ -23,6 +24,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -43,6 +45,8 @@ public class RotationData implements GraphEntity<RotationData> {
         public void update(ServerWorld world) {
         }
     };
+    protected boolean overstressed = false;
+
     private double speed;
     private float rotationValue;
     private float rotation;
@@ -139,19 +143,30 @@ public class RotationData implements GraphEntity<RotationData> {
     }
 
     public double speed() {
+        return this.overstressed ? 0 : this.speed;
+    }
+
+    public double directSpeed() {
         return this.speed;
     }
 
-    public float rotation() {
-        return this.rotation;
-    }
-
     public double stressCapacity() {
+        return this.overstressed ? 0 : this.stressCapacity;
+    }
+    public double directStressCapacity() {
         return stressCapacity;
     }
 
     public double stressUsage() {
+        return this.overstressed ? 0 : this.stressUsage;
+    }
+
+    public double directStressUsage() {
         return this.stressUsage;
+    }
+
+    public float rotation() {
+        return this.rotation;
     }
 
     public boolean isNegative() {
@@ -177,12 +192,6 @@ public class RotationData implements GraphEntity<RotationData> {
 
             var checkedNodes = new ObjectOpenHashSet<BlockPos>();
             collectGraphs(connectors, checkedNodes, dirMap, speedMap, clogged, rotationDataList, false, 1);
-            /*{
-                var first = connectors.stream().findFirst().get();
-
-                DebugInfoSender.addGameTestMarker((ServerWorld) first.getBlockWorld(), first.getBlockPos(),
-                        "Start: " + first.getBlockWorld().getServer().getTicks() + " Size: " + rotationDataList.size(), (int) (0x8844FF44 + (first.getBlockWorld().getTime() % 16)), 50 * 4 * 20);
-            }*/
 
             if (rotationDataList.isEmpty()) {
                 updateSelf(world, delta);
@@ -195,6 +204,7 @@ public class RotationData implements GraphEntity<RotationData> {
             if (clogged.booleanValue()) {
                 for (var rot : rotationDataList) {
                     rot.lastTick = currentTick;
+                    rot.overstressed = true;
                     rot.speed = 0;
                     rot.stressUsage = 0;
                     rot.stressCapacity = 0;
@@ -215,41 +225,29 @@ public class RotationData implements GraphEntity<RotationData> {
             }
             double fullStress = 0;
 
-            boolean overloaded = false;
 
             for (var data : rotationDataList) {
-                state.multiplier = speedMap.get(data.getContext().getGraph().getId());
                 var stress = usage.get(data.getContext().getGraph().getId());
-                if (Math.abs(state.finalStressCapacity()) - stress < 0) {
-                    overloaded = true;
-                }
-                fullStress += stress / state.multiplier;
+                fullStress += stress / speedMap.get(data.getContext().getGraph().getId());
             }
-            state.multiplier = 1;
-            if (overloaded || Math.abs(state.stressCapacity) - fullStress < 0) {
-                for (var rot : rotationDataList) {
-                    rot.lastTick = currentTick;
-                    rot.speed = 0;
-                    rot.stressUsage = 0;
-                    rot.stressCapacity = 0;
-                    if (state.providerCount != 0) {
-                        rot.getContext().getGraph().getNodes().forEach(this::spawnSmoke);
-                    }
-                }
-                return;
-            }
-            state.stressUsed = fullStress;
 
             var negative = state.speed == 0 ? TriState.DEFAULT : TriState.of(state.speed < 0);
+            state.multiplier = 1;
+
+            state.stressUsed = fullStress;
+
             float biggest = 1;
             for (var data : rotationDataList) {
                 data.negative = negative == TriState.DEFAULT ? data.negative : dirMap.get(data.getContext().getGraph().getId()) != negative.get();
                 state.multiplier = speedMap.get(data.getContext().getGraph().getId());
                 biggest = Math.max(biggest, state.multiplier);
                 data.applyState(state);
+                if (data.overstressed) {
+                    data.getContext().getGraph().getNodes().forEach(this::spawnSmoke);
+                }
             }
 
-            if (this.speed == 0) {
+            if (this.speed == 0 || Math.abs(state.stressCapacity) - fullStress < 0) {
                 return;
             }
 
@@ -265,7 +263,7 @@ public class RotationData implements GraphEntity<RotationData> {
             }
             r = Math.abs(r);
 
-            var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_3 - MathHelper.RADIANS_PER_DEGREE * 10) * delta;
+            var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_3 - MathHelper.RADIANS_PER_DEGREE * 15) * delta;
 
             for (var data : rotationDataList) {
                 var div = speedMap.get(data.getContext().getGraph().getId());
@@ -306,19 +304,17 @@ public class RotationData implements GraphEntity<RotationData> {
 
     private void applyState(State state) {
         if (state.providerCount == 0) {
+            this.overstressed = false;
             this.stressCapacity = 0;
             this.stressUsage = 0;
             this.speed = 0;
             return;
         }
-        this.stressCapacity = Math.abs(state.stressCapacity);
-        this.stressUsage = state.stressUsed;
+        this.stressCapacity = Math.abs(state.finalStressCapacity());
+        this.stressUsage = state.finalStressUsed();
+        this.overstressed = this.stressCapacity - stressUsage < 0;
 
-        if (this.stressCapacity - stressUsage < 0) {
-            this.speed = 0;
-        } else {
-            this.speed = Math.abs(state.finalSpeed() / state.providerCount);
-        }
+        this.speed = Math.abs(state.finalSpeed() / state.providerCount);
     }
 
     private void updateSelf(ServerWorld world, float delta) {
@@ -331,12 +327,14 @@ public class RotationData implements GraphEntity<RotationData> {
 
         var speed = this.speed != 0 ? this.speed / Math.signum(state.speed) : 0;
 
-        if (Math.abs(state.stressCapacity) - stressUsage < 0) {
+        if (this.overstressed) {
             for (var entry : graph.getCachedNodes(FunctionalDirectionNode.CACHE)) {
                 var pos = entry.getBlockPos();
                 world.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.3, 0.3, 0.3, 0.2);
             }
+            return;
         }
+
 
         var baseDelta = speed * MathHelper.RADIANS_PER_DEGREE * delta;
         float r = (float) ((baseDelta + this.rotationValue) % MathHelper.TAU);
@@ -345,7 +343,7 @@ public class RotationData implements GraphEntity<RotationData> {
         }
         r = Math.abs(r);
 
-        var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_3 - MathHelper.RADIANS_PER_DEGREE * 10) * delta;
+        var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_3 - MathHelper.RADIANS_PER_DEGREE * 15) * delta;
 
         this.rotationValue = (this.negative ? -r : r);
 
@@ -380,11 +378,6 @@ public class RotationData implements GraphEntity<RotationData> {
     }
 
     @Override
-    public void onUnload() {
-
-    }
-
-    @Override
     public void merge(@NotNull RotationData other) {
         if (this.speed < other.speed) {
             this.rotation = other.rotation;
@@ -398,6 +391,22 @@ public class RotationData implements GraphEntity<RotationData> {
         data.rotationValue = this.rotationValue;
         data.speed = this.speed;
         return data;
+    }
+
+    public boolean isOverstressed() {
+        return this.overstressed;
+    }
+    @Nullable
+    public Text getStateText() {
+        if (this.overstressed) {
+            return this.stressCapacity == 0 ? MachineInfoProvider.LOCKED_TEXT : MachineInfoProvider.OVERSTRESSED_TEXT;
+        }
+        return null;
+    }
+
+    public Text getStateTextOrElse(Text fallback) {
+        var state = getStateText();
+        return state != null ? state : fallback;
     }
 
     public static class State {
@@ -437,7 +446,7 @@ public class RotationData implements GraphEntity<RotationData> {
         }
 
         public double finalStressUsed() {
-            return this.stressUsed;
+            return this.stressUsed * this.multiplier;
         }
 
         public double finalSpeed() {

@@ -7,6 +7,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
-public interface StateNameProvider {
+public interface BlockStateNameProvider {
     Text getName(ServerWorld world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity);
 }

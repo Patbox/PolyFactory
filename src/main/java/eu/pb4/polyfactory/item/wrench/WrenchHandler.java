@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.scoreboard.number.BlankNumberFormat;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Style;
@@ -35,6 +36,7 @@ public class WrenchHandler {
 
     public WrenchHandler(ServerPlayNetworkHandler handler) {
         this.sidebar.addPlayer(handler);
+        this.sidebar.setDefaultNumberFormat(BlankNumberFormat.INSTANCE);
     }
 
     public static WrenchHandler of(ServerPlayerEntity player) {
@@ -70,10 +72,9 @@ public class WrenchHandler {
                             t.append("   ");
                         }
 
-                        t.append(action.name()).append(": ").append(
-                                Text.literal(action.value().getDisplayValue(player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state)).formatted(Formatting.GRAY));
+                        t.append(action.name()).append(": ");
 
-                        b.add(t);
+                        b.add(t, Text.literal(action.value().getDisplayValue(player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state)).formatted(Formatting.YELLOW));
                     }
                 });
                 this.sidebar.show();

@@ -2,7 +2,8 @@ package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.polyfactory.block.base.LockableBlockEntity;
+import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
+import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
@@ -29,6 +30,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -39,7 +41,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
-public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSidedInventory {
+public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, MachineInfoProvider {
     public static final int INPUT_SLOT = 0;
     private static final int[] INPUT_SLOTS = {INPUT_SLOT};
     private static final int[] OUTPUT_SLOTS = {1, 2, 3};
@@ -50,6 +52,8 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
     @Nullable
     protected Item currentItem = null;
     private boolean active;
+    private double speedScale;
+    private Text state = null;
 
     public GrinderBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.GRINDER, pos, state);
@@ -98,25 +102,31 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
         var self = (GrinderBlockEntity) t;
 
         var stack = self.getStack(0);
+        self.state = null;
         if (stack.isEmpty()) {
             self.process = 0;
             self.active = false;
+            self.speedScale = 0;
             return;
         }
 
         if (self.currentRecipe == null && self.currentItem != null && stack.isOf(self.currentItem)) {
             self.process = 0;
             self.active = false;
+            self.speedScale = 0;
+            self.state = INCORRECT_ITEMS_TEXT;
             return;
         }
 
         if (self.currentItem == null || !stack.isOf(self.currentItem)) {
             self.process = 0;
+            self.speedScale = 0;
             self.currentItem = stack.getItem();
             self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.GRINDING, self, world).orElse(null);
 
             if (self.currentRecipe == null) {
                 self.active = false;
+                self.state = INCORRECT_ITEMS_TEXT;
                 return;
             }
         }
@@ -143,6 +153,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
                     FactoryUtil.tryInsertingInv(inv, item, null);
 
                     if (!item.isEmpty()) {
+                        self.state = OUTPUT_FULL_TEXT;
                         return;
                     }
                 }
@@ -188,9 +199,9 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
             self.markDirty();
         } else {
             var d = Math.max(self.currentRecipe.value().optimalSpeed() - self.currentRecipe.value().minimumSpeed(), 1);
-
-            var speed = Math.min(Math.max(Math.abs(RotationUser.getRotation((ServerWorld) world, pos).speed()) - self.currentRecipe.value().minimumSpeed(), 0), d) / d / 20;
-
+            var rot = RotationUser.getRotation((ServerWorld) world, pos);
+            var speed = Math.min(Math.max(Math.abs(rot.speed()) - self.currentRecipe.value().minimumSpeed(), 0), d) / d / 20;
+            self.speedScale = speed;
             if (speed > 0) {
                 if (world.getTime() % MathHelper.clamp(Math.round(1 / speed), 2, 5) == 0) {
                     ((ServerWorld) world).spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, stack.copy()),
@@ -204,19 +215,31 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
 
                 self.process += speed;
                 self.markDirty();
+                return;
             } else if (world.getTime() % 5 == 0) {
                 ((ServerWorld) world).spawnParticles(ParticleTypes.SMOKE,
                         pos.getX() + 0.5, pos.getY() + 1.3, pos.getZ() + 0.5, 0,
                         (Math.random() - 0.5) * 0.2, 0.04, (Math.random() - 0.5) * 0.2, 0.3);
             }
+
+            self.state = rot.getStateTextOrElse(TOO_SLOW_TEXT);
         }
     }
 
     public double getStress() {
         if (this.active) {
-            return this.currentRecipe != null ? this.currentRecipe.value().optimalSpeed() * 0.6 : 4;
+            return this.currentRecipe != null ?
+                    MathHelper.clamp(this.currentRecipe.value().optimalSpeed() * 0.7 * this.speedScale,
+                            this.currentRecipe.value().minimumSpeed() * 0.7,
+                            this.currentRecipe.value().optimalSpeed() * 0.7
+                            ) : 1;
         }
         return 0;
+    }
+
+    @Override
+    public @Nullable Text getCurrentState() {
+        return this.state;
     }
 
     private class Gui extends SimpleGui {

@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.block.mechanical.source;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.base.LockableBlockEntity;
+import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.ui.FuelSlot;
 import eu.pb4.polyfactory.ui.GuiTextures;
@@ -110,7 +110,7 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
 
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {
         if (this.state > 0) {
-            modifier.provide(25 * this.state, 100 * this.state, state.get(SteamEngineBlock.FACING).getDirection());
+            modifier.provide(30 * this.state, 110 * this.state, state.get(SteamEngineBlock.FACING).getDirection());
         }
     }
 

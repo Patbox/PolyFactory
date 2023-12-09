@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.data;
 
-import eu.pb4.polyfactory.util.StateNameProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;

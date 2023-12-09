@@ -45,10 +45,12 @@ import org.joml.Matrix4fStack;
 
 
 public class ContainerBlock extends Block implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder, AttackableBlock, SneakBypassingBlock, VirtualDestroyStage.Marker, BarrierBasedWaterloggable {
+    public final int maxStackCount;
     public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
-    public ContainerBlock(Settings settings) {
+    public ContainerBlock(int maxStackCount, Settings settings) {
         super(settings);
+        this.maxStackCount = maxStackCount;
         this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
     }
 

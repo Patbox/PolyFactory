@@ -80,7 +80,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
 
         var stack = self.containers[0];
         var stack2 = self.containers[1];
-
+        self.state = null;
         if (self.process < 0 && stack.isContainerEmpty()) {
             var speed = Math.max(Math.abs(RotationUser.getRotation((ServerWorld) world, pos.up()).speed()), 0);
 
@@ -112,6 +112,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             self.model.tick();
             self.delayedOutput = null;
             self.active = false;
+            self.state = INCORRECT_ITEMS_TEXT;
             return;
         }
 
@@ -130,6 +131,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             if (self.currentRecipe == null) {
                 self.model.tick();
                 self.active = false;
+                self.state = INCORRECT_ITEMS_TEXT;
                 return;
             }
         }
@@ -167,7 +169,8 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
                 self.delayedOutput = nextOut;
             }
         } else {
-            var speed = Math.max(Math.abs(RotationUser.getRotation((ServerWorld) world, pos.up(1)).speed()), 0);
+            var rot = RotationUser.getRotation((ServerWorld) world, pos.up(1));
+            var speed = Math.max(Math.abs(rot.speed()), 0);
 
             if (speed >= self.currentRecipe.value().minimumSpeed()) {
                 self.process += speed / 100;
@@ -181,6 +184,10 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
                 ((ServerWorld) world).spawnParticles(ParticleTypes.SMOKE,
                         pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, 0,
                         (Math.random() - 0.5) * 0.2, 0.04, (Math.random() - 0.5) * 0.2, 0.3);
+
+                self.state = rot.getStateTextOrElse(TOO_SLOW_TEXT);
+            } else {
+                self.state = rot.getStateTextOrElse(TOO_SLOW_TEXT);
             }
         }
         self.model.tick();

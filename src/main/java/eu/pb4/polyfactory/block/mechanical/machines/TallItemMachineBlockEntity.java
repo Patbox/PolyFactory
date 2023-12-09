@@ -1,16 +1,20 @@
 package eu.pb4.polyfactory.block.mechanical.machines;
 
-import eu.pb4.polyfactory.block.base.LockableBlockEntity;
+import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.util.movingitem.InventorySimpleContainerProvider;
 import eu.pb4.polyfactory.util.movingitem.MovingItem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.inventory.SidedInventory;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class TallItemMachineBlockEntity extends LockableBlockEntity implements InventorySimpleContainerProvider, SidedInventory {
+public abstract class TallItemMachineBlockEntity extends LockableBlockEntity implements MachineInfoProvider, InventorySimpleContainerProvider, SidedInventory {
+    protected Text state;
+
     public TallItemMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
@@ -47,5 +51,10 @@ public abstract class TallItemMachineBlockEntity extends LockableBlockEntity imp
             }
         }
         this.markDirty();
+    }
+
+    @Override
+    public @Nullable Text getCurrentState() {
+        return this.state;
     }
 }

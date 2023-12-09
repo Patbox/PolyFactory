@@ -7,7 +7,7 @@ import eu.pb4.factorytools.api.virtualentity.BaseModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import eu.pb4.polyfactory.util.StateNameProvider;
+import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -27,7 +27,7 @@ import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockEntityProvider, StateNameProvider {
+public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockEntityProvider, BlockStateNameProvider {
     private final boolean inverted;
 
     public LampBlock(Settings settings, boolean inverted) {

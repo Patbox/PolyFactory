@@ -3,8 +3,9 @@ package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.base.LockableBlockEntity;
+import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.ui.GuiTextures;
@@ -36,6 +37,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -50,7 +52,7 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, CustomInsertInventory, RecipeInputInventory {
+public class MCrafterBlockEntity extends LockableBlockEntity implements MachineInfoProvider, MinimalSidedInventory, CustomInsertInventory, RecipeInputInventory {
     private static final int[] INPUT_SLOTS = IntStream.range(0, 9).toArray();
     private static final int[] OUTPUT_SLOTS = IntStream.range(9, 9+9).toArray();
     private static final SoundEvent CRAFT_SOUND_EVENT = SoundEvent.of(new Identifier("minecraft:block.crafter.craft"));
@@ -64,6 +66,8 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalS
     private boolean active;
     private boolean itemsDirty;
     private final RecipeInputInventory recipeInputProvider = WrappingRecipeInputInventory.of(this, 0, 9, 3, 3);
+    @Nullable
+    private Text state;
 
     public MCrafterBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.CRAFTER, pos, state);
@@ -139,7 +143,8 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalS
 
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return slot >= 9 && dir == this.getCachedState().get(MCrafterBlock.FACING);
+        return slot >= 9 && dir == this.getCachedState().get(MCrafterBlock.FACING)
+                || slot < 9 && this.getCachedState().get(MCrafterBlock.FACING).rotateYClockwise().getAxis() == dir.getAxis();
     }
 
     public void createGui(ServerPlayerEntity player) {
@@ -154,7 +159,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalS
 
     public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
         var self = (MCrafterBlockEntity) t;
-
+        self.state = null;
         if (self.isInputNotFull()) {
             self.process = 0;
             self.active = false;
@@ -166,6 +171,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalS
             self.currentRecipe = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, self.recipeInputProvider, world).orElse(null);
             self.itemsDirty = false;
             if (self.currentRecipe == null) {
+                self.state = INCORRECT_ITEMS_TEXT;
                 self.active = false;
                 return;
             }
@@ -192,6 +198,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalS
                     FactoryUtil.tryInsertingInv(inv, item, null);
 
                     if (!item.isEmpty()) {
+                        self.state = OUTPUT_FULL_TEXT;
                         return;
                     }
                 }
@@ -242,8 +249,8 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalS
 
             self.markDirty();
         } else {
-
-            var speed = Math.min(RotationUser.getRotation(world, pos).speed() / 40, 1);
+            var rot = RotationUser.getRotation(world, pos);
+            var speed = Math.min(rot.speed() / 40, 1);
 
             if (speed > 0.05) {
                 //if (world.getTime() % MathHelper.clamp(Math.round(1 / speed), 2, 5) == 0) {
@@ -258,11 +265,13 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalS
 
                 self.process += speed;
                 self.markDirty();
+                return;
             } else if (world.getTime() % 5 == 0) {
                 ((ServerWorld) world).spawnParticles(ParticleTypes.SMOKE,
                         pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0,
                         (Math.random() - 0.5) * 0.2, 0.04, (Math.random() - 0.5) * 0.2, 0.3);
             }
+            self.state = rot.getStateTextOrElse(TOO_SLOW_TEXT);
         }
     }
 
@@ -331,6 +340,11 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MinimalS
                 itemStack.decrement(1);
             }
         }
+    }
+
+    @Override
+    public @Nullable Text getCurrentState() {
+        return this.state;
     }
 
     private class Gui extends SimpleGui {

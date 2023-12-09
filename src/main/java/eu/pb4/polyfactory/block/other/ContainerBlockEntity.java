@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.base.LockableBlockEntity;
+import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -21,7 +21,6 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     static  {
         ItemStorage.SIDED.registerForBlockEntity((self, dir) -> self.storage, FactoryBlockEntities.CONTAINER);
     }
-    private static final int MAX_SLOT_SIZE = 9 * 4;
 
     private ItemStack itemStack = ItemStack.EMPTY;
     private ContainerBlock.Model model;
@@ -85,7 +84,11 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     }
 
     public int getMaxCount(ItemStack stack) {
-        return MAX_SLOT_SIZE * stack.getMaxCount();
+        return getMaxStackCount() * stack.getMaxCount();
+    }
+
+    protected int getMaxStackCount() {
+        return this.getCachedState().getBlock() instanceof ContainerBlock c ? c.maxStackCount : 0;
     }
 
     @Override

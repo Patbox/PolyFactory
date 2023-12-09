@@ -8,7 +8,7 @@ import eu.pb4.factorytools.api.virtualentity.BaseModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import eu.pb4.polyfactory.util.StateNameProvider;
+import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -34,14 +34,13 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-public class SmallLampBlock extends Block implements FactoryBlock, BlockEntityProvider, StateNameProvider, BarrierBasedWaterloggable {
+public class SmallLampBlock extends Block implements FactoryBlock, BlockEntityProvider, BlockStateNameProvider, BarrierBasedWaterloggable {
     public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
     public static final BooleanProperty LIT = Properties.LIT;
     public static final DirectionProperty FACING = Properties.FACING;

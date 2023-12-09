@@ -19,7 +19,7 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 
 public class WindmillBlockEntity extends BlockEntity {
-    private static final double LOG_BASE = Math.log(3);
+    private static final double LOG_BASE = Math.log(2);
     private final DefaultedList<ItemStack> sails = DefaultedList.of();
     private int sample = Integer.MIN_VALUE;
 
@@ -90,6 +90,7 @@ public class WindmillBlockEntity extends BlockEntity {
         return this.sails;
     }
 
+    // https://www.desmos.com/calculator/u7cstq97vr
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {
         if (state.get(WindmillBlock.WATERLOGGED)) {
             return;
@@ -118,24 +119,23 @@ public class WindmillBlockEntity extends BlockEntity {
             return;
         }
 
-        var speed = Math.min(Math.log(x) / LOG_BASE * 2, 10.5);
+        var speed = Math.min(Math.log(x) / LOG_BASE * 2.1, 10.5);
         if (speed <= 0) {
             return;
         }
 
         var biome = serverWorld.getBiome(pos);
         if (biome.isIn(ConventionalBiomeTags.OCEAN)) {
-            speed *= 1.4;
-        } else if (biome.isIn(ConventionalBiomeTags.BEACH)) {
             speed *= 1.3;
-        } else if (biome.isIn(ConventionalBiomeTags.MOUNTAIN)) {
-            speed *= 1.25;
+        } else if (biome.isIn(ConventionalBiomeTags.BEACH)
+                || biome.isIn(ConventionalBiomeTags.MOUNTAIN)) {
+            speed *= 1.2;
         }
 
         if (serverWorld.isRaining()) {
             speed *= 1.1;
         }
 
-        modifier.provide(speed, MathHelper.clamp(speed * 0.15 * sails * 3, 2, 20), false);
+        modifier.provide(speed, MathHelper.clamp(speed * 0.15 * sails * 1.2, 0.5, 18), false);
     }
 }

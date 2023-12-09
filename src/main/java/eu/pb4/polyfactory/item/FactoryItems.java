@@ -2,8 +2,9 @@ package eu.pb4.polyfactory.item;
 
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.factorytools.api.item.ModeledItem;
+import eu.pb4.factorytools.api.item.MultiBlockItem;
 import eu.pb4.factorytools.api.item.PolymerMusicDiscItem;
-import eu.pb4.polyfactory.block.base.MultiBlock;
+import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polyfactory.item.block.ColoredDownsampledBlockItem;
 import eu.pb4.polyfactory.item.block.GearItem;
 import eu.pb4.polyfactory.item.block.WindmillSailItem;

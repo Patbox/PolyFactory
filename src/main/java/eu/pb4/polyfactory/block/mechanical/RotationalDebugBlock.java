@@ -63,10 +63,13 @@ public class RotationalDebugBlock extends RotationalNetworkBlock implements Poly
             var rotation = RotationUser.getRotation(this.world, this.pos);
 
             this.mainElement.setText(Text.translatable("""
-                    Speed: %s
+                    Speed: %s (%s)
                     Stress: %s / %s
                     Rotation: %s
-                    Negative: %s""", rotation.speed(), rotation.stressUsage(), rotation.stressCapacity(), rotation.rotation(), rotation.isNegative()));
+                    Negative: %s""", rotation.speed(), rotation.directSpeed(), rotation.directStressUsage(), rotation.directStressCapacity(), rotation.rotation(), rotation.isNegative()
+                    ).withColor(rotation.isOverstressed() ? 0xFFBBBB : 0xFFFFFF)
+            )
+            ;
         }
     }
 }

@@ -86,14 +86,21 @@
   "item.polyfactory.wrench.action.reverse": "Reverse",
 
   "enchantment.polyfactory.ignore_movement": "Stable Ground",
-  "text.polyfactory.artificial_color": "Artificially Colored",
-  "text.polyfactory.recipes": "Recipes",
   "recipe_type.polyfactory.press": "Press",
   "recipe_type.polyfactory.mixer": "Mixer",
   "recipe_type.polyfactory.grinding": "Grinder",
 
   "stat.polyfactory.taters_clicked": "Potatoes Clicked",
   "subtitles.block.crafter.craft": "Crafter crafts",
+
+  "text.polyfactory.artificial_color": "Artificially Colored",
+  "text.polyfactory.recipes": "Recipes",
+
+  "text.polyfactory.state.overstressed": "Overstressed!",
+  "text.polyfactory.state.locked": "Locked!",
+  "text.polyfactory.state.too_slow": "Too slow!",
+  "text.polyfactory.state.incorrect_items": "Incorrect ingredients!",
+  "text.polyfactory.state.output_full": "Output full!",
 
   "advancements.polyfactory.root.title": "PolyFactory",
   "advancements.polyfactory.root.description": "Welcome to the factory!",
@@ -118,7 +125,7 @@
   "advancements.polyfactory.steel_ingot.description": "Smelt Steel Alloy Mixture into Steel Ingot",
 
   "advancements.polyfactory.steel_gear.title": "Speed Up, Slow Down",
-  "advancements.polyfactory.steel_gear.description": "Connect differently sized Steel Gears to change rotation speed",
+  "advancements.polyfactory.steel_gear.description": "Connect regular and large Steel Gears on diagonal to change rotation speed",
 
   "advancements.polyfactory.press.title": "Better with Plates",
   "advancements.polyfactory.press.description": "Use Mechanical Press to craft Steel Plate or Wooden Plate",

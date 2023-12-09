@@ -15,7 +15,7 @@ import eu.pb4.polyfactory.models.CableModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.generic.SelectiveSideNode;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import eu.pb4.polyfactory.util.StateNameProvider;
+import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -45,7 +45,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class CableBlock extends NetworkBlock implements FactoryBlock, BlockEntityProvider, CableConnectable, StateNameProvider, NetworkComponent.Data, NetworkComponent.Energy {
+public class CableBlock extends NetworkBlock implements FactoryBlock, BlockEntityProvider, CableConnectable, BlockStateNameProvider, NetworkComponent.Data, NetworkComponent.Energy {
     public static final BooleanProperty NORTH;
     public static final BooleanProperty EAST;
     public static final BooleanProperty SOUTH;
