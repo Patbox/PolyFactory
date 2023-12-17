@@ -54,7 +54,7 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
                 super.onFinalCommit();
                 ContainerBlockEntity.this.markDirty();
                 world.updateComparators(pos, ContainerBlockEntity.this.getCachedState().getBlock());
-                updateHologram();
+                updateStack();
             }
         };
     }
@@ -68,18 +68,17 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     @Override
     public void readNbt(NbtCompound nbt) {
         this.storage.readNbt(nbt);
-        this.itemStack = this.storage.variant.toStack();
+        updateStack();
         super.readNbt(nbt);
     }
 
-    private void updateHologram() {
-        if (this.itemStack == ItemStack.EMPTY) {
-            this.itemStack = this.storage.variant.toStack();
-        }
-
+    private void updateStack() {
+        this.itemStack = this.storage.variant.toStack();
         if (this.model != null) {
             model.setDisplay(this.itemStack, this.storage.amount);
-            model.tick();
+            if (this.world != null) {
+                model.tick();
+            }
         }
     }
 
@@ -91,13 +90,8 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
         return this.getCachedState().getBlock() instanceof ContainerBlock c ? c.maxStackCount : 0;
     }
 
-    @Override
-    public void markRemoved() {
-        super.markRemoved();
-    }
-
     public boolean matches(ItemStack stackInHand) {
-        return ItemStack.canCombine(this.itemStack, stackInHand);
+        return this.storage.variant.matches(stackInHand);
     }
 
     public ItemStack getItemStack() {
@@ -105,17 +99,17 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     }
 
     public void setItemStack(ItemStack stack) {
-        this.itemStack = stack.copyWithCount(1);
         this.storage.variant = ItemVariant.of(stack);
-        this.updateHologram();
+        this.updateStack();
     }
 
     public ItemStack extract(int amount) {
         try (var t = Transaction.openOuter()) {
-            var i = this.storage.extract(this.storage.variant, amount, t);
+            var variant = this.storage.variant;
+            var i = this.storage.extract(variant, amount, t);
             t.commit();
             this.markDirty();
-            return this.itemStack.copyWithCount((int) i);
+            return variant.toStack((int) i);
         }
     }
 
@@ -135,6 +129,6 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     @Override
     public void onListenerUpdate(WorldChunk chunk) {
         this.model = BlockBoundAttachment.get(chunk, this.pos).holder() instanceof ContainerBlock.Model model ? model : null;
-        this.updateHologram();
+        this.updateStack();
     }
 }
