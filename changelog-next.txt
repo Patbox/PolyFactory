@@ -1,7 +1,1 @@
-- Updated to 1.20.4
-- Wooden Containers can store more items (45 stacks instead of 36)
-- Tweaked the strength of Windmill and Steam Engine
-- Mechanical Stress caused by Grinder and Mixer are now proportional to their working speed.
-- Polydex can now show state of machines / axles.
-- Tweaked some recipes
-- [Dev]: More generic parts of codebase were moved out into their own library, for usage by other mods.
+- Compressed all asset files, making them take less space

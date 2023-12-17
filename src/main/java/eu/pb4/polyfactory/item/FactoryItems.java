@@ -92,10 +92,6 @@ public class FactoryItems {
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
     public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING);
 
-    public static final Item MUSIC_DISC_RICOCHET = register("music_disc_ricochet", new PolymerMusicDiscItem(4,
-            SoundEvent.of(id("music_disc.ricochet")), new Item.Settings().maxCount(1), 94)
-    );
-
 
     public static void register() {
         FuelRegistry.INSTANCE.add(SAW_DUST, 60);
@@ -236,7 +232,6 @@ public class FactoryItems {
                         if (ModInit.DEV_ENV) {
                             entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                             entries.add(GREEN_SCREEN, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                            entries.add(MUSIC_DISC_RICOCHET, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         }
                     })).build()
             );

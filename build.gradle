@@ -95,6 +95,30 @@ dependencies {
 }
 
 processResources {
+	doLast {
+		fileTree(dir: outputs.files.asPath, include: ["**/*.json", "**/*.mcmeta"]).each {
+			File file -> file.text = com.google.gson.JsonParser.parseString(file.text).toString()
+		}
+	}
+}
+
+classes {
+	doLast {
+		fileTree(dir: project.sourceSets.main.output.classesDirs.asPath, include: ["**/*.json", "**/*.mcmeta"]).each {
+			File file -> file.text = com.google.gson.JsonParser.parseString(file.text).toString()
+		}
+	}
+}
+
+remapJar {
+	doLast {
+		fileTree(dir: outputs.files.asPath, include: ["**/*.json", "**/*.mcmeta"]).each {
+			File file -> file.text = com.google.gson.JsonParser.parseString(file.text).toString()
+		}
+	}
+}
+
+processResources {
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
