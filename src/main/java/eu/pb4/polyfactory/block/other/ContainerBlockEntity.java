@@ -54,7 +54,7 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
                 super.onFinalCommit();
                 ContainerBlockEntity.this.markDirty();
                 world.updateComparators(pos, ContainerBlockEntity.this.getCachedState().getBlock());
-                updateStack();
+                updateStackWithTick();
             }
         };
     }
@@ -76,9 +76,13 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
         this.itemStack = this.storage.variant.toStack();
         if (this.model != null) {
             model.setDisplay(this.itemStack, this.storage.amount);
-            if (this.world != null) {
+        }
+    }
+
+    private void updateStackWithTick() {
+        updateStack();
+        if (this.model != null && this.world != null) {
                 model.tick();
-            }
         }
     }
 
@@ -100,7 +104,7 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
 
     public void setItemStack(ItemStack stack) {
         this.storage.variant = ItemVariant.of(stack);
-        this.updateStack();
+        this.updateStackWithTick();
     }
 
     public ItemStack extract(int amount) {

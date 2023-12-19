@@ -231,7 +231,7 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
         }
 
         public void setDisplay(ItemStack stack, long count) {
-            this.itemElement.setItem(stack.copyWithCount(1));
+            this.itemElement.setItem(stack.copy());
             this.countElement.setText(Text.literal("" + count));
         }
 
