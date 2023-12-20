@@ -43,6 +43,9 @@ public class FactoryEntities {
     public static final EntityType<ArtificialWitherSkullEntity> ARTIFICIAL_WITHER_SKULL = register("artificial_wither_skull", FabricEntityTypeBuilder
             .create().fireImmune().dimensions(EntityDimensions.fixed(0.5f, 0.5f)).entityFactory(ArtificialWitherSkullEntity::new));
 
+    public static final EntityType<DynamiteEntity> DYNAMITE = register("dynamite", FabricEntityTypeBuilder
+            .create().dimensions(EntityDimensions.fixed(0.25f, 0.25f)).entityFactory(DynamiteEntity::new));
+
     public static void register() {
 
     }

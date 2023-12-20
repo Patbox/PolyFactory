@@ -400,6 +400,8 @@ class RecipesProvider extends FabricRecipeProvider {
         of(exporter,
                 GrindingRecipe.of("coal_dust", Ingredient.ofItems(Items.COAL), 1, 5, 8, FactoryItems.COAL_DUST),
                 GrindingRecipe.of("coal_dust_charcoal", Ingredient.ofItems(Items.CHARCOAL), 1.5, 5, 14, OutputStack.of(FactoryItems.COAL_DUST, 0.8f)),
+                GrindingRecipe.of("netherrack_dust", Ingredient.ofItems(Items.NETHERRACK), 2, 8, 15,
+                        OutputStack.of(FactoryItems.NETHERRACK_DUST, 1, 2), OutputStack.of(FactoryItems.NETHERRACK_DUST, 0.25f, 5)),
                 GrindingRecipe.of("planks_saw_dust", Ingredient.fromTag(ItemTags.PLANKS), 1, 5, 6,
                         OutputStack.of(FactoryItems.SAW_DUST, 0.6f, 3), OutputStack.of(Items.STICK, 0.4f, 3)),
                 GrindingRecipe.of("logs_saw_dust", Ingredient.fromTag(ItemTags.LOGS), 1, 5, 6,
@@ -606,7 +608,10 @@ class RecipesProvider extends FabricRecipeProvider {
         of(exporter, 
                 new RecipeEntry<>(id("mixing/artificial_dye"), new ArtificialDyeMixingRecipe(3, 4, 15))
         );
-
+        ShapelessRecipeJsonBuilder.create(RecipeCategory.COMBAT, FactoryItems.DYNAMITE)
+                .input(Items.PAPER, 1).input(Items.GUNPOWDER, 2).input(ItemTags.SAND)
+                .criterion("get_item", InventoryChangedCriterion.Conditions.items(Items.GUNPOWDER))
+                .offerTo(exporter);
         of(exporter, 
                 GenericMixingRecipe.ofCounted("treated_dried_kelp", List.of(CountedIngredient.ofItems(16, Items.DRIED_KELP), CountedIngredient.ofItems(1, Items.BLACK_DYE)), 2, 1, 6f, 0.2f, new ItemStack(FactoryItems.TREATED_DRIED_KELP, 16)),
                 GenericMixingRecipe.ofCounted("fermented_spider_eye", List.of(CountedIngredient.ofItems(1, Items.SPIDER_EYE),
@@ -645,9 +650,20 @@ class RecipesProvider extends FabricRecipeProvider {
                         2, 4, 16, new ItemStack(Items.TNT)),
                 GenericMixingRecipe.ofCounted("redstone_to_glowstone",
                         List.of(CountedIngredient.ofItems(8, Items.REDSTONE), CountedIngredient.ofItems(1, Items.BLAZE_POWDER)),
-                        8, 4, 16, new ItemStack(Items.GLOWSTONE_DUST, 12))
-
-        );
+                        8, 4, 16, new ItemStack(Items.GLOWSTONE_DUST, 12)),
+                GenericMixingRecipe.ofCounted("redstone_to_glowstone_2",
+                        List.of(CountedIngredient.ofItems(8, Items.REDSTONE), CountedIngredient.ofItems(3, FactoryItems.NETHERRACK_DUST)),
+                        8, 5, 16, new ItemStack(Items.GLOWSTONE_DUST, 8)),
+                GenericMixingRecipe.ofCounted("dynamite",
+                        List.of(CountedIngredient.ofItems(1, Items.PAPER), CountedIngredient.fromTag(1, ItemTags.SAND), CountedIngredient.ofItems(2, Items.GUNPOWDER)),
+                        2, 1, 6f, new ItemStack(FactoryItems.DYNAMITE, 1)),
+                GenericMixingRecipe.ofCounted("gunpowder",
+                        List.of(CountedIngredient.ofItems(2, FactoryItems.NETHERRACK_DUST),
+                                CountedIngredient.ofItems(1, FactoryItems.COAL_DUST),
+                                CountedIngredient.ofItems(1, FactoryItems.SAW_DUST)
+                        ),
+                        2, 1, 15f, 0.3f, new ItemStack(Items.GUNPOWDER))
+                );
 
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_GEAR, 2)
                 .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))

@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class MixerRecipePage extends PrioritizedRecipePage<GenericMixingRecipe> {
+    private static final Text REQUIRED_HEAT = Text.translatable("text.polyfactory.required_heat").styled(x -> x.withItalic(false));
     private static final ItemStack ICON = FactoryItems.MIXER.getDefaultStack();
     private final List<PolydexIngredient<?>> ingredients;
 
@@ -48,6 +50,10 @@ public class MixerRecipePage extends PrioritizedRecipePage<GenericMixingRecipe> 
             }
         }
         layer.setOutput(6, 2, this.recipe.output());
-        layer.set(4, 3, GuiTextures.FLAME_OFFSET_RIGHT.get(Math.max(this.recipe.minimumTemperature(), 0)).getItemStack(), GuiTextures.FLAME_OFFSET_RIGHT.get(Math.min(this.recipe.maxTemperature(), 1)).getItemStack());
+        layer.set(5, 3, GuiElementBuilder.from(GuiTextures.EMPTY.getItemStack()).setName(REQUIRED_HEAT).asStack());
+        layer.set(4, 3,
+                GuiTextures.FLAME_OFFSET_RIGHT.getNamed(Math.max(this.recipe.minimumTemperature(), 0), REQUIRED_HEAT),
+                GuiTextures.FLAME_OFFSET_RIGHT.getNamed(Math.min(this.recipe.maxTemperature(), 1),  REQUIRED_HEAT));
+
     }
 }

@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.ui;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 
 import java.util.function.Function;
@@ -38,9 +39,14 @@ public class GuiTextures {
 
 
     public record Progress(GuiElement[] elements) {
-
         public GuiElement get(float progress) {
             return elements[Math.min((int) (progress * elements.length), elements.length - 1)];
+        }
+
+        public ItemStack getNamed(float progress, Text text) {
+            var base = elements[Math.min((int) (progress * elements.length), elements.length - 1)].getItemStack().copy();
+            base.setCustomName(text);
+            return base;
         }
 
         public static Progress createVertical(String path, int start, int stop, boolean reverse) {

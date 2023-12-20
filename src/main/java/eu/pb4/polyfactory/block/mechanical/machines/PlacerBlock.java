@@ -202,7 +202,7 @@ public class PlacerBlock extends RotationalNetworkBlock implements PolymerBlock,
             this.main.setTransformation(mat);
 
             mat.rotateY(MathHelper.HALF_PI);
-            mat.scale( 0.48f);
+            mat.scale( 0.4f);
 
             mat.translate((float) (-MathHelper.cos(this.rotation) * 0.3) - 0.3f, -MathHelper.sin(this.rotation) * 4f / 16f - 2 / 16f, 0);
             mat.rotateZ(MathHelper.cos(this.rotation) / 4);

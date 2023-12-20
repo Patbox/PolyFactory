@@ -8,6 +8,7 @@ import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polyfactory.item.block.ColoredDownsampledBlockItem;
 import eu.pb4.polyfactory.item.block.GearItem;
 import eu.pb4.polyfactory.item.block.WindmillSailItem;
+import eu.pb4.polyfactory.item.tool.DynamiteItem;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.item.util.*;
 import eu.pb4.polyfactory.util.DyeColorExtra;
@@ -55,6 +56,7 @@ public class FactoryItems {
     public static final Item METAL_GRID = register(FactoryBlocks.METAL_GRID);
     public static final Item SAW_DUST = register("saw_dust", new ModeledItem(Items.STICK, new Item.Settings()));
     public static final Item COAL_DUST = register("coal_dust", new ModeledItem(Items.COAL, new Item.Settings()));
+    public static final Item NETHERRACK_DUST = register("netherrack_dust", new ModeledItem(new Item.Settings()));
     public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", new ModeledItem(new Item.Settings()));
     public static final Item STEEL_INGOT = register("steel_ingot", new ModeledItem(new Item.Settings()));
     public static final Item STEEL_PLATE = register("steel_plate", new ModeledItem(new Item.Settings()));
@@ -89,6 +91,7 @@ public class FactoryItems {
     public static final Item WITHER_SKULL_GENERATOR = register(FactoryBlocks.WITHER_SKULL_GENERATOR);
 
     public static final Item ARTIFICIAL_DYE = register("artificial_dye", new ArtificialDyeItem(new Item.Settings()));
+    public static final Item DYNAMITE = register("dynamite", new DynamiteItem(new Item.Settings().maxCount(16)));
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
     public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING);
 
@@ -155,7 +158,6 @@ public class FactoryItems {
                     entries.add(ELECTRIC_MOTOR);
 
                     // Rest
-
                     entries.add(INVERTED_REDSTONE_LAMP);
                     entries.add(ColoredItem.stack(LAMP, 1, DyeColor.WHITE));
                     entries.add(ColoredItem.stack(INVERTED_LAMP, 1, DyeColor.WHITE));
@@ -163,9 +165,13 @@ public class FactoryItems {
                     entries.add(ColoredItem.stack(INVERTED_CAGED_LAMP, 1, DyeColor.WHITE));
                     entries.add(TINY_POTATO_SPRING);
 
+                    // Other items
+                    entries.add(DYNAMITE);
+
                     // Generic Materials
                     entries.add(SAW_DUST);
                     entries.add(COAL_DUST);
+                    entries.add(NETHERRACK_DUST);
                     entries.add(STEEL_ALLOY_MIXTURE);
                     entries.add(STEEL_INGOT);
                     entries.add(STEEL_PLATE);

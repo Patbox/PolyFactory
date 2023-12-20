@@ -128,8 +128,6 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
         self.process += speed / 30;
 
-        self.model.rotate((float) self.process);
-
         if (self.process >= 1) {
             self.process = 0;
             self.stress = 0;
@@ -144,6 +142,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
             }
             self.markDirty();
         }
+        self.model.rotate((float) self.process);
     }
 
     public float getStress() {

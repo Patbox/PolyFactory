@@ -1,1 +1,6 @@
-- Compressed all asset files, making them take less space
+- Added throwable Dynamite item.
+- Improved status display and ui for Mechanical Mixer.
+- Added Netherrack Dust and Gunpowder recipe.
+- Model and texture tweaks and fixes.
+- Compressed all asset files, making them take less space.
+- Italian translation by CamperSamu

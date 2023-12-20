@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.press.PressRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.util.FactorySoundEvents;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -27,7 +28,6 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -177,7 +177,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
                 self.model.updatePiston(self.process);
 
                 if (self.process >= 0.4 && !self.playedSound) {
-                    world.playSound(null, pos, SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 0.1f, 1.2f);
+                    world.playSound(null, pos, FactorySoundEvents.BLOCK_PRESS_CRAFT, SoundCategory.BLOCKS, 0.1f, 1.2f);
                     self.playedSound = true;
                 }
             } else if (world.getTime() % 5 == 0) {

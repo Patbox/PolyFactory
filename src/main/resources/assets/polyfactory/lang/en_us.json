@@ -43,6 +43,7 @@
   "block.polyfactory.tiny_potato_spring": "Potato on a Spring",
   "item.polyfactory.mod_icon": "Mod Icon",
   "item.polyfactory.windmill_sail": "Windmill Sail",
+  "item.polyfactory.dynamite": "Dynamite",
   "item.polyfactory.item_filter": "Item Filter",
   "item.polyfactory.item_filter.empty": "Empty Item Filter",
   "item.polyfactory.item_filter.with": "Item Filter (%s)",
@@ -54,6 +55,7 @@
   "item.polyfactory.large_steel_gear": "Large Steel Gear",
   "item.polyfactory.coal_dust": "Coal Dust",
   "item.polyfactory.saw_dust": "Saw Dust",
+  "item.polyfactory.netherrack_dust": "Netherrack Dust",
   "item.polyfactory.integrated_circuit": "Integrated Circuit",
   "item.polyfactory.artificial_dye": "Artificial Dye",
   "item.polyfactory.artificial_dye.named": "Artificial Dye (%s)",
@@ -85,20 +87,26 @@
   "item.polyfactory.wrench.action.scroll_loop": "Scroll Loop",
   "item.polyfactory.wrench.action.reverse": "Reverse",
 
+  "entity.polyfactory.dynamite": "Dynamite",
+
   "enchantment.polyfactory.ignore_movement": "Stable Ground",
   "recipe_type.polyfactory.press": "Press",
   "recipe_type.polyfactory.mixer": "Mixer",
   "recipe_type.polyfactory.grinding": "Grinder",
 
   "stat.polyfactory.taters_clicked": "Potatoes Clicked",
-  "subtitles.block.crafter.craft": "Crafter crafts",
+  "subtitles.polyfactory.block.press.craft": "Mechanical Press presses",
+  "subtitles.polyfactory.entity.dynamite.throw": "Dynamite flies",
 
   "text.polyfactory.artificial_color": "Artificially Colored",
   "text.polyfactory.recipes": "Recipes",
-
+  "text.polyfactory.current_heat": "Current heat",
+  "text.polyfactory.required_heat": "Required heat",
   "text.polyfactory.state.overstressed": "Overstressed!",
   "text.polyfactory.state.locked": "Locked!",
   "text.polyfactory.state.too_slow": "Too slow!",
+  "text.polyfactory.state.too_cold": "Too cold!",
+  "text.polyfactory.state.too_hot": "Too hot!",
   "text.polyfactory.state.incorrect_items": "Incorrect ingredients!",
   "text.polyfactory.state.output_full": "Output full!",
 

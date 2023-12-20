@@ -15,6 +15,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.WrappingRecipeInputInventory;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
+import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
@@ -32,6 +33,7 @@ import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -41,6 +43,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class MixerBlockEntity extends TallItemMachineBlockEntity {
+
     public static final int OUTPUT_FIRST = 6;
     public static final int INPUT_FIRST = 0;
     public static final int SIZE = 9;
@@ -177,6 +180,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
 
         if (self.temperature < self.currentRecipe.value().minimumTemperature() || self.temperature > self.currentRecipe.value().maxTemperature()) {
             self.active = false;
+            self.state = self.temperature < self.currentRecipe.value().minimumTemperature() ? TOO_COLD_TEXT : TOO_HOT_TEXT;
             self.model.setActive(false);
             self.model.tick();
             return;
@@ -316,6 +320,8 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     }
 
     private class Gui extends SimpleGui {
+        private static final Text CURRENT_HEAT = Text.translatable("text.polyfactory.current_heat").styled(x -> x.withItalic(false));
+
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X3, player, false);
             this.setTitle(GuiTextures.MIXER.apply(MixerBlockEntity.this.getCachedState().getBlock().getName()));
@@ -328,7 +334,8 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             this.setSlotRedirect(2 + 18, new Slot(MixerBlockEntity.this, 4, 4, 0));
             this.setSlotRedirect(3 + 18, new Slot(MixerBlockEntity.this, 5, 5, 0));
             this.setSlot(4 + 9, GuiTextures.PROGRESS_HORIZONTAL_OFFSET_RIGHT.get(progress()));
-            this.setSlot(4 + 9 + 9, GuiTextures.FLAME_OFFSET_RIGHT.get(MathHelper.clamp(MixerBlockEntity.this.temperature, 0, 1)));
+            this.setSlot(4 + 9 + 9, GuiTextures.FLAME_OFFSET_RIGHT.getNamed(MathHelper.clamp(MixerBlockEntity.this.temperature, 0, 1), CURRENT_HEAT));
+            this.setSlot(5 + 9 + 9, GuiElementBuilder.from(GuiTextures.EMPTY.getItemStack()).setName(CURRENT_HEAT));
             this.setSlotRedirect(6, new FurnaceOutputSlot(player, MixerBlockEntity.this, 6, 3, 0));
             this.setSlotRedirect(6 + 9, new FurnaceOutputSlot(player, MixerBlockEntity.this, 7, 3, 0));
             this.setSlotRedirect(6 + 18, new FurnaceOutputSlot(player, MixerBlockEntity.this, 8, 3, 0));
@@ -347,7 +354,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
                 this.close();
             }
             this.setSlot(4 + 9, GuiTextures.PROGRESS_HORIZONTAL_OFFSET_RIGHT.get(progress()));
-            this.setSlot(4 + 9 + 9, GuiTextures.FLAME_OFFSET_RIGHT.get(MathHelper.clamp(MixerBlockEntity.this.temperature, 0, 1)));
+            this.setSlot(4 + 9 + 9, GuiTextures.FLAME_OFFSET_RIGHT.getNamed(MathHelper.clamp(MixerBlockEntity.this.temperature, 0, 1), CURRENT_HEAT));
             super.onTick();
         }
     }

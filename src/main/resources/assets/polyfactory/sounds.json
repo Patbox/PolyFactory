@@ -1,0 +1,14 @@
+{
+  "entity.dynamite.throw": {
+    "sounds": [
+      "random/bow"
+    ],
+    "subtitle": "subtitles.polyfactory.entity.dynamite.throw"
+  },
+  "block.press.craft": {
+    "sounds": [
+      "random/anvil_land"
+    ],
+    "subtitle": "subtitles.polyfactory.block.press.craft"
+  }
+}
