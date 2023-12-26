@@ -40,7 +40,7 @@
     "block.polyfactory.creative_motor": "크리에이티브 모터",
     "block.polyfactory.creative_container": "크리에이티브 콘테이너",
     "block.polyfactory.inverted_redstone_lamp": "반전된 레드스톤 램프 ",
-    "block.polyfactory.tiny_potato_spring": "Potato on a Spring",
+    "block.polyfactory.tiny_potato_spring": "대롱감자",
     "item.polyfactory.mod_icon": "모드 아이콘",
     "item.polyfactory.windmill_sail": "풍차 돛",
     "item.polyfactory.dynamite": "다이나마이트",
@@ -160,10 +160,10 @@
     "advancements.polyfactory.wrench.title": "설정 완료.",
     "advancements.polyfactory.wrench.description": "렌치를 사용해 기계들의 설정을 수정해보세요.",
     "advancements.polyfactory.tater_16.title": "포테이토 입문자",
-    "advancements.polyfactory.tater_16.description": "포테이토를 16번 클릭해보세요....",
+    "advancements.polyfactory.tater_16.description": "대롱감자를 16번 클릭해보세요....",
     "advancements.polyfactory.tater_128.title": "포테이토 2스택",
-    "advancements.polyfactory.tater_128.description": "포테이토를 128번 클릭해보세요...",
+    "advancements.polyfactory.tater_128.description": "대롱감자를 128번 클릭해보세요...",
     "advancements.polyfactory.tater_1024.title": "포테이토 전문가",
-    "advancements.polyfactory.tater_1024.description": "포테이토를 1024번 클릭해보세요... 이게 끝이에요! 더 안눌러도 돼요!",
+    "advancements.polyfactory.tater_1024.description": "대롱감자를 1024번 클릭해보세요... 이게 끝이에요! 더 안눌러도 돼요!",
     "color.polyfactory.teal": "틸"
 }
