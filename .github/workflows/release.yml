@@ -33,7 +33,7 @@ jobs:
       - name: compress png
         run: chmod +x ./oxipng/oxipng && ./oxipng/oxipng -o max -s -a -r src
       - name: Build and publish with Gradle
-        run: ./gradlew build publish
+        run: ./gradlew downloadTranslations build publish
         env:
           MODRINTH: ${{ secrets.MODRINTH }}
           CHANGELOG: ${{ github.event.release.body }}

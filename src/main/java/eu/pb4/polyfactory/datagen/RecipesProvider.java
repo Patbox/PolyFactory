@@ -612,6 +612,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .input(Items.PAPER, 1).input(Items.GUNPOWDER, 2).input(ItemTags.SAND)
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(Items.GUNPOWDER))
                 .offerTo(exporter);
+
         of(exporter, 
                 GenericMixingRecipe.ofCounted("treated_dried_kelp", List.of(CountedIngredient.ofItems(16, Items.DRIED_KELP), CountedIngredient.ofItems(1, Items.BLACK_DYE)), 2, 1, 6f, 0.2f, new ItemStack(FactoryItems.TREATED_DRIED_KELP, 16)),
                 GenericMixingRecipe.ofCounted("fermented_spider_eye", List.of(CountedIngredient.ofItems(1, Items.SPIDER_EYE),

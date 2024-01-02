@@ -35,7 +35,7 @@ jobs:
       - name: compress png
         run: chmod +x ./oxipng/oxipng && ./oxipng/oxipng -o max -s -a -r src
       - name: build
-        run: ./gradlew build
+        run: ./gradlew downloadTranslations build
       - name: capture build artifacts
         if: ${{ runner.os == 'Linux' && matrix.java == '17' }} # Only upload artifacts built from LTS java on one OS
         uses: actions/upload-artifact@v2
