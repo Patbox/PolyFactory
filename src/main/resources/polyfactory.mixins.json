@@ -10,6 +10,7 @@
     "machines.HopperBlockMixin",
     "machines.WorldMixin",
     "player.ItemUsageContextAccessor",
+    "player.LivingEntityMixin",
     "player.ServerPlayerEntityMixin",
     "player.ServerPlayerInteractionManagerMixin",
     "player.ServerPlayNetworkHandlerMixin",

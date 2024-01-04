@@ -1,6 +1,6 @@
-- Added throwable Dynamite item.
-- Improved status display and ui for Mechanical Mixer.
-- Added Netherrack Dust and Gunpowder recipe.
-- Model and texture tweaks and fixes.
-- Compressed all asset files, making them take less space.
-- Italian translation by CamperSamu
+- Added Clutch. It works like an Axle, but when powered with redstone it disconnects both sides from each other.
+- Added Crushed Raw Iron/Gold/Copper. They can be smelted into regular ingots. You get them by grinding raw ores, from which you get 1-2 of them.
+- Mechanical Miners can attack entities now.
+- Improved the Polydex recipe support.
+- Tweaked textures of dynamite and lamps.
+- Tweaked recipes of dynamite.

@@ -343,6 +343,18 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.AXLE))
                 .offerTo(exporter);
 
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.CLUTCH, 1)
+                .pattern("sps")
+                .pattern("gwg")
+                .pattern("sps")
+                .input('w', FactoryItems.AXLE)
+                .input('s', ItemTags.PLANKS)
+                .input('g', FactoryItems.STEEL_GEAR)
+                .input('p', FactoryItems.STEEL_PLATE)
+                .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.AXLE))
+                .offerTo(exporter);
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.HAND_CRANK)
                 .pattern("ip")
                 .pattern("l ")
@@ -413,19 +425,31 @@ class RecipesProvider extends FabricRecipeProvider {
                 GrindingRecipe.of("iron_ingot_to_nuggets", Ingredient.ofItems(Items.IRON_INGOT), 2, 5, 10, new ItemStack(Items.IRON_NUGGET, 9)),
                 GrindingRecipe.of("gold_ingot_to_nuggets", Ingredient.ofItems(Items.GOLD_INGOT), 1.8, 5, 10, new ItemStack(Items.GOLD_NUGGET, 9)),
 
-                GrindingRecipe.of("iron_ore_to_raw", Ingredient.fromTag(ItemTags.IRON_ORES), 6, 10, 30,
+                GrindingRecipe.of("iron_ore_to_raw", Ingredient.fromTag(ItemTags.IRON_ORES), 6, 12, 38,
                         OutputStack.of(Items.RAW_IRON, 1f, 1), OutputStack.of(Items.RAW_IRON, 0.6f, 5)
                 ),
-                GrindingRecipe.of("gold_ore_to_raw", Ingredient.fromTag(ItemTags.GOLD_ORES), 6, 10, 30,
+                GrindingRecipe.of("gold_ore_to_raw", Ingredient.fromTag(ItemTags.GOLD_ORES), 6, 12, 38,
                         OutputStack.of(Items.RAW_GOLD, 1f, 1), OutputStack.of(Items.RAW_GOLD, 0.6f, 5)
                 ),
-                GrindingRecipe.of("copper_ore_to_raw", Ingredient.fromTag(ItemTags.COPPER_ORES), 6, 10, 30,
+                GrindingRecipe.of("copper_ore_to_raw", Ingredient.fromTag(ItemTags.COPPER_ORES), 6, 12, 38,
                         OutputStack.of(Items.RAW_COPPER, 1f, 2), OutputStack.of(Items.RAW_COPPER, 0.6f, 20)
                 ),
                 GrindingRecipe.of("bone_to_bone_meal", Ingredient.ofItems(Items.BONE), 1, 5, 10, OutputStack.of(Items.BONE_MEAL, 1, 3), OutputStack.of(Items.BONE_MEAL, 0.5f, 2)),
                 GrindingRecipe.of("blaze_rod_to_powder", Ingredient.ofItems(Items.BLAZE_ROD), 2, 5, 10, OutputStack.of(Items.BLAZE_POWDER, 1, 2), OutputStack.of(Items.BLAZE_POWDER, 0.5f, 2)),
                 GrindingRecipe.of("glowstone_to_powder", Ingredient.ofItems(Items.GLOWSTONE), 1, 5, 10, new ItemStack(Items.GLOWSTONE_DUST, 4)),
                 GrindingRecipe.of("sugar", Ingredient.ofItems(Items.SUGAR_CANE), 1, 5, OutputStack.of(Items.SUGAR, 1f, 1), OutputStack.of(Items.SUGAR, 0.4f, 1)),
+
+                // Crushed raw metals
+
+                GrindingRecipe.of("crushed_raw_iron", Ingredient.ofItems(Items.RAW_IRON), 6, 12, 38,
+                        OutputStack.of(FactoryItems.CRUSHED_RAW_IRON, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_IRON, 0.33f, 1)
+                ),
+                GrindingRecipe.of("crushed_raw_gold", Ingredient.ofItems(Items.RAW_GOLD), 4, 12, 38,
+                        OutputStack.of(FactoryItems.CRUSHED_RAW_GOLD, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_GOLD, 0.33f, 1)
+                ),
+                GrindingRecipe.of("crushed_raw_copper", Ingredient.ofItems(Items.RAW_COPPER), 4, 12, 38,
+                        OutputStack.of(FactoryItems.CRUSHED_RAW_COPPER, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_COPPER, 0.33f, 1)
+                ),
 
                 // Flower to Dye
                 GrindingRecipe.of("dandelion_to_dye", "dye", Ingredient.ofItems(Items.DANDELION), 1, 6, new ItemStack(Items.YELLOW_DYE, 3)),
@@ -448,6 +472,13 @@ class RecipesProvider extends FabricRecipeProvider {
                 GrindingRecipe.of("pitcher_to_dye", "dye", Ingredient.ofItems(Items.PITCHER_PLANT), 1, 6, new ItemStack(Items.CYAN_DYE, 6)),
                 GrindingRecipe.of("cactus_to_dye", "dye", Ingredient.ofItems(Items.CACTUS), 1, 6, new ItemStack(Items.GREEN_DYE, 3))
         );
+
+        offerSmelting(exporter, List.of(FactoryItems.CRUSHED_RAW_IRON), RecipeCategory.MISC, Items.IRON_INGOT, 0.5F, 180, "iron_ingot");
+        offerSmelting(exporter, List.of(FactoryItems.CRUSHED_RAW_COPPER), RecipeCategory.MISC, Items.COPPER_INGOT, 0.5F, 180, "copper_ingot");
+        offerSmelting(exporter, List.of(FactoryItems.CRUSHED_RAW_GOLD), RecipeCategory.MISC, Items.GOLD_INGOT, 0.7F, 180, "gold_ingot");
+        offerBlasting(exporter, List.of(FactoryItems.CRUSHED_RAW_IRON), RecipeCategory.MISC, Items.IRON_INGOT, 0.5F, 100, "iron_ingot");
+        offerBlasting(exporter, List.of(FactoryItems.CRUSHED_RAW_COPPER), RecipeCategory.MISC, Items.COPPER_INGOT, 0.5F, 100, "copper_ingot");
+        offerBlasting(exporter, List.of(FactoryItems.CRUSHED_RAW_GOLD), RecipeCategory.MISC, Items.GOLD_INGOT, 0.7F, 100, "gold_ingot");
 
         of(exporter,
                 GenericPressRecipe.of("purpur_block", Ingredient.ofItems(Items.POPPED_CHORUS_FRUIT), 4, 5f, new ItemStack(Items.PURPUR_BLOCK, 1)),
@@ -609,7 +640,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 new RecipeEntry<>(id("mixing/artificial_dye"), new ArtificialDyeMixingRecipe(3, 4, 15))
         );
         ShapelessRecipeJsonBuilder.create(RecipeCategory.COMBAT, FactoryItems.DYNAMITE)
-                .input(Items.PAPER, 1).input(Items.GUNPOWDER, 2).input(ItemTags.SAND)
+            .input(Items.PAPER, 1).input(FactoryItems.SAW_DUST, 1).input(Items.GUNPOWDER, 2).input(ItemTags.SAND)
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(Items.GUNPOWDER))
                 .offerTo(exporter);
 
@@ -656,7 +687,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         List.of(CountedIngredient.ofItems(8, Items.REDSTONE), CountedIngredient.ofItems(3, FactoryItems.NETHERRACK_DUST)),
                         8, 5, 16, new ItemStack(Items.GLOWSTONE_DUST, 8)),
                 GenericMixingRecipe.ofCounted("dynamite",
-                        List.of(CountedIngredient.ofItems(1, Items.PAPER), CountedIngredient.fromTag(1, ItemTags.SAND), CountedIngredient.ofItems(2, Items.GUNPOWDER)),
+                        List.of(CountedIngredient.ofItems(1, Items.PAPER), CountedIngredient.ofItems(1, FactoryItems.SAW_DUST), CountedIngredient.fromTag(1, ItemTags.SAND), CountedIngredient.ofItems(2, Items.GUNPOWDER)),
                         2, 1, 6f, new ItemStack(FactoryItems.DYNAMITE, 1)),
                 GenericMixingRecipe.ofCounted("gunpowder",
                         List.of(CountedIngredient.ofItems(2, FactoryItems.NETHERRACK_DUST),

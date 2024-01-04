@@ -33,4 +33,9 @@ Simplest way to handle automatic resource pack generation for your server!
 While bundled by main distribution of [Polymer](https://modrinth.com/mod/polymer), it requires some manual
 setup to work correctly. But it is quick and simple!
 
+## Contribute!
+Do you speak some other languages than english? If so, you can help with translating
+this mod (and others) to it!
+### https://crowdin.com/project/patbox-mods
+If you can't find the language you speak, feel free to request it!
 

@@ -74,6 +74,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                         FactoryBlocks.SPLITTER)
                 .add(FactoryBlocks.MIXER)
                 .add(FactoryBlocks.PLANTER)
+                .add(FactoryBlocks.PLACER)
                 .add(FactoryBlocks.STEAM_ENGINE)
                 .add(FactoryBlocks.ITEM_COUNTER)
                 .add(FactoryBlocks.REDSTONE_INPUT)
@@ -85,6 +86,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.ELECTRIC_MOTOR)
                 .add(FactoryBlocks.ELECTRIC_GENERATOR)
                 .add(FactoryBlocks.CRAFTER)
+                .add(FactoryBlocks.CLUTCH)
                 .add(FactoryBlocks.WITHER_SKULL_GENERATOR)
         ;
 

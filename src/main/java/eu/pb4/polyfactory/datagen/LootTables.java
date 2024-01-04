@@ -39,6 +39,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.FUNNEL);
         this.addDrop(FactoryBlocks.AXLE);
         this.addDrop(FactoryBlocks.GEARBOX);
+        this.addDrop(FactoryBlocks.CLUTCH);
         this.addDrop(FactoryBlocks.CONTAINER);
         this.addDrop(FactoryBlocks.NIXIE_TUBE);
         this.addDrop(FactoryBlocks.METAL_GRID);

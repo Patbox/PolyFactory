@@ -3,7 +3,6 @@ package eu.pb4.polyfactory.item;
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.factorytools.api.item.MultiBlockItem;
-import eu.pb4.factorytools.api.item.PolymerMusicDiscItem;
 import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polyfactory.item.block.ColoredDownsampledBlockItem;
 import eu.pb4.polyfactory.item.block.GearItem;
@@ -24,12 +23,9 @@ import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
-
-import static eu.pb4.polyfactory.ModInit.id;
 
 public class FactoryItems {
     public static final Item MOD_ICON = register("mod_icon", new ModeledItem(new Item.Settings()));
@@ -50,6 +46,7 @@ public class FactoryItems {
     public static final Item PLANTER = register(FactoryBlocks.PLANTER);
     public static final FactoryBlockItem AXLE = register(FactoryBlocks.AXLE);
     public static final Item GEARBOX = register(FactoryBlocks.GEARBOX);
+    public static final Item CLUTCH = register(FactoryBlocks.CLUTCH);
     public static final Item CONTAINER = register( FactoryBlocks.CONTAINER);
     public static final Item NIXIE_TUBE = register(FactoryBlocks.NIXIE_TUBE);
     public static final WindmillSailItem WINDMILL_SAIL = register("windmill_sail", new WindmillSailItem(new Item.Settings()));
@@ -95,6 +92,10 @@ public class FactoryItems {
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
     public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING);
 
+    public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", new ModeledItem(new Item.Settings()));
+    public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", new ModeledItem(new Item.Settings()));
+    public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
+
 
     public static void register() {
         FuelRegistry.INSTANCE.add(SAW_DUST, 60);
@@ -112,6 +113,7 @@ public class FactoryItems {
                     // Rotation transmission
                     entries.add(AXLE);
                     entries.add(GEARBOX);
+                    entries.add(CLUTCH);
                     entries.add(STEEL_GEAR);
                     entries.add(LARGE_STEEL_GEAR);
 
@@ -172,6 +174,9 @@ public class FactoryItems {
                     entries.add(SAW_DUST);
                     entries.add(COAL_DUST);
                     entries.add(NETHERRACK_DUST);
+                    entries.add(CRUSHED_RAW_IRON);
+                    entries.add(CRUSHED_RAW_COPPER);
+                    entries.add(CRUSHED_RAW_GOLD);
                     entries.add(STEEL_ALLOY_MIXTURE);
                     entries.add(STEEL_INGOT);
                     entries.add(STEEL_PLATE);

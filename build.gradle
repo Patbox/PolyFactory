@@ -95,7 +95,7 @@ dependencies {
 	modImplementation include('eu.pb4:map-canvas-api:0.2.2+1.19.4')
 	modImplementation include('eu.pb4:common-protection-api:1.0.0')
 	modImplementation include('eu.pb4:sidebar-api:0.3.0+1.20.3')
-	modImplementation include('eu.pb4:sgui:1.4.0+1.20.4')
+	modImplementation include('eu.pb4:sgui:1.4.1+1.20.4')
 	modImplementation include('com.kneelawk:graphlib:1.4.0+1.20.4')
 	modImplementation include('eu.pb4:factorytools:0.1.2+1.20.4')
 

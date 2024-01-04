@@ -31,10 +31,14 @@ class AssetProvider implements DataProvider {
             }
         };
         return CompletableFuture.runAsync(() -> {
-            ConveyorModel.generateModels(assetWriter);
-            CableModel.generateModels(assetWriter);
-            UiResourceCreator.generateAssets(assetWriter);
+            runWriters(assetWriter);
         }, Util.getMainWorkerExecutor());
+    }
+
+    public static void runWriters(BiConsumer<String,byte[]> assetWriter) {
+        ConveyorModel.generateModels(assetWriter);
+        CableModel.generateModels(assetWriter);
+        UiResourceCreator.generateAssets(assetWriter);
     }
 
     @Override

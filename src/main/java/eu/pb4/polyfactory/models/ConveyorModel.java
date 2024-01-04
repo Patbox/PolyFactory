@@ -68,7 +68,7 @@ public class ConveyorModel {
     };
     private static final String MODEL_JSON = """
             {
-              "parent": "polyfactory:block/conveyor|TYPE|",
+              "parent": "polyfactory:block/|SUBTYPE|conveyor|TYPE|",
               "textures": {
                 "1": "polyfactory:block/gen/|PREFIX|conveyor_top_|ID|"
               }
@@ -76,7 +76,7 @@ public class ConveyorModel {
             """;
     private static final String MODEL_JSON_UP = """
             {
-              "parent": "polyfactory:block/conveyor_up|TYPE|",
+              "parent": "polyfactory:block/|SUBTYPE|conveyor_up|TYPE|",
               "textures": {
                 "1": "polyfactory:block/gen/|PREFIX|conveyor_top_|ID|"
               }
@@ -84,7 +84,7 @@ public class ConveyorModel {
             """;
     private static final String MODEL_JSON_DOWN = """
             {
-              "parent": "polyfactory:block/conveyor_down|TYPE|",
+              "parent": "polyfactory:block/|SUBTYPE|conveyor_down|TYPE|",
               "textures": {
                 "1": "polyfactory:block/gen/|PREFIX|conveyor_top_|ID|"
               }
@@ -99,7 +99,7 @@ public class ConveyorModel {
     public static final ItemStack STICKY_DOWN_FAST = new ItemStack(MODEL_ITEMS[currentItemIndex++]);
 
     private static void createItemModel(ItemStack[] array, String path, int i) {
-        var model = PolymerResourcePackUtils.requestModel(MODEL_ITEMS[currentItemIndex++ % MODEL_ITEMS.length], FactoryUtil.id(path + (i == 0 ? "" : ("/" + i))));
+        var model = PolymerResourcePackUtils.requestModel(MODEL_ITEMS[currentItemIndex++ % MODEL_ITEMS.length], FactoryUtil.id(path));
         var stack = new ItemStack(model.item());
         stack.getOrCreateNbt().putInt("CustomModelData", model.value());
         array[i == 0 ? 0 : (array.length - i)] = stack;
@@ -115,19 +115,20 @@ public class ConveyorModel {
 
         for (int i = 0; i <= FRAMES; i++) {
             for (var a = 0; a < 16; a++) {
-                String addition = a == 0 ? "" : ("_" + a);
-
-                createItemModel(ANIMATION_REGULAR[a], "block/conveyor" + addition, i);
-                createItemModel(ANIMATION_UP[a], "block/conveyor_up" + addition, i);
-                createItemModel(ANIMATION_DOWN[a], "block/conveyor_down" + addition, i);
-                createItemModel(ANIMATION_REGULAR_STICKY[a], "block/sticky_conveyor" + addition, i);
-                createItemModel(ANIMATION_UP_STICKY[a], "block/sticky_conveyor_up" + addition, i);
-                createItemModel(ANIMATION_DOWN_STICKY[a], "block/sticky_conveyor_down" + addition, i);
+                String addition = i == 0 ? (a == 0 ? "" : "_" + a) : ("_" + a + "/" + i);
+                String prefix = a == 0 && i == 0 ? "" : "gen/";
+                createItemModel(ANIMATION_REGULAR[a], "block/" + prefix + "conveyor" + addition, i);
+                createItemModel(ANIMATION_UP[a], "block/" + prefix + "conveyor_up" + addition, i);
+                createItemModel(ANIMATION_DOWN[a], "block/" + prefix + "conveyor_down" + addition, i);
+                createItemModel(ANIMATION_REGULAR_STICKY[a], "block/" + prefix + "sticky_conveyor" + addition, i);
+                createItemModel(ANIMATION_UP_STICKY[a], "block/" + prefix + "sticky_conveyor_up" + addition, i);
+                createItemModel(ANIMATION_DOWN_STICKY[a], "block/" + prefix + "sticky_conveyor_down" + addition, i);
             }
         }
 
         if (ModInit.DYNAMIC_ASSETS) {
-            PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register((resourcePackBuilder) -> ConveyorModel.generateModels(resourcePackBuilder::addData));
+            PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register((resourcePackBuilder) ->
+                    ConveyorModel.generateModels(resourcePackBuilder::addData));
         }
     }
 
@@ -210,10 +211,10 @@ public class ConveyorModel {
                 }
                 base.add("elements", elements);
 
-                dataWriter.accept("assets/polyfactory/models/block/" + variant + "_" + i + ".json", base.toString().getBytes(StandardCharsets.UTF_8));
-                dataWriter.accept("assets/polyfactory/models/block/sticky_" + variant + "_" + i + ".json", ("""
+                dataWriter.accept("assets/polyfactory/models/block/gen/" + variant + "_" + i + ".json", base.toString().getBytes(StandardCharsets.UTF_8));
+                dataWriter.accept("assets/polyfactory/models/block/gen/sticky_" + variant + "_" + i + ".json", ("""
                         {
-                          "parent": "polyfactory:block/""" + variant + "_" + i
+                          "parent": "polyfactory:block/gen/""" + variant + "_" + i
                         + """
                         ",
                          "textures": {
@@ -237,12 +238,21 @@ public class ConveyorModel {
         dataWriter.accept("assets/polyfactory/textures/block/gen/" + prefix + "conveyor_top_" + i + ".png", texture);
 
         for (int a = 0; a < 16; a++) {
-            var base = (a == 0 ? "" : ("_" + a + ""));
-            var addition = (a == 0 ? "/" : ("_" + a + "/")) + i;
+            var base = a == 0 ? "" : "_" + a;
+            var addition = "_" + a + "/" + i;
 
-            dataWriter.accept("assets/polyfactory/models/block/" + prefix + "conveyor" + addition + ".json", MODEL_JSON.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
-            dataWriter.accept("assets/polyfactory/models/block/" + prefix + "conveyor_up" + addition + ".json", MODEL_JSON_UP.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
-            dataWriter.accept("assets/polyfactory/models/block/" + prefix + "conveyor_down" + addition + ".json", MODEL_JSON_DOWN.replace("|PREFIX|", prefix).replace("|ID|", "" + i).replace("|TYPE|", base).getBytes(StandardCharsets.UTF_8));
+            dataWriter.accept("assets/polyfactory/models/block/gen/" + prefix + "conveyor" + addition + ".json", MODEL_JSON.
+                    replace("|PREFIX|", prefix).replace("|ID|", "" + i)
+                    .replace("|TYPE|", base).replace("|SUBTYPE|", a == 0  ? "" : "gen/")
+                    .getBytes(StandardCharsets.UTF_8));
+            dataWriter.accept("assets/polyfactory/models/block/gen/" + prefix + "conveyor_up" + addition + ".json", MODEL_JSON_UP
+                    .replace("|PREFIX|", prefix).replace("|ID|", "" + i)
+                    .replace("|TYPE|", base).replace("|SUBTYPE|", a == 0 ? "" : "gen/")
+                    .getBytes(StandardCharsets.UTF_8));
+            dataWriter.accept("assets/polyfactory/models/block/gen/" + prefix + "conveyor_down" + addition + ".json", MODEL_JSON_DOWN
+                    .replace("|PREFIX|", prefix).replace("|ID|", "" + i)
+                    .replace("|TYPE|", base).replace("|SUBTYPE|", a == 0 ? "" : "gen/")
+                    .getBytes(StandardCharsets.UTF_8));
         }
     }
 

@@ -71,6 +71,10 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
             this.setVelocity(this.getVelocity().multiply(0.8, -0.8, 0.8));
         }
 
+        if (this.isTouchingWater()) {
+            this.setVelocity(this.getVelocity().multiply(0.8));
+        }
+
         if (this.isOnFire()) {
             this.discard();
             this.explode();

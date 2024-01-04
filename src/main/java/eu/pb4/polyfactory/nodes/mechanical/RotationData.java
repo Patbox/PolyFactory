@@ -379,9 +379,12 @@ public class RotationData implements GraphEntity<RotationData> {
 
     @Override
     public void merge(@NotNull RotationData other) {
-        if (this.speed < other.speed) {
+        if (this.ctx.getGraph().size() < other.ctx.getGraph().size()) {
             this.rotation = other.rotation;
             this.rotationValue = other.rotationValue;
+        } else {
+            other.rotation = this.rotation;
+            other.rotationValue = this.rotationValue;
         }
     }
 

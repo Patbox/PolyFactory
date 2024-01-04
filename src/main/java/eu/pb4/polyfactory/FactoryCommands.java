@@ -42,8 +42,16 @@ public class FactoryCommands {
                                         .executes(FactoryCommands::enableLod)
                                 )
                         )
+                        //.then(literal("run_asset_generator")
+                        //        .executes(FactoryCommands::assetGenerator)
+                        //)
                 )
         );
+    }
+
+    private static int assetGenerator(CommandContext<ServerCommandSource> serverCommandSourceCommandContext) {
+
+        return 0;
     }
 
     private static int enableLod(CommandContext<ServerCommandSource> context) {

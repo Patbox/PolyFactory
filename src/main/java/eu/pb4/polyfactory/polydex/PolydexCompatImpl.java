@@ -11,12 +11,15 @@ import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
+import eu.pb4.polyfactory.polydex.pages.ColoringCraftingRecipePage;
 import eu.pb4.polyfactory.polydex.pages.GrindingRecipePage;
 import eu.pb4.polyfactory.polydex.pages.MixerRecipePage;
 import eu.pb4.polyfactory.polydex.pages.PressRecipePage;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
+import eu.pb4.polyfactory.recipe.ColoringCraftingRecipe;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import eu.pb4.factorytools.api.recipe.OutputStack;
+import eu.pb4.polyfactory.recipe.ShapelessNbtCopyRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
@@ -48,6 +51,7 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(GenericPressRecipe.class, PressRecipePage::new);
         PolydexPage.registerRecipeViewer(GenericMixingRecipe.class, MixerRecipePage::new);
         PolydexPage.registerRecipeViewer(GrindingRecipe.class, GrindingRecipePage::new);
+        PolydexPage.registerRecipeViewer(ColoringCraftingRecipe.class, ColoringCraftingRecipePage::new);
 
         PolydexEntry.registerEntryCreator(FactoryItems.CABLE, PolydexCompatImpl::seperateColoredItems);
         PolydexEntry.registerEntryCreator(FactoryItems.LAMP, PolydexCompatImpl::seperateColoredItems);
@@ -64,7 +68,24 @@ public class PolydexCompatImpl {
         if (dye != null) {
             baseId = baseId.withSuffixedPath("/" + dye.asString());
         }
-        return PolydexEntry.of(baseId, stack);
+        return PolydexEntry.of(baseId, stack, PolydexCompatImpl::isSameColoredObject);
+    }
+
+    private static boolean isSameColoredObject(PolydexEntry polydexEntry, PolydexStack<?> polydexStack) {
+        if (polydexStack.getBacking() instanceof ItemStack stack) {
+            var base = (ItemStack) polydexEntry.stack().getBacking();
+            if (!base.isOf(stack.getItem())) {
+                return false;
+            }
+
+            if (ColoredItem.hasColor(base) && !ColoredItem.hasColor(stack)) {
+                return true;
+            }
+
+            return ColoredItem.getColor(base) == ColoredItem.getColor(stack);
+        }
+
+        return polydexEntry.stack().matches(polydexStack, true);
     }
 
     private static void stateAccurateNames(HoverDisplayBuilder hoverDisplayBuilder) {
