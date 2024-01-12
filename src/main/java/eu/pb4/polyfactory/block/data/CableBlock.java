@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.data;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.FactoryBlock;
@@ -10,13 +11,14 @@ import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.models.CableModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.generic.SelectiveSideNode;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
@@ -246,7 +248,7 @@ public class CableBlock extends NetworkBlock implements FactoryBlock, BlockEntit
         return this.getName();
     }
 
-    public static final class Model extends BaseModel {
+    public static final class Model extends BlockModel {
         private final ItemDisplayElement main;
         private int color;
         private BlockState state;
@@ -261,8 +263,8 @@ public class CableBlock extends NetworkBlock implements FactoryBlock, BlockEntit
 
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
-            if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.setState(BlockBoundAttachment.get(this).getBlockState());
+            if (updateType == BlockAwareAttachment.BLOCK_STATE_UPDATE) {
+                this.setState(this.blockState());
             }
         }
 

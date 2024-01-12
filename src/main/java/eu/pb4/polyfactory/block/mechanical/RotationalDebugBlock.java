@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.nodes.generic.AllSideNode;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
@@ -43,7 +43,7 @@ public class RotationalDebugBlock extends RotationalNetworkBlock implements Poly
         return true;
     }
 
-    public final class Model extends BaseModel {
+    public final class Model extends BlockModel {
         private final TextDisplayElement mainElement;
         private final ServerWorld world;
         private final BlockPos pos;

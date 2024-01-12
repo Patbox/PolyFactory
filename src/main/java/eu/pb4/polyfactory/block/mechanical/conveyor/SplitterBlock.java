@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
@@ -241,7 +242,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
         return List.of(WrenchAction.FACING_HORIZONTAL);
     }
 
-    public static final class Model extends ElementHolder {
+    public static final class Model extends BlockModel {
         static {
         }
 
@@ -315,7 +316,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.updateFacing(BlockBoundAttachment.get(this).getBlockState());
+                this.updateFacing(this.blockState());
             }
         }
     }

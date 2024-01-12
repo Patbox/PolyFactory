@@ -113,24 +113,20 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                var x = BlockBoundAttachment.get(this);
-                assert x != null;
-                var pos = x.getBlockPos();
+                var pos = this.blockAware().getBlockPos();
                 this.mainElement.setItem(((pos.getX() + pos.getY() + pos.getZ()) % 2 == 0) ? ITEM_MODEL_2 : ITEM_MODEL_1);
             }
         }
 
         @Override
         protected void onTick() {
-
+            
             var tick = this.getAttachment().getWorld().getTime();
 
             if (tick % this.getUpdateRate() == 0) {
                 this.updateAnimation(this.getRotation(),
-                        ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(AXIS));
-                if (this.mainElement.isDirty()) {
-                    this.mainElement.startInterpolation();
-                }
+                        this.blockAware().getBlockState().get(AXIS));
+                this.mainElement.startInterpolationIfDirty();
             }
         }
 

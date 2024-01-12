@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.block.other;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ColoredItem;
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
@@ -93,7 +93,7 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
         return true;
     }
 
-    public static final class Model extends BaseModel implements ColorProvider.Consumer {
+    public static final class Model extends BlockModel implements ColorProvider.Consumer {
         private final ItemDisplayElement main;
         private final boolean inverted;
         private int color = -2;
@@ -112,7 +112,7 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.setState(BlockBoundAttachment.get(this).getBlockState());
+                this.setState(this.blockState());
             }
         }
 

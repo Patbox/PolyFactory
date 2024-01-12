@@ -147,7 +147,7 @@ public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements
             var tick = this.getAttachment().getWorld().getTime();
 
             if (tick % this.getUpdateRate() == 0) {
-                var facing = ((BlockBoundAttachment) this.getAttachment()).getBlockState();
+                var facing = this.blockState();
 
                 this.updateAnimation(this.getRotation(), facing);
                 if (this.axle.isDirty()) {
@@ -167,8 +167,8 @@ public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                updateStatePos(this.blockBound().getBlockState());
-                updateAnimation(this.getRotation(), this.blockBound().getBlockState());
+                updateStatePos(this.blockState());
+                updateAnimation(this.getRotation(), this.blockState());
                 this.axle.setInterpolationDuration(0);
                 this.axle.tick();
                 this.axle.setInterpolationDuration(this.getUpdateRate());

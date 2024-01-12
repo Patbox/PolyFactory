@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.machines;
 
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.util.movingitem.InventorySimpleContainerProvider;
 import eu.pb4.polyfactory.util.movingitem.MovingItem;
@@ -20,7 +20,7 @@ public abstract class TallItemMachineBlockEntity extends LockableBlockEntity imp
     }
 
     @Nullable
-    public abstract BaseModel getModel();
+    public abstract BlockModel getModel();
 
     public abstract double getStress();
 

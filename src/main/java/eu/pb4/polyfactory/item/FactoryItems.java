@@ -97,6 +97,9 @@ public class FactoryItems {
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
 
 
+    public static final Item THE_CUBE = register(FactoryBlocks.THE_CUBE);
+
+
     public static void register() {
         FuelRegistry.INSTANCE.add(SAW_DUST, 60);
         FuelRegistry.INSTANCE.add(WOODEN_PLATE, 120);
@@ -243,6 +246,7 @@ public class FactoryItems {
                         if (ModInit.DEV_ENV) {
                             entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                             entries.add(GREEN_SCREEN, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                            entries.add(THE_CUBE, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         }
                     })).build()
             );

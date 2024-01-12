@@ -220,11 +220,11 @@ public class PressBlock extends TallItemMachineBlock {
             var tick = this.getTick();
             var b = tick % this.getUpdateRate() == 0;
             var c = tick % 2 == 0;
-            var dir = BlockBoundAttachment.get(this).getBlockState().get(INPUT_FACING);
+            var dir = this.blockState().get(INPUT_FACING);
 
 
             this.updateAnimation(b, c,
-                    b ? RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos().up()).rotation() : 0,
+                    b ? RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().up()).rotation() : 0,
                     (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
 
             if (c && this.piston.isDirty()) {
@@ -241,7 +241,7 @@ public class PressBlock extends TallItemMachineBlock {
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                updateStatePos(BlockBoundAttachment.get(this).getBlockState());
+                updateStatePos(this.blockState());
             }
         }
 

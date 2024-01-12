@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.util.VirtualDestroyStage;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
@@ -39,7 +40,7 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
-public class ClutchBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker, WrenchableBlock, BarrierBasedWaterloggable {
+public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock, WrenchableBlock, BarrierBasedWaterloggable {
     public static final Property<Direction.Axis> AXIS = Properties.AXIS;
     public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
     public static final BooleanProperty POWERED = Properties.POWERED;
@@ -214,7 +215,7 @@ public class ClutchBlock extends RotationalNetworkBlock implements PolymerBlock,
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                updateStatePos(this.blockBound().getBlockState());
+                updateStatePos(this.blockState());
             }
         }
 
@@ -224,7 +225,7 @@ public class ClutchBlock extends RotationalNetworkBlock implements PolymerBlock,
             var tick = this.getAttachment().getWorld().getTime();
 
             if (tick % this.getUpdateRate() == 0) {
-                var state = this.blockBound().getBlockState();
+                var state = this.blockState();
 
 
                 float left, right;
@@ -237,7 +238,7 @@ public class ClutchBlock extends RotationalNetworkBlock implements PolymerBlock,
                     right = left;
                 }
 
-                this.updateAnimation(left, right, this.blockBound().getBlockState().get(AXIS));
+                this.updateAnimation(left, right, this.blockState().get(AXIS));
                 if (this.left.isDirty()) {
                     this.left.startInterpolation();
                 }

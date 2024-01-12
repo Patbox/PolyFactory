@@ -5,7 +5,7 @@ import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.FilterItem;
@@ -292,7 +292,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         return List.of(WrenchAction.FACING, MODE_ACTION);
     }
 
-    public static final class Model extends BaseModel {
+    public static final class Model extends BlockModel {
         private static final ItemStack MODEL_IN = new ItemStack(BaseItemProvider.requestModel());
         private static final ItemStack MODEL_OUT = new ItemStack(BaseItemProvider.requestModel());
         private final ItemDisplayElement mainElement;
@@ -343,7 +343,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.updateFacing(BlockBoundAttachment.get(this).getBlockState());
+                this.updateFacing(this.blockState());
             }
         }
 

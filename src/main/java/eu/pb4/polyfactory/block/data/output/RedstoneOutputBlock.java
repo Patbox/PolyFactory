@@ -6,7 +6,7 @@ import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.block.data.util.GenericDirectionalDataBlock;
 import eu.pb4.factorytools.api.block.RedstoneConnectable;
 import eu.pb4.polyfactory.data.DataContainer;
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
@@ -91,7 +91,7 @@ public class RedstoneOutputBlock extends GenericDirectionalDataBlock implements 
         return state.get(FACING).getOpposite() == dir;
     }
 
-    public static class Model extends BaseModel {
+    public static class Model extends BlockModel {
         public static final PolymerModelData OUTPUT_OVERLAY = PolymerResourcePackUtils.requestModel(Items.LEATHER_HELMET, id("block/redstone_output_overlay"));
         public static final PolymerModelData INPUT_OVERLAY = PolymerResourcePackUtils.requestModel(Items.LEATHER_HELMET, id("block/redstone_input_overlay"));
         private final LodItemDisplayElement base;
@@ -142,8 +142,7 @@ public class RedstoneOutputBlock extends GenericDirectionalDataBlock implements 
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                var attachment = BlockBoundAttachment.get(this);
-                var state = attachment.getBlockState();
+                var state = this.blockState();
                 updateStatePos(state);
                 this.overlay.setItem(createOverlay(state));
                 this.base.tick();

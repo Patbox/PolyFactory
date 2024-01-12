@@ -179,7 +179,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlo
 
             if (tick % this.getUpdateRate() == 0) {
                 this.updateAnimation(this.getRotation(),
-                        ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(FACING));
+                        this.blockState().get(FACING));
                 if (this.mainElement.isDirty()) {
                     this.mainElement.startInterpolation();
                 }

@@ -251,15 +251,15 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                updateStatePos(BlockBoundAttachment.get(this).getBlockState());
+                updateStatePos(this.blockState());
             }
         }
 
         @Override
         protected void onTick() {
             if (this.getTick() % this.getUpdateRate() == 0) {
-                var dir = BlockBoundAttachment.get(this).getBlockState().get(FACING);
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos().up()).rotation(),
+                var dir = this.blockState().get(FACING);
+                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().up()).rotation(),
                         (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
                 //if (this.whisk.isDirty()) {
                 //    this.whisk.startInterpolation();

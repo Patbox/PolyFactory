@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
@@ -50,7 +51,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 
-public class PlacerBlock extends RotationalNetworkBlock implements PolymerBlock, BlockEntityProvider, RotationUser, WrenchableBlock, BlockWithElementHolder, VirtualDestroyStage.Marker, BarrierBasedWaterloggable {
+public class PlacerBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, WrenchableBlock, BarrierBasedWaterloggable {
     public static final Property<Direction> FACING = Properties.FACING;
 
     public PlacerBlock(Settings settings) {
@@ -215,7 +216,7 @@ public class PlacerBlock extends RotationalNetworkBlock implements PolymerBlock,
 
         @Override
         protected void onTick() {
-            this.updateAnimation(((BlockBoundAttachment) this.getAttachment()).getBlockState().get(FACING));
+            this.updateAnimation(this.blockState().get(FACING));
             if (this.item.isDirty()) {
                 this.item.startInterpolation();
             }

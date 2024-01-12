@@ -179,7 +179,7 @@ public class WitherSkullGeneratorBlock extends NetworkBlock implements FactoryBl
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                updateStatePos(BlockBoundAttachment.get(this).getBlockState());
+                updateStatePos(this.blockState());
             }
         }
     }

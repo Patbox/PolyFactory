@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.data.providers;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
@@ -9,7 +10,7 @@ import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.data.StringData;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
 import eu.pb4.polyfactory.util.PotatoWisdom;
@@ -56,7 +57,7 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class TinyPotatoSpringBlock extends DataNetworkBlock implements PolymerBlock, BlockWithElementHolder, CableConnectable, BarrierBasedWaterloggable, VirtualDestroyStage.Marker {
+public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBlock, CableConnectable, BarrierBasedWaterloggable {
     public static final Identifier STATISTIC = PolymerStat.registerStat(id("taters_clicked"), StatFormatter.DEFAULT);
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
@@ -165,7 +166,7 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements PolymerBl
         return List.of(new ChannelProviderDirectionNode(Direction.DOWN, 0));
     }
 
-    public static final class Model extends BaseModel {
+    public static final class Model extends BlockModel {
         public static final ItemStack BASE_MODEL = BaseItemProvider.requestModel(id("block/tiny_potato_spring_base"));
         public static final ItemStack TATER_MODEL = BaseItemProvider.requestModel(id("block/tiny_potato_spring"));
         private final LodItemDisplayElement base;
@@ -218,7 +219,7 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements PolymerBl
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                updateRotation(this.blockBound().getBlockState().get(FACING));
+                updateRotation(this.blockState().get(FACING));
             }
         }
     }

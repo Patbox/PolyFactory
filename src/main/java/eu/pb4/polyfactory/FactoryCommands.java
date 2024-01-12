@@ -4,7 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.factorytools.impl.DebugData;
 import eu.pb4.polymer.virtualentity.impl.HolderHolder;
@@ -64,11 +64,11 @@ public class FactoryCommands {
     private static int listModels(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         var player = context.getSource().getPlayerOrThrow();
 
-        var map = new HashMap<Class<?>, List<BaseModel>>();
+        var map = new HashMap<Class<?>, List<BlockModel>>();
 
 
         ((HolderHolder) player.networkHandler).polymer$getHolders().forEach((x) -> {
-            if (x instanceof BaseModel b) {
+            if (x instanceof BlockModel b) {
                 map.computeIfAbsent(x.getClass(), (a) -> new ArrayList<>()).add(b);
             }
         });

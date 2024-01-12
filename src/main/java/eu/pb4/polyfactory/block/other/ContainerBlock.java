@@ -1,11 +1,12 @@
 package eu.pb4.polyfactory.block.other;
 
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.AttackableBlock;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.SneakBypassingBlock;
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.factorytools.api.util.VirtualDestroyStage;
@@ -202,7 +203,7 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
         return new Model(world, pos, initialBlockState);
     }
 
-    public final class Model extends BaseModel {
+    public final class Model extends BlockModel {
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement itemElement;
@@ -265,7 +266,7 @@ public class ContainerBlock extends Block implements PolymerBlock, BlockEntityPr
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.updateFacing(BlockBoundAttachment.get(this).getBlockState());
+                this.updateFacing(this.blockState());
             }
         }
     }

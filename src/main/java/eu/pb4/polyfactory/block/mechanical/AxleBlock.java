@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
@@ -17,6 +18,7 @@ import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.core.impl.networking.PolymerServerProtocol;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
+import eu.pb4.polymer.virtualentity.api.BlockWithMovingElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
@@ -44,7 +46,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker, WrenchableBlock, BarrierBasedWaterloggable {
+public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, WrenchableBlock, BarrierBasedWaterloggable {
     public static final Property<Direction.Axis> AXIS = Properties.AXIS;
     public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
 
@@ -149,6 +151,7 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
         private Model(ServerWorld world, BlockState state) {
             this.mainElement = LodItemDisplayElement.createSimple(ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
             this.mainElement.setViewRange(0.7f);
+            this.mainElement.setTeleportDuration(1);
             this.updateAnimation(0,  state.get(AXIS));
             this.addElement(this.mainElement);
         }
@@ -177,11 +180,15 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
 
         @Override
         protected void onTick() {
+            if (!this.blockAware().isPartOfTheWorld()) {
+                return;
+            }
+
             var rodState = Blocks.LIGHTNING_ROD.getDefaultState()
-                    .with(Properties.FACING, Direction.from(BlockBoundAttachment.get(this).getBlockState().get(AXIS),
-                            Direction.AxisDirection.POSITIVE)).with(LightningRodBlock.POWERED, true).with(WATERLOGGED, BlockBoundAttachment.get(this).getBlockState().get(WATERLOGGED));
-            var pos = BlockBoundAttachment.get(this).getBlockPos();
-            var state = BlockBoundAttachment.get(this).getBlockState();
+                    .with(Properties.FACING, Direction.from(this.blockAware().getBlockState().get(AXIS),
+                            Direction.AxisDirection.POSITIVE)).with(LightningRodBlock.POWERED, true).with(WATERLOGGED, this.blockAware().getBlockState().get(WATERLOGGED));
+            var pos = this.blockAware().getBlockPos();
+            var state = this.blockAware().getBlockState();
             for (var player : this.sentRod) {
                 player.sendPacket(new BlockUpdateS2CPacket(pos, rodState));
                 //noinspection UnstableApiUsage
@@ -189,14 +196,14 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
             }
             this.sentRod.clear();
             for (var player : this.sentBarrier) {
-                player.sendPacket(new BlockUpdateS2CPacket(pos, Blocks.BARRIER.getDefaultState().with(WATERLOGGED, BlockBoundAttachment.get(this).getBlockState().get(WATERLOGGED))));
+                player.sendPacket(new BlockUpdateS2CPacket(pos, Blocks.BARRIER.getDefaultState().with(WATERLOGGED, this.blockAware().getBlockState().get(WATERLOGGED))));
                 //noinspection UnstableApiUsage
                 PolymerServerProtocol.sendBlockUpdate(player, pos, state);
             }
             this.sentBarrier.clear();
 
             for (var player : this.getWatchingPlayers()) {
-                var d = this.getSquaredDistance(player);
+                var d = this.squaredDistance(player);
 
                 if (d < 16 * 16) {
                     if (!this.viewingClose.contains(player)) {
@@ -209,13 +216,11 @@ public class AxleBlock extends RotationalNetworkBlock implements PolymerBlock, B
                 }
             }
 
-            var tick = this.getAttachment().getWorld().getTime();
+            var tick = this.blockAware().getWorld().getTime();
 
             if (tick % this.getUpdateRate() == 0) {
-                this.updateAnimation(this.getRotation(), ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(AXIS));
-                if (this.mainElement.isDirty()) {
-                    this.mainElement.startInterpolation();
-                }
+                this.updateAnimation(this.getRotation(), this.blockAware().getBlockState().get(AXIS));
+                this.mainElement.startInterpolationIfDirty();
             }
         }
 

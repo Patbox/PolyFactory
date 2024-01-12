@@ -80,15 +80,12 @@ public class AxleWithLargeGearBlock extends AxleWithGearBlock {
         }
         @Override
         protected void onTick() {
-            var tick = this.getAttachment().getWorld().getTime();
+            var tick = this.blockAware().getWorld().getTime();
 
             if (tick % this.getUpdateRate() == 0) {
-                this.updateAnimation(this.getRotation(),
-                        ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(AXIS));
-                if (this.mainElement.isDirty()) {
-                    this.mainElement.startInterpolation();
-                    this.gear.startInterpolation();
-                }
+                this.updateAnimation(this.getRotation(), this.blockAware().getBlockState().get(AXIS));
+                this.mainElement.startInterpolationIfDirty();
+                this.gear.startInterpolationIfDirty();
             }
         }
 

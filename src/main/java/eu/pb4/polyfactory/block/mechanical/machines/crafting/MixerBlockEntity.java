@@ -5,7 +5,7 @@ import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
@@ -304,7 +304,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     }
 
     @Override
-    public @Nullable BaseModel getModel() {
+    public @Nullable BlockModel getModel() {
         return this.model;
     }
 

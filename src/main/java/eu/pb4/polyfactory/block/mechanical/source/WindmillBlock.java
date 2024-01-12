@@ -279,16 +279,15 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
         protected void onTick() {
             var tick = this.getAttachment().getWorld().getTime();
             if (this.blockEntity == null) {
-                var attach = BlockBoundAttachment.get(this);
-                this.blockEntity = attach.getWorld().getBlockEntity(attach.getBlockPos()) instanceof WindmillBlockEntity be ? be : null;
+                this.blockEntity = this.getAttachment().getWorld().getBlockEntity(this.blockPos()) instanceof WindmillBlockEntity be ? be : null;
                 this.updateSailsBe();
             }
 
 
             if (tick % this.getUpdateRate() == 0) {
                     this.updateAnimation(this.getRotation(),
-                        ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(WindmillBlock.FACING),
-                        ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
+                        this.blockState().get(WindmillBlock.FACING),
+                        this.blockState().get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
 
                 for (var i = 0; i < sails.length; i++) {
                     if (this.sails[i].isDirty()) {
@@ -305,13 +304,13 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                var state = BlockBoundAttachment.get(this).getBlockState();
+                var state = this.blockState();
                 this.big = state.get(BIG);
                 this.updateSailsBe();
 
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), BlockBoundAttachment.get(this).getBlockPos()).rotation(),
-                        ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(WindmillBlock.FACING),
-                        ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
+                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos()).rotation(),
+                        this.blockState().get(WindmillBlock.FACING),
+                        this.blockState().get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
                 for (var i = 0; i < this.sails.length; i++) {
                     this.sails[i].setInterpolationDuration(0);
                     this.sails[i].tick();
@@ -321,7 +320,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
         }
 
         public void updateSailsBe() {
-            var state = BlockBoundAttachment.get(this).getBlockState();
+            var state = this.blockState();
             this.updateSails(state.get(SAIL_COUNT), state.get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
         }
     }

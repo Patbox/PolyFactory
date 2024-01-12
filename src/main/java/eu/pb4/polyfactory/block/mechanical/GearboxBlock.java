@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.RotationAwareModel;
@@ -29,7 +30,7 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
-public class GearboxBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, VirtualDestroyStage.Marker, BarrierBasedWaterloggable {
+public class GearboxBlock extends RotationalNetworkBlock implements FactoryBlock, BarrierBasedWaterloggable {
     public GearboxBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));

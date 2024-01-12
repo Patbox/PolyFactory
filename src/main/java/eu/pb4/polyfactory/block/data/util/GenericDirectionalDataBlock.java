@@ -5,7 +5,7 @@ import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -89,7 +89,7 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
         return FactoryUtil.transform(state, rotation::rotate, FACING);
     }
 
-    public static class Model extends BaseModel {
+    public static class Model extends BlockModel {
         private final LodItemDisplayElement base;
 
         private Model(BlockState state) {
@@ -120,7 +120,7 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                updateStatePos(BlockBoundAttachment.get(this).getBlockState());
+                updateStatePos(this.blockState());
                 this.base.tick();
             }
         }

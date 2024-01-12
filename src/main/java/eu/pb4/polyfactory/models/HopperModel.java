@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.models;
 
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
@@ -11,7 +11,7 @@ import net.minecraft.util.math.MathHelper;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-public class HopperModel extends BaseModel {
+public class HopperModel extends BlockModel {
     private final LodItemDisplayElement icon;
     private final LodItemDisplayElement model;
 

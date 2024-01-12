@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
@@ -8,7 +9,9 @@ import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.RotationAwareModel;
+import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.generic.SimpleDirectionNode;
+import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.factorytools.api.util.VirtualDestroyStage;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -48,7 +51,7 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
-public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider, VirtualDestroyStage.Marker, WrenchableBlock {
+public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider, WrenchableBlock {
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
     public static final BooleanProperty REVERSE = BooleanProperty.of("reverse");
@@ -93,7 +96,7 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new SimpleDirectionNode(state.get(FACING).getOpposite()));
+        return List.of(new FunctionalDirectionNode(state.get(FACING).getOpposite()));
     }
 
     @Nullable
@@ -141,6 +144,11 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
     @Override
     public List<WrenchAction> getWrenchActions() {
         return List.of(REVERSE_ACTION, WrenchAction.FACING);
+    }
+
+    @Override
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+        modifier.stress(0.2);
     }
 
     public final class Model extends RotationAwareModel {
@@ -211,7 +219,7 @@ public class FanBlock extends RotationalNetworkBlock implements PolymerBlock, Bl
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                updateStatePos(BlockBoundAttachment.get(this).getBlockState());
+                updateStatePos(this.blockState());
             }
         }
 

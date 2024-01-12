@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.block.data.providers;
 
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -92,7 +92,7 @@ public class ItemReaderBlock extends DataProviderBlock {
         return new Model(initialBlockState);
     }
 
-    public static class Model extends BaseModel {
+    public static class Model extends BlockModel {
         private final LodItemDisplayElement base;
         private final LodItemDisplayElement book;
 
@@ -132,7 +132,7 @@ public class ItemReaderBlock extends DataProviderBlock {
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                updateStatePos(BlockBoundAttachment.get(this).getBlockState());
+                updateStatePos(this.blockState());
                 this.base.tick();
                 this.book.tick();
             }

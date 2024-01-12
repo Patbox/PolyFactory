@@ -106,6 +106,7 @@ public class FactoryBlocks {
 
     public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", new RotationalDebugBlock(AbstractBlock.Settings.create().strength(-1, -1)));
     public static final GreenScreenBlock GREEN_SCREEN = register("green_screen", new GreenScreenBlock(AbstractBlock.Settings.copy(Blocks.GREEN_WOOL)));
+    public static final TheCubeBlock THE_CUBE = register("the_cube", new TheCubeBlock(AbstractBlock.Settings.copy(Blocks.STONE)));
 
 
     public static void register() {

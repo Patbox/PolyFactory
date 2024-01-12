@@ -8,7 +8,7 @@ import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.models.ConveyorModel;
 import eu.pb4.factorytools.api.virtualentity.FastItemDisplayElement;
 import eu.pb4.polyfactory.nodes.mechanical.ConveyorNode;
@@ -493,7 +493,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         }
     }
 
-    public final class Model extends BaseModel implements ContainerHolder {
+    public final class Model extends BlockModel implements ContainerHolder {
         private final FastItemDisplayElement base;
         private double speed;
         private Direction direction;
@@ -558,7 +558,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                var state = BlockBoundAttachment.get(this).getBlockState();
+                var state = this.blockState();
                 this.base.setItem(getModelForSpeed(speed, state.get(ConveyorBlock.VERTICAL), state.isOf(FactoryBlocks.STICKY_CONVEYOR), state));
                 this.base.setFastItem(getFastModel(state.get(ConveyorBlock.VERTICAL), state.isOf(FactoryBlocks.STICKY_CONVEYOR), state), 24);
                 this.updateAnimation(state.get(ConveyorBlock.DIRECTION), state.get(ConveyorBlock.VERTICAL));
@@ -568,7 +568,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
 
         public boolean updateSpeed(double speed) {
             if (this.speed != speed) {
-                var state = BlockBoundAttachment.get(this).getBlockState();
+                var state = this.blockState();
                 this.base.setItem(getModelForSpeed(speed, state.get(ConveyorBlock.VERTICAL), state.isOf(FactoryBlocks.STICKY_CONVEYOR), state));
                 this.speed = speed;
                 return true;

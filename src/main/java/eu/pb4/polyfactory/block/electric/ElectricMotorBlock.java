@@ -171,7 +171,7 @@ public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, Bl
             var tick = this.getAttachment().getWorld().getTime();
 
             if (tick % this.getUpdateRate() == 0) {
-                var facing = ((BlockBoundAttachment) this.getAttachment()).getBlockState().get(FACING);
+                var facing = this.blockState().get(FACING);
 
                 this.updateAnimation(this.getRotation(), facing);
                 if (this.axle.isDirty()) {
@@ -202,7 +202,7 @@ public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, Bl
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                updateStatePos(BlockBoundAttachment.get(this).getBlockState());
+                updateStatePos(this.blockState());
             }
         }
     }

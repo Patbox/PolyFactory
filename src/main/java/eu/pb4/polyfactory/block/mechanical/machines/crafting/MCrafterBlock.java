@@ -5,7 +5,7 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
-import eu.pb4.factorytools.api.virtualentity.BaseModel;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -142,7 +142,7 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
         }
     }
 
-    public static class Model extends BaseModel {
+    public static class Model extends BlockModel {
         private final LodItemDisplayElement base;
 
         private Model(BlockState state) {
@@ -173,7 +173,7 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                updateStatePos(BlockBoundAttachment.get(this).getBlockState());
+                updateStatePos(this.blockState());
                 this.base.tick();
             }
         }
