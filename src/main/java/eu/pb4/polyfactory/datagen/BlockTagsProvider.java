@@ -88,11 +88,15 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.CRAFTER)
                 .add(FactoryBlocks.CLUTCH)
                 .add(FactoryBlocks.WITHER_SKULL_GENERATOR)
+                .add(FactoryBlocks.AXLE_WITH_GEAR)
+                .add(FactoryBlocks.AXLE_WITH_LARGE_GEAR)
         ;
 
         this.getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)
                 .add(FactoryBlocks.WINDMILL)
                 .add(FactoryBlocks.AXLE)
+                .add(FactoryBlocks.AXLE_WITH_GEAR)
+                .add(FactoryBlocks.AXLE_WITH_LARGE_GEAR)
                 .add(FactoryBlocks.HAND_CRANK)
                 .add(FactoryBlocks.GEARBOX)
                 .add(FactoryBlocks.CONTAINER)
