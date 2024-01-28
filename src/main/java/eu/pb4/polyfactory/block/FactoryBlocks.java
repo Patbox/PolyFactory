@@ -1,7 +1,6 @@
 package eu.pb4.polyfactory.block;
 
 import eu.pb4.polyfactory.ModInit;
-import eu.pb4.factorytools.api.block.AttackableBlock;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlock;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
 import eu.pb4.polyfactory.block.data.CableBlock;
@@ -42,8 +41,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
@@ -84,6 +81,7 @@ public class FactoryBlocks {
     public static final NixieTubeBlock NIXIE_TUBE = register("nixie_tube", new NixieTubeBlock(Block.Settings.copy(Blocks.GLASS).nonOpaque()));
 
     public static final NixieTubeControllerBlock NIXIE_TUBE_CONTROLLER = register("nixie_tube_controller", new NixieTubeControllerBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
+    public static final WirelessRedstoneReceiverBlock WIRELESS_REDSTONE_RECEIVER = register("wireless_redstone_receiver", new WirelessRedstoneReceiverBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
 
     public static final ElectricMotorBlock ELECTRIC_MOTOR = register("electric_motor", new ElectricMotorBlock(Block.Settings.create().hardness(2).nonOpaque()));
     public static final ElectricGeneratorBlock ELECTRIC_GENERATOR = register("electric_generator", new ElectricGeneratorBlock(Block.Settings.create().hardness(2).nonOpaque()));

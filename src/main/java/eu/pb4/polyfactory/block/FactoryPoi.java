@@ -27,11 +27,14 @@ import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.other.*;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.Instrument;
 import net.minecraft.loot.LootTable;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
@@ -43,21 +46,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class FactoryPoi {
-    public static PointOfInterestType WIRELESS_REDSTONE_RECEIVED = register("wireless_redstone_receiver", Set.of());
-    public static void register() {
+import static eu.pb4.polyfactory.ModInit.id;
 
+public class FactoryPoi {
+    public static final RegistryKey<PointOfInterestType> WIRELESS_REDSTONE_RECEIVED = of("wireless_redstone_receiver");
+
+    public static void register() {
+        register(WIRELESS_REDSTONE_RECEIVED,
+                Set.copyOf(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER.getStateManager().getStates()));
     }
-    public static PointOfInterestType register(String path, Set<BlockState> blockStates) {
-        return register(path, new PointOfInterestType(blockStates, 1, 1));
+
+
+    private static RegistryKey<PointOfInterestType> of(String path) {
+        return RegistryKey.of(RegistryKeys.POINT_OF_INTEREST_TYPE, id(path));
     }
-    public static PointOfInterestType register(String path, Set<BlockState> blockStates, int ticketCount) {
-        return register(path, new PointOfInterestType(blockStates, ticketCount, 1));
+
+    public static PointOfInterestType register(RegistryKey<PointOfInterestType> key, Set<BlockState> blockStates) {
+        return register(key, blockStates, 1, 1);
     }
-    public static PointOfInterestType register(String path, Set<BlockState> blockStates, int ticketCount, int searchDistance) {
-        return register(path, new PointOfInterestType(blockStates, ticketCount, searchDistance));
+    public static PointOfInterestType register(RegistryKey<PointOfInterestType> key, Set<BlockState> blockStates, int ticketCount) {
+        return register(key, blockStates, ticketCount, 1);
     }
-    public static PointOfInterestType register(String path, PointOfInterestType item) {
-        return Registry.register(Registries.POINT_OF_INTEREST_TYPE, new Identifier(ModInit.ID, path), item);
+    public static PointOfInterestType register(RegistryKey<PointOfInterestType> key, Set<BlockState> blockStates, int ticketCount, int searchDistance) {
+        return PointOfInterestHelper.register(key.getValue(), ticketCount, searchDistance, blockStates);
     }
 }

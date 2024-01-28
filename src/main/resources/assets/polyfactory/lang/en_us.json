@@ -42,6 +42,7 @@
   "block.polyfactory.creative_container": "Creative Container",
   "block.polyfactory.inverted_redstone_lamp": "Inverted Redstone Lamp",
   "block.polyfactory.tiny_potato_spring": "Potato on a Spring",
+  "block.polyfactory.wireless_redstone_receiver": "Wireless Redstone Receiver",
   "item.polyfactory.mod_icon": "Mod Icon",
   "item.polyfactory.windmill_sail": "Windmill Sail",
   "item.polyfactory.dynamite": "Dynamite",
@@ -66,6 +67,8 @@
   "item.polyfactory.generic_machine_part": "Steel Machine Gearbox",
   "item.polyfactory.wooden_plate": "Wooden Plate",
   "item.polyfactory.treated_dried_kelp": "Treated Dried Kelp",
+  "item.polyfactory.portable_redstone_transmitter": "Portable Redstone Transmitter",
+
   "block.polyfactory.colored_lamp": "Colored Lamp",
   "block.polyfactory.colored_lamp.colored": "%s Lamp",
   "block.polyfactory.colored_lamp.colored.full": "%s Lamp (%s)",

@@ -3,6 +3,7 @@ package eu.pb4.polyfactory;
 import eu.pb4.factorytools.impl.DebugData;
 import eu.pb4.factorytools.api.advancement.FactoryAdvancementCriteria;
 import eu.pb4.polyfactory.advancement.FactoryItemPredicates;
+import eu.pb4.polyfactory.block.FactoryPoi;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock;
@@ -58,6 +59,7 @@ public class ModInit implements ModInitializer {
 		}
 
 		FactoryBlocks.register();
+		FactoryPoi.register();
 		FactoryBlockEntities.register();
 		FactoryEnchantments.register();
 		FactoryItems.register();

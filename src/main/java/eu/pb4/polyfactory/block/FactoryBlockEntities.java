@@ -25,6 +25,7 @@ import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlockEntity;
 import eu.pb4.polyfactory.block.other.ContainerBlockEntity;
 import eu.pb4.polyfactory.block.data.output.NixieTubeBlockEntity;
 import eu.pb4.polyfactory.block.other.ColorableBlockEntity;
+import eu.pb4.polyfactory.block.other.WirelessRedstoneBlockEntity;
 import eu.pb4.polyfactory.mixin.util.BlockEntityTypeAccessor;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -94,6 +95,8 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<ChanneledDataBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache", FabricBlockEntityTypeBuilder
             .create(ChanneledDataBlockEntity::new).addBlocks(FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT));
 
+    public static final BlockEntityType<WirelessRedstoneBlockEntity> WIRELESS_REDSTONE = register("wireless_redstone", FabricBlockEntityTypeBuilder
+            .create(WirelessRedstoneBlockEntity::new).addBlock(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER));
     public static final BlockEntityType<CableBlockEntity> CABLE = register("cable", FabricBlockEntityTypeBuilder
             .create(CableBlockEntity::new).addBlock(FactoryBlocks.CABLE));
     public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader", FabricBlockEntityTypeBuilder

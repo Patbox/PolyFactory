@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.item.block.GearItem;
 import eu.pb4.polyfactory.item.block.WindmillSailItem;
 import eu.pb4.polyfactory.item.tool.DynamiteItem;
 import eu.pb4.polyfactory.item.tool.FilterItem;
+import eu.pb4.polyfactory.item.tool.WirelessRedstoneTransmitterItem;
 import eu.pb4.polyfactory.item.util.*;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -77,6 +78,8 @@ public class FactoryItems {
     public static final Item ITEM_READER = register(FactoryBlocks.ITEM_READER);
     public static final Item BLOCK_OBSERVER = register(FactoryBlocks.BLOCK_OBSERVER);
     public static final Item NIXIE_TUBE_CONTROLLER = register(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
+    public static final Item WIRELESS_REDSTONE_RECEIVER = register(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
+    public static final Item PORTABLE_REDSTONE_TRANSMITTER = register("portable_redstone_transmitter", new WirelessRedstoneTransmitterItem(new Item.Settings().maxCount(1)));
     public static final ColoredDownsampledBlockItem CABLE = register("cable", new ColoredDownsampledBlockItem(FactoryBlocks.CABLE, 0xbbbbbb, new Item.Settings()));
     public static final ColoredDownsampledBlockItem LAMP = register("colored_lamp", new ColoredDownsampledBlockItem(FactoryBlocks.LAMP, -1, new Item.Settings()));
     public static final ColoredDownsampledBlockItem INVERTED_LAMP = register("inverted_colored_lamp", new ColoredDownsampledBlockItem(FactoryBlocks.INVERTED_LAMP, -1, new Item.Settings()));
@@ -242,6 +245,8 @@ public class FactoryItems {
                     .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
                     .entries(((context, entries) -> {
                         entries.add(WITHER_SKULL_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(WIRELESS_REDSTONE_RECEIVER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(PORTABLE_REDSTONE_TRANSMITTER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         // Remove this
                         if (ModInit.DEV_ENV) {
                             entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
