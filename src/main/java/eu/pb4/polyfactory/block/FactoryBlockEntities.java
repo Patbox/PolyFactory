@@ -26,6 +26,7 @@ import eu.pb4.polyfactory.block.other.ContainerBlockEntity;
 import eu.pb4.polyfactory.block.data.output.NixieTubeBlockEntity;
 import eu.pb4.polyfactory.block.other.ColorableBlockEntity;
 import eu.pb4.polyfactory.block.other.WirelessRedstoneBlockEntity;
+import eu.pb4.polyfactory.block.other.WorkbenchBlockEntity;
 import eu.pb4.polyfactory.mixin.util.BlockEntityTypeAccessor;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -102,6 +103,8 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader", FabricBlockEntityTypeBuilder
             .create(ItemReaderBlockEntity::new).addBlock(FactoryBlocks.ITEM_READER));
 
+    public static final BlockEntityType<WorkbenchBlockEntity> WORKBENCH = register("workbench", FabricBlockEntityTypeBuilder
+            .create(WorkbenchBlockEntity::new).addBlock(FactoryBlocks.WORKBENCH));
     public static final BlockEntityType<WitherSkullGeneratorBlockEntity> WITHER_SKULL_GENERATOR = register("wither_skull_generator", FabricBlockEntityTypeBuilder
             .create(WitherSkullGeneratorBlockEntity::new).addBlock(FactoryBlocks.WITHER_SKULL_GENERATOR));
 

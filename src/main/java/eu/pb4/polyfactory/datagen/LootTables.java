@@ -47,6 +47,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.STEAM_ENGINE);
         this.addDrop(FactoryBlocks.ITEM_COUNTER);
         this.addDrop(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
+        this.addDrop(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER);
         this.addDrop(FactoryBlocks.REDSTONE_INPUT);
         this.addDrop(FactoryBlocks.REDSTONE_OUTPUT);
         this.addDrop(FactoryBlocks.ITEM_READER);
@@ -57,6 +58,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.TINY_POTATO_SPRING);
         this.addDrop(FactoryBlocks.WITHER_SKULL_GENERATOR);
         this.addDrop(FactoryBlocks.CRAFTER);
+        this.addDrop(FactoryBlocks.WORKBENCH);
         this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE);
 
         this.addAxle(FactoryBlocks.AXLE_WITH_LARGE_GEAR, FactoryItems.LARGE_STEEL_GEAR);

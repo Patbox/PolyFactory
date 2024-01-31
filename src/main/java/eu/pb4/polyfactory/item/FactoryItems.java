@@ -79,6 +79,7 @@ public class FactoryItems {
     public static final Item BLOCK_OBSERVER = register(FactoryBlocks.BLOCK_OBSERVER);
     public static final Item NIXIE_TUBE_CONTROLLER = register(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
     public static final Item WIRELESS_REDSTONE_RECEIVER = register(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
+    public static final Item WIRELESS_REDSTONE_TRANSMITTER = register(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER);
     public static final Item PORTABLE_REDSTONE_TRANSMITTER = register("portable_redstone_transmitter", new WirelessRedstoneTransmitterItem(new Item.Settings().maxCount(1)));
     public static final ColoredDownsampledBlockItem CABLE = register("cable", new ColoredDownsampledBlockItem(FactoryBlocks.CABLE, 0xbbbbbb, new Item.Settings()));
     public static final ColoredDownsampledBlockItem LAMP = register("colored_lamp", new ColoredDownsampledBlockItem(FactoryBlocks.LAMP, -1, new Item.Settings()));
@@ -89,6 +90,7 @@ public class FactoryItems {
     public static final Item ELECTRIC_GENERATOR = register(FactoryBlocks.ELECTRIC_GENERATOR);
 
     public static final Item WITHER_SKULL_GENERATOR = register(FactoryBlocks.WITHER_SKULL_GENERATOR);
+    public static final Item WORKBENCH = register(FactoryBlocks.WORKBENCH);
 
     public static final Item ARTIFICIAL_DYE = register("artificial_dye", new ArtificialDyeItem(new Item.Settings()));
     public static final Item DYNAMITE = register("dynamite", new DynamiteItem(new Item.Settings().maxCount(16)));
@@ -139,6 +141,7 @@ public class FactoryItems {
                     entries.add(ITEM_FILTER);
 
                     // Crafting/Machines
+                    entries.add(WORKBENCH);
                     entries.add(GRINDER);
                     entries.add(PRESS);
                     entries.add(MIXER);
@@ -246,6 +249,7 @@ public class FactoryItems {
                     .entries(((context, entries) -> {
                         entries.add(WITHER_SKULL_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(WIRELESS_REDSTONE_RECEIVER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(WIRELESS_REDSTONE_TRANSMITTER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(PORTABLE_REDSTONE_TRANSMITTER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         // Remove this
                         if (ModInit.DEV_ENV) {

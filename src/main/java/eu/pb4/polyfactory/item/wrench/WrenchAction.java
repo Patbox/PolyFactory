@@ -15,8 +15,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public record WrenchAction(String id, Text name, WrenchValueGetter value, WrenchApplyAction action) {
-
-
     public static final WrenchAction FACING = of("facing", Properties.FACING,
             (dir, next) -> FactoryUtil.REORDERED_DIRECTIONS.get(
                     (FactoryUtil.REORDERED_DIRECTIONS.size() + FactoryUtil.REORDERED_DIRECTIONS.indexOf(dir) + (next ? 1 : -1)) % FactoryUtil.REORDERED_DIRECTIONS.size()

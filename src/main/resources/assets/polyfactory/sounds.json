@@ -10,5 +10,22 @@
       "random/anvil_land"
     ],
     "subtitle": "subtitles.polyfactory.block.press.craft"
+  },
+  "block.remote_redstone.off": {
+    "sounds": [
+      {
+        "attenuation_distance": 6,
+        "name": "block/copper_bulb/turn_off",
+        "pitch": 0.75
+      }
+    ]
+  },
+  "block.remote_redstone.on": {
+    "sounds": [
+      {
+        "attenuation_distance": 6,
+        "name": "block/copper_bulb/turn_on"
+      }
+    ]
   }
 }

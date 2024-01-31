@@ -1,0 +1,9 @@
+{
+	"parent": "polyfactory:block/wireless_redstone_receiver",
+	"textures": {
+		"1": "polyfactory:block/wireless_redstone_front",
+		"2": "polyfactory:block/redstone_input_side",
+		"3": "block/copper_block",
+		"particle": "polyfactory:block/redstone_input_front"
+	}
+}

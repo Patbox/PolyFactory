@@ -4,8 +4,6 @@ import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -59,12 +57,12 @@ public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements 
     }
 
     public boolean updateKey(PlayerEntity player, BlockHitResult hit, ItemStack mainHandStack) {
-        if (hit.getSide() != this.getCachedState().get(WirelessRedstoneReceiverBlock.FACING)) {
+        if (hit.getSide() != this.getCachedState().get(WirelessRedstoneBlock.FACING).getOpposite()) {
             return false;
         }
 
         var delta = hit.getPos().subtract(hit.getBlockPos().toCenterPos());
-        boolean upper = hit.getSide() == Direction.UP ? delta.z < 0 : hit.getSide() == Direction.DOWN ? delta.z > 0 : delta.y > 0;
+        boolean upper = hit.getSide() == Direction.DOWN ? delta.z < 0 : hit.getSide() == Direction.UP ? delta.z > 0 : delta.y > 0;
 
         var current = upper ? this.key1 : this.key2;
 
@@ -81,6 +79,14 @@ public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements 
         updateStackWithTick();
         this.markDirty();
         return true;
+    }
+
+    public ItemStack key1() {
+        return key1;
+    }
+
+    public ItemStack key2() {
+        return key2;
     }
 
     public boolean matches(ItemStack key1, ItemStack key2) {

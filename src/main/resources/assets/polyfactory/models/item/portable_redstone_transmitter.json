@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "polyfactory:item/portable_redstone_transmitter"
+    "layer0": "polyfactory:item/portable_redstone_transmitter_overlay",
+    "layer1": "polyfactory:item/portable_redstone_transmitter"
   }
 }
