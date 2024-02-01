@@ -55,6 +55,8 @@ public class FactoryItems {
     public static final Item SAW_DUST = register("saw_dust", new ModeledItem(Items.STICK, new Item.Settings()));
     public static final Item COAL_DUST = register("coal_dust", new ModeledItem(Items.COAL, new Item.Settings()));
     public static final Item NETHERRACK_DUST = register("netherrack_dust", new ModeledItem(new Item.Settings()));
+    public static final Item ENDER_DUST = register("ender_dust", new ModeledItem(new Item.Settings()));
+    public static final Item ENDER_INFUSED_AMETHYST_SHARD = register("ender_infused_amethyst_shard", new ModeledItem(new Item.Settings()));
     public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", new ModeledItem(new Item.Settings()));
     public static final Item STEEL_INGOT = register("steel_ingot", new ModeledItem(new Item.Settings()));
     public static final Item STEEL_PLATE = register("steel_plate", new ModeledItem(new Item.Settings()));
@@ -164,6 +166,11 @@ public class FactoryItems {
                     entries.add(NIXIE_TUBE_CONTROLLER);
                     entries.add(NIXIE_TUBE);
 
+                    // Redstone?
+                    entries.add(WIRELESS_REDSTONE_RECEIVER);
+                    entries.add(WIRELESS_REDSTONE_TRANSMITTER);
+                    entries.add(PORTABLE_REDSTONE_TRANSMITTER);
+
                     // Electrical machines (tier 2)
                     entries.add(ELECTRIC_GENERATOR);
                     entries.add(ELECTRIC_MOTOR);
@@ -183,15 +190,16 @@ public class FactoryItems {
                     entries.add(SAW_DUST);
                     entries.add(COAL_DUST);
                     entries.add(NETHERRACK_DUST);
+                    entries.add(ENDER_DUST);
                     entries.add(CRUSHED_RAW_IRON);
                     entries.add(CRUSHED_RAW_COPPER);
                     entries.add(CRUSHED_RAW_GOLD);
                     entries.add(STEEL_ALLOY_MIXTURE);
                     entries.add(STEEL_INGOT);
                     entries.add(STEEL_PLATE);
-                    //entries.add(STEEL_GEAR);
                     entries.add(WOODEN_PLATE);
                     entries.add(TREATED_DRIED_KELP);
+                    entries.add(ENDER_INFUSED_AMETHYST_SHARD);
                     entries.add(GENERIC_MACHINE_PART);
                     entries.add(INTEGRATED_CIRCUIT);
 
@@ -248,9 +256,7 @@ public class FactoryItems {
                     .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
                     .entries(((context, entries) -> {
                         entries.add(WITHER_SKULL_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(WIRELESS_REDSTONE_RECEIVER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(WIRELESS_REDSTONE_TRANSMITTER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(PORTABLE_REDSTONE_TRANSMITTER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+
                         // Remove this
                         if (ModInit.DEV_ENV) {
                             entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);

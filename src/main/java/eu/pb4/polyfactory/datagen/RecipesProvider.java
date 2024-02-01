@@ -235,6 +235,28 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                 .offerTo(exporter);
 
+        ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.WIRELESS_REDSTONE_RECEIVER)
+                .input(FactoryItems.REDSTONE_OUTPUT)
+                .input(FactoryItems.ENDER_INFUSED_AMETHYST_SHARD)
+                .input(Items.LIGHTNING_ROD)
+                .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
+                .offerTo(exporter);
+
+        ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.WIRELESS_REDSTONE_TRANSMITTER)
+                .input(FactoryItems.REDSTONE_INPUT)
+                .input(FactoryItems.ENDER_INFUSED_AMETHYST_SHARD)
+                .input(Items.LIGHTNING_ROD)
+                .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
+                .offerTo(exporter);
+
+        ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)
+                .input(FactoryItems.STEEL_PLATE)
+                .input(FactoryItems.INTEGRATED_CIRCUIT)
+                .input(FactoryItems.ENDER_INFUSED_AMETHYST_SHARD)
+                .input(Items.COPPER_INGOT)
+                .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
+                .offerTo(exporter);
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.CONVEYOR, 1)
                 .pattern("xxx")
                 .pattern("scs")
@@ -420,6 +442,8 @@ class RecipesProvider extends FabricRecipeProvider {
                 GrindingRecipe.of("coal_dust_charcoal", Ingredient.ofItems(Items.CHARCOAL), 1.5, 5, 14, OutputStack.of(FactoryItems.COAL_DUST, 0.8f)),
                 GrindingRecipe.of("netherrack_dust", Ingredient.ofItems(Items.NETHERRACK), 2, 8, 15,
                         OutputStack.of(FactoryItems.NETHERRACK_DUST, 1, 2), OutputStack.of(FactoryItems.NETHERRACK_DUST, 0.25f, 5)),
+                GrindingRecipe.of("ender_dust", Ingredient.ofItems(Items.ENDER_PEARL), 6, 20, 25,
+                        OutputStack.of(FactoryItems.ENDER_DUST, 1, 2), OutputStack.of(FactoryItems.ENDER_DUST, 0.20f, 2)),
                 GrindingRecipe.of("planks_saw_dust", Ingredient.fromTag(ItemTags.PLANKS), 1, 5, 6,
                         OutputStack.of(FactoryItems.SAW_DUST, 0.6f, 3), OutputStack.of(Items.STICK, 0.4f, 3)),
                 GrindingRecipe.of("logs_saw_dust", Ingredient.fromTag(ItemTags.LOGS), 1, 5, 6,
@@ -447,13 +471,13 @@ class RecipesProvider extends FabricRecipeProvider {
 
                 // Crushed raw metals
 
-                GrindingRecipe.of("crushed_raw_iron", Ingredient.ofItems(Items.RAW_IRON), 6, 12, 38,
+                GrindingRecipe.of("crushed_raw_iron", Ingredient.ofItems(Items.RAW_IRON), 8, 12, 38,
                         OutputStack.of(FactoryItems.CRUSHED_RAW_IRON, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_IRON, 0.33f, 1)
                 ),
-                GrindingRecipe.of("crushed_raw_gold", Ingredient.ofItems(Items.RAW_GOLD), 4, 12, 38,
+                GrindingRecipe.of("crushed_raw_gold", Ingredient.ofItems(Items.RAW_GOLD), 6, 12, 38,
                         OutputStack.of(FactoryItems.CRUSHED_RAW_GOLD, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_GOLD, 0.33f, 1)
                 ),
-                GrindingRecipe.of("crushed_raw_copper", Ingredient.ofItems(Items.RAW_COPPER), 4, 12, 38,
+                GrindingRecipe.of("crushed_raw_copper", Ingredient.ofItems(Items.RAW_COPPER), 6, 12, 38,
                         OutputStack.of(FactoryItems.CRUSHED_RAW_COPPER, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_COPPER, 0.33f, 1)
                 ),
 
@@ -700,7 +724,12 @@ class RecipesProvider extends FabricRecipeProvider {
                                 CountedIngredient.ofItems(1, FactoryItems.COAL_DUST),
                                 CountedIngredient.ofItems(1, FactoryItems.SAW_DUST)
                         ),
-                        2, 1, 15f, 0.3f, new ItemStack(Items.GUNPOWDER))
+                        2, 1, 15f, 0.3f, new ItemStack(Items.GUNPOWDER)),
+                GenericMixingRecipe.ofCounted("ender_infused_amethyst_shard",
+                        List.of(CountedIngredient.ofItems(2, FactoryItems.ENDER_DUST),
+                                CountedIngredient.ofItems(1, Items.AMETHYST_SHARD)
+                        ),
+                        5, 5, 10f, 0.6f, new ItemStack(FactoryItems.ENDER_INFUSED_AMETHYST_SHARD))
                 );
 
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_GEAR, 2)

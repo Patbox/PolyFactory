@@ -1,2 +1,6 @@
+- Added Wireless Redstone Receiver and Transmitter - allows you to remotely transmit redstone pulses in a range of 64 blocks! Uses 2 item channel system.
+- Added Portable Redstone Transmitter - allows you to active Redstone Receivers from your inventory!
+- Added Workbench - Crafting Table that keeps its items after closing.
+- Added Ender Dust and Ender infused Amethyst Shard - purely crafting items.
 - Piston movable block now move smoothly instead of vanishing.
-- Added Workbench - Crafting Table that keeps its items after closing
+- Tweaked existing recipes.

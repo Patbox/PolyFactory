@@ -25,16 +25,12 @@ public class MovingItem implements VirtualElement, StackReference {
     private ItemStack stack;
     private ItemStack stackCurrent;
     private final ItemDisplayElement[] itemDisplay = new ItemDisplayElement[4];
-    private final GenericEntityElement riddenBase = new MarkerElement() {
-        @Override
-        protected Packet<ClientPlayPacketListener> createSpawnPacket(ServerPlayerEntity player) {
-            return new EntitySpawnS2CPacket(this.getEntityId(), this.getUuid(), pos.x, pos.y, pos.z, 0, 0, this.getEntityType(), 0, Vec3d.ZERO, 0);
-        }
-    };
+    private final ItemDisplayElement riddenBase;
     private Vec3d pos;
     private Vec3d lastPos;
     private float globalScale = 1;
     private int tick;
+    private boolean isFirstMove = true;
 
     @Deprecated
     public MovingItem(ItemStack stack) {
@@ -56,6 +52,7 @@ public class MovingItem implements VirtualElement, StackReference {
             this.itemDisplay[i].setInterpolationDuration(10);
             this.updateDisplay(i);
         }
+        this.riddenBase = this.itemDisplay[0];
     }
 
     public MovingItem split(ContainerHolder aware) {
@@ -63,7 +60,7 @@ public class MovingItem implements VirtualElement, StackReference {
     }
 
     public MovingItem split(int newCount) {
-        var x = new MovingItem(this.stack.copyWithCount(newCount));
+        var x = new MovingItem(this.stack.copyWithCount(newCount), this.pos);
         this.stack.decrement(newCount);
         return x;
     }
@@ -110,12 +107,11 @@ public class MovingItem implements VirtualElement, StackReference {
 
     @Override
     public IntList getEntityIds() {
-        return IntList.of(this.riddenBase.getEntityId(), this.itemDisplay[0].getEntityId(), this.itemDisplay[1].getEntityId(), this.itemDisplay[2].getEntityId(), this.itemDisplay[3].getEntityId());
+        return IntList.of(this.riddenBase.getEntityId(), this.itemDisplay[1].getEntityId(), this.itemDisplay[2].getEntityId(), this.itemDisplay[3].getEntityId());
     }
 
     @Override
     public void setHolder(@Nullable ElementHolder holder) {
-        this.riddenBase.setHolder(holder);
         for (var x : itemDisplay) {
             x.setHolder(holder);
         }
@@ -137,11 +133,10 @@ public class MovingItem implements VirtualElement, StackReference {
 
     @Override
     public void startWatching(ServerPlayerEntity player, Consumer<Packet<ClientPlayPacketListener>> packetConsumer) {
-        this.riddenBase.startWatching(player, packetConsumer);
         for (var x : itemDisplay) {
             x.startWatching(player, packetConsumer);
         }
-        packetConsumer.accept(VirtualEntityUtils.createRidePacket(this.riddenBase.getEntityId(), IntList.of(this.itemDisplay[0].getEntityId(), this.itemDisplay[1].getEntityId(), this.itemDisplay[2].getEntityId(), this.itemDisplay[3].getEntityId())));
+        packetConsumer.accept(VirtualEntityUtils.createRidePacket(this.riddenBase.getEntityId(), IntList.of(this.itemDisplay[1].getEntityId(), this.itemDisplay[2].getEntityId(), this.itemDisplay[3].getEntityId())));
     }
 
     @Override
@@ -164,6 +159,10 @@ public class MovingItem implements VirtualElement, StackReference {
         }
         if (!this.pos.equals(this.lastPos)) {
             this.riddenBase.notifyMove(this.lastPos, this.pos, this.lastPos.subtract(this.pos));
+            if (this.isFirstMove) {
+                this.riddenBase.setTeleportDuration(4);
+                this.isFirstMove = false;
+            }
             this.lastPos = this.pos;
         }
     }

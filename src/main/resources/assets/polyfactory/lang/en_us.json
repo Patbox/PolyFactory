@@ -63,6 +63,8 @@
   "item.polyfactory.crushed_raw_copper": "Crushed Raw Copper",
   "item.polyfactory.crushed_raw_gold": "Crushed Raw Gold",
   "item.polyfactory.netherrack_dust": "Netherrack Dust",
+  "item.polyfactory.ender_dust": "Ender Dust",
+  "item.polyfactory.ender_infused_amethyst_shard": "Ender infused Amethyst Shard",
   "item.polyfactory.integrated_circuit": "Integrated Circuit",
   "item.polyfactory.artificial_dye": "Artificial Dye",
   "item.polyfactory.artificial_dye.named": "Artificial Dye (%s)",
@@ -155,6 +157,9 @@
 
   "advancements.polyfactory.container.title": "Alternative Storage",
   "advancements.polyfactory.container.description": "Put item into Wooden Container",
+
+  "advancements.polyfactory.workbench.title": "Better than Crafting Table",
+  "advancements.polyfactory.workbench.description": "Create a Workbench",
 
   "advancements.polyfactory.fan.title": "Moving with the wind",
   "advancements.polyfactory.fan.description": "Get pushed by a Fan!",

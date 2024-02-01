@@ -419,8 +419,23 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.FUEL_STEAM_ENGINE))
                 .build(exporter, "polyfactory:main/base/steam_engine");
 
-        var container = Advancement.Builder.create()
+        var workbench = Advancement.Builder.create()
                 .parent(press)
+                .display(
+                        FactoryItems.WORKBENCH,
+                        Text.translatable("advancements.polyfactory.workbench.title"),
+                        Text.translatable("advancements.polyfactory.workbench.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("craft", RecipeCraftedCriterion.Conditions.create(id("workbench")))
+                .build(exporter, "polyfactory:main/base/workbench");
+
+        var container = Advancement.Builder.create()
+                .parent(workbench)
                 .display(
                         FactoryItems.CONTAINER,
                         Text.translatable("advancements.polyfactory.container.title"),
