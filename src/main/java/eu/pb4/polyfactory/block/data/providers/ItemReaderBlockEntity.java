@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.data.DataContainer;
+import eu.pb4.polyfactory.data.ItemStackData;
 import eu.pb4.polyfactory.data.StringData;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -114,7 +115,7 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
         }
 
         this.page = this.page % this.lines.length;
-        this.lastData = new StringData(this.lines[this.page]);
+        this.lastData = new ItemStackData(this.stack.copy(), this.lines[this.page]);
         if (this.world != null) {
             if (FactoryBlocks.ITEM_READER.sendData(this.world, this.pos, this.lastData) > 0) {
                 if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {

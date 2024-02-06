@@ -50,7 +50,9 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
     @Override
     public void readNbt(NbtCompound nbt) {
         Inventories.readNbt(nbt, this.stacks);
-        updateResult();
+        if (this.world != null) {
+            updateResult();
+        }
         super.readNbt(nbt);
     }
 

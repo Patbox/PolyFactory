@@ -26,6 +26,11 @@ public record StringData(String value) implements DataContainer {
     }
 
     @Override
+    public boolean isEmpty() {
+        return this.value.isEmpty();
+    }
+
+    @Override
     public boolean forceRight() {
         return false;
     }

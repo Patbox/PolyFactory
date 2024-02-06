@@ -13,6 +13,9 @@ public interface DataContainer {
     String asString();
     long asLong();
     double asDouble();
+    default boolean isEmpty() {
+        return false;
+    }
 
     default int asRedstoneOutput() {
         return (int) MathHelper.clamp(asLong(), 0, 15);
@@ -41,4 +44,5 @@ public interface DataContainer {
         writeNbt(nbt);
         return nbt;
     }
+
 }

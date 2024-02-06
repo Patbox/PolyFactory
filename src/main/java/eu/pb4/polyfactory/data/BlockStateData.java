@@ -28,6 +28,11 @@ public record BlockStateData(BlockState state) implements DataContainer {
     }
 
     @Override
+    public boolean isEmpty() {
+        return state.isAir();
+    }
+
+    @Override
     public void writeNbt(NbtCompound compound) {
         compound.put("value", NbtHelper.fromBlockState(this.state));
     }
