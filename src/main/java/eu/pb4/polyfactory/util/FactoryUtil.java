@@ -156,6 +156,34 @@ public class FactoryUtil {
     }
 
 
+    public static int insertBetween(Inventory inventory, int start, int end, ItemStack itemStack) {
+        var size = Math.min(inventory.size(), end);
+        var init = itemStack.getCount();
+        for (int i = start; i < size; i++) {
+            var current = inventory.getStack(i);
+
+            if (current.isEmpty()) {
+                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxCountPerStack());
+                inventory.setStack(i, itemStack.copyWithCount(maxMove));
+                itemStack.decrement(maxMove);
+
+            } else if (ItemStack.canCombine(current, itemStack)) {
+                var maxMove = Math.min(Math.min(current.getMaxCount() - current.getCount(), itemStack.getCount()), inventory.getMaxCountPerStack());
+
+                if (maxMove > 0) {
+                    current.increment(maxMove);
+                    itemStack.decrement(maxMove);
+                }
+            }
+
+            if (itemStack.isEmpty()) {
+                return init;
+            }
+        }
+
+        return init - itemStack.getCount();
+    }
+
     private static int tryInsertingRegular(Inventory inventory, ItemStack itemStack) {
         var size = inventory.size();
         var init = itemStack.getCount();

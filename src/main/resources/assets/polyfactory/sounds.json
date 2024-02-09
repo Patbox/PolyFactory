@@ -1,4 +1,20 @@
 {
+  "item.wrench.use": {
+    "sounds": [
+      {
+        "name": "note/hat",
+        "pitch": 1.2
+      }
+    ]
+  },
+  "item.wrench.switch": {
+    "sounds": [
+      {
+        "name": "note/hat",
+        "pitch": 1.5
+      }
+    ]
+  },
   "entity.dynamite.throw": {
     "sounds": [
       "random/bow"

@@ -304,6 +304,19 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                 .offerTo(exporter);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.HOLOGRAM_PROJECTOR, 1)
+                .pattern("pdp")
+                .pattern("ese")
+                .pattern("pcp")
+                .input('d', Items.DIAMOND)
+                .input('e', FactoryItems.ENDER_INFUSED_AMETHYST_SHARD)
+                .input('p', FactoryItems.STEEL_PLATE)
+                .input('c', Items.COPPER_INGOT)
+                .input('s', FactoryItems.INTEGRATED_CIRCUIT)
+                .criterion("get_steel", InventoryChangedCriterion.Conditions.items(Items.ENDER_PEARL))
+                .offerTo(exporter);
+
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.ITEM_READER)
                 .pattern("plp")
                 .pattern("sbs")
@@ -339,7 +352,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .offerTo(exporter);
 
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.ELECTRIC_GENERATOR)
+        /*ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.ELECTRIC_GENERATOR)
                 .pattern("scs")
                 .pattern("aia")
                 .pattern("scs")
@@ -360,7 +373,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .input('c', Items.COPPER_BLOCK)
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                 .offerTo(exporter);
-
+        */
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.GEARBOX, 1)
                 .pattern("sgs")
                 .pattern("gwg")
@@ -696,7 +709,26 @@ class RecipesProvider extends FabricRecipeProvider {
                         List.of(CountedIngredient.ofItems(2, Items.WHEAT), CountedIngredient.ofItems(2, Items.SUGAR),
                                 CountedIngredient.ofItems(1, Items.EGG),
                                 CountedIngredient.ofItemsRemainder(2, Items.MILK_BUCKET, Items.BUCKET)),
-                        2, 4, 10, new ItemStack(Items.CAKE)),
+                        3, 4, 10, new ItemStack(Items.CAKE)),
+                GenericMixingRecipe.ofCounted("pumpkin_pie",
+                        List.of(CountedIngredient.ofItems(1, Items.PUMPKIN), CountedIngredient.ofItems(1, Items.SUGAR),
+                                CountedIngredient.ofItems(1, Items.EGG)),
+                        3, 4, 10, new ItemStack(Items.PUMPKIN_PIE, 2)),
+                GenericMixingRecipe.ofCounted("mushroom_stew",
+                        List.of(CountedIngredient.ofItems(1, Items.RED_MUSHROOM), CountedIngredient.ofItems(1, Items.BROWN_MUSHROOM),
+                                CountedIngredient.ofItems(2, Items.BOWL)),
+                        2, 4, 10, new ItemStack(Items.MUSHROOM_STEW, 2)),
+                GenericMixingRecipe.ofCounted("beetroot_soup",
+                        List.of(CountedIngredient.ofItems(3, Items.BEETROOT),
+                                CountedIngredient.ofItems(1, Items.BOWL)),
+                        2, 4, 10, new ItemStack(Items.BEETROOT_SOUP, 1)),
+                GenericMixingRecipe.ofCounted("rabbit_stew",
+                        List.of(CountedIngredient.ofItems(1, Items.COOKED_RABBIT),
+                                CountedIngredient.ofItems(2, Items.BAKED_POTATO),
+                                CountedIngredient.ofItems(2, Items.CARROT),
+                                CountedIngredient.ofItems(2, Items.BROWN_MUSHROOM),
+                                CountedIngredient.ofItems(3, Items.BOWL)),
+                        2, 4, 10, new ItemStack(Items.RABBIT_STEW, 3)),
                 GenericMixingRecipe.ofCounted("cookie",
                         List.of(CountedIngredient.ofItems(2, Items.WHEAT), CountedIngredient.ofItems(1, Items.COCOA_BEANS)),
                         2, 4, 10, new ItemStack(Items.COOKIE, 10)),

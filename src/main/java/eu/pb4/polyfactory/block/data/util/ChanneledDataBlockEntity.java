@@ -14,11 +14,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
 
-public class ChanneledDataBlockEntity extends LockableBlockEntity implements ChanneledDataCache, BlockEntityExtraListener {
+public class ChanneledDataBlockEntity extends LockableBlockEntity implements ChanneledDataCache {
     protected DataContainer lastData = StringData.EMPTY;
     private int channel;
-    private ModelInitializer updateCaller;
-
     @Nullable
     public DataContainer getCachedData() {
         return this.lastData;
@@ -26,9 +24,6 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
 
     public void setCachedData(DataContainer lastData) {
         this.lastData = lastData;
-        if (this.updateCaller != null) {
-            this.updateCaller.setData(lastData);
-        }
     }
 
     @Override
@@ -65,20 +60,5 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
 
     protected ChanneledDataBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-    }
-
-    @Override
-    public void onListenerUpdate(WorldChunk chunk) {
-        if (this.lastData != null) {
-            var x = BlockAwareAttachment.get(chunk, this.pos);
-            if (x != null && x.holder() instanceof ModelInitializer call) {
-                call.setData(this.lastData);
-                this.updateCaller = call;
-            }
-        }
-    }
-    
-    public interface ModelInitializer {
-        void setData(DataContainer data);
     }
 }

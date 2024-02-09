@@ -70,5 +70,6 @@ public interface MinimalSidedInventory extends SidedInventory {
     @Override
     default void clear() {
         this.getStacks().clear();
+        this.markDirty();
     }
 }

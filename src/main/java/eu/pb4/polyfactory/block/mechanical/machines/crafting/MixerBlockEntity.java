@@ -22,6 +22,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.RecipeInputInventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ItemStackParticleEffect;
@@ -41,6 +42,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
 
 public class MixerBlockEntity extends TallItemMachineBlockEntity {
 
@@ -194,14 +197,29 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         self.model.tick();
 
         if (self.process >= self.currentRecipe.value().time()) {
-            var currentOutput = self.getStack(OUTPUT_FIRST);
             var output = self.currentRecipe.value().craft(self, world.getRegistryManager());
             {
-                if (!currentOutput.isEmpty() && (!ItemStack.canCombine(currentOutput, output) || output.getCount() + currentOutput.getCount() > output.getMaxCount())) {
-                    self.state = MachineInfoProvider.OUTPUT_FULL_TEXT;
-                    return;
+                var items = new ArrayList<ItemStack>();
+                items.add(output.copy());
+                for (var x : self.currentRecipe.value().remainders()) {
+                    items.add(x.copy());
+                }
+
+                var inv = new SimpleInventory(3);
+                for (int i = 0; i < 3; i++) {
+                    inv.setStack(i, self.getStack(OUTPUT_FIRST + i).copy());
+                }
+
+                for (var item : items) {
+                    FactoryUtil.tryInsertingInv(inv, item, null);
+
+                    if (!item.isEmpty()) {
+                        self.state = OUTPUT_FULL_TEXT;
+                        return;
+                    }
                 }
             }
+            self.currentRecipe.value().applyRecipeUse(self, world);
             self.process = 0;
 
             if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity player) {
@@ -209,37 +227,9 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
                 TriggerCriterion.trigger(player, FactoryTriggers.MIXER_CRAFTS);
             }
 
-            self.currentRecipe.value().applyRecipeUse(self, world);
-
-            if (currentOutput.isEmpty()) {
-                self.setStack(OUTPUT_FIRST, output);
-            } else {
-                currentOutput.increment(output.getCount());
-            }
-
-            for (var remainder : self.currentRecipe.value().remainders()) {
-                if (remainder.isEmpty()) {
-                    continue;
-                }
-
-                for (int i = OUTPUT_FIRST; i < SIZE; i++) {
-                    var slot = self.getStack(i);
-                    if (slot.isEmpty()) {
-                        self.setStack(i, remainder.copyAndEmpty());
-                    } else if (ItemStack.canCombine(slot, remainder)) {
-                        var count = Math.max(remainder.getCount(), slot.getMaxCount() - slot.getCount());
-                        remainder.decrement(count);
-                        slot.increment(count);
-
-                        if (remainder.isEmpty()) {
-                            break;
-                        }
-                    }
-                }
-
-                if (!remainder.isEmpty()) {
-                    ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5, remainder);
-                }
+            FactoryUtil.insertBetween(self, OUTPUT_FIRST, self.size(), output);
+            for (var x : self.currentRecipe.value().remainders()) {
+                FactoryUtil.insertBetween(self, OUTPUT_FIRST, self.size(), x);
             }
 
             self.markDirty();

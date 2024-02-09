@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.other;
 
+import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlock;
@@ -26,13 +27,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-public class WorkbenchBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, CustomInsertInventory, RecipeInputInventory {
+public class WorkbenchBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, CustomInsertInventory, RecipeInputInventory, BlockEntityExtraListener {
     private static final int[] INPUT_SLOTS = IntStream.range(0, 9).toArray();
     private final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(9, ItemStack.EMPTY);
     private final CraftingResultInventory result = new CraftingResultInventory();
@@ -189,4 +191,8 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
     }
 
 
+    @Override
+    public void onListenerUpdate(WorldChunk chunk) {
+        updateResult();
+    }
 }

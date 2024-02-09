@@ -10,6 +10,8 @@ public class FactorySoundEvents {
     public static final SoundEvent BLOCK_PRESS_CRAFT = of("block.press.craft");
     public static final SoundEvent BLOCK_REMOTE_REDSTONE_ON = of("block.remote_redstone.on");
     public static final SoundEvent BLOCK_REMOTE_REDSTONE_OFF = of("block.remote_redstone.off");
+    public static final SoundEvent ITEM_WRENCH_USE = of("item.wrench.use");
+    public static final SoundEvent ITEM_WRENCH_SWITCH = of("item.wrench.switch");
 
     private static SoundEvent of(String path) {
         return SoundEvent.of(id(path));

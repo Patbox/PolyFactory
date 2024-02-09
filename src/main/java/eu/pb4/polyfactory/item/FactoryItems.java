@@ -166,6 +166,7 @@ public class FactoryItems {
                     entries.add(BLOCK_OBSERVER);
                     entries.add(NIXIE_TUBE_CONTROLLER);
                     entries.add(NIXIE_TUBE);
+                    entries.add(HOLOGRAM_PROJECTOR);
 
                     // Redstone?
                     entries.add(WIRELESS_REDSTONE_RECEIVER);
@@ -173,8 +174,6 @@ public class FactoryItems {
                     entries.add(PORTABLE_REDSTONE_TRANSMITTER);
 
                     // Electrical machines (tier 2)
-                    entries.add(ELECTRIC_GENERATOR);
-                    entries.add(ELECTRIC_MOTOR);
 
                     // Rest
                     entries.add(INVERTED_REDSTONE_LAMP);
@@ -257,7 +256,8 @@ public class FactoryItems {
                     .icon(WITHER_SKULL_GENERATOR::getDefaultStack)
                     .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
                     .entries(((context, entries) -> {
-                        entries.add(HOLOGRAM_PROJECTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(WITHER_SKULL_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
 
                         // Remove this

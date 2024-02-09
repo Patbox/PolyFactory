@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.item.wrench;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.util.FactorySoundEvents;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import eu.pb4.sidebars.api.Sidebar;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
@@ -12,6 +13,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.scoreboard.number.BlankNumberFormat;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -109,6 +111,7 @@ public class WrenchHandler {
                 action.action().applyAction(world, pos, side, state, !player.isSneaking());
                 this.pos = null;
                 TriggerCriterion.trigger(player, FactoryTriggers.WRENCH);
+                player.playSound(FactorySoundEvents.ITEM_WRENCH_USE, SoundCategory.PLAYERS, 0.3f, player.getRandom().nextFloat() * 0.1f + 0.95f);
                 return ActionResult.SUCCESS;
             }
         }
@@ -133,11 +136,11 @@ public class WrenchHandler {
             current = actions.get(0).id();
         }
         boolean next = false;
+        String act = this.actions.get(0).id();
         for (var action : actions) {
             if (next) {
-                this.currentAction.put(state.getBlock(), action.id());
-                this.pos = null;
-                return;
+                act = action.id();
+                break;
             }
             if (action.id().equals(current)) {
                 next = true;
@@ -145,7 +148,8 @@ public class WrenchHandler {
         }
 
         if (next) {
-            this.currentAction.put(state.getBlock(), this.actions.get(0).id());
+            this.currentAction.put(state.getBlock(), act);
+            player.playSound(FactorySoundEvents.ITEM_WRENCH_SWITCH, SoundCategory.PLAYERS, 0.3f, 1f);
             this.pos = null;
         }
     }

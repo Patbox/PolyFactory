@@ -1,6 +1,10 @@
 - Added Wireless Redstone Receiver and Transmitter - allows you to remotely transmit redstone pulses in a range of 64 blocks! Uses 2 item channel system.
 - Added Portable Redstone Transmitter - allows you to active Redstone Receivers from your inventory!
-- Added Workbench - Crafting Table that keeps its items after closing.
-- Added Ender Dust and Ender infused Amethyst Shard - purely crafting items.
-- Piston movable block now move smoothly instead of vanishing.
-- Tweaked existing recipes.
+- Added Hologram Projector - new display block that can show a hologram of Items/Block/Other data in world! Configurable with a Wrench.
+- Added Workbench - Crafting Table that keeps its items after closing. The classic for any modded experience.
+- Added Ender Dust and Ender infused Amethyst Shard - new ingredient items.
+- Added sounds to Wrench actions.
+- Removed recipes for Electric Motor/Generator. Both of these items were unfinished and require extra work.
+- Piston movable blocks now move smoothly instead of vanishing.
+- Changed crafting behaviour of Mechanical Mixer. It will not try to fill all available slots.
+- Tweaked existing recipes and added few new ones!

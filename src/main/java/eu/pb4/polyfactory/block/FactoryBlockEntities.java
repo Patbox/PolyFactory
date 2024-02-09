@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlockEntity;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlockEntity;
 import eu.pb4.polyfactory.block.data.CableBlockEntity;
+import eu.pb4.polyfactory.block.data.output.HologramProjectorBlockEntity;
 import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlockEntity;
 import eu.pb4.polyfactory.block.data.providers.ItemReaderBlockEntity;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
@@ -95,6 +96,9 @@ public class FactoryBlockEntities {
             FabricBlockEntityTypeBuilder.create(CreativeMotorBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_MOTOR));
     public static final BlockEntityType<ChanneledDataBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache", FabricBlockEntityTypeBuilder
             .create(ChanneledDataBlockEntity::new).addBlocks(FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT));
+
+    public static final BlockEntityType<HologramProjectorBlockEntity> HOLOGRAM_PROJECTOR = register("hologram_projector", FabricBlockEntityTypeBuilder
+            .create(HologramProjectorBlockEntity::new).addBlocks(FactoryBlocks.HOLOGRAM_PROJECTOR));
 
     public static final BlockEntityType<WirelessRedstoneBlockEntity> WIRELESS_REDSTONE = register("wireless_redstone", FabricBlockEntityTypeBuilder
             .create(WirelessRedstoneBlockEntity::new).addBlock(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER));

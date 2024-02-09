@@ -27,6 +27,11 @@ public record BoolData(boolean value) implements DataContainer {
     }
 
     @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
     public void writeNbt(NbtCompound compound) {
         compound.putBoolean("value", this.value);
     }

@@ -19,13 +19,13 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 public class NixieTubeControllerBlock extends GenericDirectionalDataBlock implements DataReceiver {
     public static final BooleanProperty TOP_CONNECTOR = BooleanProperty.of("top_connector");
@@ -37,7 +37,7 @@ public class NixieTubeControllerBlock extends GenericDirectionalDataBlock implem
             (x, n) -> x.setScrollLoop(!x.scrollLoop())
     );
     public static final WrenchAction SCROLL_SPEED = WrenchAction.ofBlockEntity("scroll_speed", NixieTubeControllerBlockEntity.class,
-            x -> String.format("%.2f char/sec", (20f / x.scrollSpeed())),
+            x -> String.format(Locale.ROOT,"%.2f char/sec", (20f / x.scrollSpeed())),
             (x, n) -> x.setScrollSpeed(n ? (x.scrollSpeed() + 1 > 30 ? 5 : x.scrollSpeed() + 1) : (x.scrollSpeed() - 1 < 5 ? 30 : x.scrollSpeed() - 1))
     );
 

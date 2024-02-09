@@ -168,30 +168,10 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
             self.process = 0;
             stack.decrement(1);
 
-            var items = new ArrayList<ItemStack>();
-
             for (var out : self.currentRecipe.value().output()) {
                 for (int a = 0; a < out.roll(); a++) {
                     if (world.random.nextFloat() < out.chance()) {
-                        items.add(out.stack().copy());
-                    }
-                }
-            }
-
-            for (var out : items) {
-                for (int i = 1; i < 4; i++) {
-                    var c = self.getStack(i);
-                    if (c.isEmpty()) {
-                        self.setStack(i, out);
-                        break;
-                    } else if (ItemStack.canCombine(c, out)) {
-                        var count = Math.min((c.getMaxCount() - c.getCount()), out.getCount());
-                        c.increment(count);
-                        out.decrement(count);
-                    }
-
-                    if (out.isEmpty()) {
-                        break;
+                        FactoryUtil.insertBetween(self, 1, 4, out.stack().copy());
                     }
                 }
             }
