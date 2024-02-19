@@ -7,6 +7,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -90,6 +91,11 @@ public class ItemReaderBlock extends DataProviderBlock {
     @Override
     public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.IRON_BLOCK.getDefaultState();
     }
 
     public static class Model extends BlockModel {

@@ -93,7 +93,7 @@ public class PlacerBlock extends RotationalNetworkBlock implements FactoryBlock,
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
-        return Blocks.DISPENSER.getDefaultState();
+        return Blocks.IRON_BLOCK.getDefaultState();
     }
 
     @Override
@@ -206,8 +206,8 @@ public class PlacerBlock extends RotationalNetworkBlock implements FactoryBlock,
             mat.scale( 0.4f);
 
             mat.translate((float) (-MathHelper.cos(this.rotation) * 0.3) - 0.3f, -MathHelper.sin(this.rotation) * 4f / 16f - 2 / 16f, 0);
-            mat.rotateZ(MathHelper.cos(this.rotation) / 4);
-            mat.rotateY(-MathHelper.HALF_PI);
+            mat.rotateZ(MathHelper.cos(this.rotation) / 4 + MathHelper.HALF_PI);
+            //mat.rotateY(-MathHelper.HALF_PI);
             if (this.item.getItem().isEmpty()) {
                 mat.scale(0);
             }

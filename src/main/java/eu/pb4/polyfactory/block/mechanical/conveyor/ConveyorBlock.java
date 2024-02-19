@@ -36,6 +36,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -466,6 +467,10 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         return FactoryUtil.transform(state, mirror::apply, DIRECTION);
     }
 
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.SMOOTH_STONE.getDefaultState();
+    }
 
     @Override
     public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {

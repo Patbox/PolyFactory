@@ -64,6 +64,26 @@ public class FactoryUtil {
         return new Identifier(ModInit.ID, path);
     }
 
+    public static float wrap(float value, float min, float max) {
+        if (value > max) {
+            return min;
+        } else if (value < min) {
+            return max;
+        }
+
+        return value;
+    }
+
+    public static int wrap(int value, int min, int max) {
+        if (value > max) {
+            return min;
+        } else if (value < min) {
+            return max;
+        }
+
+        return value;
+    }
+
     public static int tryInserting(World world, BlockPos pos, ItemStack itemStack, Direction direction) {
         var inv = HopperBlockEntity.getInventoryAt(world, pos);
 

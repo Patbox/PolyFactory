@@ -31,6 +31,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -274,6 +275,11 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
     @Override
     public BlockState getPolymerBlockState(BlockState state) {
         return Blocks.BARRIER.getDefaultState();
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.SPRUCE_PLANKS.getDefaultState();
     }
 
     @Nullable

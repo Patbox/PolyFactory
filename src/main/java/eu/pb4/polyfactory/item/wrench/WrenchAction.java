@@ -27,6 +27,7 @@ public record WrenchAction(String id, Text name, WrenchValueGetter value, Wrench
             x -> String.valueOf(x.channel()),
             (x, n) -> x.setChannel((x.channel() + 4 + (n ? 1 : -1)) % 4 )
     );
+    public static final WrenchAction FACING_HOPPER = WrenchAction.of("rotation", Properties.HOPPER_FACING);
 
     public static WrenchAction of(String id, Property<?> property) {
         return new WrenchAction(id, Text.translatable("item.polyfactory.wrench.action." + id),

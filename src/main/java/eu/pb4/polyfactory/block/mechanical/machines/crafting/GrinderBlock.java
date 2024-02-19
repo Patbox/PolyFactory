@@ -161,7 +161,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
-        return Blocks.GRINDSTONE.getDefaultState();
+        return Blocks.BARREL.getDefaultState();
     }
 
     @Override

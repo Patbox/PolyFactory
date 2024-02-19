@@ -8,11 +8,14 @@ import eu.pb4.polyfactory.block.data.util.GenericDirectionalDataBlock;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -37,8 +40,8 @@ public class NixieTubeControllerBlock extends GenericDirectionalDataBlock implem
             (x, n) -> x.setScrollLoop(!x.scrollLoop())
     );
     public static final WrenchAction SCROLL_SPEED = WrenchAction.ofBlockEntity("scroll_speed", NixieTubeControllerBlockEntity.class,
-            x -> String.format(Locale.ROOT,"%.2f char/sec", (20f / x.scrollSpeed())),
-            (x, n) -> x.setScrollSpeed(n ? (x.scrollSpeed() + 1 > 30 ? 5 : x.scrollSpeed() + 1) : (x.scrollSpeed() - 1 < 5 ? 30 : x.scrollSpeed() - 1))
+            x -> String.format(Locale.ROOT,"%.2f char/sec", x.scrollSpeed() == 0 ? 0 : (20f / x.scrollSpeed())),
+            (x, n) -> x.setScrollSpeed(FactoryUtil.wrap(x.scrollSpeed() + (n ? 1 : -1), 0, 80))
     );
 
     public NixieTubeControllerBlock(Settings settings) {
@@ -94,6 +97,11 @@ public class NixieTubeControllerBlock extends GenericDirectionalDataBlock implem
     @Override
     public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new NixieTubeControllerBlockEntity(pos, state);
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.IRON_BLOCK.getDefaultState();
     }
 
     @Nullable

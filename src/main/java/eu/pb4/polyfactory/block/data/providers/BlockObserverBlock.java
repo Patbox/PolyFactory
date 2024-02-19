@@ -2,8 +2,10 @@ package eu.pb4.polyfactory.block.data.providers;
 
 import eu.pb4.polyfactory.data.BlockStateData;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -31,5 +33,10 @@ public class BlockObserverBlock extends DataProviderBlock {
         }
 
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.IRON_BLOCK.getDefaultState();
     }
 }

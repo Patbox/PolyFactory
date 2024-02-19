@@ -49,8 +49,8 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
     public void setChannel(int channel) {
         this.channel = channel;
         if (this.hasWorld()) {
-            this.markDirty();
             NetworkComponent.Data.updateDataAt(this.world, this.pos);
+            this.markDirty();
         }
     }
 

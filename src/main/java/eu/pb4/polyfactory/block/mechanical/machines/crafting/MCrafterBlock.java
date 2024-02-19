@@ -73,7 +73,7 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
-        return Blocks.DISPENSER.getDefaultState();
+        return Blocks.CRAFTER.getDefaultState();
     }
 
     @Override
@@ -134,6 +134,8 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
     public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
+
+
 
     @Override
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {

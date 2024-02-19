@@ -1,0 +1,6 @@
+{
+	"parent": "polyfactory:block/tachometer",
+	"textures": {
+		"5": "polyfactory:block/rotation_meter/side_stress"
+	}
+}

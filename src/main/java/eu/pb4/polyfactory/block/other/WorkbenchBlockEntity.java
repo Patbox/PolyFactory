@@ -150,12 +150,12 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
         if (optional.isPresent()) {
             RecipeEntry<CraftingRecipe> recipeEntry = optional.get();
             CraftingRecipe craftingRecipe = recipeEntry.value();
-            if (result.shouldCraftRecipe(world, null, recipeEntry)) {
+            //if (result.shouldCraftRecipe(world, null, recipeEntry)) {
                 ItemStack itemStack2 = craftingRecipe.craft(this, world.getRegistryManager());
                 if (itemStack2.isItemEnabled(world.getEnabledFeatures())) {
                     itemStack = itemStack2;
                 }
-            }
+            //}
         }
 
         result.setStack(0, itemStack);

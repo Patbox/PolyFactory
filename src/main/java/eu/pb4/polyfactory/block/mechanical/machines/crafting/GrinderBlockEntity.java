@@ -81,7 +81,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
     @Override
     public int[] getAvailableSlots(Direction side) {
         var facing = this.getCachedState().get(GrinderBlock.INPUT_FACING);
-        return facing.getOpposite() == side ? OUTPUT_SLOTS : INPUT_SLOTS;
+        return facing.getOpposite() == side || side == Direction.DOWN ? OUTPUT_SLOTS : INPUT_SLOTS;
     }
 
     @Override

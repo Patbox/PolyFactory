@@ -97,7 +97,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
     @Override
     public int[] getAvailableSlots(Direction side) {
         var facing = this.getCachedState().get(MCrafterBlock.FACING);
-        return facing == side ? OUTPUT_SLOTS : INPUT_SLOTS;
+        return facing == side || side == Direction.DOWN ? OUTPUT_SLOTS : INPUT_SLOTS;
     }
 
     @Override
@@ -112,6 +112,13 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
 
         return slot < 9;
     }
+
+    @Override
+    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+        return slot >= 9 && (dir == this.getCachedState().get(MCrafterBlock.FACING) || dir == Direction.DOWN)
+                || slot < 9 && this.getCachedState().get(MCrafterBlock.FACING).rotateYClockwise().getAxis() == dir.getAxis();
+    }
+
 
     private int getLeastPopulatedInputSlot(ItemStack stack) {
         if (stack.isEmpty()) {
@@ -139,12 +146,6 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
         }
 
         return slot;
-    }
-
-    @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return slot >= 9 && dir == this.getCachedState().get(MCrafterBlock.FACING)
-                || slot < 9 && this.getCachedState().get(MCrafterBlock.FACING).rotateYClockwise().getAxis() == dir.getAxis();
     }
 
     public void createGui(ServerPlayerEntity player) {

@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.block.RedstoneConnectable;
 import eu.pb4.factorytools.api.block.SneakBypassingBlock;
 import eu.pb4.factorytools.api.util.VirtualDestroyStage;
@@ -55,7 +56,7 @@ import org.joml.Vector3f;
 import java.util.List;
 
 
-public class WirelessRedstoneBlock extends Block implements PolymerBlock, RedstoneConnectable, BlockEntityProvider, WrenchableBlock, BlockWithElementHolder, SneakBypassingBlock, VirtualDestroyStage.Marker, BarrierBasedWaterloggable {
+public class WirelessRedstoneBlock extends Block implements FactoryBlock, RedstoneConnectable, BlockEntityProvider, WrenchableBlock, SneakBypassingBlock, BarrierBasedWaterloggable {
     public static DirectionProperty FACING = Properties.FACING;
     public static BooleanProperty POWERED = Properties.POWERED;
     public WirelessRedstoneBlock(Settings settings) {
@@ -139,7 +140,7 @@ public class WirelessRedstoneBlock extends Block implements PolymerBlock, Redsto
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
-        return Blocks.STONE.getDefaultState();
+        return Blocks.IRON_BLOCK.getDefaultState();
     }
 
     @Override

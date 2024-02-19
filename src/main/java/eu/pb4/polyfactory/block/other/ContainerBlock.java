@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.other;
 
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
@@ -45,7 +46,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 
 
-public class ContainerBlock extends Block implements PolymerBlock, BlockEntityProvider, BlockWithElementHolder, AttackableBlock, SneakBypassingBlock, VirtualDestroyStage.Marker, BarrierBasedWaterloggable {
+public class ContainerBlock extends Block implements FactoryBlock, BlockEntityProvider, AttackableBlock, SneakBypassingBlock, BarrierBasedWaterloggable {
     public final int maxStackCount;
     public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 

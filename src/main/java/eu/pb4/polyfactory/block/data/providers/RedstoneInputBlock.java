@@ -7,9 +7,11 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
@@ -68,5 +70,10 @@ public class RedstoneInputBlock extends DataProviderBlock implements RedstoneCon
     @Override
     public boolean canRedstoneConnect(BlockState state, @Nullable Direction dir) {
         return state.get(FACING).getOpposite() == dir;
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.IRON_BLOCK.getDefaultState();
     }
 }

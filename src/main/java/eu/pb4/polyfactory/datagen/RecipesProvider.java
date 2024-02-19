@@ -778,6 +778,27 @@ class RecipesProvider extends FabricRecipeProvider {
                 .input(FactoryItems.STEEL_GEAR)
                 .offerTo(exporter);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.TACHOMETER, 1)
+                .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                .pattern("#c#")
+                .pattern("-=-")
+                .pattern("#c#")
+                .input('#', FactoryItems.STEEL_PLATE)
+                .input('c', Items.COPPER_INGOT)
+                .input('-', FactoryItems.AXLE)
+                .input('=', ItemTags.PLANKS)
+                .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STRESSOMETER, 1)
+                .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                .pattern("#c#")
+                .pattern("-=-")
+                .pattern("#c#")
+                .input('#', FactoryItems.STEEL_PLATE)
+                .input('c', Items.GOLD_INGOT)
+                .input('-', FactoryItems.AXLE)
+                .input('=', ItemTags.PLANKS)
+                .offerTo(exporter);
 
         exporter.accept(id("crafting/prt_key_setter"), new PRTKeySetterCraftingRecipe(CraftingRecipeCategory.MISC), null);
     }

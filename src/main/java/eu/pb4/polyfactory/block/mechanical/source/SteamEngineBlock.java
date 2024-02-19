@@ -155,6 +155,11 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
     }
 
     @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.DEEPSLATE_BRICKS.getDefaultState();
+    }
+
+    @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
         return getY(state) == 2 ? List.of(getX(state) == 0 && getZ(state) == 0 ?
                 new FunctionalAxisNode(state.get(FACING).rotateYCounterclockwise().getAxis()) : new SimpleAxisNode(state.get(FACING).rotateYCounterclockwise().getAxis())) : List.of();

@@ -28,6 +28,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.*;
@@ -151,6 +152,11 @@ public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityPr
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new NixieTubeBlockEntity(pos, state);
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.GLASS.getDefaultState();
     }
 
     public static final class Model extends BlockModel {

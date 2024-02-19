@@ -74,6 +74,8 @@ public class FactoryItems {
 
     public static final Item ROTATION_DEBUG = register(FactoryBlocks.ROTATION_DEBUG);
     public static final Item GREEN_SCREEN = register(FactoryBlocks.GREEN_SCREEN);
+    public static final Item TACHOMETER = register(FactoryBlocks.TACHOMETER);
+    public static final Item STRESSOMETER = register(FactoryBlocks.STRESSOMETER);
     public static final Item ITEM_COUNTER = register(FactoryBlocks.ITEM_COUNTER);
     public static final Item REDSTONE_INPUT = register(FactoryBlocks.REDSTONE_INPUT);
     public static final Item REDSTONE_OUTPUT = register(FactoryBlocks.REDSTONE_OUTPUT);
@@ -161,6 +163,8 @@ public class FactoryItems {
 
                     entries.add(REDSTONE_OUTPUT);
                     entries.add(REDSTONE_INPUT);
+                    entries.add(TACHOMETER);
+                    entries.add(STRESSOMETER);
                     entries.add(ITEM_COUNTER);
                     entries.add(ITEM_READER);
                     entries.add(BLOCK_OBSERVER);

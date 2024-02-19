@@ -179,6 +179,11 @@ public class CableBlock extends NetworkBlock implements FactoryBlock, BlockEntit
         return Blocks.STRUCTURE_VOID;
     }
 
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.BARRIER.getDefaultState();
+    }
+
     public static int getModelId(BlockState state) {
         int i = 0;
 

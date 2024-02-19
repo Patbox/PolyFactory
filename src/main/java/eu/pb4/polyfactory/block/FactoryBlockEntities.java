@@ -95,7 +95,8 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<CreativeMotorBlockEntity> CREATIVE_MOTOR = register("creative_motor",
             FabricBlockEntityTypeBuilder.create(CreativeMotorBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_MOTOR));
     public static final BlockEntityType<ChanneledDataBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache", FabricBlockEntityTypeBuilder
-            .create(ChanneledDataBlockEntity::new).addBlocks(FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT));
+            .create(ChanneledDataBlockEntity::new).addBlocks(FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
+                    FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER));
 
     public static final BlockEntityType<HologramProjectorBlockEntity> HOLOGRAM_PROJECTOR = register("hologram_projector", FabricBlockEntityTypeBuilder
             .create(HologramProjectorBlockEntity::new).addBlocks(FactoryBlocks.HOLOGRAM_PROJECTOR));

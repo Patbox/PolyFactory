@@ -5,13 +5,9 @@ import eu.pb4.polyfactory.block.creative.CreativeContainerBlock;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
 import eu.pb4.polyfactory.block.data.CableBlock;
 import eu.pb4.polyfactory.block.data.output.HologramProjectorBlock;
-import eu.pb4.polyfactory.block.data.providers.TinyPotatoSpringBlock;
+import eu.pb4.polyfactory.block.data.providers.*;
 import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlock;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
-import eu.pb4.polyfactory.block.data.providers.ItemReaderBlock;
-import eu.pb4.polyfactory.block.data.providers.DataProviderBlock;
-import eu.pb4.polyfactory.block.data.providers.BlockObserverBlock;
-import eu.pb4.polyfactory.block.data.providers.RedstoneInputBlock;
 import eu.pb4.polyfactory.block.electric.ElectricGeneratorBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.electric.WitherSkullGeneratorBlock;
@@ -86,6 +82,8 @@ public class FactoryBlocks {
     public static final WirelessRedstoneBlock WIRELESS_REDSTONE_RECEIVER = register("wireless_redstone_receiver", new WirelessRedstoneBlock.Receiver(AbstractBlock.Settings.copy(ITEM_COUNTER)));
     public static final WirelessRedstoneBlock WIRELESS_REDSTONE_TRANSMITTER = register("wireless_redstone_transmitter", new WirelessRedstoneBlock.Transmitter(AbstractBlock.Settings.copy(ITEM_COUNTER)));
 
+    public static final RotationMeterBlock TACHOMETER = register("tachometer", new RotationMeterBlock.Speed(Block.Settings.create().hardness(2).nonOpaque()));
+    public static final RotationMeterBlock STRESSOMETER = register("stressometer", new RotationMeterBlock.Stress(Block.Settings.create().hardness(2).nonOpaque()));
     public static final ElectricMotorBlock ELECTRIC_MOTOR = register("electric_motor", new ElectricMotorBlock(Block.Settings.create().hardness(2).nonOpaque()));
     public static final ElectricGeneratorBlock ELECTRIC_GENERATOR = register("electric_generator", new ElectricGeneratorBlock(Block.Settings.create().hardness(2).nonOpaque()));
     public static final WitherSkullGeneratorBlock WITHER_SKULL_GENERATOR = register("wither_skull_generator", new WitherSkullGeneratorBlock(Block.Settings.create().hardness(2).nonOpaque()));

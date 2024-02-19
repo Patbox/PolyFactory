@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +44,17 @@ class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
                 .add(FactoryItems.WINDMILL_SAIL)
                 .add(FactoryItems.AXLE)
                 ;
+
+        this.getOrCreateTagBuilder(FactoryItemTags.PLACER_USABLE)
+                .addOptionalTag(ItemTags.TOOLS)
+                .addOptionalTag(ConventionalItemTags.EMPTY_BUCKETS)
+                .addOptionalTag(ConventionalItemTags.WATER_BUCKETS)
+                .addOptionalTag(ConventionalItemTags.LAVA_BUCKETS)
+                .addOptionalTag(ConventionalItemTags.DYES)
+                .add(FactoryItems.WINDMILL_SAIL, FactoryItems.STEEL_GEAR, FactoryItems.LARGE_STEEL_GEAR)
+                .add(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)
+                .add(Items.END_CRYSTAL, Items.ENDER_EYE, Items.EXPERIENCE_BOTTLE, Items.GLASS_BOTTLE, Items.POTION)
+        ;
 
         this.copy(FactoryBlockTags.STRIPPED_LOGS, FactoryItemTags.STRIPPED_LOGS);
     }

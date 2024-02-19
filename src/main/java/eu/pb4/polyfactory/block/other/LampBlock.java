@@ -18,6 +18,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIntArray;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -91,6 +92,11 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
     @Override
     public boolean isTransparent(BlockState state, BlockView world, BlockPos pos) {
         return true;
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.GLASS.getDefaultState();
     }
 
     public static final class Model extends BlockModel implements ColorProvider.Consumer {

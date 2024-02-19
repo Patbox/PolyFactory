@@ -21,7 +21,7 @@ import java.util.List;
 public abstract class AxisAndFacingBlock extends Block implements WrenchableBlock, FactoryBlock {
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty FIRST_AXIS = BooleanProperty.of("first_axis");
-    private static final WrenchAction FIRST_AXIS_ACTION = WrenchAction.of("axis", (World world, BlockPos pos, Direction side, BlockState state) -> {
+    public static final WrenchAction FIRST_AXIS_ACTION = WrenchAction.of("axis", (World world, BlockPos pos, Direction side, BlockState state) -> {
         return getAxis(state).asString();
     }, WrenchApplyAction.ofProperty(FIRST_AXIS));
 

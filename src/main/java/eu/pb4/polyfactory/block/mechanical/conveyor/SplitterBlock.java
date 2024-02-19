@@ -27,6 +27,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -224,6 +225,11 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
     @Override
     public Block getPolymerBlock(BlockState state) {
         return Blocks.BARRIER;
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.SMOOTH_STONE.getDefaultState();
     }
 
     @Nullable

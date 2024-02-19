@@ -16,11 +16,13 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
@@ -79,6 +81,11 @@ public class RedstoneOutputBlock extends GenericDirectionalDataBlock implements 
         }
 
         return true;
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.IRON_BLOCK.getDefaultState();
     }
 
     @Override

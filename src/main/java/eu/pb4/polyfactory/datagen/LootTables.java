@@ -49,6 +49,8 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.HOLOGRAM_PROJECTOR);
         this.addDrop(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
         this.addDrop(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER);
+        this.addDrop(FactoryBlocks.TACHOMETER);
+        this.addDrop(FactoryBlocks.STRESSOMETER);
         this.addDrop(FactoryBlocks.REDSTONE_INPUT);
         this.addDrop(FactoryBlocks.REDSTONE_OUTPUT);
         this.addDrop(FactoryBlocks.ITEM_READER);

@@ -128,7 +128,7 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
-        return Blocks.SMOOTH_STONE.getDefaultState();
+        return Blocks.IRON_BLOCK.getDefaultState();
     }
 
     @Override

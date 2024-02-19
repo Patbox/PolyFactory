@@ -1,10 +1,10 @@
-- Added Wireless Redstone Receiver and Transmitter - allows you to remotely transmit redstone pulses in a range of 64 blocks! Uses 2 item channel system.
-- Added Portable Redstone Transmitter - allows you to active Redstone Receivers from your inventory!
-- Added Hologram Projector - new display block that can show a hologram of Items/Block/Other data in world! Configurable with a Wrench.
-- Added Workbench - Crafting Table that keeps its items after closing. The classic for any modded experience.
-- Added Ender Dust and Ender infused Amethyst Shard - new ingredient items.
-- Added sounds to Wrench actions.
-- Removed recipes for Electric Motor/Generator. Both of these items were unfinished and require extra work.
-- Piston movable blocks now move smoothly instead of vanishing.
-- Changed crafting behaviour of Mechanical Mixer. It will not try to fill all available slots.
-- Tweaked existing recipes and added few new ones!
+- Added Tachometer (measures rotations per minute) and Stressometer (measures stress units left).
+  Both require connection to some display (Hologram Projector, Nixie Tube) to display their values.
+- Added option to force everything to display as text in Hologram Projector.
+- Mechanical Placers can now use selected items on blocks.
+- Hoppers, Pistons, Redstone Repeater, Redstone Comparator, Dispensers and Droppers are now rotable with wrench.
+- Added breaking particles to all the blocks that didn't have them.
+- Fixed some bugs with displaying Holograms Projectors.
+- All crafting-machines should now work with hoppers.
+
+

@@ -106,6 +106,8 @@ public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityPr
         super.onStateReplaced(state, world, pos, newState, moved);
     }
 
+
+
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {

@@ -15,9 +15,9 @@ import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.ItemStackData;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchApplyAction;
-import eu.pb4.polyfactory.item.wrench.WrenchValueGetter;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -25,9 +25,7 @@ import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.DisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.decoration.Brightness;
@@ -36,10 +34,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.DustColorTransitionParticleEffect;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.*;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -59,7 +59,6 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
     public static final BooleanProperty ACTIVE = BooleanProperty.of("active");
     public static final DirectionProperty FACING = Properties.FACING;
     public static final IntProperty FRONT = IntProperty.of("front", 0, 3);
-
     private static final WrenchAction CHANGE_ROTATION = WrenchAction.of("front", (world, pos, side, state) -> {
         var axis = state.get(FACING).getAxis();
         if (axis == Direction.Axis.Y) {
@@ -79,17 +78,23 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
 
     public static final WrenchAction SCALE = WrenchAction.ofBlockEntity("scale", HologramProjectorBlockEntity.class,
             x -> String.format(Locale.ROOT, "%.1f", x.scale()),
-            (x, n) -> x.setScale(1 + (4 + (x.scale() - 1) + (n ? 0.5f : -0.5f)) % 4)
+            (x, n) -> x.setScale(FactoryUtil.wrap(x.scale() + (n ? 0.5f : -0.5f), 1, 5) )
     );
 
     public static final WrenchAction OFFSET = WrenchAction.ofBlockEntity("offset", HologramProjectorBlockEntity.class,
             x -> String.format(Locale.ROOT,"%.1f", x.offset()),
-            (x, n) -> x.setOffset((1.5f + x.offset() + (n ? 0.1f : -0.1f)) % 1.5f)
+            (x, n) -> x.setOffset(FactoryUtil.wrap(x.offset() + (n ? 0.1f : -0.1f), 0.1f, 1.5f))
     );
 
     public static final WrenchAction ROTATION_DISPLAY = WrenchAction.ofBlockEntity("rotation", HologramProjectorBlockEntity.class,
             x -> Math.round(x.rotationDisplay() * MathHelper.DEGREES_PER_RADIAN) + "°",
-            (x, n) -> x.setRotationDisplay((MathHelper.TAU + x.rotationDisplay() + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5)) % MathHelper.TAU)
+            (x, n) -> x.setRotationDisplay(FactoryUtil.wrap(x.rotationDisplay() + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
+                    0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
+    );
+
+    public static final WrenchAction FORCE_TEXT = WrenchAction.ofBlockEntity("force_text", HologramProjectorBlockEntity.class,
+            x -> Boolean.toString(x.forceText()),
+            (x, n) -> x.setForceText(!x.forceText())
     );
 
     public HologramProjectorBlock(Settings settings) {
@@ -139,7 +144,8 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 CHANGE_ROTATION,
                 SCALE,
                 OFFSET,
-                ROTATION_DISPLAY
+                ROTATION_DISPLAY,
+                FORCE_TEXT
         );
     }
 
@@ -147,6 +153,11 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
     public BlockState rotate(BlockState state, BlockRotation rotation) {
         return FactoryUtil.transform(state, rotation::rotate, FACING);
     }*/
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.IRON_BLOCK.getDefaultState();
+    }
 
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
@@ -197,12 +208,16 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
         private static final Random RANDOM = Random.create();
         private final LodItemDisplayElement base;
         private DisplayElement currentDisplay;
+        private DisplayElement currentDisplayExtra;
         private Direction facing;
         private boolean active;
         private Direction.Axis axis;
         private float scale;
         private float offset;
         private float rotationDisplay;
+        private float extraScale = 1;
+        private boolean forceText = false;
+        private DataContainer lastData;
 
         public Model(BlockState state) {
             this.base = LodItemDisplayElement.createSimple(state.get(ACTIVE) ? ACTIVE_MODEL : LodItemDisplayElement.getModel(state.getBlock().asItem()));
@@ -258,7 +273,10 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
             this.base.setYaw(y);
             this.base.setPitch(p);
             if (this.currentDisplay != null) {
-                applyPositionTransformation(this.currentDisplay, this.facing);
+                applyPositionTransformation(this.currentDisplay, this.facing, 0);
+            }
+            if (this.currentDisplayExtra != null) {
+                applyPositionTransformation(this.currentDisplayExtra, this.facing, 1);
             }
         }
 
@@ -279,8 +297,15 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
         }
 
         public void setData(DataContainer data) {
-            DisplayElement newDisplay;
-            if (data instanceof ItemStackData stackData) {
+            if (data.equals(this.lastData)) {
+                return;
+            }
+            this.lastData = data;
+
+            this.extraScale = 1;
+            DisplayElement newDisplay = null;
+            DisplayElement newDisplayExtra = null;
+            if (data instanceof ItemStackData stackData && !this.forceText) {
                 if (this.currentDisplay instanceof ItemDisplayElement e) {
                     e.setItem(stackData.stack());
                     e.tick();
@@ -289,82 +314,136 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 var i = new ItemDisplayElement(stackData.stack());
                 i.setModelTransformation(ModelTransformationMode.GUI);
                 newDisplay = i;
-            } else if (data instanceof BlockStateData blockStateData) {
-                if (this.currentDisplay instanceof BlockDisplayElement e) {
+            } else if (data instanceof BlockStateData blockStateData && !this.forceText) {
+                var asItem = (blockStateData.state().getBlock() instanceof FactoryBlock
+                || blockStateData.state().getBlock() instanceof SkullBlock)
+                        && blockStateData.state().getBlock().asItem() != null;
+                if (this.currentDisplay instanceof BlockDisplayElement e && !asItem) {
                     e.setBlockState(blockStateData.state());
                     e.tick();
                     return;
+                } else if (this.currentDisplay instanceof ItemDisplayElement e && asItem) {
+                    e.setItem(LodItemDisplayElement.getModel(blockStateData.state().getBlock().asItem()));
+                    e.tick();
+                    this.extraScale = 2;
+                    return;
                 }
-                newDisplay = new BlockDisplayElement(blockStateData.state());
+                if (asItem) {
+                    var i = new ItemDisplayElement(LodItemDisplayElement.getModel(blockStateData.state().getBlock().asItem()));
+                    i.setModelTransformation(ModelTransformationMode.FIXED);
+                    this.extraScale = 2;
+                    newDisplay = i;
+                } else {
+                    newDisplay = new BlockDisplayElement(blockStateData.state());
+                }
             } else if (!data.isEmpty()) {
-                var t = new TextDisplayElement(Text.literal(String.join("\n", data.asString().lines().limit(4).toList())));
+                var text = Text.literal(String.join("\n", data.asString().lines().limit(4).toList())).formatted(Formatting.AQUA);
+                if (this.currentDisplay instanceof TextDisplayElement display && this.currentDisplayExtra instanceof TextDisplayElement displayExtra) {
+                    display.setText(text);
+                    display.tick();
+                    displayExtra.setText(text);
+                    displayExtra.tick();
+                    return;
+                }
+                var t = new TextDisplayElement(text);
                 t.setBackground(0);
                 t.setShadow(true);
                 t.setLineWidth(60);
                 newDisplay = t;
-            } else {
-                newDisplay = null;
+                t = new TextDisplayElement(text);
+                t.setBackground(0);
+                t.setShadow(true);
+                t.setLineWidth(60);
+                newDisplayExtra = t;
             }
 
             if (this.currentDisplay != null) {
                 this.removeElement(this.currentDisplay);
             }
 
+            if (this.currentDisplayExtra != null) {
+                this.removeElement(this.currentDisplayExtra);
+            }
+
             this.currentDisplay = newDisplay;
 
             if (newDisplay != null) {
-                this.applyInitialTransformation(newDisplay);
+                this.applyInitialTransformation(newDisplay, 0);
                 this.addElement(newDisplay);
+            }
+
+            this.currentDisplayExtra = newDisplayExtra;
+
+            if (newDisplayExtra != null) {
+                this.applyInitialTransformation(newDisplayExtra, 1);
+                this.addElement(newDisplayExtra);
             }
         }
 
-        private void applyInitialTransformation(DisplayElement display) {
+        private void applyInitialTransformation(DisplayElement display, int id) {
             display.setDisplaySize(0,0);
             display.setInterpolationDuration(4);
             display.setViewRange(0.8f);
             display.setBrightness(new Brightness(15, 15));
-            applyPositionTransformation(display, this.facing);
+            applyPositionTransformation(display, this.facing, id);
         }
 
-        private void applyDynamicTransformation(DisplayElement display) {
+        private void applyDynamicTransformation(DisplayElement display, int id) {
             mat.identity();
-            if (display instanceof BlockDisplayElement) {
-                mat.translate(-this.scale / 2, -this.scale / 2, 0);
-            }
 
             mat.rotate(Direction.get(Direction.AxisDirection.POSITIVE, this.facing.getAxis()).getRotationQuaternion());
-            if (display instanceof TextDisplayElement) {
+            if (display instanceof TextDisplayElement && id == 0) {
                 mat.rotateY(MathHelper.PI);
             }
             mat.rotateY((float) (MathHelper.HALF_PI * blockState().get(FRONT)));
 
             mat.rotateZ((this.facing.getDirection() == Direction.AxisDirection.POSITIVE ? 0 : MathHelper.PI));
+
+            if (display instanceof BlockDisplayElement) {
+                mat.translate(-this.scale / 2, -this.scale / 2, 0);
+            }
+
             mat.translate(0, this.offset + this.scale / 2, 0);
             if (display instanceof TextDisplayElement t) {
                 mat.translate(0, -t.getText().getString().lines().count() * this.scale * (7 / 16f), 0);
             }
             mat.rotateZ(this.rotationDisplay);
 
-            mat.scale(new Vector3f(this.scale, this.scale, display instanceof TextDisplayElement ? 1 : 0.005f));
+            mat.scale(new Vector3f(this.scale, this.scale, display instanceof TextDisplayElement ? 1 : 0.01f).mul(this.extraScale));
             display.setTransformation(mat);
         }
 
-        private void applyPositionTransformation(DisplayElement display, Direction facing) {
+        private void applyPositionTransformation(DisplayElement display, Direction facing, int id) {
             //var vec = new Vector3f(0, 0.5f, 0).rotate(facing.getRotationQuaternion());
             //display.setOffset(new Vec3d(vec));
             //display.setYaw(this.base.getYaw());
             //display.setPitch(this.base.getPitch());
 
 
-            applyDynamicTransformation(display);
+            applyDynamicTransformation(display, id);
         }
 
-        public void setTransform(float scale, float offset, float rotationDisplay) {
+        public void setTransform(float scale, float offset, float rotationDisplay, boolean forceText) {
+            var textChange = forceText != this.forceText;
             this.scale = scale;
             this.offset = offset;
+            this.forceText = forceText;
             this.rotationDisplay = rotationDisplay;
-            if (this.currentDisplay != null) {
-                applyDynamicTransformation(this.currentDisplay);
+
+            if (textChange) {
+                if (this.lastData != null) {
+                    var oldData = this.lastData;
+                    this.lastData = null;
+                    this.setData(oldData);
+                }
+            } else {
+                if (this.currentDisplay != null) {
+                    applyDynamicTransformation(this.currentDisplay, 0);
+                }
+
+                if (this.currentDisplayExtra != null) {
+                    applyDynamicTransformation(this.currentDisplayExtra, 1);
+                }
             }
         }
     }

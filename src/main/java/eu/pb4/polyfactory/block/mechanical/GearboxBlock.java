@@ -70,7 +70,7 @@ public class GearboxBlock extends RotationalNetworkBlock implements FactoryBlock
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
-        return Blocks.SMOOTH_STONE.getDefaultState();
+        return Blocks.OAK_PLANKS.getDefaultState();
     }
 
     @Override

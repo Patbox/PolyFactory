@@ -21,7 +21,10 @@
     "util.BlockEntityMixin",
     "util.BlockEntityTypeAccessor",
     "util.DyeColorMixin",
-    "util.DyeItemMixin"
+    "util.DyeItemMixin",
+    "wrench.AbstractRedstoneGateBlockMixin",
+    "wrench.FacingBlockMixin",
+    "wrench.HopperBlockMixin"
   ],
   "client": [
   ],

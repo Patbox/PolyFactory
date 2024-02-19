@@ -7,9 +7,12 @@ import eu.pb4.polyfactory.util.FactorySoundEvents;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import eu.pb4.sidebars.api.Sidebar;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import net.minecraft.advancement.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.item.Items;
+import net.minecraft.network.packet.s2c.play.AdvancementUpdateS2CPacket;
 import net.minecraft.scoreboard.number.BlankNumberFormat;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -18,6 +21,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -26,6 +30,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public class WrenchHandler {
     private final Sidebar sidebar = new Sidebar(Sidebar.Priority.HIGH);
@@ -94,6 +100,18 @@ public class WrenchHandler {
     public ActionResult useAction(ServerPlayerEntity player, World world, BlockPos pos, Direction side) {
         var state = world.getBlockState(pos);
         if (!(state.getBlock() instanceof WrenchableBlock wrenchableBlock)) {
+            /*player.networkHandler.sendPacket(new AdvancementUpdateS2CPacket(false, List.of(), Set.of(new Identifier("pb:tmp")), Map.of()));
+            var req = new AdvancementRequirements(List.of(List.of("a")));
+            var prog = new AdvancementProgress();
+            prog.init(req);
+            prog.obtain("a");
+            player.networkHandler.sendPacket(new AdvancementUpdateS2CPacket(false, List.of(
+                    new AdvancementEntry(new Identifier("pb:tmp"),
+                            new Advancement(Optional.empty(), Optional.of(
+                                    new AdvancementDisplay(Items.TNT.getDefaultStack(), Text.literal("a"), Text.literal("b"),
+                                            Optional.empty(), AdvancementFrame.TASK, true, false, false)), AdvancementRewards.NONE, Map.of(),
+                                    req, false, Optional.of(Text.literal("Hello World"))))
+            ), Set.of(), Map.of(new Identifier("pb:tmp"), prog)));*/
             return ActionResult.PASS;
         }
         var actions = wrenchableBlock.getWrenchActions();

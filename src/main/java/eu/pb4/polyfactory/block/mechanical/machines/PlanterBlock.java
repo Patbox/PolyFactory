@@ -88,7 +88,7 @@ public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
-        return Blocks.DISPENSER.getDefaultState();
+        return Blocks.IRON_BLOCK.getDefaultState();
     }
 
     @Override

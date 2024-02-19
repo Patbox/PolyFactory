@@ -241,7 +241,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
         var facing = this.getCachedState().get(PressBlock.INPUT_FACING);
         if (facing == side) {
             return INPUT_SLOTS;
-        } else if (facing.getOpposite() == side) {
+        } else if (facing.getOpposite() == side || side == Direction.DOWN) {
             return OUTPUT_SLOTS;
         } else if (facing.rotateYClockwise().getAxis() == side.getAxis()) {
             return INPUT_2_SLOTS;
@@ -259,7 +259,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
         var facing = this.getCachedState().get(PressBlock.INPUT_FACING);
-        return (slot == INPUT_SLOT && facing == dir) || (slot != INPUT_SLOT && facing.getOpposite() == dir);
+        return (slot == INPUT_SLOT && facing == dir) || (slot != INPUT_SLOT && (facing.getOpposite() == dir || dir == Direction.DOWN));
     }
 
     public void createGui(ServerPlayerEntity player) {
