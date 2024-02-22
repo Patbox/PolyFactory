@@ -1,10 +1,15 @@
 - Added Tachometer (measures rotations per minute) and Stressometer (measures stress units left).
   Both require connection to some display (Hologram Projector, Nixie Tube) to display their values.
-- Added option to force everything to display as text in Hologram Projector.
+- Improved Hologram Projectors:
+  - Added option to force everything to display as text.
+  - Added option to change pitch and yaw aside of just roll of hologram.
+  - Fixed some bugs with displaying holograms.
 - Mechanical Placers can now use selected items on blocks.
-- Hoppers, Pistons, Redstone Repeater, Redstone Comparator, Dispensers and Droppers are now rotable with wrench.
+- Improved placement of Windmills to always point to connected side.
+- Added new advancements!
+- Hoppers, Pistons, Redstone Repeater, Redstone Comparator, Dispensers and Droppers can be rotated by using Wrench.
 - Added breaking particles to all the blocks that didn't have them.
-- Fixed some bugs with displaying Holograms Projectors.
 - All crafting-machines should now work with hoppers.
+- Changed some textures.
 
 

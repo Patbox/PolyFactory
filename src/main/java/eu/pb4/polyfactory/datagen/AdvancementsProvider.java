@@ -4,6 +4,7 @@ import eu.pb4.factorytools.impl.ExtraItemPredicate;
 import eu.pb4.polyfactory.advancement.FactoryItemPredicates;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ColoredItem;
@@ -16,8 +17,11 @@ import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.advancement.AdvancementRequirements;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
+import net.minecraft.advancement.criterion.ItemCriterion;
 import net.minecraft.advancement.criterion.RecipeCraftedCriterion;
 import net.minecraft.item.Items;
+import net.minecraft.loot.condition.AnyOfLootCondition;
+import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
 import net.minecraft.predicate.item.ItemPredicate;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
@@ -305,6 +309,39 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.CABLE_CONNECT))
                 .build(exporter, "polyfactory:main/base/cable");
 
+        var redstone = Advancement.Builder.create()
+                .parent(cable)
+                .display(
+                        FactoryItems.REDSTONE_INPUT,
+                        Text.translatable("advancements.polyfactory.redstone.title"),
+                        Text.translatable("advancements.polyfactory.redstone.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("a", TriggerCriterion.of(FactoryTriggers.REDSTONE_IN))
+                .criterion("b", TriggerCriterion.of(FactoryTriggers.REDSTONE_OUT))
+                .criteriaMerger(AdvancementRequirements.CriterionMerger.AND)
+                .build(exporter, "polyfactory:main/base/redstone");
+
+
+        var wirelessRedstone = Advancement.Builder.create()
+                .parent(redstone)
+                .display(
+                        FactoryItems.WIRELESS_REDSTONE_TRANSMITTER,
+                        Text.translatable("advancements.polyfactory.wireless_redstone.title"),
+                        Text.translatable("advancements.polyfactory.wireless_redstone.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("a", TriggerCriterion.of(FactoryTriggers.WIRELESS_REDSTONE))
+                .build(exporter, "polyfactory:main/base/wireless_redstone");
+
         // Mixer -> Cable
 
         var itemReader = Advancement.Builder.create()
@@ -336,6 +373,21 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 )
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.NIXIE_TUBE_CONNECTED_3_OR_MORE))
                 .build(exporter, "polyfactory:main/base/nixie_tube");
+
+        var hologramProjector = Advancement.Builder.create()
+                .parent(nixieTubes)
+                .display(
+                        FactoryItems.HOLOGRAM_PROJECTOR,
+                        Text.translatable("advancements.polyfactory.hologram_projector.title"),
+                        Text.translatable("advancements.polyfactory.hologram_projector.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.HOLOGRAM_PROJECTOR_ACTIVATES))
+                .build(exporter, "polyfactory:main/base/hologram_projector");
 
         // Steel
 
@@ -370,6 +422,25 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 )
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.CONNECT_DIFFERENT_GEARS))
                 .build(exporter, "polyfactory:main/base/steel_gear");
+
+        var tachometer = Advancement.Builder.create()
+                .parent(gear)
+                .display(
+                        FactoryItems.TACHOMETER,
+                        Text.translatable("advancements.polyfactory.tachometer.title"),
+                        Text.translatable("advancements.polyfactory.tachometer.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", ItemCriterion.Conditions.createPlacedBlock(
+                        AnyOfLootCondition.builder(
+                                BlockStatePropertyLootCondition.builder(FactoryBlocks.TACHOMETER),
+                                BlockStatePropertyLootCondition.builder(FactoryBlocks.STRESSOMETER)
+                        )))
+                .build(exporter, "polyfactory:main/base/tachometer");
 
 
         // Steel -> Press

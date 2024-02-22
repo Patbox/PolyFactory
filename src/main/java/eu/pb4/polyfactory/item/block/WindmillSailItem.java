@@ -8,6 +8,8 @@ import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
 import eu.pb4.factorytools.api.item.FireworkStarColoredItem;
 import eu.pb4.factorytools.api.item.ModeledItem;
+import eu.pb4.polyfactory.nodes.FactoryNodes;
+import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;
@@ -32,11 +34,23 @@ public class WindmillSailItem extends ModeledItem implements DyeableItem, Firewo
                 return ActionResult.FAIL;
             }
 
+
             var val = Direction.AxisDirection.POSITIVE;
 
             if ((axis == Direction.Axis.X && context.getPlayerYaw() > 0 && context.getPlayerYaw() < 180)
                     || (axis == Direction.Axis.Z && (context.getPlayerYaw() < -90 || context.getPlayerYaw() > 90))) {
                 val = Direction.AxisDirection.NEGATIVE;
+            }
+
+            var o = FactoryNodes.ROTATIONAL.getGraphView(context.getWorld()).getNodesAt(context.getBlockPos()).filter(x -> x.getNode() instanceof SimpleAxisNode).findFirst();
+            if (o.isPresent() && o.get().getConnections().size() == 1) {
+                var conn = o.get().getConnections().iterator().next();
+                var offset = conn.other(o.get()).getPos().pos().subtract(context.getBlockPos());
+                val = switch (offset.getComponentAlongAxis(axis)) {
+                    case 1 -> Direction.AxisDirection.POSITIVE;
+                    case -1 -> Direction.AxisDirection.NEGATIVE;
+                    default -> val;
+                };
             }
 
             context.getWorld()

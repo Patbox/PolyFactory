@@ -1,11 +1,14 @@
 package eu.pb4.polyfactory.block.data.output;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.mapcanvas.api.font.DefaultFonts;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.block.data.DataReceiver;
@@ -29,6 +32,8 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.decoration.Brightness;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
@@ -49,6 +54,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -86,9 +92,20 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
             (x, n) -> x.setOffset(FactoryUtil.wrap(x.offset() + (n ? 0.1f : -0.1f), 0.1f, 1.5f))
     );
 
-    public static final WrenchAction ROTATION_DISPLAY = WrenchAction.ofBlockEntity("rotation", HologramProjectorBlockEntity.class,
-            x -> Math.round(x.rotationDisplay() * MathHelper.DEGREES_PER_RADIAN) + "°",
-            (x, n) -> x.setRotationDisplay(FactoryUtil.wrap(x.rotationDisplay() + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
+    public static final WrenchAction CHANGE_PITCH = WrenchAction.ofBlockEntity("pitch", HologramProjectorBlockEntity.class,
+            x -> Math.round(x.pitch() * MathHelper.DEGREES_PER_RADIAN) + "°",
+            (x, n) -> x.setPitch(FactoryUtil.wrap(x.pitch() + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
+                    0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
+    );
+
+    public static final WrenchAction CHANGE_YAW = WrenchAction.ofBlockEntity("yaw", HologramProjectorBlockEntity.class,
+            x -> Math.round(x.yaw() * MathHelper.DEGREES_PER_RADIAN) + "°",
+            (x, n) -> x.setYaw(FactoryUtil.wrap(x.yaw() + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
+                    0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
+    );
+    public static final WrenchAction CHANGE_ROLL = WrenchAction.ofBlockEntity("roll", HologramProjectorBlockEntity.class,
+            x -> Math.round(x.roll() * MathHelper.DEGREES_PER_RADIAN) + "°",
+            (x, n) -> x.setRoll(FactoryUtil.wrap(x.roll() + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
                     0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
     );
 
@@ -144,7 +161,9 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 CHANGE_ROTATION,
                 SCALE,
                 OFFSET,
-                ROTATION_DISPLAY,
+                CHANGE_PITCH,
+                CHANGE_YAW,
+                CHANGE_ROLL,
                 FORCE_TEXT
         );
     }
@@ -166,6 +185,11 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
     }
 
     @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+    }
+
+    @Override
     public Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos) {
         return List.of(new ChannelReceiverDirectionNode(state.get(FACING).getOpposite(), getChannel(world, pos)));
     }
@@ -176,6 +200,10 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
             be.setCachedData(data);
             var active = selfState.get(ACTIVE);
             if (data.isEmpty() == active) {
+                if (!data.isEmpty() && FactoryUtil.getClosestPlayer(world, selfPos, 32) instanceof ServerPlayerEntity player) {
+                    TriggerCriterion.trigger(player, FactoryTriggers.HOLOGRAM_PROJECTOR_ACTIVATES);
+                }
+
                 world.setBlockState(selfPos, selfState.cycle(ACTIVE));
             }
             return true;
@@ -214,10 +242,14 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
         private Direction.Axis axis;
         private float scale;
         private float offset;
-        private float rotationDisplay;
+        private float pitch;
+        private float yaw;
+        private float roll;
         private float extraScale = 1;
         private boolean forceText = false;
         private DataContainer lastData;
+        private float customCenter;
+        private float extraOffset;
 
         public Model(BlockState state) {
             this.base = LodItemDisplayElement.createSimple(state.get(ACTIVE) ? ACTIVE_MODEL : LodItemDisplayElement.getModel(state.getBlock().asItem()));
@@ -243,6 +275,10 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
 
                 if (this.currentDisplay != null) {
                     this.currentDisplay.startInterpolationIfDirty();
+                }
+
+                if (this.currentDisplayExtra != null) {
+                    this.currentDisplayExtra.startInterpolationIfDirty();
                 }
             }
         }
@@ -303,6 +339,8 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
             this.lastData = data;
 
             this.extraScale = 1;
+            this.customCenter = 0;
+            this.extraOffset = 0;
             DisplayElement newDisplay = null;
             DisplayElement newDisplayExtra = null;
             if (data instanceof ItemStackData stackData && !this.forceText) {
@@ -337,7 +375,39 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                     newDisplay = new BlockDisplayElement(blockStateData.state());
                 }
             } else if (!data.isEmpty()) {
-                var text = Text.literal(String.join("\n", data.asString().lines().limit(4).toList())).formatted(Formatting.AQUA);
+                var list = new ArrayList<String>();
+                var string = data.asString();
+                var space = -1;
+                var start = 0;
+
+                for (var i = 0; i < string.length(); i++) {
+                    var chr = string.charAt(i);
+                    if (chr == '\n') {
+                        list.add(string.substring(start, i));
+                        start = i + 1;
+                        space = -1;
+                        continue;
+                    } else if (chr == ' ') {
+                        space = i;
+                    }
+
+                    if (DefaultFonts.VANILLA.getTextWidth(string.substring(start, i + 1), 8) > 55) {
+                        if (space != -1) {
+                            list.add(string.substring(start, space));
+                            start = space + 1;
+                            space = -1;
+                            i -= 1;
+                        } else {
+                            list.add(string.substring(start, i - 1));
+                            start = i;
+                        }
+                    }
+                }
+                if (start < string.length() - 1) {
+                    list.add(string.substring(start));
+                }
+
+                var text = Text.literal(String.join("\n", list)).formatted(Formatting.AQUA);
                 if (this.currentDisplay instanceof TextDisplayElement display && this.currentDisplayExtra instanceof TextDisplayElement displayExtra) {
                     display.setText(text);
                     display.tick();
@@ -345,16 +415,19 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                     displayExtra.tick();
                     return;
                 }
+
                 var t = new TextDisplayElement(text);
                 t.setBackground(0);
                 t.setShadow(true);
-                t.setLineWidth(60);
+                t.setLineWidth(80);
                 newDisplay = t;
                 t = new TextDisplayElement(text);
                 t.setBackground(0);
                 t.setShadow(true);
-                t.setLineWidth(60);
+                t.setLineWidth(80);
                 newDisplayExtra = t;
+                this.extraOffset = list.size() / 4f;
+                this.customCenter = list.size() / 8f;
             }
 
             if (this.currentDisplay != null) {
@@ -396,20 +469,23 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 mat.rotateY(MathHelper.PI);
             }
             mat.rotateY((float) (MathHelper.HALF_PI * blockState().get(FRONT)));
-
             mat.rotateZ((this.facing.getDirection() == Direction.AxisDirection.POSITIVE ? 0 : MathHelper.PI));
 
-            if (display instanceof BlockDisplayElement) {
-                mat.translate(-this.scale / 2, -this.scale / 2, 0);
-            }
-
-            mat.translate(0, this.offset + this.scale / 2, 0);
+            mat.translate(0, this.offset + this.scale / 2 , 0);
             if (display instanceof TextDisplayElement t) {
                 mat.translate(0, -t.getText().getString().lines().count() * this.scale * (7 / 16f), 0);
             }
-            mat.rotateZ(this.rotationDisplay);
 
-            mat.scale(new Vector3f(this.scale, this.scale, display instanceof TextDisplayElement ? 1 : 0.01f).mul(this.extraScale));
+            mat.scale(new Vector3f(this.scale, this.scale, display instanceof TextDisplayElement ? 0.1f : 0.01f).mul(this.extraScale));
+            mat.translate(0, this.extraOffset, 0);
+
+            mat.translate(0, this.customCenter, 0);
+            mat.rotateXYZ(this.pitch, this.yaw, this.roll);
+            if (display instanceof BlockDisplayElement) {
+                mat.translate(-1f / 2, -1f / 2, -1f / 2);
+            }
+            mat.translate(0, -this.customCenter, 0);
+
             display.setTransformation(mat);
         }
 
@@ -423,12 +499,14 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
             applyDynamicTransformation(display, id);
         }
 
-        public void setTransform(float scale, float offset, float rotationDisplay, boolean forceText) {
+        public void setTransform(float scale, float offset, float pitch, float yaw, float roll, boolean forceText) {
             var textChange = forceText != this.forceText;
             this.scale = scale;
             this.offset = offset;
             this.forceText = forceText;
-            this.rotationDisplay = rotationDisplay;
+            this.pitch = pitch;
+            this.yaw = yaw;
+            this.roll = roll;
 
             if (textChange) {
                 if (this.lastData != null) {

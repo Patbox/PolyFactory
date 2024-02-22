@@ -15,12 +15,20 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.particle.ItemStackParticleEffect;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
+import org.joml.Vector3f;
 
 public class FanBlockEntity extends BlockEntity {
 
@@ -45,9 +53,36 @@ public class FanBlockEntity extends BlockEntity {
         int length = 0;
 
         var testState = world.getBlockState(mut);
+        var fluidState = Fluids.EMPTY.getDefaultState();
         while ((!testState.isSideSolidFullSquare(world, mut, dir) || testState.isIn(FactoryBlockTags.WIND_PASSTHROUGH)) && length < speed * 20 * Math.pow(0.98, length)) {
             mut.move(dir);
             testState = world.getBlockState(mut);
+
+            if (fluidState != testState.getFluidState()) {
+                var old = fluidState;
+                fluidState = testState.getFluidState();
+
+                ParticleEffect effect = null;
+
+                var airFluid = reverse ? old : fluidState;
+                var liquidFluid = reverse ? fluidState : old;
+
+                var pSpeed = 0d;
+
+                if (airFluid.isOf(Fluids.EMPTY) && liquidFluid.isIn(FluidTags.WATER)) {
+                    effect = new ItemStackParticleEffect(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE.getDefaultStack());
+                    pSpeed = speed * 0.8f;
+                } else if (airFluid.isOf(Fluids.EMPTY) && liquidFluid.isIn(FluidTags.LAVA)) {
+                    effect = ParticleTypes.FLAME;
+                    pSpeed = speed * 0.2f;
+                }
+
+                if (effect != null && (world.getTime() + pos.getX() * 3L + pos.getY() * 7L + pos.getZ() * 5L) % MathHelper.clamp(Math.round(2 / speed), 4, 8) == 0) {
+                    var a = Vec3d.ofCenter(mut).offset(dir, -0.5f);
+                    ((ServerWorld) world).spawnParticles(effect, a.x + world.random.nextFloat() - 0.5, a.y + world.random.nextFloat() - 0.5, a.z + world.random.nextFloat() - 0.5, 0, dir.getOffsetX(), dir.getOffsetY(), dir.getOffsetZ(), reverse ? -pSpeed : pSpeed);
+                }
+            }
+
             length++;
         }
 

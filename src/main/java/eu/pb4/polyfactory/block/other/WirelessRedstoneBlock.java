@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.other;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.block.RedstoneConnectable;
@@ -7,6 +8,7 @@ import eu.pb4.factorytools.api.block.SneakBypassingBlock;
 import eu.pb4.factorytools.api.util.VirtualDestroyStage;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.FactoryPoi;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
@@ -76,6 +78,10 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
                         }
                         world.playSound(null, poi.getPos().getX() + 0.5, poi.getPos().getY() + 0.5, poi.getPos().getZ() + 0.5,
                                 FactorySoundEvents.BLOCK_REMOTE_REDSTONE_ON, SoundCategory.BLOCKS, 1, 1);
+
+                        if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
+                            TriggerCriterion.trigger(player, FactoryTriggers.WIRELESS_REDSTONE);
+                        }
                     }
         });
     }

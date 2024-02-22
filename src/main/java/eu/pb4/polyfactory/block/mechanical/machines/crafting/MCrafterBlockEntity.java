@@ -205,7 +205,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
                 }
             }
 
-            if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity player) {
+            if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
                 TriggerCriterion.trigger(player, FactoryTriggers.CRAFTER_CRAFTS);
                 if (output.isOf(FactoryItems.CRAFTER)) {
                     TriggerCriterion.trigger(player, FactoryTriggers.CRAFTER_CRAFTS_CRAFTER);

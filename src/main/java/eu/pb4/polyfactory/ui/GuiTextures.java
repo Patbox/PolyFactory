@@ -32,6 +32,7 @@ public class GuiTextures {
     public static final Progress PROGRESS_HORIZONTAL_OFFSET_RIGHT = Progress.createHorizontal32Right("progress_horizontal_offset_right", 6, 26, false);
     public static final IntFunction<GuiElementBuilder>[] NUMBERS_FLAT = createNumbers("flat/");
     public static final IntFunction<GuiElementBuilder>[] NUMBERS_SHADOW = createNumbers("shadow/");
+    public static final char SPACE_1 = UiResourceCreator.space(1);
 
     public static void register() {
         PolydexTextures.register();

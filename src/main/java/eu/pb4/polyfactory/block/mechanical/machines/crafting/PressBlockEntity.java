@@ -153,7 +153,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             }
 
             if (success) {
-                if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity player) {
+                if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
                     Criteria.RECIPE_CRAFTED.trigger(player, self.currentRecipe.id(), List.of(stack.getStack(), stack2.getStack()));
                 }
 

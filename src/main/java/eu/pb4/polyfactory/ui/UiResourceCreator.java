@@ -45,7 +45,7 @@ public class UiResourceCreator {
     public static final String X32_MODEL = "polyfactory:sgui/button_32";
     public static final String X32_RIGHT_MODEL = "polyfactory:sgui/button_32_right";
 
-    private static final Style STYLE = Style.EMPTY.withColor(0xFFFFFF).withFont(id("gui"));
+    public static final Style STYLE = Style.EMPTY.withColor(0xFFFFFF).withFont(id("gui"));
     private static final String ITEM_TEMPLATE = """
             {
               "parent": "|BASE|",
@@ -59,13 +59,17 @@ public class UiResourceCreator {
     private static final List<SlicedTexture> HORIZONTAL_PROGRESS = new ArrayList<>();
     private static final List<Pair<PolymerModelData, String>> SIMPLE_MODEL = new ArrayList<>();
     private static final Char2IntMap SPACES = new Char2IntOpenHashMap();
-    private static final Char2ObjectMap<Identifier> TEXTURES = new Char2ObjectOpenHashMap<>();
-    private static final Object2ObjectMap<Pair<Character, Character>, Identifier> TEXTURES_POLYDEX = new Object2ObjectOpenHashMap<>();
+    private static final List<FontTexture> FONT_TEXTURES = new ArrayList<>();
     private static final List<String> TEXTURES_NUMBERS = new ArrayList<>();
     private static char character = 'a';
 
     private static final char CHEST_SPACE0 = character++;
     private static final char CHEST_SPACE1 = character++;
+
+    public static Supplier<GuiElementBuilder> custom(String path) {
+        var model = PolymerResourcePackUtils.requestModel (Items.ALLIUM, id("sgui/" + path));
+        return () -> new GuiElementBuilder(model.item()).setName(Text.empty()).hideFlags().setCustomModelData(model.value());
+    }
 
     public static Supplier<GuiElementBuilder> icon16(String path) {
         var model = genericIconRaw(Items.ALLIUM, path, BASE_MODEL);
@@ -162,20 +166,38 @@ public class UiResourceCreator {
         var c = (character++);
         builder.append(c);
         builder.append(CHEST_SPACE1);
-        TEXTURES.put(c, id("sgui/" + path));
 
+        var texture = new FontTexture(id("sgui/" + path), 13, 256, new char[][] { new char[] {c} });
+
+        FONT_TEXTURES.add(texture);
         return new TextBuilders(Text.literal(builder.toString()).setStyle(STYLE));
+    }
+
+    public static char font(Identifier path, int ascent, int height) {
+        var c = (character++);
+        var texture = new FontTexture(path, ascent, height, new char[][] { new char[] {c} });
+        FONT_TEXTURES.add(texture);
+        return c;
     }
 
     public static Pair<Text, Text> polydexBackground(String path) {
         var c = (character++);
         var d = (character++);
-        TEXTURES_POLYDEX.put(new Pair<>(c, d), id("sgui/polydex/" + path));
+
+        var texture = new FontTexture(id("sgui/polydex/" + path), -4, 128, new char[][] {new char[] { c }, new char[] { d } });
+
+        FONT_TEXTURES.add(texture);
 
         return new Pair<>(
                 Text.literal(Character.toString(c)).setStyle(STYLE),
                 Text.literal(Character.toString(d)).setStyle(STYLE)
         );
+    }
+
+    public static char space(int width) {
+        var c = character++;
+        SPACES.put(c, width);
+        return c;
     }
 
     public static void setup() {
@@ -252,27 +274,22 @@ public class UiResourceCreator {
         }
 
 
-        TEXTURES.char2ObjectEntrySet().stream().sorted(Comparator.comparing(Char2ObjectMap.Entry::getCharKey)).forEach((entry) -> {
+        FONT_TEXTURES.forEach((entry) -> {
             var bitmap = new JsonObject();
             bitmap.addProperty("type", "bitmap");
-            bitmap.addProperty("file", entry.getValue().toString() + ".png");
-            bitmap.addProperty("ascent", 13);
-            bitmap.addProperty("height", 256);
+            bitmap.addProperty("file", entry.path + ".png");
+            bitmap.addProperty("ascent", entry.ascent);
+            bitmap.addProperty("height", entry.height);
             var chars = new JsonArray();
-            chars.add(Character.toString(entry.getCharKey()));
-            bitmap.add("chars", chars);
-            providers.add(bitmap);
-        });
 
-        TEXTURES_POLYDEX.entrySet().stream().sorted(Comparator.comparing(x -> x.getKey().getLeft())).forEach((entry) -> {
-            var bitmap = new JsonObject();
-            bitmap.addProperty("type", "bitmap");
-            bitmap.addProperty("file", entry.getValue().toString() + ".png");
-            bitmap.addProperty("ascent", -4);
-            bitmap.addProperty("height", 128);
-            var chars = new JsonArray();
-            chars.add(Character.toString(entry.getKey().getLeft()));
-            chars.add(Character.toString(entry.getKey().getRight()));
+            for (var a : entry.chars) {
+                var builder = new StringBuilder();
+                for (var b : a) {
+                    builder.append(b);
+                }
+                chars.add(builder.toString());
+            }
+
             bitmap.add("chars", chars);
             providers.add(bitmap);
         });
@@ -308,4 +325,6 @@ public class UiResourceCreator {
     }
 
     public record SlicedTexture(String path, int start, int stop, boolean reverse) {};
+
+    public record FontTexture(Identifier path, int ascent, int height, char[][] chars) {};
 }

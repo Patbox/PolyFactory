@@ -12,7 +12,9 @@ public interface FactoryTriggers {
     Identifier MINER_MINES = id("miner_mines");
     Identifier PLANTER_PLANTS = id("planter_plants");
     Identifier CABLE_CONNECT = id("cable_connect_2_or_more");
-    Identifier REDSTONE_IN_OUT = id("redstone_in_out");
+    Identifier REDSTONE_IN = id("redstone_in");
+    Identifier REDSTONE_OUT = id("redstone_out");
+    Identifier WIRELESS_REDSTONE = id("wireless_redstone");
     Identifier ITEM_READER = id("item_reader");
     Identifier NIXIE_TUBE_CONNECTED_3_OR_MORE = id("nixie_tube_connected_3_or_more");
     Identifier CONNECT_DIFFERENT_GEARS = id("shifting_gears");
@@ -23,6 +25,7 @@ public interface FactoryTriggers {
     Identifier CRAFTER_CRAFTS = id("crafterd_crafts");
     Identifier CRAFTER_CRAFTS_CRAFTER = id("crafterd_crafts_crafter");
     Identifier PLACER_PLACES = id("placer_places");
+    Identifier HOLOGRAM_PROJECTOR_ACTIVATES = id("hologram_projector_activates");
 
     Identifier TATER_16 = id("tater_16");
     Identifier TATER_128 = id("tater_128");

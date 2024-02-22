@@ -15,7 +15,9 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
 
     private float scale = 2;
     private float offset = 0.2f;
-    private float rotationDisplay = 0;
+    private float pitch = 0;
+    private float yaw = 0;
+    private float roll = 0;
     private boolean forceText = false;
 
     public HologramProjectorBlockEntity(BlockPos pos, BlockState state) {
@@ -27,7 +29,9 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
         super.writeNbt(nbt);
         nbt.putFloat("scale", scale);
         nbt.putFloat("offset", offset);
-        nbt.putFloat("rotation_display", rotationDisplay);
+        nbt.putFloat("pitch", pitch);
+        nbt.putFloat("yaw", yaw);
+        nbt.putFloat("roll", roll);
         nbt.putBoolean("force_text", forceText);
     }
 
@@ -36,7 +40,14 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
         super.readNbt(nbt);
         this.scale = nbt.getFloat("scale");
         this.offset = nbt.getFloat("offset");
-        this.rotationDisplay = nbt.getFloat("rotation_display");
+        this.pitch = nbt.getFloat("pitch");
+        this.yaw = nbt.getFloat("yaw");
+        this.roll = nbt.getFloat("roll");
+
+        if (nbt.contains("rotation_display")) {
+            this.roll = nbt.getFloat("rotation_display");
+        }
+
         this.forceText = nbt.getBoolean("force_text");
     }
 
@@ -54,7 +65,7 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
         }
         this.scale = scale;
         if (this.model != null) {
-            this.model.setTransform(scale, offset, rotationDisplay, forceText);
+            this.model.setTransform(scale, offset, pitch, yaw, roll, forceText);
         }
         this.markDirty();
     }
@@ -69,7 +80,7 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
         }
         this.forceText = forceText;
         if (this.model != null) {
-            this.model.setTransform(scale, offset, rotationDisplay, forceText);
+            this.model.setTransform(scale, offset, pitch, yaw, roll, forceText);
         }
         this.markDirty();
     }
@@ -84,7 +95,7 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
         }
         this.offset = offset;
         if (this.model != null) {
-            this.model.setTransform(scale, offset, rotationDisplay, forceText);
+            this.model.setTransform(scale, offset, pitch, yaw, roll, forceText);
         }
         this.markDirty();
     }
@@ -93,26 +104,55 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
         return this.offset;
     }
 
-    public void setRotationDisplay(float rotationDisplay) {
-        if (this.rotationDisplay == rotationDisplay) {
+    public float pitch() {
+        return this.pitch;
+    }
+    public void setPitch(float pitch) {
+        if (this.pitch == pitch) {
             return;
         }
-        this.rotationDisplay = rotationDisplay;
+        this.pitch = pitch;
         if (this.model != null) {
-            this.model.setTransform(scale, offset, rotationDisplay, forceText);
+            this.model.setTransform(scale, offset, pitch, yaw, roll, forceText);
         }
         this.markDirty();
     }
 
+    public float yaw() {
+        return this.yaw;
+    }
+    public void setYaw(float yaw) {
+        if (this.yaw == yaw) {
+            return;
+        }
+        this.yaw = yaw;
+        if (this.model != null) {
+            this.model.setTransform(scale, offset, pitch, yaw, roll, forceText);
+        }
+        this.markDirty();
+    }
+
+    public float roll() {
+        return this.roll;
+    }
+    public void setRoll(float roll) {
+        if (this.roll == roll) {
+            return;
+        }
+        this.roll = roll;
+        if (this.model != null) {
+            this.model.setTransform(scale, offset, pitch, yaw, roll, forceText);
+        }
+        this.markDirty();
+    }
+
+
     @Override
     public void onListenerUpdate(WorldChunk chunk) {
         this.model = (HologramProjectorBlock.Model) BlockAwareAttachment.get(chunk, this.pos).holder();
-        this.model.setTransform(scale, offset, rotationDisplay, forceText);
+        this.model.setTransform(scale, offset, pitch, yaw, roll, forceText);
         this.model.setData(this.lastData);
     }
 
 
-    public float rotationDisplay() {
-        return this.rotationDisplay;
-    }
 }

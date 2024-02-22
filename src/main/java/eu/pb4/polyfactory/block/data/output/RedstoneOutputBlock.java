@@ -1,6 +1,8 @@
 package eu.pb4.polyfactory.block.data.output;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.block.data.util.GenericDirectionalDataBlock;
@@ -9,6 +11,7 @@ import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -78,6 +81,9 @@ public class RedstoneOutputBlock extends GenericDirectionalDataBlock implements 
         var val = MathHelper.clamp(data.asRedstoneOutput(), 0, 15);
         if (selfState.get(POWER) != val) {
             world.setBlockState(selfPos, selfState.with(POWER, val));
+            if (FactoryUtil.getClosestPlayer(world, selfPos, 32) instanceof ServerPlayerEntity player) {
+                TriggerCriterion.trigger(player, FactoryTriggers.REDSTONE_OUT);
+            }
         }
 
         return true;

@@ -3,6 +3,8 @@ package eu.pb4.polyfactory.item.wrench;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.FactorySoundEvents;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import eu.pb4.sidebars.api.Sidebar;
@@ -75,6 +77,7 @@ public class WrenchHandler {
                         var t = Text.empty();
 
                         if ((selected == null && i == 0) || action.id().equals(selected)) {
+                            t.append(Text.literal(String.valueOf(GuiTextures.SPACE_1)).setStyle(UiResourceCreator.STYLE));
                             t.append(Text.literal("» ").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
                         } else {
                             t.append("   ");
@@ -153,20 +156,23 @@ public class WrenchHandler {
         if (current == null) {
             current = actions.get(0).id();
         }
-        boolean next = false;
-        String act = this.actions.get(0).id();
+        boolean foundCurrent = false;
+        String nextAction = actions.get(0).id();
+        String previousAction = actions.get(actions.size() - 1).id();
         for (var action : actions) {
-            if (next) {
-                act = action.id();
+            if (foundCurrent) {
+                nextAction = action.id();
                 break;
             }
             if (action.id().equals(current)) {
-                next = true;
+                foundCurrent = true;
+            } else {
+                previousAction = action.id();
             }
         }
 
-        if (next) {
-            this.currentAction.put(state.getBlock(), act);
+        if (foundCurrent) {
+            this.currentAction.put(state.getBlock(), player.isSneaking() ? previousAction : nextAction);
             player.playSound(FactorySoundEvents.ITEM_WRENCH_SWITCH, SoundCategory.PLAYERS, 0.3f, 1f);
             this.pos = null;
         }

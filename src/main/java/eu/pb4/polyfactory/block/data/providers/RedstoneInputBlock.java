@@ -1,8 +1,12 @@
 package eu.pb4.polyfactory.block.data.providers;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.factorytools.api.block.RedstoneConnectable;
+import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.LongData;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -19,6 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 public class RedstoneInputBlock extends DataProviderBlock implements RedstoneConnectable {
@@ -60,6 +65,15 @@ public class RedstoneInputBlock extends DataProviderBlock implements RedstoneCon
                 sendData((ServerWorld) world, pos, new LongData(input));
             }
         }
+    }
+
+    @Override
+    public int sendData(WorldAccess world, BlockPos selfPos, DataContainer data) {
+        var i = super.sendData(world, selfPos, data);
+        if (i > 0 && FactoryUtil.getClosestPlayer((World) world, selfPos, 32) instanceof ServerPlayerEntity player) {
+            TriggerCriterion.trigger(player, FactoryTriggers.REDSTONE_IN);
+        }
+        return i;
     }
 
     @Override

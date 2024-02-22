@@ -94,6 +94,9 @@
   "item.polyfactory.wrench.title": "Wrench Actions: %s",
   "item.polyfactory.wrench.action.facing": "Facing",
   "item.polyfactory.wrench.action.rotation": "Rotation",
+  "item.polyfactory.wrench.action.pitch": "Pitch",
+  "item.polyfactory.wrench.action.yaw": "Yaw",
+  "item.polyfactory.wrench.action.roll": "Roll",
   "item.polyfactory.wrench.action.type": "Type",
   "item.polyfactory.wrench.action.axis": "Axis",
   "item.polyfactory.wrench.action.mode": "Mode",
@@ -155,6 +158,9 @@
   "advancements.polyfactory.steel_gear.title": "Speed Up, Slow Down",
   "advancements.polyfactory.steel_gear.description": "Connect regular and large Steel Gears on diagonal to change rotation speed",
 
+  "advancements.polyfactory.tachometer.title": "Measured rotation",
+  "advancements.polyfactory.tachometer.description": "Place Tachometer or Stressometer to measure rotation!",
+
   "advancements.polyfactory.press.title": "Better with Plates",
   "advancements.polyfactory.press.description": "Use Mechanical Press to craft Steel Plate or Wooden Plate",
 
@@ -201,13 +207,20 @@
   "advancements.polyfactory.cable.description": "Connect Data Provider to an Receiver with Cable",
 
   "advancements.polyfactory.redstone.title": "Redstone in, Redstone out",
-  "advancements.polyfactory.redstone.description": "Connect Redstone Input and Redstone Output together",
+  "advancements.polyfactory.redstone.description": "Connect Redstone Input and Redstone Output together and send a signal",
+
+  "advancements.polyfactory.wireless_redstone.title": "Wireless Connection!",
+  "advancements.polyfactory.wireless_redstone.description": "Receive a signal with Wireless Redstone Receiver",
+
 
   "advancements.polyfactory.item_reader.title": "Just read it",
   "advancements.polyfactory.item_reader.description": "Read name of any item with Item Reader",
 
   "advancements.polyfactory.nixie_tube.title": "Vintage Displays",
   "advancements.polyfactory.nixie_tube.description": "Connect at least 3 Nixie Tubes together",
+
+  "advancements.polyfactory.hologram_projector.title": "Holographic Displays",
+  "advancements.polyfactory.hologram_projector.description": "Display something with Hologram Projector",
 
   "advancements.polyfactory.wrench.title": "Configured",
   "advancements.polyfactory.wrench.description": "Use Wrench to change properties of a machine.",

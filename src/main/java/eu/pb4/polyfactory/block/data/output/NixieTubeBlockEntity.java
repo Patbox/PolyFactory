@@ -201,7 +201,7 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
                 entry.updateTextDisplay();
             }
         }
-        if (list.size() >= 3 && FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity player) {
+        if (list.size() >= 3 && FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
             TriggerCriterion.trigger(player, FactoryTriggers.NIXIE_TUBE_CONNECTED_3_OR_MORE);
         }
     }

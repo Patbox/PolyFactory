@@ -159,7 +159,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
                 }
             }
 
-            if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity player) {
+            if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
                 Criteria.RECIPE_CRAFTED.trigger(player, self.currentRecipe.id(), self.stacks.subList(0, 1));
             }
 
