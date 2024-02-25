@@ -5,8 +5,8 @@ import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
+import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.ItemStackData;
 import eu.pb4.polyfactory.data.StringData;
@@ -149,6 +149,7 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
     public void onListenerUpdate(WorldChunk chunk) {
         this.model = (ItemReaderBlock.Model) BlockBoundAttachment.get(chunk, this.pos).holder();
         this.model.setItem(this.stack);
+        super.onListenerUpdate(chunk);
     }
 
     private class Gui extends SimpleGui {

@@ -28,9 +28,17 @@ public class ColoredDownsampledBlockItem extends FactoryBlockItem implements Fir
     @Override
     public Text getName(ItemStack stack) {
         if (ColoredItem.hasColor(stack)) {
-            return Text.translatable( this.getTranslationKey() + ".colored", ColoredItem.getColorName(ColoredItem.getColor(stack)));
+            return getColoredName(stack, ColoredItem.getColor(stack));
         }
 
+        return super.getName(stack);
+    }
+
+    protected Text getColoredName(ItemStack stack, int color) {
+        return Text.translatable( this.getTranslationKey() + ".colored", ColoredItem.getColorName(ColoredItem.getColor(stack)));
+    }
+
+    protected Text getColorlessName(ItemStack stack) {
         return super.getName(stack);
     }
 
@@ -43,7 +51,7 @@ public class ColoredDownsampledBlockItem extends FactoryBlockItem implements Fir
 
     @Override
     public int downSampleColor(int color, boolean isVanilla) {
-        if (isVanilla) {
+        if (isVanilla || color == this.defaultColor) {
             return color;
         }
 

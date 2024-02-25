@@ -5,6 +5,8 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "FallingBlockAccessor",
+    "block.StateManagerMixin",
+    "block.WorldChunkMixin",
     "machines.FallingBlockEntityMixin",
     "machines.HopperBlockEntityMixin",
     "machines.HopperBlockMixin",

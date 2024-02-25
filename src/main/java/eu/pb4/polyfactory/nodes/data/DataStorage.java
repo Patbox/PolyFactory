@@ -10,7 +10,9 @@ import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.data.DataContainer;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -187,7 +189,34 @@ public class DataStorage implements GraphEntity<DataStorage> {
 
     @Override
     public @Nullable NbtElement toTag() {
-        return null;
+        var nbt = new NbtCompound();
+        var list = new NbtList();
+        for (var x : this.currentData.int2ObjectEntrySet()) {
+            var out = x.getValue().createNbt();
+            out.putInt("__key", x.getIntKey());
+        }
+        nbt.put("current_data", list);
+
+        return nbt;
+    }
+
+    private static DataStorage decode(@Nullable NbtElement nbtElement) {
+        var data = new DataStorage();
+        if (nbtElement instanceof NbtCompound nbt) {
+            for (var obj : nbt.getList("current_data", NbtElement.COMPOUND_TYPE)) {
+                try {
+                    var input = (NbtCompound) obj;
+                    var decoded = DataContainer.fromNbt(input);
+                    if (decoded != null) {
+                        data.currentData.put(input.getInt("__key"), decoded);
+                    }
+                } catch (Throwable ignored) {
+
+                }
+            }
+        }
+
+        return data;
     }
 
     @Override
@@ -241,9 +270,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
         return data;
     }
 
-    private static DataStorage decode(@Nullable NbtElement nbtElement) {
-        return new DataStorage();
-    }
 
     public boolean hasReceivers() {
         return !this.receivers.isEmpty();

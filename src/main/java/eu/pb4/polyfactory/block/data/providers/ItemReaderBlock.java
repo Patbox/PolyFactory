@@ -28,7 +28,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-public class ItemReaderBlock extends DataProviderBlock {
+public class ItemReaderBlock extends CabledDataProviderBlock {
     public static final BooleanProperty POWERED = Properties.POWERED;
 
     public ItemReaderBlock(Settings settings) {
@@ -38,7 +38,7 @@ public class ItemReaderBlock extends DataProviderBlock {
 
     @Override
     public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection().getOpposite()).with(POWERED, ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos()));
+        return super.getPlacementState(ctx).with(POWERED, ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos()));
     }
 
     @Override
@@ -80,12 +80,14 @@ public class ItemReaderBlock extends DataProviderBlock {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (!player.isSneaking() && state.get(FACING).getOpposite() != hit.getSide() && player instanceof ServerPlayerEntity serverPlayer && hand == Hand.MAIN_HAND && world.getBlockEntity(pos) instanceof ItemReaderBlockEntity be) {
+        var x = super.onUse(state, world, pos, player, hand, hit);
+
+        if (x == ActionResult.PASS  && !player.isSneaking() && state.get(FACING).getOpposite() != hit.getSide() && player instanceof ServerPlayerEntity serverPlayer && hand == Hand.MAIN_HAND && world.getBlockEntity(pos) instanceof ItemReaderBlockEntity be) {
             be.openGui(serverPlayer);
             return ActionResult.SUCCESS;
         }
 
-        return super.onUse(state, world, pos, player, hand, hit);
+        return x;
     }
 
     @Override
@@ -98,11 +100,12 @@ public class ItemReaderBlock extends DataProviderBlock {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
-    public static class Model extends BlockModel {
+    public static class Model extends BaseCableModel {
         private final LodItemDisplayElement base;
         private final LodItemDisplayElement book;
 
         private Model(BlockState state) {
+            super(state, state.get(HAS_CABLE));
             this.base = LodItemDisplayElement.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 
@@ -114,6 +117,11 @@ public class ItemReaderBlock extends DataProviderBlock {
             updateStatePos(state);
             this.addElement(this.base);
             this.addElement(this.book);
+        }
+
+        @Override
+        protected boolean hasCable(BlockState state) {
+            return state.get(HAS_CABLE);
         }
 
         private void updateStatePos(BlockState state) {
@@ -136,12 +144,11 @@ public class ItemReaderBlock extends DataProviderBlock {
         }
 
         @Override
-        public void notifyUpdate(HolderAttachment.UpdateType updateType) {
-            if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                updateStatePos(this.blockState());
-                this.base.tick();
-                this.book.tick();
-            }
+        protected void setState(BlockState blockState) {
+            super.setState(blockState);
+            updateStatePos(this.blockState());
+            this.base.tick();
+            this.book.tick();
         }
 
         public void setItem(ItemStack stack) {

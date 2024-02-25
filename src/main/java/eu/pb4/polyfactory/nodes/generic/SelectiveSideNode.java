@@ -32,7 +32,7 @@ public record SelectiveSideNode(EnumSet<Direction> directions) implements Direct
                 out.add(Direction.byName(string.asString()));
             }
         }
-        return new SelectiveSideNode(EnumSet.copyOf(out));
+        return new SelectiveSideNode(list.isEmpty() ? EnumSet.noneOf(Direction.class) : EnumSet.copyOf(out));
     }
 
     @Override

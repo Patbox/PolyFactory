@@ -1,6 +1,9 @@
 package eu.pb4.polyfactory.datagen;
 
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.block.data.AbstractCableBlock;
+import eu.pb4.polyfactory.block.data.CableBlock;
+import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -11,11 +14,13 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;
+import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
 import net.minecraft.loot.condition.SurvivesExplosionLootCondition;
 import net.minecraft.loot.entry.ItemEntry;
-import net.minecraft.loot.function.CopyNbtLootFunction;
-import net.minecraft.loot.provider.nbt.ContextLootNbtProvider;
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
+import net.minecraft.predicate.StatePredicate;
+
+import java.util.function.Consumer;
 
 class LootTables extends FabricBlockLootTableProvider {
     protected LootTables(FabricDataOutput dataOutput) {
@@ -45,7 +50,6 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.METAL_GRID);
         this.addDrop(FactoryBlocks.MINER);
         this.addDrop(FactoryBlocks.STEAM_ENGINE);
-        this.addDrop(FactoryBlocks.ITEM_COUNTER);
         this.addDrop(FactoryBlocks.HOLOGRAM_PROJECTOR);
         this.addDrop(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
         this.addDrop(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER);
@@ -53,9 +57,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.STRESSOMETER);
         this.addDrop(FactoryBlocks.REDSTONE_INPUT);
         this.addDrop(FactoryBlocks.REDSTONE_OUTPUT);
-        this.addDrop(FactoryBlocks.ITEM_READER);
-        this.addDrop(FactoryBlocks.BLOCK_OBSERVER);
-        this.addDrop(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
+
         this.addDrop(FactoryBlocks.INVERTED_REDSTONE_LAMP);
         this.addDrop(FactoryBlocks.ELECTRIC_GENERATOR);
         this.addDrop(FactoryBlocks.TINY_POTATO_SPRING);
@@ -64,10 +66,19 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.WORKBENCH);
         this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE);
 
+
+        this.addOptionalCable(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
+        this.addOptionalCable(FactoryBlocks.ITEM_COUNTER);
+        this.addOptionalCable(FactoryBlocks.ITEM_READER);
+        this.addOptionalCable(FactoryBlocks.BLOCK_OBSERVER);
+
+
         this.addAxle(FactoryBlocks.AXLE_WITH_LARGE_GEAR, FactoryItems.LARGE_STEEL_GEAR);
         this.addAxle(FactoryBlocks.AXLE_WITH_GEAR, FactoryItems.STEEL_GEAR);
 
-        this.addColored(FactoryBlocks.CABLE);
+        this.addColored(FactoryBlocks.CABLE, (x) -> x.with(ItemEntry.builder(FactoryItems.FRAME)
+                .conditionally(BlockStatePropertyLootCondition.builder(FactoryBlocks.CABLE)
+                        .properties(StatePredicate.Builder.create().exactMatch(CableBlock.FRAMED, true)))));
         this.addColored(FactoryBlocks.LAMP);
         this.addColored(FactoryBlocks.INVERTED_LAMP);
         this.addColored(FactoryBlocks.CAGED_LAMP);
@@ -87,13 +98,32 @@ class LootTables extends FabricBlockLootTableProvider {
         );
     }
 
+    private void addOptionalCable(Block block) {
+        var x = LootPool.builder()
+                .conditionally(SurvivesExplosionLootCondition.builder())
+                .rolls(ConstantLootNumberProvider.create(1.0F))
+                .with(ItemEntry.builder(block))
+                .with(ItemEntry.builder(FactoryItems.CABLE)
+                        .conditionally(BlockStatePropertyLootCondition.builder(block).properties(StatePredicate.Builder.create()
+                                .exactMatch(GenericCabledDataBlock.HAS_CABLE, true)))
+                        .apply(() -> CopyColorLootFunction.INSTANCE)
+                );
+
+        this.addDrop(block, LootTable.builder().pool(x));
+    }
+
     private void addColored(Block block) {
-        this.addDrop(block, LootTable.builder()
-                .pool(LootPool.builder()
-                        .conditionally(SurvivesExplosionLootCondition.builder())
-                        .rolls(ConstantLootNumberProvider.create(1.0F))
-                        .with(ItemEntry.builder(block)
-                                .apply(() -> CopyColorLootFunction.INSTANCE)
-                        )));
+        addColored(block, (x) -> {});
+    }
+    private void addColored(Block block, Consumer<LootPool.Builder> consumer) {
+        var x = LootPool.builder()
+                .conditionally(SurvivesExplosionLootCondition.builder())
+                .rolls(ConstantLootNumberProvider.create(1.0F))
+                .with(ItemEntry.builder(block)
+                        .apply(() -> CopyColorLootFunction.INSTANCE)
+                );
+        consumer.accept(x);
+
+        this.addDrop(block, LootTable.builder().pool(x));
     }
 }

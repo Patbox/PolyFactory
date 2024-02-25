@@ -32,6 +32,10 @@ public interface ColoredItem {
 
     int getDefaultColor();
 
+    default int downSampleColor(int color) {
+        return downSampleColor(color, DyeColorExtra.BY_COLOR.containsKey(color));
+    }
+
     default int downSampleColor(int color, boolean isVanilla) {
         return color;
     }
@@ -70,7 +74,7 @@ public interface ColoredItem {
 
     static boolean setColorCrafting(ItemStack stack, int color) {
         if (stack.getItem() instanceof ColoredItem coloredItem) {
-            stack.getOrCreateNbt().putInt("color", coloredItem.downSampleColor(color, DyeColorExtra.BY_COLOR.containsKey(color)));
+            stack.getOrCreateNbt().putInt("color", coloredItem.downSampleColor(color));
             return true;
         }
 

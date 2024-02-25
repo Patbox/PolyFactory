@@ -3,11 +3,10 @@ package eu.pb4.polyfactory.block.data.output;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.data.DataReceiver;
-import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
-import eu.pb4.polyfactory.block.data.util.GenericDirectionalDataBlock;
+import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
+import eu.pb4.polyfactory.nodes.data.ChannelReceiverSelectiveSideNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -30,9 +29,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class NixieTubeControllerBlock extends GenericDirectionalDataBlock implements DataReceiver {
-    public static final BooleanProperty TOP_CONNECTOR = BooleanProperty.of("top_connector");
-    public static final BooleanProperty BOTTOM_CONNECTOR = BooleanProperty.of("bottom_connector");
+public class NixieTubeControllerBlock extends GenericCabledDataBlock implements DataReceiver {
     public static final BooleanProperty POWERED = Properties.POWERED;
 
     public static final WrenchAction SCROLL_LOOP = WrenchAction.ofBlockEntity("scroll_loop", NixieTubeControllerBlockEntity.class,
@@ -46,14 +43,12 @@ public class NixieTubeControllerBlock extends GenericDirectionalDataBlock implem
 
     public NixieTubeControllerBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(TOP_CONNECTOR, false).with(BOTTOM_CONNECTOR, false).with(POWERED, false));
+        this.setDefaultState(this.getDefaultState().with(POWERED, false));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(TOP_CONNECTOR);
-        builder.add(BOTTOM_CONNECTOR);
         builder.add(POWERED);
     }
 
@@ -61,9 +56,9 @@ public class NixieTubeControllerBlock extends GenericDirectionalDataBlock implem
     public List<WrenchAction> getWrenchActions() {
         return List.of(
                 WrenchAction.CHANNEL,
+                this.facingAction,
                 SCROLL_SPEED,
-                SCROLL_LOOP,
-                WrenchAction.FACING
+                SCROLL_LOOP
         );
     }
     @Override
@@ -86,12 +81,7 @@ public class NixieTubeControllerBlock extends GenericDirectionalDataBlock implem
 
     @Override
     public Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        var be = world.getBlockEntity(pos);
-        int channel = 0;
-        if (be instanceof NixieTubeControllerBlockEntity blockEntity) {
-            channel = blockEntity.channel();
-        }
-        return List.of(new ChannelReceiverDirectionNode(state.get(FACING).getOpposite(), channel));
+        return List.of(new ChannelReceiverSelectiveSideNode(getDirections(state), getChannel(world, pos)));
     }
 
     @Override

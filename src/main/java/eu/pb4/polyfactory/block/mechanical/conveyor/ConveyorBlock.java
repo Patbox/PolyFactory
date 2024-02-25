@@ -250,7 +250,9 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         }
 
         entity.addVelocity(vec);
-        entity.velocityModified = true;
+        if (entity instanceof ServerPlayerEntity player) {
+            FactoryUtil.sendVelocityDelta(player, vec.multiply(0.55));
+        }
     }
 
     @Nullable

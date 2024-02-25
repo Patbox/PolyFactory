@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockObserverBlock extends DataProviderBlock {
+public class BlockObserverBlock extends CabledDataProviderBlock {
     public BlockObserverBlock(Settings settings) {
         super(settings);
     }

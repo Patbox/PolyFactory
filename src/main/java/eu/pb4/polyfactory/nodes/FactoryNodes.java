@@ -7,9 +7,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
-import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
-import eu.pb4.polyfactory.nodes.data.DataStorage;
+import eu.pb4.polyfactory.nodes.data.*;
 import eu.pb4.polyfactory.nodes.electric.EnergyData;
 import eu.pb4.polyfactory.nodes.generic.*;
 import eu.pb4.polyfactory.nodes.mechanical.*;
@@ -67,6 +65,8 @@ public class FactoryNodes {
         addSimpleNodes(universe);
         universe.addNodeType(ChannelProviderDirectionNode.TYPE);
         universe.addNodeType(ChannelReceiverDirectionNode.TYPE);
+        universe.addNodeType(ChannelReceiverSelectiveSideNode.TYPE);
+        universe.addNodeType(ChannelProviderSelectiveSideNode.TYPE);
 
         universe.addGraphEntityType(DataStorage.TYPE);
 

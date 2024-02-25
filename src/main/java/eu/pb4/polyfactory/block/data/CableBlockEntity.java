@@ -15,12 +15,11 @@ import org.jetbrains.annotations.Nullable;
 public class CableBlockEntity extends BlockEntity implements BlockEntityExtraListener, ColorProvider {
     private int color = -2;
     @Nullable
-    private CableBlock.Model model;
+    private AbstractCableBlock.BaseCableModel model;
 
     public CableBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.CABLE, pos, state);
     }
-
 
     @Override
     protected void writeNbt(NbtCompound nbt) {
@@ -46,14 +45,18 @@ public class CableBlockEntity extends BlockEntity implements BlockEntityExtraLis
     }
 
     @Override
+    public void setColorFromPreviousBlockEntity(int c) {
+        setColor(c);
+    }
 
+    @Override
     public int getColor() {
         return this.color;
     }
 
     @Override
     public void onListenerUpdate(WorldChunk chunk) {
-        this.model = (CableBlock.Model) BlockBoundAttachment.get(chunk, this.getPos()).holder();
+        this.model = (AbstractCableBlock.BaseCableModel) BlockBoundAttachment.get(chunk, this.getPos()).holder();
         this.model.setColor(this.color);
     }
 

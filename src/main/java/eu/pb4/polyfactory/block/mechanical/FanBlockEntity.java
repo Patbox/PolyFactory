@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
 import eu.pb4.polyfactory.mixin.FallingBlockAccessor;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.LastFanEffectedTickConsumer;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import net.minecraft.block.BlockState;
@@ -18,6 +19,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
@@ -26,9 +28,13 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 import org.joml.Vector3f;
+
+import java.util.List;
 
 public class FanBlockEntity extends BlockEntity {
 
@@ -130,6 +136,7 @@ public class FanBlockEntity extends BlockEntity {
                 x = -x;
             }
 
+            var original = entity.getVelocity();
             var base = entity.getVelocity().getComponentAlongAxis(dir.getAxis());
             entity.setVelocity(entity.getVelocity().withAxis(dir.getAxis(), base * 0.8f).add(Vec3d.of(dir.getVector()).multiply(x)));
 
@@ -138,9 +145,11 @@ public class FanBlockEntity extends BlockEntity {
             }
 
             if (entity instanceof ServerPlayerEntity player) {
+                FactoryUtil.sendVelocityDelta(player, entity.getVelocity().subtract(original));
+
                 ((ServerPlayNetExt) player.networkHandler).polyFactory$resetFloating();
                 if (x > 0.05 || x < -0.05) {
-                    entity.velocityModified = true;
+                    //entity.velocityModified = true;
                     TriggerCriterion.trigger(player, FactoryTriggers.MOVED_BY_FAN);
                     var alt = (LastFanEffectedTickConsumer) player;
                     if (dir == Direction.UP && !player.isOnGround() && player.age - alt.polyfactory$getLastOnGround() > 10 && player.getY() - alt.polyfactory$getLastY() > 32 && player.getVelocity().getY() > 0.5) {

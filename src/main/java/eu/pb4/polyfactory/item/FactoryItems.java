@@ -4,9 +4,8 @@ import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.factorytools.api.item.MultiBlockItem;
 import eu.pb4.factorytools.api.block.MultiBlock;
-import eu.pb4.polyfactory.item.block.ColoredDownsampledBlockItem;
-import eu.pb4.polyfactory.item.block.GearItem;
-import eu.pb4.polyfactory.item.block.WindmillSailItem;
+import eu.pb4.polyfactory.block.data.AbstractCableBlock;
+import eu.pb4.polyfactory.item.block.*;
 import eu.pb4.polyfactory.item.tool.DynamiteItem;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.item.tool.WirelessRedstoneTransmitterItem;
@@ -86,21 +85,21 @@ public class FactoryItems {
     public static final Item WIRELESS_REDSTONE_RECEIVER = register(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
     public static final Item WIRELESS_REDSTONE_TRANSMITTER = register(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER);
     public static final Item PORTABLE_REDSTONE_TRANSMITTER = register("portable_redstone_transmitter", new WirelessRedstoneTransmitterItem(new Item.Settings().maxCount(1)));
-    public static final ColoredDownsampledBlockItem CABLE = register("cable", new ColoredDownsampledBlockItem(FactoryBlocks.CABLE, 0xbbbbbb, new Item.Settings()));
-    public static final ColoredDownsampledBlockItem LAMP = register("colored_lamp", new ColoredDownsampledBlockItem(FactoryBlocks.LAMP, -1, new Item.Settings()));
-    public static final ColoredDownsampledBlockItem INVERTED_LAMP = register("inverted_colored_lamp", new ColoredDownsampledBlockItem(FactoryBlocks.INVERTED_LAMP, -1, new Item.Settings()));
-    public static final ColoredDownsampledBlockItem CAGED_LAMP = register("caged_lamp", new ColoredDownsampledBlockItem(FactoryBlocks.CAGED_LAMP, -1, new Item.Settings()));
-    public static final ColoredDownsampledBlockItem INVERTED_CAGED_LAMP = register("inverted_caged_lamp", new ColoredDownsampledBlockItem(FactoryBlocks.INVERTED_CAGED_LAMP, -1, new Item.Settings()));
+
+    public static final ColoredDownsampledBlockItem CABLE = registerColored(FactoryBlocks.CABLE, AbstractCableBlock.DEFAULT_COLOR);
+    public static final ColoredDownsampledBlockItem LAMP = registerColored(FactoryBlocks.LAMP, -1);
+    public static final ColoredDownsampledBlockItem INVERTED_LAMP = registerColored(FactoryBlocks.INVERTED_LAMP, -1);
+    public static final ColoredDownsampledBlockItem CAGED_LAMP = registerColored(FactoryBlocks.CAGED_LAMP, -1);
+    public static final ColoredDownsampledBlockItem INVERTED_CAGED_LAMP = registerColored(FactoryBlocks.INVERTED_CAGED_LAMP, -1);
     public static final Item ELECTRIC_MOTOR = register(FactoryBlocks.ELECTRIC_MOTOR);
     public static final Item ELECTRIC_GENERATOR = register(FactoryBlocks.ELECTRIC_GENERATOR);
-
     public static final Item WITHER_SKULL_GENERATOR = register(FactoryBlocks.WITHER_SKULL_GENERATOR);
     public static final Item WORKBENCH = register(FactoryBlocks.WORKBENCH);
-
     public static final Item ARTIFICIAL_DYE = register("artificial_dye", new ArtificialDyeItem(new Item.Settings()));
     public static final Item DYNAMITE = register("dynamite", new DynamiteItem(new Item.Settings().maxCount(16)));
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
     public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING);
+    public static final Item FRAME = register("frame", new FrameItem(new Item.Settings()));
 
     public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", new ModeledItem(new Item.Settings()));
@@ -108,7 +107,6 @@ public class FactoryItems {
 
 
     public static final Item THE_CUBE = register(FactoryBlocks.THE_CUBE);
-
 
     public static void register() {
         FuelRegistry.INSTANCE.add(SAW_DUST, 60);
@@ -160,11 +158,10 @@ public class FactoryItems {
                     entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.RED)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.GREEN)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.BLUE)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-
-                    entries.add(REDSTONE_OUTPUT);
-                    entries.add(REDSTONE_INPUT);
                     entries.add(TACHOMETER);
                     entries.add(STRESSOMETER);
+                    entries.add(REDSTONE_OUTPUT);
+                    entries.add(REDSTONE_INPUT);
                     entries.add(ITEM_COUNTER);
                     entries.add(ITEM_READER);
                     entries.add(BLOCK_OBSERVER);
@@ -260,6 +257,7 @@ public class FactoryItems {
                     .icon(WITHER_SKULL_GENERATOR::getDefaultStack)
                     .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
                     .entries(((context, entries) -> {
+                        entries.add(FRAME, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(WITHER_SKULL_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
@@ -283,11 +281,20 @@ public class FactoryItems {
         return item;
     }
 
+    public static <E extends Block & PolymerBlock> ColoredDownsampledBlockItem registerColored(E block, int color) {
+        var id = Registries.BLOCK.getId(block);
+        var item = new ColoredDownsampledBlockItem(block, color, new Item.Settings());
+        Registry.register(Registries.ITEM, id, item);
+        return item;
+    }
+
     public static <E extends Block & PolymerBlock> FactoryBlockItem register(E block) {
         var id = Registries.BLOCK.getId(block);
         FactoryBlockItem item;
         if (block instanceof MultiBlock multiBlock) {
             item = new MultiBlockItem(multiBlock, new Item.Settings());
+        } else if (block instanceof AbstractCableBlock cableBlock) {
+            item = new CabledBlockItem(cableBlock, new Item.Settings());
         } else {
             item = new FactoryBlockItem(block, new Item.Settings());
         }

@@ -1,5 +1,5 @@
 {
-	"parent": "polyfactory:block/item_counter",
+	"parent": "polyfactory:block/item_counter_old",
 	"textures": {
 		"2": "polyfactory:block/redstone_output_side",
 		"particle": "polyfactory:block/redstone_output_side",

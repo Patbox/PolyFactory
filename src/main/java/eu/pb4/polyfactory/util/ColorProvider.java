@@ -5,6 +5,11 @@ public interface ColorProvider {
     void setColor(int color);
 
     boolean isDefaultColor();
+
+    default void setColorFromPreviousBlockEntity(int c) {
+
+    }
+
     interface Consumer {
         void setColor(int color);
     }

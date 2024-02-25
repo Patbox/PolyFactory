@@ -4,8 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import eu.pb4.polyfactory.ModInit;
-import eu.pb4.polyfactory.block.data.CableBlock;
-import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
+import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.loader.api.FabricLoader;
@@ -14,15 +13,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.Direction;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.awt.image.IndexColorModel;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.function.BiConsumer;
 
 public class CableModel {
@@ -68,7 +60,7 @@ public class CableModel {
         for (int i = 0; i < SIZE; i++) {
             int dirCount = 0;
             for (var dir : Direction.values()) {
-                if (CableBlock.hasDirection(i, dir)) {
+                if (AbstractCableBlock.hasDirection(i, dir)) {
                     dirCount++;
                 }
             }
@@ -80,7 +72,7 @@ public class CableModel {
             for (var element : model.getAsJsonArray("elements")) {
                 var name = element.getAsJsonObject().get("name");
 
-                if (name == null || CableBlock.hasDirection(i, Direction.byName(name.getAsString()))
+                if (name == null || AbstractCableBlock.hasDirection(i, Direction.byName(name.getAsString()))
                         || (name.getAsString().equals("center") && dirCount != 1) || name.getAsString().equals("centerx")) {
                     elements.add(element);
                 }

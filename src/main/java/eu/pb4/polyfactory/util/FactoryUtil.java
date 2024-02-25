@@ -18,8 +18,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -27,6 +31,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -62,6 +67,11 @@ public class FactoryUtil {
 
     public static Identifier id(String path) {
         return new Identifier(ModInit.ID, path);
+    }
+
+    public static void sendVelocityDelta(ServerPlayerEntity player, Vec3d delta) {
+        player.networkHandler.sendPacket(new ExplosionS2CPacket(player.getX(),  player.getY() - 9999, player.getZ(), 0, List.of(), delta, Explosion.DestructionType.KEEP,
+                ParticleTypes.BUBBLE, ParticleTypes.BUBBLE, SoundEvents.INTENTIONALLY_EMPTY));
     }
 
     public static float wrap(float value, float min, float max) {
