@@ -4,7 +4,9 @@ import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.minecraft.block.Blocks;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
 
@@ -30,6 +32,18 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(Blocks.STRIPPED_WARPED_STEM)
         ;
 
+        this.getOrCreateTagBuilder(FactoryBlockTags.SPRAY_CAN_COLORABLE)
+                .addOptionalTag(BlockTags.WOOL)
+                .addOptionalTag(BlockTags.WOOL_CARPETS)
+                .addOptionalTag(BlockTags.BEDS)
+                .addOptionalTag(BlockTags.TERRACOTTA)
+                .addOptionalTag(BlockTags.CONCRETE_POWDER)
+                .addOptionalTag(BlockTags.CANDLES)
+                .addOptionalTag(BlockTags.CANDLE_CAKES)
+                .addOptionalTag(ConventionalBlockTags.GLASS_BLOCKS)
+                .addOptionalTag(ConventionalBlockTags.GLASS_PANES)
+                .addOptionalTag(FactoryBlockTags.CONCRETE)
+        ;
 
         this.getOrCreateTagBuilder(FactoryBlockTags.CONVEYORS)
                 .add(FactoryBlocks.CONVEYOR)
@@ -88,6 +102,9 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.NIXIE_TUBE_CONTROLLER)
                 .add(FactoryBlocks.ELECTRIC_MOTOR)
                 .add(FactoryBlocks.ELECTRIC_GENERATOR)
+                .add(FactoryBlocks.TACHOMETER)
+                .add(FactoryBlocks.STRESSOMETER)
+                .add(FactoryBlocks.CABLE)
                 .add(FactoryBlocks.CRAFTER)
                 .add(FactoryBlocks.CLUTCH)
                 .add(FactoryBlocks.WITHER_SKULL_GENERATOR)
@@ -105,5 +122,15 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.CONTAINER)
                 .add(FactoryBlocks.FUNNEL)
         ;
+
+        var conc = this.getOrCreateTagBuilder(FactoryBlockTags.CONCRETE);
+
+        for (var block : Registries.BLOCK) {
+            var id = Registries.BLOCK.getId(block);
+
+            if (id.getPath().endsWith("_concrete")) {
+                conc.add(block);
+            }
+        }
     }
 }

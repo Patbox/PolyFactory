@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.factorytools.api.item.RegistryCallbackItem;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
+import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.block.data.output.NixieTubeBlock;
 import eu.pb4.polyfactory.block.data.output.NixieTubeBlockEntity;
@@ -91,7 +92,8 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
             if (success) {
                 be.updateTextDisplay();
             }
-        } else if (DyeColorExtra.BY_COLOR.get(color) != null && !(blockEntity instanceof Inventory)) {
+        } else if (state.isIn(FactoryBlockTags.SPRAY_CAN_COLORABLE) && DyeColorExtra.BY_COLOR.get(color) != null
+                && !(blockEntity instanceof Inventory)) {
             var dye = DyeColorExtra.BY_COLOR.get(color);
             var id = Registries.BLOCK.getId(state.getBlock());
             Identifier newId;

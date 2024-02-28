@@ -13,12 +13,10 @@
 - Mechanical Placers can now use selected items on blocks.
 - Improved physics of players effected by fans.
 - Improved placement of Windmills to always point to connected side.
-- Added new advancements!
+- Added new advancements, pointing to recently added things.
 - Hoppers, Pistons, Redstone Repeater, Redstone Comparator, Dispensers and Droppers can be rotated by using Wrench.
 - Added breaking particles to all the blocks that didn't have them.
 - All crafting-machines should now work with hoppers.
 - Fixed dynamic blocks not having correct visuals sometimes.
 - Changed multiple textures and models:
   - Most notably: Item Splitter, Cables, Wireless Redstone Input/Output, Treated Kelp and Ender-Amethyst Crystal
-
-

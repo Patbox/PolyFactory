@@ -1,14 +1,13 @@
 package eu.pb4.polyfactory.util;
 
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polymer.common.api.PolymerCommonUtils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.math.random.Random;
 
 import java.nio.file.Files;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class PotatoWisdom {
@@ -30,6 +29,11 @@ public class PotatoWisdom {
             var file = FabricLoader.getInstance().getModContainer(ModInit.ID).get().findPath("potato.txt");
             if (file.isPresent()) {
                 RANDOM.addAll(Files.readAllLines(file.get()));
+            }
+
+            var splashPath = PolymerCommonUtils.getClientJarRoot().resolve("assets/minecraft/texts/splashes.txt");
+            if (Files.exists(splashPath)) {
+                RANDOM.addAll(Files.readAllLines(splashPath));
             }
         } catch (Throwable e) {
             e.printStackTrace();

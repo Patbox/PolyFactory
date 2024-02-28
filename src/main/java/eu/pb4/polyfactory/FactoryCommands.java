@@ -28,8 +28,8 @@ public class FactoryCommands {
 
     private static void createCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
         dispatcher.register(literal("polyfactory")
+                .requires((x) -> x.hasPermissionLevel(3))
                 .then(literal("debug")
-                        .requires((x) -> x.hasPermissionLevel(3))
                         .then(literal("packetinfo")
                                 .then(argument("enable", BoolArgumentType.bool())
                                         .executes(FactoryCommands::togglePacketDebug)

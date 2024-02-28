@@ -107,7 +107,6 @@ public class FactoryItems {
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
     public static final Item SPRAY_CAN = register("spray_can", new DyeSprayItem(new Item.Settings().maxCount(1)));
 
-
     public static final Item THE_CUBE = register(FactoryBlocks.THE_CUBE);
 
     public static void register() {
