@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical.source;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
@@ -188,7 +189,7 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
         private final LodItemDisplayElement axle;
 
         private Model(BlockState state) {
-            this.main = LodItemDisplayElement.createSimple(state.get(SteamEngineBlock.LIT) ? LIT : FactoryItems.STEAM_ENGINE.getDefaultStack(), 0);
+            this.main = ItemDisplayElementUtil.createSimple(state.get(SteamEngineBlock.LIT) ? LIT : FactoryItems.STEAM_ENGINE.getDefaultStack());
             this.main.setScale(new Vector3f(2));
             var facing = state.get(FACING);
             var offset = new Vec3d(

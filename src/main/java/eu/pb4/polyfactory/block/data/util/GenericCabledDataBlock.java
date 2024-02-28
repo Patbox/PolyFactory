@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.data.util;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
@@ -14,6 +15,7 @@ import eu.pb4.polyfactory.item.wrench.WrenchValueGetter;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -44,7 +46,6 @@ import java.util.stream.Stream;
 
 public abstract class GenericCabledDataBlock extends AbstractCableBlock implements WrenchableBlock, BlockEntityProvider, CableConnectable {
     public static final DirectionProperty FACING = Properties.FACING;
-    public static final BooleanProperty HAS_CABLE = BooleanProperty.of("has_cable");
 
     public final WrenchAction facingAction = WrenchAction.of("facing", WrenchValueGetter.ofProperty(Properties.FACING),
             WrenchApplyAction.ofState(
@@ -111,7 +112,14 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         var state = ctx.getWorld().getBlockState(ctx.getBlockPos());
-        return super.getPlacementState(ctx).with(FACING, ctx.getPlayerLookDirection())
+
+        var delta = ctx.getHitPos().subtract(ctx.getBlockPos().getX() + 0.5, ctx.getBlockPos().getY() + 0.5, ctx.getBlockPos().getZ() + 0.5);
+
+        return super.getPlacementState(ctx).with(FACING, state.isOf(FactoryBlocks.CABLE)
+                        && delta.getX() < 4 / 16f && delta.getX() > -4 / 16f
+                        && delta.getY() < 4 / 16f && delta.getY() > -4 / 16f
+                        && delta.getZ() < 4 / 16f && delta.getZ() > -4 / 16f
+                        ? ctx.getSide() : ctx.getPlayerLookDirection())
                 .with(HAS_CABLE, state.isOf(FactoryBlocks.CABLE))
                 .with(FACING_PROPERTIES.get(ctx.getPlayerLookDirection()), false);
     }
@@ -124,6 +132,11 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
     @Override
     public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         return state.get(FACING) != dir && state.get(HAS_CABLE) && super.canCableConnect(world, cableColor, pos, state, dir);
+    }
+
+    @Override
+    public boolean hasCable(BlockState state) {
+        return state.get(HAS_CABLE);
     }
 
     @Override
@@ -150,7 +163,7 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
     }
 
     @Override
-    protected boolean setColor(BlockState state, World world, BlockPos pos, int color) {
+    public boolean setColor(BlockState state, World world, BlockPos pos, int color) {
         return state.get(HAS_CABLE) && super.setColor(state, world, pos, color);
     }
 
@@ -173,23 +186,18 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
     }
 
     public static class Model extends BaseCableModel {
-        private final LodItemDisplayElement base;
+        protected final ItemDisplayElement base;
 
-        private Model(BlockState state) {
+        protected Model(BlockState state) {
             super(state, state.get(HAS_CABLE));
-            this.base = LodItemDisplayElement.createSimple(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);
             this.addElement(this.base);
         }
 
-        @Override
-        protected boolean hasCable(BlockState state) {
-            return state.get(HAS_CABLE);
-        }
-
-        private void updateStatePos(BlockState state) {
+        protected void updateStatePos(BlockState state) {
             var dir = state.get(FACING);
             float p = -90;
             float y = 0;

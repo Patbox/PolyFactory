@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.other;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.entity.FactoryEntityTags;
 import eu.pb4.factorytools.api.util.VirtualDestroyStage;
@@ -82,7 +83,7 @@ public class SelectivePassthroughBlock extends Block implements FactoryBlock, Ba
     @Override
     public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         var model = new BlockModel();
-        var element = LodItemDisplayElement.createSimple(this.asItem());
+        var element = ItemDisplayElementUtil.createSimple(this.asItem());
         element.setScale(new Vector3f(1.9995f));
         model.addElement(element);
         return model;

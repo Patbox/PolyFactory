@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.data.providers;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
@@ -201,11 +202,11 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
 
     public static final class Model extends RotationAwareModel {
         private final ItemDisplayElement axle;
-        private final LodItemDisplayElement base;
+        private final ItemDisplayElement base;
 
         public Model(BlockState state) {
             this.axle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
-            this.base = LodItemDisplayElement.createSimple(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);

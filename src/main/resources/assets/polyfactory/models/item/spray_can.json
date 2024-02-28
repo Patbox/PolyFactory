@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "polyfactory:item/spray_can_color",
+    "layer1": "polyfactory:item/spray_can"
+  }
+}

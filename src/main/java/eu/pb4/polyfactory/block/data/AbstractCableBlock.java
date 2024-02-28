@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.FactoryBlock;
@@ -50,6 +51,7 @@ import java.util.List;
 
 public abstract class AbstractCableBlock extends NetworkBlock implements FactoryBlock, BlockEntityProvider, CableConnectable, NetworkComponent.Data, NetworkComponent.Energy {
     public static final int DEFAULT_COLOR = 0xbbbbbb;
+    public static final BooleanProperty HAS_CABLE = BooleanProperty.of("has_cable");
 
     public static final BooleanProperty NORTH = Properties.NORTH;
     public static final BooleanProperty EAST = Properties.EAST;
@@ -109,7 +111,7 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
         return stack;
     }
 
-    protected boolean setColor(BlockState state, World world, BlockPos pos, int color) {
+    public boolean setColor(BlockState state, World world, BlockPos pos, int color) {
         color = FactoryItems.CABLE.downSampleColor(color);
         if (world.getBlockEntity(pos) instanceof ColorProvider provider && provider.getColor() != color) {
             provider.setColor(color);
@@ -246,13 +248,17 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
         return true;
     }
 
+    public boolean hasCable(BlockState state) {
+        return true;
+    }
+
     public static class BaseCableModel extends BlockModel {
         private final ItemDisplayElement cable;
         private int color = AbstractCableBlock.DEFAULT_COLOR;
         private BlockState state;
 
         public BaseCableModel(BlockState state, boolean addCable) {
-            this.cable = LodItemDisplayElement.createSimple();
+            this.cable = ItemDisplayElementUtil.createSimple();
             this.cable.setViewRange(0.5f);
             this.state = state;
             updateModel();
@@ -278,8 +284,9 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
             updateModel();
         }
 
-        protected boolean hasCable(BlockState state) {
-            return true;
+
+        protected final boolean hasCable(BlockState state) {
+            return ((AbstractCableBlock) state.getBlock()).hasCable(state);
         }
 
         protected void updateModel() {

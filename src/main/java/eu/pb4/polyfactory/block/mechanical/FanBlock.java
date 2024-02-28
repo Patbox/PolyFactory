@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
@@ -160,12 +161,8 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
         private boolean reverse;
 
         private Model(BlockState state) {
-            this.mainElement = new LodItemDisplayElement(FactoryItems.FAN.getDefaultStack());
-            this.mainElement.setDisplaySize(1, 1);
-            this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
+            this.mainElement = ItemDisplayElementUtil.createSimple(FactoryItems.FAN);
             this.mainElement.setScale(new Vector3f(2f));
-            this.mainElement.setViewRange(0.8f);
-            this.mainElement.setInvisible(true);
 
             this.fan = LodItemDisplayElement.createSimple(ITEM_MODEL, 2, 0.2f, 0.4f);
             this.fan.setViewRange(0.3f);

@@ -55,8 +55,6 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER);
         this.addDrop(FactoryBlocks.TACHOMETER);
         this.addDrop(FactoryBlocks.STRESSOMETER);
-        this.addDrop(FactoryBlocks.REDSTONE_INPUT);
-        this.addDrop(FactoryBlocks.REDSTONE_OUTPUT);
 
         this.addDrop(FactoryBlocks.INVERTED_REDSTONE_LAMP);
         this.addDrop(FactoryBlocks.ELECTRIC_GENERATOR);
@@ -71,12 +69,15 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addOptionalCable(FactoryBlocks.ITEM_COUNTER);
         this.addOptionalCable(FactoryBlocks.ITEM_READER);
         this.addOptionalCable(FactoryBlocks.BLOCK_OBSERVER);
+        this.addOptionalCable(FactoryBlocks.REDSTONE_INPUT);
+        this.addOptionalCable(FactoryBlocks.REDSTONE_OUTPUT);
 
 
         this.addAxle(FactoryBlocks.AXLE_WITH_LARGE_GEAR, FactoryItems.LARGE_STEEL_GEAR);
         this.addAxle(FactoryBlocks.AXLE_WITH_GEAR, FactoryItems.STEEL_GEAR);
 
-        this.addColored(FactoryBlocks.CABLE, (x) -> x.with(ItemEntry.builder(FactoryItems.FRAME)
+        this.addColored(FactoryBlocks.CABLE, (x) -> x.pool(LootPool.builder()
+                .with(ItemEntry.builder(FactoryItems.FRAME))
                 .conditionally(BlockStatePropertyLootCondition.builder(FactoryBlocks.CABLE)
                         .properties(StatePredicate.Builder.create().exactMatch(CableBlock.FRAMED, true)))));
         this.addColored(FactoryBlocks.LAMP);
@@ -99,31 +100,34 @@ class LootTables extends FabricBlockLootTableProvider {
     }
 
     private void addOptionalCable(Block block) {
-        var x = LootPool.builder()
-                .conditionally(SurvivesExplosionLootCondition.builder())
-                .rolls(ConstantLootNumberProvider.create(1.0F))
-                .with(ItemEntry.builder(block))
-                .with(ItemEntry.builder(FactoryItems.CABLE)
-                        .conditionally(BlockStatePropertyLootCondition.builder(block).properties(StatePredicate.Builder.create()
-                                .exactMatch(GenericCabledDataBlock.HAS_CABLE, true)))
-                        .apply(() -> CopyColorLootFunction.INSTANCE)
-                );
-
-        this.addDrop(block, LootTable.builder().pool(x));
+        this.addDrop(block, LootTable.builder()
+                .pool(LootPool.builder()
+                        .conditionally(SurvivesExplosionLootCondition.builder()
+                                .and(BlockStatePropertyLootCondition.builder(block).properties(StatePredicate.Builder.create()
+                                .exactMatch(GenericCabledDataBlock.HAS_CABLE, true))))
+                        .with(ItemEntry.builder(FactoryItems.CABLE)
+                                .apply(() -> CopyColorLootFunction.INSTANCE)
+                        )
+                )
+                .pool(LootPool.builder()
+                        .conditionally(SurvivesExplosionLootCondition.builder())
+                        .rolls(ConstantLootNumberProvider.create(1.0F))
+                        .with(ItemEntry.builder(block)))
+        );
     }
 
     private void addColored(Block block) {
         addColored(block, (x) -> {});
     }
-    private void addColored(Block block, Consumer<LootPool.Builder> consumer) {
-        var x = LootPool.builder()
+    private void addColored(Block block, Consumer<LootTable.Builder> consumer) {
+        var x = LootTable.builder().pool(LootPool.builder()
                 .conditionally(SurvivesExplosionLootCondition.builder())
                 .rolls(ConstantLootNumberProvider.create(1.0F))
                 .with(ItemEntry.builder(block)
                         .apply(() -> CopyColorLootFunction.INSTANCE)
-                );
+                ));
         consumer.accept(x);
 
-        this.addDrop(block, LootTable.builder().pool(x));
+        this.addDrop(block, x);
     }
 }

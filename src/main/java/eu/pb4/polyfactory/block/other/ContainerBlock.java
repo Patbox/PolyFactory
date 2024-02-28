@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.AttackableBlock;
@@ -211,9 +212,9 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
         private final TextDisplayElement countElement;
 
         private Model(ServerWorld world, BlockPos pos, BlockState state) {
-            this.mainElement = LodItemDisplayElement.createSimple(ContainerBlock.this.asItem());
+            this.mainElement = ItemDisplayElementUtil.createSimple(ContainerBlock.this.asItem());
 
-            this.itemElement = LodItemDisplayElement.createSimple();
+            this.itemElement = ItemDisplayElementUtil.createSimple();
             this.itemElement.setDisplaySize(1, 1);
             this.itemElement.setModelTransformation(ModelTransformationMode.GUI);
             this.itemElement.setViewRange(0.3f);

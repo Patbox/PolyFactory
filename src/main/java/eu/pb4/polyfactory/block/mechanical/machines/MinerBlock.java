@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
@@ -186,7 +187,7 @@ public class MinerBlock extends RotationalNetworkBlock implements FactoryBlock, 
         private float rotation = 0;
 
         private Model(ServerWorld world, BlockState state) {
-            this.main = LodItemDisplayElement.createSimple(FactoryItems.MINER);
+            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.MINER);
             this.item = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 1, 0.5f);
 
             this.updateAnimation(state.get(FACING));

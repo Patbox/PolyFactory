@@ -7,6 +7,7 @@ import eu.pb4.factorytools.api.block.RedstoneConnectable;
 import eu.pb4.factorytools.api.block.SneakBypassingBlock;
 import eu.pb4.factorytools.api.util.VirtualDestroyStage;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlocks;
@@ -239,10 +240,10 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
         private final ItemDisplayElement key2;
 
         private Model(ServerWorld world, BlockPos pos, BlockState state) {
-            this.main = LodItemDisplayElement.createSimple(WirelessRedstoneBlock.this.asItem());
+            this.main = ItemDisplayElementUtil.createSimple(WirelessRedstoneBlock.this.asItem());
             this.main.setScale(new Vector3f(2));
 
-            this.key1 = LodItemDisplayElement.createSimple();
+            this.key1 = ItemDisplayElementUtil.createSimple();
             this.key1.setDisplaySize(1, 1);
             this.key1.setModelTransformation(ModelTransformationMode.GUI);
             this.key1.setViewRange(0.3f);
@@ -258,7 +259,7 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
             this.key2.setScale(new Vector3f(4 / 16f, 4 / 16f, 0.01f));
             this.key2.setTranslation(new Vector3f(0, -2.5f / 16f, -2.2f / 16f));
 
-            this.overlay = LodItemDisplayElement.createSimple(createOverlay(state));
+            this.overlay = ItemDisplayElementUtil.createSimple(createOverlay(state));
             this.overlay.setScale(new Vector3f(2.001f));
             this.overlay.setViewRange(0.6f);
 
@@ -285,6 +286,8 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
         public void updateItems(ItemStack key1, ItemStack key2) {
             this.key1.setItem(key1.copy());
             this.key2.setItem(key2.copy());
+            this.key1.tick();
+            this.key2.tick();
         }
 
         private void updateStatePos(BlockState state) {

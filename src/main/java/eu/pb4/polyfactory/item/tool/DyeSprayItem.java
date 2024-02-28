@@ -1,0 +1,218 @@
+package eu.pb4.polyfactory.item.tool;
+
+import eu.pb4.factorytools.api.item.RegistryCallbackItem;
+import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
+import eu.pb4.polyfactory.block.data.AbstractCableBlock;
+import eu.pb4.polyfactory.block.data.output.NixieTubeBlock;
+import eu.pb4.polyfactory.block.data.output.NixieTubeBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
+import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
+import eu.pb4.polyfactory.block.other.LampBlock;
+import eu.pb4.polyfactory.block.other.SmallLampBlock;
+import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.util.ColoredItem;
+import eu.pb4.polyfactory.util.DyeColorExtra;
+import eu.pb4.polyfactory.util.inventory.WrappingRecipeInputInventory;
+import eu.pb4.polymer.core.api.item.PolymerItem;
+import eu.pb4.polymer.resourcepack.api.PolymerModelData;
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.minecraft.block.BedBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.SignBlock;
+import net.minecraft.block.entity.SignBlockEntity;
+import net.minecraft.block.enums.BedPart;
+import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.inventory.StackReference;
+import net.minecraft.item.*;
+import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.registry.Registries;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.ClickType;
+import net.minecraft.util.DyeColor;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
+
+public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerItem, ColoredItem {
+    private static final int MAX_USES = 128;
+    private PolymerModelData mainModel;
+    private PolymerModelData emptyModel;
+
+    public DyeSprayItem(Settings settings) {
+        super(settings);
+    }
+    @Override
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        var stack = context.getStack();
+        var color = ColoredItem.getColor(stack);
+        var uses = getUses(stack);
+
+        if (color == -1 || uses == 0) {
+            return ActionResult.FAIL;
+        }
+
+        var state = context.getWorld().getBlockState(context.getBlockPos());
+        var blockEntity = context.getWorld().getBlockEntity(context.getBlockPos());
+        boolean success = false;
+
+        if (state.getBlock() instanceof AbstractCableBlock cableBlock && cableBlock.hasCable(state)) {
+            success = cableBlock.setColor(state, context.getWorld(), context.getBlockPos(), color);
+        } else if (state.getBlock() instanceof LampBlock lampBlock) {
+            success = lampBlock.setColor(context.getWorld(), context.getBlockPos(), color);
+        } else if (state.getBlock() instanceof SmallLampBlock lampBlock) {
+            success = lampBlock.setColor(context.getWorld(), context.getBlockPos(), color);
+        } else if (state.getBlock() instanceof WindmillBlock && context.getWorld().getBlockEntity(context.getBlockPos()) instanceof WindmillBlockEntity be) {
+            var stacks = be.getSails();
+            for (int i = 0; i < stacks.size(); i++) {
+                var x = stacks.get(i);
+                if (!x.isEmpty() && be.getSailColor(i) != color) {
+                    FactoryItems.WINDMILL_SAIL.setColor(x, color);
+                    be.addSail(i, x);
+                    success = true;
+                    break;
+                }
+            }
+        } else if (state.getBlock() instanceof NixieTubeBlock && context.getWorld().getBlockEntity(context.getBlockPos()) instanceof NixieTubeBlockEntity be) {
+            success = be.setColor(color);
+            if (success) {
+                be.updateTextDisplay();
+            }
+        } else if (DyeColorExtra.BY_COLOR.get(color) != null && !(blockEntity instanceof Inventory)) {
+            var dye = DyeColorExtra.BY_COLOR.get(color);
+            var id = Registries.BLOCK.getId(state.getBlock());
+            Identifier newId;
+            if (id.getPath().equals("glass") || id.getPath().equals("glass_pane")) {
+                newId = id.withPrefixedPath(dye.asString() + "_stained_");
+            } else {
+                var x = id.getPath().split("_", 2);
+                newId = DyeColor.byName(x[0], null) == null ? id.withPath(dye.asString() + "_" + id.getPath()) : id.withPath(dye.asString() + "_" + x[1]);
+            }
+
+            var block = Registries.BLOCK.get(newId);
+            if (block != Blocks.AIR && block != state.getBlock()) {
+                context.getWorld().setBlockState(context.getBlockPos(), block.getStateWithProperties(state), Block.FORCE_STATE);
+
+                if (state.getBlock() instanceof BedBlock) {
+                    var dir = state.get(BedBlock.FACING);
+                    var offset = context.getBlockPos().offset(dir, state.get(BedBlock.PART) == BedPart.HEAD ? -1 : 1);
+                    context.getWorld().setBlockState(offset, block.getStateWithProperties(context.getWorld().getBlockState(offset)), Block.FORCE_STATE);
+                }
+                success = true;
+            }
+
+        }
+
+        if (success) {
+            context.getWorld().playSound(null, context.getBlockPos(), SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS);
+            if (context.getPlayer() == null || !context.getPlayer().isCreative()) {
+                setUses(stack, uses - 1);
+            }
+
+            var p = new Vector3f(ColorHelper.Argb.getRed(color) / 255f, ColorHelper.Argb.getGreen(color) / 255f, ColorHelper.Argb.getBlue(color) / 255f);
+            ((ServerWorld) context.getWorld()).spawnParticles(new DustParticleEffect(p, 1), context.getHitPos().x, context.getHitPos().y, context.getHitPos().z, 10, 0.2f, 0.2f, 0.2f, 1);
+
+            return ActionResult.SUCCESS;
+        }
+        return ActionResult.FAIL;
+    }
+
+    @Override
+    public Text getName(ItemStack stack) {
+        if (getUses(stack) == 0) {
+            return Text.translatable(getTranslationKey() + ".empty");
+        }
+        var color = ColoredItem.getColor(stack);
+        if (!DyeColorExtra.hasLang(color)) {
+            return Text.translatable( this.getTranslationKey() + ".colored.full",
+                    ColoredItem.getColorName(color), ColoredItem.getHexName(color));
+        } else {
+            return Text.translatable(this.getTranslationKey() + ".colored", ColoredItem.getColorName(color));
+        }
+    }
+
+    @Override
+    public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
+        var color = ColoredItem.getColor(stack);
+        var uses = getUses(stack);
+
+        if (otherStack.isIn(ConventionalItemTags.DYES) && uses + 8 <= MAX_USES) {
+            var dyeColor = DyeColorExtra.getColor(otherStack);
+
+            if (dyeColor == color || uses == 0) {
+                ColoredItem.setColor(stack, dyeColor);
+                setUses(stack, uses + 8);
+                otherStack.decrement(1);
+            }
+        } else if (otherStack.isOf(Items.WATER_BUCKET)) {
+            setUses(stack, 0);
+        } else {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int downSampleColor(int color, boolean isVanilla) {
+       return color;
+    }
+
+    @Override
+    public int getDefaultColor() {
+        return -1;
+    }
+
+    @Override
+    public int getPolymerArmorColor(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
+        return ColoredItem.getColor(itemStack);
+    }
+
+    private int getUses(ItemStack stack) {
+        return stack.hasNbt() ? stack.getNbt().getInt("uses") : 0;
+    }
+
+    private void setUses(ItemStack stack, int count) {
+        stack.getOrCreateNbt().putInt("uses", count);
+    }
+
+    @Override
+    public void onRegistered(Identifier selfId) {
+        this.mainModel = PolymerResourcePackUtils.requestModel(Items.LEATHER_BOOTS, selfId.withPrefixedPath("item/"));
+        this.emptyModel = PolymerResourcePackUtils.requestModel(BaseItemProvider.requestItem(), selfId.withPrefixedPath("item/").withSuffixedPath("_empty"));
+    }
+
+    @Override
+    public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
+        return getUses(itemStack) == 0 ? this.emptyModel.item() : this.mainModel.item();
+    }
+
+    @Override
+    public int getPolymerCustomModelData(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
+        return getUses(itemStack) == 0 ? this.emptyModel.value() : this.mainModel.value();
+    }
+
+    @Override
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipContext context, @Nullable ServerPlayerEntity player) {
+        var out = PolymerItem.super.getPolymerItemStack(itemStack, context, player);
+        var uses = getUses(itemStack);
+
+        if (uses != 0) {
+            out.getNbt().putInt("Damage", (int) ((((double) MAX_USES - uses) / MAX_USES) * out.getItem().getMaxDamage()));
+        }
+        return out;
+    }
+}

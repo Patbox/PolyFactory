@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.data.util;
 
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
@@ -11,6 +12,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -90,10 +92,10 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
     }
 
     public static class Model extends BlockModel {
-        private final LodItemDisplayElement base;
+        private final ItemDisplayElement base;
 
         private Model(BlockState state) {
-            this.base = LodItemDisplayElement.createSimple(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);

@@ -6,6 +6,7 @@ import eu.pb4.factorytools.api.item.MultiBlockItem;
 import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.item.block.*;
+import eu.pb4.polyfactory.item.tool.DyeSprayItem;
 import eu.pb4.polyfactory.item.tool.DynamiteItem;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.item.tool.WirelessRedstoneTransmitterItem;
@@ -104,6 +105,7 @@ public class FactoryItems {
     public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
+    public static final Item SPRAY_CAN = register("spray_can", new DyeSprayItem(new Item.Settings().maxCount(1)));
 
 
     public static final Item THE_CUBE = register(FactoryBlocks.THE_CUBE);
@@ -186,6 +188,7 @@ public class FactoryItems {
 
                     // Other items
                     entries.add(DYNAMITE);
+                    entries.add(SPRAY_CAN);
 
                     // Generic Materials
                     entries.add(SAW_DUST);
@@ -247,6 +250,12 @@ public class FactoryItems {
                     }
                     for (var dye : DyeColor.values()) {
                         entries.add(ColoredItem.stack(INVERTED_CAGED_LAMP, 1, DyeColorExtra.getColor(dye)));
+                    }
+
+                    for (var dye : DyeColor.values()) {
+                        var x = ColoredItem.stack(SPRAY_CAN, 1, DyeColorExtra.getColor(dye));
+                        x.getOrCreateNbt().putInt("uses", 128);
+                        entries.add(x);
                     }
                 })).build()
         );

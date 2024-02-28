@@ -6,6 +6,7 @@ import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.mapcanvas.api.font.DefaultFonts;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
@@ -234,7 +235,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 0.2f);
 
         private static final Random RANDOM = Random.create();
-        private final LodItemDisplayElement base;
+        private final ItemDisplayElement base;
         private DisplayElement currentDisplay;
         private DisplayElement currentDisplayExtra;
         private Direction facing;
@@ -252,7 +253,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
         private float extraOffset;
 
         public Model(BlockState state) {
-            this.base = LodItemDisplayElement.createSimple(state.get(ACTIVE) ? ACTIVE_MODEL : LodItemDisplayElement.getModel(state.getBlock().asItem()));
+            this.base = ItemDisplayElementUtil.createSimple(state.get(ACTIVE) ? ACTIVE_MODEL : LodItemDisplayElement.getModel(state.getBlock().asItem()));
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);

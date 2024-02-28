@@ -26,7 +26,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
-public class RedstoneInputBlock extends DataProviderBlock implements RedstoneConnectable {
+public class RedstoneInputBlock extends CabledDataProviderBlock implements RedstoneConnectable {
     public static final IntProperty POWER = RedstoneOutputBlock.POWER;
 
     public RedstoneInputBlock(AbstractBlock.Settings settings) {
@@ -42,7 +42,7 @@ public class RedstoneInputBlock extends DataProviderBlock implements RedstoneCon
 
     @Nullable
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection()).with(POWER, clamp(ctx.getWorld().getReceivedRedstonePower(ctx.getBlockPos())));
+        return super.getPlacementState(ctx).with(POWER, clamp(ctx.getWorld().getReceivedRedstonePower(ctx.getBlockPos())));
     }
 
     @Override

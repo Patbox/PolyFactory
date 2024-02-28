@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.RotationAwareModel;
@@ -90,7 +91,7 @@ public class GearboxBlock extends RotationalNetworkBlock implements FactoryBlock
         private final ItemDisplayElement zAxle;
 
         private Model() {
-            this.mainElement = LodItemDisplayElement.createSimple(FactoryItems.GEARBOX);
+            this.mainElement = ItemDisplayElementUtil.createSimple(FactoryItems.GEARBOX);
             this.mainElement.setScale(new Vector3f(2));
             this.addElement(this.mainElement);
 

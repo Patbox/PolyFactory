@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
@@ -157,7 +158,7 @@ public class PressBlock extends TallItemMachineBlock {
         private float value;
 
         private Model(ServerWorld world, BlockState state) {
-            this.main = LodItemDisplayElement.createSimple(FactoryItems.PRESS);
+            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.PRESS);
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.piston = LodItemDisplayElement.createSimple(MODEL_PISTON, 2, 0.4f, 0.8f);

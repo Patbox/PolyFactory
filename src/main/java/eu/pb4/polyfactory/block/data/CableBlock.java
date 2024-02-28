@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.data;
 
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
@@ -97,7 +98,7 @@ public final class CableBlock extends AbstractCableBlock implements BlockStateNa
 
         private Model(BlockState state) {
             super(state, true);
-            this.frame = LodItemDisplayElement.createSimple(FactoryItems.FRAME);
+            this.frame = ItemDisplayElementUtil.createSimple(FactoryItems.FRAME);
             this.frame.setScale(new Vector3f(2));
             this.frame.setViewRange(0.8f);
             if (state.get(FRAMED)) {

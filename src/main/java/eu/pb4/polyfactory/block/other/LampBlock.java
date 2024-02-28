@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
@@ -22,6 +23,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
@@ -44,6 +46,16 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
             ColoredItem.setColor(stack, be.getColor());
         }
         return stack;
+    }
+
+    public boolean setColor(World world, BlockPos pos, int color) {
+        color = FactoryItems.LAMP.downSampleColor(color);
+        if (world.getBlockEntity(pos) instanceof ColorProvider provider && provider.getColor() != color) {
+            provider.setColor(color);
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -106,7 +118,7 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
         private BlockState state;
 
         private Model(BlockPos pos, BlockState state, boolean inverted) {
-            this.main = LodItemDisplayElement.createSimple();
+            this.main = ItemDisplayElementUtil.createSimple();
             this.main.setScale(new Vector3f(2 + (pos.getManhattanDistance(BlockPos.ORIGIN) % 2) * 0.001f));
             this.main.setViewRange(0.5f);
             this.state = state;

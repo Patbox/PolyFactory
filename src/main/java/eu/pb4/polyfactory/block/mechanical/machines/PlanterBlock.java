@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
@@ -171,7 +172,7 @@ public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock
         EightWayDirection direction = null;
 
         private Model(ServerWorld world, BlockState state) {
-            this.main = LodItemDisplayElement.createSimple(FactoryItems.PLANTER);
+            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.PLANTER);
             this.output1 = LodItemDisplayElement.createSimple(OUTPUT_1, 5, 0.3f);
             this.output2 = LodItemDisplayElement.createSimple(OUTPUT_2, 5, 0.3f);
             this.output1.setViewRange(0.5f);

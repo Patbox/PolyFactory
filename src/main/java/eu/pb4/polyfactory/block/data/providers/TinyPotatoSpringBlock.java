@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.data.providers;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
@@ -21,6 +22,7 @@ import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -169,7 +171,7 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
     public static final class Model extends BlockModel {
         public static final ItemStack BASE_MODEL = BaseItemProvider.requestModel(id("block/tiny_potato_spring_base"));
         public static final ItemStack TATER_MODEL = BaseItemProvider.requestModel(id("block/tiny_potato_spring"));
-        private final LodItemDisplayElement base;
+        private final ItemDisplayElement base;
         private final LodItemDisplayElement tater;
         private float extraRotation = 0;
 
@@ -177,7 +179,7 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
         private float interactionYaw;
 
         private Model(ServerWorld world, BlockPos pos, BlockState state) {
-            this.base = LodItemDisplayElement.createSimple(BASE_MODEL);
+            this.base = ItemDisplayElementUtil.createSimple(BASE_MODEL);
             this.tater = LodItemDisplayElement.createSimple(TATER_MODEL, 1);
             this.tater.setTranslation(new Vector3f(0, -6f / 16, 0));
             //this.tater.setOffset(new Vec3d(0, 2f / 16, 0));

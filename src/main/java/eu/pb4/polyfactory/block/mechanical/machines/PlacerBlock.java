@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
@@ -188,7 +189,7 @@ public class PlacerBlock extends RotationalNetworkBlock implements FactoryBlock,
         private float rotation = 0;
 
         private Model(ServerWorld world, BlockState state) {
-            this.main = LodItemDisplayElement.createSimple(FactoryItems.PLACER);
+            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.PLACER);
             this.item = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 3, 0.5f);
 
             this.updateAnimation(state.get(FACING));

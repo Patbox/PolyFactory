@@ -1,9 +1,8 @@
 {
-	"parent": "polyfactory:block/item_counter_old",
+	"parent": "polyfactory:block/redstone_input",
 	"textures": {
-		"2": "polyfactory:block/redstone_output_side",
-		"particle": "polyfactory:block/redstone_output_side",
-		"front": "polyfactory:block/redstone_output_front",
-		"back": "polyfactory:block/steel_plate_connection"
+		"side": "polyfactory:block/cable/redstone_output_side",
+		"particle": "polyfactory:block/cable/redstone_output_side",
+		"front": "polyfactory:block/redstone_output_front"
 	}
 }

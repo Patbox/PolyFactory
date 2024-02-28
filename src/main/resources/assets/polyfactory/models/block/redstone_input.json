@@ -1,9 +1,11 @@
 {
-	"parent": "polyfactory:block/item_counter_old",
+	"parent": "polyfactory:block/nixie_tube_controller",
 	"textures": {
-		"2": "polyfactory:block/redstone_input_side",
-		"particle": "polyfactory:block/redstone_input_side",
+		"particle": "polyfactory:block/cable/redstone_input_side",
+		"side": "polyfactory:block/cable/redstone_input_side",
+		"back_inner": "polyfactory:block/cable/back_inner",
 		"front": "polyfactory:block/redstone_input_front",
-		"back": "polyfactory:block/steel_plate_connection"
+		"back": "polyfactory:block/cable/integrated_back_data",
+		"back_inner_center": "polyfactory:block/cable/back_inner_center_data"
 	}
 }

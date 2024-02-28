@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
@@ -142,7 +143,7 @@ public class MixerBlock extends TallItemMachineBlock {
         private boolean active;
 
         private Model(BlockState state) {
-            this.main = LodItemDisplayElement.createSimple(FactoryItems.MIXER);
+            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.MIXER);
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.whisk = LodItemDisplayElement.createSimple(MODEL_PISTON, 2, 0.4f, 0.8f);

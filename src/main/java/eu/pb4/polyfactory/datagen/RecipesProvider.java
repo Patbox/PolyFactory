@@ -551,7 +551,9 @@ class RecipesProvider extends FabricRecipeProvider {
                 GenericPressRecipe.of("glistening_melon_slice", CountedIngredient.ofItems(1, Items.MELON_SLICE), CountedIngredient.ofItems(8, Items.GOLD_NUGGET),
                         5, OutputStack.of(Items.GLISTERING_MELON_SLICE)),
                 GenericPressRecipe.of("golden_apple", CountedIngredient.ofItems(1, Items.APPLE), CountedIngredient.ofItems(8, Items.GOLD_INGOT),
-                        5, OutputStack.of(Items.GOLDEN_APPLE))
+                        5, OutputStack.of(Items.GOLDEN_APPLE)),
+                GenericPressRecipe.of("spray_can", CountedIngredient.ofItems(1, Items.BUCKET), CountedIngredient.ofItems(1, Items.COPPER_INGOT),
+                        5f, OutputStack.of(FactoryItems.SPRAY_CAN))
         );
 
         of(exporter, new RecipeEntry<>(id("crafting/inverted_colored_lamp"),

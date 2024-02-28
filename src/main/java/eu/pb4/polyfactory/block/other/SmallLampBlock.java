@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
@@ -97,6 +98,16 @@ public class SmallLampBlock extends Block implements FactoryBlock, BlockEntityPr
         }
     }
 
+    public boolean setColor(World world, BlockPos pos, int color) {
+        color = FactoryItems.LAMP.downSampleColor(color);
+        if (world.getBlockEntity(pos) instanceof ColorProvider provider && provider.getColor() != color) {
+            provider.setColor(color);
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
     public boolean forceLightUpdates(BlockState blockState) {
         return true;
@@ -156,7 +167,7 @@ public class SmallLampBlock extends Block implements FactoryBlock, BlockEntityPr
         private BlockState state;
 
         private Model(BlockPos pos, BlockState state, boolean inverted) {
-            this.main = LodItemDisplayElement.createSimple();
+            this.main = ItemDisplayElementUtil.createSimple();
             this.main.setScale(new Vector3f(2));
             this.main.setViewRange(0.5f);
             this.state = state;

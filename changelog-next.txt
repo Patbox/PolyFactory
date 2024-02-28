@@ -1,20 +1,24 @@
 - Added Tachometer (measures rotations per minute) and Stressometer (measures stress units left).
   Both require connection to some display (Hologram Projector, Nixie Tube) to display their values.
-- Reworked general "data provider/receiver blocks" (Item Counter, Nixie Tube Controller, Block Observer, Item Reader):
+- Added Spray Can. It can be used to recolor Cables, Nixie Tubes, Lamps and most vanilla colored blocks.
+  You can create it in Mechanical Press with Empty Bucket and Copper Ingot. You can fill it with dye by putting it in the inventory (like bundles), with 8 charges per dye.
+- Reworked general "data provider/receiver blocks" (Item Counter, Nixie Tube Controller, Block Observer, Item Reader, Redstone Input/Output):
   - Instead of having single directional input/output, you need to place cable inside of it.
   - The cable connects the same way as regular one, excluding the direction data-block is facing.
+  - Existing blocks will convert to the new ones, without any changes in connection until you change them yourself.
 - Improved Hologram Projectors:
   - Added option to force everything to display as text.
   - Added option to change pitch and yaw aside of just roll of hologram.
   - Fixed some bugs with displaying holograms.
 - Mechanical Placers can now use selected items on blocks.
-- Improved placement of Windmills to always point to connected side.
 - Improved physics of players effected by fans.
+- Improved placement of Windmills to always point to connected side.
 - Added new advancements!
 - Hoppers, Pistons, Redstone Repeater, Redstone Comparator, Dispensers and Droppers can be rotated by using Wrench.
 - Added breaking particles to all the blocks that didn't have them.
 - All crafting-machines should now work with hoppers.
+- Fixed dynamic blocks not having correct visuals sometimes.
 - Changed multiple textures and models:
-  - Most notably: Item Splitter, Cables and Ender-Amethyst Crystal,
+  - Most notably: Item Splitter, Cables, Wireless Redstone Input/Output, Treated Kelp and Ender-Amethyst Crystal
 
 

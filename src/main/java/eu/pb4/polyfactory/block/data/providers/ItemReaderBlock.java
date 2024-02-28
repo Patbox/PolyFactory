@@ -1,10 +1,12 @@
 package eu.pb4.polyfactory.block.data.providers;
 
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -101,15 +103,15 @@ public class ItemReaderBlock extends CabledDataProviderBlock {
     }
 
     public static class Model extends BaseCableModel {
-        private final LodItemDisplayElement base;
-        private final LodItemDisplayElement book;
+        private final ItemDisplayElement base;
+        private final ItemDisplayElement book;
 
         private Model(BlockState state) {
             super(state, state.get(HAS_CABLE));
-            this.base = LodItemDisplayElement.createSimple(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 
-            this.book = LodItemDisplayElement.createSimple();
+            this.book = ItemDisplayElementUtil.createSimple();
             this.book.setScale(new Vector3f(0.5f));
             this.book.setDisplaySize(1, 1);
             this.book.setTranslation(new Vector3f(0, 0, 0.35f));
@@ -117,11 +119,6 @@ public class ItemReaderBlock extends CabledDataProviderBlock {
             updateStatePos(state);
             this.addElement(this.base);
             this.addElement(this.book);
-        }
-
-        @Override
-        protected boolean hasCable(BlockState state) {
-            return state.get(HAS_CABLE);
         }
 
         private void updateStatePos(BlockState state) {

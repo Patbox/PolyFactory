@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.AbovePlacingLimiter;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.factorytools.api.block.FactoryBlock;
@@ -183,7 +184,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
 
         private Model(ServerWorld world, BlockState state) {
 
-            this.main = LodItemDisplayElement.createSimple(FactoryItems.GRINDER);
+            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.GRINDER);
             this.stoneWheel = LodItemDisplayElement.createSimple(MODEL_STONE_WHEEL, this.getUpdateRate(), 0.6f, 0.6f);
 
             this.updateAnimation(0, state.get(INPUT_FACING));

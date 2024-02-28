@@ -76,6 +76,10 @@
   "item.polyfactory.wooden_plate": "Wooden Plate",
   "item.polyfactory.treated_dried_kelp": "Treated Dried Kelp",
   "item.polyfactory.portable_redstone_transmitter": "Portable Redstone Transmitter",
+  "item.polyfactory.spray_can": "Splay Can",
+  "item.polyfactory.spray_can.empty": "Empty Splay Can",
+  "item.polyfactory.spray_can.colored": "%s Spray Can",
+  "item.polyfactory.spray_can.colored.full": "%s Spray Can (%s)",
 
   "block.polyfactory.colored_lamp": "Colored Lamp",
   "block.polyfactory.colored_lamp.colored": "%s Lamp",

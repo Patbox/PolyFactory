@@ -1,7 +1,9 @@
 package eu.pb4.polyfactory.models;
 
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
@@ -12,14 +14,14 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class HopperModel extends BlockModel {
-    private final LodItemDisplayElement icon;
-    private final LodItemDisplayElement model;
+    private final ItemDisplayElement icon;
+    private final ItemDisplayElement model;
 
     public HopperModel(BlockState cachedState) {
-        this.model = LodItemDisplayElement.createSimple(GenericParts.FILTER_MESH);
+        this.model = ItemDisplayElementUtil.createSimple(GenericParts.FILTER_MESH);
         this.model.setScale(new Vector3f(2));
         this.model.setTranslation(new Vector3f(0, 15 / 16f, 0));
-        this.icon = LodItemDisplayElement.createSimple();
+        this.icon = ItemDisplayElementUtil.createSimple();
         this.icon.setModelTransformation(ModelTransformationMode.GUI);
         this.icon.setViewRange(0.1f);
         this.icon.setScale(new Vector3f(0.3f, 0.3f, 0.005f));
