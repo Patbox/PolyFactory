@@ -49,7 +49,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerItem, ColoredItem {
-    private static final int MAX_USES = 128;
+    public static final int MAX_USES = 128;
     private PolymerModelData mainModel;
     private PolymerModelData emptyModel;
 
@@ -106,12 +106,12 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
 
             var block = Registries.BLOCK.get(newId);
             if (block != Blocks.AIR && block != state.getBlock()) {
-                context.getWorld().setBlockState(context.getBlockPos(), block.getStateWithProperties(state), Block.FORCE_STATE);
+                context.getWorld().setBlockState(context.getBlockPos(), block.getStateWithProperties(state), Block.FORCE_STATE | Block.NOTIFY_ALL_AND_REDRAW);
 
                 if (state.getBlock() instanceof BedBlock) {
                     var dir = state.get(BedBlock.FACING);
                     var offset = context.getBlockPos().offset(dir, state.get(BedBlock.PART) == BedPart.HEAD ? -1 : 1);
-                    context.getWorld().setBlockState(offset, block.getStateWithProperties(context.getWorld().getBlockState(offset)), Block.FORCE_STATE);
+                    context.getWorld().setBlockState(offset, block.getStateWithProperties(context.getWorld().getBlockState(offset)), Block.FORCE_STATE | Block.NOTIFY_ALL_AND_REDRAW);
                 }
                 success = true;
             }
@@ -183,11 +183,11 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
         return ColoredItem.getColor(itemStack);
     }
 
-    private int getUses(ItemStack stack) {
+    public static int getUses(ItemStack stack) {
         return stack.hasNbt() ? stack.getNbt().getInt("uses") : 0;
     }
 
-    private void setUses(ItemStack stack, int count) {
+    public static void setUses(ItemStack stack, int count) {
         stack.getOrCreateNbt().putInt("uses", count);
     }
 

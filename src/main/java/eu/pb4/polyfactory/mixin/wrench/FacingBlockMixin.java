@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.List;
 
-@Mixin({ PistonBlock.class, DispenserBlock.class })
+@Mixin({ /*PistonBlock.class,*/ DispenserBlock.class })
 public class FacingBlockMixin implements WrenchableBlock {
     @SuppressWarnings("AddedMixinMembersNamePattern")
     @Override

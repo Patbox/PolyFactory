@@ -392,7 +392,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                         space = i;
                     }
 
-                    if (DefaultFonts.VANILLA.getTextWidth(string.substring(start, i + 1), 8) > 55) {
+                    if (DefaultFonts.VANILLA.getTextWidth(string.substring(start, i + 1), 8) > 70) {
                         if (space != -1) {
                             list.add(string.substring(start, space));
                             start = space + 1;
@@ -420,12 +420,12 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 var t = new TextDisplayElement(text);
                 t.setBackground(0);
                 t.setShadow(true);
-                t.setLineWidth(80);
+                t.setLineWidth(90);
                 newDisplay = t;
                 t = new TextDisplayElement(text);
                 t.setBackground(0);
                 t.setShadow(true);
-                t.setLineWidth(80);
+                t.setLineWidth(90);
                 newDisplayExtra = t;
                 this.extraOffset = list.size() / 4f;
                 this.customCenter = list.size() / 8f;
@@ -477,7 +477,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 mat.translate(0, -t.getText().getString().lines().count() * this.scale * (7 / 16f), 0);
             }
 
-            mat.scale(new Vector3f(this.scale, this.scale, display instanceof TextDisplayElement ? 0.1f : 0.01f).mul(this.extraScale));
+            mat.scale(new Vector3f(this.scale, this.scale, display instanceof TextDisplayElement ? 1f : 0.01f).mul(this.extraScale));
             mat.translate(0, this.extraOffset, 0);
 
             mat.translate(0, this.customCenter, 0);

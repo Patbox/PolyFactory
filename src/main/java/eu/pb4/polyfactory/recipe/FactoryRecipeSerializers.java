@@ -7,12 +7,15 @@ import eu.pb4.polyfactory.recipe.mixing.ArtificialDyeMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.ColoringMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
+import eu.pb4.polyfactory.recipe.press.FillSprayCanPressRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.dynamic.Codecs;
 
 public class FactoryRecipeSerializers {
     public static final LazyRecipeSerializer<GrindingRecipe> GRINDING = register("grinding", GrindingRecipe.CODEC);
@@ -26,6 +29,11 @@ public class FactoryRecipeSerializers {
     public static final LazyRecipeSerializer<ShapelessNbtCopyRecipe> CRAFTING_SHAPELESS_NBT_COPY = register("crafting/shapeless_nbt_copy", ShapelessNbtCopyRecipe.CODEC);
 
     public static final LazyRecipeSerializer<PRTKeySetterCraftingRecipe> CRAFTING_PRT_KEY_SETTER = register("crafting/prt_key_setter", PRTKeySetterCraftingRecipe.CODEC);
+
+    public static final LazyRecipeSerializer<FillSprayCanCraftingRecipe> CRAFTING_FILL_SPRAY_CAN = register("crafring/fill_spray_can",
+            CraftingRecipeCategory.CODEC.xmap(FillSprayCanCraftingRecipe::new, FillSprayCanCraftingRecipe::category));
+    public static final LazyRecipeSerializer<FillSprayCanPressRecipe> PRESS_FILL_SPRAY_CAN = register("press/fill_spray_can",
+            Codecs.POSITIVE_INT.xmap(FillSprayCanPressRecipe::new, FillSprayCanPressRecipe::amount));
 
     public static void register() {
 

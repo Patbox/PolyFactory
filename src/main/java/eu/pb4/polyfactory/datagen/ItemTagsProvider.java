@@ -52,7 +52,7 @@ class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
                 .addOptionalTag(ConventionalItemTags.LAVA_BUCKETS)
                 .addOptionalTag(ConventionalItemTags.DYES)
                 .add(FactoryItems.WINDMILL_SAIL, FactoryItems.STEEL_GEAR, FactoryItems.LARGE_STEEL_GEAR)
-                .add(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)
+                .add(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, FactoryItems.SPRAY_CAN)
                 .add(Items.END_CRYSTAL, Items.ENDER_EYE, Items.EXPERIENCE_BOTTLE, Items.GLASS_BOTTLE, Items.POTION)
         ;
 

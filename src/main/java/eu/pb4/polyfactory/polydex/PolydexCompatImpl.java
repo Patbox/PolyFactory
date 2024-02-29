@@ -53,6 +53,7 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(GrindingRecipe.class, GrindingRecipePage::new);
         PolydexPage.registerRecipeViewer(ColoringCraftingRecipe.class, ColoringCraftingRecipePage::new);
 
+        PolydexEntry.registerEntryCreator(FactoryItems.SPRAY_CAN, PolydexCompatImpl::seperateColoredItems);
         PolydexEntry.registerEntryCreator(FactoryItems.CABLE, PolydexCompatImpl::seperateColoredItems);
         PolydexEntry.registerEntryCreator(FactoryItems.LAMP, PolydexCompatImpl::seperateColoredItems);
         PolydexEntry.registerEntryCreator(FactoryItems.INVERTED_LAMP, PolydexCompatImpl::seperateColoredItems);

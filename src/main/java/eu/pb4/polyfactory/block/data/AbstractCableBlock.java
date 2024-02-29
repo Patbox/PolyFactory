@@ -200,7 +200,7 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
 
     @Override
     public Collection<BlockNode> createEnergyNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return createDataNodes(state, world, pos);
+        return List.of(new SelectiveSideNode(this.getDirections(state)));
     }
 
     public EnumSet<Direction> getDirections(BlockState state) {

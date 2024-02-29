@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.recipe.mixing.ArtificialDyeMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.ColoringMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
+import eu.pb4.polyfactory.recipe.press.FillSprayCanPressRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -553,14 +554,17 @@ class RecipesProvider extends FabricRecipeProvider {
                 GenericPressRecipe.of("golden_apple", CountedIngredient.ofItems(1, Items.APPLE), CountedIngredient.ofItems(8, Items.GOLD_INGOT),
                         5, OutputStack.of(Items.GOLDEN_APPLE)),
                 GenericPressRecipe.of("spray_can", CountedIngredient.ofItems(1, Items.BUCKET), CountedIngredient.ofItems(1, Items.COPPER_INGOT),
-                        5f, OutputStack.of(FactoryItems.SPRAY_CAN))
+                        5f, OutputStack.of(FactoryItems.SPRAY_CAN)),
+                new RecipeEntry<>(id("press/spray_can_fill"), new FillSprayCanPressRecipe(12))
         );
 
-        of(exporter, new RecipeEntry<>(id("crafting/inverted_colored_lamp"),
-                new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
-                        FactoryItems.INVERTED_LAMP.getDefaultStack(),
-                        Ingredient.ofItems(FactoryItems.LAMP),
-                        DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(Items.REDSTONE_TORCH)))),
+        of(exporter,
+                new RecipeEntry<>(id("crafting/spray_can_fill"), new FillSprayCanCraftingRecipe(CraftingRecipeCategory.MISC)),
+                new RecipeEntry<>(id("crafting/inverted_colored_lamp"),
+                        new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
+                                FactoryItems.INVERTED_LAMP.getDefaultStack(),
+                                Ingredient.ofItems(FactoryItems.LAMP),
+                                DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(Items.REDSTONE_TORCH)))),
                 new RecipeEntry<>(id("crafting/inverted_caged_lamp"),
                         new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
                                 FactoryItems.INVERTED_CAGED_LAMP.getDefaultStack(),
