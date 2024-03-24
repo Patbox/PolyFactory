@@ -7,6 +7,7 @@
     "FallingBlockAccessor",
     "block.StateManagerMixin",
     "block.WorldChunkMixin",
+    "datafixer.Schema1460Mixin",
     "machines.FallingBlockEntityMixin",
     "machines.HopperBlockEntityMixin",
     "machines.HopperBlockMixin",
