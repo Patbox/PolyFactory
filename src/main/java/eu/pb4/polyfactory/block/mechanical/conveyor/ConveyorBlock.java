@@ -517,8 +517,8 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
             this.base.setViewRange(0.7f);
             this.base.setInvisible(true);
 
-            this.addElement(this.base);
             this.updateAnimation(state.get(ConveyorBlock.DIRECTION), state.get(ConveyorBlock.VERTICAL));
+            this.addElement(this.base);
         }
 
         private ItemStack getModelForSpeed(double speed, DirectionValue directionValue, boolean sticky, BlockState state) {

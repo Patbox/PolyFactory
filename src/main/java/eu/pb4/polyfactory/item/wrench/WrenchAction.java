@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.item.wrench;
 
 import eu.pb4.polyfactory.block.data.ChannelContainer;
+import eu.pb4.polyfactory.nodes.data.DataStorage;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -24,8 +25,8 @@ public record WrenchAction(String id, Text name, WrenchValueGetter value, Wrench
     public static final WrenchAction HALF = of("half", Properties.BLOCK_HALF);
     public static final WrenchAction CHANNEL = ofBlockEntity("channel",
             ChannelContainer.class,
-            x -> String.valueOf(x.channel()),
-            (x, n) -> x.setChannel((x.channel() + 4 + (n ? 1 : -1)) % 4 )
+            x -> String.valueOf(x.channel() + 1),
+            (x, n) -> x.setChannel((x.channel() + DataStorage.MAX_CHANNELS + (n ? 1 : -1)) % DataStorage.MAX_CHANNELS)
     );
     public static final WrenchAction FACING_HOPPER = WrenchAction.of("rotation", Properties.HOPPER_FACING);
 

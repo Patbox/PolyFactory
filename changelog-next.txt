@@ -1,25 +1,8 @@
-- Added Tachometer (measures rotations per minute) and Stressometer (measures stress units left):
-  - Both require connection to some display (Hologram Projector, Nixie Tube) to display their values.
-- Added Spray Can:
-  - It can be used to recolor Cables, Nixie Tubes, Lamps and most vanilla colored blocks.
-  - You can create it in Mechanical Press with Empty Bucket and Copper Ingot.
-  - You can fill it with dye by putting it in the inventory (like bundles) or crafting, with 8 charges per dye.
-- Reworked general "data provider/receiver blocks" (Item Counter, Nixie Tube Controller, Block Observer, Item Reader, Redstone Input/Output):
-  - Instead of having single directional input/output, you need to place cable inside of it.
-  - The cable connects the same way as regular one, excluding the direction data-block is facing.
-  - Existing blocks will convert to the new ones, without any changes in connection until you change them yourself.
-- Improved Hologram Projectors:
-  - Added option to force everything to display as text.
-  - Added option to change pitch and yaw aside of just roll of hologram.
-  - Fixed some bugs with displaying holograms.
-- Mechanical Placers can now use selected items on blocks.
-- Improved physics of players effected by fans and conveyors.
-- Improved placement of Windmills to always point to connected side.
-- Added new advancements, pointing to recently added things.
-- Hoppers, Redstone Repeater, Redstone Comparator, Dispensers and Droppers can be rotated by using Wrench.
-- Added breaking particles to all the blocks that didn't have them.
-- All crafting-machines should now work with hoppers.
-- Fixed dynamic blocks not having correct visuals sometimes.
-- Improved Wrench Action selection.
-- Changed multiple textures and models:
-  - Most notably: Item Splitter, Cables, Wireless Redstone Input/Output, Treated Kelp and Ender-Amethyst Crystal
+- Tweaked how cables/data is handled:
+  - Channels now display from 1 to 4 (inclusive) instead of 0 to 3.
+  - Data is no longer sent instantly, instead it's sent only at the end of the tick.
+  - This allows to allow concurrent modification/bugs caused by elements that can be received and send the signal.
+  - This might change behaviour of some existing cable circuits, so make sure to check if things work!
+- Bug Fixes!
+  - Fixed Steam Engine consuming lava with the bucket.
+  - Fixed Steam Engine placement  possibly deleting blocks on z-axis.

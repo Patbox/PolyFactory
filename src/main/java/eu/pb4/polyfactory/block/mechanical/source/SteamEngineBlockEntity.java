@@ -7,6 +7,7 @@ import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.ui.FuelSlot;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
@@ -14,12 +15,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventories;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -67,12 +70,21 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
                 if (!stack.isEmpty()) {
                     var value = FuelRegistry.INSTANCE.get(stack.getItem());
                     if (value != null) {
+                        var remainder = stack.getRecipeRemainder();
                         stack.decrement(1);
                         self.fuelTicks = value * 10;
                         self.fuelInitial = self.fuelTicks;
-                        if (self.isEmpty()) {
+                        if (stack.isEmpty()) {
                             self.setStack(i, ItemStack.EMPTY);
                         }
+
+                        if (!remainder.isEmpty()) {
+                            FactoryUtil.tryInsertingRegular(self, remainder);
+                            if (!remainder.isEmpty()) {
+                                ItemScatterer.spawn(world, pos.getX()  + 0.5, pos.getY(), pos.getZ() + 0.5, remainder);
+                            }
+                        }
+
                         self.markDirty();
                         return;
                     }

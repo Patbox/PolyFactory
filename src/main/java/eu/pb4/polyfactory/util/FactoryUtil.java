@@ -214,7 +214,7 @@ public class FactoryUtil {
         return init - itemStack.getCount();
     }
 
-    private static int tryInsertingRegular(Inventory inventory, ItemStack itemStack) {
+    public static int tryInsertingRegular(Inventory inventory, ItemStack itemStack) {
         var size = inventory.size();
         var init = itemStack.getCount();
         for (int i = 0; i < size; i++) {

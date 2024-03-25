@@ -27,6 +27,7 @@ import java.util.Set;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class DataStorage implements GraphEntity<DataStorage> {
+    public static final int MAX_CHANNELS = 4;
     public static DataStorage EMPTY = new DataStorage() {
     };
 
@@ -35,10 +36,9 @@ public class DataStorage implements GraphEntity<DataStorage> {
     private final Int2ObjectOpenHashMap<Set<BlockPos>> receivers = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectOpenHashMap<Set<BlockPos>> providers = new Int2ObjectOpenHashMap<>();
 
-    private final Int2ObjectOpenHashMap<DataContainer> currentData = new Int2ObjectOpenHashMap<>();
+    private Int2ObjectOpenHashMap<DataContainer> currentData = new Int2ObjectOpenHashMap<>();
+    private Int2ObjectOpenHashMap<DataContainer> swapData = new Int2ObjectOpenHashMap<>();
     private GraphEntityContext ctx;
-    private long lastTick;
-
     public DataStorage() {
     }
 
@@ -46,12 +46,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
     public DataContainer getData(int channel) {
         if (!(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
             return null;
-        }
-
-        var tick = world.getTime();
-        if (this.lastTick != tick) {
-            this.lastTick = tick;
-            this.currentData.clear();
         }
 
         var current = this.currentData.get(channel);
@@ -70,7 +64,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
             if (state.getBlock() instanceof DataProvider provider) {
                 current = provider.provideData(world, x, state, channel);
                 if (current != null) {
-                    this.currentData.put(channel, current);
                     return current;
                 }
             }
@@ -79,31 +72,48 @@ public class DataStorage implements GraphEntity<DataStorage> {
     }
 
     public int pushDataUpdate(int channel, DataContainer data) {
-        if (this.ctx == null || !(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
-            return 0;
-        }
-
-        var tick = world.getTime();
-        if (this.lastTick != tick) {
-            this.lastTick = tick;
-            this.currentData.clear();
-        }
-
         this.currentData.put(channel, data);
-
-
         var receivers = this.receivers.get(channel);
         if (receivers == null) {
             return 0;
         }
 
-        for (var x : receivers) {
-            var state = world.getBlockState(x);
-            if (state.getBlock() instanceof DataReceiver receiver) {
-                receiver.receiveData(world, x, state, channel, data);
-            }
-        }
         return receivers.size();
+    }
+
+    @Override
+    public void onTick() {
+        if (this.ctx == null || !(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
+            return;
+        }
+
+        if (this.currentData.isEmpty()) {
+            return;
+        }
+
+
+
+        if (this.receivers.isEmpty()) {
+            this.currentData.clear();
+        } else {
+            var current = this.currentData;
+            this.currentData = this.swapData;
+
+            for (var data : current.int2ObjectEntrySet()) {
+                var rec = receivers.get(data.getIntKey());
+                if (rec != null) {
+                    for (var x : rec) {
+                        var state = world.getBlockState(x);
+                        if (state.getBlock() instanceof DataReceiver receiver) {
+                            receiver.receiveData(world, x, state, data.getIntKey(), data.getValue());
+                        }
+                    }
+                }
+            }
+
+            current.clear();
+            this.swapData = current;
+        }
     }
 
     @Override
@@ -215,7 +225,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 }
             }
         }
-
         return data;
     }
 
