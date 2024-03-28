@@ -91,8 +91,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
             return;
         }
 
-
-
         if (this.receivers.isEmpty()) {
             this.currentData.clear();
         } else {
