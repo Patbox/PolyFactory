@@ -114,6 +114,12 @@
   "item.polyfactory.wrench.action.scroll_speed": "Scroll Speed",
   "item.polyfactory.wrench.action.scroll_loop": "Scroll Loop",
   "item.polyfactory.wrench.action.reverse": "Reverse",
+  "item.polyfactory.wrench.action.facing_input_1": "Input A Facing",
+  "item.polyfactory.wrench.action.facing_input_2": "Input B Facing",
+  "item.polyfactory.wrench.action.facing_output": "Output Facing",
+  "item.polyfactory.wrench.action.channel_input_1": "Input A Channel",
+  "item.polyfactory.wrench.action.channel_input_2": "Input B Channel",
+  "item.polyfactory.wrench.action.channel_output": "Output Channel",
 
   "entity.polyfactory.dynamite": "Dynamite",
 

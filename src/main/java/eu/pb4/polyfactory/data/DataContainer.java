@@ -26,7 +26,7 @@ public interface DataContainer {
 
     default boolean forceRight() {
         return false;
-    };
+    }
 
     void writeNbt(NbtCompound compound);
 

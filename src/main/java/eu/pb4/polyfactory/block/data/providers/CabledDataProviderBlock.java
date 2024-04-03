@@ -4,10 +4,9 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
 import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
-import eu.pb4.polyfactory.block.data.util.GenericDirectionalDataBlock;
 import eu.pb4.polyfactory.data.DataContainer;
-import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
 import eu.pb4.polyfactory.nodes.data.ChannelProviderSelectiveSideNode;
+import eu.pb4.polyfactory.nodes.data.DataProviderNode;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -28,7 +27,7 @@ public class CabledDataProviderBlock extends GenericCabledDataBlock implements D
     }
 
     @Override
-    public @Nullable DataContainer provideData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel) {
+    public @Nullable DataContainer provideData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataProviderNode node) {
         if (world.getBlockEntity(selfPos) instanceof ChanneledDataCache be && be.channel() == channel) {
             return be.getCachedData();
         }

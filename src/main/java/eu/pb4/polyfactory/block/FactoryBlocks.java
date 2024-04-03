@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.block.creative.CreativeContainerBlock;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.block.data.CableBlock;
+import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlock;
 import eu.pb4.polyfactory.block.data.output.*;
 import eu.pb4.polyfactory.block.data.providers.*;
 import eu.pb4.polyfactory.block.electric.ElectricGeneratorBlock;
@@ -73,6 +74,8 @@ public class FactoryBlocks {
     public static final RedstoneOutputBlock REDSTONE_OUTPUT = register("redstone_output", new RedstoneOutputBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
     public static final ItemReaderBlock ITEM_READER = register("item_reader", new ItemReaderBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
     public static final BlockObserverBlock BLOCK_OBSERVER = register("block_observer", new BlockObserverBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
+    public static final DoubleInputTransformerBlock DATA_ADDER = register("data_adder",
+            new DoubleInputTransformerBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
 
     public static final HologramProjectorBlock HOLOGRAM_PROJECTOR = register("hologram_projector", new HologramProjectorBlock(AbstractBlock.Settings.copy(SPLITTER)));
     public static final NixieTubeBlock NIXIE_TUBE = register("nixie_tube", new NixieTubeBlock(Block.Settings.copy(Blocks.GLASS).nonOpaque()));

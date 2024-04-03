@@ -18,6 +18,7 @@ import eu.pb4.polyfactory.data.LongData;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
+import eu.pb4.polyfactory.nodes.data.DataProviderNode;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -112,7 +113,7 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
     }
 
     @Override
-    public @Nullable DataContainer provideData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel) {
+    public @Nullable DataContainer provideData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataProviderNode node) {
         if (world.getBlockEntity(selfPos) instanceof ChanneledDataCache be && be.channel() == channel) {
             return be.getCachedData();
         }

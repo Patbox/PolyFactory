@@ -9,13 +9,12 @@ import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.data.DataContainer;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,8 +32,8 @@ public class DataStorage implements GraphEntity<DataStorage> {
 
     public static final GraphEntityType<DataStorage> TYPE = GraphEntityType.of(id("data_storage"), DataStorage::new, DataStorage::decode, DataStorage::split);
 
-    private final Int2ObjectOpenHashMap<Set<BlockPos>> receivers = new Int2ObjectOpenHashMap<>();
-    private final Int2ObjectOpenHashMap<Set<BlockPos>> providers = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectOpenHashMap<Set<Pair<BlockPos, DataReceiverNode>>> receivers = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectOpenHashMap<Set<Pair<BlockPos, DataProviderNode>>> providers = new Int2ObjectOpenHashMap<>();
 
     private Int2ObjectOpenHashMap<DataContainer> currentData = new Int2ObjectOpenHashMap<>();
     private Int2ObjectOpenHashMap<DataContainer> swapData = new Int2ObjectOpenHashMap<>();
@@ -60,9 +59,9 @@ public class DataStorage implements GraphEntity<DataStorage> {
         }
 
         for (var x : providers) {
-            var state = world.getBlockState(x);
+            var state = world.getBlockState(x.getLeft());
             if (state.getBlock() instanceof DataProvider provider) {
-                current = provider.provideData(world, x, state, channel);
+                current = provider.provideData(world, x.getLeft(), state, channel, x.getRight());
                 if (current != null) {
                     return current;
                 }
@@ -101,9 +100,9 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 var rec = receivers.get(data.getIntKey());
                 if (rec != null) {
                     for (var x : rec) {
-                        var state = world.getBlockState(x);
+                        var state = world.getBlockState(x.getLeft());
                         if (state.getBlock() instanceof DataReceiver receiver) {
-                            receiver.receiveData(world, x, state, data.getIntKey(), data.getValue());
+                            receiver.receiveData(world, x.getLeft(), state, data.getIntKey(), data.getValue(), x.getRight());
                         }
                     }
                 }
@@ -123,7 +122,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
             if (node.getNode() instanceof DataProviderNode providerNode) {
                 var state = node.getBlockWorld().getBlockState(node.getBlockPos());
                 if (state.getBlock() instanceof DataProvider provider) {
-                    var data = provider.provideData(serverWorld, node.getBlockPos(), state, providerNode.channel());
+                    var data = provider.provideData(serverWorld, node.getBlockPos(), state, providerNode.channel(), providerNode);
                     if (data != null) {
                         pushDataUpdate(providerNode.channel(), data);
                     }
@@ -133,7 +132,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 if (state.getBlock() instanceof DataReceiver receiver) {
                     var data = this.getData(receiverNode.channel());
                     if (data != null) {
-                        receiver.receiveData(serverWorld, node.getBlockPos(), state, receiverNode.channel(), data);
+                        receiver.receiveData(serverWorld, node.getBlockPos(), state, receiverNode.channel(), data, receiverNode);
                     }
                 }
             }
@@ -144,35 +143,35 @@ public class DataStorage implements GraphEntity<DataStorage> {
     public void onNodeDestroyed(@NotNull NodeHolder<BlockNode> node, @Nullable NodeEntity nodeEntity, Map<LinkPos, LinkEntity> linkEntities) {
         GraphEntity.super.onNodeDestroyed(node, nodeEntity, linkEntities);
         if (node.getNode() instanceof DataReceiverNode data) {
-            removeMap(this.receivers, data.channel(), node.getBlockPos());
+            removeMap(this.receivers, data.channel(), node.getBlockPos(), data);
         } else if (node.getNode() instanceof DataProviderNode data) {
-            removeMap(this.providers, data.channel(), node.getBlockPos());
+            removeMap(this.providers, data.channel(), node.getBlockPos(), data);
         }
     }
 
     private void storeReceiverOrProvider(NodeHolder<BlockNode> node) {
         if (node.getNode() instanceof DataReceiverNode data) {
-            addMap(this.receivers, data.channel(), node.getBlockPos());
+            addMap(this.receivers, data.channel(), node.getBlockPos(), data);
         } else if (node.getNode() instanceof DataProviderNode data) {
-            addMap(this.providers, data.channel(), node.getBlockPos());
+            addMap(this.providers, data.channel(), node.getBlockPos(), data);
         }
     }
 
-    private void addMap(Int2ObjectOpenHashMap<Set<BlockPos>> map, int channel, BlockPos blockPos) {
+    private <T> void addMap(Int2ObjectOpenHashMap<Set<Pair<BlockPos, T>>> map, int channel, BlockPos blockPos, T data) {
         var set = map.get(channel);
         if (set == null) {
             set = new HashSet<>();
             map.put(channel, set);
         }
-        set.add(blockPos);
+        set.add(new Pair<>(blockPos, data));
     }
-
-    private void removeMap(Int2ObjectOpenHashMap<Set<BlockPos>> map, int channel, BlockPos blockPos) {
+// todo Broken!!!!!!!
+    private <T> void removeMap(Int2ObjectOpenHashMap<Set<Pair<BlockPos, T>>> map, int channel, BlockPos blockPos, T data) {
         var set = map.get(channel);
         if (set == null) {
             return;
         }
-        set.remove(blockPos);
+        set.removeIf(x -> x.getLeft().equals(blockPos) && x.getRight().equals(data));
         if (set.isEmpty()) {
             map.remove(channel);
         }
@@ -234,17 +233,17 @@ public class DataStorage implements GraphEntity<DataStorage> {
         for (var channel : this.receivers.keySet()) {
             var data = getData(channel);
             if (data != null) {
-                for (var x : this.receivers.get(channel)) {
-                    var state = this.ctx.getBlockWorld().getBlockState(x);
+                for (var x : this.receivers.get(channel.intValue())) {
+                    var state = this.ctx.getBlockWorld().getBlockState(x.getLeft());
                     if (state.getBlock() instanceof DataReceiver receiver) {
-                        receiver.receiveData((ServerWorld) this.ctx.getBlockWorld(), x, state, channel, data);
+                        receiver.receiveData((ServerWorld) this.ctx.getBlockWorld(), x.getLeft(), state, channel, data, x.getRight());
                     }
                 }
             }
         }
     }
 
-    private static void mergeMap(Int2ObjectOpenHashMap<Set<BlockPos>> into, Int2ObjectOpenHashMap<Set<BlockPos>> from) {
+    private static <T> void mergeMap(Int2ObjectOpenHashMap<Set<T>> into, Int2ObjectOpenHashMap<Set<T>> from) {
         for (var entry : from.int2ObjectEntrySet()) {
             var self = into.get(entry.getIntKey());
             if (self == null) {
@@ -255,11 +254,11 @@ public class DataStorage implements GraphEntity<DataStorage> {
         }
     }
 
-    private static void splitMap(Int2ObjectOpenHashMap<Set<BlockPos>> into, Int2ObjectOpenHashMap<Set<BlockPos>> from, BlockGraph targetGraph) {
+    private static <T> void splitMap(Int2ObjectOpenHashMap<Set<Pair<BlockPos, T>>> into, Int2ObjectOpenHashMap<Set<Pair<BlockPos, T>>> from, BlockGraph targetGraph) {
         for (var entry : from.int2ObjectEntrySet()) {
-            var set = new HashSet<BlockPos>();
+            var set = new HashSet<Pair<BlockPos, T>>();
             for (var pos : List.copyOf(entry.getValue())) {
-                if (targetGraph.getNodesAt(pos).findAny().isPresent()) {
+                if (targetGraph.getNodesAt(pos.getLeft()).findAny().isPresent()) {
                     set.add(pos);
                     entry.getValue().remove(pos);
                 }

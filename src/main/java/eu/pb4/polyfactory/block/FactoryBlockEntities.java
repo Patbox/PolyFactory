@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlockEntity;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlockEntity;
 import eu.pb4.polyfactory.block.data.CableBlockEntity;
+import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlockEntity;
 import eu.pb4.polyfactory.block.data.output.HologramProjectorBlockEntity;
 import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlockEntity;
 import eu.pb4.polyfactory.block.data.providers.ItemReaderBlockEntity;
@@ -107,6 +108,8 @@ public class FactoryBlockEntities {
             .create(CableBlockEntity::new).addBlock(FactoryBlocks.CABLE));
     public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader", FabricBlockEntityTypeBuilder
             .create(ItemReaderBlockEntity::new).addBlock(FactoryBlocks.ITEM_READER));
+    public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer", FabricBlockEntityTypeBuilder
+            .create(DoubleInputTransformerBlockEntity::new).addBlocks(FactoryBlocks.DATA_ADDER));
 
     public static final BlockEntityType<WorkbenchBlockEntity> WORKBENCH = register("workbench", FabricBlockEntityTypeBuilder
             .create(WorkbenchBlockEntity::new).addBlock(FactoryBlocks.WORKBENCH));
@@ -115,6 +118,8 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container", FabricBlockEntityTypeBuilder
             .create(ColorableBlockEntity::new).addBlocks(FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP));
+
+
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;
         var set = ImmutableSet.<Block>builder();
