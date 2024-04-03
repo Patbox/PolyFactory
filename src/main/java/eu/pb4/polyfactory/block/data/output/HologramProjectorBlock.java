@@ -197,7 +197,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
     }
 
     @Override
-    public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node) {
+    public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
         if (world.getBlockEntity(selfPos) instanceof HologramProjectorBlockEntity be) {
             be.setCachedData(data);
             var active = selfState.get(ACTIVE);
@@ -405,8 +405,8 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                         }
                     }
                 }
-                if (start < string.length() - 1) {
-                    list.add(string.substring(start));
+                if (start <= string.length() - 1) {
+                     list.add(string.substring(start));
                 }
 
                 var text = Text.literal(String.join("\n", list)).formatted(Formatting.AQUA);

@@ -160,7 +160,7 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
 
     @Override
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        NetworkComponent.Data.getLogic(world, pos).pushDataUpdate(0, new StringData(PotatoWisdom.get(random)));
+        NetworkComponent.Data.getLogic(world, pos).pushDataUpdate(pos, 0, new StringData(PotatoWisdom.get(random)), Direction.DOWN);
     }
 
     @Override

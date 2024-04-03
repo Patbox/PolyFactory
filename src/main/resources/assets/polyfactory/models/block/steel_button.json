@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/button",
+  "textures": {
+    "texture": "polyfactory:block/steel_plate_base"
+  }
+}

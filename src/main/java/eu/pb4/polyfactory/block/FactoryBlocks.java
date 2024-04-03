@@ -27,10 +27,7 @@ import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.other.*;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.MapColor;
+import net.minecraft.block.*;
 import net.minecraft.block.enums.Instrument;
 import net.minecraft.loot.LootTable;
 import net.minecraft.registry.Registries;
@@ -102,7 +99,7 @@ public class FactoryBlocks {
 
     public static final SmallLampBlock CAGED_LAMP = register("caged_lamp", new SmallLampBlock(Block.Settings.copy(Blocks.REDSTONE_LAMP).nonOpaque(), false));
     public static final SmallLampBlock INVERTED_CAGED_LAMP = register("inverted_caged_lamp", new SmallLampBlock(Block.Settings.copy(INVERTED_REDSTONE_LAMP).nonOpaque(), true));
-
+    public static final PolymerButtonBlock STEEL_BUTTON = register("steel_button", new PolymerButtonBlock("steel", BlockSetType.IRON, 5, Block.Settings.copy(Blocks.STONE_BUTTON).nonOpaque()));
     public static final TinyPotatoSpringBlock TINY_POTATO_SPRING = register("tiny_potato_spring", new TinyPotatoSpringBlock(AbstractBlock.Settings.create().strength(1).nonOpaque()));
 
     public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", new RotationalDebugBlock(AbstractBlock.Settings.create().strength(-1, -1)));

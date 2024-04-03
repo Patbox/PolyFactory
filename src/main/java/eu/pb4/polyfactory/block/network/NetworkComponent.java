@@ -1,14 +1,17 @@
 package eu.pb4.polyfactory.block.network;
 
+import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.data.DataStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
 
 import java.util.Collection;
+import java.util.function.Predicate;
 
 public interface NetworkComponent {
     interface Rotational extends NetworkComponent {
@@ -43,6 +46,19 @@ public interface NetworkComponent {
         static DataStorage getLogic(ServerWorld world, BlockPos pos) {
             {
                 var o = FactoryNodes.DATA.getGraphView(world).getNodesAt(pos).findFirst();
+                if (o.isPresent()) {
+                    var graph = FactoryNodes.DATA.getGraphView(world).getGraph(o.get().getGraphId());
+                    var ent = graph.getGraphEntity(DataStorage.TYPE);
+
+                    return ent;
+                }
+            }
+            return DataStorage.EMPTY;
+        }
+
+        static DataStorage getLogic(ServerWorld world, BlockPos pos, Predicate<NodeHolder<BlockNode>> predicate) {
+            {
+                var o = FactoryNodes.DATA.getGraphView(world).getNodesAt(pos).filter(predicate).findFirst();
                 if (o.isPresent()) {
                     var graph = FactoryNodes.DATA.getGraphView(world).getGraph(o.get().getGraphId());
                     var ent = graph.getGraphEntity(DataStorage.TYPE);

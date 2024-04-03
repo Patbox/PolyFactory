@@ -50,6 +50,10 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_iron", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
                 .offerTo(exporter);
 
+        ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_BUTTON)
+                .input(FactoryItems.STEEL_INGOT, 1)
+                .criterion("get_s", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_BUTTON))
+                .offerTo(exporter);
 
         CookingRecipeJsonBuilder.createSmelting(
                         Ingredient.ofItems(FactoryItems.STEEL_ALLOY_MIXTURE), RecipeCategory.MISC, FactoryItems.STEEL_INGOT, 0.4f, 80)

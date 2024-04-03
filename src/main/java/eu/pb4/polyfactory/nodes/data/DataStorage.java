@@ -8,13 +8,18 @@ import com.kneelawk.graphlib.api.util.LinkPos;
 import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.data.DataContainer;
+import eu.pb4.polyfactory.nodes.DirectionNode;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,14 +40,14 @@ public class DataStorage implements GraphEntity<DataStorage> {
     private final Int2ObjectOpenHashMap<Set<Pair<BlockPos, DataReceiverNode>>> receivers = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectOpenHashMap<Set<Pair<BlockPos, DataProviderNode>>> providers = new Int2ObjectOpenHashMap<>();
 
-    private Int2ObjectOpenHashMap<DataContainer> currentData = new Int2ObjectOpenHashMap<>();
-    private Int2ObjectOpenHashMap<DataContainer> swapData = new Int2ObjectOpenHashMap<>();
+    private Int2ObjectOpenHashMap<SentData> currentData = new Int2ObjectOpenHashMap<>();
+    private Int2ObjectOpenHashMap<SentData> swapData = new Int2ObjectOpenHashMap<>();
     private GraphEntityContext ctx;
     public DataStorage() {
     }
 
     @Nullable
-    public DataContainer getData(int channel) {
+    public SentData getData(int channel) {
         if (!(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
             return null;
         }
@@ -61,17 +66,17 @@ public class DataStorage implements GraphEntity<DataStorage> {
         for (var x : providers) {
             var state = world.getBlockState(x.getLeft());
             if (state.getBlock() instanceof DataProvider provider) {
-                current = provider.provideData(world, x.getLeft(), state, channel, x.getRight());
-                if (current != null) {
-                    return current;
+                var c = provider.provideData(world, x.getLeft(), state, channel, x.getRight());
+                if (c != null) {
+                    return new SentData(c, x.getLeft(), x.getRight() instanceof DirectionNode d ? d.direction() : null);
                 }
             }
         }
         return null;
     }
 
-    public int pushDataUpdate(int channel, DataContainer data) {
-        this.currentData.put(channel, data);
+    public int pushDataUpdate(BlockPos pos, int channel, DataContainer data, @Nullable Direction direction) {
+        this.currentData.put(channel, new SentData(data, pos, direction));
         var receivers = this.receivers.get(channel);
         if (receivers == null) {
             return 0;
@@ -96,17 +101,24 @@ public class DataStorage implements GraphEntity<DataStorage> {
             var current = this.currentData;
             this.currentData = this.swapData;
 
+            //var count = new Object2IntOpenHashMap<BlockPos>();
+
             for (var data : current.int2ObjectEntrySet()) {
                 var rec = receivers.get(data.getIntKey());
                 if (rec != null) {
                     for (var x : rec) {
+                        //count.put(x.getLeft(), count.getInt(x.getLeft()) + 1);
                         var state = world.getBlockState(x.getLeft());
                         if (state.getBlock() instanceof DataReceiver receiver) {
-                            receiver.receiveData(world, x.getLeft(), state, data.getIntKey(), data.getValue(), x.getRight());
+                            receiver.receiveData(world, x.getLeft(), state, data.getIntKey(), data.getValue().container(), x.getRight(), data.getValue().pos, data.getValue().direction);
                         }
                     }
                 }
             }
+
+            //for (var c : count.object2IntEntrySet()) {
+            //    DebugInfoSender.addGameTestMarker(world, c.getKey(), "                Count: " + c.getIntValue(), 0x88FFFF66, 60);
+            //}
 
             current.clear();
             this.swapData = current;
@@ -124,7 +136,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 if (state.getBlock() instanceof DataProvider provider) {
                     var data = provider.provideData(serverWorld, node.getBlockPos(), state, providerNode.channel(), providerNode);
                     if (data != null) {
-                        pushDataUpdate(providerNode.channel(), data);
+                        pushDataUpdate(node.getBlockPos(), providerNode.channel(), data, providerNode instanceof DirectionNode d ? d.direction() : null);
                     }
                 }
             } else if (node.getNode() instanceof DataReceiverNode receiverNode) {
@@ -132,7 +144,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 if (state.getBlock() instanceof DataReceiver receiver) {
                     var data = this.getData(receiverNode.channel());
                     if (data != null) {
-                        receiver.receiveData(serverWorld, node.getBlockPos(), state, receiverNode.channel(), data, receiverNode);
+                        receiver.receiveData(serverWorld, node.getBlockPos(), state, receiverNode.channel(), data.container(), receiverNode, data.pos(), data.direction);
                     }
                 }
             }
@@ -165,7 +177,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
         }
         set.add(new Pair<>(blockPos, data));
     }
-// todo Broken!!!!!!!
     private <T> void removeMap(Int2ObjectOpenHashMap<Set<Pair<BlockPos, T>>> map, int channel, BlockPos blockPos, T data) {
         var set = map.get(channel);
         if (set == null) {
@@ -199,8 +210,12 @@ public class DataStorage implements GraphEntity<DataStorage> {
         var nbt = new NbtCompound();
         var list = new NbtList();
         for (var x : this.currentData.int2ObjectEntrySet()) {
-            var out = x.getValue().createNbt();
+            var out = x.getValue().container.createNbt();
             out.putInt("__key", x.getIntKey());
+            out.put("__pos", NbtHelper.fromBlockPos(x.getValue().pos));
+            if (x.getValue().direction != null) {
+                out.putString("__dir", x.getValue().direction.asString());
+            }
         }
         nbt.put("current_data", list);
 
@@ -215,7 +230,11 @@ public class DataStorage implements GraphEntity<DataStorage> {
                     var input = (NbtCompound) obj;
                     var decoded = DataContainer.fromNbt(input);
                     if (decoded != null) {
-                        data.currentData.put(input.getInt("__key"), decoded);
+
+                        data.currentData.put(input.getInt("__key"), new SentData(decoded,
+                                NbtHelper.toBlockPos(input.getCompound("__pos")),
+                                input.contains("__dir") ? Direction.CODEC.byId(input.getString("__dir")) : null
+                                ));
                     }
                 } catch (Throwable ignored) {
 
@@ -236,7 +255,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 for (var x : this.receivers.get(channel.intValue())) {
                     var state = this.ctx.getBlockWorld().getBlockState(x.getLeft());
                     if (state.getBlock() instanceof DataReceiver receiver) {
-                        receiver.receiveData((ServerWorld) this.ctx.getBlockWorld(), x.getLeft(), state, channel, data, x.getRight());
+                        receiver.receiveData((ServerWorld) this.ctx.getBlockWorld(), x.getLeft(), state, channel, data.container, x.getRight(), data.pos, data.direction);
                     }
                 }
             }
@@ -284,4 +303,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
     public boolean hasProviders() {
         return !this.providers.isEmpty();
     }
+
+    public record SentData(DataContainer container, BlockPos pos, @Nullable Direction direction) {}
 }

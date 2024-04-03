@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.data;
 
+import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
@@ -9,6 +10,7 @@ import eu.pb4.polyfactory.data.StringData;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.nodes.DirectionNode;
+import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
 import eu.pb4.polyfactory.nodes.data.DataProviderNode;
@@ -73,9 +75,9 @@ public class DoubleInputTransformerBlock extends DataNetworkBlock implements Blo
 
     @Override
     public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
-        return state.get(FACING_INPUT_1).getOpposite() == dir
-                || state.get(FACING_INPUT_2).getOpposite() == dir
-                || state.get(FACING_OUTPUT).getOpposite() == dir;
+        return state.get(FACING_INPUT_1) == dir
+                || state.get(FACING_INPUT_2) == dir
+                || state.get(FACING_OUTPUT) == dir;
     }
 
     @Override
@@ -88,17 +90,23 @@ public class DoubleInputTransformerBlock extends DataNetworkBlock implements Blo
     }
 
     @Override
-    public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node) {
+    public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
+        // This if statement is a mess...
         if (node instanceof DirectionNode directionNode && world.getBlockEntity(selfPos) instanceof DoubleInputTransformerBlockEntity be && (
                 (channel == be.inputChannel1() && selfState.get(FACING_INPUT_1) == directionNode.direction())
                 || (channel == be.inputChannel2() && selfState.get(FACING_INPUT_2) == directionNode.direction())
-        )) {
+            ) && !(selfPos.equals(sourcePos) && sourceDir == selfState.get(FACING_OUTPUT)
+                && (directionNode.direction() != sourceDir
+                && FactoryNodes.DATA.getGraphView(world).getNodesAt(selfPos).filter(x -> x.getNode() == node).findFirst().map(NodeHolder::getGraphId)
+                        .orElse(-1l).longValue() != FactoryNodes.DATA.getGraphView(world).getNodesAt(selfPos).filter(x -> x.getNode() instanceof DataProviderNode)
+                .findFirst().map(NodeHolder::getGraphId).orElse(-2l).longValue()
+        ))) {
             var input1 = channel == be.inputChannel1() && selfState.get(FACING_INPUT_1) == directionNode.direction()
                     ? be.setLastInput1(data) : be.lastInput1();
             var input2 = channel == be.inputChannel2() && selfState.get(FACING_INPUT_2) == directionNode.direction()
                     ? be.setLastInput2(data) : be.lastInput2();
 
-            sendData(world, selfPos, be.setLastOutput(this.transformData(input1, input2, world, selfPos, selfState, be)));
+            sendData(world, selfState.get(FACING_OUTPUT), selfPos, this.transformData(input1, input2, world, selfPos, selfState, be));
             return true;
         }
 
@@ -113,10 +121,12 @@ public class DoubleInputTransformerBlock extends DataNetworkBlock implements Blo
         return DataContainer.of(input1.asLong() + input2.asLong());
     }
 
-    public int sendData(WorldAccess world, BlockPos selfPos, DataContainer data) {
+    public int sendData(WorldAccess world, Direction direction, BlockPos selfPos, DataContainer data) {
         if (data != null && world instanceof ServerWorld serverWorld && world.getBlockEntity(selfPos) instanceof DoubleInputTransformerBlockEntity be) {
             be.setLastOutput(data);
-            return NetworkComponent.Data.getLogic(serverWorld, selfPos).pushDataUpdate(be.outputChannel(), data);
+            return NetworkComponent.Data.getLogic(serverWorld, selfPos,
+                    x -> x.getNode() instanceof ChannelProviderDirectionNode p && p.channel() == be.outputChannel() && p.direction() == direction)
+                    .pushDataUpdate(selfPos, be.outputChannel(), data, direction);
         }
         return 0;
     }

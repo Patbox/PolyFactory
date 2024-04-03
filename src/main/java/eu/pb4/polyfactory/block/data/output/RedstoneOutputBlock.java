@@ -70,7 +70,7 @@ public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataR
     }
 
     @Override
-    public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node) {
+    public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
         var val = MathHelper.clamp(data.asRedstoneOutput(), 0, 15);
         if (selfState.get(POWER) != val) {
             world.setBlockState(selfPos, selfState.with(POWER, val));

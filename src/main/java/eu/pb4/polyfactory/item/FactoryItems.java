@@ -93,6 +93,7 @@ public class FactoryItems {
     public static final ColoredDownsampledBlockItem INVERTED_LAMP = registerColored(FactoryBlocks.INVERTED_LAMP, -1);
     public static final ColoredDownsampledBlockItem CAGED_LAMP = registerColored(FactoryBlocks.CAGED_LAMP, -1);
     public static final ColoredDownsampledBlockItem INVERTED_CAGED_LAMP = registerColored(FactoryBlocks.INVERTED_CAGED_LAMP, -1);
+    public static final Item STEEL_BUTTON = register(FactoryBlocks.STEEL_BUTTON);
     public static final Item ELECTRIC_MOTOR = register(FactoryBlocks.ELECTRIC_MOTOR);
     public static final Item ELECTRIC_GENERATOR = register(FactoryBlocks.ELECTRIC_GENERATOR);
     public static final Item WITHER_SKULL_GENERATOR = register(FactoryBlocks.WITHER_SKULL_GENERATOR);
@@ -184,6 +185,7 @@ public class FactoryItems {
                     entries.add(ColoredItem.stack(INVERTED_LAMP, 1, DyeColor.WHITE));
                     entries.add(ColoredItem.stack(CAGED_LAMP, 1, DyeColor.WHITE));
                     entries.add(ColoredItem.stack(INVERTED_CAGED_LAMP, 1, DyeColor.WHITE));
+                    entries.add(STEEL_BUTTON);
                     entries.add(TINY_POTATO_SPRING);
 
                     // Other items

@@ -123,7 +123,7 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
     public int sendData(WorldAccess world, BlockPos selfPos, DataContainer data) {
         if (world instanceof ServerWorld serverWorld && world.getBlockEntity(selfPos) instanceof ChanneledDataCache be) {
             be.setCachedData(data);
-            return NetworkComponent.Data.getLogic(serverWorld, selfPos).pushDataUpdate(be.channel(), data);
+            return NetworkComponent.Data.getLogic(serverWorld, selfPos).pushDataUpdate(selfPos, be.channel(), data, null);
         }
         return 0;
     }
