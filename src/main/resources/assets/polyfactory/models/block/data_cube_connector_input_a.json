@@ -1,0 +1,21 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"1": "polyfactory:block/data_io/connector_input_a",
+		"particle": "polyfactory:block/data_io/outside"
+	},
+	"elements": [
+		{
+			"from": [1, 1, -0.01],
+			"to": [15, 15, 0.09],
+			"faces": {
+				"north": {"uv": [1, 1, 15, 15], "texture": "#1"},
+				"east": {"uv": [0, 1, 1, 15], "texture": "#1"},
+				"south": {"uv": [1, 1, 15, 15], "texture": "#1"},
+				"west": {"uv": [15, 1, 16, 15], "texture": "#1"},
+				"up": {"uv": [1, 0, 15, 1], "texture": "#1"},
+				"down": {"uv": [1, 15, 15, 16], "texture": "#1"}
+			}
+		}
+	]
+}

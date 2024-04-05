@@ -4,6 +4,7 @@ import eu.pb4.factorytools.impl.DebugData;
 import eu.pb4.factorytools.api.advancement.FactoryAdvancementCriteria;
 import eu.pb4.polyfactory.advancement.FactoryItemPredicates;
 import eu.pb4.polyfactory.block.FactoryPoi;
+import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlock;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock;
@@ -96,5 +97,6 @@ public class ModInit implements ModInitializer {
 		TinyPotatoSpringBlock.Model.BASE_MODEL.getItem();
 		RedstoneOutputBlock.Model.OUTPUT_OVERLAY.item();
 		GenericParts.SMALL_GEAR.isEmpty();
+		DoubleInputTransformerBlock.Model.INPUT_A.getItem();
 	}
 }

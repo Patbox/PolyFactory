@@ -3,6 +3,10 @@ package eu.pb4.polyfactory.block.data;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.block.base.AxisAndFacingBlock;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.data.DataContainer;
@@ -15,8 +19,15 @@ import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
 import eu.pb4.polyfactory.nodes.data.DataProviderNode;
 import eu.pb4.polyfactory.nodes.data.DataReceiverNode;
+import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
+import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
@@ -24,9 +35,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
+
+import static eu.pb4.polyfactory.ModInit.id;
 
 public class DoubleInputTransformerBlock extends DataNetworkBlock implements BlockEntityProvider, FactoryBlock, CableConnectable, DataProvider, DataReceiver, WrenchableBlock {
     public static final DirectionProperty FACING_INPUT_1 = DirectionProperty.of("facing_input_1");
@@ -56,6 +70,22 @@ public class DoubleInputTransformerBlock extends DataNetworkBlock implements Blo
         super(settings);
     }
 
+
+    @Nullable
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        var facing = ctx.getPlayerLookDirection().getOpposite();
+
+        var axis = ctx.getSide().getAxis();
+        if (axis == facing.getAxis()) {
+            axis = AxisAndFacingBlock.getAxis(facing, false);
+        }
+
+        return this.getDefaultState().with(FACING_OUTPUT, facing)
+                .with(FACING_INPUT_1, facing.rotateCounterclockwise(axis))
+                .with(FACING_INPUT_2, facing.rotateClockwise(axis));
+    }
+
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
@@ -65,6 +95,11 @@ public class DoubleInputTransformerBlock extends DataNetworkBlock implements Blo
     @Override
     public Block getPolymerBlock(BlockState state) {
         return Blocks.BARRIER;
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.IRON_BLOCK.getDefaultState();
     }
 
     @Nullable
@@ -146,5 +181,64 @@ public class DoubleInputTransformerBlock extends DataNetworkBlock implements Blo
     @Override
     public List<WrenchAction> getWrenchActions() {
         return WRENCH_ACTIONS;
+    }
+
+    @Override
+    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return new Model(initialBlockState);
+    }
+
+    public static class Model extends BlockModel {
+        public static final ItemStack INPUT_A = BaseItemProvider.requestModel(id("block/data_cube_connector_input_a"));
+        public static final ItemStack INPUT_B = BaseItemProvider.requestModel(id("block/data_cube_connector_input_b"));
+        public static final ItemStack OUTPUT = BaseItemProvider.requestModel(id("block/data_cube_connector_output"));
+        private final ItemDisplayElement base;
+        private final ItemDisplayElement inputA;
+        private final ItemDisplayElement inputB;
+        private final ItemDisplayElement output;
+
+        private Model(BlockState state) {
+            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.base.setScale(new Vector3f(2));
+
+            this.inputA = ItemDisplayElementUtil.createSimple(INPUT_A);
+            this.inputB = ItemDisplayElementUtil.createSimple(INPUT_B);
+            this.output = ItemDisplayElementUtil.createSimple(OUTPUT);
+
+            updateStatePos(state, FACING_INPUT_1, inputA);
+            updateStatePos(state, FACING_INPUT_2, inputB);
+            updateStatePos(state, FACING_OUTPUT, output);
+            this.addElement(this.base);
+            this.addElement(this.inputA);
+            this.addElement(this.inputB);
+            this.addElement(this.output);
+        }
+
+        private void updateStatePos(BlockState state, DirectionProperty property, ItemDisplayElement element) {
+            var dir = state.get(property);
+            float p = -90;
+            float y = 0;
+
+            if (dir.getAxis() != Direction.Axis.Y) {
+                p = 0;
+                y = dir.asRotation();
+            } else if (dir == Direction.DOWN) {
+                p = 90;
+            }
+
+            element.setYaw(y);
+            element.setPitch(p);
+        }
+
+        @Override
+        public void notifyUpdate(HolderAttachment.UpdateType updateType) {
+            if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
+                var state = this.blockState();
+                updateStatePos(state, FACING_INPUT_1, inputA);
+                updateStatePos(state, FACING_INPUT_2, inputB);
+                updateStatePos(state, FACING_OUTPUT, output);
+                this.base.tick();
+            }
+        }
     }
 }
