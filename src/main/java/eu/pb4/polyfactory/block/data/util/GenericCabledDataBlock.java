@@ -49,7 +49,7 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
 
     public final WrenchAction facingAction = WrenchAction.of("facing", WrenchValueGetter.ofProperty(Properties.FACING),
             WrenchApplyAction.ofState(
-            (world, pos, state, next) -> {
+            (player, world, pos, side, state, next) -> {
                 var oldDir = state.get(FACING);
                 var dir = FactoryUtil.REORDERED_DIRECTIONS.get(
                     (FactoryUtil.REORDERED_DIRECTIONS.size() + FactoryUtil.REORDERED_DIRECTIONS.indexOf(oldDir)

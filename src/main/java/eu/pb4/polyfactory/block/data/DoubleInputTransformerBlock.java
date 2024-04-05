@@ -48,15 +48,15 @@ public class DoubleInputTransformerBlock extends DataNetworkBlock implements Blo
     public static final DirectionProperty FACING_OUTPUT = DirectionProperty.of("facing_output");
 
     private static final List<WrenchAction> WRENCH_ACTIONS = List.of(
-            WrenchAction.ofAnyDirection(FACING_INPUT_1),
+            WrenchAction.ofDirection(FACING_INPUT_1),
             WrenchAction.ofChannel("channel_input_1", DoubleInputTransformerBlockEntity.class,
                     DoubleInputTransformerBlockEntity::inputChannel1, DoubleInputTransformerBlockEntity::setInputChannel1),
 
-            WrenchAction.ofAnyDirection(FACING_INPUT_2),
+            WrenchAction.ofDirection(FACING_INPUT_2),
             WrenchAction.ofChannel("channel_input_2", DoubleInputTransformerBlockEntity.class,
                     DoubleInputTransformerBlockEntity::inputChannel2, DoubleInputTransformerBlockEntity::setInputChannel2),
 
-            WrenchAction.ofAnyDirection(FACING_OUTPUT),
+            WrenchAction.ofDirection(FACING_OUTPUT),
             WrenchAction.ofChannel("channel_output", DoubleInputTransformerBlockEntity.class,
                     DoubleInputTransformerBlockEntity::outputChannel, DoubleInputTransformerBlockEntity::setOutputChannel),
 
@@ -237,7 +237,9 @@ public class DoubleInputTransformerBlock extends DataNetworkBlock implements Blo
                 updateStatePos(state, FACING_INPUT_1, inputA);
                 updateStatePos(state, FACING_INPUT_2, inputB);
                 updateStatePos(state, FACING_OUTPUT, output);
-                this.base.tick();
+                this.inputA.tick();
+                this.inputB.tick();
+                this.output.tick();
             }
         }
     }

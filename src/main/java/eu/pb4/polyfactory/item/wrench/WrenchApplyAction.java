@@ -5,6 +5,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.DisplayElement;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -17,12 +18,15 @@ import java.util.function.BiFunction;
 
 public interface WrenchApplyAction {
     static <T> WrenchApplyAction ofBlockEntity(Class<T> beClass, BiConsumer<T, Boolean> value) {
-        return (world, pos, side, state, next) -> {
+        return (player, world, pos, side, state, next) -> {
             var be = world.getBlockEntity(pos);
 
             if (be != null && beClass.isAssignableFrom(be.getClass())) {
                 value.accept((T) be, next);
+                return true;
             }
+
+            return false;
         };
     }
 
@@ -42,7 +46,7 @@ public interface WrenchApplyAction {
         return ofState(StateAction.of(function));
     }
     static <T extends Comparable<T>> WrenchApplyAction ofState(StateAction function) {
-        return (world, pos, side, state, next) -> {
+        return (player, world, pos, side, state, next) -> {
             if (state.getBlock() instanceof FactoryBlock) {
                 var holder = BlockAwareAttachment.get(world, pos);
                 if (holder != null) {
@@ -57,7 +61,7 @@ public interface WrenchApplyAction {
                             displayElement.tick();
                         }
                     }
-                    world.setBlockState(pos, function.apply(world, pos, state, next));
+                    var x = world.setBlockState(pos, function.apply(player, world, pos, side, state, next));
                     for (var el : holder.holder().getElements()) {
                         if (el instanceof DisplayElement displayElement) {
                             displayElement.setTeleportDuration(map.getInt(displayElement));
@@ -65,19 +69,20 @@ public interface WrenchApplyAction {
                             displayElement.tick();
                         }
                     }
-                    return;
+                    return x;
                 }
             }
-            world.setBlockState(pos, function.apply(world, pos, state, next));
+
+            return world.setBlockState(pos, function.apply(player, world, pos, side, state, next));
         };
     }
 
-    void applyAction(World world, BlockPos pos, Direction side, BlockState state, boolean next);
+    boolean applyAction(PlayerEntity player, World world, BlockPos pos, Direction side, BlockState state, boolean next);
 
     interface StateAction {
-        BlockState apply(World world, BlockPos pos, BlockState state, boolean next);
+        BlockState apply(PlayerEntity entity, World world, BlockPos pos, Direction side, BlockState state, boolean next);
         static StateAction of(BiFunction<BlockState, Boolean, BlockState> action) {
-            return ((world, pos, state, next) -> action.apply(state, next));
+            return ((player, world, pos, dir, state, next) -> action.apply(state, next));
         }
     }
 }

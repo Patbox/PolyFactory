@@ -100,21 +100,9 @@ public class WrenchHandler {
         }
     }
 
-    public ActionResult useAction(ServerPlayerEntity player, World world, BlockPos pos, Direction side) {
+    public ActionResult useAction(ServerPlayerEntity player, World world, BlockPos pos, Direction side, boolean alt) {
         var state = world.getBlockState(pos);
         if (!(state.getBlock() instanceof WrenchableBlock wrenchableBlock)) {
-            /*player.networkHandler.sendPacket(new AdvancementUpdateS2CPacket(false, List.of(), Set.of(new Identifier("pb:tmp")), Map.of()));
-            var req = new AdvancementRequirements(List.of(List.of("a")));
-            var prog = new AdvancementProgress();
-            prog.init(req);
-            prog.obtain("a");
-            player.networkHandler.sendPacket(new AdvancementUpdateS2CPacket(false, List.of(
-                    new AdvancementEntry(new Identifier("pb:tmp"),
-                            new Advancement(Optional.empty(), Optional.of(
-                                    new AdvancementDisplay(Items.TNT.getDefaultStack(), Text.literal("a"), Text.literal("b"),
-                                            Optional.empty(), AdvancementFrame.TASK, true, false, false)), AdvancementRewards.NONE, Map.of(),
-                                    req, false, Optional.of(Text.literal("Hello World"))))
-            ), Set.of(), Map.of(new Identifier("pb:tmp"), prog)));*/
             return ActionResult.PASS;
         }
         var actions = wrenchableBlock.getWrenchActions();
@@ -129,11 +117,13 @@ public class WrenchHandler {
 
         for (var action : actions) {
             if (action.id().equals(current)) {
-                action.action().applyAction(world, pos, side, state, !player.isSneaking());
-                this.pos = null;
-                TriggerCriterion.trigger(player, FactoryTriggers.WRENCH);
-                player.playSound(FactorySoundEvents.ITEM_WRENCH_USE, SoundCategory.PLAYERS, 0.3f, player.getRandom().nextFloat() * 0.1f + 0.95f);
-                return ActionResult.SUCCESS;
+                if ((alt ? action.alt() : action.action()).applyAction(player, world, pos, side, state, !player.isSneaking())) {
+                    this.pos = null;
+                    TriggerCriterion.trigger(player, FactoryTriggers.WRENCH);
+                    player.playSound(FactorySoundEvents.ITEM_WRENCH_USE, SoundCategory.PLAYERS, 0.3f, player.getRandom().nextFloat() * 0.1f + 0.95f);
+                    return ActionResult.SUCCESS;
+                }
+                return ActionResult.FAIL;
             }
         }
 

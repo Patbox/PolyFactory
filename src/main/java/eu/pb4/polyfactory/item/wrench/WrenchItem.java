@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.item.wrench;
 
 import eu.pb4.factorytools.api.item.ModeledItem;
+import eu.pb4.polyfactory.item.util.SwitchActionItem;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -10,6 +11,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -17,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class WrenchItem extends ModeledItem {
+public class WrenchItem extends ModeledItem implements SwitchActionItem {
     public WrenchItem() {
         super(new Settings().maxCount(1));
     }
@@ -26,13 +29,14 @@ public class WrenchItem extends ModeledItem {
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
         tooltip.add(Text.translatable("item.polyfactory.wrench.tooltip.1", Text.keybind("key.use")).formatted(Formatting.GRAY));
+        tooltip.add(Text.translatable("item.polyfactory.wrench.tooltip.1.alt", Text.keybind("key.swapOffhand")).formatted(Formatting.GRAY));
         tooltip.add(Text.translatable("item.polyfactory.wrench.tooltip.2", Text.keybind("key.attack")).formatted(Formatting.GRAY));
     }
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         if (context.getPlayer() instanceof ServerPlayerEntity player) {
-            return WrenchHandler.of(player).useAction(player, context.getWorld(), context.getBlockPos(), context.getSide());
+            return WrenchHandler.of(player).useAction(player, context.getWorld(), context.getBlockPos(), context.getSide(), false);
         }
         return ActionResult.FAIL;
     }
@@ -45,4 +49,17 @@ public class WrenchItem extends ModeledItem {
         return ActionResult.PASS;
     }
 
+    @Override
+    public boolean onSwitchAction(ServerPlayerEntity player, ItemStack main, Hand mainHand) {
+        var raycast = player.raycast(PlayerEntity.getReachDistance(false), 0, false);
+
+        if (raycast.getType() == HitResult.Type.BLOCK
+                && raycast instanceof BlockHitResult result
+                && WrenchHandler.of(player).useAction(player, player.getServerWorld(), result.getBlockPos(), result.getSide(), true).shouldSwingHand()) {
+            player.swingHand(mainHand, true);
+        }
+
+
+        return true;
+    }
 }

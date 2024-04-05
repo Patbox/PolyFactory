@@ -4,27 +4,36 @@ import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.nodes.data.DataStorage;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public record WrenchAction(String id, Text name, WrenchValueGetter value, WrenchApplyAction action) {
-    public static final WrenchAction FACING = ofAnyDirection(Properties.FACING);
+public record WrenchAction(String id, Text name, WrenchValueGetter value, WrenchApplyAction action, WrenchApplyAction alt) {
+    public static final WrenchAction FACING = ofDirection(Properties.FACING);
     public static final WrenchAction AXIS = of("axis", Properties.AXIS);
-    public static final WrenchAction FACING_HORIZONTAL = of("facing", Properties.HORIZONTAL_FACING, (dir, next) -> next ? dir.rotateYClockwise() : dir.rotateYCounterclockwise());
+    public static final WrenchAction FACING_HORIZONTAL = ofDirection("facing", Properties.HORIZONTAL_FACING);
     public static final WrenchAction HALF = of("half", Properties.BLOCK_HALF);
     public static final WrenchAction CHANNEL = ofChannel("channel", ChannelContainer.class,
         ChannelContainer::channel, ChannelContainer::setChannel
     );
-    public static final WrenchAction FACING_HOPPER = WrenchAction.of("rotation", Properties.HOPPER_FACING);
+    public static final WrenchAction FACING_HOPPER = ofDirection("rotation", Properties.HOPPER_FACING);
+
+    public WrenchAction(String id, Text name, WrenchValueGetter value, WrenchApplyAction action) {
+        this(id, name, value, action, action);
+    }
+
+    public WrenchAction withAlt(WrenchApplyAction alt) {
+        return new WrenchAction(id, name, value, action, alt);
+    }
 
     public static WrenchAction of(String id, Property<?> property) {
         return new WrenchAction(id, Text.translatable("item.polyfactory.wrench.action." + id),
@@ -45,14 +54,25 @@ public record WrenchAction(String id, Text name, WrenchValueGetter value, Wrench
                 WrenchValueGetter.ofBlockEntity(tClass, value), WrenchApplyAction.ofBlockEntity(tClass, change));
     }
 
-    public static WrenchAction ofAnyDirection(DirectionProperty property) {
-        return ofAnyDirection(property.getName(), property);
+    public static WrenchAction ofDirection(DirectionProperty property) {
+        return ofDirection(property.getName(), property);
     }
-    public static WrenchAction ofAnyDirection(String id, DirectionProperty property) {
+
+    public static WrenchAction ofDirection(String id, DirectionProperty property) {
+        var reordered = new ArrayList<Direction>();
+        for (var x : FactoryUtil.REORDERED_DIRECTIONS) {
+            if (property.getValues().contains(x)) {
+                reordered.add(x);
+            }
+        }
+
         return of(id, property,
-                (dir, next) -> FactoryUtil.REORDERED_DIRECTIONS.get(
-                        (FactoryUtil.REORDERED_DIRECTIONS.size() + FactoryUtil.REORDERED_DIRECTIONS.indexOf(dir) + (next ? 1 : -1)) % FactoryUtil.REORDERED_DIRECTIONS.size()
-                ));
+                (dir, next) -> reordered.get(
+                        (reordered.size() + reordered.indexOf(dir) + (next ? 1 : -1)) % reordered.size()
+                )).withAlt(WrenchApplyAction.ofState((player, world, pos, dir, state, next) -> {
+                    dir = next ? dir : dir.getOpposite();
+                    return property.getValues().contains(dir) ? state.with(property, dir) : state;
+                }));
     }
 
     public static <T> WrenchAction ofChannel(String id, Class<T> tClass, Function<T, Integer> get, BiConsumer<T, Integer> set) {

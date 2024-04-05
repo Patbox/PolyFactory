@@ -1,6 +1,11 @@
-
-- Added Steel Button - Fastest button in the game (5 tick of activation)
-- New textures: Steel Alloy Mixture
+- Added Steel Button - Fastest button in the game (5 tick of activation).
+- Added "alt actions" to Wrenches:
+  - Can be used by pressing F / item hand swap key.
+  - Instead of swapping hands, it will perform alternative action on a block.
+  - Currently only one available is making direction setting face the player.
+  - By default falls back to the main action.
+- New textures: Steel Alloy Mixture.
+- You can now put Potato on a Spring on your head.
 - Tweaked how cables/data is handled:
   - Channels now display from 1 to 4 (inclusive) instead of 0 to 3.
   - Data is no longer sent instantly, instead it's sent only at the end of the tick.
