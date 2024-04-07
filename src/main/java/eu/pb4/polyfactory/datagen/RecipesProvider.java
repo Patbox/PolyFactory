@@ -173,6 +173,15 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .offerTo(exporter);
 
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.TURNTABLE, 1)
+                .pattern("-")
+                .pattern("i")
+                .input('-', ItemTags.WOODEN_SLABS)
+                .input('i', FactoryItems.AXLE)
+                .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                .offerTo(exporter);
+
         ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.WORKBENCH, 1)
                 .input(Items.CRAFTING_TABLE)
                 .input(FactoryItems.WOODEN_PLATE)

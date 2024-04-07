@@ -1,4 +1,5 @@
-- Added Steel Button - Fastest button in the game (5 tick of activation).
+- Added Turntable - Rotate entities on top!
+- Added Steel Button - Fastest button in the game (5 ticks of activation).
 - Added "alt actions" to Wrenches:
   - Can be used by pressing F / item hand swap key.
   - Instead of swapping hands, it will perform alternative action on a block.

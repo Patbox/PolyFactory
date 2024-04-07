@@ -46,6 +46,7 @@ public class FactoryItems {
     public static final Item PLACER = register(FactoryBlocks.PLACER);
     public static final Item PLANTER = register(FactoryBlocks.PLANTER);
     public static final FactoryBlockItem AXLE = register(FactoryBlocks.AXLE);
+    public static final Item TURNTABLE = register(FactoryBlocks.TURNTABLE);
     public static final Item GEARBOX = register(FactoryBlocks.GEARBOX);
     public static final Item CLUTCH = register(FactoryBlocks.CLUTCH);
     public static final Item CONTAINER = register( FactoryBlocks.CONTAINER);
@@ -145,6 +146,9 @@ public class FactoryItems {
                     entries.add(SPLITTER);
                     entries.add(CONTAINER);
                     entries.add(ITEM_FILTER);
+
+                    // Rotation other?
+                    entries.add(TURNTABLE);
 
                     // Crafting/Machines
                     entries.add(WORKBENCH);

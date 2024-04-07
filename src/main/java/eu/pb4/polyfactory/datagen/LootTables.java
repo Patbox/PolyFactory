@@ -64,6 +64,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.CRAFTER);
         this.addDrop(FactoryBlocks.WORKBENCH);
         this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE);
+        this.addDrop(FactoryBlocks.TURNTABLE);
 
 
         this.addOptionalCable(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
@@ -72,7 +73,6 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addOptionalCable(FactoryBlocks.BLOCK_OBSERVER);
         this.addOptionalCable(FactoryBlocks.REDSTONE_INPUT);
         this.addOptionalCable(FactoryBlocks.REDSTONE_OUTPUT);
-
 
         this.addAxle(FactoryBlocks.AXLE_WITH_LARGE_GEAR, FactoryItems.LARGE_STEEL_GEAR);
         this.addAxle(FactoryBlocks.AXLE_WITH_GEAR, FactoryItems.STEEL_GEAR);

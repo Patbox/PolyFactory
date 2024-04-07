@@ -58,6 +58,12 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
                 state = state.with(FACING, dir).with(FACING_PROPERTIES.get(dir), false);
                 return state.get(HAS_CABLE) ? state.with(FACING_PROPERTIES.get(oldDir),
                         canConnectTo(world, getColor(world, pos), pos.offset(oldDir), world.getBlockState(pos.offset(oldDir)), oldDir.getOpposite())) : state;
+            })).withAlt(WrenchApplyAction.ofState(
+            (player, world, pos, side, state, next) -> {
+                var oldDir = state.get(FACING);
+                state = state.with(FACING, side).with(FACING_PROPERTIES.get(side), false);
+                return state.get(HAS_CABLE) ? state.with(FACING_PROPERTIES.get(oldDir),
+                        canConnectTo(world, getColor(world, pos), pos.offset(oldDir), world.getBlockState(pos.offset(oldDir)), oldDir.getOpposite())) : state;
             }));
     public GenericCabledDataBlock(Settings settings) {
         super(settings);
