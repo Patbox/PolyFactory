@@ -13,7 +13,6 @@ import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.CableModel;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.generic.SelectiveSideNode;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
@@ -290,11 +289,15 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
         }
 
         protected void updateModel() {
-            var stack = CableModel.MODELS_BY_ID[getModelId(state)].copy();
+            //if (color == AbstractCableBlock.DEFAULT_COLOR) {
+           //     this.cable.setItem(CableModel.MODELS_BY_ID[getModelId(state)]);
+            //} else {
+            var stack = CableModel.COLORED_MODELS_BY_ID[getModelId(state)].copy();
             var display = new NbtCompound();
             display.putInt("color", this.color);
             stack.getOrCreateNbt().put("display", display);
             this.cable.setItem(stack);
+            //}
             if (this.cable.getHolder() == this && this.color >= 0) {
                 this.cable.tick();
             }

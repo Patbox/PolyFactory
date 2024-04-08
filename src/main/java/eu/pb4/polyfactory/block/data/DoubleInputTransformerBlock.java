@@ -31,6 +31,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
@@ -42,12 +43,12 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class DoubleInputTransformerBlock extends DataNetworkBlock implements BlockEntityProvider, FactoryBlock, CableConnectable, DataProvider, DataReceiver, WrenchableBlock {
+public abstract class DoubleInputTransformerBlock extends DataNetworkBlock implements BlockEntityProvider, FactoryBlock, CableConnectable, DataProvider, DataReceiver, WrenchableBlock {
     public static final DirectionProperty FACING_INPUT_1 = DirectionProperty.of("facing_input_1");
     public static final DirectionProperty FACING_INPUT_2 = DirectionProperty.of("facing_input_2");
     public static final DirectionProperty FACING_OUTPUT = DirectionProperty.of("facing_output");
 
-    private static final List<WrenchAction> WRENCH_ACTIONS = List.of(
+     protected static final List<WrenchAction> WRENCH_ACTIONS = List.of(
             WrenchAction.ofDirection(FACING_INPUT_1),
             WrenchAction.ofChannel("channel_input_1", DoubleInputTransformerBlockEntity.class,
                     DoubleInputTransformerBlockEntity::inputChannel1, DoubleInputTransformerBlockEntity::setInputChannel1),
@@ -58,12 +59,7 @@ public class DoubleInputTransformerBlock extends DataNetworkBlock implements Blo
 
             WrenchAction.ofDirection(FACING_OUTPUT),
             WrenchAction.ofChannel("channel_output", DoubleInputTransformerBlockEntity.class,
-                    DoubleInputTransformerBlockEntity::outputChannel, DoubleInputTransformerBlockEntity::setOutputChannel),
-
-            WrenchAction.ofBlockEntity("force_text", DoubleInputTransformerBlockEntity.class,
-                x -> Boolean.toString(x.forceText()),
-                (x, n) -> x.setForceText(!x.forceText())
-            )
+                    DoubleInputTransformerBlockEntity::outputChannel, DoubleInputTransformerBlockEntity::setOutputChannel)
     );
 
     public DoubleInputTransformerBlock(Settings settings) {
@@ -76,8 +72,11 @@ public class DoubleInputTransformerBlock extends DataNetworkBlock implements Blo
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         var facing = ctx.getPlayerLookDirection().getOpposite();
 
-        var axis = ctx.getSide().getAxis();
-        if (axis == facing.getAxis()) {
+        Direction.Axis axis;
+
+        if (facing.getAxis() == Direction.Axis.Y) {
+            axis = ctx.getHorizontalPlayerFacing().getAxis();
+        } else {
             axis = AxisAndFacingBlock.getAxis(facing, false);
         }
 
@@ -148,13 +147,7 @@ public class DoubleInputTransformerBlock extends DataNetworkBlock implements Blo
         return false;
     }
 
-    protected DataContainer transformData(DataContainer input1, DataContainer input2, ServerWorld world, BlockPos selfPos, BlockState selfState, DoubleInputTransformerBlockEntity be) {
-        if (be.forceText()) {
-            return new StringData(input1.asString() + input2.asString());
-        }
-
-        return DataContainer.of(input1.asLong() + input2.asLong());
-    }
+    protected abstract DataContainer transformData(DataContainer input1, DataContainer input2, ServerWorld world, BlockPos selfPos, BlockState selfState, DoubleInputTransformerBlockEntity be);
 
     public int sendData(WorldAccess world, Direction direction, BlockPos selfPos, DataContainer data) {
         if (data != null && world instanceof ServerWorld serverWorld && world.getBlockEntity(selfPos) instanceof DoubleInputTransformerBlockEntity be) {

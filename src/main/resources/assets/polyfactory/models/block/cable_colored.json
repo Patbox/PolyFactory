@@ -1,0 +1,7 @@
+{
+	"parent": "polyfactory:block/cable_base",
+	"textures": {
+		"0": "polyfactory:block/cable/cable_colored",
+		"particle": "polyfactory:block/cable/cable_colored"
+	}
+}

@@ -16,3 +16,4 @@
   - Fixed Steam Engine consuming lava with the bucket.
   - Fixed Steam Engine placement  possibly deleting blocks on z-axis.
   - Fixed items not dropping when breaking Steam Engine
+  - Fixed center element of Cable model being offset upwards

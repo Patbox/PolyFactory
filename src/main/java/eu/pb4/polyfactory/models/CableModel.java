@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.models;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -20,7 +21,8 @@ import java.util.function.BiConsumer;
 public class CableModel {
     public static final int SIZE = (int) Math.pow(2, 6);
 
-    public static final ItemStack[] MODELS_BY_ID = new ItemStack[SIZE];
+    public static final ItemStack[] COLORED_MODELS_BY_ID = new ItemStack[SIZE];
+    //public static final ItemStack[] MODELS_BY_ID = new ItemStack[SIZE];
 
     private static final Item[] MODEL_ITEMS = new Item[]{
             Items.LEATHER_HELMET,
@@ -33,10 +35,14 @@ public class CableModel {
 
     public static void registerAssetsEvents() {
         for (var i = 0; i < SIZE; i++) {
-            var model = PolymerResourcePackUtils.requestModel(MODEL_ITEMS[currentItemIndex++ % MODEL_ITEMS.length], FactoryUtil.id("block/gen/cable/" + i));
-            var stack = new ItemStack(model.item());
-            stack.getOrCreateNbt().putInt("CustomModelData", model.value());
-            MODELS_BY_ID[i] = stack;
+            //MODELS_BY_ID[i] = BaseItemProvider.requestModel(FactoryUtil.id("block/gen/cable_base/" + i));
+
+            {
+                var model = PolymerResourcePackUtils.requestModel(MODEL_ITEMS[currentItemIndex++ % MODEL_ITEMS.length], FactoryUtil.id("block/gen/cable_colored/" + i));
+                var stack = new ItemStack(model.item());
+                stack.getOrCreateNbt().putInt("CustomModelData", model.value());
+                COLORED_MODELS_BY_ID[i] = stack;
+            }
         }
         if (ModInit.DYNAMIC_ASSETS) {
             PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register((resourcePackBuilder) -> CableModel.generateModels(resourcePackBuilder::addData));
@@ -79,7 +85,10 @@ public class CableModel {
             }
             base.add("elements", elements);
 
-            dataWriter.accept("assets/polyfactory/models/block/gen/cable/" + i + ".json", base.toString().getBytes(StandardCharsets.UTF_8));
+            //dataWriter.accept("assets/polyfactory/models/block/gen/cable_base/" + i + ".json", base.toString().getBytes(StandardCharsets.UTF_8));
+
+            dataWriter.accept("assets/polyfactory/models/block/gen/cable_colored/" + i + ".json", base.toString()
+                    .replace("polyfactory:block/cable/cable_base", "polyfactory:block/cable/cable_colored").getBytes(StandardCharsets.UTF_8));
         }
     }
 }

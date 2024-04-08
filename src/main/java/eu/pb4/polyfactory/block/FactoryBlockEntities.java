@@ -109,7 +109,7 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader", FabricBlockEntityTypeBuilder
             .create(ItemReaderBlockEntity::new).addBlock(FactoryBlocks.ITEM_READER));
     public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer", FabricBlockEntityTypeBuilder
-            .create(DoubleInputTransformerBlockEntity::new).addBlocks(FactoryBlocks.DATA_ADDER));
+            .create(DoubleInputTransformerBlockEntity::new).addBlocks(FactoryBlocks.DATA_ARITHMETICS));
 
     public static final BlockEntityType<WorkbenchBlockEntity> WORKBENCH = register("workbench", FabricBlockEntityTypeBuilder
             .create(WorkbenchBlockEntity::new).addBlock(FactoryBlocks.WORKBENCH));

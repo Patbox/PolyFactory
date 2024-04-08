@@ -45,4 +45,7 @@ public interface DataContainer {
         return nbt;
     }
 
+    default boolean isTrue() {
+        return this.asLong() != 0;
+    }
 }

@@ -1,6 +1,6 @@
 {
 	"parent": "polyfactory:block/data_cube_connector_input_a",
 	"textures": {
-		"1": "polyfactory:block/data_io/connector_output"
+		"1": "polyfactory:block/cable/data_io/connector_output"
 	}
 }

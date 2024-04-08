@@ -1,10 +1,10 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "polyfactory:block/data_io/outside",
+		"0": "polyfactory:block/cable/data_io/outside",
 		"1": "polyfactory:block/empty",
-		"2": "polyfactory:block/data_io/inner",
-		"particle": "polyfactory:block/data_io/outside"
+		"2": "polyfactory:block/cable/data_io/inner",
+		"particle": "polyfactory:block/cable/data_io/outside"
 	},
 	"elements": [
 		{

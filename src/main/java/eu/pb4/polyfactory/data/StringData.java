@@ -5,6 +5,10 @@ import net.minecraft.nbt.NbtCompound;
 public record StringData(String value) implements DataContainer {
     public static final DataContainer EMPTY = new StringData("");
 
+    public static StringData ofLimited(String s) {
+        return new StringData(s.substring(0, Math.min(s.length(), 512)));
+    }
+
     @Override
     public DataType type() {
         return DataType.STRING;

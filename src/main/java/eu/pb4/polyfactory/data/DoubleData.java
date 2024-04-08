@@ -2,11 +2,10 @@ package eu.pb4.polyfactory.data;
 
 import net.minecraft.nbt.NbtCompound;
 
-public record LongData(long value) implements DataContainer {
-    public static final LongData ZERO = new LongData(0);
+public record DoubleData(double value) implements DataContainer {
     @Override
     public DataType type() {
-        return DataType.LONG;
+        return DataType.DOUBLE;
     }
 
     @Override
@@ -16,7 +15,7 @@ public record LongData(long value) implements DataContainer {
 
     @Override
     public long asLong() {
-        return value;
+        return (long) value;
     }
 
     @Override
@@ -31,15 +30,15 @@ public record LongData(long value) implements DataContainer {
 
     @Override
     public boolean forceRight() {
-        return true;
+        return false;
     }
 
     @Override
     public void writeNbt(NbtCompound compound) {
-        compound.putLong("value", this.value);
+        compound.putDouble("value", this.value);
     }
 
     public static DataContainer fromNbt(NbtCompound compound) {
-        return new LongData(compound.getLong("value"));
+        return new DoubleData(compound.getDouble("value"));
     }
 }

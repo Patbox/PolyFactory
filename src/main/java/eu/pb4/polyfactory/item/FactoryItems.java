@@ -82,7 +82,7 @@ public class FactoryItems {
     public static final Item REDSTONE_OUTPUT = register(FactoryBlocks.REDSTONE_OUTPUT);
     public static final Item ITEM_READER = register(FactoryBlocks.ITEM_READER);
     public static final Item BLOCK_OBSERVER = register(FactoryBlocks.BLOCK_OBSERVER);
-    public static final Item DATA_ADDER = register(FactoryBlocks.DATA_ADDER);
+    public static final Item DATA_ARITHMETICS = register(FactoryBlocks.DATA_ARITHMETICS);
     public static final Item NIXIE_TUBE_CONTROLLER = register(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
     public static final Item HOLOGRAM_PROJECTOR = register(FactoryBlocks.HOLOGRAM_PROJECTOR);
     public static final Item WIRELESS_REDSTONE_RECEIVER = register(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
@@ -276,7 +276,7 @@ public class FactoryItems {
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(WITHER_SKULL_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(DATA_ADDER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(DATA_ARITHMETICS, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
 
                         // Remove this
                         if (ModInit.DEV_ENV) {

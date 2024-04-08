@@ -17,7 +17,6 @@ public class DoubleInputTransformerBlockEntity extends LockableBlockEntity {
     private int channelInput1;
     private int channelInput2;
     private int channelOutput;
-    private boolean forceText = false;
 
     public DoubleInputTransformerBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.DOUBLE_INPUT_TRANSFORMER, pos, state);
@@ -27,12 +26,7 @@ public class DoubleInputTransformerBlockEntity extends LockableBlockEntity {
         super(type, pos, state);
     }
 
-    public boolean forceText() {
-        return forceText;
-    }
-
     public void setForceText(boolean forceText) {
-        this.forceText = forceText;
         this.markDirty();
     }
 
