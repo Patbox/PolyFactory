@@ -143,7 +143,7 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
 
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return false;
+        return true;
     }
 
     public void createGui(ServerPlayerEntity player) {
