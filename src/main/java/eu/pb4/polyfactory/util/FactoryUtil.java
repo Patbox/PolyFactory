@@ -25,6 +25,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Property;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -248,6 +249,10 @@ public class FactoryUtil {
 
     public static PlayerEntity getClosestPlayer(World world, BlockPos pos, double distance) {
         return world.getClosestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, distance, false);
+    }
+
+    public static Text asText(Direction dir) {
+        return Text.translatable("text.polyfactory.direction." + dir);
     }
 
     public enum MovableResult {

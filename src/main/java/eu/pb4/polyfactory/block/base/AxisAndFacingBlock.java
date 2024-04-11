@@ -11,6 +11,7 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -22,7 +23,7 @@ public abstract class AxisAndFacingBlock extends Block implements WrenchableBloc
     public static final DirectionProperty FACING = Properties.FACING;
     public static final BooleanProperty FIRST_AXIS = BooleanProperty.of("first_axis");
     public static final WrenchAction FIRST_AXIS_ACTION = WrenchAction.of("axis", (World world, BlockPos pos, Direction side, BlockState state) -> {
-        return getAxis(state).asString();
+        return Text.literal(getAxis(state).asString());
     }, WrenchApplyAction.ofProperty(FIRST_AXIS));
 
     public AxisAndFacingBlock(Settings settings) {

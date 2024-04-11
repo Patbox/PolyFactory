@@ -49,7 +49,7 @@
   "block.polyfactory.tiny_potato_spring": "Potato on a Spring",
   "block.polyfactory.wireless_redstone_receiver": "Wireless Redstone Receiver",
   "block.polyfactory.wireless_redstone_transmitter": "Wireless Redstone Transmitter",
-  "block.polyfactory.data_arithmetics": "Arithmetic Machine",
+  "block.polyfactory.arithmetic_operator": "Arithmetic Operator",
   "item.polyfactory.mod_icon": "Mod Icon",
   "item.polyfactory.windmill_sail": "Windmill Sail",
   "item.polyfactory.dynamite": "Dynamite",
@@ -119,12 +119,41 @@
   "item.polyfactory.wrench.action.scroll_speed": "Scroll Speed",
   "item.polyfactory.wrench.action.scroll_loop": "Scroll Loop",
   "item.polyfactory.wrench.action.reverse": "Reverse",
+  "item.polyfactory.wrench.action.operation": "Operation",
   "item.polyfactory.wrench.action.facing_input_1": "Input A Facing",
   "item.polyfactory.wrench.action.facing_input_2": "Input B Facing",
   "item.polyfactory.wrench.action.facing_output": "Output Facing",
   "item.polyfactory.wrench.action.channel_input_1": "Input A Channel",
   "item.polyfactory.wrench.action.channel_input_2": "Input B Channel",
   "item.polyfactory.wrench.action.channel_output": "Output Channel",
+
+  "item.polyfactory.wrench.action.mode.arithmetic.integer": "Integer",
+  "item.polyfactory.wrench.action.mode.arithmetic.decimal": "Decimal",
+  "item.polyfactory.wrench.action.mode.arithmetic.boolean": "Boolean",
+  "item.polyfactory.wrench.action.mode.arithmetic.string": "String",
+
+
+  "item.polyfactory.wrench.action.operation.arithmetic.addition": "Addition",
+  "item.polyfactory.wrench.action.operation.arithmetic.subtraction": "Subtraction",
+  "item.polyfactory.wrench.action.operation.arithmetic.multiplication": "Multiplication",
+  "item.polyfactory.wrench.action.operation.arithmetic.division": "Division",
+  "item.polyfactory.wrench.action.operation.arithmetic.modulo": "Modulo",
+
+  "item.polyfactory.wrench.action.mode.transfer_mode.to_conveyor": "To Conveyor",
+  "item.polyfactory.wrench.action.mode.transfer_mode.from_conveyor": "From Conveyor",
+  "item.polyfactory.wrench.action.mode.transfer_mode.both": "Both",
+
+  "text.polyfactory.direction.up": "Up",
+  "text.polyfactory.direction.down": "Down",
+  "text.polyfactory.direction.north": "North",
+  "text.polyfactory.direction.south": "South",
+  "text.polyfactory.direction.east": "East",
+  "text.polyfactory.direction.west": "West",
+
+  "text.polyfactory.half.bottom": "Bottom",
+  "text.polyfactory.half.top": "Top",
+
+  "text.polyfactory.char_per_sec": "%s char/sec",
 
   "entity.polyfactory.dynamite": "Dynamite",
 

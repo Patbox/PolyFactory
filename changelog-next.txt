@@ -1,10 +1,24 @@
-- Added Turntable - Rotate entities on top!
-- Added Steel Button - Fastest button in the game (5 ticks of activation).
-- Added "alt actions" to Wrenches:
-  - Can be used by pressing F / item hand swap key.
-  - Instead of swapping hands, it will perform alternative action on a block.
-  - Currently only one available is making direction setting face the player.
-  - By default falls back to the main action.
+- Added Arithmetic Operator:
+  - New "data" block!
+  - It has two inputs and an output, with all of them having configurable channel and direction, while still allowing overlap.
+  - Can be used to execute operations such as addition, subtraction, multiplication and division.
+  - Can operate in 4 modes: Integer, Decimal, Boolean and String.
+- Added Turntable:
+  - Currently can be used to rotate entities on top of it.
+  - Crafted with a Wooden Slab and an Axle.
+- Added Steel Button:
+  - Fastest button in the game (5 ticks of activation).
+  - Crafted with a single Steel Ingot.
+- Wrench changes:
+  - Added "alt actions" to Wrenches:
+    - Can be used by pressing F / item hand swap key.
+    - Instead of swapping hands, it will perform alternative action on a block.
+    - Currently only one available is making direction setting face the player.
+    - By default falls back to the main action.
+  - Added translations for many wrench action values!
+- Recipe changes:
+  - Steel Gear recipe now gives 3 gears instead of 2.
+  - Large Steel Gear recipe requires now only a single Steel Ingot instead of two.
 - New textures: Steel Alloy Mixture.
 - You can now put Potato on a Spring on your head.
 - Tweaked how cables/data is handled:

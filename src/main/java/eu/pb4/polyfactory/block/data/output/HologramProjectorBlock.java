@@ -41,6 +41,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.DustColorTransitionParticleEffect;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -74,45 +75,45 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
             for (var i = 0; i < state.get(FRONT); i++) {
                 rot = rot.rotateClockwise(axis);
             }
-            return rot.asString();
+            return FactoryUtil.asText(rot);
         } else  {
             var rot = Direction.UP;
             for (var i = 0; i < state.get(FRONT); i++) {
                 rot = rot.rotateCounterclockwise(axis);
             }
-            return rot.asString();
+            return FactoryUtil.asText(rot);
         }
     }, WrenchApplyAction.ofProperty(FRONT));
 
-    public static final WrenchAction SCALE = WrenchAction.ofBlockEntity("scale", HologramProjectorBlockEntity.class,
+    public static final WrenchAction SCALE = WrenchAction.ofBlockEntityString("scale", HologramProjectorBlockEntity.class,
             x -> String.format(Locale.ROOT, "%.1f", x.scale()),
             (x, n) -> x.setScale(FactoryUtil.wrap(x.scale() + (n ? 0.5f : -0.5f), 1, 5) )
     );
 
-    public static final WrenchAction OFFSET = WrenchAction.ofBlockEntity("offset", HologramProjectorBlockEntity.class,
+    public static final WrenchAction OFFSET = WrenchAction.ofBlockEntityString("offset", HologramProjectorBlockEntity.class,
             x -> String.format(Locale.ROOT,"%.1f", x.offset()),
             (x, n) -> x.setOffset(FactoryUtil.wrap(x.offset() + (n ? 0.1f : -0.1f), 0.1f, 1.5f))
     );
 
-    public static final WrenchAction CHANGE_PITCH = WrenchAction.ofBlockEntity("pitch", HologramProjectorBlockEntity.class,
+    public static final WrenchAction CHANGE_PITCH = WrenchAction.ofBlockEntityString("pitch", HologramProjectorBlockEntity.class,
             x -> Math.round(x.pitch() * MathHelper.DEGREES_PER_RADIAN) + "°",
             (x, n) -> x.setPitch(FactoryUtil.wrap(x.pitch() + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
                     0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
     );
 
-    public static final WrenchAction CHANGE_YAW = WrenchAction.ofBlockEntity("yaw", HologramProjectorBlockEntity.class,
+    public static final WrenchAction CHANGE_YAW = WrenchAction.ofBlockEntityString("yaw", HologramProjectorBlockEntity.class,
             x -> Math.round(x.yaw() * MathHelper.DEGREES_PER_RADIAN) + "°",
             (x, n) -> x.setYaw(FactoryUtil.wrap(x.yaw() + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
                     0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
     );
-    public static final WrenchAction CHANGE_ROLL = WrenchAction.ofBlockEntity("roll", HologramProjectorBlockEntity.class,
+    public static final WrenchAction CHANGE_ROLL = WrenchAction.ofBlockEntityString("roll", HologramProjectorBlockEntity.class,
             x -> Math.round(x.roll() * MathHelper.DEGREES_PER_RADIAN) + "°",
             (x, n) -> x.setRoll(FactoryUtil.wrap(x.roll() + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
                     0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
     );
 
     public static final WrenchAction FORCE_TEXT = WrenchAction.ofBlockEntity("force_text", HologramProjectorBlockEntity.class,
-            x -> Boolean.toString(x.forceText()),
+            x -> ScreenTexts.onOrOff(x.forceText()),
             (x, n) -> x.setForceText(!x.forceText())
     );
 

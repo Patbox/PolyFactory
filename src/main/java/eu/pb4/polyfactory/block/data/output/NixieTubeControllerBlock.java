@@ -15,11 +15,13 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
@@ -34,11 +36,11 @@ public class NixieTubeControllerBlock extends GenericCabledDataBlock implements 
     public static final BooleanProperty POWERED = Properties.POWERED;
 
     public static final WrenchAction SCROLL_LOOP = WrenchAction.ofBlockEntity("scroll_loop", NixieTubeControllerBlockEntity.class,
-            x -> "" + x.scrollLoop(),
+            x -> ScreenTexts.onOrOff(x.scrollLoop()),
             (x, n) -> x.setScrollLoop(!x.scrollLoop())
     );
     public static final WrenchAction SCROLL_SPEED = WrenchAction.ofBlockEntity("scroll_speed", NixieTubeControllerBlockEntity.class,
-            x -> String.format(Locale.ROOT,"%.2f char/sec", x.scrollSpeed() == 0 ? 0 : (20f / x.scrollSpeed())),
+            x -> Text.translatable("text.polyfactory.char_per_sec", String.format(Locale.ROOT,"%.2f", x.scrollSpeed() == 0 ? 0 : (20f / x.scrollSpeed()))),
             (x, n) -> x.setScrollSpeed(FactoryUtil.wrap(x.scrollSpeed() + (n ? 1 : -1), 0, 80))
     );
 

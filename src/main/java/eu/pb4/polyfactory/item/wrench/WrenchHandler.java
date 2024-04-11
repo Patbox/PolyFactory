@@ -85,7 +85,7 @@ public class WrenchHandler {
 
                         t.append(action.name()).append(": ");
 
-                        b.add(t, Text.literal(action.value().getDisplayValue(player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state)).formatted(Formatting.YELLOW));
+                        b.add(t, Text.empty().append(action.value().getDisplayValue(player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state)).formatted(Formatting.YELLOW));
                     }
                 });
                 this.sidebar.show();

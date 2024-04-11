@@ -249,6 +249,15 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                 .offerTo(exporter);
 
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.ARITHMETIC_OPERATOR, 1)
+                .pattern("csc")
+                .pattern("s-s")
+                .pattern("csc")
+                .input('c', Items.COPPER_INGOT).input('s', FactoryItems.STEEL_PLATE).input('-', FactoryItems.INTEGRATED_CIRCUIT)
+                .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                .offerTo(exporter);
+
         ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.WIRELESS_REDSTONE_RECEIVER)
                 .input(FactoryItems.REDSTONE_OUTPUT)
                 .input(FactoryItems.ENDER_INFUSED_AMETHYST_SHARD)
@@ -783,7 +792,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         5, 5, 10f, 0.6f, new ItemStack(FactoryItems.ENDER_INFUSED_AMETHYST_SHARD))
                 );
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_GEAR, 2)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_GEAR, 3)
                 .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .pattern(" i ")
                 .pattern("i i")
@@ -793,7 +802,7 @@ class RecipesProvider extends FabricRecipeProvider {
 
         ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.LARGE_STEEL_GEAR)
                 .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
-                .input(FactoryItems.STEEL_INGOT, 2)
+                .input(FactoryItems.STEEL_INGOT, 1)
                 .input(FactoryItems.STEEL_GEAR)
                 .offerTo(exporter);
 

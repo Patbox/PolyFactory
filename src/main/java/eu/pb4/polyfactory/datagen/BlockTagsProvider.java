@@ -96,6 +96,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER)
                 .add(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER)
                 .add(FactoryBlocks.HOLOGRAM_PROJECTOR)
+                .add(FactoryBlocks.ARITHMETIC_OPERATOR)
                 .add(FactoryBlocks.METAL_GRID)
                 .add(FactoryBlocks.ITEM_READER)
                 .add(FactoryBlocks.BLOCK_OBSERVER)

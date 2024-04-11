@@ -32,6 +32,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -57,7 +58,7 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
     public static final BooleanProperty ENABLED = Properties.ENABLED;
     public static final BooleanProperty REVERSE = BooleanProperty.of("reverse");
 
-    public static final WrenchAction REVERSE_ACTION = WrenchAction.of("reverse", REVERSE);
+    public static final WrenchAction REVERSE_ACTION = WrenchAction.of("reverse", REVERSE, ScreenTexts::onOrOff);
 
     public FanBlock(Settings settings) {
         super(settings);

@@ -38,6 +38,7 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
@@ -54,7 +55,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
     public static final EnumProperty<ConveyorLikeDirectional.TransferMode> MODE = EnumProperty.of("mode", ConveyorLikeDirectional.TransferMode.class,
             ConveyorLikeDirectional.TransferMode.FROM_CONVEYOR, ConveyorLikeDirectional.TransferMode.TO_CONVEYOR);
 
-    private static final WrenchAction MODE_ACTION = WrenchAction.of("mode", MODE);
+    private static final WrenchAction MODE_ACTION = WrenchAction.of("mode", MODE, t -> Text.translatable("item.polyfactory.wrench.action.mode.transfer_mode." + t.asString()));
 
     public FunnelBlock(Settings settings) {
         super(settings);
