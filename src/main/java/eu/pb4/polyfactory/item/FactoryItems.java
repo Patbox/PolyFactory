@@ -83,6 +83,7 @@ public class FactoryItems {
     public static final Item ITEM_READER = register(FactoryBlocks.ITEM_READER);
     public static final Item BLOCK_OBSERVER = register(FactoryBlocks.BLOCK_OBSERVER);
     public static final Item ARITHMETIC_OPERATOR = register(FactoryBlocks.ARITHMETIC_OPERATOR);
+    public static final Item DATA_MEMORY = register(FactoryBlocks.DATA_MEMORY);
     public static final Item NIXIE_TUBE_CONTROLLER = register(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
     public static final Item HOLOGRAM_PROJECTOR = register(FactoryBlocks.HOLOGRAM_PROJECTOR);
     public static final Item WIRELESS_REDSTONE_RECEIVER = register(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
@@ -175,6 +176,7 @@ public class FactoryItems {
                     entries.add(NIXIE_TUBE_CONTROLLER);
                     entries.add(NIXIE_TUBE);
                     entries.add(HOLOGRAM_PROJECTOR);
+                    entries.add(DATA_MEMORY);
                     entries.add(ARITHMETIC_OPERATOR);
 
 

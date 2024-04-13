@@ -19,6 +19,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.AutomaticItemPlacementContext;
@@ -34,10 +35,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
 public class PlacerBlockEntity extends LockableBlockEntity implements SingleStackInventory, SidedInventory, OwnedBlockEntity {
@@ -120,6 +118,9 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         var dir = state.get(PlacerBlock.FACING);
         var speed = Math.abs(RotationUser.getRotation((ServerWorld) world, pos).speed()) * MathHelper.RADIANS_PER_DEGREE * 2.5f;
 
+
+        var entities = world.getEntitiesByClass(Entity.class, new Box(blockPos), Entity::canHit);
+
         var blockHitResult = new BlockHitResult(Vec3d.ofCenter(blockPos).offset(dir, 0.5), dir.getOpposite(), blockPos, true);
 
         var context = usable
@@ -132,7 +133,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         };
 
 
-        if (context instanceof AutomaticItemPlacementContext ctx && !ctx.canPlace()) {
+        if (!entities.isEmpty() && context instanceof AutomaticItemPlacementContext ctx && !ctx.canPlace()) {
             self.model.setItem(ItemStack.EMPTY);
             self.stress = 0;
             return;
@@ -153,12 +154,43 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         if (self.process >= 1) {
             self.process = 0;
             self.stress = 0;
-            if (self.stack.getItem() instanceof BlockItem blockItem && context instanceof AutomaticItemPlacementContext ctx) {
+
+            boolean skip = false;
+
+            if (!entities.isEmpty()) {
+                var p = self.getFakePlayer();
+                if (dir == Direction.UP) {
+                    p.setYaw(0);
+                    p.setPitch(-90);
+                } else if (dir == Direction.DOWN) {
+                    p.setYaw(0);
+                    p.setPitch(90);
+                } else  {
+                    p.setYaw(dir.asRotation());
+                    p.setPitch(0);
+                }
+
+                var vec = Vec3d.ofCenter(pos).offset(state.get(PlacerBlock.FACING), 0.51);
+                p.setPos(vec.x, vec.y, vec.z);
+
+                for (var entity : entities) {
+                    var s = entity.interact(p, Hand.MAIN_HAND);
+                    ItemScatterer.spawn(world, pos, p.getInventory());
+
+                    if (s.isAccepted()) {
+                        skip = true;
+                        break;
+                    }
+
+                }
+            }
+
+            if (!skip && self.stack.getItem() instanceof BlockItem blockItem && context instanceof AutomaticItemPlacementContext ctx) {
                 blockItem.place(ctx);
                 if (world.getBlockEntity(blockPos) instanceof OwnedBlockEntity ownedBlockEntity) {
                     ownedBlockEntity.setOwner(self.owner);
                 }
-            } else {
+            } else if (!skip) {
                 var p = self.getFakePlayer();
                 if (dir == Direction.UP) {
                     p.setYaw(0);

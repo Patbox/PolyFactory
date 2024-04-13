@@ -4,8 +4,9 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlock;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
-import eu.pb4.polyfactory.block.data.ArithmeticOperatorBlock;
+import eu.pb4.polyfactory.block.data.io.ArithmeticOperatorBlock;
 import eu.pb4.polyfactory.block.data.CableBlock;
+import eu.pb4.polyfactory.block.data.io.DataMemoryBlock;
 import eu.pb4.polyfactory.block.data.output.*;
 import eu.pb4.polyfactory.block.data.providers.*;
 import eu.pb4.polyfactory.block.electric.ElectricGeneratorBlock;
@@ -74,6 +75,9 @@ public class FactoryBlocks {
     public static final BlockObserverBlock BLOCK_OBSERVER = register("block_observer", new BlockObserverBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
     public static final ArithmeticOperatorBlock ARITHMETIC_OPERATOR = register("arithmetic_operator",
             new ArithmeticOperatorBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
+
+    public static final DataMemoryBlock DATA_MEMORY = register("data_memory",
+            new DataMemoryBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
 
     public static final HologramProjectorBlock HOLOGRAM_PROJECTOR = register("hologram_projector", new HologramProjectorBlock(AbstractBlock.Settings.copy(SPLITTER)));
     public static final NixieTubeBlock NIXIE_TUBE = register("nixie_tube", new NixieTubeBlock(Block.Settings.copy(Blocks.GLASS).nonOpaque()));

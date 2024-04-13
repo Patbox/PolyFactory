@@ -258,6 +258,19 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .offerTo(exporter);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.DATA_MEMORY, 1)
+                .pattern("csc")
+                .pattern("s-s")
+                .pattern("csc")
+                .input('c', Items.GOLD_INGOT).input('s', FactoryItems.STEEL_PLATE).input('-', Items.COPPER_BLOCK)
+                .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                .offerTo(exporter);
+
+        ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.DATA_MEMORY, 1)
+                .input(FactoryItems.DATA_MEMORY)
+                .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.DATA_MEMORY))
+                .offerTo(exporter, "polyfactory:data_memoey_clear");
+
         ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.WIRELESS_REDSTONE_RECEIVER)
                 .input(FactoryItems.REDSTONE_OUTPUT)
                 .input(FactoryItems.ENDER_INFUSED_AMETHYST_SHARD)

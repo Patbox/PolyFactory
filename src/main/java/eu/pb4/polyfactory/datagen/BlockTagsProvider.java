@@ -103,6 +103,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.NIXIE_TUBE_CONTROLLER)
                 .add(FactoryBlocks.ELECTRIC_MOTOR)
                 .add(FactoryBlocks.ELECTRIC_GENERATOR)
+                .add(FactoryBlocks.DATA_MEMORY)
                 .add(FactoryBlocks.TACHOMETER)
                 .add(FactoryBlocks.STRESSOMETER)
                 .add(FactoryBlocks.CABLE)

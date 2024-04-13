@@ -6,7 +6,9 @@ import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.loottable.CopyCachedDataLootFunction;
 import eu.pb4.polyfactory.loottable.CopyColorLootFunction;
+import eu.pb4.polyfactory.loottable.CopyReadOnlyLootFunction;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.minecraft.block.Block;
@@ -56,6 +58,14 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.ARITHMETIC_OPERATOR);
         this.addDrop(FactoryBlocks.TACHOMETER);
         this.addDrop(FactoryBlocks.STRESSOMETER);
+
+        this.addDrop(FactoryBlocks.DATA_MEMORY, LootTable.builder().pool(LootPool.builder()
+                .conditionally(SurvivesExplosionLootCondition.builder())
+                .rolls(ConstantLootNumberProvider.create(1.0F))
+                .with(ItemEntry.builder(FactoryBlocks.DATA_MEMORY)
+                        .apply(() -> CopyCachedDataLootFunction.INSTANCE)
+                        .apply(() -> CopyReadOnlyLootFunction.INSTANCE)
+                )));
 
         this.addDrop(FactoryBlocks.INVERTED_REDSTONE_LAMP);
         this.addDrop(FactoryBlocks.ELECTRIC_GENERATOR);

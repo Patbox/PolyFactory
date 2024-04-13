@@ -3,12 +3,23 @@
   - It has two inputs and an output, with all of them having configurable channel and direction, while still allowing overlap.
   - Can be used to execute operations such as addition, subtraction, multiplication and division.
   - Can operate in 4 modes: Integer, Decimal, Boolean and String.
+  - Can be crafted with 4 Copper Ingots, 4 Steel Plates and 1 Integrated Circuit.
+- Added Data Memory Block:
+  - Another new "data" block!
+  - It has single connectable side, working as both input and output.
+  - It can be used to store any type of data.
+  - By default, any signal it receives overrides stored state, but it can be set to "read only" state with a wrench.
+  - Breaking it keeps the stored data, allowing you to easily move it.
+  - You can reset it by putting it in crafting.
+  - Can be crafted with 4 Gold Ingots, 4 Steel Plates and 1 Copper Block.
 - Added Turntable:
   - Currently can be used to rotate entities on top of it.
   - Crafted with a Wooden Slab and an Axle.
 - Added Steel Button:
   - Fastest button in the game (5 ticks of activation).
   - Crafted with a single Steel Ingot.
+- Mechanical Placers can now use items on entities!
+  - Supports using items such as Shears or Buckets.
 - Wrench changes:
   - Added "alt actions" to Wrenches:
     - Can be used by pressing F / item hand swap key.

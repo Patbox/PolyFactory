@@ -7,7 +7,6 @@ import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -34,8 +33,11 @@ import java.util.List;
 
 public abstract class GenericDirectionalDataBlock extends DataNetworkBlock implements FactoryBlock, WrenchableBlock, BlockEntityProvider, CableConnectable {
     public static DirectionProperty FACING = Properties.FACING;
-    public GenericDirectionalDataBlock(Settings settings) {
+    protected final boolean oppositeFacing;
+
+    public GenericDirectionalDataBlock(Settings settings, boolean oppositeFacing) {
         super(settings);
+        this.oppositeFacing = oppositeFacing;
     }
 
     @Override
@@ -52,7 +54,7 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
 
     @Override
     public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
-        return state.get(FACING).getOpposite() == dir;
+        return state.get(FACING) == (oppositeFacing ? dir.getOpposite() : dir);
     }
 
     @Override
@@ -70,7 +72,7 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
 
     @Override
     public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(initialBlockState);
+        return new Model(initialBlockState, this.oppositeFacing);
     }
 
     @Nullable
@@ -92,18 +94,20 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
     }
 
     public static class Model extends BlockModel {
-        private final ItemDisplayElement base;
+        protected final ItemDisplayElement base;
+        private final boolean oppositeFacing;
 
-        private Model(BlockState state) {
+        protected Model(BlockState state, boolean oppositeFacing) {
             this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
+            this.oppositeFacing = oppositeFacing;
 
             updateStatePos(state);
             this.addElement(this.base);
         }
 
-        private void updateStatePos(BlockState state) {
-            var dir = state.get(FACING);
+        protected void updateStatePos(BlockState state) {
+            var dir = this.oppositeFacing ? state.get(FACING) : state.get(FACING).getOpposite();
             float p = -90;
             float y = 0;
 

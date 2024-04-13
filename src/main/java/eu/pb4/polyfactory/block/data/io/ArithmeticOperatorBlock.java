@@ -1,6 +1,8 @@
-package eu.pb4.polyfactory.block.data;
+package eu.pb4.polyfactory.block.data.io;
 
 import com.google.common.collect.ImmutableList;
+import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlock;
+import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlockEntity;
 import eu.pb4.polyfactory.data.*;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import net.minecraft.block.Block;

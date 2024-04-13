@@ -18,13 +18,13 @@ import java.util.Collection;
 import java.util.List;
 
 public class DataProviderBlock extends GenericDirectionalDataBlock implements DataProvider {
-    public DataProviderBlock(Settings settings) {
-        super(settings);
+    public DataProviderBlock(Settings settings, boolean oppositeFacing) {
+        super(settings, oppositeFacing);
     }
 
     @Override
     public Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new ChannelProviderDirectionNode(state.get(FACING).getOpposite(), getChannel(world, pos)));
+        return List.of(new ChannelProviderDirectionNode(oppositeFacing ? state.get(FACING).getOpposite() : state.get(FACING), getChannel(world, pos)));
     }
 
     @Override
@@ -36,7 +36,7 @@ public class DataProviderBlock extends GenericDirectionalDataBlock implements Da
     }
 
     public int sendData(WorldAccess world, BlockPos selfPos, DataContainer data) {
-        if (world instanceof ServerWorld serverWorld && world.getBlockEntity(selfPos) instanceof ChanneledDataCache be) {
+        if (data != null && world instanceof ServerWorld serverWorld && world.getBlockEntity(selfPos) instanceof ChanneledDataCache be) {
             be.setCachedData(data);
             return NetworkComponent.Data.getLogic(serverWorld, selfPos).pushDataUpdate(selfPos, be.channel(), data, null);
         }
