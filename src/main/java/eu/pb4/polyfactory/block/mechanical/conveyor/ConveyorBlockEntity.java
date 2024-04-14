@@ -42,7 +42,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
             self.model.setContainer(self.holdStack);
         }
 
-        var speed = RotationUser.getRotation((ServerWorld) world, pos).speed() * MathHelper.RADIANS_PER_DEGREE * 0.7;
+        var speed = Math.min(RotationUser.getRotation((ServerWorld) world, pos).speed() * MathHelper.RADIANS_PER_DEGREE * 0.7, 128);
 
         var itemChanged = self.model.updateSpeed(speed);
 

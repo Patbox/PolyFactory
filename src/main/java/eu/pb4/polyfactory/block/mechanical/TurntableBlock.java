@@ -113,8 +113,9 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
                 return;
             }
             var rot = RotationUser.getRotation(world, pos);
-            if (rot.speed() != 0) {
-                var rotate = (float) (rot.isNegative() ? rot.speed() : -rot.speed());
+            var speed = Math.min(rot.speed(), 1028f);
+            if (speed != 0) {
+                var rotate = (float) (rot.isNegative() ? speed : -speed);
                 entity.setYaw(entity.getYaw() + rotate);
                 entity.setHeadYaw(entity.getHeadYaw() + rotate);
 

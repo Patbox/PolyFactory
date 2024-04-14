@@ -48,7 +48,7 @@ public class FanBlockEntity extends BlockEntity {
         }
 
         var reverse = state.get(FanBlock.REVERSE);
-        var speed = RotationUser.getRotation(world, pos).speed() * MathHelper.RADIANS_PER_DEGREE * 2;
+        var speed = Math.min(RotationUser.getRotation(world, pos).speed() * MathHelper.RADIANS_PER_DEGREE * 2, 1024);
 
         if (speed == 0) {
             return;
