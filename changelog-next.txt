@@ -40,6 +40,7 @@
 - Bug Fixes!
   - Fixed Steam Engine consuming lava with the bucket.
   - Fixed Steam Engine placement possibly deleting blocks on z-axis.
-  - Fixed items not dropping when breaking Steam Engine
+  - Fixed items not dropping when breaking Steam Engine.
   - Fixed hopper interactions with Steam Engine.
-  - Fixed center element of Cable model being offset upwards
+  - Fixed center element of Cable model being offset upwards.
+  - Fixed specific setups causing server to crash.

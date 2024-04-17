@@ -231,7 +231,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
                 for (var shape : state.getCollisionShape(world, pos).getBoundingBoxes()) {
                     if (shape.offset(pos).intersects(box)) {
                         entity.move(MovementType.SELF, new Vec3d(0, 0.51, 0));
-                        entity.move(MovementType.SELF, vec);
+                        entity.move(MovementType.SELF, FactoryUtil.safeVelocity(vec));
                         return;
                     }
                 }
@@ -242,14 +242,14 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
                 for (var shape : state.getCollisionShape(world, pos).getBoundingBoxes()) {
                     if (shape.offset(next).intersects(box)) {
                         entity.move(MovementType.SELF, new Vec3d(0, 0.51, 0));
-                        entity.move(MovementType.SELF, vec);
+                        entity.move(MovementType.SELF, FactoryUtil.safeVelocity(vec));
                         return;
                     }
                 }
             }
         }
 
-        entity.addVelocity(vec);
+        FactoryUtil.addSafeVelocity(entity, vec);
         if (entity instanceof ServerPlayerEntity player) {
             FactoryUtil.sendVelocityDelta(player, vec.multiply(0.55));
         }

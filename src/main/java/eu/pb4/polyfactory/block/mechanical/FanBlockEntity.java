@@ -138,8 +138,7 @@ public class FanBlockEntity extends BlockEntity {
 
             var original = entity.getVelocity();
             var base = entity.getVelocity().getComponentAlongAxis(dir.getAxis());
-            entity.setVelocity(entity.getVelocity().withAxis(dir.getAxis(), base * 0.8f).add(Vec3d.of(dir.getVector()).multiply(x)));
-
+            FactoryUtil.setSafeVelocity(entity, entity.getVelocity().withAxis(dir.getAxis(), base * 0.8f).add(Vec3d.of(dir.getVector()).multiply(x)));
             if (dir.getAxis() == Direction.Axis.Y && dir.getDirection() == Direction.AxisDirection.NEGATIVE == reverse) {
                 entity.fallDistance = 0;
             }

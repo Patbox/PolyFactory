@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.HopperBlockEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
@@ -253,6 +254,24 @@ public class FactoryUtil {
 
     public static Text asText(Direction dir) {
         return Text.translatable("text.polyfactory.direction." + dir);
+    }
+
+    public static void setSafeVelocity(Entity entity, Vec3d vec) {
+        entity.setVelocity(safeVelocity(vec));
+    }
+
+    public static Vec3d safeVelocity(Vec3d vec) {
+        var l = vec.length();
+
+        if (l > 1028) {
+            return vec.multiply(1028 / l);
+        } else {
+            return vec;
+        }
+    }
+
+    public static void addSafeVelocity(Entity entity, Vec3d vec) {
+        setSafeVelocity(entity, entity.getVelocity().add(vec));
     }
 
     public enum MovableResult {
