@@ -61,12 +61,14 @@ public class FactoryItems {
     public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", new ModeledItem(new Item.Settings()));
     public static final Item STEEL_INGOT = register("steel_ingot", new ModeledItem(new Item.Settings()));
     public static final Item STEEL_PLATE = register("steel_plate", new ModeledItem(new Item.Settings()));
+    public static final Item COPPER_PLATE = register("copper_plate", new ModeledItem(new Item.Settings()));
     public static final Item STEEL_GEAR = register("steel_gear", new GearItem(FactoryBlocks.AXLE_WITH_GEAR, new Item.Settings()));
     public static final Item LARGE_STEEL_GEAR = register("large_steel_gear", new GearItem(FactoryBlocks.AXLE_WITH_LARGE_GEAR, new Item.Settings()));
     public static final Item GENERIC_MACHINE_PART = register("generic_machine_part", new ModeledItem(new Item.Settings()));
     public static final Item WOODEN_PLATE = register("wooden_plate", new ModeledItem(Items.STICK, new Item.Settings()));
     public static final Item TREATED_DRIED_KELP = register("treated_dried_kelp", new ModeledItem(new Item.Settings()));
     public static final Item INTEGRATED_CIRCUIT = register("integrated_circuit", new ModeledItem(new Item.Settings()));
+    public static final Item REDSTONE_CHIP = register("redstone_chip", new ModeledItem(new Item.Settings()));
 
     public static final Item ITEM_FILTER = register("item_filter", new FilterItem(Items.PAPER, new Item.Settings()));
 
@@ -211,10 +213,12 @@ public class FactoryItems {
                     entries.add(STEEL_ALLOY_MIXTURE);
                     entries.add(STEEL_INGOT);
                     entries.add(STEEL_PLATE);
+                    entries.add(COPPER_PLATE);
                     entries.add(WOODEN_PLATE);
                     entries.add(TREATED_DRIED_KELP);
                     entries.add(ENDER_INFUSED_AMETHYST_SHARD);
                     entries.add(GENERIC_MACHINE_PART);
+                    entries.add(REDSTONE_CHIP);
                     entries.add(INTEGRATED_CIRCUIT);
 
                     // Fancy dyes

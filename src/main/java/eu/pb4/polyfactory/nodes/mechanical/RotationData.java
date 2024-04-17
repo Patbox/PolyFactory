@@ -325,7 +325,7 @@ public class RotationData implements GraphEntity<RotationData> {
 
         this.negative = state.speed == 0 ? this.negative : state.speed < 0;
 
-        var speed = this.speed != 0 ? this.speed / Math.signum(state.speed) : 0;
+        var speed = this.speed != 0 ? this.speed * Math.signum(state.speed) : 0;
 
         if (this.overstressed) {
             for (var entry : graph.getCachedNodes(FunctionalDirectionNode.CACHE)) {

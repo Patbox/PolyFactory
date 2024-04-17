@@ -202,7 +202,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .pattern("fxf")
                 .pattern("sss")
                 .input('f', FactoryItems.FUNNEL).input('s', FactoryItems.STEEL_PLATE)
-                .input('x', FactoryItems.INTEGRATED_CIRCUIT)
+                .input('x', FactoryItems.REDSTONE_CHIP)
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.FUNNEL))
                 .offerTo(exporter);
 
@@ -260,16 +260,18 @@ class RecipesProvider extends FabricRecipeProvider {
 
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.DATA_MEMORY, 1)
                 .pattern("csc")
-                .pattern("s-s")
+                .pattern("p-p")
                 .pattern("csc")
-                .input('c', Items.GOLD_INGOT).input('s', FactoryItems.STEEL_PLATE).input('-', Items.COPPER_BLOCK)
+                .input('c', Items.GOLD_INGOT).input('s', FactoryItems.STEEL_PLATE)
+                .input('p', FactoryItems.COPPER_PLATE)
+                .input('-', FactoryItems.REDSTONE_CHIP)
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .offerTo(exporter);
 
         ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.DATA_MEMORY, 1)
                 .input(FactoryItems.DATA_MEMORY)
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.DATA_MEMORY))
-                .offerTo(exporter, "polyfactory:data_memoey_clear");
+                .offerTo(exporter, "polyfactory:data_memory_clear");
 
         ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.WIRELESS_REDSTONE_RECEIVER)
                 .input(FactoryItems.REDSTONE_OUTPUT)
@@ -361,7 +363,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .input('c', Items.COPPER_INGOT)
                 .input('l', Items.LECTERN)
                 .input('p', FactoryItems.WOODEN_PLATE)
-                .input('b', FactoryItems.INTEGRATED_CIRCUIT)
+                .input('b', FactoryItems.REDSTONE_CHIP)
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                 .offerTo(exporter);
 
@@ -372,7 +374,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .input('s', FactoryItems.STEEL_PLATE)
                 .input('c', Items.COPPER_INGOT)
                 .input('o', Items.OBSERVER)
-                .input('b', FactoryItems.INTEGRATED_CIRCUIT)
+                .input('b', FactoryItems.REDSTONE_CHIP)
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                 .offerTo(exporter);
 
@@ -381,7 +383,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .pattern("pbp")
                 .pattern("sgs")
                 .input('s', FactoryItems.STEEL_PLATE)
-                .input('b', FactoryItems.INTEGRATED_CIRCUIT)
+                .input('b', FactoryItems.REDSTONE_CHIP)
                 .input('p', ItemTags.PLANKS)
                 .input('g', FactoryItems.STEEL_GEAR)
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
@@ -439,14 +441,24 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_axle", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
                 .offerTo(exporter);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.REDSTONE_CHIP)
+                .pattern("grg")
+                .pattern("rcr")
+                .pattern("grg")
+                .input('g', Items.GOLD_NUGGET)
+                .input('c', FactoryItems.COPPER_PLATE)
+                .input('r', Items.REDSTONE)
+                .criterion("get_axle", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
+                .offerTo(exporter);
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.INTEGRATED_CIRCUIT)
-                .pattern("rtr")
-                .pattern("cpq")
+                .pattern("qtq")
+                .pattern("cpr")
                 .pattern("ggg")
                 .input('g', Items.GOLD_NUGGET)
                 .input('q', Items.QUARTZ)
-                .input('c', Items.COPPER_INGOT)
-                .input('r', Items.REDSTONE)
+                .input('c', FactoryItems.COPPER_PLATE)
+                .input('r', FactoryItems.REDSTONE_CHIP)
                 .input('t', FactoryItems.TREATED_DRIED_KELP)
                 .input('p', FactoryItems.WOODEN_PLATE)
                 .criterion("get_axle", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
@@ -581,6 +593,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 GenericPressRecipe.of("iron_ingot", Ingredient.ofItems(Items.IRON_NUGGET), 9, 10f, Items.IRON_INGOT),
                 GenericPressRecipe.of("gold_ingot", Ingredient.ofItems(Items.GOLD_NUGGET), 9, 8f, Items.GOLD_INGOT),
                 GenericPressRecipe.of("steel_plate", Ingredient.ofItems(FactoryItems.STEEL_INGOT), 1, 8.5f, new ItemStack(FactoryItems.STEEL_PLATE, 1)),
+                GenericPressRecipe.of("copper_plate", Ingredient.ofItems(Items.COPPER_INGOT), 2, 8.5f, new ItemStack(FactoryItems.COPPER_PLATE, 1)),
                 GenericPressRecipe.of("wooden_plate", Ingredient.ofItems(FactoryItems.SAW_DUST), 2, 5f, new ItemStack(FactoryItems.WOODEN_PLATE, 1)),
                 GenericPressRecipe.of("golden_carrot", CountedIngredient.ofItems(1, Items.CARROT), CountedIngredient.ofItems(8, Items.GOLD_NUGGET),
                         5, OutputStack.of(Items.GOLDEN_CARROT)),
