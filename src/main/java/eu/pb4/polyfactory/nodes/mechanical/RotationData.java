@@ -257,11 +257,7 @@ public class RotationData implements GraphEntity<RotationData> {
             }
 
             var baseDelta = speed * MathHelper.RADIANS_PER_DEGREE * delta;
-            float r = (float) ((baseDelta + this.rotationValue) % (MathHelper.TAU * biggest));
-            if (this.negative) {
-                r = -r;
-            }
-            r = Math.abs(r);
+            float r = Math.abs((float) ((baseDelta + this.rotationValue) % (MathHelper.TAU * biggest)));
 
             var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_3 - MathHelper.RADIANS_PER_DEGREE * 15) * delta;
 
