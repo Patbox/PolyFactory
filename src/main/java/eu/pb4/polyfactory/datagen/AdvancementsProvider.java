@@ -359,6 +359,36 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.ITEM_READER))
                 .build(exporter, "polyfactory:main/base/item_reader");
 
+        var aritheticOperator = Advancement.Builder.create()
+                .parent(cable)
+                .display(
+                        FactoryItems.ARITHMETIC_OPERATOR,
+                        Text.translatable("advancements.polyfactory.arithmetic_operator.title"),
+                        Text.translatable("advancements.polyfactory.arithmetic_operator.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.ARITHMETIC_OPERATOR))
+                .build(exporter, "polyfactory:main/base/arithmetic_operator");
+
+        var dataMemory = Advancement.Builder.create()
+                .parent(aritheticOperator)
+                .display(
+                        FactoryItems.DATA_MEMORY,
+                        Text.translatable("advancements.polyfactory.data_memory.title"),
+                        Text.translatable("advancements.polyfactory.data_memory.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.DATA_MEMORY))
+                .build(exporter, "polyfactory:main/base/data_memory");
+
         var nixieTubes = Advancement.Builder.create()
                 .parent(cable)
                 .display(

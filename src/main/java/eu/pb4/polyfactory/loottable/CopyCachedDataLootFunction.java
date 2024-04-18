@@ -22,7 +22,7 @@ public class CopyCachedDataLootFunction implements LootFunction {
     @Override
     public ItemStack apply(ItemStack stack, LootContext lootContext) {
         if (lootContext.hasParameter(LootContextParameters.BLOCK_ENTITY)) {
-            if (lootContext.get(LootContextParameters.BLOCK_ENTITY) instanceof DataCache provider && provider.getCachedData() != null) {
+            if (lootContext.get(LootContextParameters.BLOCK_ENTITY) instanceof DataCache provider && provider.getCachedData() != null && !provider.getCachedData().isEmpty()) {
                 stack.getOrCreateNbt().put("cached_data", provider.getCachedData().createNbt());
             }
         }

@@ -1,12 +1,17 @@
 package eu.pb4.polyfactory.block.data.io;
 
 import com.google.common.collect.ImmutableList;
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlock;
 import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlockEntity;
 import eu.pb4.polyfactory.data.*;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
@@ -52,6 +57,10 @@ public class ArithmeticOperatorBlock extends DoubleInputTransformerBlock {
     protected DataContainer transformData(DataContainer input1, DataContainer input2, ServerWorld world, BlockPos selfPos, BlockState selfState, DoubleInputTransformerBlockEntity be) {
         var action = selfState.get(OPERATION);
         var mode = selfState.get(MODE);
+
+        if (FactoryUtil.getClosestPlayer(world, selfPos, 16) instanceof ServerPlayerEntity player) {
+            TriggerCriterion.trigger(player, FactoryTriggers.ARITHMETIC_OPERATOR);
+        }
 
         return switch (action) {
             case ADDITION -> switch (mode) {

@@ -62,7 +62,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.DATA_MEMORY, LootTable.builder().pool(LootPool.builder()
                 .conditionally(SurvivesExplosionLootCondition.builder())
                 .rolls(ConstantLootNumberProvider.create(1.0F))
-                .with(ItemEntry.builder(FactoryBlocks.DATA_MEMORY)
+                .with(ItemEntry.builder(FactoryItems.DATA_MEMORY)
                         .apply(() -> CopyCachedDataLootFunction.INSTANCE)
                         .apply(() -> CopyReadOnlyLootFunction.INSTANCE)
                 )));

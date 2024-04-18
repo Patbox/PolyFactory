@@ -286,6 +286,12 @@
   "advancements.polyfactory.wrench.title": "Configured",
   "advancements.polyfactory.wrench.description": "Use Wrench to change properties of a machine.",
 
+  "advancements.polyfactory.arithmetic_operator.title": "It just adds up!",
+  "advancements.polyfactory.arithmetic_operator.description": "Use Arithmetic Operator to apply any operation on data!",
+
+  "advancements.polyfactory.data_memory.title": "The storage device can now be safely removed from your computer.",
+  "advancements.polyfactory.data_memory.description": "Store some data in Data Memory Block and then take it with you!",
+
   "advancements.polyfactory.tater_16.title": "Potato Beginner",
   "advancements.polyfactory.tater_16.description": "Click Potato on a Spring 16 times...",
   "advancements.polyfactory.tater_128.title": "2 stacks of taters",

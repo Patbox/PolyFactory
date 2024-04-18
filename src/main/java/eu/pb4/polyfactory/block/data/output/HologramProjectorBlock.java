@@ -341,9 +341,6 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
             }
             this.lastData = data;
 
-            this.extraScale = 1;
-            this.customCenter = 0;
-            this.extraOffset = 0;
             DisplayElement newDisplay = null;
             DisplayElement newDisplayExtra = null;
             if (data instanceof ItemStackData stackData && !this.forceText) {
@@ -352,6 +349,9 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                     e.tick();
                     return;
                 }
+                this.extraScale = 1;
+                this.customCenter = 0;
+                this.extraOffset = 0;
                 var i = new ItemDisplayElement(stackData.stack());
                 i.setModelTransformation(ModelTransformationMode.GUI);
                 newDisplay = i;
@@ -369,6 +369,9 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                     this.extraScale = 2;
                     return;
                 }
+                this.extraScale = 1;
+                this.customCenter = 0;
+                this.extraOffset = 0;
                 if (asItem) {
                     var i = new ItemDisplayElement(LodItemDisplayElement.getModel(blockStateData.state().getBlock().asItem()));
                     i.setModelTransformation(ModelTransformationMode.FIXED);
@@ -394,7 +397,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                         space = i;
                     }
 
-                    if (DefaultFonts.VANILLA.getTextWidth(string.substring(start, i + 1), 8) > 70) {
+                    if (DefaultFonts.VANILLA.getTextWidth(string.substring(start, i + 1), 8) > 100) {
                         if (space != -1) {
                             list.add(string.substring(start, space));
                             start = space + 1;
@@ -418,18 +421,18 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                     displayExtra.tick();
                     return;
                 }
-
+                this.extraScale = 1;
                 var t = new TextDisplayElement(text);
                 t.setBackground(0);
                 t.setShadow(true);
-                t.setLineWidth(90);
+                t.setLineWidth(120);
                 newDisplay = t;
                 t = new TextDisplayElement(text);
                 t.setBackground(0);
                 t.setShadow(true);
-                t.setLineWidth(90);
+                t.setLineWidth(120);
                 newDisplayExtra = t;
-                this.extraOffset = list.size() / 4f;
+                this.extraOffset = -list.size() / 4f;
                 this.customCenter = list.size() / 8f;
             }
 
@@ -475,13 +478,11 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
             mat.rotateZ((this.facing.getDirection() == Direction.AxisDirection.POSITIVE ? 0 : MathHelper.PI));
 
             mat.translate(0, this.offset + this.scale / 2 , 0);
-            if (display instanceof TextDisplayElement t) {
-                mat.translate(0, -t.getText().getString().lines().count() * this.scale * (7 / 16f), 0);
-            }
-
             mat.scale(new Vector3f(this.scale, this.scale, display instanceof TextDisplayElement ? 1f : 0.01f).mul(this.extraScale));
+            //if (display instanceof TextDisplayElement t) {
+            //    mat.translate(0, -t.getText().getString().lines().count() * (6 / 16f), 0);
+            //}
             mat.translate(0, this.extraOffset, 0);
-
             mat.translate(0, this.customCenter, 0);
             mat.rotateXYZ(this.pitch, this.yaw, this.roll);
             if (display instanceof BlockDisplayElement) {

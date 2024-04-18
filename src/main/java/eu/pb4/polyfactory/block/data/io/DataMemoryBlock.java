@@ -1,8 +1,10 @@
 package eu.pb4.polyfactory.block.data.io;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.block.data.providers.DataProviderBlock;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
@@ -13,12 +15,15 @@ import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
 import eu.pb4.polyfactory.nodes.data.DataReceiverNode;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenTexts;
@@ -108,6 +113,15 @@ public final class DataMemoryBlock extends DataProviderBlock implements DataRece
                         ).formatted(Formatting.DARK_GRAY));
             }
         }
+    }
+
+    @Override
+    public void afterBreak(World world, PlayerEntity player1, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
+        if (blockEntity instanceof DataCache cache && cache.getCachedData() != null && !cache.getCachedData().isEmpty()
+                && player1 instanceof ServerPlayerEntity player) {
+            TriggerCriterion.trigger(player, FactoryTriggers.DATA_MEMORY);
+        }
+        super.afterBreak(world, player1, pos, state, blockEntity, tool);
     }
 
     @Override

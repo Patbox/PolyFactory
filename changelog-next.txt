@@ -49,3 +49,4 @@
   - Fixed hopper interactions with Steam Engine.
   - Fixed center element of Cable model being offset upwards.
   - Fixed specific setups causing server to crash.
+  - Fixed Hologram Projector's display (internal) offset being reset when it shouldn't.
