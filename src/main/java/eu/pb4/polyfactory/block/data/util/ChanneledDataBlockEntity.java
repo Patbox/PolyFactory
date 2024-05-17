@@ -7,11 +7,13 @@ import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.StringData;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
@@ -109,5 +111,31 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
 
     protected ChanneledDataBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+    }
+
+    @Override
+    protected void addComponents(ComponentMap.Builder componentMapBuilder) {
+        super.addComponents(componentMapBuilder);
+        componentMapBuilder.add(FactoryDataComponents.STORED_DATA, this.lastData);
+        componentMapBuilder.add(FactoryDataComponents.CHANNEL, this.channel);
+        if (this.color != -2) {
+            componentMapBuilder.add(FactoryDataComponents.COLOR, this.color);
+        }
+    }
+
+    @Override
+    protected void readComponents(ComponentsAccess components) {
+        super.readComponents(components);
+        this.lastData = components.getOrDefault(FactoryDataComponents.STORED_DATA, this.lastData);
+        this.channel = components.getOrDefault(FactoryDataComponents.CHANNEL, this.channel);
+        this.color = components.getOrDefault(FactoryDataComponents.COLOR, this.color);
+    }
+
+    @Override
+    public void removeFromCopiedStackNbt(NbtCompound nbt) {
+        super.removeFromCopiedStackNbt(nbt);
+        nbt.remove("channel");
+        nbt.remove("data");
+        nbt.remove("color");
     }
 }

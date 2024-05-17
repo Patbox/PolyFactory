@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.datagen;
 
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.factorytools.api.recipe.OutputStack;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.*;
@@ -16,7 +17,13 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
-import net.minecraft.data.server.recipe.*;
+import net.minecraft.component.DataComponentType;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.DyedColorComponent;
+import net.minecraft.data.server.recipe.CookingRecipeJsonBuilder;
+import net.minecraft.data.server.recipe.RecipeExporter;
+import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
+import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -627,9 +634,9 @@ class RecipesProvider extends FabricRecipeProvider {
         );
 
 
-        // todo
         {
-            var x = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
+            var x = new CompShapedRecipeJsonBuilder(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
+                    .setComponent(FactoryDataComponents.COLOR, -2)
                     .pattern("dps")
                     .pattern("rgr")
                     .pattern("sps")
@@ -638,15 +645,12 @@ class RecipesProvider extends FabricRecipeProvider {
                     .input('p', Items.GLASS).input('d', ConventionalItemTags.DYES)
                     .group("polyfactory:colored_lamp")
                     .criterion("get", InventoryChangedCriterion.Conditions.items(Items.GLOWSTONE));
-
-            var display = new NbtCompound();
-            display.putString("color", "dyn");
-            //((NbtRecipeBuilder) x).factorytools$setNbt(display);
 
             x.offerTo(exporter, id("colored_lamp/glass/regular_a"));
         }
         {
-            var x = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
+            var x = new CompShapedRecipeJsonBuilder(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
+                    .setComponent(FactoryDataComponents.COLOR, -2)
                     .pattern("sps")
                     .pattern("rgr")
                     .pattern("dps")
@@ -655,17 +659,14 @@ class RecipesProvider extends FabricRecipeProvider {
                     .input('p', Items.GLASS).input('d', ConventionalItemTags.DYES)
                     .group("polyfactory:colored_lamp")
                     .criterion("get", InventoryChangedCriterion.Conditions.items(Items.GLOWSTONE));
-
-            var display = new NbtCompound();
-            display.putString("color", "dyn");
-            //((NbtRecipeBuilder) x).factorytools$setNbt(display);
-
             x.offerTo(exporter, id("colored_lamp/glass/regular_b"));
         }
 
         for (var dye : dyes) {
             {
-                var x = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
+                var x = new CompShapedRecipeJsonBuilder(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
+                        .setComponent(FactoryDataComponents.COLOR, DyeColorExtra.getColor(dye.getColor()))
+
                         .pattern("sps")
                         .pattern("rgr")
                         .pattern("sps")
@@ -675,33 +676,24 @@ class RecipesProvider extends FabricRecipeProvider {
                         .group("polyfactory:colored_lamp")
                         .criterion("get", InventoryChangedCriterion.Conditions.items(Items.GLOWSTONE));
 
-                var display = new NbtCompound();
-                display.putInt("color", DyeColorExtra.getColor(dye.getColor()));
-                //((NbtRecipeBuilder) x).factorytools$setNbt(display);
-
                 x.offerTo(exporter, id("colored_lamp/glass/" + dye.getColor()));
             }
 
             {
-                var x = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.WINDMILL_SAIL, 1)
-                        .pattern(" sw")
+                var x = new CompShapedRecipeJsonBuilder(RecipeCategory.REDSTONE, FactoryItems.WINDMILL_SAIL, 1);
+
+                if (dye != Items.WHITE_DYE) {
+                    x.setComponent(DataComponentTypes.DYED_COLOR, new DyedColorComponent(DyeColorExtra.getColor(dye.getColor()), true));
+                }
+
+                x.pattern(" sw")
                         .pattern(" ws")
                         .pattern("wsc")
                         .input('w', FactoryItems.WOODEN_PLATE).input('s', Items.STICK)
                         .input('c', Registries.ITEM.get(new Identifier(dye.getColor().getName() + "_wool")))
                         .group("polyfactory:windmill_sail")
-                        .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.WOODEN_PLATE));
-
-                if (dye != Items.WHITE_DYE) {
-                    var nbt = new NbtCompound();
-                    var display = new NbtCompound();
-                    display.putInt("color", DyeColorExtra.getColor(dye.getColor()));
-                    nbt.put("display", display);
-
-                    //((NbtRecipeBuilder) x).factorytools$setNbt(nbt, lookup);
-                }
-
-                x.offerTo(exporter, id("windmill_sail/wool/" + dye.getColor()));
+                        .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.WOODEN_PLATE))
+                        .offerTo(exporter, id("windmill_sail/wool/" + dye.getColor()));
             }
 
             {
@@ -714,36 +706,36 @@ class RecipesProvider extends FabricRecipeProvider {
                         Ingredient.ofItems(solid), 3, 5, powder
                 ));
 
-                of(exporter,  GenericMixingRecipe.ofCounted(namePowder, "concrete_powder",
+                of(exporter, GenericMixingRecipe.ofCounted(namePowder, "concrete_powder",
                         List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS), CountedIngredient.ofItems(4, Items.GRAVEL), CountedIngredient.ofItems(1, dye)),
                         4, 1, 13, new ItemStack(powder, 8)));
 
-                of(exporter,  GenericMixingRecipe.ofCounted(nameSolid + "_direct", "concrete_direct",
+                of(exporter, GenericMixingRecipe.ofCounted(nameSolid + "_direct", "concrete_direct",
                         List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS),
                                 CountedIngredient.ofItems(4, Items.GRAVEL),
                                 CountedIngredient.ofItems(0, Items.WATER_BUCKET),
                                 CountedIngredient.ofItems(1, dye)),
                         5, 1, 15, new ItemStack(solid, 8)));
 
-                of(exporter,  GenericMixingRecipe.ofCounted(nameSolid + "_from_powder", "concrete_water",
+                of(exporter, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder", "concrete_water",
                         List.of(CountedIngredient.ofItems(1, powder), CountedIngredient.ofItems(0, Items.WATER_BUCKET)),
                         1, 1, 4, new ItemStack(solid, 1)));
             }
         }
 
-        of(exporter, 
+        of(exporter,
                 new RecipeEntry<>(id("mixing/firework_star"), new FireworkStarMixingRecipe(4, 4, 17))
         );
 
-        of(exporter, 
+        of(exporter,
                 new RecipeEntry<>(id("mixing/artificial_dye"), new ArtificialDyeMixingRecipe(3, 4, 15))
         );
         ShapelessRecipeJsonBuilder.create(RecipeCategory.COMBAT, FactoryItems.DYNAMITE)
-            .input(Items.PAPER, 1).input(FactoryItems.SAW_DUST, 1).input(Items.GUNPOWDER, 2).input(ItemTags.SAND)
+                .input(Items.PAPER, 1).input(FactoryItems.SAW_DUST, 1).input(Items.GUNPOWDER, 2).input(ItemTags.SAND)
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(Items.GUNPOWDER))
                 .offerTo(exporter);
 
-        of(exporter, 
+        of(exporter,
                 GenericMixingRecipe.ofCounted("treated_dried_kelp", List.of(CountedIngredient.ofItems(16, Items.DRIED_KELP), CountedIngredient.ofItems(1, Items.BLACK_DYE)), 2, 1, 6f, 0.2f, new ItemStack(FactoryItems.TREATED_DRIED_KELP, 16)),
                 GenericMixingRecipe.ofCounted("fermented_spider_eye", List.of(CountedIngredient.ofItems(1, Items.SPIDER_EYE),
                                 CountedIngredient.ofItems(1, Items.SUGAR),
@@ -818,7 +810,7 @@ class RecipesProvider extends FabricRecipeProvider {
                                 CountedIngredient.ofItems(1, Items.AMETHYST_SHARD)
                         ),
                         5, 5, 10f, 0.6f, new ItemStack(FactoryItems.ENDER_INFUSED_AMETHYST_SHARD))
-                );
+        );
 
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_GEAR, 3)
                 .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
@@ -858,6 +850,7 @@ class RecipesProvider extends FabricRecipeProvider {
 
         exporter.accept(id("crafting/prt_key_setter"), new PRTKeySetterCraftingRecipe(CraftingRecipeCategory.MISC), null);
     }
+
     public void of(RecipeExporter exporter, RecipeEntry<?>... recipes) {
         for (var recipe : recipes) {
             exporter.accept(recipe.id(), recipe.value(), null);

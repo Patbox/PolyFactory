@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "FallingBlockAccessor",
+    "ShapedRecipeAccessor",
     "block.StateManagerMixin",
     "block.WorldChunkMixin",
     "datafixer.ItemStackComponentizationFixMixin",
@@ -22,6 +23,7 @@
     "recipe.ArmorDyeRecipeMixin",
     "recipe.DyedColorComponentMixin",
     "recipe.FireworkStarRecipeMixin",
+    "recipe.ShapedRecipeMixin",
     "util.BlockEntityMixin",
     "util.BlockEntityTypeAccessor",
     "util.DyeColorMixin",

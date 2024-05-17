@@ -2,11 +2,13 @@ package eu.pb4.polyfactory.block.data;
 
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
@@ -64,5 +66,25 @@ public class CableBlockEntity extends BlockEntity implements BlockEntityExtraLis
     @Override
     public boolean isDefaultColor() {
         return this.color == FactoryItems.CABLE.getDefaultColor();
+    }
+
+    @Override
+    public void removeFromCopiedStackNbt(NbtCompound nbt) {
+        super.removeFromCopiedStackNbt(nbt);
+        nbt.remove("color");
+    }
+
+    @Override
+    protected void addComponents(ComponentMap.Builder componentMapBuilder) {
+        super.addComponents(componentMapBuilder);
+        if (this.color != -2) {
+            componentMapBuilder.add(FactoryDataComponents.COLOR, this.color);
+        }
+    }
+
+    @Override
+    protected void readComponents(ComponentsAccess components) {
+        super.readComponents(components);
+        this.color = components.getOrDefault(FactoryDataComponents.COLOR, AbstractCableBlock.DEFAULT_COLOR);
     }
 }

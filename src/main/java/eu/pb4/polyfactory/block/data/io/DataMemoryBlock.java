@@ -74,23 +74,13 @@ public final class DataMemoryBlock extends DataProviderBlock implements DataRece
     @Override
     public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         var x = super.getPickStack(world, pos, state);
-        // todo
-        //x.getOrCreateNbt().putBoolean("read_only", state.get(READ_ONLY));
-        //if (world.getBlockEntity(pos) instanceof DataCache cache && cache.getCachedData() != null) {
-        //    x.getOrCreateNbt().put("cached_data", cache.getCachedData().createNbt());
-        //}
+        x.set(FactoryDataComponents.READ_ONLY, state.get(READ_ONLY));
+        if (world.getBlockEntity(pos) instanceof DataCache cache && cache.getCachedData() != null) {
+            x.set(FactoryDataComponents.STORED_DATA, cache.getCachedData());
+        }
 
         return x;
     }
-
-    @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        super.onPlaced(world, pos, state, placer, itemStack);
-        if (world.getBlockEntity(pos) instanceof ChanneledDataCache be && itemStack.contains(FactoryDataComponents.STORED_DATA)) {
-            be.setCachedData(itemStack.get(FactoryDataComponents.STORED_DATA));
-        }
-    }
-
     @Override
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         if (stack.contains(FactoryDataComponents.STORED_DATA)) {

@@ -26,6 +26,9 @@ public class FactoryDataComponents {
 
     public static final DataComponentType<Boolean> READ_ONLY = register("read_only", DataComponentType.<Boolean>builder().codec(Codec.BOOL).build());
 
+    public static final DataComponentType<Integer> CHANNEL = register("channel", DataComponentType.<Integer>builder().codec(Codec.INT).build());
+
+
     public static void register() {
 
     }
