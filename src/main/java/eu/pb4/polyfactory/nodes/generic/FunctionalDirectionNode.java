@@ -19,17 +19,11 @@ import java.util.Collection;
 
 
 public record FunctionalDirectionNode(Direction direction) implements FunctionalNode, DirectionNode {
-    public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("direction/functional"),
-            tag -> new FunctionalDirectionNode(tag instanceof NbtString string ? Direction.byName(string.asString()) : Direction.NORTH));
+    public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("direction/functional"), Direction.CODEC.xmap(FunctionalDirectionNode::new, FunctionalDirectionNode::direction));
 
     @Override
     public @NotNull BlockNodeType getType() {
         return TYPE;
-    }
-
-    @Override
-    public @Nullable NbtElement toTag() {
-        return NbtString.of(direction.asString());
     }
 
     @Override

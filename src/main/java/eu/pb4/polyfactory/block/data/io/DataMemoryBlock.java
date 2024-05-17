@@ -11,19 +11,21 @@ import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
 import eu.pb4.polyfactory.block.data.util.DataCache;
 import eu.pb4.polyfactory.block.data.util.GenericDirectionalDataBlock;
 import eu.pb4.polyfactory.data.DataContainer;
+import eu.pb4.polyfactory.data.StringData;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
 import eu.pb4.polyfactory.nodes.data.DataReceiverNode;
-import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.item.TooltipType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenTexts;
@@ -37,7 +39,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
@@ -66,17 +67,18 @@ public final class DataMemoryBlock extends DataProviderBlock implements DataRece
     public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
         return super.getPlacementState(ctx)
                 .with(POWERED, ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos()))
-                .with(READ_ONLY, ctx.getStack().hasNbt() && ctx.getStack().getNbt().getBoolean("read_only"))
+                .with(READ_ONLY, ctx.getStack().getOrDefault(FactoryDataComponents.READ_ONLY, false))
                 ;
     }
 
     @Override
     public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         var x = super.getPickStack(world, pos, state);
-        x.getOrCreateNbt().putBoolean("read_only", state.get(READ_ONLY));
-        if (world.getBlockEntity(pos) instanceof DataCache cache && cache.getCachedData() != null) {
-            x.getOrCreateNbt().put("cached_data", cache.getCachedData().createNbt());
-        }
+        // todo
+        //x.getOrCreateNbt().putBoolean("read_only", state.get(READ_ONLY));
+        //if (world.getBlockEntity(pos) instanceof DataCache cache && cache.getCachedData() != null) {
+        //    x.getOrCreateNbt().put("cached_data", cache.getCachedData().createNbt());
+        //}
 
         return x;
     }
@@ -84,34 +86,32 @@ public final class DataMemoryBlock extends DataProviderBlock implements DataRece
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
-        if (world.getBlockEntity(pos) instanceof ChanneledDataCache be && itemStack.hasNbt() && itemStack.getNbt().contains("cached_data")) {
-            be.setCachedData(DataContainer.fromNbt(itemStack.getNbt().getCompound("cached_data")));
+        if (world.getBlockEntity(pos) instanceof ChanneledDataCache be && itemStack.contains(FactoryDataComponents.STORED_DATA)) {
+            be.setCachedData(itemStack.get(FactoryDataComponents.STORED_DATA));
         }
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable BlockView world, List<Text> tooltip, TooltipContext options) {
-        super.appendTooltip(stack, world, tooltip, options);
-        if (stack.hasNbt()) {
-            var nbt = stack.getOrCreateNbt();
-            if (nbt.contains("cached_data")) {
-                var decoded = DataContainer.fromNbt(stack.getNbt().getCompound("cached_data"));
-                tooltip.add(
-                        Texts.bracketed(
-                            Text.translatable("block.polyfactory.data_memory.tooltip.stored_data").formatted(Formatting.YELLOW)
-                        ).formatted(Formatting.DARK_GRAY)
-                        );
-                tooltip.add(ScreenTexts.space().append(Text.translatable("block.polyfactory.data_memory.tooltip.type",
-                        Text.translatable("data_type.polyfactory." + decoded.type().id())).formatted(Formatting.GRAY)));
-                tooltip.add(ScreenTexts.space().append(Text.translatable("block.polyfactory.data_memory.tooltip.value", decoded.asString()).formatted(Formatting.GRAY)));
-            }
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
+        if (stack.contains(FactoryDataComponents.STORED_DATA)) {
 
-            if (nbt.getBoolean("read_only")) {
-                tooltip.add(
-                        Texts.bracketed(
-                                Text.translatable("block.polyfactory.data_memory.tooltip.read_only").formatted(Formatting.RED)
-                        ).formatted(Formatting.DARK_GRAY));
-            }
+            var decoded = stack.getOrDefault(FactoryDataComponents.STORED_DATA, StringData.EMPTY);
+            tooltip.add(
+                    Texts.bracketed(
+                            Text.translatable("block.polyfactory.data_memory.tooltip.stored_data").formatted(Formatting.YELLOW)
+                    ).formatted(Formatting.DARK_GRAY)
+            );
+            tooltip.add(ScreenTexts.space().append(Text.translatable("block.polyfactory.data_memory.tooltip.type",
+                    Text.translatable("data_type.polyfactory." + decoded.type().id())).formatted(Formatting.GRAY)));
+            tooltip.add(ScreenTexts.space().append(Text.translatable("block.polyfactory.data_memory.tooltip.value", decoded.asString()).formatted(Formatting.GRAY)));
+        }
+
+
+        if (stack.getOrDefault(FactoryDataComponents.READ_ONLY, false)) {
+            tooltip.add(
+                    Texts.bracketed(
+                            Text.translatable("block.polyfactory.data_memory.tooltip.read_only").formatted(Formatting.RED)
+                    ).formatted(Formatting.DARK_GRAY));
         }
     }
 
@@ -160,9 +160,9 @@ public final class DataMemoryBlock extends DataProviderBlock implements DataRece
         return state.get(READ_ONLY)
                 ? List.of(new ChannelProviderDirectionNode(dir, channel))
                 : List.of(
-                        new ChannelProviderDirectionNode(dir, channel),
-                        new ChannelReceiverDirectionNode(dir, channel)
-                );
+                new ChannelProviderDirectionNode(dir, channel),
+                new ChannelReceiverDirectionNode(dir, channel)
+        );
     }
 
     @Override
@@ -192,13 +192,14 @@ public final class DataMemoryBlock extends DataProviderBlock implements DataRece
 
     public static class Model extends GenericDirectionalDataBlock.Model {
         public static final ItemStack POWERED_MODEL = BaseItemProvider.requestModel(id("block/data_memory_powered"));
+
         protected Model(BlockState state) {
             super(state, false);
         }
 
         @Override
         protected void updateStatePos(BlockState state) {
-            this.base.setItem(state.get(POWERED) ? POWERED_MODEL : ItemDisplayElementUtil.getModel(state.getBlock().asItem()) );
+            this.base.setItem(state.get(POWERED) ? POWERED_MODEL : ItemDisplayElementUtil.getModel(state.getBlock().asItem()));
             super.updateStatePos(state);
         }
     }

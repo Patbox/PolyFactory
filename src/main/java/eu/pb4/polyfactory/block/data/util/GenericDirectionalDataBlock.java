@@ -58,8 +58,8 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
     @Override

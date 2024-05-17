@@ -88,7 +88,7 @@ public class MovingItem implements VirtualElement, StackReference {
 
     @Override
     public boolean set(ItemStack stack) {
-        if (ItemStack.canCombine(this.stack, stack)) {
+        if (ItemStack.areItemsAndComponentsEqual(this.stack, stack)) {
             return false;
         }
         this.stack = stack;
@@ -197,7 +197,7 @@ public class MovingItem implements VirtualElement, StackReference {
     }
 
     public void checkItems() {
-        if (this.stack.getCount() != this.stackCurrent.getCount() || ItemStack.canCombine(this.stack, this.stackCurrent)) {
+        if (this.stack.getCount() != this.stackCurrent.getCount() || ItemStack.areItemsAndComponentsEqual(this.stack, this.stackCurrent)) {
             this.stackCurrent = this.stack.copy();
             for (var i = 0; i < 4; i++) {
                 this.updateDisplay(i);

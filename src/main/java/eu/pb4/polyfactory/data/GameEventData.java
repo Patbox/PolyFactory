@@ -1,5 +1,8 @@
 package eu.pb4.polyfactory.data;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
@@ -8,8 +11,29 @@ import net.minecraft.world.event.GameEvent;
 
 
 public record GameEventData(GameEvent event, Vec3d pos, double distance) implements DataContainer {
+    private static final MapCodec<Vec3d> FLAT_VEC = RecordCodecBuilder.mapCodec(ins -> ins.group(
+            Codec.DOUBLE.fieldOf("pos_x").forGetter(Vec3d::getX),
+            Codec.DOUBLE.fieldOf("pos_y").forGetter(Vec3d::getY),
+            Codec.DOUBLE.fieldOf("pos_z").forGetter(Vec3d::getZ)
+    ).apply(ins, Vec3d::new));
+
+    public static MapCodec<GameEventData> TYPE_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    Registries.GAME_EVENT.getCodec().fieldOf("event").forGetter(GameEventData::event),
+                    FLAT_VEC.forGetter(GameEventData::pos),
+                    Codec.DOUBLE.fieldOf("distance").forGetter(GameEventData::distance)
+            ).apply(instance, GameEventData::new)
+    );
+
+    public static DataContainer fromNbt(NbtCompound compound) {
+        return new GameEventData(
+                Registries.GAME_EVENT.get(Identifier.tryParse(compound.getString("event"))),
+                new Vec3d(compound.getDouble("pos_x"), compound.getDouble("pos_y"), compound.getDouble("pos_z")),
+                compound.getDouble("distance")
+        );
+    }
+
     @Override
-    public DataType type() {
+    public DataType<GameEventData> type() {
         return DataType.GAME_EVENT;
     }
 
@@ -26,22 +50,5 @@ public record GameEventData(GameEvent event, Vec3d pos, double distance) impleme
     @Override
     public double asDouble() {
         return this.distance;
-    }
-
-    @Override
-    public void writeNbt(NbtCompound compound) {
-        compound.putString("event", Registries.GAME_EVENT.getId(event).toString());
-        compound.putDouble("pos_x", this.pos.x);
-        compound.putDouble("pos_y", this.pos.y);
-        compound.putDouble("pos_z", this.pos.z);
-        compound.putDouble("distance", this.distance);
-    }
-
-    public static DataContainer fromNbt(NbtCompound compound) {
-        return new GameEventData(
-                Registries.GAME_EVENT.get(Identifier.tryParse(compound.getString("event"))),
-                new Vec3d(compound.getDouble("pos_x"), compound.getDouble("pos_y"), compound.getDouble("pos_z")),
-                compound.getDouble("distance")
-        );
     }
 }

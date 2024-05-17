@@ -59,8 +59,8 @@ public abstract class TallItemMachineBlock extends RotationalNetworkBlock implem
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
     @Nullable
@@ -104,8 +104,8 @@ public abstract class TallItemMachineBlock extends RotationalNetworkBlock implem
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (!world.isClient && hand == Hand.MAIN_HAND && !player.isSneaking()) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if (!world.isClient && !player.isSneaking()) {
             pos = state.get(PART) == Part.MAIN ? pos : pos.down();
 
             if (world.getBlockEntity(pos) instanceof TallItemMachineBlockEntity be) {
@@ -114,7 +114,7 @@ public abstract class TallItemMachineBlock extends RotationalNetworkBlock implem
             return ActionResult.SUCCESS;
         }
 
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.onUse(state, world, pos, player, hit);
     }
 
     @Override

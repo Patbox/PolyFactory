@@ -7,6 +7,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
@@ -21,14 +22,14 @@ public class ColorableBlockEntity extends BlockEntity implements BlockEntityExtr
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.writeNbt(nbt, lookup);
         nbt.putInt("color", this.color);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.readNbt(nbt, lookup);
         setColor(nbt.getInt("color"));
     }
 

@@ -57,4 +57,9 @@ public class TheCubeBlock extends MultiBlock implements CustomPistonBehavior {
 
         return true;
     }
+
+    @Override
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.TNT.getDefaultState();
+    }
 }

@@ -14,11 +14,14 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FireworkExplosionComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
@@ -132,11 +135,6 @@ public class SmallLampBlock extends Block implements FactoryBlock, BlockEntityPr
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
-    }
-
-    @Override
     public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return new Model(pos, initialBlockState, this.inverted);
     }
@@ -210,11 +208,8 @@ public class SmallLampBlock extends Block implements FactoryBlock, BlockEntityPr
         }
 
         private void updateModel() {
-            var stack = LodItemDisplayElement.getModel(this.state.get(LIT) == this.inverted ? FactoryItems.CAGED_LAMP : FactoryItems.INVERTED_CAGED_LAMP).copy();
-            var ex = new NbtCompound();
-            var c = new NbtIntArray(new int[]{this.color});
-            ex.put("Colors", c);
-            stack.getOrCreateNbt().put("Explosion", ex);
+            var stack = ItemDisplayElementUtil.getModel(this.state.get(LIT) == this.inverted ? FactoryItems.CAGED_LAMP : FactoryItems.INVERTED_CAGED_LAMP).copy();
+            stack.set(DataComponentTypes.FIREWORK_EXPLOSION, new FireworkExplosionComponent(FireworkExplosionComponent.Type.BURST, IntList.of(this.color), IntList.of(), false, false));
             this.main.setItem(stack);
             this.tick();
         }

@@ -24,8 +24,8 @@ public class RotationalDebugBlock extends RotationalNetworkBlock implements Poly
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.DAYLIGHT_DETECTOR;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.DAYLIGHT_DETECTOR.getDefaultState();
     }
 
     @Override

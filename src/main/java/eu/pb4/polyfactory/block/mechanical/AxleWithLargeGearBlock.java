@@ -11,6 +11,8 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.BlockState;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -90,7 +92,7 @@ public class AxleWithLargeGearBlock extends AxleWithGearBlock {
         }
 
         static {
-            GEAR_MODEL.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(GEAR_MODEL.getItem(), id("block/large_gear")).value());
+            GEAR_MODEL.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(GEAR_MODEL.getItem(), id("block/large_gear")).value()));
         }
     }
 }

@@ -81,10 +81,10 @@ public class ItemReaderBlock extends CabledDataProviderBlock {
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        var x = super.onUse(state, world, pos, player, hand, hit);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        var x = super.onUse(state, world, pos, player, hit);
 
-        if (x == ActionResult.PASS  && !player.isSneaking() && state.get(FACING).getOpposite() != hit.getSide() && player instanceof ServerPlayerEntity serverPlayer && hand == Hand.MAIN_HAND && world.getBlockEntity(pos) instanceof ItemReaderBlockEntity be) {
+        if (x == ActionResult.PASS  && !player.isSneaking() && state.get(FACING).getOpposite() != hit.getSide() && player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof ItemReaderBlockEntity be) {
             be.openGui(serverPlayer);
             return ActionResult.SUCCESS;
         }

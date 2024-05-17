@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.loottable;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.ColorProvider;
 import net.minecraft.item.ItemStack;
@@ -11,7 +12,7 @@ import net.minecraft.loot.function.LootFunctionType;
 
 public class CopyColorLootFunction implements LootFunction {
     public static final LootFunction INSTANCE = new CopyColorLootFunction();
-    public static final LootFunctionType TYPE = new LootFunctionType(Codec.unit(INSTANCE));
+    public static final LootFunctionType TYPE = new LootFunctionType(MapCodec.unit(INSTANCE));
 
     @Override
     public LootFunctionType getType() {

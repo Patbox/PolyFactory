@@ -7,7 +7,7 @@ import java.util.Objects;
 public record SimpleItemFilter(ItemStack item) implements ItemFilter {
     @Override
     public boolean test(ItemStack stack) {
-        return !stack.isEmpty() && ItemStack.canCombine(item, stack);
+        return !stack.isEmpty() && ItemStack.areItemsAndComponentsEqual(item, stack);
     }
 
     @Override
@@ -15,7 +15,7 @@ public record SimpleItemFilter(ItemStack item) implements ItemFilter {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SimpleItemFilter that = (SimpleItemFilter) o;
-        return that.item.isEmpty() == this.item.isEmpty() && ItemStack.canCombine(that.item, that.item);
+        return that.item.isEmpty() == this.item.isEmpty() && ItemStack.areItemsAndComponentsEqual(that.item, that.item);
     }
 
     @Override

@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.data.StringData;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 
 public class DoubleInputTransformerBlockEntity extends LockableBlockEntity {
@@ -61,27 +62,27 @@ public class DoubleInputTransformerBlockEntity extends LockableBlockEntity {
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.readNbt(nbt, lookup);
         this.channelInput1 = nbt.getInt("input_channel_1");
         this.channelInput2 = nbt.getInt("input_channel_2");
         this.channelOutput = nbt.getInt("output_channel");
 
-        this.lastInput1 = DataContainer.fromNbt(nbt.getCompound("input_data_1"));
-        this.lastInput2 = DataContainer.fromNbt(nbt.getCompound("input_data_2"));
-        this.lastOutput = DataContainer.fromNbt(nbt.getCompound("output_data"));
+        this.lastInput1 = DataContainer.fromNbt(nbt.getCompound("input_data_1"), lookup);
+        this.lastInput2 = DataContainer.fromNbt(nbt.getCompound("input_data_2"), lookup);
+        this.lastOutput = DataContainer.fromNbt(nbt.getCompound("output_data"), lookup);
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.writeNbt(nbt, lookup);
         nbt.putInt("input_channel_1", this.channelInput1);
         nbt.putInt("input_channel_2", this.channelInput2);
         nbt.putInt("output_channel", this.channelOutput);
 
-        nbt.put("input_data_1", this.lastInput1.createNbt());
-        nbt.put("input_data_2", this.lastInput2.createNbt());
-        nbt.put("output_data", this.lastOutput.createNbt());
+        nbt.put("input_data_1", this.lastInput1.createNbt(lookup));
+        nbt.put("input_data_2", this.lastInput2.createNbt(lookup));
+        nbt.put("output_data", this.lastOutput.createNbt(lookup));
     }
 
     public int inputChannel1() {

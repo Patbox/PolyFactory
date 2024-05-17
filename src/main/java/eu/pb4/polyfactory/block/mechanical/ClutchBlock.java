@@ -100,11 +100,6 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
-    }
-
-    @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }

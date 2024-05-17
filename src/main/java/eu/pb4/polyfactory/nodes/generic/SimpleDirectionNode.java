@@ -17,17 +17,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 
 public record SimpleDirectionNode(Direction direction) implements DirectionNode {
-    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("direction"),
-            tag -> new SimpleDirectionNode(tag instanceof NbtString string ? Direction.byName(string.asString()) : Direction.NORTH));
+    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("direction"), Direction.CODEC.xmap(SimpleDirectionNode::new, SimpleDirectionNode::direction));
 
     @Override
     public @NotNull BlockNodeType getType() {
         return TYPE;
-    }
-
-    @Override
-    public @Nullable NbtElement toTag() {
-        return NbtString.of(direction.asString());
     }
 
     @Override

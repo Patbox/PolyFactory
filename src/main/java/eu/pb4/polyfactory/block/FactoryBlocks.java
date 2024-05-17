@@ -123,9 +123,9 @@ public class FactoryBlocks {
 
     private static void validateLootTables(MinecraftServer server) {
         for (var block : BLOCKS) {
-            var lt = server.getLootManager().getLootTable(block.getLootTableId());
+            var lt = server.getReloadableRegistries().getLootTable(block.getLootTableKey());
             if (lt == LootTable.EMPTY) {
-                ModInit.LOGGER.warn("Missing loot table? " + block.getLootTableId());
+                ModInit.LOGGER.warn("Missing loot table? " + block.getLootTableKey().getValue());
             }
         }
     }

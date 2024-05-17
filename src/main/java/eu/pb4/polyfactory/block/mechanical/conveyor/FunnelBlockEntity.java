@@ -12,6 +12,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
@@ -34,8 +35,8 @@ public class FunnelBlockEntity extends BlockEntity implements BlockEntityExtraLi
     private FilterData filter = FilterData.of(ItemStack.EMPTY, true);
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        nbt.put("FilterStack", this.filterStack.writeNbt(new NbtCompound()));
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        nbt.put("FilterStack", this.filterStack.encodeAllowEmpty(lookup));
     }
 
     @Override
@@ -52,8 +53,8 @@ public class FunnelBlockEntity extends BlockEntity implements BlockEntityExtraLi
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        this.filterStack = ItemStack.fromNbt(nbt.getCompound("FilterStack"));
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.filterStack = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("FilterStack"));
         this.filter = FilterData.of(this.filterStack, true);
     }
 

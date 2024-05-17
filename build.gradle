@@ -11,13 +11,13 @@ buildscript {
 }
 
 plugins {
-	id 'fabric-loom' version '1.4.+'
+	id 'fabric-loom' version '1.6.+'
 	id "com.modrinth.minotaur" version "2.+"
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_21
+targetCompatibility = JavaVersion.VERSION_21
 
 archivesBaseName = project.archives_base_name
 group = project.maven_group
@@ -51,6 +51,7 @@ loom {
 			vmArg("-Dfabric-api.datagen.output-dir=${file("src/main/generated")}")
 		}
 	}
+	accessWidenerPath = file("src/main/resources/polyfactory.accesswidener")
 }
 
 
@@ -92,22 +93,22 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation 'eu.pb4:polymer-core:0.7.7+1.20.4'
-	modImplementation 'eu.pb4:polymer-resource-pack:0.7.7+1.20.4'
-	modImplementation 'eu.pb4:polymer-autohost:0.7.7+1.20.4'
-	modImplementation 'eu.pb4:polymer-virtual-entity:0.7.7+1.20.4'
-	modImplementation include('eu.pb4:map-canvas-api:0.2.2+1.19.4')
+	modImplementation 'eu.pb4:polymer-core:0.8.0+1.20.6'
+	modImplementation 'eu.pb4:polymer-resource-pack:0.8.0+1.20.6'
+	modImplementation 'eu.pb4:polymer-autohost:0.8.0+1.20.6'
+	modImplementation 'eu.pb4:polymer-virtual-entity:0.8.0+1.20.6'
+	modImplementation include('eu.pb4:map-canvas-api:0.3.0+1.20.6')
 	modImplementation include('eu.pb4:common-protection-api:1.0.0')
-	modImplementation include('eu.pb4:sidebar-api:0.3.0+1.20.3')
-	modImplementation include('eu.pb4:sgui:1.4.2+1.20.4')
-	modImplementation include('com.kneelawk:graphlib:1.4.0+1.20.4')
-	modImplementation include('eu.pb4:factorytools:0.1.9+1.20.4')
+	modImplementation include('eu.pb4:sidebar-api:0.4.0+1.20.5')
+	modImplementation include('eu.pb4:sgui:1.5.1+1.20.5')
+	modImplementation include('com.kneelawk.graphlib:core-fabric:2.0.0-alpha.15+1.20.6')
+	modImplementation include('eu.pb4:factorytools:0.2.0+1.20.6')
 
 	// Temp hack to allow development
 	//modImplementation include('com.kneelawk:graphlib:1.99.99+1.20.local')
 	//modImplementation include('alexiil.mc.lib:libnetworkstack-base:0.11.0-aaa.patbox')
 
-	modCompileOnly 'maven.modrinth:polydex:1.0.0+1.20.3-rc1'
+	modCompileOnly 'maven.modrinth:polydex:1.1.0+1.20.5-rc3'
 	// Uncomment the following line to enable the deprecated Fabric API modules.
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 

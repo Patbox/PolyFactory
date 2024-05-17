@@ -1,5 +1,8 @@
 package eu.pb4.polyfactory.block.other;
 
+import com.mojang.datafixers.DataFix;
+import com.mojang.datafixers.DataFixer;
+import com.mojang.serialization.Dynamic;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
@@ -9,10 +12,15 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.base.SingleItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.minecraft.SharedConstants;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.datafixer.Schemas;
+import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 
@@ -60,16 +68,34 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        this.storage.writeNbt(nbt);
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.storage.writeNbt(nbt, lookup);
+        // amount -> long
+        // variant -> { item -> string/id, tag -> compound/null }
+        super.writeNbt(nbt, lookup);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        this.storage.readNbt(nbt);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        try {
+            if (nbt.getCompound("variant").contains("tag")) {
+                var hack = new NbtCompound();
+                var variant = nbt.getCompound("variant");
+                hack.put("tag", variant.get("tag"));
+                hack.put("id", variant.get("item"));
+                hack.putInt("Count", 1);
+                var updated = (NbtCompound) Schemas.getFixer().update(TypeReferences.ITEM_STACK, new Dynamic<>(NbtOps.INSTANCE, hack), 3700, SharedConstants.getGameVersion().getSaveVersion().getId()).getValue();
+                variant.put("components", updated.get("components"));
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
+
+        this.storage.readNbt(nbt, lookup);
+
         updateStack();
-        super.readNbt(nbt);
+        super.readNbt(nbt, lookup);
     }
 
     private void updateStack() {

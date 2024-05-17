@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.recipe;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import eu.pb4.factorytools.api.recipe.LazyRecipeSerializer;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.recipe.mixing.ArtificialDyeMixingRecipe;
@@ -30,10 +31,10 @@ public class FactoryRecipeSerializers {
 
     public static final LazyRecipeSerializer<PRTKeySetterCraftingRecipe> CRAFTING_PRT_KEY_SETTER = register("crafting/prt_key_setter", PRTKeySetterCraftingRecipe.CODEC);
 
-    public static final LazyRecipeSerializer<FillSprayCanCraftingRecipe> CRAFTING_FILL_SPRAY_CAN = register("crafring/fill_spray_can",
-            CraftingRecipeCategory.CODEC.xmap(FillSprayCanCraftingRecipe::new, FillSprayCanCraftingRecipe::category));
+    public static final LazyRecipeSerializer<FillSprayCanCraftingRecipe> CRAFTING_FILL_SPRAY_CAN = register("crafting/fill_spray_can",
+            CraftingRecipeCategory.CODEC.xmap(FillSprayCanCraftingRecipe::new, FillSprayCanCraftingRecipe::category).fieldOf("category"));
     public static final LazyRecipeSerializer<FillSprayCanPressRecipe> PRESS_FILL_SPRAY_CAN = register("press/fill_spray_can",
-            Codecs.POSITIVE_INT.xmap(FillSprayCanPressRecipe::new, FillSprayCanPressRecipe::amount));
+            Codecs.POSITIVE_INT.xmap(FillSprayCanPressRecipe::new, FillSprayCanPressRecipe::amount).fieldOf("amount"));
 
     public static void register() {
 
@@ -43,7 +44,7 @@ public class FactoryRecipeSerializers {
         return Registry.register(Registries.RECIPE_SERIALIZER, new Identifier(ModInit.ID, path), recipeSerializer);
     }
 
-    public static <T extends Recipe<?>> LazyRecipeSerializer<T> register(String path, Codec<T> codec) {
+    public static <T extends Recipe<?>> LazyRecipeSerializer<T> register(String path, MapCodec<T> codec) {
         return Registry.register(Registries.RECIPE_SERIALIZER, new Identifier(ModInit.ID, path), new LazyRecipeSerializer<>(codec));
     }
 }

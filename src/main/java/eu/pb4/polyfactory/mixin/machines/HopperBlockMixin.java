@@ -24,18 +24,14 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(HopperBlock.class)
 public class HopperBlockMixin {
     @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
-    private void polyfactory$dontDropItems(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
-        if (hand != Hand.MAIN_HAND) {
-            return;
-        }
-
+    private void polyfactory$dontDropItems(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
         var be = world.getBlockEntity(pos) instanceof FilteredBlockEntity x ? x : null;
 
         if (be == null) {
             return;
         }
 
-        var stack = player.getStackInHand(hand);
+        var stack = player.getStackInHand(Hand.MAIN_HAND);
         if (stack.isOf(FactoryItems.ITEM_FILTER) && !FilterItem.getStack(stack).isEmpty()) {
             if (!be.polyfactory$getFilter().isEmpty()) {
                 player.getInventory().offerOrDrop(be.polyfactory$getFilter());
@@ -44,7 +40,7 @@ public class HopperBlockMixin {
             stack.decrement(1);
             cir.setReturnValue(ActionResult.SUCCESS);
         } else if (stack.isEmpty() && !be.polyfactory$getFilter().isEmpty() && player.isSneaking()) {
-            player.setStackInHand(hand, be.polyfactory$getFilter());
+            player.setStackInHand(Hand.MAIN_HAND, be.polyfactory$getFilter());
             be.polyfactory$setFilter(ItemStack.EMPTY);
             cir.setReturnValue(ActionResult.SUCCESS);
         }

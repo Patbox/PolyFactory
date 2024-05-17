@@ -20,12 +20,15 @@ import net.minecraft.loot.condition.SurvivesExplosionLootCondition;
 import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
 import net.minecraft.predicate.StatePredicate;
+import net.minecraft.registry.RegistryWrapper;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 class LootTables extends FabricBlockLootTableProvider {
-    protected LootTables(FabricDataOutput dataOutput) {
-        super(dataOutput);
+
+    protected LootTables(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
+        super(dataOutput, registryLookup);
     }
 
     @Override

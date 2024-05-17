@@ -16,16 +16,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public record AllSideNode() implements BlockNode {
-    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("all_side"), (nbt) -> new AllSideNode());
+    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("all_side"), AllSideNode::new);
 
     @Override
     public @NotNull BlockNodeType getType() {
         return TYPE;
-    }
-
-    @Override
-    public @Nullable NbtElement toTag() {
-        return null;
     }
 
     @Override

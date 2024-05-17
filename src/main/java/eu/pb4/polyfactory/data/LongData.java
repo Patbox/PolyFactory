@@ -1,8 +1,12 @@
 package eu.pb4.polyfactory.data;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.nbt.NbtCompound;
 
 public record LongData(long value) implements DataContainer {
+    public static MapCodec<LongData> TYPE_CODEC = Codec.LONG.xmap(LongData::new, LongData::value).fieldOf("value");
+
     public static final LongData ZERO = new LongData(0);
     @Override
     public DataType type() {
@@ -32,11 +36,6 @@ public record LongData(long value) implements DataContainer {
     @Override
     public boolean forceRight() {
         return true;
-    }
-
-    @Override
-    public void writeNbt(NbtCompound compound) {
-        compound.putLong("value", this.value);
     }
 
     public static DataContainer fromNbt(NbtCompound compound) {

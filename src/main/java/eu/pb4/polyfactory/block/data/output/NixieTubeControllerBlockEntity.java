@@ -7,6 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -24,8 +25,8 @@ public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.readNbt(nbt, lookup);
         this.scrollSpeed = nbt.getInt("scroll_speed");
         this.scrollLoop = nbt.getBoolean("scroll_loop");
         this.scrollPoint = nbt.getInt("scroll_point");
@@ -33,8 +34,8 @@ public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.writeNbt(nbt, lookup);
         nbt.putInt("scroll_speed", this.scrollSpeed);
         nbt.putInt("scroll_point", this.scrollPoint);
         nbt.putBoolean("scroll_loop", this.scrollLoop);

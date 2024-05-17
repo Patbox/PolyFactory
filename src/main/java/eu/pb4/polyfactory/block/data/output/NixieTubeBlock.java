@@ -21,6 +21,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.decoration.Brightness;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
@@ -66,11 +67,6 @@ public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityPr
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
-    }
-
-    @Override
     public List<WrenchAction> getWrenchActions() {
         return List.of(AXIS_ACTION, WrenchAction.HALF);
     }
@@ -80,14 +76,14 @@ public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityPr
         return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
     }
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!player.canModifyBlocks()) {
             return ActionResult.PASS;
         }
-        var stack = player.getStackInHand(hand);
+        var stack = player.getStackInHand(Hand.MAIN_HAND);
 
         if (stack.isOf(Items.NAME_TAG)) {
-            var name = stack.hasCustomName() ? stack.getName().getString() : "";
+            var name = stack.contains(DataComponentTypes.CUSTOM_NAME) ? stack.getName().getString() : "";
 
             if (world.getBlockEntity(pos) instanceof NixieTubeBlockEntity be) {
                 be.pushText(name, ' ');
@@ -109,7 +105,7 @@ public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityPr
             }
         }
 
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.onUse(state, world, pos, player, hit);
     }
 
     @Nullable

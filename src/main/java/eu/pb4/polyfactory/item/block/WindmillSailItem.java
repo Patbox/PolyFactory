@@ -11,16 +11,16 @@ import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
-import net.minecraft.item.DyeableItem;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
 
-public class WindmillSailItem extends ModeledItem implements DyeableItem, FireworkStarColoredItem {
+public class WindmillSailItem extends ModeledItem implements FireworkStarColoredItem {
     public WindmillSailItem(Settings settings) {
         super(Items.FIREWORK_STAR, settings);
     }
@@ -42,7 +42,7 @@ public class WindmillSailItem extends ModeledItem implements DyeableItem, Firewo
                 val = Direction.AxisDirection.NEGATIVE;
             }
 
-            var o = FactoryNodes.ROTATIONAL.getGraphView(context.getWorld()).getNodesAt(context.getBlockPos()).filter(x -> x.getNode() instanceof SimpleAxisNode).findFirst();
+            var o = FactoryNodes.ROTATIONAL.getGraphWorld((ServerWorld) context.getWorld()).getNodesAt(context.getBlockPos()).filter(x -> x.getNode() instanceof SimpleAxisNode).findFirst();
             if (o.isPresent() && o.get().getConnections().size() == 1) {
                 var conn = o.get().getConnections().iterator().next();
                 var offset = conn.other(o.get()).getPos().pos().subtract(context.getBlockPos());
@@ -88,14 +88,11 @@ public class WindmillSailItem extends ModeledItem implements DyeableItem, Firewo
 
         return super.useOnBlock(context);
     }
+    @SuppressWarnings("DataFlowIssue")
     @Override
     public int getItemColor(ItemStack itemStack) {
-        if (itemStack.hasNbt() && itemStack.getNbt().contains("display", NbtElement.COMPOUND_TYPE)) {
-            var d = itemStack.getNbt().getCompound("display");
-
-            if (d.contains("color", NbtElement.NUMBER_TYPE)) {
-                return d.getInt("color");
-            }
+        if (itemStack.contains(DataComponentTypes.DYED_COLOR)) {
+            return itemStack.get(DataComponentTypes.DYED_COLOR).rgb();
         }
 
         return 0xFFFFFF;

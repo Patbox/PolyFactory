@@ -17,17 +17,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public record SmallGearNode(Direction.Axis axis) implements BlockNode {
-    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("small_gear"),
-            tag -> new SmallGearNode(tag instanceof NbtString string ? Direction.Axis.fromName(string.asString()) : Direction.Axis.Y));
+    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("small_gear"), Direction.Axis.CODEC.xmap(SmallGearNode::new, SmallGearNode::axis));
 
     @Override
     public @NotNull BlockNodeType getType() {
         return TYPE;
-    }
-
-    @Override
-    public @Nullable NbtElement toTag() {
-        return NbtString.of(axis.asString());
     }
 
     @Override

@@ -10,15 +10,8 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
+
 
 import java.util.List;
 

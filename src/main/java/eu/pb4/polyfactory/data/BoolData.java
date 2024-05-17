@@ -1,10 +1,18 @@
 package eu.pb4.polyfactory.data;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.nbt.NbtCompound;
 
 public record BoolData(boolean value) implements DataContainer {
     public static BoolData TRUE = new BoolData(true);
     public static BoolData FALSE = new BoolData(false);
+
+    public static MapCodec<BoolData> TYPE_CODEC = Codec.BOOL.xmap(BoolData::of, BoolData::value).fieldOf("value");
+
+    public static BoolData of(boolean count) {
+        return count ? BoolData.TRUE : BoolData.FALSE;
+    }
 
     @Override
     public DataType type() {
@@ -35,14 +43,4 @@ public record BoolData(boolean value) implements DataContainer {
     public boolean isTrue() {
         return this.value;
     }
-
-    @Override
-    public void writeNbt(NbtCompound compound) {
-        compound.putBoolean("value", this.value);
-    }
-
-    public static DataContainer fromNbt(NbtCompound compound) {
-        return compound.getBoolean("value") ? TRUE : FALSE;
-    }
-
 }

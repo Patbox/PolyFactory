@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polymer.core.api.item.PolymerRecipe;
 import net.minecraft.inventory.RecipeInputInventory;
@@ -9,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.*;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.dynamic.Codecs;
@@ -18,11 +20,11 @@ public class ShapelessNbtCopyRecipe extends ShapelessRecipe implements PolymerRe
     private final ItemStack result;
     private final Ingredient source;
     private final DefaultedList<Ingredient> ingredientsOg;
-    public static Codec<ShapelessNbtCopyRecipe> CODEC = RecordCodecBuilder.create((instance) -> {
+    public static MapCodec<ShapelessNbtCopyRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) -> {
         return instance.group(
-                        Codecs.createStrictOptionalFieldCodec(Codec.STRING, "group", "").forGetter(ShapelessNbtCopyRecipe::getGroup),
+                        Codec.STRING.optionalFieldOf("group", "").forGetter(ShapelessNbtCopyRecipe::getGroup),
                         CraftingRecipeCategory.CODEC.fieldOf("category").orElse(CraftingRecipeCategory.MISC).forGetter(ShapelessNbtCopyRecipe::getCategory),
-                        ItemStack.RECIPE_RESULT_CODEC.fieldOf("result").forGetter(t -> t.result),
+                        ItemStack.CODEC.fieldOf("result").forGetter(t -> t.result),
                         Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("source").forGetter(t -> t.source),
                         Ingredient.DISALLOW_EMPTY_CODEC.listOf().fieldOf("ingredients").flatXmap((ingredients) -> {
                             Ingredient[] ingredients2 = (Ingredient[]) ingredients.stream().filter((ingredient) -> {
@@ -56,11 +58,11 @@ public class ShapelessNbtCopyRecipe extends ShapelessRecipe implements PolymerRe
     }
 
     @Override
-    public ItemStack craft(RecipeInputInventory recipeInputInventory, DynamicRegistryManager dynamicRegistryManager) {
+    public ItemStack craft(RecipeInputInventory recipeInputInventory, RegistryWrapper.WrapperLookup dynamicRegistryManager) {
         var stack = super.craft(recipeInputInventory, dynamicRegistryManager);
         for (var tmp : recipeInputInventory.getHeldStacks()) {
             if (this.source.test(tmp)) {
-                stack.setNbt(tmp.hasNbt() ? tmp.getNbt().copy() : null);
+                stack.applyComponentsFrom(tmp.getComponents());
                 break;
             }
         }

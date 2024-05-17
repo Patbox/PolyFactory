@@ -13,6 +13,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
@@ -33,10 +34,10 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.readNbt(nbt, lookup);
         if (nbt.contains("data")) {
-            this.lastData = DataContainer.fromNbt(nbt.getCompound("data"));
+            this.lastData = DataContainer.fromNbt(nbt.getCompound("data"), lookup);
         }
         setChannel(nbt.getInt("channel"));
         if (nbt.contains("color")) {
@@ -47,10 +48,10 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.writeNbt(nbt, lookup);
         nbt.putInt("channel", this.channel);
-        nbt.put("data", this.lastData.createNbt());
+        nbt.put("data", this.lastData.createNbt(lookup));
         nbt.putInt("color", this.color);
     }
 

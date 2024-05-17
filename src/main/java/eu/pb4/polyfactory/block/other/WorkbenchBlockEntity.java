@@ -19,6 +19,7 @@ import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
@@ -44,18 +45,18 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        Inventories.writeNbt(nbt, stacks);
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        Inventories.writeNbt(nbt, stacks, lookup);
+        super.writeNbt(nbt, lookup);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        Inventories.readNbt(nbt, this.stacks);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        Inventories.readNbt(nbt, this.stacks, lookup);
         if (this.world != null) {
             updateResult();
         }
-        super.readNbt(nbt);
+        super.readNbt(nbt, lookup);
     }
 
     @Override
@@ -91,7 +92,7 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
                 return i;
             }
 
-            if (ItemStack.canCombine(cur, stack)) {
+            if (ItemStack.areItemsAndComponentsEqual(cur, stack)) {
                 if (count > cur.getCount() && cur.getCount() < cur.getMaxCount()) {
                     count = cur.getCount();
                     slot = i;

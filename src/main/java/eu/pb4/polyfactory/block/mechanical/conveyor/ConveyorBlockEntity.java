@@ -16,6 +16,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.*;
@@ -214,16 +215,16 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         if (this.holdStack != null) {
-            nbt.put("HeldStack", this.holdStack.get().writeNbt(new NbtCompound()));
+            nbt.put("HeldStack", this.holdStack.get().encodeAllowEmpty(lookup));
         }
         nbt.putDouble("Delta", this.delta);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        var stack = ItemStack.fromNbt(nbt.getCompound("HeldStack"));
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        var stack = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("HeldStack"));
         if (!stack.isEmpty()) {
             if (this.holdStack != null) {
                 this.holdStack.set(stack);

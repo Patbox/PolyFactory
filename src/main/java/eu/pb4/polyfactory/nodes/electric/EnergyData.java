@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.BlockGraph;
 import com.kneelawk.graphlib.api.graph.GraphEntityContext;
 import com.kneelawk.graphlib.api.graph.user.GraphEntity;
 import com.kneelawk.graphlib.api.graph.user.GraphEntityType;
+import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.block.electric.EnergyUser;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import net.minecraft.nbt.NbtElement;
@@ -20,7 +21,7 @@ public class EnergyData implements GraphEntity<EnergyData> {
         public void update(ServerWorld world, BlockGraph graph) {}
     };
 
-    public static final GraphEntityType<EnergyData> TYPE = GraphEntityType.of(id("energy_info"), EnergyData::new, EnergyData::decode, EnergyData::split);
+    public static final GraphEntityType<EnergyData> TYPE = GraphEntityType.of(id("energy_info"), Codec.unit(EnergyData::new), EnergyData::new,  EnergyData::split);
 
     private long speed;
     private int lastTick = -1;
@@ -99,11 +100,6 @@ public class EnergyData implements GraphEntity<EnergyData> {
     }
 
     @Override
-    public @Nullable NbtElement toTag() {
-        return null;
-    }
-
-    @Override
     public void onUnload() {
 
     }
@@ -116,10 +112,6 @@ public class EnergyData implements GraphEntity<EnergyData> {
         var data = new EnergyData();
         data.speed = this.speed;
         return data;
-    }
-
-    private static EnergyData decode(@Nullable NbtElement nbtElement) {
-        return new EnergyData();
     }
 
     public boolean powered() {

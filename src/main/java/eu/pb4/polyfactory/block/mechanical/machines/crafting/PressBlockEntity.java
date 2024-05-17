@@ -22,6 +22,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
@@ -147,7 +148,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             if (currentOut.isEmpty()) {
                 success = true;
                 self.setStack(OUTPUT_SLOT, nextOut);
-            } else if (ItemStack.canCombine(currentOut, nextOut) && currentOut.getCount() + nextOut.getCount() <= currentOut.getMaxCount()) {
+            } else if (ItemStack.areItemsAndComponentsEqual(currentOut, nextOut) && currentOut.getCount() + nextOut.getCount() <= currentOut.getMaxCount()) {
                 success = true;
                 currentOut.increment(nextOut.getCount());
             }
@@ -214,26 +215,26 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        this.writeInventoryNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.writeInventoryNbt(nbt, lookup);
         nbt.putDouble("Progress", this.process);
         if (this.delayedOutput != null) {
-            nbt.put("DelayedOutput", this.delayedOutput.writeNbt(new NbtCompound()));
+            nbt.put("DelayedOutput", this.delayedOutput.encodeAllowEmpty(lookup));
         }
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, lookup);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        this.readInventoryNbt(nbt);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.readInventoryNbt(nbt, lookup);
         this.process = nbt.getDouble("Progress");
         if (nbt.contains("DelayedOutput", NbtElement.COMPOUND_TYPE)) {
-            this.delayedOutput = ItemStack.fromNbt(nbt.getCompound("DelayedOutput"));
+            this.delayedOutput = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("DelayedOutput"));
             if (this.delayedOutput.isEmpty()) {
                 this.delayedOutput = null;
             }
         }
-        super.readNbt(nbt);
+        super.readNbt(nbt, lookup);
     }
 
     @Override

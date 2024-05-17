@@ -1,20 +1,24 @@
 package eu.pb4.polyfactory.recipe;
 
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
 public class PRTKeySetterCraftingRecipe extends SpecialCraftingRecipe {
-    public static final Codec<PRTKeySetterCraftingRecipe> CODEC = Codec.unit(() -> new PRTKeySetterCraftingRecipe(CraftingRecipeCategory.MISC));
+    public static final MapCodec<PRTKeySetterCraftingRecipe> CODEC = MapCodec.unit(() -> new PRTKeySetterCraftingRecipe(CraftingRecipeCategory.MISC));
     public PRTKeySetterCraftingRecipe(CraftingRecipeCategory category) {
         super(category);
     }
@@ -51,7 +55,7 @@ public class PRTKeySetterCraftingRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public ItemStack craft(RecipeInputInventory inventory, DynamicRegistryManager registryManager) {
+    public ItemStack craft(RecipeInputInventory inventory, RegistryWrapper.WrapperLookup registryManager) {
         ItemStack transmitter = ItemStack.EMPTY;
         ItemStack key1 = ItemStack.EMPTY;
         ItemStack key2 = ItemStack.EMPTY;
@@ -70,8 +74,7 @@ public class PRTKeySetterCraftingRecipe extends SpecialCraftingRecipe {
 
         var x = transmitter.copy();
 
-        x.getOrCreateNbt().put("key1", key1.writeNbt(new NbtCompound()));
-        x.getOrCreateNbt().put("key2", key2.writeNbt(new NbtCompound()));
+        x.set(FactoryDataComponents.REMOTE_KEYS, new Pair<>(key1, key2));
 
         return x;
     }

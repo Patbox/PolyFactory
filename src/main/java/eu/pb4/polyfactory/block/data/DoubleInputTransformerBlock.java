@@ -92,8 +92,8 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
@@ -131,8 +131,8 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
                 || (channel == be.inputChannel2() && selfState.get(FACING_INPUT_2) == directionNode.direction())
             ) && !(selfPos.equals(sourcePos) && sourceDir == selfState.get(FACING_OUTPUT)
                 && (directionNode.direction() != sourceDir
-                && FactoryNodes.DATA.getGraphView(world).getNodesAt(selfPos).filter(x -> x.getNode() == node).findFirst().map(NodeHolder::getGraphId)
-                        .orElse(-1l).longValue() != FactoryNodes.DATA.getGraphView(world).getNodesAt(selfPos).filter(x -> x.getNode() instanceof DataProviderNode)
+                && FactoryNodes.DATA.getGraphWorld(world).getNodesAt(selfPos).filter(x -> x.getNode() == node).findFirst().map(NodeHolder::getGraphId)
+                        .orElse(-1l).longValue() != FactoryNodes.DATA.getGraphWorld(world).getNodesAt(selfPos).filter(x -> x.getNode() instanceof DataProviderNode)
                 .findFirst().map(NodeHolder::getGraphId).orElse(-2l).longValue()
         ))) {
             var input1 = channel == be.inputChannel1() && selfState.get(FACING_INPUT_1) == directionNode.direction()

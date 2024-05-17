@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.nodes.electric.EnergyData;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -24,16 +25,16 @@ public class ElectricMotorBlockEntity extends LockableBlockEntity {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.writeNbt(nbt, lookup);
         nbt.putFloat("speed", this.speed);
         nbt.putFloat("stress", this.stress);
     }
 
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.readNbt(nbt, lookup);
         this.speed = nbt.getFloat("speed");
         this.stress = nbt.getFloat("stress");
     }

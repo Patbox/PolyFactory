@@ -109,7 +109,7 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
         if (state.get(FACING) == Direction.DOWN) {
             if (entity instanceof LivingEntity livingEntity
-                    && EnchantmentHelper.getEquipmentLevel(FactoryEnchantments.IGNORE_MOVEMENT, livingEntity) != 0) {
+                    && EnchantmentHelper.getEquipmentLevel(FactoryEnchantments.IGNORE_MOVEMENT.value(), livingEntity) != 0) {
                 return;
             }
             var rot = RotationUser.getRotation(world, pos);
@@ -128,8 +128,8 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
     @Override

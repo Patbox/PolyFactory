@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.recipe.press;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.factorytools.api.recipe.OutputStack;
@@ -14,13 +15,14 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
 import java.util.List;
 
 public record GenericPressRecipe(CountedIngredient inputA, CountedIngredient inputB, List<OutputStack> output, double minimumSpeed) implements PressRecipe {
-    public static final Codec<GenericPressRecipe> CODEC = RecordCodecBuilder.create(x -> x.group(
+    public static final MapCodec<GenericPressRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     CountedIngredient.CODEC.fieldOf("input_a").forGetter(GenericPressRecipe::inputA),
                     CountedIngredient.CODEC.optionalFieldOf("input_b", CountedIngredient.EMPTY).forGetter(GenericPressRecipe::inputB),
                     OutputStack.LIST_CODEC.fieldOf("output").forGetter(GenericPressRecipe::output),
@@ -67,7 +69,7 @@ public record GenericPressRecipe(CountedIngredient inputA, CountedIngredient inp
     }
 
     @Override
-    public ItemStack craft(PressBlockEntity inventory, DynamicRegistryManager registryManager) {
+    public ItemStack craft(PressBlockEntity inventory, RegistryWrapper.WrapperLookup registryManager) {
         for (var out : output) {
             if (Math.random() <= out.chance()) {
                 return out.stack().copy();
@@ -84,7 +86,7 @@ public record GenericPressRecipe(CountedIngredient inputA, CountedIngredient inp
 
     @Deprecated
     @Override
-    public ItemStack getResult(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
         return this.output.isEmpty() ? ItemStack.EMPTY : this.output.get(0).stack();
     }
 

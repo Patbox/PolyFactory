@@ -9,11 +9,6 @@ public class InvertedRedstoneLampBlock extends RedstoneLampBlock implements Poly
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.REDSTONE_LAMP;
-    }
-
-    @Override
     public BlockState getPolymerBlockState(BlockState state) {
         return Blocks.REDSTONE_LAMP.getDefaultState().with(RedstoneTorchBlock.LIT, !state.get(RedstoneTorchBlock.LIT));
     }

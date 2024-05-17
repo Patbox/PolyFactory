@@ -6,13 +6,14 @@ import eu.pb4.polyfactory.item.tool.DyeSprayItem;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.recipe.press.PressRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.world.World;
 
 public record FillSprayCanCraftingRecipe(CraftingRecipeCategory category) implements CraftingRecipe {
@@ -46,7 +47,7 @@ public record FillSprayCanCraftingRecipe(CraftingRecipeCategory category) implem
     }
 
     @Override
-    public ItemStack craft(RecipeInputInventory inventory, DynamicRegistryManager registryManager) {
+    public ItemStack craft(RecipeInputInventory inventory, RegistryWrapper.WrapperLookup registryManager) {
         ItemStack can = ItemStack.EMPTY;
         int dye = -1;
         int dyeCount = 0;
@@ -73,7 +74,7 @@ public record FillSprayCanCraftingRecipe(CraftingRecipeCategory category) implem
     }
 
     @Override
-    public ItemStack getResult(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
         return FactoryItems.SPRAY_CAN.getDefaultStack();
     }
 

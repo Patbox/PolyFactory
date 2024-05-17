@@ -29,6 +29,7 @@ import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
@@ -74,19 +75,19 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        Inventories.writeNbt(nbt, stacks);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        Inventories.writeNbt(nbt, stacks, lookup);
         nbt.putDouble("progress", this.process);
         nbt.putByteArray("locked_slots", this.lockedSlots.toByteArray());
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, lookup);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        Inventories.readNbt(nbt, this.stacks);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        Inventories.readNbt(nbt, this.stacks, lookup);
         this.process = nbt.getDouble("progress");
         this.lockedSlots = BitSet.valueOf(nbt.getByteArray("locked_slots"));
-        super.readNbt(nbt);
+        super.readNbt(nbt, lookup);
     }
 
     @Override
@@ -137,7 +138,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
                 return i;
             }
 
-            if (ItemStack.canCombine(cur, stack)) {
+            if (ItemStack.areItemsAndComponentsEqual(cur, stack)) {
                 if (count > cur.getCount() && cur.getCount() < cur.getMaxCount()) {
                     count = cur.getCount();
                     slot = i;
@@ -236,7 +237,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
                     if (c.isEmpty()) {
                         self.setStack(i, out);
                         break;
-                    } else if (ItemStack.canCombine(c, out)) {
+                    } else if (ItemStack.areItemsAndComponentsEqual(c, out)) {
                         var count = Math.min((c.getMaxCount() - c.getCount()), out.getCount());
                         c.increment(count);
                         out.decrement(count);

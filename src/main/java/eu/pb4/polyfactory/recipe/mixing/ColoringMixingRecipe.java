@@ -1,18 +1,20 @@
 package eu.pb4.polyfactory.recipe.mixing;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.registry.Registries;
 import net.minecraft.world.World;
 
@@ -22,7 +24,7 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
                                    double minimumSpeed,
                                    double optimalSpeed, float minimumTemperature,
                                    float maxTemperature) implements MixingRecipe {
-    public static final Codec<ColoringMixingRecipe> CODEC = RecordCodecBuilder.create(x -> x.group(
+    public static final MapCodec<ColoringMixingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.STRING.optionalFieldOf("group", "").forGetter(ColoringMixingRecipe::group),
                     Registries.ITEM.getCodec().fieldOf("input").forGetter(ColoringMixingRecipe::input),
                     Codec.INT.optionalFieldOf("max_count", 12).forGetter(ColoringMixingRecipe::maxCount),
@@ -63,7 +65,7 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
     }
 
     @Override
-    public ItemStack craft(MixerBlockEntity inventory, DynamicRegistryManager registryManager) {
+    public ItemStack craft(MixerBlockEntity inventory, RegistryWrapper.WrapperLookup registryManager) {
         int color = -1;
         int count = 0;
 
@@ -85,7 +87,7 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
     }
 
     @Override
-    public ItemStack getResult(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
         return input.getDefaultStack();
     }
 

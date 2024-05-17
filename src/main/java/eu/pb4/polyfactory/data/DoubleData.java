@@ -1,10 +1,14 @@
 package eu.pb4.polyfactory.data;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.nbt.NbtCompound;
 
 public record DoubleData(double value) implements DataContainer {
+    public static MapCodec<DoubleData> TYPE_CODEC = Codec.DOUBLE.xmap(DoubleData::new, DoubleData::value).fieldOf("value");
+
     @Override
-    public DataType type() {
+    public DataType<DoubleData> type() {
         return DataType.DOUBLE;
     }
 
@@ -31,14 +35,5 @@ public record DoubleData(double value) implements DataContainer {
     @Override
     public boolean forceRight() {
         return false;
-    }
-
-    @Override
-    public void writeNbt(NbtCompound compound) {
-        compound.putDouble("value", this.value);
-    }
-
-    public static DataContainer fromNbt(NbtCompound compound) {
-        return new DoubleData(compound.getDouble("value"));
     }
 }

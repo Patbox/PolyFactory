@@ -23,6 +23,8 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
@@ -69,13 +71,13 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (getY(state) != 2 && hand == Hand.MAIN_HAND && !player.isSneaking() && world.getBlockEntity(getCenter(state, pos)) instanceof SteamEngineBlockEntity be) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if (getY(state) != 2 && !player.isSneaking() && world.getBlockEntity(getCenter(state, pos)) instanceof SteamEngineBlockEntity be) {
             be.openGui((ServerPlayerEntity) player);
             return ActionResult.SUCCESS;
         }
 
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.onUse(state, world, pos, player, hit);
     }
 
     @Nullable
@@ -151,8 +153,8 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
@@ -177,9 +179,9 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
         public static final ItemStack LINK = new ItemStack(BaseItemProvider.requestModel());
 
         static {
-            AXLE.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(AXLE.getItem(), FactoryUtil.id("block/steam_engine_axle")).value());
-            LINK.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(LINK.getItem(), FactoryUtil.id("block/steam_engine_link")).value());
-            LIT.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(LIT.getItem(), FactoryUtil.id("block/steam_engine_lit")).value());
+            AXLE.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(AXLE.getItem(), FactoryUtil.id("block/steam_engine_axle")).value()));
+            LINK.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(LINK.getItem(), FactoryUtil.id("block/steam_engine_link")).value()));
+            LIT.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(LIT.getItem(), FactoryUtil.id("block/steam_engine_lit")).value()));
         }
 
         private final Matrix4fStack mat = new Matrix4fStack(2);

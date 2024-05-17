@@ -22,8 +22,8 @@ public class GreenScreenBlock extends Block implements PolymerBlock, BlockWithEl
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
 

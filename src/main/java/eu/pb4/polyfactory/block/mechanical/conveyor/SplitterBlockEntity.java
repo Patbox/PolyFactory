@@ -8,6 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 
@@ -28,9 +29,9 @@ public class SplitterBlockEntity extends BlockEntity implements BlockEntityExtra
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        nbt.put("FilterStackLeft", this.filterStackLeft.writeNbt(new NbtCompound()));
-        nbt.put("FilterStackRight", this.filterStackRight.writeNbt(new NbtCompound()));
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        nbt.put("FilterStackLeft", this.filterStackLeft.encodeAllowEmpty(lookup));
+        nbt.put("FilterStackRight", this.filterStackRight.encodeAllowEmpty(lookup));
         nbt.putByte("CurPos", (byte) this.position);
     }
 
@@ -42,9 +43,9 @@ public class SplitterBlockEntity extends BlockEntity implements BlockEntityExtra
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        this.filterStackLeft = ItemStack.fromNbt(nbt.getCompound("FilterStackLeft"));
-        this.filterStackRight = ItemStack.fromNbt(nbt.getCompound("FilterStackRight"));
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.filterStackLeft = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("FilterStackLeft"));
+        this.filterStackRight = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("FilterStackRight"));
         this.filterRight = FilterData.of(this.filterStackRight, false);
         this.filterLeft = FilterData.of(this.filterStackLeft, false);
         this.filtersEqual = Objects.equals(this.filterLeft.filter(), this.filterRight.filter());

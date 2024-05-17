@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.recipe.mixing;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
@@ -8,7 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.FireworkStarRecipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -19,7 +21,7 @@ public record FireworkStarMixingRecipe(double time,
                                        double optimalSpeed) implements MixingRecipe {
     public static final FireworkStarRecipe VANILLA = new FireworkStarRecipe(CraftingRecipeCategory.BUILDING);
 
-    public static final Codec<FireworkStarMixingRecipe> CODEC = RecordCodecBuilder.create(x -> x.group(
+    public static final MapCodec<FireworkStarMixingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.DOUBLE.fieldOf("time").forGetter(FireworkStarMixingRecipe::time),
                     Codec.DOUBLE.optionalFieldOf("minimum_speed", 1d).forGetter(FireworkStarMixingRecipe::minimumSpeed),
                     Codec.DOUBLE.optionalFieldOf("optimal_speed", 1d).forGetter(FireworkStarMixingRecipe::optimalSpeed)
@@ -60,7 +62,7 @@ public record FireworkStarMixingRecipe(double time,
     }
 
     @Override
-    public ItemStack craft(MixerBlockEntity inventory, DynamicRegistryManager registryManager) {
+    public ItemStack craft(MixerBlockEntity inventory, RegistryWrapper.WrapperLookup registryManager) {
         return VANILLA.craft(inventory.asRecipeInputProvider(), registryManager);
     }
 
@@ -70,7 +72,7 @@ public record FireworkStarMixingRecipe(double time,
     }
 
     @Override
-    public ItemStack getResult(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
         return VANILLA.getResult(registryManager);
     }
 

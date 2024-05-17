@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.ui;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 
@@ -46,7 +47,7 @@ public class GuiTextures {
 
         public ItemStack getNamed(float progress, Text text) {
             var base = elements[Math.min((int) (progress * elements.length), elements.length - 1)].getItemStack().copy();
-            base.setCustomName(text);
+            base.set(DataComponentTypes.ITEM_NAME, text);
             return base;
         }
 

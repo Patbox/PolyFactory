@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.recipe.mixing;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.item.ArtificialDyeItem;
@@ -9,7 +10,8 @@ import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.minecraft.item.*;
 import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.world.World;
 
@@ -19,7 +21,7 @@ public record ArtificialDyeMixingRecipe(double time,
                                         double minimumSpeed,
                                         double optimalSpeed) implements MixingRecipe {
 
-    public static final Codec<ArtificialDyeMixingRecipe> CODEC = RecordCodecBuilder.create(x -> x.group(
+    public static final MapCodec<ArtificialDyeMixingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.DOUBLE.fieldOf("time").forGetter(ArtificialDyeMixingRecipe::time),
                     Codec.DOUBLE.optionalFieldOf("minimum_speed", 1d).forGetter(ArtificialDyeMixingRecipe::minimumSpeed),
                     Codec.DOUBLE.optionalFieldOf("optimal_speed", 1d).forGetter(ArtificialDyeMixingRecipe::optimalSpeed)
@@ -72,7 +74,7 @@ public record ArtificialDyeMixingRecipe(double time,
     }
 
     @Override
-    public ItemStack craft(MixerBlockEntity inventory, DynamicRegistryManager registryManager) {
+    public ItemStack craft(MixerBlockEntity inventory, RegistryWrapper.WrapperLookup registryManager) {
         int[] rgb = new int[3];
         int[] rgbDye = new int[3];
         int maxColor = 0;
@@ -165,7 +167,7 @@ public record ArtificialDyeMixingRecipe(double time,
     }
 
     @Override
-    public ItemStack getResult(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
         return FactoryItems.ARTIFICIAL_DYE.getDefaultStack();
     }
 

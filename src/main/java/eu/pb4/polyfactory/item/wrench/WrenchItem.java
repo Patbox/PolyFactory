@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.item.wrench;
 
 import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.polyfactory.item.util.SwitchActionItem;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.item.TooltipType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -25,9 +25,10 @@ public class WrenchItem extends ModeledItem implements SwitchActionItem {
         super(new Settings().maxCount(1));
     }
 
+
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        super.appendTooltip(stack, world, tooltip, context);
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        super.appendTooltip(stack, context, tooltip, type);
         tooltip.add(Text.translatable("item.polyfactory.wrench.tooltip.1", Text.keybind("key.use")).formatted(Formatting.GRAY));
         tooltip.add(Text.translatable("item.polyfactory.wrench.tooltip.1.alt", Text.keybind("key.swapOffhand")).formatted(Formatting.GRAY));
         tooltip.add(Text.translatable("item.polyfactory.wrench.tooltip.2", Text.keybind("key.attack")).formatted(Formatting.GRAY));
@@ -51,7 +52,7 @@ public class WrenchItem extends ModeledItem implements SwitchActionItem {
 
     @Override
     public boolean onSwitchAction(ServerPlayerEntity player, ItemStack main, Hand mainHand) {
-        var raycast = player.raycast(PlayerEntity.getReachDistance(false), 0, false);
+        var raycast = player.raycast(player.getBlockInteractionRange(), 0, false);
 
         if (raycast.getType() == HitResult.Type.BLOCK
                 && raycast instanceof BlockHitResult result

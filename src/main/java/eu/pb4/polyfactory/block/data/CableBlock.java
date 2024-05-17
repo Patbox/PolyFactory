@@ -58,8 +58,8 @@ public final class CableBlock extends AbstractCableBlock implements BlockStateNa
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.STRUCTURE_VOID;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.STRUCTURE_VOID.getDefaultState();
     }
 
     @Override

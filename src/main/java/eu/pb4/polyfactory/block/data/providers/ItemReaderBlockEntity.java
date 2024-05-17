@@ -16,12 +16,16 @@ import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.block.BlockState;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.WritableBookContentComponent;
+import net.minecraft.component.type.WrittenBookContentComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.MusicDiscItem;
 import net.minecraft.item.WrittenBookItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -51,17 +55,17 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-        this.stack = ItemStack.fromNbt(nbt.getCompound("stack"));
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.readNbt(nbt, lookup);
+        this.stack = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("stack"));
         this.page = nbt.getInt("page");
         forceUpdate();
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
-        nbt.put("stack", this.stack.writeNbt(new NbtCompound()));
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.writeNbt(nbt, lookup);
+        nbt.put("stack", this.stack.encodeAllowEmpty(lookup));
         nbt.putInt("page", this.page);
     }
 
@@ -78,28 +82,28 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
             this.model.setItem(this.stack);
         }
 
-        if (this.stack.isOf(Items.WRITABLE_BOOK) && this.stack.hasNbt()) {
-            var lines = this.stack.getNbt().getList(WrittenBookItem.PAGES_KEY, NbtElement.STRING_TYPE);
+        if (this.stack.contains(DataComponentTypes.WRITABLE_BOOK_CONTENT)) {
+            var lines = this.stack.getOrDefault(DataComponentTypes.WRITABLE_BOOK_CONTENT, WritableBookContentComponent.DEFAULT).pages();
             if (lines.isEmpty()) {
                 this.lines = NO_DATA;
             } else {
                 var list = new ArrayList<String>(lines.size());
                 for (var x : lines) {
-                    var text = x.asString();
+                    var text = x.raw();
                     if (!text.isEmpty()) {
                         list.add(text);
                     }
                 }
                 this.lines = list.toArray(new String[0]);
             }
-        } else if (this.stack.isOf(Items.WRITTEN_BOOK) && this.stack.hasNbt()) {
-            var lines = this.stack.getNbt().getList(WrittenBookItem.PAGES_KEY, NbtElement.STRING_TYPE);
+        } else if (this.stack.contains(DataComponentTypes.WRITTEN_BOOK_CONTENT)) {
+            var lines = this.stack.getOrDefault(DataComponentTypes.WRITTEN_BOOK_CONTENT, WrittenBookContentComponent.DEFAULT).pages();
             if (lines.isEmpty()) {
                 this.lines = NO_DATA;
             } else {
                 var list = new ArrayList<String>(lines.size());
                 for (var x : lines) {
-                    var text = Text.Serialization.fromLenientJson(x.asString());
+                    var text = x.raw();
                     if (text != null) {
                         list.add(text.getString());
                     }

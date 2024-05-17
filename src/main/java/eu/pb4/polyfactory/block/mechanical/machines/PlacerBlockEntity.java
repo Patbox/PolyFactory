@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 import com.mojang.authlib.GameProfile;
 import eu.pb4.common.protection.api.CommonProtection;
 import eu.pb4.factorytools.api.util.FactoryPlayer;
+import eu.pb4.factorytools.api.util.LegacyNbtHelper;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
@@ -28,6 +29,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -51,23 +53,23 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        nbt.put("stack", this.stack.writeNbt(new NbtCompound()));
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        nbt.put("stack", this.stack.encodeAllowEmpty(lookup));
         nbt.putDouble("progress", this.process);
         if (this.owner != null) {
-            nbt.put("owner", NbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+            nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, lookup);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        this.stack = ItemStack.fromNbt(nbt.getCompound("tool"));
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.stack = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("tool"));
         this.process = nbt.getDouble("progress");
         if (nbt.contains("owner")) {
-            this.owner = NbtHelper.toGameProfile(nbt.getCompound("owner"));
+            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompound("owner"));
         }
-        super.readNbt(nbt);
+        super.readNbt(nbt, lookup);
     }
 
     @Override
@@ -206,7 +208,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                 var vec = Vec3d.ofCenter(pos).offset(state.get(PlacerBlock.FACING), 0.51);
                 p.setPos(vec.x, vec.y, vec.z);
 
-                var actionResult = world.getBlockState(blockPos).onUse(world, self.getFakePlayer(), Hand.MAIN_HAND, blockHitResult);
+                var actionResult = world.getBlockState(blockPos).onUse(world, self.getFakePlayer(), blockHitResult);
                 if (!actionResult.isAccepted()) {
                     actionResult = self.stack.useOnBlock(context);
                     if (!actionResult.isAccepted()) {

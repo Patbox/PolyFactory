@@ -16,6 +16,8 @@ import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import it.unimi.dsi.fastutil.chars.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -68,27 +70,23 @@ public class UiResourceCreator {
 
     public static Supplier<GuiElementBuilder> custom(String path) {
         var model = PolymerResourcePackUtils.requestModel (Items.ALLIUM, id("sgui/" + path));
-        return () -> new GuiElementBuilder(model.item()).setName(Text.empty()).hideFlags().setCustomModelData(model.value());
+        return () -> new GuiElementBuilder(model.item()).setName(Text.empty()).hideDefaultTooltip().setCustomModelData(model.value());
     }
 
     public static Supplier<GuiElementBuilder> icon16(String path) {
         var model = genericIconRaw(Items.ALLIUM, path, BASE_MODEL);
-        return () -> new GuiElementBuilder(model.item()).setName(Text.empty()).hideFlags().setCustomModelData(model.value());
+        return () -> new GuiElementBuilder(model.item()).setName(Text.empty()).hideDefaultTooltip().setCustomModelData(model.value());
     }
 
     public static Supplier<GuiElementBuilder> icon32(String path) {
         var model = genericIconRaw(Items.ALLIUM, path, X32_MODEL);
-        return () -> new GuiElementBuilder(model.item()).setName(Text.empty()).hideFlags().setCustomModelData(model.value());
+        return () -> new GuiElementBuilder(model.item()).setName(Text.empty()).hideDefaultTooltip().setCustomModelData(model.value());
     }
 
     public static IntFunction<GuiElementBuilder> icon32Color(String path) {
         var model = genericIconRaw(Items.LEATHER_LEGGINGS, path, X32_MODEL);
         return (i) -> {
-            var b = new GuiElementBuilder(model.item()).setName(Text.empty()).hideFlags().setCustomModelData(model.value());
-            var display = new NbtCompound();
-            display.putInt("color", i);
-            b.getOrCreateNbt().put("display", display);
-            return b;
+            return new GuiElementBuilder(model.item()).setName(Text.empty()).hideDefaultTooltip().setCustomModelData(model.value()).setComponent(DataComponentTypes.DYED_COLOR, new DyedColorComponent(i, true));
         };
     }
 
@@ -98,7 +96,7 @@ public class UiResourceCreator {
         for (var i = 0; i < size; i++) {
             models[i] = genericIconRaw(Items.ALLIUM, path + "_" + i, BASE_MODEL);
         }
-        return (i) -> new GuiElementBuilder(models[i].item()).setName(Text.empty()).hideFlags().setCustomModelData(models[i].value());
+        return (i) -> new GuiElementBuilder(models[i].item()).setName(Text.empty()).hideDefaultTooltip().setCustomModelData(models[i].value());
     }
 
     public static IntFunction<GuiElementBuilder> horizontalProgress16(String path, int start, int stop, boolean reverse) {
@@ -134,7 +132,7 @@ public class UiResourceCreator {
         for (var i = start; i < stop; i++) {
             models[i - start] = genericIconRaw(Items.ALLIUM,  "gen/" + path + "_" + i, base);
         }
-        return (i) -> new GuiElementBuilder(models[i].item()).setName(Text.empty()).hideFlags().setCustomModelData(models[i].value());
+        return (i) -> new GuiElementBuilder(models[i].item()).setName(Text.empty()).hideDefaultTooltip().setCustomModelData(models[i].value());
     }
 
     public static IntFunction<GuiElementBuilder>[] createNumbers(String prefix) {

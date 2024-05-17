@@ -5,7 +5,7 @@ import eu.pb4.factorytools.api.item.FireworkStarColoredItem;
 import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.item.TooltipType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -48,14 +48,12 @@ public class ArtificialDyeItem extends ModeledItem implements SignChangingItem, 
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         if (ColoredItem.hasColor(stack)) {
             tooltip.add(Text.translatable("item.color", ColoredItem.getHexName(ColoredItem.getColor(stack))).formatted(Formatting.GRAY));
         }
-
-        super.appendTooltip(stack, world, tooltip, context);
+        super.appendTooltip(stack, context, tooltip, type);
     }
-
 
     @Override
     public boolean useOnSign(World world, SignBlockEntity signBlockEntity, boolean front, PlayerEntity player) {

@@ -23,23 +23,26 @@ import net.minecraft.item.Items;
 import net.minecraft.loot.condition.AnyOfLootCondition;
 import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
 import net.minecraft.predicate.item.ItemPredicate;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
 class AdvancementsProvider extends FabricAdvancementProvider {
 
-    protected AdvancementsProvider(FabricDataOutput output) {
-        super(output);
+
+    protected AdvancementsProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
+        super(output, registryLookup);
     }
 
     @Override
-    public void generateAdvancement(Consumer<AdvancementEntry> exporter) {
+    public void generateAdvancement(RegistryWrapper.WrapperLookup registryLookup, Consumer<AdvancementEntry> exporter) {
         var root = Advancement.Builder.create()
                 .display(
                         FactoryItems.WINDMILL_SAIL,
@@ -56,11 +59,11 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 ))
                 .build(exporter, "polyfactory:main/root");
 
-        this.base(root, exporter);
-        this.taters(root, exporter);
+        this.base(registryLookup, root, exporter);
+        this.taters(registryLookup, root, exporter);
     }
 
-    private void taters(AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
+    private void taters(RegistryWrapper.WrapperLookup registryLookup, AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
         var tater16 = Advancement.Builder.create()
                 .parent(root)
                 .display(
@@ -107,7 +110,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .build(exporter, "polyfactory:main/taters/1023");
     }
 
-    private void base(AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
+    private void base(RegistryWrapper.WrapperLookup registryLookup, AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
         // Start
 
         var handCrank = Advancement.Builder.create()

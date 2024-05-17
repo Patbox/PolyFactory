@@ -18,17 +18,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public record SimpleAxisNode(Direction.Axis axis) implements AxisNode {
-    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("axis"),
-            tag -> new SimpleAxisNode(tag instanceof NbtString string ? Direction.Axis.fromName(string.asString()) : Direction.Axis.Y));
+    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("axis"), Direction.Axis.CODEC.xmap(SimpleAxisNode::new, SimpleAxisNode::axis));
 
     @Override
     public @NotNull BlockNodeType getType() {
         return TYPE;
-    }
-
-    @Override
-    public @Nullable NbtElement toTag() {
-        return NbtString.of(axis.asString());
     }
 
     @Override

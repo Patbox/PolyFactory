@@ -8,6 +8,8 @@ import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -101,7 +103,7 @@ public class ConveyorModel {
     private static void createItemModel(ItemStack[] array, String path, int i) {
         var model = PolymerResourcePackUtils.requestModel(MODEL_ITEMS[currentItemIndex++ % MODEL_ITEMS.length], FactoryUtil.id(path));
         var stack = new ItemStack(model.item());
-        stack.getOrCreateNbt().putInt("CustomModelData", model.value());
+        stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(model.value()));
         array[i == 0 ? 0 : (array.length - i)] = stack;
     }
 
@@ -134,7 +136,7 @@ public class ConveyorModel {
 
     private static void createFast(ItemStack stack, String prefix, String suffix) {
         var path = FactoryUtil.id("block/" + prefix + "conveyor" + suffix + "_fast");
-        stack.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(stack.getItem(), path).value());
+        stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(stack.getItem(), path).value()));
     }
 
     public static void generateModels(BiConsumer<String, byte[]> dataWriter) {

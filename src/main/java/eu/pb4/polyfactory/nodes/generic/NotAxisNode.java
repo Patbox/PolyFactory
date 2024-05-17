@@ -18,17 +18,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public record NotAxisNode(Direction.Axis axis) implements DirectionCheckingNode {
-    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("not_axis"),
-            tag -> new NotAxisNode(tag instanceof NbtString string ? Direction.Axis.fromName(string.asString()) : Direction.Axis.Y));
+    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("not_axis"), Direction.Axis.CODEC.xmap(NotAxisNode::new, NotAxisNode::axis));
 
     @Override
     public @NotNull BlockNodeType getType() {
         return TYPE;
-    }
-
-    @Override
-    public @Nullable NbtElement toTag() {
-        return NbtString.of(axis.asString());
     }
 
     @Override

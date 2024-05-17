@@ -6,14 +6,12 @@ import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.Block;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.item.TooltipType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.ColorHelper;
-import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -43,10 +41,11 @@ public class ColoredDownsampledBlockItem extends FactoryBlockItem implements Fir
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         if (ColoredItem.hasColor(stack) && !DyeColorExtra.hasLang(ColoredItem.getColor(stack))) {
             tooltip.add(Text.translatable("item.color", ColoredItem.getHexName(ColoredItem.getColor(stack))).formatted(Formatting.GRAY));
         }
+        super.appendTooltip(stack, context, tooltip, type);
     }
 
     @Override

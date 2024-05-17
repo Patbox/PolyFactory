@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
@@ -28,20 +29,20 @@ public class SimpleContainer implements ContainerHolder {
         this.removed = removed;
     }
 
-    public static void readArray(SimpleContainer[] containers, NbtList items) {
+    public static void readArray(SimpleContainer[] containers, NbtList items, RegistryWrapper.WrapperLookup lookup) {
         var l = Math.min(containers.length, items.size());
 
         for (int i = 0; i < l; i++) {
             if (items.get(i) instanceof NbtCompound compound) {
-                containers[i].readNbt(compound);
+                containers[i].readNbt(compound, lookup);
             }
         }
     }
 
-    public static NbtElement writeArray(SimpleContainer[] containers) {
+    public static NbtElement writeArray(SimpleContainer[] containers, RegistryWrapper.WrapperLookup lookup) {
         var list = new NbtList();
         for (var cotnainer : containers) {
-            list.add(cotnainer.writeNbt());
+            list.add(cotnainer.writeNbt(lookup));
         }
         return list;
     }
@@ -96,12 +97,12 @@ public class SimpleContainer implements ContainerHolder {
         }
     }
 
-    public NbtCompound writeNbt() {
-        return this.movingItem == null ? new NbtCompound() : this.movingItem.get().writeNbt(new NbtCompound());
+    public NbtElement writeNbt(RegistryWrapper.WrapperLookup lookup) {
+        return this.movingItem == null ? new NbtCompound() : this.movingItem.get().encodeAllowEmpty(lookup);
     }
 
-    public void readNbt(NbtCompound compound) {
-        var itemStack = ItemStack.fromNbt(compound);
+    public void readNbt(NbtCompound compound, RegistryWrapper.WrapperLookup lookup) {
+        var itemStack = ItemStack.fromNbtOrEmpty(lookup, compound);
 
         if (itemStack == ItemStack.EMPTY) {
             clearContainer();

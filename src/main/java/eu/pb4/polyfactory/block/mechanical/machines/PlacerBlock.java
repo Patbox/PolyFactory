@@ -88,11 +88,6 @@ public class PlacerBlock extends RotationalNetworkBlock implements FactoryBlock,
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
-    }
-
-    @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
@@ -118,13 +113,13 @@ public class PlacerBlock extends RotationalNetworkBlock implements FactoryBlock,
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (hand == Hand.MAIN_HAND && !player.isSneaking() && world.getBlockEntity(pos) instanceof PlacerBlockEntity be) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if (!player.isSneaking() && world.getBlockEntity(pos) instanceof PlacerBlockEntity be) {
             be.openGui((ServerPlayerEntity) player);
             return ActionResult.SUCCESS;
         }
 
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.onUse(state, world, pos, player, hit);
     }
 
     @Override

@@ -14,6 +14,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.data.providers.TinyPotatoSpringBlock;
 import eu.pb4.polyfactory.entity.FactoryEntities;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
 import eu.pb4.polyfactory.models.CableModel;
@@ -64,6 +65,7 @@ public class ModInit implements ModInitializer {
 		FactoryPoi.register();
 		FactoryBlockEntities.register();
 		FactoryEnchantments.register();
+		FactoryDataComponents.register();
 		FactoryItems.register();
 		FactoryEntities.register();
 		FactoryNodes.register();
@@ -73,7 +75,6 @@ public class ModInit implements ModInitializer {
 		FactoryCommands.register();
 		FactoryUtil.register();
 		FactoryItemPredicates.register();
-		DebugData.register();
 		PotatoWisdom.load();
 
 		ConveyorModel.registerAssetsEvents();

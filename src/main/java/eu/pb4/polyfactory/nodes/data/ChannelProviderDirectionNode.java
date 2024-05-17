@@ -6,6 +6,8 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.graph.user.BlockNodeType;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
@@ -20,27 +22,14 @@ import java.util.Collection;
 
 
 public record ChannelProviderDirectionNode(Direction direction, int channel) implements FunctionalNode, DirectionNode, DataProviderNode {
-    public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("channel/direction/provider"),
-            ChannelProviderDirectionNode::fromNbt);
-
-    private static BlockNode fromNbt(NbtElement element) {
-        if (element instanceof NbtCompound compound) {
-            return new ChannelProviderDirectionNode(Direction.byName(compound.getString("dir")), compound.getInt("channel"));
-        }
-        return new ChannelProviderDirectionNode(Direction.UP, 0);
-    }
+    public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("channel/direction/provider"), RecordCodecBuilder.<ChannelProviderDirectionNode>create(instance -> instance.group(
+            Direction.CODEC.fieldOf("dir").forGetter(ChannelProviderDirectionNode::direction),
+            Codec.INT.fieldOf("channel").forGetter(ChannelProviderDirectionNode::channel)
+    ).apply(instance, ChannelProviderDirectionNode::new)));
 
     @Override
     public @NotNull BlockNodeType getType() {
         return TYPE;
-    }
-
-    @Override
-    public @Nullable NbtElement toTag() {
-        var nbt = new NbtCompound();
-        nbt.putString("dir", direction.asString());
-        nbt.putInt("channel", channel);
-        return nbt;
     }
 
     @Override

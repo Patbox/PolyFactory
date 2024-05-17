@@ -1,11 +1,8 @@
 package eu.pb4.polyfactory.util.filter;
 
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
-import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtElement;
-
-import java.util.function.Predicate;
 
 public record FilterData(ItemFilter filter, ItemStack icon) {
 
@@ -22,8 +19,8 @@ public record FilterData(ItemFilter filter, ItemStack icon) {
 
         ItemStack testStack;
 
-        if (stack.isOf(FactoryItems.ITEM_FILTER) && stack.hasNbt() && stack.getNbt().contains("item", NbtElement.COMPOUND_TYPE)) {
-            testStack = ItemStack.fromNbt(stack.getNbt().getCompound("item"));
+        if (stack.isOf(FactoryItems.ITEM_FILTER) && stack.contains(FactoryDataComponents.ITEM_FILTER)) {
+            testStack = stack.getOrDefault(FactoryDataComponents.ITEM_FILTER, ItemStack.EMPTY);
         } else {
             testStack = stack;
         }

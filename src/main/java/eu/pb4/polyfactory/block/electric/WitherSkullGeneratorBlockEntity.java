@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.electric;
 
 import com.mojang.authlib.GameProfile;
+import eu.pb4.factorytools.api.util.LegacyNbtHelper;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.entity.ArtificialWitherSkullEntity;
 import eu.pb4.polyfactory.nodes.electric.EnergyData;
@@ -8,6 +9,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -21,21 +23,21 @@ public class WitherSkullGeneratorBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.writeNbt(nbt, lookup);
         nbt.putFloat("progress", this.progress);
         if (this.owner != null) {
-            nbt.put("owner", NbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+            nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
     }
 
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.readNbt(nbt, lookup);
         this.progress = nbt.getFloat("progress");
         if (nbt.contains("owner")) {
-            this.owner = NbtHelper.toGameProfile(nbt.getCompound("owner"));
+            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompound("owner"));
         }
     }
 

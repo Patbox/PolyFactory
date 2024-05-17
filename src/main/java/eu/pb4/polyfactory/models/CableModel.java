@@ -9,6 +9,8 @@ import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -40,7 +42,7 @@ public class CableModel {
             {
                 var model = PolymerResourcePackUtils.requestModel(MODEL_ITEMS[currentItemIndex++ % MODEL_ITEMS.length], FactoryUtil.id("block/gen/cable_colored/" + i));
                 var stack = new ItemStack(model.item());
-                stack.getOrCreateNbt().putInt("CustomModelData", model.value());
+                stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(model.value()));
                 COLORED_MODELS_BY_ID[i] = stack;
             }
         }

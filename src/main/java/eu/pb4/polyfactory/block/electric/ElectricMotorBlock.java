@@ -89,8 +89,8 @@ public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, Bl
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
@@ -114,7 +114,7 @@ public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, Bl
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         //if (!player.isSneaking() && hand == Hand.MAIN_HAND && hit.getSide() != state.get(FACING) && player.isCreative() && world.getBlockEntity(pos) instanceof ElectricMotorBlockEntity be && player instanceof ServerPlayerEntity serverPlayer) {
         //    be.openGui(serverPlayer);
         //    return ActionResult.SUCCESS;

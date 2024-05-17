@@ -9,6 +9,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -35,8 +36,8 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.writeNbt(nbt, lookup);
         nbt.putString("Text", this.value);
         nbt.putInt("PIndex", this.positiveIndex);
         nbt.putInt("NIndex", this.negativeIndex);
@@ -46,7 +47,7 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.value = nbt.getString("Text");
         this.positiveIndex = nbt.getInt("PIndex");
         this.negativeIndex = nbt.getInt("NIndex");

@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.recipe;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.factorytools.api.recipe.LazyRecipeSerializer;
 import eu.pb4.factorytools.api.recipe.OutputStack;
@@ -11,14 +12,15 @@ import eu.pb4.polymer.core.api.item.PolymerRecipe;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.*;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.world.World;
 
 import java.util.Arrays;
 import java.util.List;
 
 public record GrindingRecipe(String group, Ingredient input, List<OutputStack> output, double grindTime, double minimumSpeed, double optimalSpeed) implements Recipe<GrinderBlockEntity>, PolymerRecipe {
-    public static final Codec<GrindingRecipe> CODEC = RecordCodecBuilder.create(x -> x.group(
+    public static final MapCodec<GrindingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.STRING.optionalFieldOf("group", "").forGetter(GrindingRecipe::group),
                     LazyRecipeSerializer.INGREDIENT_CODEC.fieldOf("input").forGetter(GrindingRecipe::input),
                     OutputStack.LIST_CODEC.fieldOf("output").forGetter(GrindingRecipe::output),
@@ -72,7 +74,7 @@ public record GrindingRecipe(String group, Ingredient input, List<OutputStack> o
 
     @Deprecated
     @Override
-    public ItemStack craft(GrinderBlockEntity inventory, DynamicRegistryManager registryManager) {
+    public ItemStack craft(GrinderBlockEntity inventory, RegistryWrapper.WrapperLookup registryManager) {
         return this.output.isEmpty() ? ItemStack.EMPTY : this.output.get(0).stack();
     }
 
@@ -83,7 +85,7 @@ public record GrindingRecipe(String group, Ingredient input, List<OutputStack> o
 
     @Deprecated
     @Override
-    public ItemStack getResult(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
         return ItemStack.EMPTY;
     }
 

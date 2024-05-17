@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
@@ -85,8 +86,8 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        var x = player.getStackInHand(hand);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        var x = player.getStackInHand(Hand.MAIN_HAND);
         if (x.isOf(Items.SLIME_BALL) && this == FactoryBlocks.CONVEYOR) {
             var delta = 0d;
             MovingItem itemContainer = null;
@@ -132,20 +133,18 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         }
 
 
-        if (hand == Hand.MAIN_HAND) {
-            if (x.isEmpty()) {
-                var be = world.getBlockEntity(pos);
-
-                if (be instanceof ConveyorBlockEntity conveyor && !conveyor.getStack(0).isEmpty()) {
-                    player.setStackInHand(hand, conveyor.getStack(0));
-                    conveyor.setStack(0, ItemStack.EMPTY);
-                    conveyor.setDelta(0);
-                    return ActionResult.SUCCESS;
-                }
+        if (x.isEmpty()) {
+            var be = world.getBlockEntity(pos);
+            if (be instanceof ConveyorBlockEntity conveyor && !conveyor.getStack(0).isEmpty()) {
+                player.setStackInHand(Hand.MAIN_HAND, conveyor.getStack(0));
+                conveyor.setStack(0, ItemStack.EMPTY);
+                conveyor.setDelta(0);
+                return ActionResult.SUCCESS;
             }
         }
 
-        return super.onUse(state, world, pos, player, hand, hit);
+
+        return super.onUse(state, world, pos, player, hit);
     }
 
     @Override
@@ -207,7 +206,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         }
 
         if (entity instanceof LivingEntity livingEntity
-                && EnchantmentHelper.getEquipmentLevel(FactoryEnchantments.IGNORE_MOVEMENT, livingEntity) != 0) {
+                && EnchantmentHelper.getEquipmentLevel(FactoryEnchantments.IGNORE_MOVEMENT.value(), livingEntity) != 0) {
             return;
         }
 
@@ -371,11 +370,6 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.DEEPSLATE_TILE_STAIRS;
-    }
-
-    @Override
     public BlockState getPolymerBlockState(BlockState state) {
         if (state.get(VERTICAL) == DirectionValue.NONE || state.get(VERTICAL).stack) {
             return Blocks.BARRIER.getDefaultState();
@@ -485,6 +479,9 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         POSITIVE_STACK(1, true),
         NEGATIVE(-1, false),
         NEGATIVE_STACK(-1, true);
+
+        public static final Codec<DirectionValue> CODEC = StringIdentifiable.createBasicCodec(DirectionValue::values);
+
 
         public final int value;
         public final boolean stack;

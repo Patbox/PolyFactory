@@ -20,6 +20,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
+import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -116,9 +119,8 @@ public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataR
             var model = state.isOf(FactoryBlocks.REDSTONE_OUTPUT) ? OUTPUT_OVERLAY : INPUT_OVERLAY;
             var stack = new ItemStack(model.item());
             var display = new NbtCompound();
-            display.putInt("color", RedstoneWireBlock.getWireColor(state.get(POWER)));
-            stack.getOrCreateNbt().put("display", display);
-            stack.getNbt().putInt("CustomModelData", model.value());
+            stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(RedstoneWireBlock.getWireColor(state.get(POWER)), false));
+            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(model.value()));
             return stack;
         }
 

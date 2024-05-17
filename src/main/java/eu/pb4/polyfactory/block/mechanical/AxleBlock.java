@@ -24,6 +24,8 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.block.*;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
@@ -75,11 +77,6 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, W
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
         return List.of(new SimpleAxisNode(state.get(AXIS)));
-    }
-
-    @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
     }
 
     @Override
@@ -225,8 +222,8 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, W
         }
 
         static {
-            ITEM_MODEL.getOrCreateNbt().putInt("CustomModelData", AutoModeledPolymerItem.MODELS.get(FactoryItems.AXLE).value());
-            ITEM_MODEL_SHORT.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(ITEM_MODEL_SHORT.getItem(), FactoryUtil.id("block/axle_short")).value());
+            ITEM_MODEL.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(AutoModeledPolymerItem.MODELS.get(FactoryItems.AXLE).value()));
+            ITEM_MODEL_SHORT.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(ITEM_MODEL_SHORT.getItem(), FactoryUtil.id("block/axle_short")).value()));
         }
     }
 }

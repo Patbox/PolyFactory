@@ -13,8 +13,11 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FireworkExplosionComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -68,8 +71,8 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
@@ -142,11 +145,8 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
         }
 
         private void updateModel() {
-            var stack = LodItemDisplayElement.getModel(this.state.get(LIT) == this.inverted ? FactoryItems.LAMP : FactoryItems.INVERTED_LAMP).copy();
-            var ex = new NbtCompound();
-            var c = new NbtIntArray(new int[] { this.color });
-            ex.put("Colors", c);
-            stack.getOrCreateNbt().put("Explosion", ex);
+            var stack = ItemDisplayElementUtil.getModel(this.state.get(LIT) == this.inverted ? FactoryItems.LAMP : FactoryItems.INVERTED_LAMP).copy();
+            stack.set(DataComponentTypes.FIREWORK_EXPLOSION, new FireworkExplosionComponent(FireworkExplosionComponent.Type.BURST, IntList.of(this.color), IntList.of(), false, false));
             this.main.setItem(stack);
             this.tick();
         }

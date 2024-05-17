@@ -9,6 +9,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -29,18 +30,18 @@ public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements 
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        nbt.put("key1", this.key1.writeNbt(new NbtCompound()));
-        nbt.put("key2", this.key2.writeNbt(new NbtCompound()));
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        nbt.put("key1", this.key1.encodeAllowEmpty(lookup));
+        nbt.put("key2", this.key2.encodeAllowEmpty(lookup));
+        super.writeNbt(nbt, lookup);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        this.key1 = ItemStack.fromNbt(nbt.getCompound("key1"));
-        this.key2 = ItemStack.fromNbt(nbt.getCompound("key2"));
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.key1 = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("key1"));
+        this.key2 = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("key2"));
         updateStack();
-        super.readNbt(nbt);
+        super.readNbt(nbt, lookup);
     }
 
     private void updateStack() {
@@ -66,7 +67,7 @@ public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements 
 
         var current = upper ? this.key1 : this.key2;
 
-        if (ItemStack.canCombine(current, mainHandStack)) {
+        if (ItemStack.areItemsAndComponentsEqual(current, mainHandStack)) {
             return false;
         }
 
@@ -90,7 +91,7 @@ public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements 
     }
 
     public boolean matches(ItemStack key1, ItemStack key2) {
-        return ItemStack.canCombine(this.key1, key1) && ItemStack.canCombine(this.key2, key2);
+        return ItemStack.areItemsAndComponentsEqual(this.key1, key1) && ItemStack.areItemsAndComponentsEqual(this.key2, key2);
     }
 
     @Override

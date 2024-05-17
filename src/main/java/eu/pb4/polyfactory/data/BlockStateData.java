@@ -1,14 +1,18 @@
 package eu.pb4.polyfactory.data;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.registry.Registries;
 
 public record BlockStateData(BlockState state) implements DataContainer {
+    public static MapCodec<BlockStateData> TYPE_CODEC = BlockState.CODEC.xmap(BlockStateData::new, BlockStateData::state).fieldOf("value");
+
 
     @Override
-    public DataType type() {
+    public DataType<BlockStateData> type() {
         return DataType.BLOCK_STATE;
     }
 
@@ -31,14 +35,4 @@ public record BlockStateData(BlockState state) implements DataContainer {
     public boolean isEmpty() {
         return state.isAir();
     }
-
-    @Override
-    public void writeNbt(NbtCompound compound) {
-        compound.put("value", NbtHelper.fromBlockState(this.state));
-    }
-
-    public static DataContainer fromNbt(NbtCompound compound) {
-        return new BlockStateData(NbtHelper.toBlockState(Registries.BLOCK.getReadOnlyWrapper(), compound.getCompound("value")));
-    }
-
 }

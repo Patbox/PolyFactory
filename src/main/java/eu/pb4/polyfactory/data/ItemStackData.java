@@ -1,5 +1,8 @@
 package eu.pb4.polyfactory.data;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -8,13 +11,18 @@ import net.minecraft.registry.Registries;
 import org.jetbrains.annotations.Nullable;
 
 public record ItemStackData(ItemStack stack, String name) implements DataContainer {
+    public static MapCodec<ItemStackData> TYPE_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            ItemStack.OPTIONAL_CODEC.fieldOf("value").forGetter(ItemStackData::stack),
+            Codec.STRING.optionalFieldOf("name", "").forGetter(ItemStackData::name)
+    ).apply(instance, ItemStackData::new));
+
 
     public static ItemStackData of(ItemStack stack) {
         return new ItemStackData(stack.copy(), stack.getName().getString());
     }
 
     @Override
-    public DataType type() {
+    public DataType<ItemStackData> type() {
         return DataType.ITEM_STACK;
     }
 
@@ -37,15 +45,4 @@ public record ItemStackData(ItemStack stack, String name) implements DataContain
     public boolean isEmpty() {
         return this.stack.isEmpty();
     }
-
-    @Override
-    public void writeNbt(NbtCompound compound) {
-        compound.put("value", this.stack.writeNbt(new NbtCompound()));
-        compound.putString("name", this.name);
-    }
-
-    public static DataContainer fromNbt(NbtCompound compound) {
-        return new ItemStackData(ItemStack.fromNbt(compound.getCompound("value")), compound.getString("name"));
-    }
-
 }

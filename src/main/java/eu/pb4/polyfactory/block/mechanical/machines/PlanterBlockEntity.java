@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.mojang.authlib.GameProfile;
 import eu.pb4.common.protection.api.CommonProtection;
+import eu.pb4.factorytools.api.util.LegacyNbtHelper;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
@@ -23,6 +24,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -45,23 +47,23 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        nbt.put("stack", this.stack.writeNbt(new NbtCompound()));
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        nbt.put("stack", this.stack.encodeAllowEmpty(lookup));
         nbt.putDouble("progress", this.process);
         if (this.owner != null) {
-            nbt.put("owner", NbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+            nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, lookup);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        this.stack = ItemStack.fromNbt(nbt.getCompound("stack"));
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.stack = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("stack"));
         this.process = nbt.getDouble("progress");
         if (nbt.contains("owner")) {
-            this.owner = NbtHelper.toGameProfile(nbt.getCompound("owner"));
+            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompound("owner"));
         }
-        super.readNbt(nbt);
+        super.readNbt(nbt, lookup);
     }
 
     @Override
@@ -116,7 +118,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
                 mut.set(pos).move(dir.getOffsetX(), -i, dir.getOffsetZ());
                 var targetState = world.getBlockState(mut);
                 if ((targetState.isAir() || targetState.isReplaceable())
-                        && blockItem.getBlock().canPlaceAt(placableState, world, mut)
+                        && placableState.canPlaceAt(world, mut)
                         && CommonProtection.canPlaceBlock(world, mut, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner, null)) {
                     direction = dir;
                     break;

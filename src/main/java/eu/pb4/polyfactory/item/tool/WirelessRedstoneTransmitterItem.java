@@ -2,14 +2,12 @@ package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.polyfactory.block.other.WirelessRedstoneBlock;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.util.ColoredItem;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.item.TooltipType;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -23,43 +21,42 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class WirelessRedstoneTransmitterItem extends ModeledItem implements DyeableItem {
+public class WirelessRedstoneTransmitterItem extends ModeledItem implements ColoredItem {
     public WirelessRedstoneTransmitterItem(Settings settings) {
         super(Items.LEATHER_HORSE_ARMOR, settings);
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (world instanceof ServerWorld serverWorld) {
-            var stack = user.getStackInHand(hand);
-            var key1 = ItemStack.fromNbt(stack.getOrCreateNbt().getCompound("key1"));
-            var key2 = ItemStack.fromNbt(stack.getOrCreateNbt().getCompound("key2"));
-            WirelessRedstoneBlock.send(serverWorld, user.getBlockPos(), 20, key1, key2);
-            user.playSound(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_ON, SoundCategory.MASTER, 1f, 1.5f);
-            user.playSound(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_OFF, SoundCategory.MASTER, 1f, 1.4f);
-            return TypedActionResult.success(stack);
+        var x = user.getStackInHand(hand).get(FactoryDataComponents.REMOTE_KEYS);
+
+        if (x != null && world instanceof ServerWorld serverWorld) {
+            WirelessRedstoneBlock.send(serverWorld, user.getBlockPos(), 20, x.getFirst(), x.getSecond());
+            user.playSoundToPlayer(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_ON, SoundCategory.MASTER, 1f, 1.5f);
+            user.playSoundToPlayer(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_OFF, SoundCategory.MASTER, 1f, 1.4f);
+            return TypedActionResult.success(user.getStackInHand(hand));
         }
 
         return super.use(world, user, hand);
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        var key1 = ItemStack.fromNbt(stack.getOrCreateNbt().getCompound("key1"));
-        var key2 = ItemStack.fromNbt(stack.getOrCreateNbt().getCompound("key2"));
-        tooltip.add(key1.toHoverableText().copy().formatted(Formatting.GRAY));
-        tooltip.add(key2.toHoverableText().copy().formatted(Formatting.GRAY));
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        super.appendTooltip(stack, context, tooltip, type);
+        var x = stack.get(FactoryDataComponents.REMOTE_KEYS);
+        if (x != null) {
+            tooltip.add(x.getFirst().toHoverableText().copy().formatted(Formatting.GRAY));
+            tooltip.add(x.getSecond().toHoverableText().copy().formatted(Formatting.GRAY));
+        }
     }
 
     @Override
-    public int getColor(ItemStack stack) {
-        NbtCompound nbtCompound = stack.getSubNbt("display");
-        return nbtCompound != null && nbtCompound.contains("color", NbtElement.NUMBER_TYPE)
-                ? nbtCompound.getInt("color") : 0x888888;
+    public int getDefaultColor() {
+        return 0x888888;
     }
 
     @Override
     public int getPolymerArmorColor(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        return getColor(itemStack);
+        return itemStack.getOrDefault(FactoryDataComponents.COLOR, 0x888888);
     }
 }

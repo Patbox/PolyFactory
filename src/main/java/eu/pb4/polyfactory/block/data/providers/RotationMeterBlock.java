@@ -71,8 +71,8 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
@@ -217,6 +217,7 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
         }
 
         private void updateAnimation(float speed, BlockState state) {
+            var mat = mat();
             mat.identity();
             switch (getAxis(state)) {
                 case X -> mat.rotate(Direction.EAST.getRotationQuaternion());
@@ -245,6 +246,7 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
         }
 
         private void updateStatePos(BlockState state) {
+            var mat = mat();
             mat.identity();
             mat.rotate(state.get(FIRST_AXIS) ? MathHelper.HALF_PI : 0, state.get(FACING).getUnitVector());
             mat.rotate(state.get(FACING).getRotationQuaternion());

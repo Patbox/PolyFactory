@@ -16,6 +16,8 @@
   "license": "LGPLv3",
   "icon": "assets/polyfactory/textures/icon.png",
 
+  "accessWidener": "polyfactory.accesswidener",
+
   "environment": "*",
   "entrypoints": {
     "main": [

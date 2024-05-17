@@ -12,6 +12,7 @@ import net.minecraft.block.entity.LootableContainerBlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -39,13 +40,13 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
     }
 
     @Inject(method = "writeNbt", at = @At("TAIL"))
-    private void writeFilterNbt(NbtCompound nbt, CallbackInfo ci) {
-        nbt.put("polydex:filter", this.filterStack.writeNbt(new NbtCompound()));
+    private void writeFilterNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
+        nbt.put("polydex:filter", this.filterStack.encodeAllowEmpty(registryLookup));
     }
 
     @Inject(method = "readNbt", at = @At("TAIL"))
-    private void readFilterNbt(NbtCompound nbt, CallbackInfo ci) {
-        polyfactory$setFilter(ItemStack.fromNbt(nbt.getCompound("polydex:filter")));
+    private void readFilterNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
+        polyfactory$setFilter(ItemStack.fromNbtOrEmpty(registryLookup, nbt.getCompound("polydex:filter")));
     }
 
     @Inject(method = "transfer(Lnet/minecraft/inventory/Inventory;Lnet/minecraft/inventory/Inventory;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/math/Direction;)Lnet/minecraft/item/ItemStack;", at = @At("HEAD"), cancellable = true)

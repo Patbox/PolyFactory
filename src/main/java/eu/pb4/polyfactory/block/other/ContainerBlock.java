@@ -71,10 +71,10 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be && hand == Hand.MAIN_HAND && hit.getSide() == state.get(FACING)) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be && hit.getSide() == state.get(FACING)) {
             if (be.checkUnlocked(player)) {
-                var stack = player.getStackInHand(hand);
+                var stack = player.getStackInHand(Hand.MAIN_HAND);
 
                 if (player.isSneaking() && stack.isEmpty() && !be.getItemStack().isEmpty()) {
                     var inv = player.getInventory().main;
@@ -105,14 +105,14 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
                     }
 
                     if (stack.isEmpty()) {
-                        player.setStackInHand(hand, ItemStack.EMPTY);
+                        player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
                     }
                 }
             }
             return ActionResult.SUCCESS;
         }
 
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.onUse(state, world, pos, player, hit);
     }
 
     @Override
@@ -182,11 +182,6 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
     @Override
     public BlockState mirror(BlockState state, BlockMirror mirror) {
         return FactoryUtil.transform(state, mirror::apply, FACING);
-    }
-
-    @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
     }
 
     @Override

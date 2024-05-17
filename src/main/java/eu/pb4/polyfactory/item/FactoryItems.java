@@ -20,6 +20,9 @@ import eu.pb4.polyfactory.item.wrench.WrenchItem;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.block.Block;
+import net.minecraft.component.DataComponentType;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
@@ -230,7 +233,7 @@ public class FactoryItems {
                     entries.add(ArtificialDyeItem.of(0xFF00FF));
 
                     // Enchantments
-                    entries.add(EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(FactoryEnchantments.IGNORE_MOVEMENT, 1)));
+                    entries.add(EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(FactoryEnchantments.IGNORE_MOVEMENT.value(), 1)));
 
                     // Creative
                     entries.add(CREATIVE_MOTOR);
@@ -245,7 +248,7 @@ public class FactoryItems {
 
                     for (var dye : DyeColor.values()) {
                         var stack = WINDMILL_SAIL.getDefaultStack();
-                        WINDMILL_SAIL.setColor(stack, DyeColorExtra.getColor(dye));
+                        stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(DyeColorExtra.getColor(dye), true));
                         entries.add(stack);
                     }
 
@@ -268,7 +271,7 @@ public class FactoryItems {
 
                     for (var dye : DyeColor.values()) {
                         var x = ColoredItem.stack(SPRAY_CAN, 1, DyeColorExtra.getColor(dye));
-                        x.getOrCreateNbt().putInt("uses", 128);
+                        x.set(FactoryDataComponents.USES_LEFT, 128);
                         entries.add(x);
                     }
                 })).build()

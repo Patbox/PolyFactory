@@ -122,7 +122,7 @@ public class FanBlockEntity extends BlockEntity {
 
         for (var entity : world.getEntitiesByClass(Entity.class, box, EntityPredicates.EXCEPT_SPECTATOR)) {
             if (entity instanceof LivingEntity livingEntity
-                    && EnchantmentHelper.getEquipmentLevel(FactoryEnchantments.IGNORE_MOVEMENT, livingEntity) != 0) {
+                    && EnchantmentHelper.getEquipmentLevel(FactoryEnchantments.IGNORE_MOVEMENT.value(), livingEntity) != 0) {
                 continue;
             }
 

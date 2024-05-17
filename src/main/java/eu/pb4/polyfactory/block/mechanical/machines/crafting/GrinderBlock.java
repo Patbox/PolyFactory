@@ -23,6 +23,8 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
@@ -64,10 +66,9 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
-
 
     @Nullable
     @Override
@@ -106,13 +107,13 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (hand == Hand.MAIN_HAND && !player.isSneaking() && world.getBlockEntity(pos) instanceof GrinderBlockEntity be) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if (!player.isSneaking() && world.getBlockEntity(pos) instanceof GrinderBlockEntity be) {
             be.openGui((ServerPlayerEntity) player);
             return ActionResult.SUCCESS;
         }
 
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.onUse(state, world, pos, player,  hit);
     }
 
     @Override
@@ -176,7 +177,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
         public static final ItemStack MODEL_STONE_WHEEL = new ItemStack(BaseItemProvider.requestModel());
 
         static {
-            MODEL_STONE_WHEEL.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_STONE_WHEEL.getItem(), FactoryUtil.id("block/grindstone_wheel")).value());
+            MODEL_STONE_WHEEL.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(MODEL_STONE_WHEEL.getItem(), FactoryUtil.id("block/grindstone_wheel")).value()));
         }
 
         private final ItemDisplayElement stoneWheel;

@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.ui.GuiUtils;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -29,16 +30,16 @@ public class CreativeMotorBlockEntity extends LockableBlockEntity {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.writeNbt(nbt, lookup);
         nbt.putDouble("Speed", this.speed);
         nbt.putDouble("Stress", this.stress);
     }
 
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        super.readNbt(nbt, lookup);
         this.speed = nbt.getDouble("Speed");
         this.stress = nbt.getDouble("Stress");
     }

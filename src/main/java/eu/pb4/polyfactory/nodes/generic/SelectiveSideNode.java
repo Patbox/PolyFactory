@@ -5,6 +5,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.graph.user.BlockNodeType;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
+import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
 import eu.pb4.polyfactory.nodes.DirectionNode;
@@ -19,34 +20,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.List;
 
 public record SelectiveSideNode(EnumSet<Direction> directions) implements DirectionCheckingNode {
-    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("selective_dir"), SelectiveSideNode::decode);
-
-    private static BlockNode decode(NbtElement element) {
-        var out = new ArrayList<Direction>();
-        var list = element instanceof NbtList list1 ? list1 : new NbtList();
-
-        for (var entry : list) {
-            if (entry instanceof NbtString string) {
-                out.add(Direction.byName(string.asString()));
-            }
-        }
-        return new SelectiveSideNode(list.isEmpty() ? EnumSet.noneOf(Direction.class) : EnumSet.copyOf(out));
-    }
+    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("selective_dir"), Codec.list(Direction.CODEC)
+            .xmap(x -> new SelectiveSideNode(x.isEmpty() ? EnumSet.noneOf(Direction.class) : EnumSet.copyOf(x)), x -> List.copyOf(x.directions)));
 
     @Override
     public @NotNull BlockNodeType getType() {
         return TYPE;
-    }
-
-    @Override
-    public @Nullable NbtElement toTag() {
-        var list = new NbtList();
-        for (var dir : directions) {
-            list.add(NbtString.of(dir.asString()));
-        }
-        return list;
     }
 
     @Override

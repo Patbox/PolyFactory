@@ -23,6 +23,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
@@ -60,17 +61,17 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        Inventories.writeNbt(nbt, stacks);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        Inventories.writeNbt(nbt, stacks, lookup);
         nbt.putDouble("Progress", this.process);
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, lookup);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        Inventories.readNbt(nbt, this.stacks);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        Inventories.readNbt(nbt, this.stacks, lookup);
         this.process = nbt.getDouble("Progress");
-        super.readNbt(nbt);
+        super.readNbt(nbt, lookup);
     }
 
     @Override
@@ -163,7 +164,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
                 Criteria.RECIPE_CRAFTED.trigger(player, self.currentRecipe.id(), self.stacks.subList(0, 1));
             }
 
-            var sound = stack.getItem() instanceof BlockItem blockItem ? blockItem.getBlock().getSoundGroup(blockItem.getBlock().getDefaultState()).getBreakSound() : SoundEvents.BLOCK_STONE_BREAK;
+            var sound = stack.getItem() instanceof BlockItem blockItem ? blockItem.getBlock().getDefaultState().getSoundGroup().getBreakSound() : SoundEvents.BLOCK_STONE_BREAK;
             world.playSound(null, pos, sound, SoundCategory.BLOCKS, 0.6f, 0.5f);
             self.process = 0;
             stack.decrement(1);
@@ -189,7 +190,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
                             (Math.random() - 0.5) * 0.2, 0.02, (Math.random() - 0.5) * 0.2, 2);
                 }
                 if (world.getTime() % 20 == 0) {
-                    var sound = stack.getItem() instanceof BlockItem blockItem ? blockItem.getBlock().getSoundGroup(blockItem.getBlock().getDefaultState()).getHitSound() : SoundEvents.BLOCK_STONE_HIT;
+                    var sound = stack.getItem() instanceof BlockItem blockItem ? blockItem.getBlock().getDefaultState().getSoundGroup().getHitSound() : SoundEvents.BLOCK_STONE_HIT;
                     world.playSound(null, pos, sound, SoundCategory.BLOCKS, 0.5f, 0.5f);
                 }
 

@@ -22,7 +22,7 @@ public class FactoryLootTables {
         return Registry.register(Registries.LOOT_NUMBER_PROVIDER_TYPE, new Identifier(ModInit.ID, path), item);
     }
 
-    public static <T extends LootFunctionType> T register(String path, T item) {
+    public static <T extends LootFunctionType<?>> T register(String path, T item) {
         return Registry.register(Registries.LOOT_FUNCTION_TYPE, new Identifier(ModInit.ID, path), item);
     }
 }

@@ -120,7 +120,7 @@ public class WrenchHandler {
                 if ((alt ? action.alt() : action.action()).applyAction(player, world, pos, side, state, !player.isSneaking())) {
                     this.pos = null;
                     TriggerCriterion.trigger(player, FactoryTriggers.WRENCH);
-                    player.playSound(FactorySoundEvents.ITEM_WRENCH_USE, SoundCategory.PLAYERS, 0.3f, player.getRandom().nextFloat() * 0.1f + 0.95f);
+                    player.playSoundToPlayer(FactorySoundEvents.ITEM_WRENCH_USE, SoundCategory.PLAYERS, 0.3f, player.getRandom().nextFloat() * 0.1f + 0.95f);
                     return ActionResult.SUCCESS;
                 }
                 return ActionResult.FAIL;
@@ -163,7 +163,7 @@ public class WrenchHandler {
 
         if (foundCurrent) {
             this.currentAction.put(state.getBlock(), player.isSneaking() ? previousAction : nextAction);
-            player.playSound(FactorySoundEvents.ITEM_WRENCH_SWITCH, SoundCategory.PLAYERS, 0.3f, 1f);
+            player.playSoundToPlayer(FactorySoundEvents.ITEM_WRENCH_SWITCH, SoundCategory.PLAYERS, 0.3f, 1f);
             this.pos = null;
         }
     }

@@ -5,7 +5,7 @@ import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
@@ -21,7 +21,7 @@ class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
     @Override
     protected void configure(RegistryWrapper.WrapperLookup arg) {
         this.getOrCreateTagBuilder(FactoryItemTags.ALLOWED_IN_MINER)
-                .addOptionalTag(ItemTags.TOOLS)
+                .addOptionalTag(ConventionalItemTags.TOOLS)
                 .add(FactoryItems.STEEL_GEAR)
         ;
 
@@ -46,7 +46,7 @@ class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
                 ;
 
         this.getOrCreateTagBuilder(FactoryItemTags.PLACER_USABLE)
-                .addOptionalTag(ItemTags.TOOLS)
+                .addOptionalTag(ConventionalItemTags.TOOLS)
                 .addOptionalTag(ConventionalItemTags.EMPTY_BUCKETS)
                 .addOptionalTag(ConventionalItemTags.WATER_BUCKETS)
                 .addOptionalTag(ConventionalItemTags.LAVA_BUCKETS)

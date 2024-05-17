@@ -1,11 +1,12 @@
 package eu.pb4.polyfactory.recipe;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,10 +16,11 @@ import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.world.World;
 
 public record ColoringCraftingRecipe(String group, Item input, int maxCount) implements CraftingRecipe {
-    public static final Codec<ColoringCraftingRecipe> CODEC = RecordCodecBuilder.create(x -> x.group(
+    public static final MapCodec<ColoringCraftingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.STRING.optionalFieldOf("group", "").forGetter(ColoringCraftingRecipe::group),
                     Registries.ITEM.getCodec().fieldOf("input").forGetter(ColoringCraftingRecipe::input),
                     Codec.INT.optionalFieldOf("max_count", 8).forGetter(ColoringCraftingRecipe::maxCount)
@@ -57,7 +59,7 @@ public record ColoringCraftingRecipe(String group, Item input, int maxCount) imp
     }
 
     @Override
-    public ItemStack craft(RecipeInputInventory inventory, DynamicRegistryManager registryManager) {
+    public ItemStack craft(RecipeInputInventory inventory, RegistryWrapper.WrapperLookup registryManager) {
         int color = -1;
         int count = 0;
 
@@ -78,7 +80,7 @@ public record ColoringCraftingRecipe(String group, Item input, int maxCount) imp
     }
 
     @Override
-    public ItemStack getResult(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
         return input.getDefaultStack();
     }
 

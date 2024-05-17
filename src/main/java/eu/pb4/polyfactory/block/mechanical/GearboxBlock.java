@@ -65,8 +65,8 @@ public class GearboxBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
     @Override

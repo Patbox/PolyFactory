@@ -20,19 +20,12 @@ import java.util.Collection;
 
 public record AxleWithGearMechanicalNode(Direction.Axis axis) implements AxisNode {
     public static final CacheCategory<AxleWithGearMechanicalNode> CACHE = CacheCategory.of(AxleWithGearMechanicalNode.class);
-    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("axle_with_gear"),
-            tag -> new AxleWithGearMechanicalNode(tag instanceof NbtString string ? Direction.Axis.fromName(string.asString()) : Direction.Axis.Y));
+    public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("axle_with_gear"), Direction.Axis.CODEC.xmap(AxleWithGearMechanicalNode::new, AxleWithGearMechanicalNode::axis));
 
     @Override
     public @NotNull BlockNodeType getType() {
         return TYPE;
     }
-
-    @Override
-    public @Nullable NbtElement toTag() {
-        return NbtString.of(axis.asString());
-    }
-
     @Override
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
         var list = new ArrayList<HalfLink>();

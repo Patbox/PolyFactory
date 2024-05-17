@@ -14,6 +14,8 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.*;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -131,8 +133,8 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
         }
 
         static {
-            ITEM_MODEL_1.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(ITEM_MODEL_1.getItem(), id("block/axle_with_gear_1")).value());
-            ITEM_MODEL_2.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(ITEM_MODEL_2.getItem(), id("block/axle_with_gear_2")).value());
+            ITEM_MODEL_1.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(ITEM_MODEL_1.getItem(), id("block/axle_with_gear_1")).value()));
+            ITEM_MODEL_2.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(ITEM_MODEL_2.getItem(), id("block/axle_with_gear_2")).value()));
         }
     }
 }

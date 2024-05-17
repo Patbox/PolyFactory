@@ -81,8 +81,8 @@ public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlo
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (hand == Hand.MAIN_HAND && world.getBlockEntity(pos) instanceof HandCrankBlockEntity be && be.lastTick != world.getServer().getTicks()) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if (world.getBlockEntity(pos) instanceof HandCrankBlockEntity be && be.lastTick != world.getServer().getTicks()) {
             player.addExhaustion(0.1f);
             be.lastTick = world.getServer().getTicks();
             be.negative = player.isSneaking() != (state.get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
@@ -94,7 +94,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlo
             return ActionResult.SUCCESS;
         }
 
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.onUse(state, world, pos, player, hit);
     }
 
     @Override
@@ -122,11 +122,6 @@ public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlo
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
         return List.of(new FunctionalDirectionNode(state.get(FACING)));
-    }
-
-    @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
     }
 
     @Override

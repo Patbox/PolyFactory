@@ -7,6 +7,8 @@ import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.graph.user.GraphEntity;
 import com.kneelawk.graphlib.api.graph.user.GraphEntityType;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.block.mechanical.RotationConstants;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
@@ -39,7 +41,12 @@ import java.util.Objects;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class RotationData implements GraphEntity<RotationData> {
-    public static final GraphEntityType<RotationData> TYPE = GraphEntityType.of(id("rotation_info"), RotationData::new, RotationData::decode, RotationData::split);
+    public static final Codec<RotationData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+        Codec.FLOAT.optionalFieldOf("Rot", 0f).forGetter(RotationData::rotation),
+        Codec.FLOAT.optionalFieldOf("RotVal", 0f).forGetter(RotationData::rotationValue)
+    ).apply(instance, RotationData::new));
+
+    public static final GraphEntityType<RotationData> TYPE = GraphEntityType.of(id("rotation_info"), CODEC, RotationData::new, RotationData::split);
     public static RotationData EMPTY = new RotationData() {
         @Override
         public void update(ServerWorld world) {
@@ -59,13 +66,18 @@ public class RotationData implements GraphEntity<RotationData> {
     public RotationData() {
     }
 
+    public RotationData(float rotation, float rotationValue) {
+        this.rotation = rotation;
+        this.rotationValue = rotationValue;
+    }
+
     private static void collectGraphs(Collection<NodeHolder<AxleWithGearMechanicalNode>> connectors, ObjectOpenHashSet<BlockPos> checkedNodes,
                                       Long2BooleanOpenHashMap dirMap, Long2FloatOpenHashMap speedMap, MutableBoolean clogged, ArrayList<RotationData> data,
                                       boolean currentDirection, float speed) {
         for (var connection : connectors) {
             //DebugInfoSender.addGameTestMarker((ServerWorld) connection.getBlockWorld(), connection.getBlockPos(), "Alt", 0x88FFFF66, 50 * 4 * 20);
 
-            var connectGraph = Objects.requireNonNull(FactoryNodes.ROTATIONAL_CONNECTOR.getSidedGraphView(connection.getBlockWorld()))
+            var connectGraph = Objects.requireNonNull(FactoryNodes.ROTATIONAL_CONNECTOR.getGraphWorld((ServerWorld) connection.getBlockWorld()))
                     .getAllGraphsAt(connection.getBlockPos()).findFirst();
             if (connectGraph.isPresent() /*&& checked2.add(connectGraph.get().getId())*/) {
                 var self = connectGraph.get().getNodesAt(connection.getBlockPos()).findFirst();
@@ -132,16 +144,6 @@ public class RotationData implements GraphEntity<RotationData> {
         }
     }
 
-    private static RotationData decode(@Nullable NbtElement nbtElement) {
-        var rotation = new RotationData();
-        if (nbtElement instanceof NbtCompound compound) {
-            rotation.rotation = compound.getFloat("Rot");
-            rotation.rotationValue = compound.getFloat("RotVal");
-        }
-
-        return rotation;
-    }
-
     public double speed() {
         return this.overstressed ? 0 : this.speed;
     }
@@ -169,13 +171,17 @@ public class RotationData implements GraphEntity<RotationData> {
         return this.rotation;
     }
 
+    public float rotationValue() {
+        return this.rotationValue;
+    }
+
     public boolean isNegative() {
         return this.negative;
     }
 
     public void update(ServerWorld world) {
         var currentTick = world.getServer().getTicks();
-        if (this.lastTick == currentTick) {
+        if (this.ctx == null || this.lastTick == currentTick) {
             return;
         }
         var delta = this.lastTick == -1 ? 1 : currentTick - this.lastTick;
@@ -363,14 +369,6 @@ public class RotationData implements GraphEntity<RotationData> {
     @Override
     public @NotNull GraphEntityType<?> getType() {
         return TYPE;
-    }
-
-    @Override
-    public @Nullable NbtElement toTag() {
-        var nbt = new NbtCompound();
-        nbt.putFloat("Rot", this.rotation);
-        nbt.putFloat("RotVal", this.rotationValue);
-        return nbt;
     }
 
     @Override

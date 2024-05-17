@@ -30,6 +30,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenTexts;
@@ -124,8 +126,8 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
@@ -222,7 +224,7 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
         }
 
         static {
-            ITEM_MODEL.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(ITEM_MODEL.getItem(), id("block/fan_rotating")).value());
+            ITEM_MODEL.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(ITEM_MODEL.getItem(), id("block/fan_rotating")).value()));
         }
     }
 }

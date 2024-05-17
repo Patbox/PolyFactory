@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.recipe.mixing;
 
 import com.google.common.collect.Iterators;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
@@ -13,7 +14,8 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
@@ -23,7 +25,7 @@ import java.util.List;
 public record GenericMixingRecipe(String group, List<CountedIngredient> input, ItemStack output, double time,
                                   double minimumSpeed,
                                   double optimalSpeed, float minimumTemperature, float maxTemperature) implements MixingRecipe {
-    public static final Codec<GenericMixingRecipe> CODEC = RecordCodecBuilder.create(x -> x.group(
+    public static final MapCodec<GenericMixingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.STRING.optionalFieldOf("group", "").forGetter(GenericMixingRecipe::group),
                     CountedIngredient.LIST_CODEC.fieldOf("input").forGetter(GenericMixingRecipe::input),
                     ItemStack.CODEC.fieldOf("output").forGetter(GenericMixingRecipe::output),
@@ -138,7 +140,7 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input, I
     }
 
     @Override
-    public ItemStack craft(MixerBlockEntity inventory, DynamicRegistryManager registryManager) {
+    public ItemStack craft(MixerBlockEntity inventory, RegistryWrapper.WrapperLookup registryManager) {
         return this.output.copy();
     }
 
@@ -148,7 +150,7 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input, I
     }
 
     @Override
-    public ItemStack getResult(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
         return this.output;
     }
     @Override

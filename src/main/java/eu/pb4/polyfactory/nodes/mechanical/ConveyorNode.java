@@ -3,46 +3,30 @@ package eu.pb4.polyfactory.nodes.mechanical;
 import com.kneelawk.graphlib.api.graph.GraphView;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import com.kneelawk.graphlib.api.graph.user.BlockNodeDecoder;
 import com.kneelawk.graphlib.api.graph.user.BlockNodeType;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.nodes.AxisNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
 
 public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue value) implements AxisNode {
-    public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("conveyor"), tag -> {
-        if (tag == null) {
-            return null;
-        }
-
-        var compound = (NbtCompound) tag;
-        return new ConveyorNode(Direction.byName(compound.getString("direction")), ConveyorBlock.DirectionValue.valueOf(compound.getString("value").toUpperCase(Locale.ROOT)));
-    });
+    public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("conveyor"), RecordCodecBuilder.<ConveyorNode>create(instance -> instance.group(
+            Direction.CODEC.fieldOf("direction").forGetter(ConveyorNode::direction),
+            ConveyorBlock.DirectionValue.CODEC.fieldOf("value").forGetter(ConveyorNode::value)
+    ).apply(instance, ConveyorNode::new)));
 
     @Override
     public @NotNull BlockNodeType getType() {
         return TYPE;
-    }
-
-    @Override
-    public @Nullable NbtElement toTag() {
-        var nbt = new NbtCompound();
-        nbt.putString("direction", direction.getName());
-        nbt.putString("value", value.asString());
-        return nbt;
     }
 
     @Override

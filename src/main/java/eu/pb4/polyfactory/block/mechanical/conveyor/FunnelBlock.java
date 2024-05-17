@@ -25,6 +25,8 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
@@ -229,12 +231,9 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        var stack = player.getStackInHand(hand);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        var stack = player.getStackInHand(Hand.MAIN_HAND);
 
-        if (hand != Hand.MAIN_HAND) {
-            return ActionResult.FAIL;
-        }
 
         var be = world.getBlockEntity(pos) instanceof FunnelBlockEntity x ? x : null;
 
@@ -250,12 +249,12 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
             stack.decrement(1);
             return ActionResult.SUCCESS;
         } else if (stack.isEmpty()) {
-            player.setStackInHand(hand, be.getFilter());
+            player.setStackInHand(Hand.MAIN_HAND, be.getFilter());
             be.setFilter(ItemStack.EMPTY);
             return ActionResult.SUCCESS;
         }
 
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.onUse(state, world, pos, player, hit);
     }
 
     @Override
@@ -266,11 +265,6 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
     @Override
     public BlockState mirror(BlockState state, BlockMirror mirror) {
         return FactoryUtil.transform(state, mirror::apply, FACING);
-    }
-
-    @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.IRON_TRAPDOOR;
     }
 
     @Override
@@ -357,8 +351,8 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
 
 
         static {
-            MODEL_IN.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_IN.getItem(), FactoryUtil.id("block/funnel_in")).value());
-            MODEL_OUT.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_OUT.getItem(), FactoryUtil.id("block/funnel_out")).value());
+            MODEL_IN.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(MODEL_IN.getItem(), FactoryUtil.id("block/funnel_in")).value()));
+            MODEL_OUT.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(MODEL_OUT.getItem(), FactoryUtil.id("block/funnel_out")).value()));
         }
     }
 

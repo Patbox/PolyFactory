@@ -10,29 +10,30 @@ import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
 import eu.pb4.polyfactory.block.other.LampBlock;
 import eu.pb4.polyfactory.block.other.SmallLampBlock;
-import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import eu.pb4.polyfactory.util.inventory.WrappingRecipeInputInventory;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.SignBlock;
-import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.block.enums.BedPart;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.item.TooltipType;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.inventory.StackReference;
-import net.minecraft.item.*;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.Items;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -44,7 +45,6 @@ import net.minecraft.util.ClickType;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -56,6 +56,15 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
     public DyeSprayItem(Settings settings) {
         super(settings);
     }
+
+    public static int getUses(ItemStack stack) {
+        return stack.getOrDefault(FactoryDataComponents.USES_LEFT, 0);
+    }
+
+    public static void setUses(ItemStack stack, int count) {
+        stack.set(FactoryDataComponents.USES_LEFT, count);
+    }
+
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         var stack = context.getStack();
@@ -81,7 +90,7 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
             for (int i = 0; i < stacks.size(); i++) {
                 var x = stacks.get(i);
                 if (!x.isEmpty() && be.getSailColor(i) != color) {
-                    FactoryItems.WINDMILL_SAIL.setColor(x, color);
+                    x.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(color, true));
                     be.addSail(i, x);
                     success = true;
                     break;
@@ -139,7 +148,7 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
         }
         var color = ColoredItem.getColor(stack);
         if (!DyeColorExtra.hasLang(color)) {
-            return Text.translatable( this.getTranslationKey() + ".colored.full",
+            return Text.translatable(this.getTranslationKey() + ".colored.full",
                     ColoredItem.getColorName(color), ColoredItem.getHexName(color));
         } else {
             return Text.translatable(this.getTranslationKey() + ".colored", ColoredItem.getColorName(color));
@@ -170,7 +179,7 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
 
     @Override
     public int downSampleColor(int color, boolean isVanilla) {
-       return color;
+        return color;
     }
 
     @Override
@@ -181,14 +190,6 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
     @Override
     public int getPolymerArmorColor(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
         return ColoredItem.getColor(itemStack);
-    }
-
-    public static int getUses(ItemStack stack) {
-        return stack.hasNbt() ? stack.getNbt().getInt("uses") : 0;
-    }
-
-    public static void setUses(ItemStack stack, int count) {
-        stack.getOrCreateNbt().putInt("uses", count);
     }
 
     @Override
@@ -208,12 +209,13 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipContext context, @Nullable ServerPlayerEntity player) {
-        var out = PolymerItem.super.getPolymerItemStack(itemStack, context, player);
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType context, RegistryWrapper.WrapperLookup lookup, @Nullable ServerPlayerEntity player) {
+        var out = PolymerItem.super.getPolymerItemStack(itemStack, context, lookup, player);
         var uses = getUses(itemStack);
 
+        out.set(DataComponentTypes.MAX_DAMAGE, MAX_USES);
         if (uses != 0) {
-            out.getNbt().putInt("Damage", (int) ((((double) MAX_USES - uses) / MAX_USES) * out.getItem().getMaxDamage()));
+            out.set(DataComponentTypes.DAMAGE, MAX_USES - uses);
         }
         return out;
     }

@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.other;
 
+import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
@@ -13,6 +14,7 @@ import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.FactoryPoi;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
@@ -27,6 +29,9 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
+import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
@@ -102,21 +107,20 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (world.getBlockEntity(pos) instanceof WirelessRedstoneBlockEntity be) {
-            if (!player.isSneaking() && hand == Hand.MAIN_HAND && hit.getSide() == state.get(FACING).getOpposite()) {
+            if (!player.isSneaking() && hit.getSide() == state.get(FACING).getOpposite()) {
                 return be.updateKey(player, hit, player.getMainHandStack()) ? ActionResult.SUCCESS : ActionResult.FAIL;
             }
 
             if (player.isSneaking() && player.getMainHandStack().isOf(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
-                player.getMainHandStack().getOrCreateNbt().put("key1", be.key1().writeNbt(new NbtCompound()));
-                player.getMainHandStack().getOrCreateNbt().put("key2", be.key2().writeNbt(new NbtCompound()));
+                player.getMainHandStack().set(FactoryDataComponents.REMOTE_KEYS, new Pair<>(be.key1(), be.key2()));
                 player.getItemCooldownManager().set(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, 5);
                 return ActionResult.SUCCESS;
             }
         }
 
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.onUse(state, world, pos, player, hit);
     }
 
     @Nullable
@@ -138,11 +142,6 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
     @Override
     public BlockState mirror(BlockState state, BlockMirror mirror) {
         return FactoryUtil.transform(state, mirror::apply, FACING);
-    }
-
-    @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
     }
 
     @Override
@@ -275,10 +274,8 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
             var model = state.isOf(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER) ? RedstoneOutputBlock.Model.OUTPUT_OVERLAY
                     : RedstoneOutputBlock.Model.INPUT_OVERLAY;
             var stack = new ItemStack(model.item());
-            var display = new NbtCompound();
-            display.putInt("color", RedstoneWireBlock.getWireColor(state.get(POWERED) ? 15 : 0));
-            stack.getOrCreateNbt().put("display", display);
-            stack.getNbt().putInt("CustomModelData", model.value());
+            stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(RedstoneWireBlock.getWireColor(state.get(POWERED) ? 15 : 0), false));
+            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(model.value()));
             return stack;
         }
 

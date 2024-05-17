@@ -15,10 +15,7 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
 import eu.pb4.polyfactory.util.PotatoWisdom;
-import eu.pb4.factorytools.api.util.VirtualDestroyStage;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.core.api.other.PolymerStat;
-import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -35,6 +32,7 @@ import net.minecraft.item.Equipment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
@@ -103,8 +101,7 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (hand == Hand.MAIN_HAND) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
             var holder = BlockBoundAttachment.get(world, pos);
 
             if (holder != null && holder.holder() instanceof Model x) {
@@ -121,9 +118,7 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
             }
 
             return ActionResult.SUCCESS;
-        }
 
-        return super.onUse(state, world, pos, player, hand, hit);
     }
 
     @Nullable
@@ -133,8 +128,8 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
@@ -179,7 +174,7 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
     }
 
     @Override
-    public SoundEvent getEquipSound() {
+    public RegistryEntry<SoundEvent> getEquipSound() {
         return Equipment.super.getEquipSound();
     }
 

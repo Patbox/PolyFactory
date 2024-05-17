@@ -57,8 +57,8 @@ public class CreativeMotorBlock extends RotationalNetworkBlock implements Factor
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
@@ -82,8 +82,8 @@ public class CreativeMotorBlock extends RotationalNetworkBlock implements Factor
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (!player.isSneaking() && hand == Hand.MAIN_HAND && hit.getSide() != state.get(FACING) && player.isCreative() && world.getBlockEntity(pos) instanceof CreativeMotorBlockEntity be && player instanceof ServerPlayerEntity serverPlayer) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if (!player.isSneaking() && hit.getSide() != state.get(FACING) && player.isCreative() && world.getBlockEntity(pos) instanceof CreativeMotorBlockEntity be && player instanceof ServerPlayerEntity serverPlayer) {
             be.openGui(serverPlayer);
             return ActionResult.SUCCESS;
         }

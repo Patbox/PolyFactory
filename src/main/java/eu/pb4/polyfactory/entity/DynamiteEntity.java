@@ -15,8 +15,8 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.joml.Vector3f;
@@ -32,12 +32,17 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
         super(type, world);
     }
 
-    public static void create(Vec3d vector, Vec3d pos, World world, ItemStack stack) {
+    public static void spawn(Vec3d vector, Position pos, World world, ItemStack stack) {
+        var entity = create(vector, pos, world, stack);
+        world.spawnEntity(entity);
+    }
+
+    public static DynamiteEntity create(Vec3d vector, Position pos, World world, ItemStack stack) {
         var entity = new DynamiteEntity(FactoryEntities.DYNAMITE, world);
         entity.setItemStack(stack);
-        entity.setPosition(pos);
+        entity.setPosition(new Vec3d(pos.getX(), pos.getY(), pos.getZ()));
         entity.setVelocity(vector);
-        world.spawnEntity(entity);
+        return entity;
     }
 
     public void setItemStack(ItemStack itemStack) {
@@ -119,17 +124,19 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
     }
 
     @Override
-    protected void initDataTracker() {
+    protected void initDataTracker(DataTracker.Builder builder) {
 
     }
 
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
         this.fuse = nbt.getShort("fuse");
     }
 
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
         nbt.putShort("fuse", (short) this.fuse);
     }
 }

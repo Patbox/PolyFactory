@@ -23,8 +23,8 @@ public class CreativeContainerBlock extends ContainerBlock {
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (world.getBlockEntity(pos) instanceof CreativeContainerBlockEntity be && hand == Hand.MAIN_HAND && hit.getSide() == state.get(FACING) && player.isCreative()) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if (world.getBlockEntity(pos) instanceof CreativeContainerBlockEntity be && hit.getSide() == state.get(FACING) && player.isCreative()) {
             be.setItemStack(player.getMainHandStack());
             return ActionResult.SUCCESS;
         }

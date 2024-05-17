@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.item.util;
 
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryColors;
 import net.minecraft.item.Item;
@@ -43,11 +44,7 @@ public interface ColoredItem {
 
     static int getColor(ItemStack stack) {
         if (stack.getItem() instanceof ColoredItem coloredItem) {
-            if (stack.hasNbt() && stack.getNbt().contains("color", NbtElement.NUMBER_TYPE)) {
-                return stack.getNbt().getInt("color");
-            }
-
-            return coloredItem.getDefaultColor();
+            return stack.getOrDefault(FactoryDataComponents.COLOR, coloredItem.getDefaultColor());
         }
 
         return -1;
@@ -55,9 +52,7 @@ public interface ColoredItem {
 
     static boolean hasColor(ItemStack stack) {
         if (stack.getItem() instanceof ColoredItem) {
-            if (stack.hasNbt() && stack.getNbt().contains("color", NbtElement.NUMBER_TYPE)) {
-                return true;
-            }
+            return stack.contains(FactoryDataComponents.COLOR);
         }
 
         return false;
@@ -65,7 +60,7 @@ public interface ColoredItem {
 
     static boolean setColor(ItemStack stack, int color) {
         if (stack.getItem() instanceof ColoredItem) {
-            stack.getOrCreateNbt().putInt("color", color);
+            stack.set(FactoryDataComponents.COLOR, color);
             return true;
         }
 
@@ -74,7 +69,7 @@ public interface ColoredItem {
 
     static boolean setColorCrafting(ItemStack stack, int color) {
         if (stack.getItem() instanceof ColoredItem coloredItem) {
-            stack.getOrCreateNbt().putInt("color", coloredItem.downSampleColor(color));
+            stack.set(FactoryDataComponents.COLOR, coloredItem.downSampleColor(color));
             return true;
         }
 

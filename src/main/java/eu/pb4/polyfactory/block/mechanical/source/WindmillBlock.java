@@ -24,6 +24,9 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
+import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
@@ -123,8 +126,8 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
 
@@ -166,8 +169,8 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
         public static final ItemStack MODEL_FLIP = new ItemStack(Items.LEATHER_HORSE_ARMOR);
 
         static {
-            MODEL.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL.getItem(), FactoryUtil.id("block/windmill_sail")).value());
-            MODEL_FLIP.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_FLIP.getItem(), FactoryUtil.id("block/windmill_sail_flip")).value());
+            MODEL.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(MODEL.getItem(), FactoryUtil.id("block/windmill_sail")).value()));
+            MODEL_FLIP.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(MODEL_FLIP.getItem(), FactoryUtil.id("block/windmill_sail_flip")).value()));
         }
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
@@ -234,16 +237,13 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
 
         private ItemStack colored(int i, ItemStack model) {
             var c = model.copy();
-            var d = new NbtCompound();
             int color = 0xFFFFFF;
 
             if (this.blockEntity != null) {
                 color = this.blockEntity.getSailColor(i);
             }
 
-            d.putInt("color", color);
-
-            c.getOrCreateNbt().put("display", d);
+            c.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(color, false));
             return c;
         }
 

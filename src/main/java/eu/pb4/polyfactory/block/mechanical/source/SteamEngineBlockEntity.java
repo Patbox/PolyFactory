@@ -19,6 +19,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -103,21 +104,21 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        Inventories.writeNbt(nbt, this.items);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        Inventories.writeNbt(nbt, this.items, lookup);
         nbt.putInt("FuelTicks", this.fuelTicks);
         nbt.putInt("FuelInitial", this.fuelInitial);
         nbt.putFloat("State", this.state);
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, lookup);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        Inventories.readNbt(nbt, items);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        Inventories.readNbt(nbt, items, lookup);
         this.fuelInitial = nbt.getInt("FuelInitial");
         this.fuelTicks = nbt.getInt("FuelTicks");
         this.state = nbt.getFloat("State");
-        super.readNbt(nbt);
+        super.readNbt(nbt, lookup);
     }
 
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {

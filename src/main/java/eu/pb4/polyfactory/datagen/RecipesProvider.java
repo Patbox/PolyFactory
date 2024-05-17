@@ -1,7 +1,6 @@
 package eu.pb4.polyfactory.datagen;
 
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
-import eu.pb4.factorytools.api.recipe.NbtRecipeBuilder;
 import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -15,7 +14,7 @@ import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.data.server.recipe.*;
 import net.minecraft.item.DyeItem;
@@ -27,17 +26,19 @@ import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
 class RecipesProvider extends FabricRecipeProvider {
-    public RecipesProvider(FabricDataOutput output) {
-        super(output);
+    public RecipesProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+        super(output, registriesFuture);
     }
 
     @Override
@@ -626,6 +627,7 @@ class RecipesProvider extends FabricRecipeProvider {
         );
 
 
+        // todo
         {
             var x = ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
                     .pattern("dps")
@@ -639,7 +641,7 @@ class RecipesProvider extends FabricRecipeProvider {
 
             var display = new NbtCompound();
             display.putString("color", "dyn");
-            ((NbtRecipeBuilder) x).factorytools$setNbt(display);
+            //((NbtRecipeBuilder) x).factorytools$setNbt(display);
 
             x.offerTo(exporter, id("colored_lamp/glass/regular_a"));
         }
@@ -656,7 +658,7 @@ class RecipesProvider extends FabricRecipeProvider {
 
             var display = new NbtCompound();
             display.putString("color", "dyn");
-            ((NbtRecipeBuilder) x).factorytools$setNbt(display);
+            //((NbtRecipeBuilder) x).factorytools$setNbt(display);
 
             x.offerTo(exporter, id("colored_lamp/glass/regular_b"));
         }
@@ -675,7 +677,7 @@ class RecipesProvider extends FabricRecipeProvider {
 
                 var display = new NbtCompound();
                 display.putInt("color", DyeColorExtra.getColor(dye.getColor()));
-                ((NbtRecipeBuilder) x).factorytools$setNbt(display);
+                //((NbtRecipeBuilder) x).factorytools$setNbt(display);
 
                 x.offerTo(exporter, id("colored_lamp/glass/" + dye.getColor()));
             }
@@ -696,7 +698,7 @@ class RecipesProvider extends FabricRecipeProvider {
                     display.putInt("color", DyeColorExtra.getColor(dye.getColor()));
                     nbt.put("display", display);
 
-                    ((NbtRecipeBuilder) x).factorytools$setNbt(nbt);
+                    //((NbtRecipeBuilder) x).factorytools$setNbt(nbt, lookup);
                 }
 
                 x.offerTo(exporter, id("windmill_sail/wool/" + dye.getColor()));

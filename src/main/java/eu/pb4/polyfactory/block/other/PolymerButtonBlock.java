@@ -29,11 +29,6 @@ public class PolymerButtonBlock extends ButtonBlock implements FactoryBlock {
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.STONE_BUTTON;
-    }
-
-    @Override
     public BlockState getPolymerBlockState(BlockState state) {
         return Blocks.STONE_BUTTON.getStateWithProperties(state);
     }

@@ -6,10 +6,11 @@ import eu.pb4.polyfactory.item.tool.DyeSprayItem;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.world.World;
 
 public record FillSprayCanPressRecipe(int amount) implements PressRecipe {
@@ -33,7 +34,7 @@ public record FillSprayCanPressRecipe(int amount) implements PressRecipe {
     }
 
     @Override
-    public ItemStack craft(PressBlockEntity inventory, DynamicRegistryManager registryManager) {
+    public ItemStack craft(PressBlockEntity inventory, RegistryWrapper.WrapperLookup registryManager) {
         var can = inventory.getStack(0).copy();
         var dye = inventory.getStack(1);
         ColoredItem.setColor(can, DyeColorExtra.getColor(dye));
@@ -47,7 +48,7 @@ public record FillSprayCanPressRecipe(int amount) implements PressRecipe {
     }
 
     @Override
-    public ItemStack getResult(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
         return FactoryItems.SPRAY_CAN.getDefaultStack();
     }
 

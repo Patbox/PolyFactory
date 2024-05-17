@@ -105,8 +105,8 @@ public class WitherSkullGeneratorBlock extends NetworkBlock implements FactoryBl
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
+    public BlockState getPolymerBlockState(BlockState state) {
+        return Blocks.BARRIER.getDefaultState();
     }
 
     @Override

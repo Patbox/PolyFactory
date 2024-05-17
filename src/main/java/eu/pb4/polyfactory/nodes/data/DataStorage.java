@@ -5,17 +5,13 @@ import com.kneelawk.graphlib.api.graph.GraphEntityContext;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.*;
 import com.kneelawk.graphlib.api.util.LinkPos;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
@@ -23,32 +19,67 @@ import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class DataStorage implements GraphEntity<DataStorage> {
     public static final int MAX_CHANNELS = 4;
+    public static final Codec<DataStorage> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            DataEntry.CODEC.listOf().optionalFieldOf("current_data", List.of()).forGetter(e -> {
+                var list = new ArrayList<DataEntry>();
+                for (var x : e.currentData.int2ObjectEntrySet()) {
+                    list.add(new DataEntry(x.getIntKey(), x.getValue().pos, x.getValue().container, Optional.ofNullable(x.getValue().direction)));
+                }
+                return list;
+            })
+    ).apply(instance, DataStorage::new));
+    public static final GraphEntityType<DataStorage> TYPE = GraphEntityType.of(id("data_storage"), CODEC, DataStorage::new, DataStorage::split);
     public static DataStorage EMPTY = new DataStorage() {
     };
-
-    public static final GraphEntityType<DataStorage> TYPE = GraphEntityType.of(id("data_storage"), DataStorage::new, DataStorage::decode, DataStorage::split);
-
     private final Int2ObjectOpenHashMap<Set<Pair<BlockPos, DataReceiverNode>>> receivers = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectOpenHashMap<Set<Pair<BlockPos, DataProviderNode>>> providers = new Int2ObjectOpenHashMap<>();
-
     private Int2ObjectOpenHashMap<SentData> currentData = new Int2ObjectOpenHashMap<>();
     private Int2ObjectOpenHashMap<SentData> swapData = new Int2ObjectOpenHashMap<>();
     private GraphEntityContext ctx;
     public DataStorage() {
     }
 
+    private DataStorage(List<DataEntry> entries) {
+        for (var entry : entries) {
+            this.currentData.put(entry.key, new SentData(entry.dataContainer, entry.blockPos, entry.direction.orElse(null)));
+        }
+    }
+
+    private static <T> void mergeMap(Int2ObjectOpenHashMap<Set<T>> into, Int2ObjectOpenHashMap<Set<T>> from) {
+        for (var entry : from.int2ObjectEntrySet()) {
+            var self = into.get(entry.getIntKey());
+            if (self == null) {
+                into.put(entry.getIntKey(), new HashSet<>(entry.getValue()));
+            } else {
+                self.addAll(entry.getValue());
+            }
+        }
+    }
+
+    private static <T> void splitMap(Int2ObjectOpenHashMap<Set<Pair<BlockPos, T>>> into, Int2ObjectOpenHashMap<Set<Pair<BlockPos, T>>> from, BlockGraph targetGraph) {
+        for (var entry : from.int2ObjectEntrySet()) {
+            var set = new HashSet<Pair<BlockPos, T>>();
+            for (var pos : List.copyOf(entry.getValue())) {
+                if (targetGraph.getNodesAt(pos.getLeft()).findAny().isPresent()) {
+                    set.add(pos);
+                    entry.getValue().remove(pos);
+                }
+            }
+            if (!set.isEmpty()) {
+                into.put(entry.getIntKey(), set);
+            }
+        }
+    }
+
     @Nullable
     public SentData getData(int channel) {
-        if (!(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
+        if (this.ctx == null || !(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
             return null;
         }
 
@@ -126,8 +157,8 @@ public class DataStorage implements GraphEntity<DataStorage> {
     }
 
     @Override
-    public void onNodeCreated(@NotNull NodeHolder<BlockNode> node, @Nullable NodeEntity nodeEntity) {
-        GraphEntity.super.onNodeCreated(node, nodeEntity);
+    public void onPostNodeCreated(@NotNull NodeHolder<BlockNode> node, @Nullable NodeEntity nodeEntity) {
+        GraphEntity.super.onPostNodeCreated(node, nodeEntity);
 
         storeReceiverOrProvider(node);
         if (node.getBlockWorld() instanceof ServerWorld serverWorld) {
@@ -152,8 +183,8 @@ public class DataStorage implements GraphEntity<DataStorage> {
     }
 
     @Override
-    public void onNodeDestroyed(@NotNull NodeHolder<BlockNode> node, @Nullable NodeEntity nodeEntity, Map<LinkPos, LinkEntity> linkEntities) {
-        GraphEntity.super.onNodeDestroyed(node, nodeEntity, linkEntities);
+    public void onPostNodeDestroyed(@NotNull NodeHolder<BlockNode> node, @Nullable NodeEntity nodeEntity, Map<LinkPos, LinkEntity> linkEntities) {
+        GraphEntity.super.onPostNodeDestroyed(node, nodeEntity, linkEntities);
         if (node.getNode() instanceof DataReceiverNode data) {
             removeMap(this.receivers, data.channel(), node.getBlockPos(), data);
         } else if (node.getNode() instanceof DataProviderNode data) {
@@ -177,6 +208,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
         }
         set.add(new Pair<>(blockPos, data));
     }
+
     private <T> void removeMap(Int2ObjectOpenHashMap<Set<Pair<BlockPos, T>>> map, int channel, BlockPos blockPos, T data) {
         var set = map.get(channel);
         if (set == null) {
@@ -191,7 +223,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
     @Override
     public void onInit(@NotNull GraphEntityContext ctx) {
         this.ctx = ctx;
-
         ctx.getGraph().getNodes().forEach(this::storeReceiverOrProvider);
     }
 
@@ -203,45 +234,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
     @Override
     public @NotNull GraphEntityType<?> getType() {
         return TYPE;
-    }
-
-    @Override
-    public @Nullable NbtElement toTag() {
-        var nbt = new NbtCompound();
-        var list = new NbtList();
-        for (var x : this.currentData.int2ObjectEntrySet()) {
-            var out = x.getValue().container.createNbt();
-            out.putInt("__key", x.getIntKey());
-            out.put("__pos", NbtHelper.fromBlockPos(x.getValue().pos));
-            if (x.getValue().direction != null) {
-                out.putString("__dir", x.getValue().direction.asString());
-            }
-        }
-        nbt.put("current_data", list);
-
-        return nbt;
-    }
-
-    private static DataStorage decode(@Nullable NbtElement nbtElement) {
-        var data = new DataStorage();
-        if (nbtElement instanceof NbtCompound nbt) {
-            for (var obj : nbt.getList("current_data", NbtElement.COMPOUND_TYPE)) {
-                try {
-                    var input = (NbtCompound) obj;
-                    var decoded = DataContainer.fromNbt(input);
-                    if (decoded != null) {
-
-                        data.currentData.put(input.getInt("__key"), new SentData(decoded,
-                                NbtHelper.toBlockPos(input.getCompound("__pos")),
-                                input.contains("__dir") ? Direction.CODEC.byId(input.getString("__dir")) : null
-                                ));
-                    }
-                } catch (Throwable ignored) {
-
-                }
-            }
-        }
-        return data;
     }
 
     @Override
@@ -262,39 +254,12 @@ public class DataStorage implements GraphEntity<DataStorage> {
         }
     }
 
-    private static <T> void mergeMap(Int2ObjectOpenHashMap<Set<T>> into, Int2ObjectOpenHashMap<Set<T>> from) {
-        for (var entry : from.int2ObjectEntrySet()) {
-            var self = into.get(entry.getIntKey());
-            if (self == null) {
-                into.put(entry.getIntKey(), new HashSet<>(entry.getValue()));
-            } else {
-                self.addAll(entry.getValue());
-            }
-        }
-    }
-
-    private static <T> void splitMap(Int2ObjectOpenHashMap<Set<Pair<BlockPos, T>>> into, Int2ObjectOpenHashMap<Set<Pair<BlockPos, T>>> from, BlockGraph targetGraph) {
-        for (var entry : from.int2ObjectEntrySet()) {
-            var set = new HashSet<Pair<BlockPos, T>>();
-            for (var pos : List.copyOf(entry.getValue())) {
-                if (targetGraph.getNodesAt(pos.getLeft()).findAny().isPresent()) {
-                    set.add(pos);
-                    entry.getValue().remove(pos);
-                }
-            }
-            if (!set.isEmpty()) {
-                into.put(entry.getIntKey(), set);
-            }
-        }
-    }
-
     private @NotNull DataStorage split(@NotNull BlockGraph originalGraph, @NotNull BlockGraph newGraph) {
         var data = new DataStorage();
         splitMap(data.receivers, this.receivers, newGraph);
         splitMap(data.providers, this.providers, newGraph);
         return data;
     }
-
 
     public boolean hasReceivers() {
         return !this.receivers.isEmpty();
@@ -304,5 +269,20 @@ public class DataStorage implements GraphEntity<DataStorage> {
         return !this.providers.isEmpty();
     }
 
-    public record SentData(DataContainer container, BlockPos pos, @Nullable Direction direction) {}
+    private record DataEntry(int key, BlockPos blockPos, DataContainer dataContainer, Optional<Direction> direction) {
+        private static final Codec<BlockPos> BLOCK_POS_CODEC = Codec.withAlternative(BlockPos.CODEC, RecordCodecBuilder.create(instance -> instance.group(
+                Codec.INT.fieldOf("X").forGetter(BlockPos::getX),
+                Codec.INT.fieldOf("Y").forGetter(BlockPos::getY),
+                Codec.INT.fieldOf("Z").forGetter(BlockPos::getZ)
+        ).apply(instance, BlockPos::new)));
+        public static final Codec<DataEntry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.INT.fieldOf("__key").forGetter(DataEntry::key),
+                BLOCK_POS_CODEC.fieldOf("__pos").forGetter(DataEntry::blockPos),
+                DataContainer.CODEC.forGetter(DataEntry::dataContainer),
+                Direction.CODEC.optionalFieldOf("__dir").forGetter(DataEntry::direction)
+        ).apply(instance, DataEntry::new));
+    }
+
+    public record SentData(DataContainer container, BlockPos pos, @Nullable Direction direction) {
+    }
 }

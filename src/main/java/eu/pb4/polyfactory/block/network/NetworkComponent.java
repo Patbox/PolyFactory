@@ -17,7 +17,7 @@ public interface NetworkComponent {
     interface Rotational extends NetworkComponent {
         static void updateRotationalAt(WorldAccess world, BlockPos pos) {
             if (world instanceof ServerWorld serverWorld) {
-                FactoryNodes.ROTATIONAL.getServerGraphWorld(serverWorld).updateNodes(pos);
+                FactoryNodes.ROTATIONAL.getGraphWorld(serverWorld).updateNodes(pos);
             }
         }
 
@@ -27,7 +27,7 @@ public interface NetworkComponent {
     interface RotationalConnector extends NetworkComponent {
         static void updateRotationalConnectorAt(WorldAccess world, BlockPos pos) {
             if (world instanceof ServerWorld serverWorld) {
-                FactoryNodes.ROTATIONAL_CONNECTOR.getServerGraphWorld(serverWorld).updateNodes(pos);
+                FactoryNodes.ROTATIONAL_CONNECTOR.getGraphWorld(serverWorld).updateNodes(pos);
             }
         }
 
@@ -37,7 +37,7 @@ public interface NetworkComponent {
     interface Data extends NetworkComponent {
         static void updateDataAt(WorldAccess world, BlockPos pos) {
             if (world instanceof ServerWorld serverWorld) {
-                FactoryNodes.DATA.getServerGraphWorld(serverWorld).updateNodes(pos);
+                FactoryNodes.DATA.getGraphWorld(serverWorld).updateNodes(pos);
             }
         }
 
@@ -45,9 +45,9 @@ public interface NetworkComponent {
 
         static DataStorage getLogic(ServerWorld world, BlockPos pos) {
             {
-                var o = FactoryNodes.DATA.getGraphView(world).getNodesAt(pos).findFirst();
+                var o = FactoryNodes.DATA.getGraphWorld(world).getNodesAt(pos).findFirst();
                 if (o.isPresent()) {
-                    var graph = FactoryNodes.DATA.getGraphView(world).getGraph(o.get().getGraphId());
+                    var graph = FactoryNodes.DATA.getGraphWorld(world).getGraph(o.get().getGraphId());
                     var ent = graph.getGraphEntity(DataStorage.TYPE);
 
                     return ent;
@@ -58,9 +58,9 @@ public interface NetworkComponent {
 
         static DataStorage getLogic(ServerWorld world, BlockPos pos, Predicate<NodeHolder<BlockNode>> predicate) {
             {
-                var o = FactoryNodes.DATA.getGraphView(world).getNodesAt(pos).filter(predicate).findFirst();
+                var o = FactoryNodes.DATA.getGraphWorld(world).getNodesAt(pos).filter(predicate).findFirst();
                 if (o.isPresent()) {
-                    var graph = FactoryNodes.DATA.getGraphView(world).getGraph(o.get().getGraphId());
+                    var graph = FactoryNodes.DATA.getGraphWorld(world).getGraph(o.get().getGraphId());
                     var ent = graph.getGraphEntity(DataStorage.TYPE);
 
                     return ent;
@@ -73,7 +73,7 @@ public interface NetworkComponent {
     interface Energy extends NetworkComponent {
         static void updateEnergyAt(WorldAccess world, BlockPos pos) {
             if (world instanceof ServerWorld serverWorld) {
-                FactoryNodes.ENERGY.getServerGraphWorld(serverWorld).updateNodes(pos);
+                FactoryNodes.ENERGY.getGraphWorld(serverWorld).updateNodes(pos);
             }
         }
 

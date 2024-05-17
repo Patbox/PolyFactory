@@ -19,10 +19,12 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -74,7 +76,8 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        var hand = Hand.MAIN_HAND;
         if (player.getStackInHand(hand).isIn(ConventionalItemTags.DYES)
                 && setColor(state, world, pos, FactoryItems.CABLE.downSampleColor(DyeColorExtra.getColor(player.getStackInHand(hand))))
         ) {
@@ -92,7 +95,7 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
             return ActionResult.SUCCESS;
         }
 
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.onUse(state, world, pos, player, hit);
     }
 
     @Override
@@ -293,9 +296,7 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
            //     this.cable.setItem(CableModel.MODELS_BY_ID[getModelId(state)]);
             //} else {
             var stack = CableModel.COLORED_MODELS_BY_ID[getModelId(state)].copy();
-            var display = new NbtCompound();
-            display.putInt("color", this.color);
-            stack.getOrCreateNbt().put("display", display);
+            stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(this.color, false));
             this.cable.setItem(stack);
             //}
             if (this.cable.getHolder() == this && this.color >= 0) {

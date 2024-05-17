@@ -161,7 +161,7 @@ public class BlockCollection extends AbstractElement implements BlockView {
     @Override
     public void tick() {
         if (this.quaternionDirty) {
-            var b = new ArrayList<Packet<ClientPlayPacketListener>>();
+            var b = new ArrayList<Packet<? super ClientPlayPacketListener>>();
             for (var x = 0; x < this.sizeX; x++) {
                 for (var y = 0; y < this.sizeY; y++) {
                     for (var z = 0; z < this.sizeZ; z++) {

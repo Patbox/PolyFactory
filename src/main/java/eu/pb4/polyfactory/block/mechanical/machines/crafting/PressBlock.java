@@ -21,6 +21,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -55,7 +57,7 @@ public class PressBlock extends TallItemMachineBlock {
 
             var container = conveyor.getContainer();
 
-            if (ItemStack.canCombine(container.get(), stack)) {
+            if (ItemStack.areItemsAndComponentsEqual(container.get(), stack)) {
                 var i = Math.min(container.get().getCount(), stack.getMaxCount() - stack.getCount());
                 stack.increment(i);
                 container.get().decrement(i);
@@ -76,7 +78,7 @@ public class PressBlock extends TallItemMachineBlock {
             var targetStack = container.getContainer().get();
             var sourceStack = conveyor.getContainer().get();
 
-            if (ItemStack.canCombine(container.getContainer().get(), conveyor.getContainer().get())) {
+            if (ItemStack.areItemsAndComponentsEqual(container.getContainer().get(), conveyor.getContainer().get())) {
                 var count = Math.min(targetStack.getCount() + sourceStack.getCount(), container.getMaxStackCount(sourceStack));
                 if (count != targetStack.getCount()) {
                     var dec = count - targetStack.getCount();
@@ -145,7 +147,7 @@ public class PressBlock extends TallItemMachineBlock {
         public static final ItemStack MODEL_PISTON = new ItemStack(BaseItemProvider.requestModel());
 
         static {
-            MODEL_PISTON.getOrCreateNbt().putInt("CustomModelData", PolymerResourcePackUtils.requestModel(MODEL_PISTON.getItem(), FactoryUtil.id("block/press_piston")).value());
+            MODEL_PISTON.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(MODEL_PISTON.getItem(), FactoryUtil.id("block/press_piston")).value()));
         }
 
         private final Matrix4fStack mat = new Matrix4fStack(2);

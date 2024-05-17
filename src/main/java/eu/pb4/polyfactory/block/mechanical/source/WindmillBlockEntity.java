@@ -7,10 +7,12 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBiomeTags;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -32,20 +34,20 @@ public class WindmillBlockEntity extends BlockEntity {
 
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         var list = new NbtList();
         for (var sail : this.sails) {
-            list.add(sail.writeNbt(new NbtCompound()));
+            list.add(sail.encodeAllowEmpty(lookup));
         }
         nbt.put("Sails", list);
     }
 
 
     @Override
-    public void readNbt(NbtCompound nbt) {
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.sails.clear();
         for (var sail : nbt.getList("Sails", NbtElement.COMPOUND_TYPE)) {
-            this.sails.add(ItemStack.fromNbt((NbtCompound) sail));
+            this.sails.add(ItemStack.fromNbtOrEmpty(lookup, (NbtCompound) sail));
         }
     }
 
@@ -74,12 +76,9 @@ public class WindmillBlockEntity extends BlockEntity {
         if (i < this.sails.size()) {
             var sail = this.sails.get(i);
 
-            if (sail.hasNbt() && sail.getNbt().contains("display", NbtElement.COMPOUND_TYPE)) {
-                var d = sail.getNbt().getCompound("display");
-
-                if (d.contains("color", NbtElement.NUMBER_TYPE)) {
-                    return d.getInt("color");
-                }
+            if (sail.contains(DataComponentTypes.DYED_COLOR)) {
+                //noinspection DataFlowIssue
+                return sail.get(DataComponentTypes.DYED_COLOR).rgb();
             }
         }
 

@@ -1,7 +1,9 @@
 package eu.pb4.polyfactory.loottable;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.block.data.util.DataCache;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.ColorProvider;
 import net.minecraft.item.ItemStack;
@@ -11,11 +13,11 @@ import net.minecraft.loot.function.LootFunction;
 import net.minecraft.loot.function.LootFunctionType;
 
 public class CopyCachedDataLootFunction implements LootFunction {
-    public static final LootFunction INSTANCE = new CopyCachedDataLootFunction();
-    public static final LootFunctionType TYPE = new LootFunctionType(Codec.unit(INSTANCE));
+    public static final CopyCachedDataLootFunction INSTANCE = new CopyCachedDataLootFunction();
+    public static final LootFunctionType<CopyCachedDataLootFunction> TYPE = new LootFunctionType<>(MapCodec.unit(INSTANCE));
 
     @Override
-    public LootFunctionType getType() {
+    public LootFunctionType<CopyCachedDataLootFunction> getType() {
         return TYPE;
     }
 
@@ -23,7 +25,7 @@ public class CopyCachedDataLootFunction implements LootFunction {
     public ItemStack apply(ItemStack stack, LootContext lootContext) {
         if (lootContext.hasParameter(LootContextParameters.BLOCK_ENTITY)) {
             if (lootContext.get(LootContextParameters.BLOCK_ENTITY) instanceof DataCache provider && provider.getCachedData() != null && !provider.getCachedData().isEmpty()) {
-                stack.getOrCreateNbt().put("cached_data", provider.getCachedData().createNbt());
+                stack.set(FactoryDataComponents.STORED_DATA, provider.getCachedData());
             }
         }
 

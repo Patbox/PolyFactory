@@ -13,9 +13,9 @@ public interface EnergyUser extends NetworkComponent.Energy {
 
     static EnergyData getEnergy(ServerWorld world, BlockPos pos) {
         {
-            var o = FactoryNodes.ENERGY.getGraphView(world).getNodesAt(pos).findFirst();
+            var o = FactoryNodes.ENERGY.getGraphWorld(world).getNodesAt(pos).findFirst();
             if (o.isPresent()) {
-                var graph = FactoryNodes.ENERGY.getGraphView(world).getGraph(o.get().getGraphId());
+                var graph = FactoryNodes.ENERGY.getGraphWorld(world).getGraph(o.get().getGraphId());
                 var ent = graph.getGraphEntity(EnergyData.TYPE);
 
                 ent.update(world, graph);

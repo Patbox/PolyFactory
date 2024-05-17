@@ -21,6 +21,7 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -73,7 +74,7 @@ public class FactoryUtil {
 
     public static void sendVelocityDelta(ServerPlayerEntity player, Vec3d delta) {
         player.networkHandler.sendPacket(new ExplosionS2CPacket(player.getX(),  player.getY() - 9999, player.getZ(), 0, List.of(), delta, Explosion.DestructionType.KEEP,
-                ParticleTypes.BUBBLE, ParticleTypes.BUBBLE, SoundEvents.INTENTIONALLY_EMPTY));
+                ParticleTypes.BUBBLE, ParticleTypes.BUBBLE, Registries.SOUND_EVENT.getEntry(SoundEvents.INTENTIONALLY_EMPTY)));
     }
 
     public static float wrap(float value, float min, float max) {
@@ -170,7 +171,7 @@ public class FactoryUtil {
                 var maxMove = Math.min(itemStack.getCount(), inventory.getMaxCountPerStack());
                 inventory.setStack(slot, itemStack.copyWithCount(maxMove));
                 itemStack.decrement(maxMove);
-            } else if (ItemStack.canCombine(current, itemStack)) {
+            } else if (ItemStack.areItemsAndComponentsEqual(current, itemStack)) {
                 var maxMove = Math.min(Math.min(current.getMaxCount() - current.getCount(), itemStack.getCount()), inventory.getMaxCountPerStack());
 
                 if (maxMove > 0) {
@@ -199,7 +200,7 @@ public class FactoryUtil {
                 inventory.setStack(i, itemStack.copyWithCount(maxMove));
                 itemStack.decrement(maxMove);
 
-            } else if (ItemStack.canCombine(current, itemStack)) {
+            } else if (ItemStack.areItemsAndComponentsEqual(current, itemStack)) {
                 var maxMove = Math.min(Math.min(current.getMaxCount() - current.getCount(), itemStack.getCount()), inventory.getMaxCountPerStack());
 
                 if (maxMove > 0) {
@@ -227,7 +228,7 @@ public class FactoryUtil {
                 inventory.setStack(i, itemStack.copyWithCount(maxMove));
                 itemStack.decrement(maxMove);
 
-            } else if (ItemStack.canCombine(current, itemStack)) {
+            } else if (ItemStack.areItemsAndComponentsEqual(current, itemStack)) {
                 var maxMove = Math.min(Math.min(current.getMaxCount() - current.getCount(), itemStack.getCount()), inventory.getMaxCountPerStack());
 
                 if (maxMove > 0) {

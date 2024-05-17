@@ -175,8 +175,9 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
 
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player,  BlockHitResult hit) {
         var be = world.getBlockEntity(pos);
+        var hand = Hand.MAIN_HAND;
         var stack = player.getStackInHand(hand);
 
         if (((stack.isOf(FactoryItems.ITEM_FILTER) && !FilterItem.getStack(stack).isEmpty()) || stack.isEmpty()) && hand == Hand.MAIN_HAND && be instanceof SplitterBlockEntity splitterBlockEntity) {
@@ -220,11 +221,6 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
     @Override
     public BlockState mirror(BlockState state, BlockMirror mirror) {
         return FactoryUtil.transform(state, mirror::apply, FACING);
-    }
-
-    @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.BARRIER;
     }
 
     @Override

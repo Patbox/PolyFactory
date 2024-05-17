@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.mojang.authlib.GameProfile;
 import eu.pb4.common.protection.api.CommonProtection;
+import eu.pb4.factorytools.api.util.LegacyNbtHelper;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
@@ -18,32 +19,29 @@ import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
-import it.unimi.dsi.fastutil.floats.FloatArrayList;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.OperatorBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeInstance;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.*;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MinerBlockEntity extends LockableBlockEntity implements SingleStackInventory, SidedInventory, OwnedBlockEntity {
     private ItemStack currentTool = ItemStack.EMPTY;
@@ -61,27 +59,27 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        nbt.put("tool", this.currentTool.writeNbt(new NbtCompound()));
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        nbt.put("tool", this.currentTool.encodeAllowEmpty(lookup));
         nbt.putDouble("progress", this.process);
         nbt.put("block_state", NbtHelper.fromBlockState(this.targetState));
         if (this.owner != null) {
-            nbt.put("owner", NbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+            nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
         nbt.putFloat("last_attacked_ticks", this.lastAttackedTicks);
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, lookup);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        this.currentTool = ItemStack.fromNbt(nbt.getCompound("tool"));
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.currentTool = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("tool"));
         this.process = nbt.getDouble("progress");
         if (nbt.contains("owner")) {
-            this.owner = NbtHelper.toGameProfile(nbt.getCompound("owner"));
+            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompound("owner"));
         }
         this.targetState = NbtHelper.toBlockState(Registries.BLOCK.getReadOnlyWrapper(), nbt.getCompound("block_state"));
         this.lastAttackedTicks = nbt.getFloat("last_attacked_ticks");
-        super.readNbt(nbt);
+        super.readNbt(nbt, lookup);
         this.updateAttackCooldownPerTick();
     }
 
@@ -112,29 +110,32 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
     }
 
     private void updateAttackCooldownPerTick() {
-        var baseSpeed = 4d;
-
-        var attackSpeed = baseSpeed;
+        var attackSpeed = new AtomicReference<>(4d);
         var multiplier = new DoubleArrayList();
         var multiplier2 = new DoubleArrayList();
 
-        for (var value : this.getStack().getAttributeModifiers(EquipmentSlot.MAINHAND).get(EntityAttributes.GENERIC_ATTACK_SPEED)) {
-            switch (value.getOperation()) {
-                case ADDITION -> attackSpeed += value.getValue();
-                case MULTIPLY_BASE -> multiplier.add(value.getValue());
-                case MULTIPLY_TOTAL -> multiplier2.add(value.getValue());
+        this.getStack().applyAttributeModifiers(EquipmentSlot.MAINHAND, ((entityAttributeRegistryEntry, value) -> {
+            if (entityAttributeRegistryEntry == EntityAttributes.GENERIC_ATTACK_SPEED) {
+                switch (value.operation()) {
+                    case ADD_VALUE -> attackSpeed.updateAndGet(v -> v + value.value());
+                    case ADD_MULTIPLIED_BASE -> multiplier.add(value.value());
+                    case ADD_MULTIPLIED_TOTAL -> multiplier2.add(value.value());
+                }
             }
-        }
+        }));
+
+        var baseSpeed = attackSpeed.get();
+        var out = baseSpeed;
 
         for(var val : multiplier) {
-            attackSpeed += baseSpeed * val;
+            out += baseSpeed * val;
         }
 
         for(var val : multiplier2) {
-            attackSpeed *= 1.0 + val;
+            out *= 1.0 + val;
         }
 
-        this.attackCooldownPerTick = (float)(1.0 / attackSpeed * 20.0);
+        this.attackCooldownPerTick = (float)(1.0 / out * 20.0);
     }
 
     public float getAttackCooldownProgress() {
@@ -198,13 +199,17 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
             var player = self.getFakePlayer();
             player.setLastAttackedTicks(9999999);
 
+            var attr = player.getAttributes();
             var dmg = player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
             if (dmg != null) {
                 dmg.setBaseValue(0);
                 dmg.clearModifiers();
-                for (var x : self.getStack().getAttributeModifiers(EquipmentSlot.MAINHAND).get(EntityAttributes.GENERIC_ATTACK_DAMAGE)) {
-                    dmg.addTemporaryModifier(x);
-                }
+                self.getStack().applyAttributeModifiers(EquipmentSlot.MAINHAND, (type, value) -> {
+                    if (type == EntityAttributes.GENERIC_ATTACK_DAMAGE) {
+                        dmg.addTemporaryModifier(value);
+
+                    }
+                });
             }
             player.attack(entities.get(player.getRandom().nextInt(entities.size())));
             self.lastAttackedTicks = 0;

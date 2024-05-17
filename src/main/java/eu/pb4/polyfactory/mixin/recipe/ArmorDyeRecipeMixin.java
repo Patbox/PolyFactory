@@ -11,6 +11,7 @@ import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.ArmorDyeRecipe;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -28,7 +29,7 @@ public class ArmorDyeRecipeMixin {
     }
 
     @WrapOperation(
-            method = "craft(Lnet/minecraft/inventory/RecipeInputInventory;Lnet/minecraft/registry/DynamicRegistryManager;)Lnet/minecraft/item/ItemStack;",
+            method = "craft(Lnet/minecraft/inventory/RecipeInputInventory;Lnet/minecraft/registry/RegistryWrapper$WrapperLookup;)Lnet/minecraft/item/ItemStack;",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isEmpty()Z", ordinal = 0)
     )
     private boolean captureArtificialDyes(ItemStack stack, Operation<Boolean> original) {
@@ -41,7 +42,7 @@ public class ArmorDyeRecipeMixin {
     }
 
     @ModifyExpressionValue(
-            method = "craft(Lnet/minecraft/inventory/RecipeInputInventory;Lnet/minecraft/registry/DynamicRegistryManager;)Lnet/minecraft/item/ItemStack;",
+            method = "craft(Lnet/minecraft/inventory/RecipeInputInventory;Lnet/minecraft/registry/RegistryWrapper$WrapperLookup;)Lnet/minecraft/item/ItemStack;",
             at = @At(value = "INVOKE", target = "Ljava/util/List;isEmpty()Z")
     )
     private boolean markNotEmpty(boolean value) {
@@ -53,10 +54,10 @@ public class ArmorDyeRecipeMixin {
     }
 
     @Inject(
-            method = "craft(Lnet/minecraft/inventory/RecipeInputInventory;Lnet/minecraft/registry/DynamicRegistryManager;)Lnet/minecraft/item/ItemStack;",
+            method = "craft(Lnet/minecraft/inventory/RecipeInputInventory;Lnet/minecraft/registry/RegistryWrapper$WrapperLookup;)Lnet/minecraft/item/ItemStack;",
             at = @At("RETURN")
     )
-    private void clearArtificialList(RecipeInputInventory recipeInputInventory, DynamicRegistryManager dynamicRegistryManager, CallbackInfoReturnable<ItemStack> cir) {
+    private void clearArtificialList(RecipeInputInventory recipeInputInventory, RegistryWrapper.WrapperLookup wrapperLookup, CallbackInfoReturnable<ItemStack> cir) {
         ArtificialDyeItem.CURRENT_DYES.get().clear();
     }
 }

@@ -13,8 +13,8 @@ import java.util.function.Supplier;
 public class GuiUtils {
     public static final GuiElement EMPTY = GuiElement.EMPTY;
 
-    public static final void playClickSound(ServerPlayerEntity player) {
-        player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.5f, 1);
+    public static void playClickSound(ServerPlayerEntity player) {
+        player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.5f, 1);
     }
 
 

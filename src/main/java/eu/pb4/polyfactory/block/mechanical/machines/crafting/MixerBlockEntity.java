@@ -28,6 +28,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
@@ -85,17 +86,17 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
-        this.writeInventoryNbt(nbt);
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.writeInventoryNbt(nbt, lookup);
         nbt.putDouble("Progress", this.process);
-        super.writeNbt(nbt);
+        super.writeNbt(nbt, lookup);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        this.readInventoryNbt(nbt);
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        this.readInventoryNbt(nbt, lookup);
         this.process = nbt.getDouble("Progress");
-        super.readNbt(nbt);
+        super.readNbt(nbt, lookup);
     }
 
     @Override
