@@ -58,7 +58,7 @@ public class FilterItem extends ModeledItem {
         if (target.isEmpty()) {
             filter.remove(FactoryDataComponents.ITEM_FILTER);
         } else {
-            filter.set(FactoryDataComponents.ITEM_FILTER, target);
+            filter.set(FactoryDataComponents.ITEM_FILTER, target.copyWithCount(1));
         }
     }
 

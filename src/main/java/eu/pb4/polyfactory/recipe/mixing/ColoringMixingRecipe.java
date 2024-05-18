@@ -41,6 +41,10 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
         return new RecipeEntry<>(FactoryUtil.id("mixing/" + id), new ColoringMixingRecipe("", item, 12, mixingTime, minimumSpeed, optimalSpeed, -1, 2));
     }
 
+    public static RecipeEntry<ColoringMixingRecipe> of(String id, Item item, int count, double mixingTime, double minimumSpeed, double optimalSpeed) {
+        return new RecipeEntry<>(FactoryUtil.id("mixing/" + id), new ColoringMixingRecipe("", item, count, mixingTime, minimumSpeed, optimalSpeed, -1, 2));
+    }
+
 
     @Override
     public boolean matches(MixerBlockEntity inventory, World world) {

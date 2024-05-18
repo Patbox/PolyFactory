@@ -94,7 +94,7 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
 
         this.storage.readNbt(nbt, lookup);
 
-        updateStack();
+        updateStackWithTick();
         super.readNbt(nbt, lookup);
     }
 
@@ -108,7 +108,7 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     private void updateStackWithTick() {
         updateStack();
         if (this.model != null && this.world != null) {
-                model.tick();
+            model.tick();
         }
     }
 
@@ -159,6 +159,6 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     @Override
     public void onListenerUpdate(WorldChunk chunk) {
         this.model = BlockBoundAttachment.get(chunk, this.pos).holder() instanceof ContainerBlock.Model model ? model : null;
-        this.updateStack();
+        this.updateStackWithTick();
     }
 }

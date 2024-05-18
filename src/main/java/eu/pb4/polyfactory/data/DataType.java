@@ -1,14 +1,16 @@
 package eu.pb4.polyfactory.data;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.StringIdentifiable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-public record DataType<T extends DataContainer>(String id, MapCodec<T> codec) {
-    public static final Map<String, DataType<DataContainer>> TYPES = new HashMap<>();
+public record DataType<T extends DataContainer>(String id, MapCodec<T> codec) implements StringIdentifiable {
+    private static final Map<String, DataType<DataContainer>> TYPES = new HashMap<>();
 
     @SuppressWarnings("unchecked")
     public DataType {
@@ -23,5 +25,11 @@ public record DataType<T extends DataContainer>(String id, MapCodec<T> codec) {
     public static final DataType<BlockStateData> BLOCK_STATE = new DataType<>("block_state", BlockStateData.TYPE_CODEC);
     public static final DataType<ItemStackData> ITEM_STACK = new DataType<>("item_stack", ItemStackData.TYPE_CODEC);
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static final Codec<DataType<?>> CODEC = Codec.STRING.xmap(x -> TYPES.getOrDefault(x, (DataType) STRING), DataType::id);
 
+    @Override
+    public String asString() {
+        return this.id;
+    }
 }

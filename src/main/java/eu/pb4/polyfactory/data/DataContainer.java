@@ -2,19 +2,14 @@ package eu.pb4.polyfactory.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.DispatchedMapCodec;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.MathHelper;
 
-import java.util.function.Function;
-
 public interface DataContainer {
-    MapCodec<DataContainer> CODEC = Codec.STRING.dispatchMap("type", data -> data.type().id(),
-            type -> DataType.TYPES.get(type).codec()).orElse(StringData.EMPTY);
+    MapCodec<DataContainer> MAP_CODEC = DataType.CODEC.dispatchMap("type", DataContainer::type, DataType::codec);
+    Codec<DataContainer> CODEC = MAP_CODEC.codec();
     static DataContainer of(long count) {
         return new LongData(count);
     }
@@ -43,12 +38,11 @@ public interface DataContainer {
     }
 
     static DataContainer fromNbt(NbtElement compound, RegistryWrapper.WrapperLookup lookup) {
-        return CODEC.codec().decode(lookup.getOps(NbtOps.INSTANCE), compound).getOrThrow().getFirst();
+        return CODEC.decode(lookup.getOps(NbtOps.INSTANCE), compound).getOrThrow().getFirst();
     }
 
-    @SuppressWarnings("unchecked")
     default NbtElement createNbt(RegistryWrapper.WrapperLookup lookup) {
-        return ((MapCodec<DataContainer>) this.type().codec()).encoder().encodeStart(lookup.getOps(NbtOps.INSTANCE), this).getOrThrow();
+        return CODEC.encodeStart(lookup.getOps(NbtOps.INSTANCE), this).getOrThrow();
     }
 
     default boolean isTrue() {

@@ -278,7 +278,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
         public static final Codec<DataEntry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.INT.fieldOf("__key").forGetter(DataEntry::key),
                 BLOCK_POS_CODEC.fieldOf("__pos").forGetter(DataEntry::blockPos),
-                DataContainer.CODEC.forGetter(DataEntry::dataContainer),
+                DataContainer.MAP_CODEC.forGetter(DataEntry::dataContainer),
                 Direction.CODEC.optionalFieldOf("__dir").forGetter(DataEntry::direction)
         ).apply(instance, DataEntry::new));
     }

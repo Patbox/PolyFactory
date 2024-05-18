@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public record ItemStackData(ItemStack stack, String name) implements DataContainer {
     public static MapCodec<ItemStackData> TYPE_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ItemStack.OPTIONAL_CODEC.fieldOf("value").forGetter(ItemStackData::stack),
+            ItemStack.OPTIONAL_CODEC.orElse(ItemStack.EMPTY).fieldOf("value").forGetter(ItemStackData::stack),
             Codec.STRING.optionalFieldOf("name", "").forGetter(ItemStackData::name)
     ).apply(instance, ItemStackData::new));
 

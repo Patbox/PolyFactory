@@ -21,7 +21,7 @@ public class GuiTextures {
     public static final Function<Text, Text> STEAM_ENGINE = background("steam_engine");
     public static final Function<Text, Text> CENTER_SLOT_GENERIC = background("center_slot");
     public static final Function<Text, Text> FILL3 = background("fill3");
-    public static final GuiElement EMPTY = icon16("empty").get().build();
+    public static final GuiElement EMPTY = icon16("empty").get().hideTooltip().build();
     public static final Supplier<GuiElementBuilder> POLYDEX_BUTTON = icon32("polydex");
     public static final Supplier<GuiElementBuilder> PLUS_BUTTON = icon32("button/plus");
     public static final Supplier<GuiElementBuilder> MINUS_BUTTON = icon32("button/minus");
@@ -40,79 +40,63 @@ public class GuiTextures {
     }
 
 
-    public record Progress(GuiElement[] elements) {
+    public record Progress(GuiElement[] elements, ItemStack[] withTooltip) {
         public GuiElement get(float progress) {
             return elements[Math.min((int) (progress * elements.length), elements.length - 1)];
         }
 
         public ItemStack getNamed(float progress, Text text) {
-            var base = elements[Math.min((int) (progress * elements.length), elements.length - 1)].getItemStack().copy();
+            var base = withTooltip[Math.min((int) (progress * withTooltip.length), withTooltip.length - 1)].copy();
             base.set(DataComponentTypes.ITEM_NAME, text);
             return base;
         }
 
-        public static Progress createVertical(String path, int start, int stop, boolean reverse) {
-            var size = stop - start;
+        private static Progress create(int size, IntFunction<GuiElementBuilder> function) {
             var elements = new GuiElement[size + 1];
-            var function = verticalProgress16(path, start, stop, reverse);
+            var withTooltip = new ItemStack[size + 1];
 
             elements[0] = EMPTY;
+            withTooltip[0] = EMPTY.getItemStack().copy();
 
             for (var i = 1; i <= size; i++) {
-                elements[i] = function.apply(i - 1).build();
+                elements[i] = function.apply(i - 1).hideTooltip().build();
+                withTooltip[i] = function.apply(i - 1).asStack();
             }
-            return new Progress(elements);
+            return new Progress(elements, withTooltip);
+        }
+
+        public static Progress createVertical(String path, int start, int stop, boolean reverse) {
+            var size = stop - start;
+            var function = verticalProgress16(path, start, stop, reverse);
+
+            return create(size, function);
         }
 
         public static Progress createHorizontal(String path, int start, int stop, boolean reverse) {
             var size = stop - start;
-            var elements = new GuiElement[size + 1];
             var function = horizontalProgress16(path, start, stop, reverse);
 
-            elements[0] = EMPTY;
-
-            for (var i = 1; i <= size; i++) {
-                elements[i] = function.apply(i - 1).build();
-            }
-            return new Progress(elements);
+            return create(size, function);
         }
 
         public static Progress createHorizontal32(String path, int start, int stop, boolean reverse) {
             var size = stop - start;
-            var elements = new GuiElement[size + 1];
             var function = horizontalProgress32(path, start, stop, reverse);
 
-            elements[0] = EMPTY;
-
-            for (var i = 1; i <= size; i++) {
-                elements[i] = function.apply(i - 1).build();
-            }
-            return new Progress(elements);
+            return create(size, function);
         }
 
         public static Progress createHorizontal32Right(String path, int start, int stop, boolean reverse) {
             var size = stop - start;
-            var elements = new GuiElement[size + 1];
             var function = horizontalProgress32Right(path, start, stop, reverse);
 
-            elements[0] = EMPTY;
-
-            for (var i = 1; i <= size; i++) {
-                elements[i] = function.apply(i - 1).build();
-            }
-            return new Progress(elements);
+            return create(size, function);
         }
         public static Progress createVertical32Right(String path, int start, int stop, boolean reverse) {
             var size = stop - start;
-            var elements = new GuiElement[size + 1];
             var function = verticalProgress32Right(path, start, stop, reverse);
 
-            elements[0] = EMPTY;
-
-            for (var i = 1; i <= size; i++) {
-                elements[i] = function.apply(i - 1).build();
-            }
-            return new Progress(elements);
+            return create(size, function);
         }
     }
 

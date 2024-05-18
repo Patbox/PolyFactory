@@ -85,6 +85,6 @@ public class CableBlockEntity extends BlockEntity implements BlockEntityExtraLis
     @Override
     protected void readComponents(ComponentsAccess components) {
         super.readComponents(components);
-        this.color = components.getOrDefault(FactoryDataComponents.COLOR, AbstractCableBlock.DEFAULT_COLOR);
+        setColor(components.getOrDefault(FactoryDataComponents.COLOR, AbstractCableBlock.DEFAULT_COLOR));
     }
 }

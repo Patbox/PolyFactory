@@ -34,6 +34,10 @@ class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
                 .add(FactoryItems.ARTIFICIAL_DYE)
         ;
 
+        this.getOrCreateTagBuilder(ItemTags.DYEABLE)
+                .add(FactoryItems.WINDMILL_SAIL)
+        ;
+
         this.getOrCreateTagBuilder(FactoryItemTags.ROOT_ADVANCEMENT)
                 .add(FactoryItems.GRINDER)
                 .add(FactoryItems.METAL_GRID)

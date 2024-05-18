@@ -194,7 +194,7 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
 
     @Override
     public void onRegistered(Identifier selfId) {
-        this.mainModel = PolymerResourcePackUtils.requestModel(Items.LEATHER_BOOTS, selfId.withPrefixedPath("item/"));
+        this.mainModel = PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, selfId.withPrefixedPath("item/"));
         this.emptyModel = PolymerResourcePackUtils.requestModel(BaseItemProvider.requestItem(), selfId.withPrefixedPath("item/").withSuffixedPath("_empty"));
     }
 

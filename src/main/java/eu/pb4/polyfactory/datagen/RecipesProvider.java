@@ -17,7 +17,6 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
-import net.minecraft.component.DataComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.data.server.recipe.CookingRecipeJsonBuilder;
@@ -496,14 +495,16 @@ class RecipesProvider extends FabricRecipeProvider {
                 ColoringCraftingRecipe.of("lamp_color", FactoryItems.LAMP),
                 ColoringCraftingRecipe.of("inverted_color", FactoryItems.INVERTED_LAMP),
                 ColoringCraftingRecipe.of("caged_lamp_color", FactoryItems.CAGED_LAMP),
-                ColoringCraftingRecipe.of("inverted_caged_color", FactoryItems.INVERTED_CAGED_LAMP)
+                ColoringCraftingRecipe.of("inverted_caged_color", FactoryItems.INVERTED_CAGED_LAMP),
+                ColoringCraftingRecipe.of("portable_redstone_transmitter_color", FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, 1)
         );
         of(exporter,
                 ColoringMixingRecipe.of("cable_color", FactoryItems.CABLE, 2, 6, 10),
                 ColoringMixingRecipe.of("lamp_color", FactoryItems.LAMP, 2, 6, 10),
                 ColoringMixingRecipe.of("inverted_lamp_color", FactoryItems.INVERTED_LAMP, 2, 6, 10),
                 ColoringMixingRecipe.of("caged_lamp_color", FactoryItems.CAGED_LAMP, 2, 6, 10),
-                ColoringMixingRecipe.of("inverted_caged_lamp_color", FactoryItems.INVERTED_CAGED_LAMP, 2, 6, 10)
+                ColoringMixingRecipe.of("inverted_caged_lamp_color", FactoryItems.INVERTED_CAGED_LAMP, 2, 6, 10),
+                ColoringMixingRecipe.of("portable_redstone_transmitter_color", FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, 1,2, 6, 10)
         );
 
         of(exporter,

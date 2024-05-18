@@ -128,7 +128,7 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
         super.readComponents(components);
         this.lastData = components.getOrDefault(FactoryDataComponents.STORED_DATA, this.lastData);
         this.channel = components.getOrDefault(FactoryDataComponents.CHANNEL, this.channel);
-        this.color = components.getOrDefault(FactoryDataComponents.COLOR, this.color);
+        setColor(components.getOrDefault(FactoryDataComponents.COLOR, this.color));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.item;
 
+import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.factorytools.api.item.MultiBlockItem;
@@ -93,7 +94,9 @@ public class FactoryItems {
     public static final Item HOLOGRAM_PROJECTOR = register(FactoryBlocks.HOLOGRAM_PROJECTOR);
     public static final Item WIRELESS_REDSTONE_RECEIVER = register(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
     public static final Item WIRELESS_REDSTONE_TRANSMITTER = register(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER);
-    public static final Item PORTABLE_REDSTONE_TRANSMITTER = register("portable_redstone_transmitter", new WirelessRedstoneTransmitterItem(new Item.Settings().maxCount(1)));
+    public static final Item PORTABLE_REDSTONE_TRANSMITTER = register("portable_redstone_transmitter",
+            new WirelessRedstoneTransmitterItem(new Item.Settings().maxCount(1)
+                    .component(FactoryDataComponents.REMOTE_KEYS, new Pair<>(ItemStack.EMPTY, ItemStack.EMPTY))));
 
     public static final ColoredDownsampledBlockItem CABLE = registerColored(FactoryBlocks.CABLE, AbstractCableBlock.DEFAULT_COLOR);
     public static final ColoredDownsampledBlockItem LAMP = registerColored(FactoryBlocks.LAMP, -1);
