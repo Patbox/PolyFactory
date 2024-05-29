@@ -96,14 +96,14 @@ public abstract class Schema1460Mixin extends Schema {
         schema.registerSimple(map, mod("hand_crank"));
     }
 
-    @Inject(method = "registerTypes", at = @At("RETURN"))
+    @Inject(method = "registerTypes", at = @At("HEAD"))
     private void registerTypeRef(Schema schema, Map<String, Supplier<TypeTemplate>> entityTypes, Map<String, Supplier<TypeTemplate>> blockEntityTypes, CallbackInfo ci) {
-        schema.registerType(false, TypeReferences.GAME_EVENT_NAME, DSL::remainder);
+        //schema.registerType(false, TypeReferences.GAME_EVENT_NAME, DSL::remainder);
         schema.registerType(true, FactoryTypeReferences.DATA_CONTAINER, () -> {
             return DSL.allWithRemainder(DSL.optional(DSL.taggedChoiceLazy("type", DSL.string(), Map.of(
                     "block_state", () -> DSL.optionalFields("value", TypeReferences.BLOCK_STATE.in(schema)),
-                    "item_stack", () -> DSL.optionalFields("value", TypeReferences.ITEM_STACK.in(schema)),
-                    "game_event", () -> DSL.optionalFields("event", TypeReferences.GAME_EVENT_NAME.in(schema))
+                    "item_stack", () -> DSL.optionalFields("value", TypeReferences.ITEM_STACK.in(schema))//,
+                //    "game_event", () -> DSL.optionalFields("event", TypeReferences.GAME_EVENT_NAME.in(schema))
             ))));
         });
     }
