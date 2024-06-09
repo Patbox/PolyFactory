@@ -40,7 +40,7 @@ public class MovingItem implements VirtualElement, StackReference {
     public MovingItem(ItemStack stack, Vec3d pos) {
         this.stack = stack.copy();
         this.stackCurrent = stack.copy();
-        this.pos = pos;
+        this.setPos(pos);
 
         for (var i = 0; i < 4; i++) {
             this.itemDisplay[i] = new LodItemDisplayElement();
@@ -50,9 +50,11 @@ public class MovingItem implements VirtualElement, StackReference {
             this.itemDisplay[i].setViewRange(i == 0 ? 0.5f : 0.2f);
             this.itemDisplay[i].setModelTransformation(ModelTransformationMode.FIXED);
             this.itemDisplay[i].setInterpolationDuration(10);
+            this.itemDisplay[i].ignorePositionUpdates();
             this.updateDisplay(i);
         }
         this.riddenBase = this.itemDisplay[0];
+        this.riddenBase.setSendPositionUpdates(true);
     }
 
     public MovingItem split(ContainerHolder aware) {
@@ -158,6 +160,7 @@ public class MovingItem implements VirtualElement, StackReference {
             }
         }
         if (!this.pos.equals(this.lastPos)) {
+            this.riddenBase.setOffset(this.pos.subtract(this.getHolder().getPos()));
             this.riddenBase.notifyMove(this.lastPos, this.pos, this.lastPos.subtract(this.pos));
             if (this.isFirstMove) {
                 this.riddenBase.setTeleportDuration(4);

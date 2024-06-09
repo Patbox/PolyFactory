@@ -313,6 +313,13 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     public static int getModelId(BlockState state) {
+        var value = state.get(VERTICAL);
+        if (value.stack && value.value == 1) {
+            return getModelId(state.get(PREVIOUS_CONVEYOR), state.get(NEXT_CONVEYOR), state.get(BOTTOM_CONVEYOR), state.get(TOP_CONVEYOR));
+        } else if (value.stack && value.value == -1) {
+            return getModelId(state.get(NEXT_CONVEYOR), state.get(PREVIOUS_CONVEYOR), state.get(TOP_CONVEYOR), state.get(BOTTOM_CONVEYOR));
+        }
+
         return getModelId(state.get(TOP_CONVEYOR), state.get(BOTTOM_CONVEYOR), state.get(PREVIOUS_CONVEYOR), state.get(NEXT_CONVEYOR));
     }
 
@@ -364,6 +371,10 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
             return neighborValue == DirectionValue.NEGATIVE;
         } else if (selfValue == DirectionValue.NEGATIVE && (neighborDirection == Direction.UP || neighborDirection == selfDirection)) {
             return neighborValue == DirectionValue.POSITIVE;
+        }
+
+        if (neighborDirection == Direction.UP || neighborDirection == Direction.DOWN) {
+            return neighborValue.value != -selfValue.value;
         }
 
         return true;
@@ -539,6 +550,9 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
                 mat.identity().translate(0, 0.5f, 0).rotateY((270 - dir.asRotation()) * MathHelper.RADIANS_PER_DEGREE);
                 if (value.value == -1 && !value.stack) {
                     mat.rotateY(MathHelper.PI);
+                }
+                if (value.value != 0 && value.stack) {
+                    mat.rotateZ(MathHelper.HALF_PI * value.value);
                 }
                 var f = dir.getAxis().ordinal() * 0.0001f;
 

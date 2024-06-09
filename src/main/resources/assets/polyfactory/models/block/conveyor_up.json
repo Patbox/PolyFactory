@@ -3,7 +3,7 @@
 	"texture_size": [32, 32],
 	"textures": {
 		"1": "polyfactory:block/conveyor_top",
-		"3": "polyfactory:block/conveyor_side_stair",
+		"3": "polyfactory:block/conveyor_side_stair_up",
 		"particle": "polyfactory:block/conveyor_top"
 	},
 	"elements": [

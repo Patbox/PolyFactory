@@ -37,7 +37,9 @@ public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue val
         var view = self.getGraphWorld();
         var pos = self.getBlockPos();
 
-        Predicate<NodeHolder<BlockNode>> conv = other -> (other.getNode() instanceof ConveyorNode node && node.direction == this.direction);
+        Predicate<NodeHolder<BlockNode>> conv = other -> other.getNode() instanceof ConveyorNode node && node.direction == this.direction;
+        Predicate<NodeHolder<BlockNode>> convVertical = other -> other.getNode() instanceof ConveyorNode node
+                && node.direction == this.direction && (node.value.value != 0 || this.value.value != 0 || node.value != this.value);
         Predicate<NodeHolder<BlockNode>> sides = other -> FactoryNodes.canBothConnect(self, other);
 
         if (this.value.value == 0) {
@@ -47,9 +49,9 @@ public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue val
             addNodes(view, nextPos, conv, list);
 
             nextPos.set(pos).move(0, 1, 0);
-            addNodes(view, nextPos, conv, list);
+            addNodes(view, nextPos, convVertical, list);
             nextPos.move(0, -2, 0);
-            addNodes(view, nextPos, conv, list);
+            addNodes(view, nextPos, convVertical, list);
         } else if (this.value.stack) {
             nextPos.set(pos).move(0, 1, 0);
             addNodes(view, nextPos, conv, list);
