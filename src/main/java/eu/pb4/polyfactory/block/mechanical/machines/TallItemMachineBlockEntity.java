@@ -16,7 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class TallItemMachineBlockEntity extends LockableBlockEntity implements MachineInfoProvider, InventorySimpleContainerProvider, SidedInventory, RecipeInput {
+public abstract class TallItemMachineBlockEntity extends LockableBlockEntity implements MachineInfoProvider, InventorySimpleContainerProvider, SidedInventory {
     protected Text state;
 
     public TallItemMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -60,20 +60,5 @@ public abstract class TallItemMachineBlockEntity extends LockableBlockEntity imp
     @Override
     public @Nullable Text getCurrentState() {
         return this.state;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        return getStack(slot);
-    }
-
-    @Override
-    public int getSize() {
-        return this.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return InventorySimpleContainerProvider.super.isEmpty();
     }
 }

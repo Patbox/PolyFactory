@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
+import eu.pb4.polyfactory.recipe.input.MixingInput;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.FireworkStarRecipe;
 import net.minecraft.recipe.RecipeSerializer;
@@ -55,12 +56,12 @@ public record FireworkStarMixingRecipe(double time,
     }
 
     @Override
-    public boolean matches(MixerBlockEntity inventory, World world) {
+    public boolean matches(MixingInput inventory, World world) {
         return VANILLA.matches(inventory.asCraftingRecipeInput(), world);
     }
 
     @Override
-    public ItemStack craft(MixerBlockEntity inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack craft(MixingInput inventory, RegistryWrapper.WrapperLookup registryManager) {
         return VANILLA.craft(inventory.asCraftingRecipeInput(), registryManager);
     }
 

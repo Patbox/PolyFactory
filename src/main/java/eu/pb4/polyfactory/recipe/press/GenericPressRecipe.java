@@ -8,13 +8,13 @@ import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.*;
+import eu.pb4.polyfactory.recipe.input.PressInput;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
@@ -47,9 +47,9 @@ public record GenericPressRecipe(CountedIngredient inputA, CountedIngredient inp
     }
 
     @Override
-    public boolean matches(PressBlockEntity inventory, World world) {
-        var input = inventory.getStack(PressBlockEntity.INPUT_SLOT);
-        var template = inventory.getStack(PressBlockEntity.INPUT_2_SLOT);
+    public boolean matches(PressInput inventory, World world) {
+        var input = inventory.pattern();
+        var template = inventory.input();
         return this.inputA.test(input) && this.inputB.test(template);
     }
 
@@ -69,7 +69,7 @@ public record GenericPressRecipe(CountedIngredient inputA, CountedIngredient inp
     }
 
     @Override
-    public ItemStack craft(PressBlockEntity inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack craft(PressInput input, RegistryWrapper.WrapperLookup registryManager) {
         for (var out : output) {
             if (Math.random() <= out.chance()) {
                 return out.stack().copy();

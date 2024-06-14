@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.item.ArtificialDyeItem;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
+import eu.pb4.polyfactory.recipe.input.MixingInput;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.minecraft.item.*;
 import net.minecraft.recipe.RecipeSerializer;
@@ -44,13 +45,13 @@ public record ArtificialDyeMixingRecipe(double time,
     }
 
     @Override
-    public boolean matches(MixerBlockEntity inventory, World world) {
+    public boolean matches(MixingInput inventory, World world) {
         boolean hasBase = false;
         int dyeCount = 0;
         int ingridCount = 0;
 
         for (var i = 0; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            var stack = inventory.getStack(i);
+            var stack = inventory.getStackInSlot(i);
 
             // Replace with custom item
             if (stack.isOf(FactoryItems.SAW_DUST)) {
@@ -74,7 +75,7 @@ public record ArtificialDyeMixingRecipe(double time,
     }
 
     @Override
-    public ItemStack craft(MixerBlockEntity inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack craft(MixingInput inventory, RegistryWrapper.WrapperLookup registryManager) {
         int[] rgb = new int[3];
         int[] rgbDye = new int[3];
         int maxColor = 0;
@@ -83,13 +84,13 @@ public record ArtificialDyeMixingRecipe(double time,
         int delta = 32;
 
         for (var i = 0; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            if (inventory.getStack(i).isOf(FactoryItems.SAW_DUST)) {
+            if (inventory.getStackInSlot(i).isOf(FactoryItems.SAW_DUST)) {
                 delta /= 2;
             }
         }
 
         for (var i = 0; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            var itemStack = inventory.getStack(i);
+            var itemStack = inventory.getStackInSlot(i);
 
             var color = DyeColorExtra.getColor(itemStack);
             if (color != -1) {

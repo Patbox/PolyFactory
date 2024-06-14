@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
+import eu.pb4.polyfactory.recipe.input.MixingInput;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
@@ -47,12 +48,12 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
 
 
     @Override
-    public boolean matches(MixerBlockEntity inventory, World world) {
+    public boolean matches(MixingInput inventory, World world) {
         boolean hasDye = false;
         int count = 0;
 
         for (int i = 0; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            var stack = inventory.getStack(i);
+            var stack = inventory.getStackInSlot(i);
             if (stack.isIn(ConventionalItemTags.DYES)) {
                 if (hasDye) {
                     return false;
@@ -69,12 +70,12 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
     }
 
     @Override
-    public ItemStack craft(MixerBlockEntity inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack craft(MixingInput inventory, RegistryWrapper.WrapperLookup registryManager) {
         int color = -1;
         int count = 0;
 
         for (int i = 0; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            var stack = inventory.getStack(i);
+            var stack = inventory.getStackInSlot(i);
             if (stack.isIn(ConventionalItemTags.DYES)) {
                 color = DyeColorExtra.getColor(stack);
             } else if (stack.isOf(this.input)) {

@@ -7,10 +7,10 @@ import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
+import eu.pb4.polyfactory.recipe.input.GrindingInput;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
-import eu.pb4.polyfactory.util.inventory.MinimalSidedRecipeInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
@@ -24,7 +24,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.input.RecipeInput;
+import net.minecraft.recipe.input.SingleStackRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
@@ -44,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
-public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSidedRecipeInventory, MachineInfoProvider {
+public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, MachineInfoProvider {
     public static final int INPUT_SLOT = 0;
     private static final int[] INPUT_SLOTS = {INPUT_SLOT};
     private static final int[] OUTPUT_SLOTS = {1, 2, 3};
@@ -120,12 +120,12 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
             self.state = INCORRECT_ITEMS_TEXT;
             return;
         }
-
+        var input = new GrindingInput(self.stacks.get(0));
         if (self.currentItem == null || !stack.isOf(self.currentItem)) {
             self.process = 0;
             self.speedScale = 0;
             self.currentItem = stack.getItem();
-            self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.GRINDING, self, world).orElse(null);
+            self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.GRINDING, input, world).orElse(null);
 
             if (self.currentRecipe == null) {
                 self.active = false;

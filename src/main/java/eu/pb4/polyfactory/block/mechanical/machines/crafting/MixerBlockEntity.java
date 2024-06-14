@@ -8,9 +8,11 @@ import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
+import eu.pb4.polyfactory.recipe.input.MixingInput;
 import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.inventory.InventoryList;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
@@ -42,6 +44,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MixerBlockEntity extends TallItemMachineBlockEntity {
 
@@ -56,6 +59,8 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     protected RecipeEntry<MixingRecipe> currentRecipe = null;
     private boolean active;
     private final SimpleContainer[] containers = SimpleContainer.createArray(9, this::addMoving, this::removeMoving);
+
+    private final List<ItemStack> stacks = new InventoryList(this);
     private MixerBlock.Model model;
     private boolean inventoryChanged = false;
     private double speedScale;
@@ -161,10 +166,12 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             return;
         }
 
-        if (self.inventoryChanged && (self.currentRecipe == null || !self.currentRecipe.value().matches(self, world))) {
+        var input = new MixingInput(self.stacks);
+
+        if (self.inventoryChanged && (self.currentRecipe == null || !self.currentRecipe.value().matches(input, world))) {
             self.process = 0;
             self.speedScale = 0;
-            self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.MIXER, self, world).orElse(null);
+            self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.MIXER, input, world).orElse(null);
 
             if (self.currentRecipe == null) {
                 self.active = false;
@@ -194,7 +201,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         self.model.tick();
 
         if (self.process >= self.currentRecipe.value().time()) {
-            var output = self.currentRecipe.value().craft(self, world.getRegistryManager());
+            var output = self.currentRecipe.value().craft(input, world.getRegistryManager());
             {
                 var items = new ArrayList<ItemStack>();
                 items.add(output.copy());

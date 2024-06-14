@@ -198,8 +198,8 @@ public class ConveyorModel {
                     var name = element.getAsJsonObject().get("name");
 
                     if (name == null || !(switch (name.getAsString()) {
-                        case "top" -> ConveyorBlock.hasTop(i);
-                        case "bottom" -> ConveyorBlock.hasBottom(i);
+                        case "pattern" -> ConveyorBlock.hasTop(i);
+                        case "input" -> ConveyorBlock.hasBottom(i);
                         case "front" -> ConveyorBlock.hasNext(i);
                         case "back" -> ConveyorBlock.hasPrevious(i);
                         case "top_front" -> ConveyorBlock.hasTop(i) && ConveyorBlock.hasNext(i);

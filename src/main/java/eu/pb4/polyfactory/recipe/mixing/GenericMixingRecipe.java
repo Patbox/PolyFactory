@@ -7,6 +7,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.recipe.*;
+import eu.pb4.polyfactory.recipe.input.MixingInput;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import net.minecraft.item.ItemStack;
@@ -77,10 +78,10 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input, I
     }
 
     @Override
-    public boolean matches(MixerBlockEntity inventory, World world) {
+    public boolean matches(MixingInput inventory, World world) {
         var map = new Object2IntArrayMap<CountedIngredient>();
         for (int i = MixerBlockEntity.INPUT_FIRST; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            var stack = inventory.getStack(i);
+            var stack = inventory.getStackInSlot(i);
             if (stack.isEmpty()) {
                 continue;
             }
@@ -140,7 +141,7 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input, I
     }
 
     @Override
-    public ItemStack craft(MixerBlockEntity inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack craft(MixingInput inventory, RegistryWrapper.WrapperLookup registryManager) {
         return this.output.copy();
     }
 

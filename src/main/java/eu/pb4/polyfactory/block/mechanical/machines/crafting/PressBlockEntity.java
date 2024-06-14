@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
+import eu.pb4.polyfactory.recipe.input.PressInput;
 import eu.pb4.polyfactory.recipe.press.PressRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactorySoundEvents;
@@ -117,7 +118,9 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             return;
         }
 
-        if (self.currentRecipe == null || !self.currentRecipe.value().matches(self, world)) {
+        var input = new PressInput(stack.getStack(), stack2.getStack());
+
+        if (self.currentRecipe == null || !self.currentRecipe.value().matches(input, world)) {
             if (self.process != 0) {
                 self.model.updatePiston(0);
             }
@@ -127,7 +130,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             self.currentItem2 = stack2.getStack().getItem();
             self.currentItemCount = stack.getStack().getCount();
             self.currentItemCount2 = stack2.getStack().getCount();
-            self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.PRESS, self, world).orElse(null);
+            self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.PRESS, input, world).orElse(null);
 
             if (self.currentRecipe == null) {
                 self.model.tick();
@@ -140,7 +143,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
         self.active = true;
 
         if (self.process >= 1 || self.delayedOutput != null) {
-            var nextOut = self.delayedOutput != null ? self.delayedOutput : self.currentRecipe.value().craft(self, self.world.getRegistryManager());
+            var nextOut = self.delayedOutput != null ? self.delayedOutput : self.currentRecipe.value().craft(input, self.world.getRegistryManager());
             var currentOut =  self.getStack(OUTPUT_SLOT);
 
             boolean success = false;

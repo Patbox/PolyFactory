@@ -7,19 +7,19 @@ import eu.pb4.factorytools.api.recipe.LazyRecipeSerializer;
 import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.recipe.input.GrindingInput;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.PolymerRecipe;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.*;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.world.World;
 
 import java.util.Arrays;
 import java.util.List;
 
-public record GrindingRecipe(String group, Ingredient input, List<OutputStack> output, double grindTime, double minimumSpeed, double optimalSpeed) implements Recipe<GrinderBlockEntity>, PolymerRecipe {
+public record GrindingRecipe(String group, Ingredient input, List<OutputStack> output, double grindTime, double minimumSpeed, double optimalSpeed) implements Recipe<GrindingInput>, PolymerRecipe {
     public static final MapCodec<GrindingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.STRING.optionalFieldOf("group", "").forGetter(GrindingRecipe::group),
                     LazyRecipeSerializer.INGREDIENT_CODEC.fieldOf("input").forGetter(GrindingRecipe::input),
@@ -68,13 +68,13 @@ public record GrindingRecipe(String group, Ingredient input, List<OutputStack> o
     }
 
     @Override
-    public boolean matches(GrinderBlockEntity inventory, World world) {
-        return this.input.test(inventory.getStack(GrinderBlockEntity.INPUT_SLOT));
+    public boolean matches(GrindingInput inventory, World world) {
+        return this.input.test(inventory.getStackInSlot(GrinderBlockEntity.INPUT_SLOT));
     }
 
     @Deprecated
     @Override
-    public ItemStack craft(GrinderBlockEntity inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack craft(GrindingInput inventory, RegistryWrapper.WrapperLookup registryManager) {
         return this.output.isEmpty() ? ItemStack.EMPTY : this.output.get(0).stack();
     }
 
