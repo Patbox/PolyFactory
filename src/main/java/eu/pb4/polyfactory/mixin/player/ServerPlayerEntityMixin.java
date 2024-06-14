@@ -33,14 +33,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements La
         super(world, pos, yaw, gameProfile);
     }
 
-    @SuppressWarnings("ConstantValue")
-    @Inject(method = "moveToSpawn", at = @At("HEAD"), cancellable = true)
-    private void dontMoveFakePlayers(ServerWorld world, CallbackInfo ci) {
-        if (((Object) this) instanceof FactoryPlayer) {
-            ci.cancel();
-        }
-    }
-
     @Override
     public void polyfactory$setLastFanTick() {
         //this.lastFanAge = this.age;

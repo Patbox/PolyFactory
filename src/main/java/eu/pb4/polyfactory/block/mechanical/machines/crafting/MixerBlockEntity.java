@@ -6,13 +6,11 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
-import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.inventory.WrappingRecipeInputInventory;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
@@ -21,13 +19,13 @@ import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.screen.ScreenHandlerType;
@@ -36,7 +34,6 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -61,7 +58,6 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     private final SimpleContainer[] containers = SimpleContainer.createArray(9, this::addMoving, this::removeMoving);
     private MixerBlock.Model model;
     private boolean inventoryChanged = false;
-    private RecipeInputInventory recipeInputProvider;
     private double speedScale;
 
     public MixerBlockEntity(BlockPos pos, BlockState state) {
@@ -224,7 +220,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             self.process = 0;
 
             if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
-                Criteria.RECIPE_CRAFTED.trigger(player, self.currentRecipe.id(), self.asRecipeInputProvider().getHeldStacks());
+                Criteria.RECIPE_CRAFTED.trigger(player, self.currentRecipe.id(), self.asCraftingRecipeInput().getStacks());
                 TriggerCriterion.trigger(player, FactoryTriggers.MIXER_CRAFTS);
             }
 
@@ -299,11 +295,13 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         return this.model;
     }
 
-    public RecipeInputInventory asRecipeInputProvider() {
-        if (this.recipeInputProvider == null) {
-            this.recipeInputProvider = WrappingRecipeInputInventory.of(this, INPUT_FIRST, OUTPUT_FIRST, 2, 3);
+    public CraftingRecipeInput asCraftingRecipeInput() {
+        var l = new ArrayList<ItemStack>();
+        for (int i = INPUT_FIRST; i < OUTPUT_FIRST; i++) {
+            l.add(this.getStack(i));
         }
-        return this.recipeInputProvider;
+
+        return CraftingRecipeInput.create(2, 3, l);
     }
 
     public float temperature() {

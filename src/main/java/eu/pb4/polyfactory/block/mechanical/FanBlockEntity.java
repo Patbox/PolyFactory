@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
+import eu.pb4.polyfactory.item.FactoryEnchantmentEffectComponents;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
 import eu.pb4.polyfactory.mixin.FallingBlockAccessor;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -121,9 +122,13 @@ public class FanBlockEntity extends BlockEntity {
         }
 
         for (var entity : world.getEntitiesByClass(Entity.class, box, EntityPredicates.EXCEPT_SPECTATOR)) {
-            if (entity instanceof LivingEntity livingEntity
-                    && EnchantmentHelper.getEquipmentLevel(FactoryEnchantments.IGNORE_MOVEMENT.value(), livingEntity) != 0) {
-                continue;
+            float mult = 1;
+
+            if (entity instanceof LivingEntity livingEntity) {
+                mult = FactoryEnchantments.getMultiplier(livingEntity, FactoryEnchantmentEffectComponents.FAN_PUSH_MULTIPLIER);
+                if (mult <= 0) {
+                    return;
+                }
             }
 
             if (entity instanceof LastFanEffectedTickConsumer consumer) {
@@ -131,7 +136,7 @@ public class FanBlockEntity extends BlockEntity {
             }
 
             var l = entity.getBoundingBox().getCenter().distanceTo(center);
-            var x = speed * (length - l) / (length + 1) * Math.pow(0.98, length);
+            var x = speed * (length - l) / (length + 1) * Math.pow(0.98, length) * mult;
             if (reverse) {
                 x = -x;
             }

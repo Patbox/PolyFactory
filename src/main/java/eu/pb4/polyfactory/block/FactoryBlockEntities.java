@@ -129,7 +129,7 @@ public class FactoryBlockEntities {
 
 
     public static <T extends BlockEntity> BlockEntityType<T> register(String path, FabricBlockEntityTypeBuilder<T> item) {
-        var x = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(ModInit.ID, path), item.build());
+        var x = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ModInit.ID, path), item.build());
         PolymerBlockUtils.registerBlockEntity(x);
         return x;
     }

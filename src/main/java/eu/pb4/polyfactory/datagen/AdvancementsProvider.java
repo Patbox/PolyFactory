@@ -292,7 +292,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         false
                 )
-                .criterion("use", RecipeCraftedCriterion.Conditions.create(new Identifier("firework_rocket"), List.of(
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(Identifier.of("firework_rocket"), List.of(
                         ExtraItemPredicate.withStatic(ItemPredicate.Builder.create(), FactoryItemPredicates.CUSTOM_FIREWORK_COLOR))))
                 .build(exporter, "polyfactory:main/base/mixer/firework");
 

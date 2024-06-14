@@ -9,9 +9,9 @@ import net.minecraft.recipe.RecipeMatcher;
 import java.util.ArrayList;
 import java.util.List;
 
-public record WrappingRecipeInputInventory(Inventory source, int start, int size, int width, int height) implements RecipeInputInventory {
+public record WrappingInputRecipeInput(Inventory source, int start, int size, int width, int height) implements RecipeInputInventory {
     public static RecipeInputInventory of(Inventory source, int start, int size, int width, int height) {
-        return new WrappingRecipeInputInventory(source, start, size, width, height);
+        return new WrappingInputRecipeInput(source, start, size, width, height);
     }
 
     @Override

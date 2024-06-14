@@ -10,6 +10,7 @@ import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.FireworkStarRecipe;
+import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,17 +24,17 @@ import java.util.List;
 @Mixin(FireworkStarRecipe.class)
 public class FireworkStarRecipeMixin {
     @SuppressWarnings("MixinAnnotationTarget")
-    @WrapOperation(method = "matches(Lnet/minecraft/inventory/RecipeInputInventory;Lnet/minecraft/world/World;)Z",
+    @WrapOperation(method = "matches(Lnet/minecraft/recipe/input/CraftingRecipeInput;Lnet/minecraft/world/World;)Z",
             constant = @Constant(classValue = DyeItem.class)
     )
     private boolean matchArtificialDye(Object obj, Operation<Boolean> original) {
         return obj == FactoryItems.ARTIFICIAL_DYE || original.call(obj);
     }
 
-    @Inject(method = "craft(Lnet/minecraft/inventory/RecipeInputInventory;Lnet/minecraft/registry/RegistryWrapper$WrapperLookup;)Lnet/minecraft/item/ItemStack;",
+    @Inject(method = "craft(Lnet/minecraft/recipe/input/CraftingRecipeInput;Lnet/minecraft/registry/RegistryWrapper$WrapperLookup;)Lnet/minecraft/item/ItemStack;",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/recipe/Ingredient;test(Lnet/minecraft/item/ItemStack;)Z", ordinal = 0)
     )
-    private void addColor(RecipeInputInventory recipeInputInventory, RegistryWrapper.WrapperLookup wrapperLookup, CallbackInfoReturnable<ItemStack> cir,
+    private void addColor(CraftingRecipeInput recipeInputInventory, RegistryWrapper.WrapperLookup wrapperLookup, CallbackInfoReturnable<ItemStack> cir,
                           @Local(ordinal = 0) ItemStack stack, @Local(ordinal = 0) IntList colors) {
         if (stack.isOf(FactoryItems.ARTIFICIAL_DYE)) {
             colors.add(ColoredItem.getColor(stack));

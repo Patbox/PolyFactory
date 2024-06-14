@@ -147,12 +147,12 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
 
     protected void updateResult() {
         ItemStack itemStack = ItemStack.EMPTY;
-        Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, this, world);
+        Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, this.createRecipeInput(), world);
         if (optional.isPresent()) {
             RecipeEntry<CraftingRecipe> recipeEntry = optional.get();
             CraftingRecipe craftingRecipe = recipeEntry.value();
             //if (result.shouldCraftRecipe(world, null, recipeEntry)) {
-                ItemStack itemStack2 = craftingRecipe.craft(this, world.getRegistryManager());
+                ItemStack itemStack2 = craftingRecipe.craft(this.createRecipeInput(), world.getRegistryManager());
                 if (itemStack2.isItemEnabled(world.getEnabledFeatures())) {
                     itemStack = itemStack2;
                 }

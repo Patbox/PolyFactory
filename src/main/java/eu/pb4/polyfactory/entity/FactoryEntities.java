@@ -22,7 +22,7 @@ public class FactoryEntities {
     }
 
     public static <T extends Entity> EntityType<T> register(String path, FabricEntityTypeBuilder<T> item) {
-        var x = Registry.register(Registries.ENTITY_TYPE, new Identifier(ModInit.ID, path), item.build());
+        var x = Registry.register(Registries.ENTITY_TYPE, Identifier.of(ModInit.ID, path), item.build());
         PolymerEntityUtils.registerType(x);
         return x;
     }

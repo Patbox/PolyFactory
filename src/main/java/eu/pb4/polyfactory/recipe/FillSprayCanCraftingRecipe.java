@@ -12,17 +12,18 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.world.World;
 
 public record FillSprayCanCraftingRecipe(CraftingRecipeCategory category) implements CraftingRecipe {
     @Override
-    public boolean matches(RecipeInputInventory inventory, World world) {
+    public boolean matches(CraftingRecipeInput inventory, World world) {
         ItemStack can = ItemStack.EMPTY;
         int dye = -1;
         int count = 0;
-        for (var stack : inventory.getHeldStacks()) {
+        for (var stack : inventory.getStacks()) {
             if (stack.isOf(FactoryItems.SPRAY_CAN)) {
                 if (can.isEmpty()) {
                     can = stack;
@@ -47,11 +48,11 @@ public record FillSprayCanCraftingRecipe(CraftingRecipeCategory category) implem
     }
 
     @Override
-    public ItemStack craft(RecipeInputInventory inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack craft(CraftingRecipeInput inventory, RegistryWrapper.WrapperLookup registryManager) {
         ItemStack can = ItemStack.EMPTY;
         int dye = -1;
         int dyeCount = 0;
-        for (var stack : inventory.getHeldStacks()) {
+        for (var stack : inventory.getStacks()) {
             if (stack.isOf(FactoryItems.SPRAY_CAN)) {
                 can = stack.copy();
             } else if (stack.isIn(ConventionalItemTags.DYES)) {

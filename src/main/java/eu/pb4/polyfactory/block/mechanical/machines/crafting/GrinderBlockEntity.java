@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
+import eu.pb4.polyfactory.util.inventory.MinimalSidedRecipeInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
@@ -23,6 +24,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
@@ -42,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
-public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, MachineInfoProvider {
+public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSidedRecipeInventory, MachineInfoProvider {
     public static final int INPUT_SLOT = 0;
     private static final int[] INPUT_SLOTS = {INPUT_SLOT};
     private static final int[] OUTPUT_SLOTS = {1, 2, 3};

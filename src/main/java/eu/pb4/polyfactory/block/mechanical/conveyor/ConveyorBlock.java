@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
+import eu.pb4.polyfactory.item.FactoryEnchantmentEffectComponents;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.models.ConveyorModel;
@@ -205,16 +206,20 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
             return;
         }
 
-        if (entity instanceof LivingEntity livingEntity
-                && EnchantmentHelper.getEquipmentLevel(FactoryEnchantments.IGNORE_MOVEMENT.value(), livingEntity) != 0) {
-            return;
+        float mult = 1;
+
+        if (entity instanceof LivingEntity livingEntity) {
+            mult = FactoryEnchantments.getMultiplier(livingEntity, FactoryEnchantmentEffectComponents.CONVEYOR_PUSH_MULTIPLIER);
+            if (mult <= 0) {
+                return;
+            }
         }
 
         var dir = state.get(DIRECTION);
 
         var next = entity.getBlockPos().offset(dir);
 
-        var speed = RotationUser.getRotation(world, pos).speed() * MathHelper.RADIANS_PER_DEGREE * 0.9 * 0.7;
+        var speed = RotationUser.getRotation(world, pos).speed() * MathHelper.RADIANS_PER_DEGREE * 0.9 * 0.7 * mult;
 
         if (speed == 0) {
             return;

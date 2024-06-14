@@ -43,9 +43,7 @@ public class ArtificialWitherSkullEntity extends ExplosiveProjectileEntity imple
 
 
         entity.setPosition(Vec3d.ofCenter(pos, 4 / 16f).offset(dir, 0.8));
-        entity.powerX = dir.getOffsetX() * 0.2;
-        entity.powerY = dir.getOffsetY() * 0.2;
-        entity.powerZ = dir.getOffsetZ() * 0.2;
+        entity.accelerationPower = 0.2;
 
         //double g = Math.sqrt(dir.getOffsetZ() + dir.getOffsetX());
         //entity.setPitch(MathHelper.wrapDegrees((float)(-(MathHelper.atan2(dir.getOffsetY(), g) * 180.0F / (float)Math.PI))));
@@ -75,7 +73,7 @@ public class ArtificialWitherSkullEntity extends ExplosiveProjectileEntity imple
                 var bl = target.damage(this.getDamageSources().create(DamageTypes.WITHER_SKULL, this, attacker), 3.0F);
                 if (bl) {
                     if (target.isAlive()) {
-                        this.applyDamageEffects(livingEntity, target);
+                        //this.applyDamageEffects(livingEntity, target);
                     } else {
                         livingEntity.heal(3.0F);
                     }

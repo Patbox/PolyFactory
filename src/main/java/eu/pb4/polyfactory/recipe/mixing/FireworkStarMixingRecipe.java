@@ -10,8 +10,6 @@ import net.minecraft.recipe.FireworkStarRecipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
-import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 import java.util.Collections;
@@ -58,12 +56,12 @@ public record FireworkStarMixingRecipe(double time,
 
     @Override
     public boolean matches(MixerBlockEntity inventory, World world) {
-        return VANILLA.matches(inventory.asRecipeInputProvider(), world);
+        return VANILLA.matches(inventory.asCraftingRecipeInput(), world);
     }
 
     @Override
     public ItemStack craft(MixerBlockEntity inventory, RegistryWrapper.WrapperLookup registryManager) {
-        return VANILLA.craft(inventory.asRecipeInputProvider(), registryManager);
+        return VANILLA.craft(inventory.asCraftingRecipeInput(), registryManager);
     }
 
     @Override

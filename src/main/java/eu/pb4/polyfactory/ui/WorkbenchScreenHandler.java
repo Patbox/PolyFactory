@@ -10,14 +10,15 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.recipe.book.RecipeBookCategory;
+import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
 
-public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<RecipeInputInventory> {
-	private final RecipeInputInventory input;
+public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<CraftingRecipeInput, Recipe<CraftingRecipeInput>> {
+	private final RecipeInputInventory recipeInput;
 	private final CraftingResultInventory result;
 	private final ScreenHandlerContext context;
 	private final PlayerEntity player;
@@ -29,12 +30,12 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<RecipeIn
 		this.block = block;
 		this.context = context;
 		this.player = playerInventory.player;
-		this.input = input;
-		this.addSlot(new CraftingResultSlot(playerInventory.player, this.input, this.result, 0, 124, 35));
+		this.recipeInput = input;
+		this.addSlot(new CraftingResultSlot(playerInventory.player, this.recipeInput, this.result, 0, 124, 35));
 
 		for(int i = 0; i < 3; ++i) {
 			for(int j = 0; j < 3; ++j) {
-				this.addSlot(new Slot(this.input, j + i * 3, 30 + j * 18, 17 + i * 18));
+				this.addSlot(new Slot(this.recipeInput, j + i * 3, 30 + j * 18, 17 + i * 18));
 			}
 		}
 
@@ -51,7 +52,7 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<RecipeIn
 
 	@Override
 	public void populateRecipeFinder(RecipeMatcher finder) {
-		this.input.provideRecipeInputs(finder);
+		this.recipeInput.provideRecipeInputs(finder);
 	}
 
 	@Override
@@ -60,8 +61,8 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<RecipeIn
 	}
 
 	@Override
-	public boolean matches(RecipeEntry<? extends Recipe<RecipeInputInventory>> recipe) {
-		return recipe.value().matches(this.input, this.player.getWorld());
+	public boolean matches(RecipeEntry recipe) {
+		return recipe.value().matches(CraftingRecipeInput.create(3, 3, this.recipeInput.getHeldStacks()), this.player.getWorld());
 	}
 
 	@Override
@@ -134,12 +135,12 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<RecipeIn
 
 	@Override
 	public int getCraftingWidth() {
-		return this.input.getWidth();
+		return this.recipeInput.getWidth();
 	}
 
 	@Override
 	public int getCraftingHeight() {
-		return this.input.getHeight();
+		return this.recipeInput.getHeight();
 	}
 
 	@Override

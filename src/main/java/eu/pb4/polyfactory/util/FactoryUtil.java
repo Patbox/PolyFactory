@@ -69,7 +69,7 @@ public class FactoryUtil {
     }
 
     public static Identifier id(String path) {
-        return new Identifier(ModInit.ID, path);
+        return Identifier.of(ModInit.ID, path);
     }
 
     public static void sendVelocityDelta(ServerPlayerEntity player, Vec3d delta) {

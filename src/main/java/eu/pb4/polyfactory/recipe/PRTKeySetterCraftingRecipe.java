@@ -12,6 +12,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.collection.DefaultedList;
@@ -24,13 +25,13 @@ public class PRTKeySetterCraftingRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public boolean matches(RecipeInputInventory inventory, World world) {
+    public boolean matches(CraftingRecipeInput inventory, World world) {
         int transmitter = -1;
         int key1 = -1;
         int key2 = -1;
 
         var x = 0;
-        for (var stack : inventory.getHeldStacks()) {
+        for (var stack : inventory.getStacks()) {
             if (!stack.isEmpty() && !stack.isIn(ConventionalItemTags.DYES)) {
                 if (stack.isOf(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
                     if (transmitter != -1) {
@@ -55,12 +56,12 @@ public class PRTKeySetterCraftingRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public ItemStack craft(RecipeInputInventory inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack craft(CraftingRecipeInput inventory, RegistryWrapper.WrapperLookup registryManager) {
         ItemStack transmitter = ItemStack.EMPTY;
         ItemStack key1 = ItemStack.EMPTY;
         ItemStack key2 = ItemStack.EMPTY;
 
-        for (var stack : inventory.getHeldStacks()) {
+        for (var stack : inventory.getStacks()) {
             if (!stack.isEmpty()) {
                 if (stack.isOf(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
                     transmitter = stack;
@@ -80,12 +81,12 @@ public class PRTKeySetterCraftingRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public DefaultedList<ItemStack> getRemainder(RecipeInputInventory inventory) {
-        DefaultedList<ItemStack> defaultedList = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
+    public DefaultedList<ItemStack> getRemainder(CraftingRecipeInput inventory) {
+        DefaultedList<ItemStack> defaultedList = DefaultedList.ofSize(inventory.getSize(), ItemStack.EMPTY);
 
         for(int i = 0; i < defaultedList.size(); ++i) {
-            if (!inventory.getStack(i).isOf(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
-                defaultedList.set(i, inventory.getStack(i).copyWithCount(1));
+            if (!inventory.getStackInSlot(i).isOf(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
+                defaultedList.set(i, inventory.getStackInSlot(i).copyWithCount(1));
             }
         }
 

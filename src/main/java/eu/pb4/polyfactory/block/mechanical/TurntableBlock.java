@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.collection.BlockCollection;
 import eu.pb4.polyfactory.block.mechanical.source.HandCrankBlockEntity;
+import eu.pb4.polyfactory.item.FactoryEnchantmentEffectComponents;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
@@ -108,12 +109,16 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
     @Override
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
         if (state.get(FACING) == Direction.DOWN) {
-            if (entity instanceof LivingEntity livingEntity
-                    && EnchantmentHelper.getEquipmentLevel(FactoryEnchantments.IGNORE_MOVEMENT.value(), livingEntity) != 0) {
-                return;
+            float mult = 1;
+
+            if (entity instanceof LivingEntity livingEntity) {
+                mult = FactoryEnchantments.getMultiplier(livingEntity, FactoryEnchantmentEffectComponents.CONVEYOR_PUSH_MULTIPLIER);
+                if (mult <= 0) {
+                    return;
+                }
             }
             var rot = RotationUser.getRotation(world, pos);
-            var speed = Math.min(rot.speed(), 1028f);
+            var speed = Math.min(rot.speed(), 1028f) * mult;
             if (speed != 0) {
                 var rotate = (float) (rot.isNegative() ? speed : -speed);
                 entity.setYaw(entity.getYaw() + rotate);

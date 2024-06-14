@@ -41,10 +41,10 @@ public class FactoryRecipeSerializers {
     }
 
     public static <T extends RecipeSerializer<?>> T register(String path, T recipeSerializer) {
-        return Registry.register(Registries.RECIPE_SERIALIZER, new Identifier(ModInit.ID, path), recipeSerializer);
+        return Registry.register(Registries.RECIPE_SERIALIZER, Identifier.of(ModInit.ID, path), recipeSerializer);
     }
 
     public static <T extends Recipe<?>> LazyRecipeSerializer<T> register(String path, MapCodec<T> codec) {
-        return Registry.register(Registries.RECIPE_SERIALIZER, new Identifier(ModInit.ID, path), new LazyRecipeSerializer<>(codec));
+        return Registry.register(Registries.RECIPE_SERIALIZER, Identifier.of(ModInit.ID, path), new LazyRecipeSerializer<>(codec));
     }
 }

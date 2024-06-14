@@ -1,7 +1,5 @@
 package eu.pb4.polyfactory;
 
-import eu.pb4.factorytools.impl.DebugData;
-import eu.pb4.factorytools.api.advancement.FactoryAdvancementCriteria;
 import eu.pb4.polyfactory.advancement.FactoryItemPredicates;
 import eu.pb4.polyfactory.block.FactoryPoi;
 import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlock;
@@ -13,11 +11,9 @@ import eu.pb4.polyfactory.block.mechanical.AxleWithLargeGearBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.data.providers.TinyPotatoSpringBlock;
-import eu.pb4.polyfactory.data.DataContainer;
-import eu.pb4.polyfactory.data.StringData;
 import eu.pb4.polyfactory.entity.FactoryEntities;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
-import eu.pb4.polyfactory.item.FactoryEnchantments;
+import eu.pb4.polyfactory.item.FactoryEnchantmentEffectComponents;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
 import eu.pb4.polyfactory.models.CableModel;
 import eu.pb4.polyfactory.models.ConveyorModel;
@@ -36,8 +32,6 @@ import eu.pb4.polyfactory.nodes.FactoryNodes;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +46,7 @@ public class ModInit implements ModInitializer {
 	public static final boolean DYNAMIC_ASSETS = true && DEV_ENV;
 
     public static Identifier id(String path) {
-		return new Identifier(ID, path);
+		return Identifier.of(ID, path);
 	}
 
 	@Override
@@ -68,7 +62,7 @@ public class ModInit implements ModInitializer {
 		FactoryBlocks.register();
 		FactoryPoi.register();
 		FactoryBlockEntities.register();
-		FactoryEnchantments.register();
+		FactoryEnchantmentEffectComponents.register();
 		FactoryDataComponents.register();
 		FactoryItems.register();
 		FactoryEntities.register();

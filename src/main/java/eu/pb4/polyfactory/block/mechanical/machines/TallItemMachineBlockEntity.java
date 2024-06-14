@@ -5,14 +5,18 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.util.movingitem.InventorySimpleContainerProvider;
 import eu.pb4.polyfactory.util.movingitem.MovingItem;
+import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.inventory.SidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class TallItemMachineBlockEntity extends LockableBlockEntity implements MachineInfoProvider, InventorySimpleContainerProvider, SidedInventory {
+public abstract class TallItemMachineBlockEntity extends LockableBlockEntity implements MachineInfoProvider, InventorySimpleContainerProvider, SidedInventory, RecipeInput {
     protected Text state;
 
     public TallItemMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -56,5 +60,20 @@ public abstract class TallItemMachineBlockEntity extends LockableBlockEntity imp
     @Override
     public @Nullable Text getCurrentState() {
         return this.state;
+    }
+
+    @Override
+    public ItemStack getStackInSlot(int slot) {
+        return getStack(slot);
+    }
+
+    @Override
+    public int getSize() {
+        return this.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return InventorySimpleContainerProvider.super.isEmpty();
     }
 }

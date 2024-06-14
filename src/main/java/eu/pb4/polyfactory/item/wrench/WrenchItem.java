@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.item.wrench;
 
 import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.polyfactory.item.util.SwitchActionItem;
-import net.minecraft.client.item.TooltipType;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;

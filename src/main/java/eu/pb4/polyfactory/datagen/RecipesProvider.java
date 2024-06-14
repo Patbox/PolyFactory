@@ -673,7 +673,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .pattern("sps")
                         .input('r', Items.REDSTONE).input('g', Items.GLOWSTONE)
                         .input('s', FactoryItems.SAW_DUST)
-                        .input('p', Registries.ITEM.get(new Identifier(dye.getColor().getName() + "_stained_glass")))
+                        .input('p', Registries.ITEM.get(Identifier.of(dye.getColor().getName() + "_stained_glass")))
                         .group("polyfactory:colored_lamp")
                         .criterion("get", InventoryChangedCriterion.Conditions.items(Items.GLOWSTONE));
 
@@ -691,7 +691,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .pattern(" ws")
                         .pattern("wsc")
                         .input('w', FactoryItems.WOODEN_PLATE).input('s', Items.STICK)
-                        .input('c', Registries.ITEM.get(new Identifier(dye.getColor().getName() + "_wool")))
+                        .input('c', Registries.ITEM.get(Identifier.of(dye.getColor().getName() + "_wool")))
                         .group("polyfactory:windmill_sail")
                         .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.WOODEN_PLATE))
                         .offerTo(exporter, id("windmill_sail/wool/" + dye.getColor()));
@@ -701,8 +701,8 @@ class RecipesProvider extends FabricRecipeProvider {
                 var nameSolid = dye.getColor().getName() + "_concrete";
                 var namePowder = nameSolid + "_powder";
 
-                var powder = Registries.ITEM.get(new Identifier(namePowder));
-                var solid = Registries.ITEM.get(new Identifier(nameSolid));
+                var powder = Registries.ITEM.get(Identifier.of(namePowder));
+                var solid = Registries.ITEM.get(Identifier.of(nameSolid));
                 of(exporter, GrindingRecipe.of(nameSolid + "_to_powder", "concrete_to_powder",
                         Ingredient.ofItems(solid), 3, 5, powder
                 ));

@@ -9,6 +9,7 @@ import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.*;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -58,9 +59,9 @@ public class ShapelessNbtCopyRecipe extends ShapelessRecipe implements PolymerRe
     }
 
     @Override
-    public ItemStack craft(RecipeInputInventory recipeInputInventory, RegistryWrapper.WrapperLookup dynamicRegistryManager) {
+    public ItemStack craft(CraftingRecipeInput recipeInputInventory, RegistryWrapper.WrapperLookup dynamicRegistryManager) {
         var stack = super.craft(recipeInputInventory, dynamicRegistryManager);
-        for (var tmp : recipeInputInventory.getHeldStacks()) {
+        for (var tmp : recipeInputInventory.getStacks()) {
             if (this.source.test(tmp)) {
                 stack.applyComponentsFrom(tmp.getComponents());
                 break;

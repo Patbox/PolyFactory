@@ -19,7 +19,7 @@ public class FactoryRecipeTypes {
     }
 
     public static <T extends Recipe<?>> RecipeType<T> register(String path) {
-        return Registry.register(Registries.RECIPE_TYPE, new Identifier(ModInit.ID, path), new RecipeType<T>() {
+        return Registry.register(Registries.RECIPE_TYPE, Identifier.of(ModInit.ID, path), new RecipeType<T>() {
             @Override
             public String toString() {
                 return ModInit.ID + ":" + path;

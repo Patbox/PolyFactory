@@ -16,20 +16,16 @@ import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.jukebox.JukeboxSong;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.WritableBookContentComponent;
 import net.minecraft.component.type.WrittenBookContentComponent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.MusicDiscItem;
-import net.minecraft.item.WrittenBookItem;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -110,8 +106,9 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
                 }
                 this.lines = list.toArray(new String[0]);
             }
-        } else if (this.stack.getItem() instanceof MusicDiscItem disc) {
-            this.lines = new String[] { disc.getDescription().getString() };
+        } else if (this.stack.contains(DataComponentTypes.JUKEBOX_PLAYABLE)) {
+            var song = JukeboxSong.getSongEntryFromStack(this.world.getRegistryManager(), this.stack);
+            this.lines = song.map(jukeboxSongRegistryEntry -> new String[]{jukeboxSongRegistryEntry.value().description().getString()}).orElseGet(() -> new String[]{this.stack.getName().getString()});
         } else if (!this.stack.isEmpty()) {
             this.lines = new String[] { this.stack.getName().getString() };
         } else {

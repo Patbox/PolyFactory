@@ -13,7 +13,7 @@ import eu.pb4.polyfactory.ui.GuiUtils;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
-import eu.pb4.polyfactory.util.inventory.WrappingRecipeInputInventory;
+import eu.pb4.polyfactory.util.inventory.WrappingInputRecipeInput;
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.advancement.criterion.Criteria;
@@ -56,7 +56,7 @@ import java.util.stream.IntStream;
 public class MCrafterBlockEntity extends LockableBlockEntity implements MachineInfoProvider, MinimalSidedInventory, CustomInsertInventory, RecipeInputInventory {
     private static final int[] INPUT_SLOTS = IntStream.range(0, 9).toArray();
     private static final int[] OUTPUT_SLOTS = IntStream.range(9, 9+9).toArray();
-    private static final SoundEvent CRAFT_SOUND_EVENT = SoundEvent.of(new Identifier("minecraft:block.crafter.craft"));
+    private static final SoundEvent CRAFT_SOUND_EVENT = SoundEvent.of(Identifier.of("minecraft:block.crafter.craft"));
     //private static final int[] OUTPUT_SLOTS = {1, 2, 3};
     private final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(9+9, ItemStack.EMPTY);
 
@@ -66,7 +66,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
     protected RecipeEntry<CraftingRecipe> currentRecipe = null;
     private boolean active;
     private boolean itemsDirty;
-    private final RecipeInputInventory recipeInputProvider = WrappingRecipeInputInventory.of(this, 0, 9, 3, 3);
+    private final RecipeInputInventory recipeInputProvider = WrappingInputRecipeInput.of(this, 0, 9, 3, 3);
     @Nullable
     private Text state;
 
@@ -168,9 +168,10 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
             return;
         }
 
-        if (self.currentRecipe == null || (self.itemsDirty && !self.currentRecipe.value().matches(self.recipeInputProvider, world))) {
+        var input = self.recipeInputProvider.createRecipeInput();
+        if (self.currentRecipe == null || (self.itemsDirty && !self.currentRecipe.value().matches(input, world))) {
             self.process = 0;
-            self.currentRecipe = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, self.recipeInputProvider, world).orElse(null);
+            self.currentRecipe = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, input, world).orElse(null);
             self.itemsDirty = false;
             if (self.currentRecipe == null) {
                 self.state = INCORRECT_ITEMS_TEXT;
@@ -183,8 +184,8 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
 
         if (self.process >= 8) {
             // Check space
-            var output = self.currentRecipe.value().craft(self.recipeInputProvider, world.getRegistryManager());
-            var remainder = self.currentRecipe.value().getRemainder(self.recipeInputProvider);
+            var output = self.currentRecipe.value().craft(input, world.getRegistryManager());
+            var remainder = self.currentRecipe.value().getRemainder(input);
 
             {
                 var items = new ArrayList<ItemStack>();

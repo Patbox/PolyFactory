@@ -15,6 +15,7 @@ import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
@@ -43,10 +44,10 @@ public record ColoringCraftingRecipe(String group, Item input, int maxCount) imp
     }
 
     @Override
-    public boolean matches(RecipeInputInventory inventory, World world) {
+    public boolean matches(CraftingRecipeInput inventory, World world) {
         boolean hasDye = false;
         int count = 0;
-        for (var stack : inventory.getHeldStacks()) {
+        for (var stack : inventory.getStacks()) {
             if (stack.isIn(ConventionalItemTags.DYES)) {
                 if (hasDye) {
                     return false;
@@ -63,12 +64,12 @@ public record ColoringCraftingRecipe(String group, Item input, int maxCount) imp
     }
 
     @Override
-    public ItemStack craft(RecipeInputInventory inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack craft(CraftingRecipeInput inventory, RegistryWrapper.WrapperLookup registryManager) {
         int color = -1;
         int count = 0;
         ItemStack og = ItemStack.EMPTY;
 
-        for (var stack : inventory.getHeldStacks()) {
+        for (var stack : inventory.getStacks()) {
             if (stack.isIn(ConventionalItemTags.DYES)) {
                 color = DyeColorExtra.getColor(stack);
             } else if (stack.isOf(this.input)) {

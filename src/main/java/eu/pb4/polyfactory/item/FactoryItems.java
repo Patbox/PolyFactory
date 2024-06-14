@@ -21,7 +21,7 @@ import eu.pb4.polyfactory.item.wrench.WrenchItem;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.block.Block;
-import net.minecraft.component.DataComponentType;
+import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
@@ -126,7 +126,7 @@ public class FactoryItems {
         FuelRegistry.INSTANCE.add(WOODEN_PLATE, 120);
         FuelRegistry.INSTANCE.add(COAL_DUST, 160);
 
-        PolymerItemGroupUtils.registerPolymerItemGroup(new Identifier(ModInit.ID, "a_group"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
+        PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(ModInit.ID, "a_group"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
                 .icon(WINDMILL_SAIL::getDefaultStack)
                 .displayName(Text.translatable("itemgroup." + ModInit.ID))
                 .entries(((context, entries) -> {
@@ -236,7 +236,7 @@ public class FactoryItems {
                     entries.add(ArtificialDyeItem.of(0xFF00FF));
 
                     // Enchantments
-                    entries.add(EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(FactoryEnchantments.IGNORE_MOVEMENT.value(), 1)));
+                    //entries.add(EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(, 1)));
 
                     // Creative
                     entries.add(CREATIVE_MOTOR);
@@ -244,7 +244,7 @@ public class FactoryItems {
                 })).build()
         );
 
-        PolymerItemGroupUtils.registerPolymerItemGroup(new Identifier(ModInit.ID, "color"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
+        PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(ModInit.ID, "color"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
                 .icon(() -> ColoredItem.stack(CABLE, 1, DyeColor.RED))
                 .displayName(Text.translatable("itemgroup." + ModInit.ID + ".color"))
                 .entries(((context, entries) -> {
@@ -281,7 +281,7 @@ public class FactoryItems {
         );
 
         if (ModInit.DEV_MODE) {
-            PolymerItemGroupUtils.registerPolymerItemGroup(new Identifier(ModInit.ID, "experimental"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
+            PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(ModInit.ID, "experimental"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
 
                     .icon(WITHER_SKULL_GENERATOR::getDefaultStack)
                     .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
@@ -306,7 +306,7 @@ public class FactoryItems {
 
 
     public static <T extends Item> T register(String path, T item) {
-        Registry.register(Registries.ITEM, new Identifier(ModInit.ID, path), item);
+        Registry.register(Registries.ITEM, Identifier.of(ModInit.ID, path), item);
         return item;
     }
 

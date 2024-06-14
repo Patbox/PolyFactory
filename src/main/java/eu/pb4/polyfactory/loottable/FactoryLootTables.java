@@ -19,10 +19,10 @@ public class FactoryLootTables {
 
 
     public static <T extends LootNumberProviderType> T register(String path, T item) {
-        return Registry.register(Registries.LOOT_NUMBER_PROVIDER_TYPE, new Identifier(ModInit.ID, path), item);
+        return Registry.register(Registries.LOOT_NUMBER_PROVIDER_TYPE, Identifier.of(ModInit.ID, path), item);
     }
 
     public static <T extends LootFunctionType<?>> T register(String path, T item) {
-        return Registry.register(Registries.LOOT_FUNCTION_TYPE, new Identifier(ModInit.ID, path), item);
+        return Registry.register(Registries.LOOT_FUNCTION_TYPE, Identifier.of(ModInit.ID, path), item);
     }
 }
