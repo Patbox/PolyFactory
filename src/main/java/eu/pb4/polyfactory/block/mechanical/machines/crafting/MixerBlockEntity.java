@@ -60,7 +60,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     private boolean active;
     private final SimpleContainer[] containers = SimpleContainer.createArray(9, this::addMoving, this::removeMoving);
 
-    private final List<ItemStack> stacks = new InventoryList(this);
+    private final List<ItemStack> stacks = new InventoryList(this, INPUT_FIRST, OUTPUT_FIRST);
     private MixerBlock.Model model;
     private boolean inventoryChanged = false;
     private double speedScale;

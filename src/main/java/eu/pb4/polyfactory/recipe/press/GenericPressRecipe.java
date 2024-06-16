@@ -48,8 +48,8 @@ public record GenericPressRecipe(CountedIngredient inputA, CountedIngredient inp
 
     @Override
     public boolean matches(PressInput inventory, World world) {
-        var input = inventory.pattern();
-        var template = inventory.input();
+        var input = inventory.input();
+        var template = inventory.pattern();
         return this.inputA.test(input) && this.inputB.test(template);
     }
 
