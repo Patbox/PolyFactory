@@ -10,7 +10,6 @@
   "block.polyfactory.splitter": "Item Splitter",
   "block.polyfactory.workbench": "Workbench",
   "block.polyfactory.grinder": "Grinder",
-  "block.polyfactory.grinder": "Grinder",
   "block.polyfactory.press": "Mechanical Press",
   "block.polyfactory.miner": "Mechanical Miner",
   "block.polyfactory.placer": "Mechanical Placer",
@@ -104,6 +103,8 @@
   "block.polyfactory.inverted_caged_lamp.colored": "Inverted %s Caged Lamp",
   "block.polyfactory.inverted_caged_lamp.colored.full": "Inverted %s Caged Lamp (%s)",
   "block.polyfactory.steel_button": "Steel Button",
+
+
   "item.polyfactory.wrench": "Wrench",
   "item.polyfactory.wrench.tooltip.1": "Use [%s] to change block's setting value",
   "item.polyfactory.wrench.tooltip.1.alt": "Use [%s] to change block's setting value depending on context",
@@ -171,6 +172,11 @@
   "data_type.polyfactory.block_state": "Block",
   "data_type.polyfactory.item_stack": "Item",
 
+  "fluid_type.minecraft.water": "Water",
+  "fluid_type.minecraft.lava": "Lava",
+  "fluid_type.minecraft.xp": "Experience",
+  "fluid_type.minecraft.milk": "Milk",
+
   "entity.polyfactory.dynamite": "Dynamite",
 
   "enchantment.polyfactory.ignore_movement": "Stable Ground",
@@ -193,6 +199,8 @@
   "text.polyfactory.state.too_hot": "Too hot!",
   "text.polyfactory.state.incorrect_items": "Incorrect ingredients!",
   "text.polyfactory.state.output_full": "Output full!",
+
+  "text.polyfactory.polydex.required_fluids": "Required fluids:",
 
   "advancements.polyfactory.root.title": "PolyFactory",
   "advancements.polyfactory.root.description": "Welcome to the factory!",

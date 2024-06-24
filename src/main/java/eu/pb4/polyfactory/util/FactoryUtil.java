@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
@@ -70,6 +71,18 @@ public class FactoryUtil {
 
     public static Identifier id(String path) {
         return Identifier.of(ModInit.ID, path);
+    }
+
+    public static Text fluidText(long amount) {
+        if (amount >= FluidConstants.BLOCK) {
+            long buckets = amount / (FluidConstants.BLOCK / 1000);
+            return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + "B");
+        } else if (amount >= 81) {
+            long buckets = amount / (FluidConstants.BLOCK / 1000);
+            return Text.literal((buckets) + "mB");
+        } else {
+            return Text.literal((amount) + "d");
+        }
     }
 
     public static void sendVelocityDelta(ServerPlayerEntity player, Vec3d delta) {

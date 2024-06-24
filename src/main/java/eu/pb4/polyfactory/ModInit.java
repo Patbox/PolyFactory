@@ -12,6 +12,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.data.providers.TinyPotatoSpringBlock;
 import eu.pb4.polyfactory.entity.FactoryEntities;
+import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryEnchantmentEffectComponents;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
@@ -21,6 +22,7 @@ import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
+import eu.pb4.polyfactory.ui.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.*;
@@ -58,7 +60,8 @@ public class ModInit implements ModInitializer {
 			LOGGER.warn("You are on your own!");
 			LOGGER.warn("=====================================================");
 		}
-
+		FactoryRegistries.setup();
+		FactoryFluids.register();
 		FactoryBlocks.register();
 		FactoryPoi.register();
 		FactoryBlockEntities.register();
@@ -74,6 +77,7 @@ public class ModInit implements ModInitializer {
 		FactoryUtil.register();
 		FactoryItemPredicates.register();
 		PotatoWisdom.load();
+		FluidTextures.setup();
 
 		ConveyorModel.registerAssetsEvents();
 		CableModel.registerAssetsEvents();
@@ -83,6 +87,8 @@ public class ModInit implements ModInitializer {
 		PolydexCompat.register();
 		PolymerResourcePackUtils.addModAssets(ID);
 		PolymerResourcePackUtils.markAsRequired();
+
+		FluidTextures.setup();
 
 		ServerPlayConnectionEvents.JOIN.register(FactorySecrets::onJoin);
 	}

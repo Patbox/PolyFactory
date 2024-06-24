@@ -18,7 +18,7 @@ public class ResourceUtils {
     public static BufferedImage getTexture(Identifier identifier) {
         try {
             return ImageIO.read(getJarStream("assets/" + identifier.getNamespace() + "/textures/" + identifier.getPath() +".png"));
-        } catch (IOException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             return new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
         }

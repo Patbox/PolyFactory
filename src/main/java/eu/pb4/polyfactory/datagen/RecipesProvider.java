@@ -2,10 +2,12 @@ package eu.pb4.polyfactory.datagen;
 
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.factorytools.api.recipe.OutputStack;
+import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.*;
+import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.ArtificialDyeMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.ColoringMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
@@ -16,6 +18,7 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
@@ -524,6 +527,9 @@ class RecipesProvider extends FabricRecipeProvider {
 
                 GrindingRecipe.of("iron_ingot_to_nuggets", Ingredient.ofItems(Items.IRON_INGOT), 2, 5, 10, new ItemStack(Items.IRON_NUGGET, 9)),
                 GrindingRecipe.of("gold_ingot_to_nuggets", Ingredient.ofItems(Items.GOLD_INGOT), 1.8, 5, 10, new ItemStack(Items.GOLD_NUGGET, 9)),
+                GrindingRecipe.of("nether_wart", Ingredient.ofItems(Items.NETHER_WART_BLOCK), 1.8, 5, 10,
+                        OutputStack.of(Items.NETHER_WART), OutputStack.of(Items.NETHER_WART,  0.4f, 5)
+                ),
 
                 GrindingRecipe.of("iron_ore_to_raw", Ingredient.fromTag(ItemTags.IRON_ORES), 6, 12, 38,
                         OutputStack.of(Items.RAW_IRON, 1f, 1), OutputStack.of(Items.RAW_IRON, 0.6f, 5)
@@ -721,6 +727,19 @@ class RecipesProvider extends FabricRecipeProvider {
                 of(exporter, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder", "concrete_water",
                         List.of(CountedIngredient.ofItems(1, powder), CountedIngredient.ofItems(0, Items.WATER_BUCKET)),
                         1, 1, 4, new ItemStack(solid, 1)));
+
+
+                of(exporter, GenericMixingRecipe.ofCounted(nameSolid + "_direct_new", "concrete_direct",
+                        List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS),
+                                CountedIngredient.ofItems(4, Items.GRAVEL),
+                                CountedIngredient.ofItems(1, dye)),
+                        List.of(new FluidInputStack(FactoryFluids.WATER, FluidConstants.BOTTLE, FluidConstants.BOTTLE / 10)),
+                        5, 1, 15, 0f, new ItemStack(solid, 8)));
+
+                of(exporter, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder_new", "concrete_water",
+                        List.of(CountedIngredient.ofItems(1, powder)),
+                        List.of(new FluidInputStack(FactoryFluids.WATER, FluidConstants.BOTTLE, FluidConstants.BOTTLE / 10)),
+                        1, 1, 4, 0f, new ItemStack(solid, 1)));
             }
         }
 

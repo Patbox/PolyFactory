@@ -49,6 +49,9 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
 
     @Override
     public boolean matches(MixingInput inventory, World world) {
+        if (!inventory.fluids().isEmpty()) {
+            return false;
+        }
         boolean hasDye = false;
         int count = 0;
 

@@ -46,6 +46,9 @@ public record ArtificialDyeMixingRecipe(double time,
 
     @Override
     public boolean matches(MixingInput inventory, World world) {
+        if (!inventory.fluids().isEmpty()) {
+            return false;
+        }
         boolean hasBase = false;
         int dyeCount = 0;
         int ingridCount = 0;

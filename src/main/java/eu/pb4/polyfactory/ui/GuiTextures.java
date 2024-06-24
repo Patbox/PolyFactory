@@ -21,7 +21,8 @@ public class GuiTextures {
     public static final Function<Text, Text> STEAM_ENGINE = background("steam_engine");
     public static final Function<Text, Text> CENTER_SLOT_GENERIC = background("center_slot");
     public static final Function<Text, Text> FILL3 = background("fill3");
-    public static final GuiElement EMPTY = icon16("empty").get().hideTooltip().build();
+    public static final Supplier<GuiElementBuilder> EMPTY_BUILDER = icon16("empty");
+    public static final GuiElement EMPTY = EMPTY_BUILDER.get().hideTooltip().build();
     public static final Supplier<GuiElementBuilder> POLYDEX_BUTTON = icon32("polydex");
     public static final Supplier<GuiElementBuilder> PLUS_BUTTON = icon32("button/plus");
     public static final Supplier<GuiElementBuilder> MINUS_BUTTON = icon32("button/minus");
@@ -34,6 +35,12 @@ public class GuiTextures {
     public static final IntFunction<GuiElementBuilder>[] NUMBERS_FLAT = createNumbers("flat/");
     public static final IntFunction<GuiElementBuilder>[] NUMBERS_SHADOW = createNumbers("shadow/");
     public static final char SPACE_1 = UiResourceCreator.space(1);
+    public static final char POLYDEX_OFFSET = UiResourceCreator.space(168);
+    public static final char POLYDEX_OFFSET_N = UiResourceCreator.space(-168);
+    public static final char MIXER_FLUID_OFFSET = UiResourceCreator.space(28 - 8);
+    public static final char MIXER_FLUID_OFFSET_N = UiResourceCreator.space(-28 + 8);
+    public static final char MIXER_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(28 - 8 + 7);
+    public static final char MIXER_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-28 + 8 - 7);
 
     public static void register() {
         PolydexTextures.register();

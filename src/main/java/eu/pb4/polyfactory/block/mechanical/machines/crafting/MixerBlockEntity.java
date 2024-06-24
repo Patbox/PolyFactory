@@ -6,11 +6,15 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.polyfactory.fluid.FluidContainer;
+import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.MixingInput;
 import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;
+import eu.pb4.polyfactory.ui.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.InventoryList;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
@@ -36,6 +40,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -51,6 +56,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     public static final int OUTPUT_FIRST = 6;
     public static final int INPUT_FIRST = 0;
     public static final int SIZE = 9;
+    public static final long FLUID_CAPACITY = FluidType.BLOCK_AMOUNT * 2;
     private static final int[] OUTPUT_SLOTS = { 6, 7, 8 };
     private static final int[] INPUT_SLOTS = { 0, 1, 2, 3, 4, 5 };
     protected double process = 0;
@@ -59,8 +65,8 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     protected RecipeEntry<MixingRecipe> currentRecipe = null;
     private boolean active;
     private final SimpleContainer[] containers = SimpleContainer.createArray(9, this::addMoving, this::removeMoving);
-
     private final List<ItemStack> stacks = new InventoryList(this, INPUT_FIRST, OUTPUT_FIRST);
+    private final FluidContainer fluidContainer = new FluidContainer(FLUID_CAPACITY, this::markDirty);
     private MixerBlock.Model model;
     private boolean inventoryChanged = false;
     private double speedScale;
@@ -90,6 +96,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.writeInventoryNbt(nbt, lookup);
         nbt.putDouble("Progress", this.process);
+        nbt.put("fluid", this.fluidContainer.toNbt());
         super.writeNbt(nbt, lookup);
     }
 
@@ -97,6 +104,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.readInventoryNbt(nbt, lookup);
         this.process = nbt.getDouble("Progress");
+        this.fluidContainer.fromNbt(nbt.getCompound("fluid"));
         super.readNbt(nbt, lookup);
     }
 
@@ -147,6 +155,8 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             self.temperature = 0;
         }
 
+        self.fluidContainer.tick((ServerWorld) world, pos, self.temperature, self::addToOutputOrDrop);
+
         if (self.isInputEmpty()) {
             self.process = 0;
             self.speedScale = 0;
@@ -166,7 +176,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             return;
         }
 
-        var input = new MixingInput(self.stacks);
+        var input = new MixingInput(self.stacks, self.fluidContainer.map());
 
         if (self.inventoryChanged && (self.currentRecipe == null || !self.currentRecipe.value().matches(input, world))) {
             self.process = 0;
@@ -266,6 +276,14 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         }
     }
 
+    private void addToOutputOrDrop(ItemStack stack) {
+        FactoryUtil.insertBetween(this, OUTPUT_FIRST, this.size(), stack);
+        if (!stack.isEmpty()) {
+            assert this.world != null;
+            ItemScatterer.spawn(this.world, this.pos.getX() + 0.5, this.pos.getY()+ 0.5, this.pos.getZ() + 0.5, stack);
+        }
+    }
+
     private boolean isInputEmpty() {
         for (int i = 0; i < OUTPUT_FIRST; i++) {
             if (!this.getStack(i).isEmpty()) {
@@ -315,13 +333,24 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         return this.temperature;
     }
 
+    public FluidContainer getFluidContainer() {
+        return this.fluidContainer;
+    }
+
     private class Gui extends SimpleGui {
         private static final Text CURRENT_HEAT = Text.translatable("text.polyfactory.current_heat").styled(x -> x.withItalic(false));
 
+        private int lastFluidUpdate = -1;
+
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X3, player, false);
-            this.setTitle(GuiTextures.MIXER.apply(MixerBlockEntity.this.getCachedState().getBlock().getName()));
+            this.updateTitleAndFluid();
             this.setSlot(9, PolydexCompat.getButton(FactoryRecipeTypes.MIXER));
+            var fluidSlot = fluidContainer.guiElement(true);
+
+            this.setSlot(1, fluidSlot);
+            this.setSlot(1 + 9, fluidSlot);
+            this.setSlot(1 + 9 * 2, fluidSlot);
 
             this.setSlotRedirect(2, new Slot(MixerBlockEntity.this, 0, 0, 0));
             this.setSlotRedirect(3, new Slot(MixerBlockEntity.this, 1, 1, 0));
@@ -338,6 +367,24 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             this.open();
         }
 
+        private void updateTitleAndFluid() {
+            var text = GuiTextures.MIXER.apply(
+                    Text.empty()
+                            .append(Text.literal(GuiTextures.MIXER_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
+                            .append(FluidTextures.MIXER.render(MixerBlockEntity.this.fluidContainer::provideRender))
+                            .append(Text.literal(GuiTextures.MIXER_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
+                            .append(MixerBlockEntity.this.getCachedState().getBlock().getName())
+            );
+
+
+            if (!text.equals(this.getTitle())) {
+                this.setTitle(text);
+            }
+
+
+            this.lastFluidUpdate = MixerBlockEntity.this.fluidContainer.updateId();
+        }
+
         private float progress() {
             return MixerBlockEntity.this.currentRecipe != null
                     ? (float) MathHelper.clamp(MixerBlockEntity.this.process / MixerBlockEntity.this.currentRecipe.value().time(), 0, 1)
@@ -349,6 +396,10 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
             if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(MixerBlockEntity.this.pos)) > (18*18)) {
                 this.close();
             }
+            if (MixerBlockEntity.this.fluidContainer.updateId() != this.lastFluidUpdate) {
+                this.updateTitleAndFluid();
+            }
+
             this.setSlot(4 + 9, GuiTextures.PROGRESS_HORIZONTAL_OFFSET_RIGHT.get(progress()));
             this.setSlot(4 + 9 + 9, GuiTextures.FLAME_OFFSET_RIGHT.getNamed(MathHelper.clamp(MixerBlockEntity.this.temperature, 0, 1), CURRENT_HEAT));
             super.onTick();

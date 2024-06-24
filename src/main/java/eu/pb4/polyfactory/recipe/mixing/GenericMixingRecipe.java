@@ -6,6 +6,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
+import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.polyfactory.recipe.input.MixingInput;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -16,19 +17,21 @@ import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public record GenericMixingRecipe(String group, List<CountedIngredient> input, ItemStack output, double time,
+public record GenericMixingRecipe(String group, List<CountedIngredient> input,
+                                  List<FluidInputStack> fluids,
+                                  ItemStack output, double time,
                                   double minimumSpeed,
                                   double optimalSpeed, float minimumTemperature, float maxTemperature) implements MixingRecipe {
     public static final MapCodec<GenericMixingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.STRING.optionalFieldOf("group", "").forGetter(GenericMixingRecipe::group),
                     CountedIngredient.LIST_CODEC.fieldOf("input").forGetter(GenericMixingRecipe::input),
+                    FluidInputStack.CODEC.listOf().optionalFieldOf("fluid_input", List.of()).forGetter(GenericMixingRecipe::fluids),
                     ItemStack.CODEC.fieldOf("output").forGetter(GenericMixingRecipe::output),
                     Codec.DOUBLE.fieldOf("time").forGetter(GenericMixingRecipe::time),
                     Codec.DOUBLE.optionalFieldOf("minimum_speed", 1d).forGetter(GenericMixingRecipe::minimumSpeed),
@@ -39,15 +42,27 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input, I
     );
 
     public static RecipeEntry<GenericMixingRecipe> ofCounted(String string, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
-        return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe("", ingredient, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
+        return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe("", ingredient,
+                List.of(),
+                output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
     }
 
     public static RecipeEntry<GenericMixingRecipe> ofCounted(String string, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStack output) {
-        return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe("", ingredient, output, mixingTime, minimumSpeed, optimalSpeed, minTemperature, 2f));
+        return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe("", ingredient,
+                List.of(),
+                output, mixingTime, minimumSpeed, optimalSpeed, minTemperature, 2f));
     }
 
     public static RecipeEntry<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
-        return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe(group, ingredient, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
+        return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe(group, ingredient,
+                List.of(),
+                output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
+    }
+
+    public static RecipeEntry<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, List<FluidInputStack> fluids, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStack output) {
+        return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe(group, ingredient,
+                fluids,
+                output, mixingTime, minimumSpeed, optimalSpeed, minTemperature, 2f));
     }
 
     public Iterable<ItemStack> remainders() {
@@ -60,7 +75,7 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input, I
             CountedIngredient countedIngredient = new CountedIngredient(x, 1, CountedIngredient.tryGettingLeftover(x));
             list.add(countedIngredient);
         }
-        return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe("", list, output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
+        return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe("", list, List.of(), output, mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
     }
 
     @Override
@@ -80,6 +95,16 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input, I
     @Override
     public boolean matches(MixingInput inventory, World world) {
         var map = new Object2IntArrayMap<CountedIngredient>();
+        if (this.fluids.size() != inventory.fluids().size()) {
+            return false;
+        }
+
+        for (var fluid : this.fluids) {
+            if (inventory.fluids().getLong(fluid.type()) < fluid.required()) {
+                return false;
+            }
+        }
+
         for (int i = MixerBlockEntity.INPUT_FIRST; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
             var stack = inventory.getStackInSlot(i);
             if (stack.isEmpty()) {
@@ -113,6 +138,12 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input, I
 
     public void applyRecipeUse(MixerBlockEntity inventory, World world) {
         var list = new ArrayList<>(this.input);
+
+        var container = inventory.getFluidContainer();
+        for (var fluid : this.fluids) {
+            container.extract(fluid.type(), fluid.used(), false);
+        }
+
         for (var ig : list) {
             int count = ig.count();
             if (count == 0) {

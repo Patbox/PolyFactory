@@ -57,6 +57,9 @@ public record FireworkStarMixingRecipe(double time,
 
     @Override
     public boolean matches(MixingInput inventory, World world) {
+        if (!inventory.fluids().isEmpty()) {
+            return false;
+        }
         return VANILLA.matches(inventory.asCraftingRecipeInput(), world);
     }
 

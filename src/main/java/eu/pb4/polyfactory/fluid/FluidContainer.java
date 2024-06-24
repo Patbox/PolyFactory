@@ -1,0 +1,245 @@
+package eu.pb4.polyfactory.fluid;
+
+import eu.pb4.polyfactory.FactoryRegistries;
+import eu.pb4.polyfactory.mixin.util.BucketItemAccessor;
+import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.sgui.api.elements.GuiElementInterface;
+import it.unimi.dsi.fastutil.objects.Reference2LongMap;
+import it.unimi.dsi.fastutil.objects.Reference2LongMaps;
+import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.item.BucketItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.PotionItem;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+
+import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+public class FluidContainer {
+    private final Reference2LongMap<FluidType> storedFluids = new Reference2LongOpenHashMap<>();
+    private final long capacity;
+    private final Runnable markDirty;
+    private int updateId = 0;
+    private final Predicate<FluidType> canInsert;
+    private long stored = 0;
+
+    public FluidContainer(long maxStorage, Runnable markDirty) {
+        this(maxStorage, markDirty, (x) -> true);
+    }
+    public FluidContainer(long maxStorage, Runnable markDirty, Predicate<FluidType> canInsert) {
+        this.capacity = maxStorage;
+        this.canInsert = canInsert;
+        this.markDirty = markDirty;
+    }
+
+    public void tick(ServerWorld world, BlockPos pos, float temperature, Consumer<ItemStack> stack) {
+        if (contains(FactoryFluids.WATER) && contains(FactoryFluids.LAVA)) {
+            this.extract(FactoryFluids.WATER, 5000, false);
+            this.extract(FactoryFluids.LAVA, 2000, false);
+
+            if (world.getRandom().nextFloat() > 0.5) {
+                stack.accept(new ItemStack(Items.FLINT));
+            }
+
+            if (world.getTime() % 10 == 0) {
+                world.spawnParticles(ParticleTypes.WHITE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 5, 0.1, 0.1, 0.1, 0.1);
+                world.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 5, 0.1, 0.1, 0.1, 0.1);
+
+                world.playSound(null, pos, SoundEvents.BLOCK_LAVA_EXTINGUISH, SoundCategory.BLOCKS);
+            }
+        } else if (temperature > 0.5) {
+            this.extract(FactoryFluids.WATER, (long) (temperature * 10), false);
+            if (world.getRandom().nextFloat() > 0.5 && world.getTime() % 5 == 0) {
+                world.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.1, 0.1, 0.1, 0.1);
+            }
+        }
+    }
+
+    public ItemStack interactWith(ServerPlayerEntity player, ItemStack stack) {
+        // Todo: generify this
+        if (stack.isOf(Items.BUCKET)) {
+            if (this.canExtract(FactoryFluids.WATER, FluidConstants.BUCKET, true)) {
+                this.extract(FactoryFluids.WATER, FluidConstants.BUCKET, true);
+                stack.decrement(1);
+                return new ItemStack(Items.WATER_BUCKET);
+            } else if (this.canExtract(FactoryFluids.LAVA, FluidConstants.BUCKET, true)) {
+                this.extract(FactoryFluids.LAVA, FluidConstants.BUCKET, true);
+                stack.decrement(1);
+                return new ItemStack(Items.LAVA_BUCKET);
+            } else if (this.canExtract(FactoryFluids.MILK, FluidConstants.BUCKET, true)) {
+                this.extract(FactoryFluids.MILK, FluidConstants.BUCKET, true);
+                stack.decrement(1);
+                return new ItemStack(Items.MILK_BUCKET);
+            }
+        } else if (stack.isOf(Items.GLASS_BOTTLE)) {
+            if (this.canExtract(FactoryFluids.WATER, FluidConstants.BOTTLE, true)) {
+                this.extract(FactoryFluids.WATER, FluidConstants.BOTTLE, true);
+                return new ItemStack(Items.POTION);
+            }
+        }else if (stack.isOf(Items.WATER_BUCKET)) {
+            if (this.canInsert(FactoryFluids.WATER, FluidConstants.BUCKET, true)) {
+                this.insert(FactoryFluids.WATER, FluidConstants.BUCKET, true);
+                return new ItemStack(Items.BUCKET);
+            }
+        } else if (stack.isOf(Items.POTION)) {
+            if (this.canInsert(FactoryFluids.WATER, FluidConstants.BOTTLE, true)) {
+                this.insert(FactoryFluids.WATER, FluidConstants.BOTTLE, true);
+                return new ItemStack(Items.GLASS_BOTTLE);
+            }
+        } else if (stack.isOf(Items.LAVA_BUCKET)) {
+            if (this.canInsert(FactoryFluids.LAVA, FluidConstants.BUCKET, true)) {
+                this.insert(FactoryFluids.LAVA, FluidConstants.BUCKET, true);
+                return new ItemStack(Items.BUCKET);
+            }
+        } else if (stack.isOf(Items.MILK_BUCKET)) {
+            if (this.canInsert(FactoryFluids.MILK, FluidConstants.BUCKET, true)) {
+                this.insert(FactoryFluids.MILK, FluidConstants.BUCKET, true);
+                return new ItemStack(Items.BUCKET);
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    public long get(FluidType type) {
+        return this.storedFluids.getOrDefault(type, 0);
+    }
+
+    public long set(FluidType type, long amount) {
+        return amount == 0 ? this.storedFluids.removeLong(amount) : this.storedFluids.put(type, amount);
+    }
+
+    public boolean contains(FluidType type) {
+        return this.storedFluids.getOrDefault(type, 0) > 0;
+    }
+
+    public boolean canInsert(FluidType type, long amount, boolean exact) {
+        return this.canInsert.test(type) && (exact ? this.stored + amount <= this.capacity : this.stored != this.capacity);
+    }
+
+    public long insert(FluidType type, long amount, boolean exact) {
+        if (!canInsert(type, amount, exact)) {
+            return amount;
+        }
+
+        var next = Math.min(this.stored + amount, this.capacity);
+        var inserted = next - this.stored;
+
+        this.storedFluids.put(type, this.storedFluids.getOrDefault(type, 0) + inserted);
+        this.stored = next;
+        this.updateId++;
+        this.markDirty.run();
+        return amount - inserted;
+    }
+
+    public boolean canExtract(FluidType type, long amount, boolean exact) {
+        return exact ? this.get(type) >= amount : this.get(type) != 0;
+    }
+
+    public long extract(FluidType type, long amount, boolean exact) {
+        if (!canExtract(type, amount, exact)) {
+            return 0;
+        }
+
+        var current = this.get(type);
+        var extracted = Math.min(current, amount);
+
+        if (current == extracted) {
+            this.storedFluids.removeLong(type);
+        } else {
+            this.storedFluids.put(type, current - extracted);
+        }
+        this.stored -= extracted;
+        this.updateId++;
+        this.markDirty.run();
+        return extracted;
+    }
+    public void provideRender(BiConsumer<FluidType, Float> consumer) {
+        storedFluids.forEach((a, b) -> consumer.accept(a, (float) ((double) b) / capacity));
+    }
+
+    public void forEach(BiConsumer<FluidType, Long> consumer) {
+        this.storedFluids.forEach(consumer);
+    }
+
+    public long capacity() {
+        return this.capacity;
+    }
+
+    public long stored() {
+        return this.stored;
+    }
+
+    public NbtCompound toNbt() {
+        var nbt = new NbtCompound();
+        storedFluids.forEach((a, b) -> nbt.putLong(Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.getId(a)).toString(), b));
+        return nbt;
+    }
+
+    public void fromNbt(NbtCompound nbt) {
+        this.storedFluids.clear();
+        this.stored = 0;
+        for (var key : nbt.getKeys()) {
+            var value = nbt.getLong(key);
+            var type = FactoryRegistries.FLUID_TYPES.get(Identifier.tryParse(key));
+            if (type != null && value != 0) {
+                this.storedFluids.put(type, value);
+                this.stored += value;
+            }
+        }
+        this.updateId++;
+    }
+
+    public int updateId() {
+        return this.updateId;
+    }
+
+    public Reference2LongMap<FluidType> map() {
+        return Reference2LongMaps.unmodifiable(this.storedFluids);
+    }
+
+    public GuiElementInterface guiElement(boolean interactable) {
+        return new GuiElementInterface() {
+            @Override
+            public ClickCallback getGuiCallback() {
+                return interactable ? (index, type, action, gui) -> {
+                    var handler = gui.getPlayer().currentScreenHandler;
+                    var out = interactWith(gui.getPlayer(), handler.getCursorStack());
+                    if (handler.getCursorStack().isEmpty()) {
+                        handler.setCursorStack(out);
+                    } else {
+                        gui.getPlayer().getInventory().offerOrDrop(out);
+                    }
+                } : GuiElementInterface.EMPTY_CALLBACK;
+            }
+
+            @Override
+            public ItemStack getItemStack() {
+                var b = GuiTextures.EMPTY_BUILDER.get()
+                        .setName(Text.empty().append(FactoryUtil.fluidText(stored)).append(" / ").append(FactoryUtil.fluidText(capacity)));
+
+                forEach((type, amount) -> {
+                    b.addLoreLine(type.toLabeledAmount(amount).setStyle(Style.EMPTY.withColor(Formatting.GRAY).withItalic(false)));
+                });
+                return b.asStack();
+            }
+        };
+    }
+}
