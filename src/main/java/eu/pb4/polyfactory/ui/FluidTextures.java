@@ -21,35 +21,35 @@ public record FluidTextures(Map<FluidType, char[]> textures, FluidUiPositionCrea
 
 
     public Text render(Consumer<BiConsumer<FluidType, Float>> provider) {
-        return renderText(renderString(provider));
-    }
-    public Text renderText(String render) {
-        return Text.literal(render).setStyle(this.uiPositionCreator.style);
-    }
-
-    public String renderString(Consumer<BiConsumer<FluidType, Float>> provider) {
-        var b = new StringBuilder();
+        var out = Text.empty().setStyle(this.uiPositionCreator.style);
 
         var line = new MutableInt(0);
 
         provider.accept((type, amount) -> {
-           var lines = MIXER.textures.get(type);
+            var b = new StringBuilder();
+            var lines = MIXER.textures.get(type);
            if (lines == null) {
                return;
            }
 
            var start = line.getValue();
-           var count = Math.min(MathHelper.floor(amount * this.uiPositionCreator.height()) + start, lines.length);
+           var count = Math.min(MathHelper.ceil(amount * this.uiPositionCreator.height()) + start, lines.length);
 
            for (int i = start; i < count; i++) {
                b.append(lines[i]);
                b.append(this.back);
            }
 
+           var t = Text.literal(b.toString());
+           if (type.color() != 0xffffff) {
+               t.withColor(type.color());
+           }
+
+           out.append(t);
            line.setValue(count);
         });
 
-        return b.toString();
+        return out;
     }
 
     public static FluidTextures of(String name, int width, int height, int offsetY) {

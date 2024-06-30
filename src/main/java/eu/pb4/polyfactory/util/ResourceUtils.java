@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polymer.common.api.PolymerCommonUtils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 
@@ -12,12 +12,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Objects;
 
 public class ResourceUtils {
 
     public static BufferedImage getTexture(Identifier identifier) {
         try {
-            return ImageIO.read(getJarStream("assets/" + identifier.getNamespace() + "/textures/" + identifier.getPath() +".png"));
+            return ImageIO.read(getJarStream("assets/" + identifier.getNamespace() + "/textures/" + identifier.getPath() + ".png"));
         } catch (Throwable e) {
             e.printStackTrace();
             return new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -35,28 +37,32 @@ public class ResourceUtils {
         }
     }
 
-    public static byte[] getJarData(String jarPath) {
-        for (var basePath : FabricLoader.getInstance().getModContainer(ModInit.ID).get().getRootPaths()) {
-            var path = basePath.resolve(jarPath);
-            if (Files.exists(path)) {
-                try {
-                    return Files.readAllBytes(path);
-                } catch (Throwable e) {
+    public static byte[] getJarData(String jarPath) throws IOException {
+        var path = findAsset(jarPath);
+        return path != null ? Files.readAllBytes(path) : null;
+    }
+
+    public static InputStream getJarStream(String jarPath) throws IOException {
+        var path = findAsset(jarPath);
+        return path != null ? Files.newInputStream(path) : null;
+    }
+
+    public static Path findAsset(String jarPath) {
+        for (var mod : FabricLoader.getInstance().getAllMods()) {
+            for (var basePath : mod.getRootPaths()) {
+                var path = basePath.resolve(jarPath);
+                if (Files.exists(path)) {
+                    try {
+                        return path;
+                    } catch (Throwable e) {}
                 }
             }
         }
-        return null;
-    }
-
-    public static InputStream getJarStream(String jarPath) {
-        for (var basePath : FabricLoader.getInstance().getModContainer(ModInit.ID).get().getRootPaths()) {
-            var path = basePath.resolve(jarPath);
-            if (Files.exists(path)) {
-                try {
-                    return Files.newInputStream(path);
-                } catch (Throwable e) {
-                }
-            }
+        var path = Objects.requireNonNull(PolymerCommonUtils.getClientJar()).resolve(jarPath);
+        if (Files.exists(path)) {
+            try {
+                return path;
+            } catch (Throwable e) {}
         }
         return null;
     }

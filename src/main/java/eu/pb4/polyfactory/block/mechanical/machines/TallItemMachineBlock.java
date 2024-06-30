@@ -109,9 +109,9 @@ public abstract class TallItemMachineBlock extends RotationalNetworkBlock implem
             pos = state.get(PART) == Part.MAIN ? pos : pos.down();
 
             if (world.getBlockEntity(pos) instanceof TallItemMachineBlockEntity be) {
-                be.openGui((ServerPlayerEntity) player);
+                return be.onUse(state, world, pos, player, hit);
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.FAIL;
         }
 
         return super.onUse(state, world, pos, player, hit);

@@ -45,7 +45,7 @@ public class FluidUiPositionCreator {
         this.width = width;
         this.height = height;
         this.offsetY = offsetY;
-        this.textureHeight = Math.min(height, 18);
+        this.textureHeight = Math.min(height, 16);
         this.style = Style.EMPTY.withColor(0xFFFFFF).withFont(this.id);
     }
 

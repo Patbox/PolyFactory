@@ -25,6 +25,7 @@ import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -40,7 +41,10 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -274,6 +278,33 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
 
             self.state = rot.getStateTextOrElse(TOO_SLOW_TEXT);
         }
+    }
+
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        var stack = player.getMainHandStack();
+        var copy = stack.copy();
+        var x = this.fluidContainer.interactWith((ServerPlayerEntity) player, player.getMainHandStack());
+        if (x == null) {
+            return super.onUse(state, world, pos, player, hit);
+        }
+        if (stack.isEmpty() && ItemStack.areEqual(stack, copy)) {
+            return ActionResult.FAIL;
+        }
+
+        if (stack.isEmpty()) {
+            player.setStackInHand(Hand.MAIN_HAND, x);
+        } else if (!x.isEmpty()) {
+            if (player.isCreative()) {
+                if (!player.getInventory().contains(x)) {
+                    player.getInventory().insertStack(x);
+                }
+            } else {
+                player.getInventory().offerOrDrop(x);
+            }
+        }
+
+        return ActionResult.SUCCESS;
     }
 
     private void addToOutputOrDrop(ItemStack stack) {

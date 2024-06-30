@@ -1,6 +1,8 @@
 package eu.pb4.polyfactory.ui;
 
+import com.mojang.datafixers.util.Pair;
 import eu.pb4.polyfactory.FactoryRegistries;
+import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.util.ResourceUtils;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
@@ -14,25 +16,34 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.BiConsumer;
 
+import static eu.pb4.polyfactory.ModInit.id;
+
 public class FluidUiTextureCreator {
-    private final Set<Identifier> textures = new HashSet<>();
+    private final Set<Pair<Identifier, Identifier>> textures = new HashSet<>();
     private final int width;
     private final int textureHeight;
 
     public FluidUiTextureCreator(int textureWidth) {
         this.width = textureWidth;
-        this.textureHeight = 18;
+        this.textureHeight = 16;
     }
 
-    public void registerTextures(Identifier identifier) {
-        this.textures.add(identifier);
+    public void registerTextures(Identifier id, FluidType object) {
+        if (object.textureOverride().isPresent()) {
+            this.textures.add(Pair.of(id, object.textureOverride().get()));
+        } else if (id.getNamespace().equals(Identifier.DEFAULT_NAMESPACE)) {
+            this.textures.add(Pair.of(id, (id("block/fluid/" + id.getPath()))));
+        } else {
+            this.textures.add(Pair.of(id, (id.withPrefixedPath("block/fluid/"))));
+        }
+
     }
     public void setup() {
         for (var fluid : FactoryRegistries.FLUID_TYPES.getIds()) {
-            this.registerTextures(fluid);
+            this.registerTextures(fluid, Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.get(fluid)));
         }
         RegistryEntryAddedCallback.event(FactoryRegistries.FLUID_TYPES).register((rawId, id, object) -> {
-            this.registerTextures(id);
+            this.registerTextures(id, object);
         });
         PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register((b) -> this.generateAssets(b::addData));
     }
@@ -40,24 +51,24 @@ public class FluidUiTextureCreator {
     public void generateAssets(BiConsumer<String, byte[]> assetWriter) {
         try {
             for (var texture : textures) {
-                this.generateSplitTextures(assetWriter, texture);
+                this.generateSplitTextures(assetWriter, texture.getFirst(), texture.getSecond());
             }
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    private void generateSplitTextures(BiConsumer<String,byte[]> assetWriter, Identifier texture) throws IOException {
-        var image = ResourceUtils.getTexture(texture.withPrefixedPath("pf_fluids/"));
-        var file = texture.withPrefixedPath("gen/fluids_" + width + "/").withSuffixedPath("/");
+    private void generateSplitTextures(BiConsumer<String,byte[]> assetWriter, Identifier id, Identifier texture) throws IOException {
+        var image = ResourceUtils.getTexture(texture);
+        var file = id.withPrefixedPath("gen/fluids_" + width + "/").withSuffixedPath("/");
 
-        var scale = image.getHeight() / 32;
+        var scale = image.getWidth() / 16;
 
         for (int i = 0; i < textureHeight; i++) {
-            var out = new BufferedImage(this.width * scale, scale, image.getType());
+            var out = new BufferedImage(this.width * scale, scale, BufferedImage.TYPE_INT_RGB);
             for (int x = 0; x < out.getWidth(); x++) {
                 for (int y = 0; y < out.getHeight(); y++) {
-                    out.setRGB(x, y, image.getRGB(x, y + i * scale));
+                    out.setRGB(x, y, image.getRGB(x % image.getWidth(), y + i * scale));
                 }
             }
 

@@ -7,10 +7,7 @@ import eu.pb4.factorytools.api.item.MultiBlockItem;
 import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.item.block.*;
-import eu.pb4.polyfactory.item.tool.DyeSprayItem;
-import eu.pb4.polyfactory.item.tool.DynamiteItem;
-import eu.pb4.polyfactory.item.tool.FilterItem;
-import eu.pb4.polyfactory.item.tool.WirelessRedstoneTransmitterItem;
+import eu.pb4.polyfactory.item.tool.*;
 import eu.pb4.polyfactory.item.util.*;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
@@ -21,16 +18,15 @@ import eu.pb4.polyfactory.item.wrench.WrenchItem;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.block.Block;
-import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Rarity;
 
 public class FactoryItems {
     public static final Item MOD_ICON = register("mod_icon", new ModeledItem(new Item.Settings()));
@@ -113,7 +109,7 @@ public class FactoryItems {
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
     public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING);
     public static final Item FRAME = register("frame", new FrameItem(new Item.Settings()));
-
+    public static final Item EXPERIENCE_BUCKET = register("experience_bucket", new XpBucketItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
     public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
@@ -290,6 +286,7 @@ public class FactoryItems {
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(WITHER_SKULL_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(EXPERIENCE_BUCKET, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
 
                         // Remove this
                         if (ModInit.DEV_ENV) {

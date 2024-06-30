@@ -8,6 +8,7 @@ import eu.pb4.sgui.api.elements.GuiElementInterface;
 import it.unimi.dsi.fastutil.objects.Reference2LongMap;
 import it.unimi.dsi.fastutil.objects.Reference2LongMaps;
 import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
@@ -27,7 +28,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -35,6 +39,7 @@ import java.util.function.Predicate;
 
 public class FluidContainer {
     private final Reference2LongMap<FluidType> storedFluids = new Reference2LongOpenHashMap<>();
+    private final List<FluidType> fluids = new ReferenceArrayList<>();
     private final long capacity;
     private final Runnable markDirty;
     private int updateId = 0;
@@ -73,49 +78,63 @@ public class FluidContainer {
         }
     }
 
+
+    @Nullable
     public ItemStack interactWith(ServerPlayerEntity player, ItemStack stack) {
-        // Todo: generify this
-        if (stack.isOf(Items.BUCKET)) {
-            if (this.canExtract(FactoryFluids.WATER, FluidConstants.BUCKET, true)) {
-                this.extract(FactoryFluids.WATER, FluidConstants.BUCKET, true);
-                stack.decrement(1);
-                return new ItemStack(Items.WATER_BUCKET);
-            } else if (this.canExtract(FactoryFluids.LAVA, FluidConstants.BUCKET, true)) {
-                this.extract(FactoryFluids.LAVA, FluidConstants.BUCKET, true);
-                stack.decrement(1);
-                return new ItemStack(Items.LAVA_BUCKET);
-            } else if (this.canExtract(FactoryFluids.MILK, FluidConstants.BUCKET, true)) {
-                this.extract(FactoryFluids.MILK, FluidConstants.BUCKET, true);
-                stack.decrement(1);
-                return new ItemStack(Items.MILK_BUCKET);
-            }
-        } else if (stack.isOf(Items.GLASS_BOTTLE)) {
-            if (this.canExtract(FactoryFluids.WATER, FluidConstants.BOTTLE, true)) {
-                this.extract(FactoryFluids.WATER, FluidConstants.BOTTLE, true);
-                return new ItemStack(Items.POTION);
-            }
-        }else if (stack.isOf(Items.WATER_BUCKET)) {
-            if (this.canInsert(FactoryFluids.WATER, FluidConstants.BUCKET, true)) {
-                this.insert(FactoryFluids.WATER, FluidConstants.BUCKET, true);
-                return new ItemStack(Items.BUCKET);
-            }
-        } else if (stack.isOf(Items.POTION)) {
-            if (this.canInsert(FactoryFluids.WATER, FluidConstants.BOTTLE, true)) {
-                this.insert(FactoryFluids.WATER, FluidConstants.BOTTLE, true);
-                return new ItemStack(Items.GLASS_BOTTLE);
-            }
-        } else if (stack.isOf(Items.LAVA_BUCKET)) {
-            if (this.canInsert(FactoryFluids.LAVA, FluidConstants.BUCKET, true)) {
-                this.insert(FactoryFluids.LAVA, FluidConstants.BUCKET, true);
-                return new ItemStack(Items.BUCKET);
-            }
-        } else if (stack.isOf(Items.MILK_BUCKET)) {
-            if (this.canInsert(FactoryFluids.MILK, FluidConstants.BUCKET, true)) {
-                this.insert(FactoryFluids.MILK, FluidConstants.BUCKET, true);
-                return new ItemStack(Items.BUCKET);
+        var inserts = FluidItemBehaviours.FLUID_INSERT.get(stack.getItem());
+        if (inserts != null) {
+            for (var x : inserts) {
+                if (x.predicate().test(stack)) {
+                    if (this.canInsert(x.fluids(), true)) {
+                        stack.decrementUnlessCreative(1, player);
+                        this.insert(x.fluids(), true);
+                        player.playSoundToPlayer(x.sound(), SoundCategory.BLOCKS, 1, 1);
+                        return x.result().copy();
+                    }
+                    return ItemStack.EMPTY;
+                }
             }
         }
-        return ItemStack.EMPTY;
+
+        var extractMap = FluidItemBehaviours.FLUID_EXTRACT.get(stack.getItem());
+        if (extractMap != null) {
+            for (var f : this.storedFluids.keySet()) {
+                var extracts = extractMap.get(f);
+                if (extracts != null) {
+                    for (var x : extracts) {
+                        if (x.predicate().test(stack)) {
+                            if (this.canExtract(x.fluids(), true)) {
+                                stack.decrementUnlessCreative(1, player);
+                                this.extract(x.fluids(), true);
+                                player.playSoundToPlayer(x.sound(), SoundCategory.BLOCKS, 1, 1);
+                                return x.result().copy();
+                            }
+                            return ItemStack.EMPTY;
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        return null;
+    }
+
+    public boolean canInsert(FluidStack stack, boolean strict) {
+        return canInsert(stack.type(), stack.amount(), strict);
+    }
+
+    public boolean canExtract(FluidStack stack, boolean strict) {
+        return canExtract(stack.type(), stack.amount(), strict);
+    }
+
+    public long insert(FluidStack stack, boolean strict) {
+        return insert(stack.type(), stack.amount(), strict);
+    }
+
+    public long extract(FluidStack stack, boolean strict) {
+        return extract(stack.type(), stack.amount(), strict);
     }
 
     public long get(FluidType type) {
@@ -142,7 +161,12 @@ public class FluidContainer {
         var next = Math.min(this.stored + amount, this.capacity);
         var inserted = next - this.stored;
 
-        this.storedFluids.put(type, this.storedFluids.getOrDefault(type, 0) + inserted);
+        var current = this.storedFluids.getOrDefault(type, 0);
+        this.storedFluids.put(type, current + inserted);
+        if (current == 0) {
+            this.fluids.add(type);
+            this.fluids.sort(FluidType.DENSITY_COMPARATOR);
+        }
         this.stored = next;
         this.updateId++;
         this.markDirty.run();
@@ -163,6 +187,7 @@ public class FluidContainer {
 
         if (current == extracted) {
             this.storedFluids.removeLong(type);
+            this.fluids.remove(type);
         } else {
             this.storedFluids.put(type, current - extracted);
         }
@@ -172,7 +197,13 @@ public class FluidContainer {
         return extracted;
     }
     public void provideRender(BiConsumer<FluidType, Float> consumer) {
-        storedFluids.forEach((a, b) -> consumer.accept(a, (float) ((double) b) / capacity));
+        forEachByDensity((a, b) -> consumer.accept(a, (float) ((double) b) / capacity));
+    }
+
+    public void forEachByDensity(BiConsumer<FluidType, Long> consumer) {
+        for (var f : this.fluids) {
+            consumer.accept(f, this.storedFluids.getOrDefault(f, 0));
+        }
     }
 
     public void forEach(BiConsumer<FluidType, Long> consumer) {
@@ -222,10 +253,19 @@ public class FluidContainer {
                 return interactable ? (index, type, action, gui) -> {
                     var handler = gui.getPlayer().currentScreenHandler;
                     var out = interactWith(gui.getPlayer(), handler.getCursorStack());
+                    if (out == null) {
+                        return;
+                    }
                     if (handler.getCursorStack().isEmpty()) {
                         handler.setCursorStack(out);
-                    } else {
-                        gui.getPlayer().getInventory().offerOrDrop(out);
+                    } else if (!out.isEmpty()) {
+                        if (gui.getPlayer().isCreative()) {
+                            if (!gui.getPlayer().getInventory().contains(out)) {
+                                gui.getPlayer().getInventory().insertStack(out);
+                            }
+                        } else {
+                            gui.getPlayer().getInventory().offerOrDrop(out);
+                        }
                     }
                 } : GuiElementInterface.EMPTY_CALLBACK;
             }
