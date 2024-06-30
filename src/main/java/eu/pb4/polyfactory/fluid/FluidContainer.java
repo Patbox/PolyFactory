@@ -165,7 +165,7 @@ public class FluidContainer {
         this.storedFluids.put(type, current + inserted);
         if (current == 0) {
             this.fluids.add(type);
-            this.fluids.sort(FluidType.DENSITY_COMPARATOR);
+            this.fluids.sort(FluidType.DENSITY_COMPARATOR_REVERSED);
         }
         this.stored = next;
         this.updateId++;
@@ -226,6 +226,7 @@ public class FluidContainer {
 
     public void fromNbt(NbtCompound nbt) {
         this.storedFluids.clear();
+        this.fluids.clear();
         this.stored = 0;
         for (var key : nbt.getKeys()) {
             var value = nbt.getLong(key);
@@ -235,6 +236,8 @@ public class FluidContainer {
                 this.stored += value;
             }
         }
+        this.fluids.addAll(this.storedFluids.keySet());
+        this.fluids.sort(FluidType.DENSITY_COMPARATOR_REVERSED);
         this.updateId++;
     }
 

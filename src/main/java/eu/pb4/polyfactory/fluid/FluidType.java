@@ -17,6 +17,7 @@ import java.util.Optional;
 
 public record FluidType(int density, Optional<Fluid> backingFluid, Optional<Identifier> textureOverride, int color) {
     public static final Comparator<FluidType> DENSITY_COMPARATOR = Comparator.comparingInt(FluidType::density);
+    public static final Comparator<FluidType> DENSITY_COMPARATOR_REVERSED = DENSITY_COMPARATOR.reversed();
     public static final long BLOCK_AMOUNT = FluidConstants.BLOCK;
     public static final Codec<FluidType> CODEC = FactoryRegistries.FLUID_TYPES.getCodec();
 
