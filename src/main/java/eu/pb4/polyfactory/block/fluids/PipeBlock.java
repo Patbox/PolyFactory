@@ -26,9 +26,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -182,7 +182,12 @@ public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnect
 
     @Override
     public Collection<BlockNode> createPipeNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new SelectiveSideNode(this.getDirections(state)));
+        return List.of(new SelectiveSideNode(getDirections(state)));
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+        return Blocks.COPPER_BLOCK.getDefaultState();
     }
 
     public static class PipeModel extends BlockModel {

@@ -51,8 +51,8 @@ public class PumpBlockEntity extends BlockEntity implements FluidInput.Container
 
         var speed = RotationUser.getRotation(world, pos).speed();
         pump.speed = speed;
-        //NetworkComponent.Pipe.forEachLogic((ServerWorld) world, pos, l -> l.setSourceStrength(pos, speed / 60));
-        NetworkComponent.Pipe.forEachLogic((ServerWorld) world, pos, l -> l.setSourceStrength(pos, 1));
+        NetworkComponent.Pipe.forEachLogic((ServerWorld) world, pos, l -> l.setSourceStrength(pos, speed / 60));
+        //NetworkComponent.Pipe.forEachLogic((ServerWorld) world, pos, l -> l.setSourceStrength(pos, 1));
 
         if (speed == 0) {
             return;

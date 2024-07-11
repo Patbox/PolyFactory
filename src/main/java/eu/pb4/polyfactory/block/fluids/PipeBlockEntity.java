@@ -55,7 +55,7 @@ public class PipeBlockEntity extends BlockEntity implements FluidInput.Container
                 if (amount != 0) {
                     pipe.container.insert(fluid, amount, false);
                 } else {
-                    ((ServerWorld) world).spawnParticles(ParticleTypes.WHITE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.8, pos.getZ() + 0.5, 0, 0, 0, 0, 0);
+                    //((ServerWorld) world).spawnParticles(ParticleTypes.WHITE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.8, pos.getZ() + 0.5, 0, 0, 0, 0, 0);
                 }
             }
         }));
