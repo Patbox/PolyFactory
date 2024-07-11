@@ -41,8 +41,8 @@ public record FluidTextures(Map<FluidType, char[]> textures, FluidUiPositionCrea
            }
 
            var t = Text.literal(b.toString());
-           if (type.color() != 0xffffff) {
-               t.withColor(type.color());
+           if (type.color().isPresent()) {
+               t.withColor(type.color().getAsInt());
            }
 
            out.append(t);

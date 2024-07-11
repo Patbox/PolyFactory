@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.block.data.providers.DataProviderBlock;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
 import eu.pb4.polyfactory.block.data.util.DataCache;
 import eu.pb4.polyfactory.block.data.util.GenericDirectionalDataBlock;
+import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.StringData;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
@@ -33,6 +34,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.text.Texts;
 import net.minecraft.util.Formatting;
@@ -49,8 +51,8 @@ import java.util.List;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public final class DataMemoryBlock extends DataProviderBlock implements DataReceiver {
-    public static final BooleanProperty READ_ONLY = BooleanProperty.of("read_only");
-    public static final BooleanProperty POWERED = BooleanProperty.of("powered");
+    public static final BooleanProperty READ_ONLY = FactoryProperties.READ_ONLY;
+    public static final BooleanProperty POWERED = Properties.POWERED;
 
     public static final List<WrenchAction> ACTIONS = List.of(
             WrenchAction.CHANNEL,

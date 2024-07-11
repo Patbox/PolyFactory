@@ -160,6 +160,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         }
 
         self.fluidContainer.tick((ServerWorld) world, pos, self.temperature, self::addToOutputOrDrop);
+        self.model.setFluid(self.fluidContainer.topFluid(), self.fluidContainer.getFilledPercentage());
 
         if (self.isInputEmpty()) {
             self.process = 0;

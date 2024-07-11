@@ -12,6 +12,8 @@ import eu.pb4.polyfactory.block.data.providers.*;
 import eu.pb4.polyfactory.block.electric.ElectricGeneratorBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.electric.WitherSkullGeneratorBlock;
+import eu.pb4.polyfactory.block.fluids.PipeBlock;
+import eu.pb4.polyfactory.block.fluids.PumpBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.PlacerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlock;
@@ -106,11 +108,9 @@ public class FactoryBlocks {
     public static final SmallLampBlock INVERTED_CAGED_LAMP = register("inverted_caged_lamp", new SmallLampBlock(Block.Settings.copy(INVERTED_REDSTONE_LAMP).nonOpaque(), true));
     public static final PolymerButtonBlock STEEL_BUTTON = register("steel_button", new PolymerButtonBlock("steel", BlockSetType.IRON, 5, Block.Settings.copy(Blocks.STONE_BUTTON).nonOpaque()));
     public static final TinyPotatoSpringBlock TINY_POTATO_SPRING = register("tiny_potato_spring", new TinyPotatoSpringBlock(AbstractBlock.Settings.create().strength(1).nonOpaque()));
-
     public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", new RotationalDebugBlock(AbstractBlock.Settings.create().strength(-1, -1)));
-    public static final GreenScreenBlock GREEN_SCREEN = register("green_screen", new GreenScreenBlock(AbstractBlock.Settings.copy(Blocks.GREEN_WOOL)));
-    public static final TheCubeBlock THE_CUBE = register("the_cube", new TheCubeBlock(AbstractBlock.Settings.copy(Blocks.STONE)));
-
+    public static final PipeBlock PIPE = register("pipe", new PipeBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
+    public static final PumpBlock PUMP = register("pump", new PumpBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
 
     public static void register() {
         if (ModInit.DEV_MODE) {

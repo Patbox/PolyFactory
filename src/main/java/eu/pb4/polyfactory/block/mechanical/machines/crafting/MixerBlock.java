@@ -4,8 +4,10 @@ import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
+import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
+import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.models.RotationAwareModel;
@@ -139,12 +141,16 @@ public class MixerBlock extends TallItemMachineBlock {
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement whisk;
         private final ItemDisplayElement main;
+        private final ItemDisplayElement fluid;
         private final ItemDisplayElement gearA;
         private final ItemDisplayElement gearB;
         private float rotation;
         private boolean active;
+        private FluidType currentFluid = null;
+        private float positionFluid = -1;
 
         private Model(BlockState state) {
+            this.fluid = ItemDisplayElementUtil.createSimple();
             this.main = ItemDisplayElementUtil.createSimple(FactoryItems.MIXER);
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
@@ -159,6 +165,7 @@ public class MixerBlock extends TallItemMachineBlock {
             this.updateStatePos(state);
             var dir = state.get(INPUT_FACING);
             this.updateAnimation(true,  true, 0, (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
+            this.addElement(this.fluid);
             this.addElement(this.whisk);
             this.addElement(this.main);
             this.addElement(this.gearA);
@@ -220,6 +227,22 @@ public class MixerBlock extends TallItemMachineBlock {
             if (this.gearA.isDirty()) {
                 this.gearA.startInterpolation();
                 this.gearB.startInterpolation();
+            }
+        }
+
+        public void setFluid(@Nullable FluidType type, float position) {
+            if (type == null || position < 0.01) {
+                this.fluid.setItem(ItemStack.EMPTY);
+                this.currentFluid = null;
+                this.positionFluid = -1;
+            }
+            if (this.currentFluid != type) {
+                this.fluid.setItem(FactoryModels.FLAT_FULL.get(type));
+                this.currentFluid = type;
+            }
+            if (this.positionFluid != position) {
+                this.fluid.setTranslation(new Vector3f(0, -4f / 16f + position * 10f / 16f, 0));
+                this.positionFluid = position;
             }
         }
 

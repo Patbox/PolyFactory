@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.base;
 
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchApplyAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
@@ -21,7 +22,7 @@ import java.util.List;
 
 public abstract class AxisAndFacingBlock extends Block implements WrenchableBlock, FactoryBlock {
     public static final DirectionProperty FACING = Properties.FACING;
-    public static final BooleanProperty FIRST_AXIS = BooleanProperty.of("first_axis");
+    public static final BooleanProperty FIRST_AXIS = FactoryProperties.FIRST_AXIS;
     public static final WrenchAction FIRST_AXIS_ACTION = WrenchAction.of("axis", (World world, BlockPos pos, Direction side, BlockState state) -> {
         return Text.literal(getAxis(state).asString());
     }, WrenchApplyAction.ofProperty(FIRST_AXIS));

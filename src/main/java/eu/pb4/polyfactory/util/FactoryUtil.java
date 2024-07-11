@@ -1,5 +1,7 @@
 package eu.pb4.polyfactory.util;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.ModInit;
@@ -19,7 +21,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
@@ -27,6 +31,8 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -40,6 +46,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -50,6 +57,20 @@ public class FactoryUtil {
     public static final Vec3d HALF_BELOW = new Vec3d(0, -0.5, 0);
 
     private static final List<Runnable> RUN_NEXT_TICK = new ArrayList<>();
+
+    private static final Item[] COLORED_MODEL_ITEMS = new Item[]{
+            Items.LEATHER_HELMET,
+            Items.LEATHER_CHESTPLATE,
+            Items.LEATHER_LEGGINGS,
+            Items.LEATHER_BOOTS,
+            Items.LEATHER_HORSE_ARMOR
+    };
+
+    private static int coloredModelIndex = 0;
+
+    public static Item requestColoredItem() {
+        return COLORED_MODEL_ITEMS[(coloredModelIndex++) % COLORED_MODEL_ITEMS.length];
+    }
 
     public static void runNextTick(Runnable runnable) {
         RUN_NEXT_TICK.add(runnable);

@@ -17,7 +17,7 @@ import net.minecraft.util.Identifier;
 
 public class FactoryFluids {
     public static final FluidType WATER = register(Identifier.ofVanilla("water"), FluidType.of(100, Fluids.WATER, 0x3b3bed));
-    public static final FluidType LAVA = register(Identifier.ofVanilla("lava"), FluidType.of(1000, Fluids.LAVA, 0xFFFFFF));
+    public static final FluidType LAVA = register(Identifier.ofVanilla("lava"), FluidType.of(1000, Fluids.LAVA));
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     public static final FluidType MILK = register(Identifier.ofVanilla("milk"), FluidType.of(200));
     public static final FluidType XP = register(Identifier.ofVanilla("xp"), FluidType.of(50));

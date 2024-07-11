@@ -14,6 +14,7 @@ import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
+import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.data.BlockStateData;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.ItemStackData;
@@ -65,9 +66,9 @@ import java.util.Locale;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class HologramProjectorBlock extends DataNetworkBlock implements FactoryBlock, WrenchableBlock, BlockEntityProvider, CableConnectable, DataReceiver, BarrierBasedWaterloggable {
-    public static final BooleanProperty ACTIVE = BooleanProperty.of("active");
+    public static final BooleanProperty ACTIVE = FactoryProperties.ACTIVE;
     public static final DirectionProperty FACING = Properties.FACING;
-    public static final IntProperty FRONT = IntProperty.of("front", 0, 3);
+    public static final IntProperty FRONT = FactoryProperties.FRONT;
     private static final WrenchAction CHANGE_ROTATION = WrenchAction.of("front", (world, pos, side, state) -> {
         var axis = state.get(FACING).getAxis();
         if (axis == Direction.Axis.Y) {

@@ -76,7 +76,6 @@ public class FactoryItems {
     public static final Item CREATIVE_CONTAINER = register(FactoryBlocks.CREATIVE_CONTAINER);
 
     public static final Item ROTATION_DEBUG = register(FactoryBlocks.ROTATION_DEBUG);
-    public static final Item GREEN_SCREEN = register(FactoryBlocks.GREEN_SCREEN);
     public static final Item TACHOMETER = register(FactoryBlocks.TACHOMETER);
     public static final Item STRESSOMETER = register(FactoryBlocks.STRESSOMETER);
     public static final Item ITEM_COUNTER = register(FactoryBlocks.ITEM_COUNTER);
@@ -114,8 +113,9 @@ public class FactoryItems {
     public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
     public static final Item SPRAY_CAN = register("spray_can", new DyeSprayItem(new Item.Settings().maxCount(1)));
+    public static final Item PIPE = register(FactoryBlocks.PIPE);
+    public static final Item PUMP = register(FactoryBlocks.PUMP);
 
-    public static final Item THE_CUBE = register(FactoryBlocks.THE_CUBE);
 
     public static void register() {
         FuelRegistry.INSTANCE.add(SAW_DUST, 60);
@@ -164,6 +164,10 @@ public class FactoryItems {
                     entries.add(MINER);
                     entries.add(PLACER);
                     entries.add(PLANTER);
+
+                    // Fluids
+                    entries.add(PIPE);
+                    entries.add(PUMP);
 
                     // Data
                     entries.add(CABLE);
@@ -291,8 +295,6 @@ public class FactoryItems {
                         // Remove this
                         if (ModInit.DEV_ENV) {
                             entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                            entries.add(GREEN_SCREEN, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                            entries.add(THE_CUBE, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         }
                     })).build()
             );

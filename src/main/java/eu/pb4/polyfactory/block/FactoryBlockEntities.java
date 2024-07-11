@@ -12,6 +12,8 @@ import eu.pb4.polyfactory.block.data.providers.ItemReaderBlockEntity;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlockEntity;
 import eu.pb4.polyfactory.block.electric.WitherSkullGeneratorBlockEntity;
+import eu.pb4.polyfactory.block.fluids.PipeBlockEntity;
+import eu.pb4.polyfactory.block.fluids.PumpBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.*;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlockEntity;
@@ -41,84 +43,85 @@ import net.minecraft.util.Identifier;
 
 public class FactoryBlockEntities {
     public static final BlockEntityType<ConveyorBlockEntity> CONVEYOR = register("conveyor",
-            FabricBlockEntityTypeBuilder.create(ConveyorBlockEntity::new).addBlocks(FactoryBlocks.CONVEYOR, FactoryBlocks.STICKY_CONVEYOR));
+            BlockEntityType.Builder.create(ConveyorBlockEntity::new, FactoryBlocks.CONVEYOR, FactoryBlocks.STICKY_CONVEYOR));
 
     public static final BlockEntityType<FunnelBlockEntity> FUNNEL = register("funnel",
-            FabricBlockEntityTypeBuilder.create(FunnelBlockEntity::new).addBlock(FactoryBlocks.FUNNEL));
+            BlockEntityType.Builder.create(FunnelBlockEntity::new, FactoryBlocks.FUNNEL));
 
     public static final BlockEntityType<SplitterBlockEntity> SPLITTER = register("splitter",
-            FabricBlockEntityTypeBuilder.create(SplitterBlockEntity::new).addBlock(FactoryBlocks.SPLITTER));
+            BlockEntityType.Builder.create(SplitterBlockEntity::new, FactoryBlocks.SPLITTER));
 
     public static final BlockEntityType<FanBlockEntity> FAN = register("fan",
-            FabricBlockEntityTypeBuilder.create(FanBlockEntity::new).addBlock(FactoryBlocks.FAN));
+            BlockEntityType.Builder.create(FanBlockEntity::new, FactoryBlocks.FAN));
 
     public static final BlockEntityType<HandCrankBlockEntity> HAND_CRANK = register("hand_crank",
-            FabricBlockEntityTypeBuilder.create(HandCrankBlockEntity::new).addBlock(FactoryBlocks.HAND_CRANK));
+            BlockEntityType.Builder.create(HandCrankBlockEntity::new, FactoryBlocks.HAND_CRANK));
 
     public static final BlockEntityType<WindmillBlockEntity> WINDMILL = register("windmill",
-            FabricBlockEntityTypeBuilder.create(WindmillBlockEntity::new).addBlock(FactoryBlocks.WINDMILL));
+            BlockEntityType.Builder.create(WindmillBlockEntity::new, FactoryBlocks.WINDMILL));
 
     public static final BlockEntityType<SteamEngineBlockEntity> STEAM_ENGINE = register("steam_engine",
-            FabricBlockEntityTypeBuilder.create(SteamEngineBlockEntity::new).addBlock(FactoryBlocks.STEAM_ENGINE));
+            BlockEntityType.Builder.create(SteamEngineBlockEntity::new, FactoryBlocks.STEAM_ENGINE));
 
     public static final BlockEntityType<ContainerBlockEntity> CONTAINER = register("container",
-            FabricBlockEntityTypeBuilder.create(ContainerBlockEntity::new).addBlock(FactoryBlocks.CONTAINER));
+            BlockEntityType.Builder.create(ContainerBlockEntity::new, FactoryBlocks.CONTAINER));
 
     public static final BlockEntityType<GrinderBlockEntity> GRINDER = register("grinder",
-            FabricBlockEntityTypeBuilder.create(GrinderBlockEntity::new).addBlock(FactoryBlocks.GRINDER));
+            BlockEntityType.Builder.create(GrinderBlockEntity::new, FactoryBlocks.GRINDER));
 
     public static final BlockEntityType<MinerBlockEntity> MINER = register("miner",
-            FabricBlockEntityTypeBuilder.create(MinerBlockEntity::new).addBlock(FactoryBlocks.MINER));
+            BlockEntityType.Builder.create(MinerBlockEntity::new, FactoryBlocks.MINER));
     public static final BlockEntityType<PlacerBlockEntity> PLACER = register("placer",
-            FabricBlockEntityTypeBuilder.create(PlacerBlockEntity::new).addBlock(FactoryBlocks.PLACER));
+            BlockEntityType.Builder.create(PlacerBlockEntity::new, FactoryBlocks.PLACER));
     public static final BlockEntityType<PlanterBlockEntity> PLANTER = register("planter",
-            FabricBlockEntityTypeBuilder.create(PlanterBlockEntity::new).addBlock(FactoryBlocks.PLANTER));
+            BlockEntityType.Builder.create(PlanterBlockEntity::new, FactoryBlocks.PLANTER));
 
     public static final BlockEntityType<PressBlockEntity> PRESS = register("press",
-            FabricBlockEntityTypeBuilder.create(PressBlockEntity::new).addBlock(FactoryBlocks.PRESS));
+            BlockEntityType.Builder.create(PressBlockEntity::new, FactoryBlocks.PRESS));
 
     public static final BlockEntityType<MixerBlockEntity> MIXER = register("mixer",
-            FabricBlockEntityTypeBuilder.create(MixerBlockEntity::new).addBlock(FactoryBlocks.MIXER));
+            BlockEntityType.Builder.create(MixerBlockEntity::new, FactoryBlocks.MIXER));
 
     public static final BlockEntityType<MCrafterBlockEntity> CRAFTER = register("crafter",
-            FabricBlockEntityTypeBuilder.create(MCrafterBlockEntity::new).addBlock(FactoryBlocks.CRAFTER));
+            BlockEntityType.Builder.create(MCrafterBlockEntity::new, FactoryBlocks.CRAFTER));
 
     public static final BlockEntityType<NixieTubeBlockEntity> NIXIE_TUBE = register("nixie_tube",
-            FabricBlockEntityTypeBuilder.create(NixieTubeBlockEntity::new).addBlock(FactoryBlocks.NIXIE_TUBE));
+            BlockEntityType.Builder.create(NixieTubeBlockEntity::new, FactoryBlocks.NIXIE_TUBE));
 
     public static final BlockEntityType<NixieTubeControllerBlockEntity> NIXIE_TUBE_CONTROLLER = register("nixie_tube_controller",
-            FabricBlockEntityTypeBuilder.create(NixieTubeControllerBlockEntity::new).addBlock(FactoryBlocks.NIXIE_TUBE_CONTROLLER));
+            BlockEntityType.Builder.create(NixieTubeControllerBlockEntity::new, FactoryBlocks.NIXIE_TUBE_CONTROLLER));
     public static final BlockEntityType<ElectricMotorBlockEntity> ELECTRIC_MOTOR = register("electric_motor",
-            FabricBlockEntityTypeBuilder.create(ElectricMotorBlockEntity::new).addBlock(FactoryBlocks.ELECTRIC_MOTOR));
+            BlockEntityType.Builder.create(ElectricMotorBlockEntity::new, FactoryBlocks.ELECTRIC_MOTOR));
     public static final BlockEntityType<CreativeContainerBlockEntity> CREATIVE_CONTAINER = register("creative_container",
-            FabricBlockEntityTypeBuilder.create(CreativeContainerBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_CONTAINER));
+            BlockEntityType.Builder.create(CreativeContainerBlockEntity::new, FactoryBlocks.CREATIVE_CONTAINER));
 
     public static final BlockEntityType<CreativeMotorBlockEntity> CREATIVE_MOTOR = register("creative_motor",
-            FabricBlockEntityTypeBuilder.create(CreativeMotorBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_MOTOR));
-    public static final BlockEntityType<ChanneledDataBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache", FabricBlockEntityTypeBuilder
-            .create(ChanneledDataBlockEntity::new).addBlocks(FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
+            BlockEntityType.Builder.create(CreativeMotorBlockEntity::new, FactoryBlocks.CREATIVE_MOTOR));
+    public static final BlockEntityType<ChanneledDataBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache",
+            BlockEntityType.Builder.create(ChanneledDataBlockEntity::new, FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
                     FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER));
 
-    public static final BlockEntityType<HologramProjectorBlockEntity> HOLOGRAM_PROJECTOR = register("hologram_projector", FabricBlockEntityTypeBuilder
-            .create(HologramProjectorBlockEntity::new).addBlocks(FactoryBlocks.HOLOGRAM_PROJECTOR));
+    public static final BlockEntityType<HologramProjectorBlockEntity> HOLOGRAM_PROJECTOR = register("hologram_projector",
+            BlockEntityType.Builder.create(HologramProjectorBlockEntity::new, FactoryBlocks.HOLOGRAM_PROJECTOR));
 
-    public static final BlockEntityType<WirelessRedstoneBlockEntity> WIRELESS_REDSTONE = register("wireless_redstone", FabricBlockEntityTypeBuilder
-            .create(WirelessRedstoneBlockEntity::new).addBlock(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER));
-    public static final BlockEntityType<CableBlockEntity> CABLE = register("cable", FabricBlockEntityTypeBuilder
-            .create(CableBlockEntity::new).addBlock(FactoryBlocks.CABLE));
-    public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader", FabricBlockEntityTypeBuilder
-            .create(ItemReaderBlockEntity::new).addBlock(FactoryBlocks.ITEM_READER));
-    public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer", FabricBlockEntityTypeBuilder
-            .create(DoubleInputTransformerBlockEntity::new).addBlocks(FactoryBlocks.ARITHMETIC_OPERATOR));
+    public static final BlockEntityType<WirelessRedstoneBlockEntity> WIRELESS_REDSTONE = register("wireless_redstone",
+            BlockEntityType.Builder.create(WirelessRedstoneBlockEntity::new, FactoryBlocks.WIRELESS_REDSTONE_RECEIVER));
+    public static final BlockEntityType<CableBlockEntity> CABLE = register("cable", BlockEntityType.Builder.create(CableBlockEntity::new, FactoryBlocks.CABLE));
+    public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader",
+            BlockEntityType.Builder.create(ItemReaderBlockEntity::new, FactoryBlocks.ITEM_READER));
+    public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer", BlockEntityType.Builder
+            .create(DoubleInputTransformerBlockEntity::new, FactoryBlocks.ARITHMETIC_OPERATOR));
 
-    public static final BlockEntityType<WorkbenchBlockEntity> WORKBENCH = register("workbench", FabricBlockEntityTypeBuilder
-            .create(WorkbenchBlockEntity::new).addBlock(FactoryBlocks.WORKBENCH));
-    public static final BlockEntityType<WitherSkullGeneratorBlockEntity> WITHER_SKULL_GENERATOR = register("wither_skull_generator", FabricBlockEntityTypeBuilder
-            .create(WitherSkullGeneratorBlockEntity::new).addBlock(FactoryBlocks.WITHER_SKULL_GENERATOR));
+    public static final BlockEntityType<WorkbenchBlockEntity> WORKBENCH = register("workbench", BlockEntityType.Builder
+            .create(WorkbenchBlockEntity::new, FactoryBlocks.WORKBENCH));
+    public static final BlockEntityType<WitherSkullGeneratorBlockEntity> WITHER_SKULL_GENERATOR = register("wither_skull_generator", BlockEntityType.Builder
+            .create(WitherSkullGeneratorBlockEntity::new, FactoryBlocks.WITHER_SKULL_GENERATOR));
 
-    public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container", FabricBlockEntityTypeBuilder
-            .create(ColorableBlockEntity::new).addBlocks(FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP));
+    public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container", BlockEntityType.Builder
+            .create(ColorableBlockEntity::new, FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP));
 
+    public static final BlockEntityType<PipeBlockEntity> PIPE = register("pipe", BlockEntityType.Builder.create(PipeBlockEntity::new, FactoryBlocks.PIPE));
+    public static final BlockEntityType<PumpBlockEntity> PUMP = register("pump", BlockEntityType.Builder.create(PumpBlockEntity::new, FactoryBlocks.PUMP));
 
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;
@@ -127,8 +130,7 @@ public class FactoryBlockEntities {
         x.polyfactory$setBlocks(set.build());
     }
 
-
-    public static <T extends BlockEntity> BlockEntityType<T> register(String path, FabricBlockEntityTypeBuilder<T> item) {
+    public static <T extends BlockEntity> BlockEntityType<T> register(String path, BlockEntityType.Builder<T> item) {
         var x = Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(ModInit.ID, path), item.build());
         PolymerBlockUtils.registerBlockEntity(x);
         return x;

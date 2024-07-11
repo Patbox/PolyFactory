@@ -190,7 +190,9 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
             {
                 var items = new ArrayList<ItemStack>();
                 items.add(output.copy());
-                items.addAll(remainder);
+                for (var stack : remainder) {
+                    items.add(stack.copy());
+                }
 
                 var inv = new SimpleInventory(9);
                 for (int i = 0; i < 9; i++) {

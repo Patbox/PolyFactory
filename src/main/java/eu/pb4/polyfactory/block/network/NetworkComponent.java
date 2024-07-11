@@ -2,8 +2,11 @@ package eu.pb4.polyfactory.block.network;
 
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.data.DataStorage;
+import eu.pb4.polyfactory.nodes.mechanical.RotationData;
+import eu.pb4.polyfactory.nodes.pipe.FlowData;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -11,6 +14,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public interface NetworkComponent {
@@ -22,6 +26,35 @@ public interface NetworkComponent {
         }
 
         Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos);
+
+
+        static RotationData getLogic(ServerWorld world, BlockPos pos) {
+            return RotationUser.getRotation(world, pos);
+        }
+    }
+
+    interface Pipe extends NetworkComponent {
+        static void updatePipeAt(WorldAccess world, BlockPos pos) {
+            if (world instanceof ServerWorld serverWorld) {
+                FactoryNodes.PIPE.getGraphWorld(serverWorld).updateNodes(pos);
+            }
+        }
+
+        Collection<BlockNode> createPipeNodes(BlockState state, ServerWorld world, BlockPos pos);
+
+        static FlowData getLogic(ServerWorld world, BlockPos pos) {
+            var o = FactoryNodes.PIPE.getGraphWorld(world).getNodesAt(pos).findFirst();
+            if (o.isPresent()) {
+                return o.get().getGraph().getGraphEntity(FlowData.TYPE);
+            }
+            return FlowData.EMPTY;
+        }
+
+        static void forEachLogic(ServerWorld world, BlockPos pos, Consumer<FlowData> consumer) {
+            FactoryNodes.PIPE.getGraphWorld(world).getNodesAt(pos).forEach(x -> {
+                consumer.accept(x.getGraph().getGraphEntity(FlowData.TYPE));
+            });
+        }
     }
 
     interface RotationalConnector extends NetworkComponent {
@@ -30,7 +63,6 @@ public interface NetworkComponent {
                 FactoryNodes.ROTATIONAL_CONNECTOR.getGraphWorld(serverWorld).updateNodes(pos);
             }
         }
-
         Collection<BlockNode> createRotationalConnectorNodes(BlockState state, ServerWorld world, BlockPos pos);
     }
 
@@ -47,10 +79,7 @@ public interface NetworkComponent {
             {
                 var o = FactoryNodes.DATA.getGraphWorld(world).getNodesAt(pos).findFirst();
                 if (o.isPresent()) {
-                    var graph = FactoryNodes.DATA.getGraphWorld(world).getGraph(o.get().getGraphId());
-                    var ent = graph.getGraphEntity(DataStorage.TYPE);
-
-                    return ent;
+                    return o.get().getGraph().getGraphEntity(DataStorage.TYPE);
                 }
             }
             return DataStorage.EMPTY;
@@ -60,10 +89,7 @@ public interface NetworkComponent {
             {
                 var o = FactoryNodes.DATA.getGraphWorld(world).getNodesAt(pos).filter(predicate).findFirst();
                 if (o.isPresent()) {
-                    var graph = FactoryNodes.DATA.getGraphWorld(world).getGraph(o.get().getGraphId());
-                    var ent = graph.getGraphEntity(DataStorage.TYPE);
-
-                    return ent;
+                    return o.get().getGraph().getGraphEntity(DataStorage.TYPE);
                 }
             }
             return DataStorage.EMPTY;

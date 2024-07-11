@@ -25,7 +25,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.function.BiConsumer;
 
-public class ConveyorModel {
+public class ConveyorModels {
     public static final int FRAMES = 20;
 
     public static final ItemStack[][] ANIMATION_REGULAR_STICKY = new ItemStack[16][1 + FRAMES];
@@ -130,7 +130,7 @@ public class ConveyorModel {
 
         if (ModInit.DYNAMIC_ASSETS) {
             PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register((resourcePackBuilder) ->
-                    ConveyorModel.generateModels(resourcePackBuilder::addData));
+                    ConveyorModels.generateModels(resourcePackBuilder::addData));
         }
     }
 

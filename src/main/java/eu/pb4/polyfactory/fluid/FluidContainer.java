@@ -28,12 +28,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -43,16 +45,24 @@ public class FluidContainer {
     private final long capacity;
     private final Runnable markDirty;
     private int updateId = 0;
-    private final Predicate<FluidType> canInsert;
+    private final BiPredicate<FluidContainer, FluidType> canInsert;
     private long stored = 0;
 
     public FluidContainer(long maxStorage, Runnable markDirty) {
-        this(maxStorage, markDirty, (x) -> true);
+        this(maxStorage, markDirty, (a, x) -> true);
     }
-    public FluidContainer(long maxStorage, Runnable markDirty, Predicate<FluidType> canInsert) {
+    public FluidContainer(long maxStorage, Runnable markDirty, BiPredicate<FluidContainer, FluidType> canInsert) {
         this.capacity = maxStorage;
         this.canInsert = canInsert;
         this.markDirty = markDirty;
+    }
+
+    public static FluidContainer singleFluid(long maxStorage, Runnable markDirty) {
+        return new FluidContainer(maxStorage, markDirty, (self, type) -> self.isEmpty() || self.contains(type));
+    }
+
+    public boolean isEmpty() {
+        return this.stored == 0;
     }
 
     public void tick(ServerWorld world, BlockPos pos, float temperature, Consumer<ItemStack> stack) {
@@ -150,7 +160,7 @@ public class FluidContainer {
     }
 
     public boolean canInsert(FluidType type, long amount, boolean exact) {
-        return this.canInsert.test(type) && (exact ? this.stored + amount <= this.capacity : this.stored != this.capacity);
+        return this.canInsert.test(this, type) && (exact ? this.stored + amount <= this.capacity : this.stored != this.capacity);
     }
 
     public long insert(FluidType type, long amount, boolean exact) {
@@ -197,7 +207,7 @@ public class FluidContainer {
         return extracted;
     }
     public void provideRender(BiConsumer<FluidType, Float> consumer) {
-        forEachByDensity((a, b) -> consumer.accept(a, (float) ((double) b) / capacity));
+        forEachByDensity((a, b) -> consumer.accept(a, (float) (((double) b) / capacity)));
     }
 
     public void forEachByDensity(BiConsumer<FluidType, Long> consumer) {
@@ -284,5 +294,18 @@ public class FluidContainer {
                 return b.asStack();
             }
         };
+    }
+
+    @Nullable
+    public FluidType topFluid() {
+        return this.fluids.isEmpty() ? null : this.fluids.get(0);
+    }
+
+    public float getFilledPercentage() {
+        return (float) (((double) this.stored) / capacity);
+    }
+
+    public boolean isNotEmpty() {
+        return !this.isEmpty();
     }
 }

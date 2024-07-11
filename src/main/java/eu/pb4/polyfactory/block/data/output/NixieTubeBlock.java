@@ -4,6 +4,7 @@ import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
@@ -48,9 +49,9 @@ import org.joml.Matrix4fStack;
 import java.util.List;
 
 public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityProvider, WrenchableBlock, BarrierBasedWaterloggable {
-    public static Property<Direction.Axis> AXIS = EnumProperty.of("axis", Direction.Axis.class, Direction.Axis.X, Direction.Axis.Z);
-    public static BooleanProperty POSITIVE_CONNECTED = BooleanProperty.of("positive_connected");
-    public static BooleanProperty NEGATIVE_CONNECTED = BooleanProperty.of("negative_connected");
+    public static Property<Direction.Axis> AXIS = Properties.HORIZONTAL_AXIS;
+    public static BooleanProperty POSITIVE_CONNECTED = FactoryProperties.POSITIVE_CONNECTED;
+    public static BooleanProperty NEGATIVE_CONNECTED = FactoryProperties.NEGATIVE_CONNECTED;
     public static EnumProperty<BlockHalf> HALF = Properties.BLOCK_HALF;
 
     public static final WrenchAction AXIS_ACTION = WrenchAction.of("axis", AXIS);

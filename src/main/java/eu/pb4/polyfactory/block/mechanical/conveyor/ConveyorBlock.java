@@ -8,10 +8,11 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
+import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.item.FactoryEnchantmentEffectComponents;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
-import eu.pb4.polyfactory.models.ConveyorModel;
+import eu.pb4.polyfactory.models.ConveyorModels;
 import eu.pb4.factorytools.api.virtualentity.FastItemDisplayElement;
 import eu.pb4.polyfactory.nodes.mechanical.ConveyorNode;
 import eu.pb4.factorytools.api.util.WorldPointer;
@@ -28,7 +29,6 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -58,7 +58,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, ConveyorLikeDirectional, MovingItemConsumer {
-    public static final DirectionProperty DIRECTION = DirectionProperty.of("direction", Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
+    public static final DirectionProperty DIRECTION = FactoryProperties.HORIZONTAL_DIRECTION;
     public static final EnumProperty<DirectionValue> VERTICAL = EnumProperty.of("vertical", DirectionValue.class);
 
 
@@ -536,17 +536,17 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
 
         private ItemStack getModelForSpeed(double speed, DirectionValue directionValue, boolean sticky, BlockState state) {
             return (switch (directionValue) {
-                case POSITIVE -> sticky ? ConveyorModel.ANIMATION_UP_STICKY : ConveyorModel.ANIMATION_UP;
-                case NEGATIVE -> sticky ? ConveyorModel.ANIMATION_DOWN_STICKY : ConveyorModel.ANIMATION_DOWN;
-                default -> sticky ? ConveyorModel.ANIMATION_REGULAR_STICKY : ConveyorModel.ANIMATION_REGULAR;
-            })[getModelId(state)][(int) Math.ceil(MathHelper.clamp(speed * ConveyorModel.FRAMES * 15, 0, ConveyorModel.FRAMES))];
+                case POSITIVE -> sticky ? ConveyorModels.ANIMATION_UP_STICKY : ConveyorModels.ANIMATION_UP;
+                case NEGATIVE -> sticky ? ConveyorModels.ANIMATION_DOWN_STICKY : ConveyorModels.ANIMATION_DOWN;
+                default -> sticky ? ConveyorModels.ANIMATION_REGULAR_STICKY : ConveyorModels.ANIMATION_REGULAR;
+            })[getModelId(state)][(int) Math.ceil(MathHelper.clamp(speed * ConveyorModels.FRAMES * 15, 0, ConveyorModels.FRAMES))];
         }
 
         private ItemStack getFastModel(DirectionValue directionValue, boolean sticky, BlockState state) {
             return (switch (directionValue) {
-                case POSITIVE -> sticky ? ConveyorModel.STICKY_UP_FAST : ConveyorModel.UP_FAST;
-                case NEGATIVE -> sticky ? ConveyorModel.STICKY_DOWN_FAST : ConveyorModel.DOWN_FAST;
-                default -> sticky ? ConveyorModel.STICKY_REGULAR_FAST : ConveyorModel.REGULAR_FAST;
+                case POSITIVE -> sticky ? ConveyorModels.STICKY_UP_FAST : ConveyorModels.UP_FAST;
+                case NEGATIVE -> sticky ? ConveyorModels.STICKY_DOWN_FAST : ConveyorModels.DOWN_FAST;
+                default -> sticky ? ConveyorModels.STICKY_REGULAR_FAST : ConveyorModels.REGULAR_FAST;
             });
         }
 

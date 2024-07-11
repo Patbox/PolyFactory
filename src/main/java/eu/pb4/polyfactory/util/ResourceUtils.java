@@ -29,7 +29,7 @@ public class ResourceUtils {
     public static JsonObject getModel(Identifier identifier) {
         try {
             return (JsonObject) JsonParser.parseString(new String(
-                    getJarData("assets/" + identifier.getNamespace() + "/models/" + identifier.getPath() +" .json"), StandardCharsets.UTF_8
+                    Objects.requireNonNull(getJarData("assets/" + identifier.getNamespace() + "/models/" + identifier.getPath() + ".json")), StandardCharsets.UTF_8
             ));
         } catch (Throwable e) {
             e.printStackTrace();
@@ -65,5 +65,26 @@ public class ResourceUtils {
             } catch (Throwable e) {}
         }
         return null;
+    }
+
+    public static JsonObject getElementResolvedModel(Identifier baseModel) {
+        var model = getModel(baseModel);
+        if (!model.has("elements") && model.has("parent")) {
+            var parent = getElementResolvedModel(Identifier.of(model.get("parent").getAsString()));
+            for (var key : model.keySet()) {
+                if (parent.has(key) && parent.get(key).isJsonObject()) {
+                    var out = parent.get(key).getAsJsonObject();
+                    var in = model.get(key).getAsJsonObject();
+                    for (var key2 : in.keySet()) {
+                        out.add(key2, in.get(key2));
+                    }
+                } else if (!key.equals("parent")) {
+                    parent.add(key, model.get(key));
+                }
+            }
+            return parent;
+        }
+
+        return model;
     }
 }

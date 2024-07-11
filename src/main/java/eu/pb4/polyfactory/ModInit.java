@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.block.FactoryPoi;
 import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlock;
 import eu.pb4.polyfactory.block.data.io.DataMemoryBlock;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
+import eu.pb4.polyfactory.block.fluids.PumpBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleWithLargeGearBlock;
@@ -16,9 +17,7 @@ import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryEnchantmentEffectComponents;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
-import eu.pb4.polyfactory.models.CableModel;
-import eu.pb4.polyfactory.models.ConveyorModel;
-import eu.pb4.polyfactory.models.GenericParts;
+import eu.pb4.polyfactory.models.*;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
@@ -78,9 +77,9 @@ public class ModInit implements ModInitializer {
 		FactoryItemPredicates.register();
 		PotatoWisdom.load();
 		FluidTextures.setup();
+		FactoryModels.load();
 
-		ConveyorModel.registerAssetsEvents();
-		CableModel.registerAssetsEvents();
+		ConveyorModels.registerAssetsEvents();
 		initModels();
 		UiResourceCreator.setup();
 		GuiTextures.register();
@@ -105,5 +104,6 @@ public class ModInit implements ModInitializer {
 		GenericParts.SMALL_GEAR.isEmpty();
 		DoubleInputTransformerBlock.Model.INPUT_A.getItem();
 		DataMemoryBlock.Model.POWERED_MODEL.getItem();
+		PumpBlock.Model.BLOCK_MODEL.getItem();
 	}
 }

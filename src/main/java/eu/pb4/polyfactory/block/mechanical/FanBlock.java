@@ -154,7 +154,6 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
         modifier.stress(0.1);
     }
-
     public static final class Model extends RotationAwareModel {
         public static final ItemStack ITEM_MODEL = new ItemStack(BaseItemProvider.requestModel());
 

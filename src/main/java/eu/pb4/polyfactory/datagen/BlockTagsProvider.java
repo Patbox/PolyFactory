@@ -112,6 +112,8 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.WITHER_SKULL_GENERATOR)
                 .add(FactoryBlocks.AXLE_WITH_GEAR)
                 .add(FactoryBlocks.AXLE_WITH_LARGE_GEAR)
+                .add(FactoryBlocks.PIPE)
+                .add(FactoryBlocks.PUMP)
         ;
 
         this.getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)

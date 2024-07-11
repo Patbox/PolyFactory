@@ -18,11 +18,8 @@ public interface RotationUser extends NetworkComponent.Rotational {
         if (world instanceof ServerWorld serverWorld) {
             var o = FactoryNodes.ROTATIONAL.getGraphWorld(serverWorld).getNodesAt(pos).findFirst();
             if (o.isPresent()) {
-                var graph = FactoryNodes.ROTATIONAL.getGraphWorld(serverWorld).getGraph(o.get().getGraphId());
-                var ent = graph.getGraphEntity(RotationData.TYPE);
-
+                var ent = o.get().getGraph().getGraphEntity(RotationData.TYPE);
                 ent.update(serverWorld);
-
                 return ent;
             }
         }
@@ -35,11 +32,8 @@ public interface RotationUser extends NetworkComponent.Rotational {
         if (world instanceof ServerWorld serverWorld) {
             var o = FactoryNodes.ROTATIONAL.getGraphWorld(serverWorld).getNodesAt(pos).filter(predicate).findFirst();
             if (o.isPresent()) {
-                var graph = FactoryNodes.ROTATIONAL.getGraphWorld(serverWorld).getGraph(o.get().getGraphId());
-                var ent = graph.getGraphEntity(RotationData.TYPE);
-
+                var ent = o.get().getGraph().getGraphEntity(RotationData.TYPE);
                 ent.update(serverWorld);
-
                 return ent;
             }
         }

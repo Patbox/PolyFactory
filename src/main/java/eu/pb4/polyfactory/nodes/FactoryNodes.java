@@ -13,6 +13,8 @@ import eu.pb4.polyfactory.nodes.generic.*;
 import eu.pb4.polyfactory.nodes.mechanical.*;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.LargeGearNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
+import eu.pb4.polyfactory.nodes.pipe.FlowData;
+import eu.pb4.polyfactory.nodes.pipe.PumpNode;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,6 +29,7 @@ public class FactoryNodes {
     public static final GraphUniverse ROTATIONAL_CONNECTOR = registerRotationalConnector();
     public static final GraphUniverse ENERGY = registerEnergy();
     public static final GraphUniverse DATA = registerData();
+    public static final GraphUniverse PIPE = registerPipe();
 
     public static void register() {
     }
@@ -73,6 +76,26 @@ public class FactoryNodes {
         universe.register();
         return universe;
     }
+
+    private static GraphUniverse registerPipe() {
+        var universe = GraphUniverse.builder().build(id("pipe"));
+        universe.addDiscoverer((world, pos) -> {
+            var blockState = world.getBlockState(pos);
+
+            if (blockState.getBlock() instanceof NetworkComponent.Pipe rotational) {
+                return rotational.createPipeNodes(blockState, world, pos);
+            }
+            return List.of();
+        });
+        addSimpleNodes(universe);
+        universe.addNodeType(PumpNode.TYPE);
+        universe.addCacheCategory(PumpNode.CACHE);
+        universe.addGraphEntityType(FlowData.TYPE);
+
+        universe.register();
+        return universe;
+    }
+
     private static GraphUniverse registerEnergy() {
         var universe = GraphUniverse.builder().build(id("energy"));
         universe.addDiscoverer((world, pos) -> {
@@ -117,6 +140,7 @@ public class FactoryNodes {
         universe.addNodeType(AllSideNode.TYPE);
         universe.addNodeType(SelectiveSideNode.TYPE);
         universe.addNodeType(NotAxisNode.TYPE);
+        universe.addNodeType(UnconnectedNode.TYPE);
         universe.addCacheCategory(FunctionalNode.CACHE);
     }
 

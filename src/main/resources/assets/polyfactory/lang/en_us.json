@@ -16,6 +16,8 @@
   "block.polyfactory.mixer": "Mechanical Mixer",
   "block.polyfactory.crafter": "Mechanical Crafter",
   "block.polyfactory.planter": "Mechanical Planter",
+  "block.polyfactory.pump": "Pump",
+  "block.polyfactory.pipe": "Pipe",
   "block.polyfactory.axle": "Axle",
   "block.polyfactory.axle_with_gear": "Axle with Gear",
   "block.polyfactory.axle_with_large_gear": "Axle with Large Gear",

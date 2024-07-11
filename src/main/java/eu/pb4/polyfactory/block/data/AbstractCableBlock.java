@@ -1,7 +1,5 @@
 package eu.pb4.polyfactory.block.data;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
@@ -10,12 +8,14 @@ import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.models.CableModel;
+import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.nodes.generic.SelectiveSideNode;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
@@ -28,7 +28,6 @@ import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -38,7 +37,6 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -60,14 +58,7 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
     public static final BooleanProperty WEST = Properties.WEST;
     public static final BooleanProperty UP = Properties.UP;
     public static final BooleanProperty DOWN = Properties.DOWN;
-    public static final Map<Direction, BooleanProperty> FACING_PROPERTIES = ImmutableMap.copyOf((Map) Util.make(Maps.newEnumMap(Direction.class), (directions) -> {
-        directions.put(Direction.NORTH, NORTH);
-        directions.put(Direction.EAST, EAST);
-        directions.put(Direction.SOUTH, SOUTH);
-        directions.put(Direction.WEST, WEST);
-        directions.put(Direction.UP, UP);
-        directions.put(Direction.DOWN, DOWN);
-    }));
+    public static final Map<Direction, BooleanProperty> FACING_PROPERTIES = FactoryProperties.DIRECTIONS;
 
     public AbstractCableBlock(Settings settings) {
         super(settings);
@@ -221,27 +212,6 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
         return false;
     }
 
-    public static int getModelId(BlockState state) {
-        int i = 0;
-
-        for(int j = 0; j < Direction.values().length; ++j) {
-            var direction = Direction.values()[j];
-            if (state.get(FACING_PROPERTIES.get(direction))) {
-                i |= 1 << j;
-            }
-        }
-
-        return i;
-    }
-
-    public static boolean hasDirection(int i, Direction direction) {
-        if (direction == null) {
-            return false;
-        }
-
-        return (i & (1 << direction.ordinal())) != 0;
-    }
-
     @Override
     public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         if (world.getBlockEntity(pos) instanceof ColorProvider be) {
@@ -252,6 +222,10 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
 
     public boolean hasCable(BlockState state) {
         return true;
+    }
+
+    private static boolean checkModelDirection(BlockState state, Direction direction) {
+        return state.get(FACING_PROPERTIES.get(direction));
     }
 
     public static class BaseCableModel extends BlockModel {
@@ -292,13 +266,10 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
         }
 
         protected void updateModel() {
-            //if (color == AbstractCableBlock.DEFAULT_COLOR) {
-           //     this.cable.setItem(CableModel.MODELS_BY_ID[getModelId(state)]);
-            //} else {
-            var stack = CableModel.COLORED_MODELS_BY_ID[getModelId(state)].copy();
+            var stack = FactoryModels.COLORED_CABLE.get(this.state, AbstractCableBlock::checkModelDirection).copy();
             stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(this.color, false));
             this.cable.setItem(stack);
-            //}
+
             if (this.cable.getHolder() == this && this.color >= 0) {
                 this.cable.tick();
             }

@@ -29,14 +29,7 @@ public class FluidUiTextureCreator {
     }
 
     public void registerTextures(Identifier id, FluidType object) {
-        if (object.textureOverride().isPresent()) {
-            this.textures.add(Pair.of(id, object.textureOverride().get()));
-        } else if (id.getNamespace().equals(Identifier.DEFAULT_NAMESPACE)) {
-            this.textures.add(Pair.of(id, (id("block/fluid/" + id.getPath()))));
-        } else {
-            this.textures.add(Pair.of(id, (id.withPrefixedPath("block/fluid/"))));
-        }
-
+        this.textures.add(Pair.of(id, object.texture()));
     }
     public void setup() {
         for (var fluid : FactoryRegistries.FLUID_TYPES.getIds()) {

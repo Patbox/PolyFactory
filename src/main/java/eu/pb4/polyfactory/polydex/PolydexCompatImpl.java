@@ -24,6 +24,7 @@ import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
+import eu.pb4.polyfactory.util.DebugTextProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.sgui.api.elements.GuiElement;
@@ -47,6 +48,9 @@ public class PolydexCompatImpl {
 
         return HoverDisplayBuilder.ComponentType.of(id("machine_state"), true);
     });
+
+    private static final HoverDisplayBuilder.ComponentType DEBUG_DATA = HoverDisplayBuilder.ComponentType.of(id("debug_data"), HoverDisplayBuilder.ComponentType.Visibility.NEVER);
+
     public static void register() {
         PolydexPage.registerRecipeViewer(GenericPressRecipe.class, PressRecipePage::new);
         PolydexPage.registerRecipeViewer(GenericMixingRecipe.class, MixerRecipePage::new);
@@ -117,6 +121,13 @@ public class PolydexCompatImpl {
             var text = provider.getCurrentState();
             if (text != null) {
                 hoverDisplayBuilder.setComponent(MACHINE_STATE, text);
+            }
+        }
+
+        if (entity instanceof DebugTextProvider provider) {
+            var text = provider.getDebugText();
+            if (text != null) {
+                hoverDisplayBuilder.setComponent(DEBUG_DATA, text);
             }
         }
 

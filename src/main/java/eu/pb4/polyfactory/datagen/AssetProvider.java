@@ -1,8 +1,8 @@
 package eu.pb4.polyfactory.datagen;
 
 import com.google.common.hash.HashCode;
-import eu.pb4.polyfactory.models.CableModel;
-import eu.pb4.polyfactory.models.ConveyorModel;
+import eu.pb4.polyfactory.models.ConveyorModels;
+import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.data.DataOutput;
@@ -36,9 +36,10 @@ class AssetProvider implements DataProvider {
     }
 
     public static void runWriters(BiConsumer<String,byte[]> assetWriter) {
-        ConveyorModel.generateModels(assetWriter);
-        CableModel.generateModels(assetWriter);
+        ConveyorModels.generateModels(assetWriter);
         UiResourceCreator.generateAssets(assetWriter);
+        FactoryModels.COLORED_CABLE.generateModels(assetWriter);
+        FactoryModels.PIPE.generateModels(assetWriter);
     }
 
     @Override

@@ -88,7 +88,6 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
         public static final ItemStack ITEM_MODEL_1 = new ItemStack(BaseItemProvider.requestModel());
         public static final ItemStack ITEM_MODEL_2 = new ItemStack(BaseItemProvider.requestModel());
 
-        private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement mainElement;
         private Model(ServerWorld world, BlockState state, BlockPos pos) {
             this.mainElement = LodItemDisplayElement.createSimple(
@@ -100,7 +99,7 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
         }
 
         private void updateAnimation(float rotation, Direction.Axis axis) {
-            mat.identity();
+            var mat = mat();
             switch (axis) {
                 case X -> mat.rotate(Direction.EAST.getRotationQuaternion());
                 case Z -> mat.rotate(Direction.SOUTH.getRotationQuaternion());
@@ -122,7 +121,6 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
 
         @Override
         protected void onTick() {
-            
             var tick = this.getAttachment().getWorld().getTime();
 
             if (tick % this.getUpdateRate() == 0) {
