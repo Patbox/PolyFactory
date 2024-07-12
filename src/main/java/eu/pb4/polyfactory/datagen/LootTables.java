@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.datagen;
 
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.CableBlock;
+import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
@@ -92,14 +93,13 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addAxle(FactoryBlocks.AXLE_WITH_LARGE_GEAR, FactoryItems.LARGE_STEEL_GEAR);
         this.addAxle(FactoryBlocks.AXLE_WITH_GEAR, FactoryItems.STEEL_GEAR);
 
-        this.addColored(FactoryBlocks.CABLE, (x) -> x.pool(LootPool.builder()
-                .with(ItemEntry.builder(FactoryItems.FRAME))
-                .conditionally(BlockStatePropertyLootCondition.builder(FactoryBlocks.CABLE)
-                        .properties(StatePredicate.Builder.create().exactMatch(CableBlock.FRAMED, true)))));
+        this.addColored(FactoryBlocks.CABLE);
         this.addColored(FactoryBlocks.LAMP);
         this.addColored(FactoryBlocks.INVERTED_LAMP);
         this.addColored(FactoryBlocks.CAGED_LAMP);
         this.addColored(FactoryBlocks.INVERTED_CAGED_LAMP);
+
+        FactoryBlocks.WALL_WITH_CABLE.values().forEach(this::addWallWithCable);
     }
 
     private void addAxle(Block block, Item item) {
@@ -129,6 +129,20 @@ class LootTables extends FabricBlockLootTableProvider {
                         .conditionally(SurvivesExplosionLootCondition.builder())
                         .rolls(ConstantLootNumberProvider.create(1.0F))
                         .with(ItemEntry.builder(block)))
+        );
+    }
+
+    private void addWallWithCable(WallWithCableBlock block) {
+        this.addDrop(block, LootTable.builder()
+                .pool(LootPool.builder()
+                        .with(ItemEntry.builder(FactoryItems.CABLE)
+                                .apply(() -> CopyColorLootFunction.INSTANCE)
+                        )
+                )
+                .pool(LootPool.builder()
+                        .conditionally(SurvivesExplosionLootCondition.builder())
+                        .rolls(ConstantLootNumberProvider.create(1.0F))
+                        .with(ItemEntry.builder(block.getBacking())))
         );
     }
 

@@ -1,12 +1,11 @@
 package eu.pb4.polyfactory.block.data;
 
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.block.CabledBlockItem;
-import eu.pb4.polyfactory.item.block.FrameItem;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.polyfactory.util.ColorProvider;
@@ -16,23 +15,31 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.WallBlock;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-public final class CableBlock extends AbstractCableBlock implements BlockStateNameProvider {
-    public static final BooleanProperty FRAMED = FrameItem.PROPERTY;
+import java.util.Objects;
+
+public final class CableBlock extends AbstractCableBlock implements FactoryBlock, BlockStateNameProvider {
 
     public CableBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(FRAMED, false));
     }
 
     @Override
@@ -40,11 +47,33 @@ public final class CableBlock extends AbstractCableBlock implements BlockStateNa
         return (context.getStack().getItem() instanceof CabledBlockItem) || super.canReplace(state, context);
     }
 
+    @Override
+    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof WallBlock wallBlock) {
+            var convert = WallWithCableBlock.MAP.get(wallBlock);
+            if (convert != null) {
+                stack.decrementUnlessCreative(1, player);
+                var convertState = Objects.requireNonNull(convert.getPlacementState(new ItemPlacementContext(world, player, hand, stack, hit)))
+                        .with(NORTH, state.get(NORTH))
+                        .with(SOUTH, state.get(SOUTH))
+                        .with(WEST, state.get(WEST))
+                        .with(EAST, state.get(EAST));
+
+                world.setBlockState(pos, convertState);
+                return ItemActionResult.SUCCESS;
+            }
+        }
+
+        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+    }
+
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         var state = ctx.getWorld().getBlockState(ctx.getBlockPos());
         if (state.getBlock() instanceof GenericCabledDataBlock && !state.get(GenericCabledDataBlock.HAS_CABLE)) {
+            return state.with(GenericCabledDataBlock.HAS_CABLE, true);
+        } else if (state.getBlock() instanceof GenericCabledDataBlock && !state.get(GenericCabledDataBlock.HAS_CABLE)) {
             return state.with(GenericCabledDataBlock.HAS_CABLE, true);
         }
 
@@ -54,7 +83,6 @@ public final class CableBlock extends AbstractCableBlock implements BlockStateNa
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(FRAMED);
     }
 
     @Override
@@ -89,31 +117,6 @@ public final class CableBlock extends AbstractCableBlock implements BlockStateNa
 
     @Override
     public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(initialBlockState);
-    }
-
-
-    public static final class Model extends BaseCableModel {
-        private final ItemDisplayElement frame;
-
-        private Model(BlockState state) {
-            super(state, true);
-            this.frame = ItemDisplayElementUtil.createSimple(FactoryItems.FRAME);
-            this.frame.setScale(new Vector3f(2));
-            this.frame.setViewRange(0.8f);
-            if (state.get(FRAMED)) {
-                this.addElement(this.frame);
-            }
-        }
-
-        @Override
-        protected void setState(BlockState blockState) {
-            super.setState(blockState);
-            if (blockState.get(FRAMED)) {
-                this.addElement(this.frame);
-            } else {
-                this.removeElement(this.frame);
-            }
-        }
+        return new BaseCableModel(initialBlockState);
     }
 }

@@ -47,8 +47,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.List;
+import java.util.function.BiPredicate;
 
-public abstract class AbstractCableBlock extends NetworkBlock implements FactoryBlock, BlockEntityProvider, CableConnectable, NetworkComponent.Data, NetworkComponent.Energy {
+public abstract class AbstractCableBlock extends NetworkBlock implements BlockEntityProvider, CableConnectable, NetworkComponent.Data, NetworkComponent.Energy {
     public static final int DEFAULT_COLOR = 0xbbbbbb;
     public static final BooleanProperty HAS_CABLE = BooleanProperty.of("has_cable");
 
@@ -233,12 +234,12 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
         private int color = AbstractCableBlock.DEFAULT_COLOR;
         private BlockState state;
 
-        public BaseCableModel(BlockState state, boolean addCable) {
+        public BaseCableModel(BlockState state) {
             this.cable = ItemDisplayElementUtil.createSimple();
             this.cable.setViewRange(0.5f);
             this.state = state;
             updateModel();
-            if (addCable) {
+            if (((AbstractCableBlock) state.getBlock()).hasCable(state)) {
                 this.addElement(this.cable);
             }
         }
@@ -266,7 +267,7 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
         }
 
         protected void updateModel() {
-            var stack = FactoryModels.COLORED_CABLE.get(this.state, AbstractCableBlock::checkModelDirection).copy();
+            var stack = getModel(this.state, AbstractCableBlock::checkModelDirection);
             stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(this.color, false));
             this.cable.setItem(stack);
 
@@ -278,6 +279,10 @@ public abstract class AbstractCableBlock extends NetworkBlock implements Factory
         public void setColor(int color) {
             this.color = color;
             updateModel();
+        }
+
+        public ItemStack getModel(BlockState state, BiPredicate<BlockState, Direction> directionPredicate) {
+            return FactoryModels.COLORED_CABLE.get(state, directionPredicate).copy();
         }
     }
 }

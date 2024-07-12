@@ -39,6 +39,7 @@ class AssetProvider implements DataProvider {
         ConveyorModels.generateModels(assetWriter);
         UiResourceCreator.generateAssets(assetWriter);
         FactoryModels.COLORED_CABLE.generateModels(assetWriter);
+        FactoryModels.COLORED_WALL_CABLE.generateModels(assetWriter);
         FactoryModels.PIPE.generateModels(assetWriter);
     }
 

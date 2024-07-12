@@ -93,7 +93,7 @@ public class FactoryItems {
             new WirelessRedstoneTransmitterItem(new Item.Settings().maxCount(1)
                     .component(FactoryDataComponents.REMOTE_KEYS, new Pair<>(ItemStack.EMPTY, ItemStack.EMPTY))));
 
-    public static final ColoredDownsampledBlockItem CABLE = registerColored(FactoryBlocks.CABLE, AbstractCableBlock.DEFAULT_COLOR);
+    public static final CableItem CABLE = register("cable", new CableItem(FactoryBlocks.CABLE, AbstractCableBlock.DEFAULT_COLOR, new Item.Settings()));
     public static final ColoredDownsampledBlockItem LAMP = registerColored(FactoryBlocks.LAMP, -1);
     public static final ColoredDownsampledBlockItem INVERTED_LAMP = registerColored(FactoryBlocks.INVERTED_LAMP, -1);
     public static final ColoredDownsampledBlockItem CAGED_LAMP = registerColored(FactoryBlocks.CAGED_LAMP, -1);
@@ -107,7 +107,6 @@ public class FactoryItems {
     public static final Item DYNAMITE = register("dynamite", new DynamiteItem(new Item.Settings().maxCount(16)));
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
     public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING);
-    public static final Item FRAME = register("frame", new FrameItem(new Item.Settings()));
     public static final Item EXPERIENCE_BUCKET = register("experience_bucket", new XpBucketItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
     public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", new ModeledItem(new Item.Settings()));
@@ -286,7 +285,6 @@ public class FactoryItems {
                     .icon(WITHER_SKULL_GENERATOR::getDefaultStack)
                     .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
                     .entries(((context, entries) -> {
-                        entries.add(FRAME, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(WITHER_SKULL_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
@@ -322,7 +320,7 @@ public class FactoryItems {
         if (block instanceof MultiBlock multiBlock) {
             item = new MultiBlockItem(multiBlock, new Item.Settings());
         } else if (block instanceof AbstractCableBlock cableBlock) {
-            item = new CabledBlockItem(cableBlock, new Item.Settings());
+            item = new CabledBlockItem((AbstractCableBlock & PolymerBlock) cableBlock, new Item.Settings());
         } else {
             item = new FactoryBlockItem(block, new Item.Settings());
         }

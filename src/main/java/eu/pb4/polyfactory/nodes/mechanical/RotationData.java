@@ -22,8 +22,6 @@ import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2FloatOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.fabric.api.util.TriState;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -71,7 +69,7 @@ public class RotationData implements GraphEntity<RotationData> {
         this.rotationValue = rotationValue;
     }
 
-    private static void collectGraphs(Collection<NodeHolder<AxleWithGearMechanicalNode>> connectors, ObjectOpenHashSet<BlockPos> checkedNodes,
+    private static void collectGraphs(Collection<NodeHolder<GearMechanicalNode>> connectors, ObjectOpenHashSet<BlockPos> checkedNodes,
                                       Long2BooleanOpenHashMap dirMap, Long2FloatOpenHashMap speedMap, MutableBoolean clogged, ArrayList<RotationData> data,
                                       boolean currentDirection, float speed) {
         for (var connection : connectors) {
@@ -137,7 +135,7 @@ public class RotationData implements GraphEntity<RotationData> {
                 data.add(targetGraph.getGraphEntity(TYPE));
             }
 
-            var subConnectors = targetGraph.getCachedNodes(AxleWithGearMechanicalNode.CACHE);
+            var subConnectors = targetGraph.getCachedNodes(GearMechanicalNode.CACHE);
             if (!subConnectors.isEmpty()) {
                 collectGraphs(subConnectors, checkedSelf, dirMap, speedMap, clogged, data, nextDirection, nextGearSpeed);
             }

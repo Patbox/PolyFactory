@@ -40,6 +40,10 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FactoryBlockEntities {
     public static final BlockEntityType<ConveyorBlockEntity> CONVEYOR = register("conveyor",
@@ -106,7 +110,11 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<WirelessRedstoneBlockEntity> WIRELESS_REDSTONE = register("wireless_redstone",
             BlockEntityType.Builder.create(WirelessRedstoneBlockEntity::new, FactoryBlocks.WIRELESS_REDSTONE_RECEIVER));
-    public static final BlockEntityType<CableBlockEntity> CABLE = register("cable", BlockEntityType.Builder.create(CableBlockEntity::new, FactoryBlocks.CABLE));
+    public static final BlockEntityType<CableBlockEntity> CABLE = register("cable", BlockEntityType.Builder.create(CableBlockEntity::new,
+            Util.make(new ArrayList<Block>(), (a) -> {
+                a.add(FactoryBlocks.CABLE);
+                a.addAll(FactoryBlocks.WALL_WITH_CABLE.values());
+            }).toArray(Block[]::new)));
     public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader",
             BlockEntityType.Builder.create(ItemReaderBlockEntity::new, FactoryBlocks.ITEM_READER));
     public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer", BlockEntityType.Builder

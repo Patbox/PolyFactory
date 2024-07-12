@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlock;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
+import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.data.io.ArithmeticOperatorBlock;
 import eu.pb4.polyfactory.block.data.CableBlock;
 import eu.pb4.polyfactory.block.data.io.DataMemoryBlock;
@@ -41,10 +42,10 @@ import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class FactoryBlocks {
     private static final List<Block> BLOCKS = new ArrayList<>();
-
     public static final ConveyorBlock CONVEYOR = register("conveyor", new ConveyorBlock(Block.Settings.create().hardness(3).nonOpaque()));
     public static final ConveyorBlock STICKY_CONVEYOR = register("sticky_conveyor", new ConveyorBlock(Block.Settings.create().hardness(3).nonOpaque()));
     public static final FunnelBlock FUNNEL = register("funnel", new FunnelBlock(Block.Settings.copy(Blocks.SPRUCE_TRAPDOOR).nonOpaque()));
@@ -68,7 +69,8 @@ public class FactoryBlocks {
     public static final ClutchBlock CLUTCH = register("clutch", new ClutchBlock(Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD).strength(2.5F).nonOpaque()));
     public static final WindmillBlock WINDMILL = register("windmill", new WindmillBlock(Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD).strength(2.5F).nonOpaque()));
     public static final ContainerBlock CONTAINER = register("wooden_container", new ContainerBlock(9 * 5, Block.Settings.copy(Blocks.CHEST).nonOpaque()));
-    public static final AbstractCableBlock CABLE = register("cable", new CableBlock(Block.Settings.copy(Blocks.GLASS).breakInstantly().nonOpaque()));
+    public static final CableBlock CABLE = register("cable", new CableBlock(Block.Settings.copy(Blocks.GLASS).breakInstantly().nonOpaque()));
+    public static final Map<Block, WallWithCableBlock> WALL_WITH_CABLE = WallWithCableBlock.MAP;
     public static final CabledDataProviderBlock ITEM_COUNTER = register("item_counter", new CabledDataProviderBlock(AbstractBlock.Settings.copy(SPLITTER)));
 
     public static final RedstoneInputBlock REDSTONE_INPUT = register("redstone_input", new RedstoneInputBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
@@ -113,6 +115,13 @@ public class FactoryBlocks {
     public static final PumpBlock PUMP = register("pump", new PumpBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
 
     public static void register() {
+        for (var block : Registries.BLOCK) {
+            if (block instanceof WallBlock wallBlock) {
+                var id = Registries.BLOCK.getId(wallBlock);
+                register("wall_with_cable/" + id.getNamespace() + "/" + id.getPath(), new WallWithCableBlock(wallBlock));
+            }
+        }
+
         if (ModInit.DEV_MODE) {
             ServerLifecycleEvents.SERVER_STARTED.register((FactoryBlocks::validateLootTables));
             ServerLifecycleEvents.END_DATA_PACK_RELOAD.register(((server, resourceManager, success) -> {

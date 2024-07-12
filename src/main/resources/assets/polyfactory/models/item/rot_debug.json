@@ -1,0 +1,7 @@
+{
+	"parent": "polyfactory:block/hologram_projector",
+	"textures": {
+		"0": "polyfactory:block/steel_plate_rot_input",
+		"1": "polyfactory:block/steel_plate_rot_input"
+	}
+}

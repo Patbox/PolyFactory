@@ -6,13 +6,13 @@ import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
-import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.RotationAwareModel;
-import eu.pb4.polyfactory.nodes.generic.*;
+import eu.pb4.polyfactory.nodes.mechanical.UnconnectedGearMechanicalNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
 import eu.pb4.polyfactory.nodes.pipe.PumpNode;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -46,9 +46,8 @@ import org.joml.Vector3f;
 import java.util.*;
 
 import static eu.pb4.polyfactory.ModInit.id;
-import static eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock.Model.ITEM_MODEL_1;
 
-public class PumpBlock extends NetworkBlock implements FactoryBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe, NetworkComponent.Rotational, NetworkComponent.RotationalConnector {
+public class PumpBlock extends NetworkBlock implements FactoryBlock, WrenchableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe, NetworkComponent.Rotational, NetworkComponent.RotationalConnector {
     public static final DirectionProperty FACING = Properties.FACING;
 
     public PumpBlock(Settings settings) {
@@ -125,7 +124,7 @@ public class PumpBlock extends NetworkBlock implements FactoryBlock, PipeConnect
 
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new UnconnectedNode());
+        return List.of(new UnconnectedGearMechanicalNode());
     }
 
     @Override
@@ -136,6 +135,11 @@ public class PumpBlock extends NetworkBlock implements FactoryBlock, PipeConnect
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
         return Blocks.COPPER_BLOCK.getDefaultState();
+    }
+
+    @Override
+    public List<WrenchAction> getWrenchActions() {
+        return List.of(WrenchAction.FACING);
     }
 
     public static final class Model extends RotationAwareModel {

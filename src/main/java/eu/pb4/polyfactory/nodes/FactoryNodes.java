@@ -48,8 +48,9 @@ public class FactoryNodes {
 
         universe.addNodeType(ConveyorNode.TYPE);
         universe.addNodeType(AxleWithGearMechanicalNode.TYPE);
+        universe.addNodeType(UnconnectedGearMechanicalNode.TYPE);
         universe.addGraphEntityType(RotationData.TYPE);
-        universe.addCacheCategory(AxleWithGearMechanicalNode.CACHE);
+        universe.addCacheCategory(GearMechanicalNode.CACHE);
 
         universe.register();
         return universe;

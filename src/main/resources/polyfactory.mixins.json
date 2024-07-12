@@ -27,9 +27,11 @@
     "recipe.ShapedRecipeMixin",
     "util.BlockEntityMixin",
     "util.BlockEntityTypeAccessor",
+    "util.BlockItemAccessor",
     "util.BucketItemAccessor",
     "util.DyeColorMixin",
     "util.DyeItemMixin",
+    "util.WallBlockAccessor",
     "wrench.AbstractRedstoneGateBlockMixin",
     "wrench.FacingBlockMixin",
     "wrench.HopperBlockMixin"

@@ -29,7 +29,9 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -125,9 +127,14 @@ public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnect
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        /*NetworkComponent.Pipe.getLogic((ServerWorld) world, pos).runFlows(pos, () -> true, ((direction, strength) -> {
+        /*player.sendMessage(Text.literal("# Push: ").formatted(Formatting.YELLOW));
+        NetworkComponent.Pipe.getLogic((ServerWorld) world, pos).runPushFlows(pos, () -> true, (direction, strength) -> {
             player.sendMessage(Text.literal(direction.asString() + "=" + strength));
-        }));*/
+        });
+        player.sendMessage(Text.literal("# Pull: ").formatted(Formatting.YELLOW));
+        NetworkComponent.Pipe.getLogic((ServerWorld) world, pos).runPullFlows(pos, () -> true, (direction, strength) -> {
+            player.sendMessage(Text.literal(direction.asString() + "=" + strength));
+        });*/
 
         return super.onUse(state, world, pos, player, hit);
     }

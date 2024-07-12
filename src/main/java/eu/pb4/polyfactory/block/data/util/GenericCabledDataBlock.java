@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.data.util;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlocks;
@@ -44,7 +45,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public abstract class GenericCabledDataBlock extends AbstractCableBlock implements WrenchableBlock, BlockEntityProvider, CableConnectable {
+public abstract class GenericCabledDataBlock extends AbstractCableBlock implements FactoryBlock, WrenchableBlock, BlockEntityProvider, CableConnectable {
     public static final DirectionProperty FACING = Properties.FACING;
 
     public final WrenchAction facingAction = WrenchAction.of("facing", WrenchValueGetter.ofProperty(Properties.FACING, FactoryUtil::asText),
@@ -195,7 +196,7 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
         protected final ItemDisplayElement base;
 
         protected Model(BlockState state) {
-            super(state, state.get(HAS_CABLE));
+            super(state);
             this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 

@@ -1,3 +1,6 @@
+- Added Pipes
+- Added Pumps
+- You can now put Cables within wall blocks
 - Mechanical Mixers can now store fluids and use them as part of recipes.
 - New Grinder recipe:
  - Nether Wart Block -> 1-5 Nether Wards

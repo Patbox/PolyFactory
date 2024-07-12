@@ -5,6 +5,7 @@ import com.kneelawk.graphlib.api.graph.GraphEntityContext;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.*;
 import com.kneelawk.graphlib.api.util.LinkPos;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
@@ -25,26 +26,37 @@ public class FlowData implements GraphEntity<FlowData> {
     public static final GraphEntityType<FlowData> TYPE = GraphEntityType.of(id("flow_data"), CODEC, FlowData::new, FlowData::split);
     public static FlowData EMPTY = new FlowData() {
         @Override
-        public void runFlows(BlockPos pos, BooleanSupplier canContinue, FlowConsumer consumer) {}
+        public void runPushFlows(BlockPos pos, BooleanSupplier canContinue, FlowConsumer consumer) {}
 
         @Override
         public void setSourceStrength(BlockPos pos, double strength) {}
     };
     private GraphEntityContext ctx;
 
-    private final Map<BlockPos, List<DirectionalFlow>> currentFlow = new HashMap<>();
+    private final Map<BlockPos, CurrentFlow> currentFlow = new HashMap<>();
     private final Object2DoubleMap<BlockPos> sourceStrength = new Object2DoubleOpenHashMap<>();
     private boolean isInvalid = true;
 
     public FlowData() {
     }
 
-    public void runFlows(BlockPos pos, BooleanSupplier canContinue, FlowConsumer consumer) {
+    public void runPushFlows(BlockPos pos, BooleanSupplier canContinue, FlowConsumer consumer) {
+        runFlows(pos, true, canContinue, consumer);
+    }
+
+    public void runPullFlows(BlockPos pos, BooleanSupplier canContinue, FlowConsumer consumer) {
+        runFlows(pos, false, canContinue, consumer);
+    }
+    public void runFlows(BlockPos pos, boolean push, BooleanSupplier canContinue, FlowConsumer consumer) {
         if (this.isInvalid) {
             this.rebuild();
         }
-        var flows = this.currentFlow.get(pos);
-        if (flows == null || flows.isEmpty()) {
+        var current = this.currentFlow.get(pos);
+        if (current == null) {
+            return;
+        }
+        var flows = push ? current.push : current.pull;
+        if (flows.isEmpty()) {
             return;
         }
 
@@ -79,7 +91,7 @@ public class FlowData implements GraphEntity<FlowData> {
             return;
         }
         this.isInvalid = false;
-        var map = this.currentFlow; //new HashMap<BlockPos, List<DirectionalFlow>>();
+        var map = new HashMap<BlockPos, Pair<int[], int[]>>();
 
         for (var pump : this.ctx.getGraph().getCachedNodes(PumpNode.CACHE)) {
             var reverse = pump.getNode().reverse();
@@ -101,11 +113,11 @@ public class FlowData implements GraphEntity<FlowData> {
                     if (node.isEmpty() || node.get().getNode() instanceof PumpNode) {
                         break;
                     }
-                    List<DirectionalFlow> flow;
+                    Pair<int[], int[]> flow;
                     if (map.containsKey(mut)) {
                         flow = map.get(mut);
                     } else {
-                        flow = new ArrayList<>();
+                        flow = new Pair<>(new int[Direction.values().length], new int[Direction.values().length]);
                         map.put(mut.toImmutable(), flow);
                     }
 
@@ -131,14 +143,18 @@ public class FlowData implements GraphEntity<FlowData> {
                     if (dirs.isEmpty()) {
                         break;
                     }
-                    if (reverse) {
-                        flow.add(new DirectionalFlow(pump.getBlockPos(), direction.getOpposite(), distance));
-                    } else {
-                        for (var d : dirs) {
-                            flow.add(new DirectionalFlow(pump.getBlockPos(), d, distance));
-                        }
+
+                    var remove = (reverse ? flow.getFirst() : flow.getSecond())[direction.getOpposite().ordinal()] == 0;
+
+                    (reverse ? flow.getFirst() : flow.getSecond())[direction.getOpposite().ordinal()] += distance;
+                    var multi = reverse ? flow.getSecond() : flow.getFirst();
+                    for (var d : dirs) {
+                        multi[d.ordinal()] += distance;
                     }
-                    distance--;
+
+                    if (remove) {
+                        distance--;
+                    }
                     if (dirs.size() == 1) {
                         direction = dirs.get(0);
                     } else {
@@ -150,6 +166,22 @@ public class FlowData implements GraphEntity<FlowData> {
                     }
                 }
             } while (!states.isEmpty());
+            map.forEach((pos, flow) -> {
+                var curr = this.currentFlow.computeIfAbsent(pos, CurrentFlow::new);
+                var push = flow.getFirst();
+                var pull = flow.getSecond();
+                for (var dir : Direction.values()) {
+                    if (push[dir.ordinal()] > 0) {
+                        curr.push.add(new DirectionalFlow(pump.getBlockPos(), dir, push[dir.ordinal()]));
+                    }
+
+                    if (pull[dir.ordinal()] > 0) {
+                        curr.pull.add(new DirectionalFlow(pump.getBlockPos(), dir, pull[dir.ordinal()]));
+                    }
+                    push[dir.ordinal()] = 0;
+                    pull[dir.ordinal()] = 0;
+                }
+            });
         }
 
     }
@@ -202,9 +234,13 @@ public class FlowData implements GraphEntity<FlowData> {
 
     private record LastState(Direction direction, BlockPos start, int distance) {};
 
-    /*private static class CurrentFlow {
-        List<DirectionalFlow> directional;
-    }*/
+    private static class CurrentFlow {
+        List<DirectionalFlow> push = new ArrayList<>();
+        List<DirectionalFlow> pull = new ArrayList<>();
+
+        public CurrentFlow(BlockPos pos) {
+        }
+    }
 
     private record DirectionalFlow(BlockPos source, Direction direction, int strength) {
     }

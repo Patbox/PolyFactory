@@ -4,7 +4,8 @@ import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
@@ -114,6 +115,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.AXLE_WITH_LARGE_GEAR)
                 .add(FactoryBlocks.PIPE)
                 .add(FactoryBlocks.PUMP)
+                .add(FactoryBlocks.WALL_WITH_CABLE.values().toArray(new Block[0]))
         ;
 
         this.getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)
@@ -126,6 +128,9 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.CONTAINER)
                 .add(FactoryBlocks.FUNNEL)
         ;
+
+        this.getOrCreateTagBuilder(BlockTags.WALLS)
+                .add(FactoryBlocks.WALL_WITH_CABLE.values().toArray(new Block[0]));
 
         var conc = this.getOrCreateTagBuilder(FactoryBlockTags.CONCRETE);
 

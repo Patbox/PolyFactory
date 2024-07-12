@@ -102,12 +102,12 @@ public class ItemReaderBlock extends CabledDataProviderBlock {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
-    public static class Model extends BaseCableModel {
+    public class Model extends BaseCableModel {
         private final ItemDisplayElement base;
         private final ItemDisplayElement book;
 
         private Model(BlockState state) {
-            super(state, state.get(HAS_CABLE));
+            super(state);
             this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 

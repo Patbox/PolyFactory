@@ -198,6 +198,27 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_plate", InventoryChangedCriterion.Conditions.items(FactoryItems.WOODEN_PLATE))
                 .offerTo(exporter);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.PIPE, 2)
+                .pattern("ppp")
+                .pattern("i i")
+                .pattern("ppp")
+                .input('p', FactoryItems.COPPER_PLATE)
+                .input('i', Items.COPPER_INGOT)
+                .criterion("get_copper", InventoryChangedCriterion.Conditions.items(Items.COPPER_INGOT))
+                .offerTo(exporter);
+
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.PUMP, 1)
+                .pattern(" w ")
+                .pattern("pgp")
+                .pattern(" w ")
+                .input('p', FactoryItems.PIPE)
+                .input('w', FactoryItems.WOODEN_PLATE)
+                .input('g', FactoryItems.STEEL_GEAR)
+                .criterion("get_copper", InventoryChangedCriterion.Conditions.items(FactoryItems.PIPE))
+                .offerTo(exporter);
+
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.FUNNEL, 1)
                 .pattern("wp ")
                 .pattern(" o ")
