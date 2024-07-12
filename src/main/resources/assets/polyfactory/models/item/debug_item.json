@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "polyfactory:item/debug_item",
+    "layer1": "polyfactory:item/debug_item_overlay"
+  }
+}

@@ -125,20 +125,6 @@ public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnect
         return state;
     }
 
-    @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        /*player.sendMessage(Text.literal("# Push: ").formatted(Formatting.YELLOW));
-        NetworkComponent.Pipe.getLogic((ServerWorld) world, pos).runPushFlows(pos, () -> true, (direction, strength) -> {
-            player.sendMessage(Text.literal(direction.asString() + "=" + strength));
-        });
-        player.sendMessage(Text.literal("# Pull: ").formatted(Formatting.YELLOW));
-        NetworkComponent.Pipe.getLogic((ServerWorld) world, pos).runPullFlows(pos, () -> true, (direction, strength) -> {
-            player.sendMessage(Text.literal(direction.asString() + "=" + strength));
-        });*/
-
-        return super.onUse(state, world, pos, player, hit);
-    }
-
     protected boolean canConnectTo(WorldAccess world, BlockPos neighborPos, BlockState neighborState, Direction direction) {
         return neighborState.getBlock() instanceof PipeConnectable connectable && connectable.canPipeConnect(world, neighborPos, neighborState, direction);
     }

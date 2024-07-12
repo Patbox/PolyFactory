@@ -115,6 +115,7 @@ public class FactoryBlocks {
     public static final PumpBlock PUMP = register("pump", new PumpBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
 
     public static void register() {
+        var s = System.currentTimeMillis();
         for (var block : Registries.BLOCK) {
             if (block instanceof WallBlock wallBlock) {
                 var id = Registries.BLOCK.getId(wallBlock);

@@ -87,16 +87,16 @@ public class FlowData implements GraphEntity<FlowData> {
     }
 
     private void rebuild() {
-        if (!this.isInvalid) {
+        if (!this.isInvalid || this.ctx == null) {
             return;
         }
         this.isInvalid = false;
-        var map = new HashMap<BlockPos, Pair<int[], int[]>>();
+        var map = new HashMap<BlockPos, Pair<double[], double[]>>();
 
         for (var pump : this.ctx.getGraph().getCachedNodes(PumpNode.CACHE)) {
             var reverse = pump.getNode().reverse();
             Direction direction;
-            int distance;
+            double distance;
             var mut = new BlockPos.Mutable();
             var states = new ObjectArrayList<LastState>();
             states.add(new LastState(pump.getNode().direction(), pump.getBlockPos(), 32));
@@ -106,18 +106,18 @@ public class FlowData implements GraphEntity<FlowData> {
                 distance = state.distance;
                 mut.set(state.start);
 
-                while (distance > 0) {
+                while (distance > 0.25) {
                     mut.move(direction);
 
                     var node = this.ctx.getGraph().getNodesAt(mut).findAny();
                     if (node.isEmpty() || node.get().getNode() instanceof PumpNode) {
                         break;
                     }
-                    Pair<int[], int[]> flow;
+                    Pair<double[], double[]> flow;
                     if (map.containsKey(mut)) {
                         flow = map.get(mut);
                     } else {
-                        flow = new Pair<>(new int[Direction.values().length], new int[Direction.values().length]);
+                        flow = new Pair<>(new double[Direction.values().length], new double[Direction.values().length]);
                         map.put(mut.toImmutable(), flow);
                     }
 
@@ -232,7 +232,7 @@ public class FlowData implements GraphEntity<FlowData> {
         return new FlowData();
     }
 
-    private record LastState(Direction direction, BlockPos start, int distance) {};
+    private record LastState(Direction direction, BlockPos start, double distance) {};
 
     private static class CurrentFlow {
         List<DirectionalFlow> push = new ArrayList<>();
@@ -242,7 +242,7 @@ public class FlowData implements GraphEntity<FlowData> {
         }
     }
 
-    private record DirectionalFlow(BlockPos source, Direction direction, int strength) {
+    private record DirectionalFlow(BlockPos source, Direction direction, double strength) {
     }
 
     public interface FlowConsumer {

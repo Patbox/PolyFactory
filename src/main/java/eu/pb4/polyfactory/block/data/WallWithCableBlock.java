@@ -36,25 +36,24 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 
-public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlock, BlockWithElementHolder, Waterloggable, BlockStateNameProvider {
+public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlock, BlockWithElementHolder, BlockStateNameProvider {
     public static final Map<Block, WallWithCableBlock> MAP = new IdentityHashMap<>();
 
-    public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
     public static final BooleanProperty UP_WALL = BooleanProperty.of("up_wall");
-    public static final EnumProperty<WallShape> EAST_WALL_SHAPE = EnumProperty.of("east_wall", WallShape .class);
-    public static final EnumProperty<WallShape> NORTH_WALL_SHAPE = EnumProperty.of("north_wall", WallShape.class);
-    public static final EnumProperty<WallShape> SOUTH_WALL_SHAPE = EnumProperty.of("south_wall", WallShape.class);
-    public static final EnumProperty<WallShape> WEST_WALL_SHAPE = EnumProperty.of("west_wall", WallShape.class);
+    public static final BooleanProperty EAST_WALL_SHAPE = BooleanProperty.of("east_wall");
+    public static final BooleanProperty NORTH_WALL_SHAPE = BooleanProperty.of("north_wall");
+    public static final BooleanProperty SOUTH_WALL_SHAPE = BooleanProperty.of("south_wall");
+    public static final BooleanProperty WEST_WALL_SHAPE = BooleanProperty.of("west_wall");
 
     @SuppressWarnings("rawtypes")
     private static final List<Pair> SELF_TO_BACKING = List.of(
-            new Pair<>(WATERLOGGED, WATERLOGGED),
-            new Pair<>(EAST_WALL_SHAPE, WallBlock.EAST_SHAPE),
-            new Pair<>(WEST_WALL_SHAPE, WallBlock.WEST_SHAPE),
-            new Pair<>(SOUTH_WALL_SHAPE, WallBlock.SOUTH_SHAPE),
-            new Pair<>(NORTH_WALL_SHAPE, WallBlock.NORTH_SHAPE),
-            new Pair<>(UP_WALL, WallBlock.UP)
+            new Pair<>(EAST_WALL_SHAPE, WallBlock.EAST_SHAPE, x -> x ? WallShape.TALL : WallShape.NONE, x -> x != WallShape.NONE),
+            new Pair<>(WEST_WALL_SHAPE, WallBlock.WEST_SHAPE, x -> x ? WallShape.TALL : WallShape.NONE, x -> x != WallShape.NONE),
+            new Pair<>(SOUTH_WALL_SHAPE, WallBlock.SOUTH_SHAPE, x -> x ? WallShape.TALL : WallShape.NONE, x -> x != WallShape.NONE),
+            new Pair<>(NORTH_WALL_SHAPE, WallBlock.NORTH_SHAPE, x -> x ? WallShape.TALL : WallShape.NONE, x -> x != WallShape.NONE),
+            new Pair<>(UP_WALL, WallBlock.UP, Function.identity(), Function.identity())
     );
     private final WallBlock backing;
 
@@ -67,8 +66,8 @@ public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlo
 
         var state = block.getDefaultState();
         for (var prop : SELF_TO_BACKING) {
-            //noinspection unchecked
-            state = state.with(prop.self, source.get(prop.backing));
+            //noinspection unchecked,rawtypes
+            state = state.with(prop.self, (Comparable) prop.backingToSelf.apply(source.get(prop.backing)));
         }
         return state;
     }
@@ -76,7 +75,7 @@ public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlo
     public WallWithCableBlock(WallBlock wallBlock) {
         super(AbstractBlock.Settings.copy(wallBlock));
         this.backing = wallBlock;
-        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
+        this.setDefaultState(this.getDefaultState());
         MAP.put(wallBlock, this);
     }
 
@@ -92,8 +91,8 @@ public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlo
         var state = this.getDefaultState();
         for (var prop : SELF_TO_BACKING) {
             assert x != null;
-            //noinspection unchecked
-            state = state.with(prop.self, x.get(prop.backing));
+            //noinspection unchecked,rawtypes
+            state = state.with(prop.self, (Comparable) prop.backingToSelf.apply(x.get(prop.backing)));
         }
 
         return state;
@@ -104,8 +103,8 @@ public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlo
         var x = ((WallBlockAccessor) this.backing).callGetStateForNeighborUpdate(this.getPolymerBlockState(state), direction, neighborState, world, pos, neighborPos);
         for (var prop : SELF_TO_BACKING) {
             assert x != null;
-            //noinspection unchecked
-            state = state.with(prop.self, x.get(prop.backing));
+            //noinspection unchecked,rawtypes
+            state = state.with(prop.self, (Comparable) prop.backingToSelf.apply(x.get(prop.backing)));
         }
 
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
@@ -114,16 +113,11 @@ public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlo
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(EAST_WALL_SHAPE, NORTH_WALL_SHAPE, SOUTH_WALL_SHAPE, WEST_WALL_SHAPE, UP_WALL, WATERLOGGED);
-    }
-
-
-    protected FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+        builder.add(EAST_WALL_SHAPE, NORTH_WALL_SHAPE, SOUTH_WALL_SHAPE, WEST_WALL_SHAPE, UP_WALL);
     }
 
     protected boolean isTransparent(BlockState state, BlockView world, BlockPos pos) {
-        return !state.get(WATERLOGGED);
+        return true;
     }
 
     protected boolean canPathfindThrough(BlockState state, NavigationType type) {
@@ -134,8 +128,8 @@ public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlo
     public BlockState getPolymerBlockState(BlockState state) {
         var backing = this.backing.getDefaultState();
         for (var x : SELF_TO_BACKING) {
-            //noinspection unchecked
-            backing = backing.with(x.backing, state.get(x.self));
+            //noinspection unchecked,rawtypes
+            backing = backing.with(x.backing, (Comparable) x.selfToBacking.apply(state.get(x.self)));
         }
         return backing;
     }
@@ -186,5 +180,5 @@ public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlo
         }
     }
 
-    private record Pair<T extends Comparable<T>>(Property<T> self, Property<T> backing) { }
+    private record Pair<A extends Comparable<A>, B extends Comparable<B>>(Property<A> self, Property<B> backing, Function<A, B> selfToBacking, Function<B, A> backingToSelf) { }
 }

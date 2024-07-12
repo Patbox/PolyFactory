@@ -6,7 +6,9 @@ import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.factorytools.api.item.MultiBlockItem;
 import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
+import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.block.*;
+import eu.pb4.polyfactory.item.debug.BaseDebugItem;
 import eu.pb4.polyfactory.item.tool.*;
 import eu.pb4.polyfactory.item.util.*;
 import eu.pb4.polyfactory.util.DyeColorExtra;
@@ -23,8 +25,10 @@ import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 
@@ -115,6 +119,21 @@ public class FactoryItems {
     public static final Item PIPE = register(FactoryBlocks.PIPE);
     public static final Item PUMP = register(FactoryBlocks.PUMP);
 
+
+    public static final Item DEBUG_PIPE_FLOW = register("debug/pipe_flow", BaseDebugItem.onBlockInteract("Pipe Flow", 0xff8800, (ctx) -> {
+        var player = ctx.getPlayer();
+        var world = ctx.getWorld();
+        var pos = ctx.getBlockPos();
+        assert player != null;
+        player.sendMessage(Text.literal("# Push: ").formatted(Formatting.YELLOW));
+        NetworkComponent.Pipe.getLogic((ServerWorld) world, pos).runPushFlows(pos, () -> true, (direction, strength) -> {
+            player.sendMessage(Text.literal(direction.asString() + "=" + strength));
+        });
+        player.sendMessage(Text.literal("# Pull: ").formatted(Formatting.YELLOW));
+        NetworkComponent.Pipe.getLogic((ServerWorld) world, pos).runPullFlows(pos, () -> true, (direction, strength) -> {
+            player.sendMessage(Text.literal(direction.asString() + "=" + strength));
+        });
+    }));
 
     public static void register() {
         FuelRegistry.INSTANCE.add(SAW_DUST, 60);
@@ -281,19 +300,15 @@ public class FactoryItems {
 
         if (ModInit.DEV_MODE) {
             PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(ModInit.ID, "experimental"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
-
                     .icon(WITHER_SKULL_GENERATOR::getDefaultStack)
                     .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
                     .entries(((context, entries) -> {
+                        entries.add(DEBUG_PIPE_FLOW, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(WITHER_SKULL_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(EXPERIENCE_BUCKET, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-
-                        // Remove this
-                        if (ModInit.DEV_ENV) {
-                            entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        }
+                        entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     })).build()
             );
         }
