@@ -105,7 +105,6 @@ public class FactoryItems {
     public static final Item STEEL_BUTTON = register(FactoryBlocks.STEEL_BUTTON);
     public static final Item ELECTRIC_MOTOR = register(FactoryBlocks.ELECTRIC_MOTOR);
     public static final Item ELECTRIC_GENERATOR = register(FactoryBlocks.ELECTRIC_GENERATOR);
-    public static final Item WITHER_SKULL_GENERATOR = register(FactoryBlocks.WITHER_SKULL_GENERATOR);
     public static final Item WORKBENCH = register(FactoryBlocks.WORKBENCH);
     public static final Item ARTIFICIAL_DYE = register("artificial_dye", new ArtificialDyeItem(new Item.Settings()));
     public static final Item DYNAMITE = register("dynamite", new DynamiteItem(new Item.Settings().maxCount(16)));
@@ -118,6 +117,7 @@ public class FactoryItems {
     public static final Item SPRAY_CAN = register("spray_can", new DyeSprayItem(new Item.Settings().maxCount(1)));
     public static final Item PIPE = register(FactoryBlocks.PIPE);
     public static final Item PUMP = register(FactoryBlocks.PUMP);
+    public static final Item DRAIN = register(FactoryBlocks.DRAIN);
 
 
     public static final Item DEBUG_PIPE_FLOW = register("debug/pipe_flow", BaseDebugItem.onBlockInteract("Pipe Flow", 0xff8800, (ctx) -> {
@@ -186,6 +186,7 @@ public class FactoryItems {
                     // Fluids
                     entries.add(PIPE);
                     entries.add(PUMP);
+                    entries.add(DRAIN);
 
                     // Data
                     entries.add(CABLE);
@@ -300,15 +301,14 @@ public class FactoryItems {
 
         if (ModInit.DEV_MODE) {
             PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(ModInit.ID, "experimental"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
-                    .icon(WITHER_SKULL_GENERATOR::getDefaultStack)
+                    .icon(DEBUG_PIPE_FLOW::getDefaultStack)
                     .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
                     .entries(((context, entries) -> {
                         entries.add(DEBUG_PIPE_FLOW, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(WITHER_SKULL_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(EXPERIENCE_BUCKET, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     })).build()
             );
         }

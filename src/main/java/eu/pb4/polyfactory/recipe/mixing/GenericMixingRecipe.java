@@ -100,7 +100,7 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
         }
 
         for (var fluid : this.fluids) {
-            if (inventory.fluids().getLong(fluid.type()) < fluid.required()) {
+            if (inventory.fluids().getLong(fluid.instance()) < fluid.required()) {
                 return false;
             }
         }
@@ -141,7 +141,7 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
 
         var container = inventory.getFluidContainer();
         for (var fluid : this.fluids) {
-            container.extract(fluid.type(), fluid.used(), false);
+            container.extract(fluid.instance(), fluid.used(), false);
         }
 
         for (var ig : list) {

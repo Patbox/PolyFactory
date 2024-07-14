@@ -40,7 +40,7 @@ public class FluidUiPositionCreator {
     private char character = 256;
 
     public FluidUiPositionCreator(String name, int width, int height, int offsetY) {
-        this.id = id("fluids/" + name);
+        this.id = id("fluid/" + name);
         this.name = name;
         this.width = width;
         this.height = height;
@@ -71,7 +71,7 @@ public class FluidUiPositionCreator {
         return c;
     }
 
-    public void setup(Map<FluidType, char[]> textures) {
+    public void setup(Map<FluidType<?>, char[]> textures) {
         for (var fluid : FactoryRegistries.FLUID_TYPES.getIds()) {
             textures.put(FactoryRegistries.FLUID_TYPES.get(fluid), this.registerTextures(fluid));
         }
@@ -120,7 +120,7 @@ public class FluidUiPositionCreator {
 
         fontBase.add("providers", providers);
 
-        assetWriter.accept("assets/polyfactory/font/fluids/" + this.name + ".json", fontBase.toString().getBytes(StandardCharsets.UTF_8));
+        assetWriter.accept("assets/polyfactory/font/fluid/" + this.name + ".json", fontBase.toString().getBytes(StandardCharsets.UTF_8));
     }
     public int height() {
         return this.height;

@@ -110,12 +110,25 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.CABLE)
                 .add(FactoryBlocks.CRAFTER)
                 .add(FactoryBlocks.CLUTCH)
-                .add(FactoryBlocks.WITHER_SKULL_GENERATOR)
                 .add(FactoryBlocks.AXLE_WITH_GEAR)
                 .add(FactoryBlocks.AXLE_WITH_LARGE_GEAR)
                 .add(FactoryBlocks.PIPE)
                 .add(FactoryBlocks.PUMP)
                 .add(FactoryBlocks.WALL_WITH_CABLE.values().toArray(new Block[0]))
+        ;
+
+        this.getOrCreateTagBuilder(FactoryBlockTags.UNCONNECTABLE)
+                .add(FactoryBlocks.PUMP)
+                .add(FactoryBlocks.PIPE)
+                .add(FactoryBlocks.AXLE)
+                .add(FactoryBlocks.AXLE_WITH_GEAR)
+                .add(FactoryBlocks.AXLE_WITH_LARGE_GEAR)
+                .add(FactoryBlocks.NIXIE_TUBE)
+                .add(FactoryBlocks.HOLOGRAM_PROJECTOR)
+                .add(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER)
+                .add(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER)
+                .add(FactoryBlocks.CAGED_LAMP)
+                .add(FactoryBlocks.INVERTED_CAGED_LAMP)
         ;
 
         this.getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)

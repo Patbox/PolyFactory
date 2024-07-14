@@ -28,7 +28,7 @@ public class FluidUiTextureCreator {
         this.textureHeight = 16;
     }
 
-    public void registerTextures(Identifier id, FluidType object) {
+    public void registerTextures(Identifier id, FluidType<?> object) {
         this.textures.add(Pair.of(id, object.texture()));
     }
     public void setup() {

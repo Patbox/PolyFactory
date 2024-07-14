@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.fluids.FluidInputOutput;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
@@ -55,7 +56,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MixerBlockEntity extends TallItemMachineBlockEntity {
+public class MixerBlockEntity extends TallItemMachineBlockEntity implements FluidInputOutput.ContainerBased {
 
     public static final int OUTPUT_FIRST = 6;
     public static final int INPUT_FIRST = 0;
@@ -100,7 +101,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.writeInventoryNbt(nbt, lookup);
         nbt.putDouble("Progress", this.process);
-        nbt.put("fluid", this.fluidContainer.toNbt());
+        nbt.put("fluid", this.fluidContainer.toNbt(lookup));
         super.writeNbt(nbt, lookup);
     }
 
@@ -108,7 +109,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.readInventoryNbt(nbt, lookup);
         this.process = nbt.getDouble("Progress");
-        this.fluidContainer.fromNbt(nbt.getCompound("fluid"));
+        this.fluidContainer.fromNbt(lookup, nbt, "fluid");
         super.readNbt(nbt, lookup);
     }
 
@@ -369,9 +370,13 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity {
         return this.fluidContainer;
     }
 
+    @Override
+    public FluidContainer getFluidContainer(Direction direction) {
+        return this.fluidContainer;
+    }
+
     private class Gui extends SimpleGui {
         private static final Text CURRENT_HEAT = Text.translatable("text.polyfactory.current_heat").styled(x -> x.withItalic(false));
-
         private int lastFluidUpdate = -1;
 
         public Gui(ServerPlayerEntity player) {

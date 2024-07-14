@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polymer.common.api.PolymerCommonUtils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
@@ -21,7 +22,7 @@ public class ResourceUtils {
         try {
             return ImageIO.read(getJarStream("assets/" + identifier.getNamespace() + "/textures/" + identifier.getPath() + ".png"));
         } catch (Throwable e) {
-            e.printStackTrace();
+            ModInit.LOGGER.error("Failed to load texture '" + identifier + "'", e);
             return new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
         }
     }

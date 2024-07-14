@@ -1,18 +1,25 @@
 package eu.pb4.polyfactory.block.fluids;
 
 import eu.pb4.polyfactory.fluid.FluidContainer;
+import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidType;
 import net.minecraft.util.math.Direction;
 
 public interface FluidOutput {
-    long extractFluid(FluidType type, long amount, Direction direction);
+    long extractFluid(FluidInstance<?> type, long amount, Direction direction);
+    FluidInstance<?> getTopFluid(Direction direction);
 
     interface ContainerBased extends FluidOutput {
         @Override
-        default long extractFluid(FluidType type, long amount, Direction direction) {
-            return getFluidContainer().extract(type, amount, false);
+        default long extractFluid(FluidInstance<?> type, long amount, Direction direction) {
+            return getFluidContainer(direction).extract(type, amount, false);
         }
 
-        FluidContainer getFluidContainer();
+        @Override
+        default FluidInstance<?> getTopFluid(Direction direction) {
+            return getFluidContainer(direction).topFluid();
+        };
+
+        FluidContainer getFluidContainer(Direction direction);
     }
 }

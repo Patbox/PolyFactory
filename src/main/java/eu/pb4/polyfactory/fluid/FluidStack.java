@@ -5,13 +5,26 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import net.minecraft.text.MutableText;
 
-public record FluidStack(FluidType type, long amount) {
-    public static final Codec<FluidStack> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            FluidType.CODEC.fieldOf("type").forGetter(FluidStack::type),
+public record FluidStack<T>(FluidInstance<T> instance, long amount) {
+    public static final Codec<FluidStack<?>> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            FluidInstance.CODEC.forGetter(FluidStack::instance),
             Codec.LONG.fieldOf("amount").forGetter(FluidStack::amount)
     ).apply(instance, FluidStack::new));
 
+
+    public FluidStack(FluidType<T> type, T data, long amount) {
+        this(type.toInstance(data), amount);
+    }
+
+    public FluidType<T> type() {
+        return this.instance.type();
+    }
+
+    public T data() {
+        return this.instance.data();
+    }
+
     public MutableText toTextRequired() {
-        return this.type.toLabeledAmount(amount);
+        return this.instance.toLabeledAmount(amount);
     }
 }

@@ -754,12 +754,12 @@ class RecipesProvider extends FabricRecipeProvider {
                         List.of(CountedIngredient.fromTag(4, ItemTags.SMELTS_TO_GLASS),
                                 CountedIngredient.ofItems(4, Items.GRAVEL),
                                 CountedIngredient.ofItems(1, dye)),
-                        List.of(new FluidInputStack(FactoryFluids.WATER, FluidConstants.BOTTLE, FluidConstants.BOTTLE / 10)),
+                        List.of(new FluidInputStack(FactoryFluids.WATER.defaultInstance(), FluidConstants.BOTTLE, FluidConstants.BOTTLE / 10)),
                         5, 1, 15, 0f, new ItemStack(solid, 8)));
 
                 of(exporter, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder_new", "concrete_water",
                         List.of(CountedIngredient.ofItems(1, powder)),
-                        List.of(new FluidInputStack(FactoryFluids.WATER, FluidConstants.BOTTLE, FluidConstants.BOTTLE / 10)),
+                        List.of(new FluidInputStack(FactoryFluids.WATER.defaultInstance(), FluidConstants.BOTTLE, FluidConstants.BOTTLE / 10)),
                         1, 1, 4, 0f, new ItemStack(solid, 1)));
             }
         }

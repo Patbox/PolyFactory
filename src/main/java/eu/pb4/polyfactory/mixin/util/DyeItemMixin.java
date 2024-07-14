@@ -14,7 +14,7 @@ public class DyeItemMixin {
     @ModifyReturnValue(method = "method_49799", at = @At("RETURN"))
     private SignText clearColor(SignText text) {
         for (int i = 0; i < 4; i++) {
-            text = text.withMessage(i, text.getMessage(i, false).copy().styled(x -> x.withColor((TextColor) null)));
+            text = text.withMessage(i, text.getMessage(i, false).copy().setStyle(text.getMessage(i, false).getStyle().withColor((TextColor) null)));
         }
         return text;
     }

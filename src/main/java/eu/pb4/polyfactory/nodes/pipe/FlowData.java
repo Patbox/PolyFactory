@@ -52,7 +52,7 @@ public class FlowData implements GraphEntity<FlowData> {
             this.rebuild();
         }
         var current = this.currentFlow.get(pos);
-        if (current == null) {
+        if (current == null || !canContinue.getAsBoolean()) {
             return;
         }
         var flows = push ? current.push : current.pull;

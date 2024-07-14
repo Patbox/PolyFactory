@@ -32,7 +32,7 @@ public class MixerRecipePage extends PrioritizedRecipePage<GenericMixingRecipe> 
                 .append(Text.literal("" + GuiTextures.POLYDEX_OFFSET_N + GuiTextures.MIXER_POLYDEX_FLUID_OFFSET).setStyle(UiResourceCreator.STYLE))
                 .append(FluidTextures.MIXER_POLYDEX.render((a) -> {
                     for (var x : this.recipe.fluids()) {
-                        a.accept(x.type(), (float) (x.required() / (double) MixerBlockEntity.FLUID_CAPACITY));
+                        a.accept(x.instance(), (float) (x.required() / (double) MixerBlockEntity.FLUID_CAPACITY));
                     }
                 }))
                 .append(Text.literal("" + GuiTextures.MIXER_POLYDEX_FLUID_OFFSET_N + GuiTextures.POLYDEX_OFFSET).setStyle(UiResourceCreator.STYLE));

@@ -88,12 +88,14 @@ public abstract class Schema1460Mixin extends Schema {
         });
 
         schema.registerSimple(map, mod("cable"));
-        schema.registerSimple(map, mod("wither_skull_generator"));
         schema.registerSimple(map, mod("electric_motor"));
         schema.registerSimple(map, mod("creative_motor"));
         schema.registerSimple(map, mod("fan"));
         schema.registerSimple(map, mod("nixie_tube"));
         schema.registerSimple(map, mod("hand_crank"));
+        schema.registerSimple(map, mod("pump"));
+        schema.registerSimple(map, mod("pipe"));
+        schema.registerSimple(map, mod("drain"));
     }
 
     @Inject(method = "registerTypes", at = @At("HEAD"))

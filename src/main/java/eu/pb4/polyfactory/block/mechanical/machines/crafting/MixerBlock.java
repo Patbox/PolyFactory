@@ -2,8 +2,10 @@ package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.fluids.PipeConnectable;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
+import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
@@ -33,11 +35,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import org.joml.Vector3f;
 
-public class MixerBlock extends TallItemMachineBlock {
+public class MixerBlock extends TallItemMachineBlock implements PipeConnectable {
     public MixerBlock(Settings settings) {
         super(settings);
         Model.MODEL_PISTON.isEmpty();
@@ -129,6 +132,10 @@ public class MixerBlock extends TallItemMachineBlock {
         }*/
     }
 
+    @Override
+    public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
+        return state.get(PART) == Part.MAIN;
+    }
 
 
     public static final class Model extends RotationAwareModel {
@@ -146,7 +153,7 @@ public class MixerBlock extends TallItemMachineBlock {
         private final ItemDisplayElement gearB;
         private float rotation;
         private boolean active;
-        private FluidType currentFluid = null;
+        private FluidInstance<?> currentFluid = null;
         private float positionFluid = -1;
 
         private Model(BlockState state) {
@@ -230,7 +237,7 @@ public class MixerBlock extends TallItemMachineBlock {
             }
         }
 
-        public void setFluid(@Nullable FluidType type, float position) {
+        public void setFluid(@Nullable FluidInstance<?> type, float position) {
             if (type == null || position < 0.01) {
                 this.fluid.setItem(ItemStack.EMPTY);
                 this.currentFluid = null;

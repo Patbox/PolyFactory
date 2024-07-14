@@ -2,8 +2,10 @@ package eu.pb4.polyfactory.models;
 
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.polyfactory.FactoryRegistries;
+import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
+import it.unimi.dsi.fastutil.objects.Object2IntFunction;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
@@ -37,7 +39,7 @@ public class FluidModel {
     };
     private final Identifier baseModel;
     private final List<Pair<Identifier, Identifier>> textures = new ArrayList<>();
-    private final Map<FluidType, ItemStack> model = new IdentityHashMap<>();
+    private final Map<FluidType<?>, ItemStack> model = new IdentityHashMap<>();
 
 
     private int coloredIndex = 0;
@@ -56,20 +58,21 @@ public class FluidModel {
         PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register((b) -> generateAssets(b::addData));
     }
 
-    public ItemStack get(@Nullable FluidType type) {
+    public ItemStack get(@Nullable FluidInstance<?> type) {
         if (type == null) {
             return ItemStack.EMPTY;
         }
-        var stack = this.model.getOrDefault(type, ItemStack.EMPTY);
-        if (type.color().isEmpty()) {
+        var stack = this.model.getOrDefault(type.type(), ItemStack.EMPTY);
+        if (type.type().color().isEmpty()) {
             return stack;
         }
         stack = stack.copy();
-        stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(type.color().getAsInt(), false));
+        //noinspection unchecked
+        stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(((FluidType.ColorProvider<Object>) type.type().color().get()).getColor(type.data()), false));
         return stack;
     }
 
-    private void addTextures(Identifier id, FluidType object) {
+    private void addTextures(Identifier id, FluidType<?> object) {
         this.textures.add(new Pair<>(id, object.texture()));
         this.model.put(object, BaseItemProvider.requestModel(
                 object.color().isEmpty() ? BaseItemProvider.requestModel() : COLOR_ITEMS[(coloredIndex++) % COLOR_ITEMS.length],

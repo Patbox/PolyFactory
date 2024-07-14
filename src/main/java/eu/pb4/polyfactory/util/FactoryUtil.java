@@ -1,7 +1,5 @@
 package eu.pb4.polyfactory.util;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.ModInit;
@@ -31,8 +29,6 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -46,12 +42,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 @SuppressWarnings("UnstableApiUsage")
 public class FactoryUtil {
-
     public static final List<Direction> REORDERED_DIRECTIONS = List.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
     public static final GameProfile GENERIC_PROFILE = new GameProfile(Util.NIL_UUID, "[PolyFactory]");
     public static final Vec3d HALF_BELOW = new Vec3d(0, -0.5, 0);
@@ -307,6 +301,14 @@ public class FactoryUtil {
 
     public static void addSafeVelocity(Entity entity, Vec3d vec) {
         setSafeVelocity(entity, entity.getVelocity().add(vec));
+    }
+
+    public static BlockPos findFurthestFluidBlockForRemoval(World world, BlockState target, BlockPos start) {
+        return start;
+    }
+
+    public static BlockPos findFurthestFluidBlockForPlacement(BlockState target, BlockPos start) {
+        return start;
     }
 
     public enum MovableResult {

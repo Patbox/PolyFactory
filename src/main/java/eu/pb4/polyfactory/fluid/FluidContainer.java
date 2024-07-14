@@ -1,24 +1,15 @@
 package eu.pb4.polyfactory.fluid;
 
-import eu.pb4.polyfactory.FactoryRegistries;
-import eu.pb4.polyfactory.mixin.util.BucketItemAccessor;
+import com.mojang.serialization.RecordBuilder;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
-import it.unimi.dsi.fastutil.objects.Reference2LongMap;
-import it.unimi.dsi.fastutil.objects.Reference2LongMaps;
-import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BucketItem;
+import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.PotionItem;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.*;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -26,32 +17,28 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 public class FluidContainer {
-    private final Reference2LongMap<FluidType> storedFluids = new Reference2LongOpenHashMap<>();
-    private final List<FluidType> fluids = new ReferenceArrayList<>();
+    private final Object2LongMap<FluidInstance<?>> storedFluids = new Object2LongOpenHashMap<>();
+    private final List<FluidInstance<?>> fluids = new ArrayList<>();
     private final long capacity;
     private final Runnable markDirty;
     private int updateId = 0;
-    private final BiPredicate<FluidContainer, FluidType> canInsert;
+    private final BiPredicate<FluidContainer, FluidInstance<?>> canInsert;
     private long stored = 0;
 
     public FluidContainer(long maxStorage, Runnable markDirty) {
         this(maxStorage, markDirty, (a, x) -> true);
     }
-    public FluidContainer(long maxStorage, Runnable markDirty, BiPredicate<FluidContainer, FluidType> canInsert) {
+    public FluidContainer(long maxStorage, Runnable markDirty, BiPredicate<FluidContainer, FluidInstance<?>> canInsert) {
         this.capacity = maxStorage;
         this.canInsert = canInsert;
         this.markDirty = markDirty;
@@ -66,9 +53,9 @@ public class FluidContainer {
     }
 
     public void tick(ServerWorld world, BlockPos pos, float temperature, Consumer<ItemStack> stack) {
-        if (contains(FactoryFluids.WATER) && contains(FactoryFluids.LAVA)) {
-            this.extract(FactoryFluids.WATER, 5000, false);
-            this.extract(FactoryFluids.LAVA, 2000, false);
+        if (contains(FactoryFluids.WATER.defaultInstance()) && contains(FactoryFluids.LAVA.defaultInstance())) {
+            this.extract(FactoryFluids.WATER.defaultInstance(), 5000, false);
+            this.extract(FactoryFluids.LAVA.defaultInstance(), 2000, false);
 
             if (world.getRandom().nextFloat() > 0.5) {
                 stack.accept(new ItemStack(Items.FLINT));
@@ -81,7 +68,7 @@ public class FluidContainer {
                 world.playSound(null, pos, SoundEvents.BLOCK_LAVA_EXTINGUISH, SoundCategory.BLOCKS);
             }
         } else if (temperature > 0.5) {
-            this.extract(FactoryFluids.WATER, (long) (temperature * 10), false);
+            this.extract(FactoryFluids.WATER.defaultInstance(), (long) (temperature * 10), false);
             if (world.getRandom().nextFloat() > 0.5 && world.getTime() % 5 == 0) {
                 world.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.1, 0.1, 0.1, 0.1);
             }
@@ -91,13 +78,13 @@ public class FluidContainer {
 
     @Nullable
     public ItemStack interactWith(ServerPlayerEntity player, ItemStack stack) {
-        var inserts = FluidItemBehaviours.FLUID_INSERT.get(stack.getItem());
+        var inserts = FluidBehaviours.FLUID_INSERT.get(stack.getItem());
         if (inserts != null) {
             for (var x : inserts) {
                 if (x.predicate().test(stack)) {
-                    if (this.canInsert(x.fluids(), true)) {
+                    if (this.canInsert(x.fluid(), true)) {
                         stack.decrementUnlessCreative(1, player);
-                        this.insert(x.fluids(), true);
+                        this.insert(x.fluid(), true);
                         player.playSoundToPlayer(x.sound(), SoundCategory.BLOCKS, 1, 1);
                         return x.result().copy();
                     }
@@ -106,22 +93,22 @@ public class FluidContainer {
             }
         }
 
-        var extractMap = FluidItemBehaviours.FLUID_EXTRACT.get(stack.getItem());
+        var extractMap = FluidBehaviours.FLUID_EXTRACT.get(stack.getItem());
         if (extractMap != null) {
             for (var f : this.storedFluids.keySet()) {
-                var extracts = extractMap.get(f);
-                if (extracts != null) {
+                var extracts = extractMap.get(f.type());
+                if (extracts != null && !extracts.isEmpty()) {
                     for (var x : extracts) {
                         if (x.predicate().test(stack)) {
-                            if (this.canExtract(x.fluids(), true)) {
+                            if (this.canExtract(x.fluid(), true)) {
                                 stack.decrementUnlessCreative(1, player);
-                                this.extract(x.fluids(), true);
+                                this.extract(x.fluid(), true);
                                 player.playSoundToPlayer(x.sound(), SoundCategory.BLOCKS, 1, 1);
                                 return x.result().copy();
                             }
-                            return ItemStack.EMPTY;
                         }
                     }
+                    return ItemStack.EMPTY;
                 }
             }
         }
@@ -131,40 +118,40 @@ public class FluidContainer {
         return null;
     }
 
-    public boolean canInsert(FluidStack stack, boolean strict) {
-        return canInsert(stack.type(), stack.amount(), strict);
+    public boolean canInsert(FluidStack<?> stack, boolean strict) {
+        return canInsert(stack.instance(), stack.amount(), strict);
     }
 
-    public boolean canExtract(FluidStack stack, boolean strict) {
-        return canExtract(stack.type(), stack.amount(), strict);
+    public boolean canExtract(FluidStack<?> stack, boolean strict) {
+        return canExtract(stack.instance(), stack.amount(), strict);
     }
 
-    public long insert(FluidStack stack, boolean strict) {
-        return insert(stack.type(), stack.amount(), strict);
+    public long insert(FluidStack<?> stack, boolean strict) {
+        return insert(stack.instance(), stack.amount(), strict);
     }
 
-    public long extract(FluidStack stack, boolean strict) {
-        return extract(stack.type(), stack.amount(), strict);
+    public long extract(FluidStack<?> stack, boolean strict) {
+        return extract(stack.instance(), stack.amount(), strict);
     }
 
-    public long get(FluidType type) {
+    public long get(FluidInstance<?> type) {
         return this.storedFluids.getOrDefault(type, 0);
     }
 
-    public long set(FluidType type, long amount) {
+    public long set(FluidInstance<?> type, long amount) {
         return amount == 0 ? this.storedFluids.removeLong(amount) : this.storedFluids.put(type, amount);
     }
 
-    public boolean contains(FluidType type) {
+    public boolean contains(FluidInstance<?> type) {
         return this.storedFluids.getOrDefault(type, 0) > 0;
     }
 
-    public boolean canInsert(FluidType type, long amount, boolean exact) {
+    public boolean canInsert(FluidInstance<?> type, long amount, boolean exact) {
         return this.canInsert.test(this, type) && (exact ? this.stored + amount <= this.capacity : this.stored != this.capacity);
     }
 
-    public long insert(FluidType type, long amount, boolean exact) {
-        if (!canInsert(type, amount, exact)) {
+    public long insert(FluidInstance<?> type, long amount, boolean exact) {
+        if (!canInsert(type, amount, exact) || amount == 0) {
             return amount;
         }
 
@@ -175,7 +162,7 @@ public class FluidContainer {
         this.storedFluids.put(type, current + inserted);
         if (current == 0) {
             this.fluids.add(type);
-            this.fluids.sort(FluidType.DENSITY_COMPARATOR_REVERSED);
+            this.fluids.sort(FluidInstance.DENSITY_COMPARATOR_REVERSED);
         }
         this.stored = next;
         this.updateId++;
@@ -183,12 +170,12 @@ public class FluidContainer {
         return amount - inserted;
     }
 
-    public boolean canExtract(FluidType type, long amount, boolean exact) {
+    public boolean canExtract(FluidInstance<?> type, long amount, boolean exact) {
         return exact ? this.get(type) >= amount : this.get(type) != 0;
     }
 
-    public long extract(FluidType type, long amount, boolean exact) {
-        if (!canExtract(type, amount, exact)) {
+    public long extract(FluidInstance<?> type, long amount, boolean exact) {
+        if (!canExtract(type, amount, exact) || amount == 0) {
             return 0;
         }
 
@@ -206,17 +193,17 @@ public class FluidContainer {
         this.markDirty.run();
         return extracted;
     }
-    public void provideRender(BiConsumer<FluidType, Float> consumer) {
+    public void provideRender(BiConsumer<FluidInstance<?>, Float> consumer) {
         forEachByDensity((a, b) -> consumer.accept(a, (float) (((double) b) / capacity)));
     }
 
-    public void forEachByDensity(BiConsumer<FluidType, Long> consumer) {
+    public void forEachByDensity(BiConsumer<FluidInstance<?>, Long> consumer) {
         for (var f : this.fluids) {
             consumer.accept(f, this.storedFluids.getOrDefault(f, 0));
         }
     }
 
-    public void forEach(BiConsumer<FluidType, Long> consumer) {
+    public void forEach(BiConsumer<FluidInstance<?>, Long> consumer) {
         this.storedFluids.forEach(consumer);
     }
 
@@ -228,26 +215,36 @@ public class FluidContainer {
         return this.stored;
     }
 
-    public NbtCompound toNbt() {
-        var nbt = new NbtCompound();
-        storedFluids.forEach((a, b) -> nbt.putLong(Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.getId(a)).toString(), b));
+    public NbtElement toNbt(RegistryWrapper.WrapperLookup lookup) {
+        var nbt = new NbtList();
+        var ops = lookup.getOps(NbtOps.INSTANCE);
+
+        storedFluids.forEach((a, b) -> {
+            var x = FluidInstance.CODEC.encode(a, ops, new RecordBuilder.MapBuilder<>(ops));
+            x.add("amount", NbtLong.of(b));
+            nbt.add(x.build(new NbtCompound()).getOrThrow());
+        });
         return nbt;
     }
 
-    public void fromNbt(NbtCompound nbt) {
+    public void fromNbt(RegistryWrapper.WrapperLookup lookup, NbtCompound base, String fluidKey) {
+        var nbt = base.getList(fluidKey, NbtElement.COMPOUND_TYPE);
+        var ops = lookup.getOps(NbtOps.INSTANCE);
         this.storedFluids.clear();
         this.fluids.clear();
         this.stored = 0;
-        for (var key : nbt.getKeys()) {
-            var value = nbt.getLong(key);
-            var type = FactoryRegistries.FLUID_TYPES.get(Identifier.tryParse(key));
-            if (type != null && value != 0) {
+        for (var t : nbt) {
+            var cp = (NbtCompound) t;
+            var type = FluidInstance.CODEC.decode(ops, ops.getMap(cp).getOrThrow()).getOrThrow();
+
+            var value = cp.getLong("amount");
+            if (value != 0) {
                 this.storedFluids.put(type, value);
                 this.stored += value;
             }
         }
         this.fluids.addAll(this.storedFluids.keySet());
-        this.fluids.sort(FluidType.DENSITY_COMPARATOR_REVERSED);
+        this.fluids.sort(FluidInstance.DENSITY_COMPARATOR_REVERSED);
         this.updateId++;
     }
 
@@ -255,8 +252,8 @@ public class FluidContainer {
         return this.updateId;
     }
 
-    public Reference2LongMap<FluidType> map() {
-        return Reference2LongMaps.unmodifiable(this.storedFluids);
+    public Object2LongMap<FluidInstance<?>> map() {
+        return Object2LongMaps.unmodifiable(this.storedFluids);
     }
 
     public GuiElementInterface guiElement(boolean interactable) {
@@ -297,8 +294,8 @@ public class FluidContainer {
     }
 
     @Nullable
-    public FluidType topFluid() {
-        return this.fluids.isEmpty() ? null : this.fluids.get(0);
+    public FluidInstance<?> topFluid() {
+        return this.fluids.isEmpty() ? null : this.fluids.getLast();
     }
 
     public float getFilledPercentage() {
@@ -307,5 +304,16 @@ public class FluidContainer {
 
     public boolean isNotEmpty() {
         return !this.isEmpty();
+    }
+
+    public boolean isFull() {
+        return this.stored >= this.capacity;
+    }
+    public boolean isNotFull() {
+        return !isFull();
+    }
+
+    public long empty() {
+        return this.capacity - this.stored;
     }
 }

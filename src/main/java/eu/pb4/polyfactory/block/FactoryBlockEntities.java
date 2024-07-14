@@ -11,7 +11,8 @@ import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlockEntity;
 import eu.pb4.polyfactory.block.data.providers.ItemReaderBlockEntity;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlockEntity;
-import eu.pb4.polyfactory.block.electric.WitherSkullGeneratorBlockEntity;
+import eu.pb4.polyfactory.block.fluids.DrainBlock;
+import eu.pb4.polyfactory.block.fluids.DrainBlockEntity;
 import eu.pb4.polyfactory.block.fluids.PipeBlockEntity;
 import eu.pb4.polyfactory.block.fluids.PumpBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.*;
@@ -33,7 +34,6 @@ import eu.pb4.polyfactory.block.other.WirelessRedstoneBlockEntity;
 import eu.pb4.polyfactory.block.other.WorkbenchBlockEntity;
 import eu.pb4.polyfactory.mixin.util.BlockEntityTypeAccessor;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -43,7 +43,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class FactoryBlockEntities {
     public static final BlockEntityType<ConveyorBlockEntity> CONVEYOR = register("conveyor",
@@ -122,14 +121,12 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<WorkbenchBlockEntity> WORKBENCH = register("workbench", BlockEntityType.Builder
             .create(WorkbenchBlockEntity::new, FactoryBlocks.WORKBENCH));
-    public static final BlockEntityType<WitherSkullGeneratorBlockEntity> WITHER_SKULL_GENERATOR = register("wither_skull_generator", BlockEntityType.Builder
-            .create(WitherSkullGeneratorBlockEntity::new, FactoryBlocks.WITHER_SKULL_GENERATOR));
-
     public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container", BlockEntityType.Builder
             .create(ColorableBlockEntity::new, FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP));
 
     public static final BlockEntityType<PipeBlockEntity> PIPE = register("pipe", BlockEntityType.Builder.create(PipeBlockEntity::new, FactoryBlocks.PIPE));
     public static final BlockEntityType<PumpBlockEntity> PUMP = register("pump", BlockEntityType.Builder.create(PumpBlockEntity::new, FactoryBlocks.PUMP));
+    public static final BlockEntityType<DrainBlockEntity> DRAIN = register("drain", BlockEntityType.Builder.create(DrainBlockEntity::new, FactoryBlocks.DRAIN));
 
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;

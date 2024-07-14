@@ -4,8 +4,6 @@
 
 package eu.pb4.polyfactory.entity;
 
-import eu.pb4.polyfactory.block.electric.WitherSkullGeneratorBlock;
-import eu.pb4.polyfactory.block.electric.WitherSkullGeneratorBlockEntity;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -22,7 +20,6 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
