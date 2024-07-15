@@ -1,10 +1,10 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "polyfactory:block/pipe",
-		"1": "polyfactory:block/pipe_front",
-		"2": "polyfactory:block/pump_holder",
-		"particle": "polyfactory:block/pipe"
+		"0": "polyfactory:block/fluids/pipe",
+		"1": "polyfactory:block/fluids/pipe_front",
+		"2": "polyfactory:block/fluids/pump_holder",
+		"particle": "polyfactory:block/fluids/pipe"
 	},
 	"elements": [
 		{

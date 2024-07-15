@@ -218,6 +218,16 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
 
         if (self.process >= self.currentRecipe.value().time()) {
             var output = self.currentRecipe.value().craft(input, world.getRegistryManager());
+
+            var emptyFluids = self.fluidContainer.empty();
+            for (var f : self.currentRecipe.value().fluidOutput()) {
+                emptyFluids -= f.amount();
+            }
+            if (emptyFluids < 0) {
+                self.state = OUTPUT_FULL_TEXT;
+                return;
+            }
+
             {
                 var items = new ArrayList<ItemStack>();
                 items.add(output.copy());
@@ -252,6 +262,9 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
                 FactoryUtil.insertBetween(self, OUTPUT_FIRST, self.size(), x);
             }
 
+            for (var f : self.currentRecipe.value().fluidOutput()) {
+                self.fluidContainer.insert(f, false);
+            }
             self.markDirty();
         } else {
             var d = Math.max(self.currentRecipe.value().optimalSpeed() - self.currentRecipe.value().minimumSpeed(), 1);

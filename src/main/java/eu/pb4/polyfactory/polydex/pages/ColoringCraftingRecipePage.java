@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.polydex.pages;
 
+import eu.pb4.polydex.api.v1.recipe.PolydexEntry;
 import eu.pb4.polydex.impl.book.view.crafting.AbstractCraftingRecipePage;
 import eu.pb4.polyfactory.recipe.ColoringCraftingRecipe;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
@@ -14,7 +15,7 @@ public class ColoringCraftingRecipePage extends AbstractCraftingRecipePage<Color
     }
 
     @Override
-    protected Ingredient getStacksAt(ColoringCraftingRecipe coloringCraftingRecipe, int x, int y) {
+    protected Ingredient getStacksAt(ColoringCraftingRecipe coloringCraftingRecipe, int x, int y, PolydexEntry entry) {
         if (x == 0 && y == 0) {
             return Ingredient.fromTag(ConventionalItemTags.DYES);
         }

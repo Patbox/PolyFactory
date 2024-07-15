@@ -93,10 +93,10 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation 'eu.pb4:polymer-core:0.9.1+1.21'
-	modImplementation 'eu.pb4:polymer-resource-pack:0.9.1+1.21'
-	modImplementation 'eu.pb4:polymer-autohost:0.9.1+1.21'
-	modImplementation 'eu.pb4:polymer-virtual-entity:0.9.1+1.21'
+	modImplementation 'eu.pb4:polymer-core:0.9.5+1.21'
+	modImplementation 'eu.pb4:polymer-resource-pack:0.9.5+1.21'
+	modImplementation 'eu.pb4:polymer-autohost:0.9.5+1.21'
+	modImplementation 'eu.pb4:polymer-virtual-entity:0.9.5+1.21'
 	modImplementation include('eu.pb4:map-canvas-api:0.4.0+1.21')
 	modImplementation include('eu.pb4:common-protection-api:1.0.0')
 	modImplementation include('eu.pb4:sidebar-api:0.5.0+1.21')
@@ -108,7 +108,8 @@ dependencies {
 	//modImplementation include('com.kneelawk:graphlib:1.99.99+1.20.local')
 	//modImplementation include('alexiil.mc.lib:libnetworkstack-base:0.11.0-aaa.patbox')
 
-	modCompileOnly 'maven.modrinth:polydex:1.1.0+1.20.5-rc3'
+	modCompileOnly 'maven.modrinth:polydex:1.2.3+1.21'
+	//modCompileOnly 'eu.pb4:polydex:1.2.3-dev2+1.21'
 	// Uncomment the following line to enable the deprecated Fabric API modules.
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 

@@ -39,8 +39,9 @@ public class GuiTextures {
     public static final char POLYDEX_OFFSET_N = UiResourceCreator.space(-168);
     public static final char MIXER_FLUID_OFFSET = UiResourceCreator.space(28 - 8);
     public static final char MIXER_FLUID_OFFSET_N = UiResourceCreator.space(-28 + 8);
-    public static final char MIXER_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(28 - 8 + 7);
-    public static final char MIXER_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-28 + 8 - 7);
+    public static final char MIXER_POLYDEX_FLUID_OFFSET_1 = UiResourceCreator.space(28 - 8 + 7);
+    public static final char MIXER_POLYDEX_FLUID_OFFSET_2 = UiResourceCreator.space(108);
+    public static final char MIXER_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-28 + 8 - 7 - 108);
 
     public static void register() {
         PolydexTextures.register();

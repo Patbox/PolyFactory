@@ -44,7 +44,7 @@ public class PumpBlockEntity extends PipeLikeBlockEntity implements FluidInput.C
 
         var speed = RotationUser.getRotation(world, pos).speed();
         pump.speed = speed;
-        var strength = speed / 60 / 20;
+        var strength = speed / 30 / 20;
         NetworkComponent.Pipe.forEachLogic((ServerWorld) world, pos, l -> l.setSourceStrength(pos, strength));
 
         if (speed != 0) {

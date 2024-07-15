@@ -3,23 +3,28 @@ package eu.pb4.polyfactory.polydex;
 import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polydex.api.v1.hover.HoverDisplayBuilder;
 import eu.pb4.polydex.api.v1.recipe.*;
+import eu.pb4.polydex.impl.book.view.PotionRecipePage;
+import eu.pb4.polydex.mixin.BrewingRecipeRegistryAccessor;
+import eu.pb4.polyfactory.FactoryRegistries;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
+import eu.pb4.polyfactory.fluid.FactoryFluids;
+import eu.pb4.polyfactory.fluid.FluidBehaviours;
+import eu.pb4.polyfactory.fluid.FluidInstance;
+import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
-import eu.pb4.polyfactory.polydex.pages.ColoringCraftingRecipePage;
-import eu.pb4.polyfactory.polydex.pages.GrindingRecipePage;
-import eu.pb4.polyfactory.polydex.pages.MixerRecipePage;
-import eu.pb4.polyfactory.polydex.pages.PressRecipePage;
+import eu.pb4.polyfactory.polydex.pages.*;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.polyfactory.recipe.ColoringCraftingRecipe;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.recipe.ShapelessNbtCopyRecipe;
+import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
@@ -29,19 +34,24 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.sgui.api.elements.GuiElement;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class PolydexCompatImpl {
+    public static final PolydexCategory FLUIDS_CATEGORY = PolydexCategory.of(id("fluids"));
     private static final HoverDisplayBuilder.ComponentType MACHINE_STATE = Util.make(() -> {
         //noinspection ResultOfMethodCallIgnored
         HoverDisplayBuilder.NAME.index();
@@ -56,7 +66,9 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(GenericMixingRecipe.class, MixerRecipePage::new);
         PolydexPage.registerRecipeViewer(GrindingRecipe.class, GrindingRecipePage::new);
         PolydexPage.registerRecipeViewer(ColoringCraftingRecipe.class, ColoringCraftingRecipePage::new);
+        PolydexPage.register(PolydexCompatImpl::createPages);
 
+        PolydexEntry.registerProvider(PolydexCompatImpl::createFluidEntries);
         PolydexEntry.registerEntryCreator(FactoryItems.SPRAY_CAN, PolydexCompatImpl::seperateColoredItems);
         PolydexEntry.registerEntryCreator(FactoryItems.CABLE, PolydexCompatImpl::seperateColoredItems);
         PolydexEntry.registerEntryCreator(FactoryItems.LAMP, PolydexCompatImpl::seperateColoredItems);
@@ -64,6 +76,38 @@ public class PolydexCompatImpl {
         PolydexEntry.registerEntryCreator(FactoryItems.CAGED_LAMP, PolydexCompatImpl::seperateColoredItems);
         PolydexEntry.registerEntryCreator(FactoryItems.INVERTED_CAGED_LAMP, PolydexCompatImpl::seperateColoredItems);
         HoverDisplayBuilder.register(PolydexCompatImpl::stateAccurateNames);
+    }
+
+    private static void createFluidEntries(MinecraftServer server, PolydexEntry.EntryConsumer consumer) {
+        for (var fluid : FactoryRegistries.FLUID_TYPES) {
+            if (fluid.dataCodec() == Unit.CODEC) {
+                consumer.accept(PolydexEntry.of(FactoryRegistries.FLUID_TYPES.getId(fluid), new PolydexFluidStack(fluid.defaultInstance(), 0, 1)));
+            }
+        }
+
+        for (var potion : Registries.POTION.getIndexedEntries()) {
+            consumer.accept(PolydexEntry.of(id("potion/" + potion.getKey().get().getValue().toUnderscoreSeparatedString()), new PolydexFluidStack(FactoryFluids.POTION.toInstance(PotionContentsComponent.DEFAULT.with(potion)), 0, 1)));
+        }
+    }
+
+    private static void createPages(MinecraftServer server, Consumer<PolydexPage> polydexPageConsumer) {
+        for (var x : FluidBehaviours.FLUID_INSERT.entrySet()) {
+            var from = Registries.ITEM.getId(x.getKey());
+            for (var value : x.getValue()) {
+                var to = FactoryRegistries.FLUID_TYPES.getId(value.fluid().type());
+
+                var fromStack = x.getKey().getDefaultStack();
+                fromStack.applyChanges(value.predicate().toChanges());
+
+                polydexPageConsumer.accept(new FluidsPage(
+                        id("fluids/" + to.getNamespace() + "/" + to.getPath() + "/from/" + from.getNamespace() + "/"
+                                + from.getPath() + (value.fluid().instance().isDefault() ? "" : "/" + value.fluid().instance().data().hashCode())),
+                        PolydexStack.of(fromStack),
+                        PolydexStack.of(value.result()),
+                        new PolydexFluidStack(value.fluid())
+                ));
+            }
+        }
     }
 
     private static PolydexEntry seperateColoredItems(ItemStack stack) {
@@ -150,6 +194,25 @@ public class PolydexCompatImpl {
         var list = new ArrayList<PolydexIngredient<?>>(input.size());
         for (var x : input) {
             list.add(PolydexIngredient.of(x.ingredient(), Math.max(x.count(), 1), 1));
+        }
+        return list;
+    }
+
+    public static List<PolydexIngredient<?>> createIngredients(List<CountedIngredient> input, List<FluidInputStack> fluids) {
+        var list = new ArrayList<PolydexIngredient<?>>(input.size());
+        for (var x : input) {
+            list.add(PolydexIngredient.of(x.ingredient(), Math.max(x.count(), 1), 1));
+        }
+        for (var x : fluids) {
+            list.add(new PolydexFluidStack(x.instance(), x.required(), 1));
+        }
+        return list;
+    }
+
+    public static List<PolydexStack<FluidInstance<?>>> createFluids(List<FluidStack<?>> fluids) {
+        var list = new ArrayList<PolydexStack<FluidInstance<?>>>(fluids.size());
+        for (var x : fluids) {
+            list.add(new PolydexFluidStack(x.instance(), x.amount(), 1));
         }
         return list;
     }

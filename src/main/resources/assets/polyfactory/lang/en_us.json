@@ -16,8 +16,6 @@
   "block.polyfactory.mixer": "Mechanical Mixer",
   "block.polyfactory.crafter": "Mechanical Crafter",
   "block.polyfactory.planter": "Mechanical Planter",
-  "block.polyfactory.pump": "Pump",
-  "block.polyfactory.pipe": "Pipe",
   "block.polyfactory.axle": "Axle",
   "block.polyfactory.axle_with_gear": "Axle with Gear",
   "block.polyfactory.axle_with_large_gear": "Axle with Large Gear",
@@ -60,6 +58,10 @@
   "block.polyfactory.data_memory.tooltip.type": "Type: %s",
   "block.polyfactory.data_memory.tooltip.value": "Value: %s",
   "block.polyfactory.data_memory.tooltip.read_only": "READ ONLY!",
+  "block.polyfactory.pump": "Mechanical Pump",
+  "block.polyfactory.pipe": "Copper Pipe",
+  "block.polyfactory.drain": "Fluid Drain",
+
   "item.polyfactory.mod_icon": "Mod Icon",
   "item.polyfactory.windmill_sail": "Windmill Sail",
   "item.polyfactory.dynamite": "Dynamite",
@@ -207,6 +209,8 @@
   "text.polyfactory.state.output_full": "Output full!",
 
   "text.polyfactory.polydex.required_fluids": "Required fluids:",
+  "text.polyfactory.polydex.created_fluids": "Created fluids:",
+  "polydex_category.polyfactory.fluids": "Item to Fluid",
 
   "advancements.polyfactory.root.title": "PolyFactory",
   "advancements.polyfactory.root.description": "Welcome to the factory!",

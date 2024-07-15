@@ -6,12 +6,14 @@ import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.RotationAwareModel;
+import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.nodes.mechanical.UnconnectedGearMechanicalNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
 import eu.pb4.polyfactory.nodes.pipe.PumpNode;
@@ -47,9 +49,8 @@ import java.util.*;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class PumpBlock extends NetworkBlock implements FactoryBlock, WrenchableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe, NetworkComponent.Rotational, NetworkComponent.RotationalConnector {
+public class PumpBlock extends NetworkBlock implements FactoryBlock, RotationUser, WrenchableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe, NetworkComponent.Rotational, NetworkComponent.RotationalConnector {
     public static final DirectionProperty FACING = Properties.FACING;
-
     public PumpBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
@@ -140,6 +141,11 @@ public class PumpBlock extends NetworkBlock implements FactoryBlock, WrenchableB
     @Override
     public List<WrenchAction> getWrenchActions() {
         return List.of(WrenchAction.FACING);
+    }
+
+    @Override
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+        modifier.stress(5);
     }
 
     public static final class Model extends RotationAwareModel {

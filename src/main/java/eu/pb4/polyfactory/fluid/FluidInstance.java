@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.FactoryRegistries;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Unit;
 
 import java.util.Comparator;
@@ -72,5 +73,13 @@ public record FluidInstance<T>(FluidType<T> type, T data) {
 
     public MutableText toLabeledAmount(long amount) {
         return this.type.toLabeledAmount(amount, this.data);
+    }
+
+    public Text getName() {
+        return this.type.getName(data);
+    }
+
+    public boolean isDefault() {
+        return Objects.equals(this.type.defaultData(), this.data);
     }
 }

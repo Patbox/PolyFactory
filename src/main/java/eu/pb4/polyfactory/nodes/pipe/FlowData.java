@@ -7,6 +7,7 @@ import com.kneelawk.graphlib.api.graph.user.*;
 import com.kneelawk.graphlib.api.util.LinkPos;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
@@ -22,6 +23,7 @@ import java.util.function.BooleanSupplier;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class FlowData implements GraphEntity<FlowData> {
+    public static final int RANGE = 32;
     public static final Codec<FlowData> CODEC = Codec.unit(FlowData::new);
     public static final GraphEntityType<FlowData> TYPE = GraphEntityType.of(id("flow_data"), CODEC, FlowData::new, FlowData::split);
     public static FlowData EMPTY = new FlowData() {
@@ -73,7 +75,8 @@ public class FlowData implements GraphEntity<FlowData> {
             }
             var s = this.sourceStrength.getDouble(flow.source);
             if (s > 0) {
-                consumer.consume(flow.direction, s * flow.strength * s * flow.strength / 32 / total);
+                var x = ((RANGE - flow.strength) / RANGE);
+                consumer.consume(flow.direction,  s * (1 - x * x * x) * (s * flow.strength / total));
             }
         }
     }
@@ -90,6 +93,7 @@ public class FlowData implements GraphEntity<FlowData> {
         if (!this.isInvalid || this.ctx == null) {
             return;
         }
+        var time = System.currentTimeMillis();
         this.isInvalid = false;
         var map = new HashMap<BlockPos, Pair<double[], double[]>>();
 
@@ -99,7 +103,7 @@ public class FlowData implements GraphEntity<FlowData> {
             double distance;
             var mut = new BlockPos.Mutable();
             var states = new ObjectArrayList<LastState>();
-            states.add(new LastState(pump.getNode().direction(), pump.getBlockPos(), 32));
+            states.add(new LastState(pump.getNode().direction(), pump.getBlockPos(), RANGE));
             do {
                 var state = states.pop();
                 direction = state.direction;
@@ -143,10 +147,12 @@ public class FlowData implements GraphEntity<FlowData> {
                     if (dirs.isEmpty()) {
                         break;
                     }
+                    var main = (reverse ? flow.getFirst() : flow.getSecond());
 
-                    var remove = (reverse ? flow.getFirst() : flow.getSecond())[direction.getOpposite().ordinal()] == 0;
+                    var remove = main[direction.getOpposite().ordinal()] <= 0;
 
-                    (reverse ? flow.getFirst() : flow.getSecond())[direction.getOpposite().ordinal()] += distance;
+                    main[direction.getOpposite().ordinal()] += distance;
+                    main[direction.ordinal()] -= distance;
                     var multi = reverse ? flow.getSecond() : flow.getFirst();
                     for (var d : dirs) {
                         multi[d.ordinal()] += distance;
@@ -184,6 +190,9 @@ public class FlowData implements GraphEntity<FlowData> {
             });
         }
 
+        //if (ModInit.DEV_ENV) {
+        //    ModInit.LOGGER.info("Rebuilding pipes took " + (System.currentTimeMillis() - time) + "ms");
+        //}
     }
 
     private void invalidate() {
@@ -214,7 +223,6 @@ public class FlowData implements GraphEntity<FlowData> {
     @Override
     public void onInit(@NotNull GraphEntityContext ctx) {
         this.ctx = ctx;
-        this.rebuild();
     }
 
     @Override

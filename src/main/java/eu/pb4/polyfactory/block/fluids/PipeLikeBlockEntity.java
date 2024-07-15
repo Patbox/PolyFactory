@@ -47,8 +47,8 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
 
     public void preTick() {
         for (int i = 0; i < this.pullOverflow.length; i++) {
-            this.pullOverflow[i] = Math.max(0, this.pullOverflow[i] - 0.05);
-            this.pushOverflow[i] = Math.max(0, this.pushOverflow[i] - 0.05);
+            this.pullOverflow[i] = Math.max(0, this.pullOverflow[i] - 0.02);
+            this.pushOverflow[i] = Math.max(0, this.pushOverflow[i] - 0.02);
         }
     }
 
