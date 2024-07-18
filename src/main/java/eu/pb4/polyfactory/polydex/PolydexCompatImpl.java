@@ -102,7 +102,7 @@ public class PolydexCompatImpl {
                 polydexPageConsumer.accept(new FluidsPage(
                         id("fluids/" + to.getNamespace() + "/" + to.getPath() + "/from/" + from.getNamespace() + "/"
                                 + from.getPath() + (value.fluid().instance().isDefault() ? "" : "/" + value.fluid().instance().data().hashCode())),
-                        PolydexStack.of(fromStack),
+                        new StrictPolydexIngredient<>(PolydexStack.of(fromStack)),
                         PolydexStack.of(value.result()),
                         new PolydexFluidStack(value.fluid())
                 ));

@@ -184,6 +184,9 @@
   "fluid_type.minecraft.lava": "Lava",
   "fluid_type.minecraft.xp": "Experience",
   "fluid_type.minecraft.milk": "Milk",
+  "fluid_type.minecraft.potion": "Potion",
+  "fluid_type.minecraft.potion.long": "Long %s",
+  "fluid_type.minecraft.potion.strong": "Strong %s",
 
   "entity.polyfactory.dynamite": "Dynamite",
 

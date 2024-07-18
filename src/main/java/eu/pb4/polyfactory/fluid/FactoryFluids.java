@@ -28,7 +28,16 @@ public class FactoryFluids {
     public static final FluidType<Unit> XP = register(Identifier.ofVanilla("xp"), FluidType.of(50));
     public static final FluidType<PotionContentsComponent> POTION = register(Identifier.ofVanilla("potion"), FluidType.of(50, PotionContentsComponent.CODEC,
             PotionContentsComponent.DEFAULT, WATER.texture(), PotionContentsComponent::getColor,
-            (t, d) -> Text.translatable(Potion.finishTranslationKey(d.potion(), "item.minecraft.potion.effect."))));
+            (t, d) -> {
+                var base = Text.translatable(Potion.finishTranslationKey(d.potion(), "item.minecraft.potion.effect."));
+                if (d.potion().isPresent() && d.potion().get().getKey().get().getValue().getPath().startsWith("long_")) {
+                    return Text.translatable("fluid_type.minecraft.potion.long", base);
+                }
+                if (d.potion().isPresent() && d.potion().get().getKey().get().getValue().getPath().startsWith("strong_")) {
+                    return Text.translatable("fluid_type.minecraft.potion.strong", base);
+                }
+                return base;
+            }));
 
 
     public static void register() {
@@ -68,6 +77,7 @@ public class FactoryFluids {
     public static <T> FluidType<T> register(Identifier identifier, FluidType<T> item) {
         return Registry.register(FactoryRegistries.FLUID_TYPES, identifier, item);
     }
+
     public static <T> FluidType<T> register(String path, FluidType<T> item) {
         return Registry.register(FactoryRegistries.FLUID_TYPES, Identifier.of(ModInit.ID, path), item);
     }

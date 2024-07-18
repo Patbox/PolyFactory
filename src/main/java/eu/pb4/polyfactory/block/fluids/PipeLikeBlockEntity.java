@@ -19,9 +19,9 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
     protected final FluidContainer container = FluidContainer.singleFluid(CAPACITY, this::markDirty);
     protected final BlockPos.Mutable mut = new BlockPos.Mutable();
     protected final double[] pullOverflow = new double[Direction.values().length];
-    protected BlockState pullState = Blocks.AIR.getDefaultState();
+    protected BlockState[] pullState = new BlockState[pullOverflow.length];
     protected final double[] pushOverflow = new double[Direction.values().length];
-    protected BlockState pushState = Blocks.AIR.getDefaultState();
+    protected BlockState[] pushState = new BlockState[pushOverflow.length];
 
     protected long maxPush = 0;
     public PipeLikeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -47,8 +47,8 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
 
     public void preTick() {
         for (int i = 0; i < this.pullOverflow.length; i++) {
-            this.pullOverflow[i] = Math.max(0, this.pullOverflow[i] - 0.02);
-            this.pushOverflow[i] = Math.max(0, this.pushOverflow[i] - 0.02);
+            this.pullOverflow[i] = Math.max(0, this.pullOverflow[i] - 0.01);
+            this.pushOverflow[i] = Math.max(0, this.pushOverflow[i] - 0.01);
         }
     }
 
@@ -71,7 +71,7 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
         }
         var pushedBlockState = world.getBlockState(mut);
 
-        if (pushedBlockState == this.pushState) {
+        if (pushedBlockState == this.pushState[direction.ordinal()]) {
             this.pushOverflow[direction.ordinal()] += amount;
             var possibilities = FluidBehaviours.BLOCK_STATE_TO_FLUID_INSERT.get(pushedBlockState);
             if (possibilities != null) {
@@ -85,7 +85,7 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
                 }
             }
         } else {
-            this.pushState = pushedBlockState;
+            this.pushState[direction.ordinal()] = pushedBlockState;
             this.pushOverflow[direction.ordinal()] = 0;
         }
     }
@@ -106,7 +106,7 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
         }
         var pulledBlockState = world.getBlockState(mut);
 
-        if (pulledBlockState == this.pullState) {
+        if (pulledBlockState == this.pullState[direction.ordinal()]) {
             this.pullOverflow[direction.ordinal()] += amount;
             var extract = FluidBehaviours.BLOCK_STATE_TO_FLUID_EXTRACT.get(pulledBlockState);
             if (extract != null && this.pullOverflow[direction.ordinal()] >= extract.getLeft().amount() && this.container.canInsert(extract.getLeft(), true)) {
@@ -115,7 +115,7 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
                 this.pullOverflow[direction.ordinal()] = 0;
             }
         } else {
-            this.pullState = pulledBlockState;
+            this.pullState[direction.ordinal()] = pulledBlockState;
             this.pullOverflow[direction.ordinal()] = 0;
         }
     }

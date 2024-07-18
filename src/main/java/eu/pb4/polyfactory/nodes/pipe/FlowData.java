@@ -5,15 +5,14 @@ import com.kneelawk.graphlib.api.graph.GraphEntityContext;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.*;
 import com.kneelawk.graphlib.api.util.LinkPos;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.mixin.SimpleBlockGraphAccessor;
 import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
-import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,6 +23,7 @@ import static eu.pb4.polyfactory.ModInit.id;
 
 public class FlowData implements GraphEntity<FlowData> {
     public static final int RANGE = 32;
+    public static final Direction[] DIRECTIONS = Direction.values();
     public static final Codec<FlowData> CODEC = Codec.unit(FlowData::new);
     public static final GraphEntityType<FlowData> TYPE = GraphEntityType.of(id("flow_data"), CODEC, FlowData::new, FlowData::split);
     public static FlowData EMPTY = new FlowData() {
@@ -95,104 +95,119 @@ public class FlowData implements GraphEntity<FlowData> {
         }
         var time = System.currentTimeMillis();
         this.isInvalid = false;
-        var map = new HashMap<BlockPos, Pair<double[], double[]>>();
+        var map = new Object2ObjectOpenHashMap<BlockPos, CurrentState>(this.sourceStrength.size());
+        var states = new ObjectArrayList<LastState>();
+        var dirs = new Direction[6];
+        var dirsI = 0;
 
         for (var pump : this.ctx.getGraph().getCachedNodes(PumpNode.CACHE)) {
-            var reverse = pump.getNode().reverse();
+            states.clear();
+            var isPulling = pump.getNode().isPulling();
             Direction direction;
-            double distance;
+            int distance;
             var mut = new BlockPos.Mutable();
-            var states = new ObjectArrayList<LastState>();
             states.add(new LastState(pump.getNode().direction(), pump.getBlockPos(), RANGE));
+
+            var nodeMap = ((SimpleBlockGraphAccessor) this.ctx.getGraph()).getNodesInPos();
+
             do {
                 var state = states.pop();
                 direction = state.direction;
                 distance = state.distance;
                 mut.set(state.start);
 
-                while (distance > 0.25) {
+                while (distance > 0) {
                     mut.move(direction);
-
-                    var node = this.ctx.getGraph().getNodesAt(mut).findAny();
-                    if (node.isEmpty() || node.get().getNode() instanceof PumpNode) {
-                        break;
-                    }
-                    Pair<double[], double[]> flow;
-                    if (map.containsKey(mut)) {
-                        flow = map.get(mut);
+                    CurrentState flow = map.get(mut);
+                    NodeHolder<BlockNode> node;
+                    if (flow != null) {
+                        node = flow.node;
+                        if (node == null) {
+                            break;
+                        }
                     } else {
-                        flow = new Pair<>(new double[Direction.values().length], new double[Direction.values().length]);
+                        var iter = nodeMap.get(mut).iterator();
+                        if (!iter.hasNext()) {
+                            break;
+                        }
+
+                        node = iter.next();
+                        if (node.getNode() instanceof PumpNode) {
+                            break;
+                        }
+
+                        flow = new CurrentState(new MutableInt(), EnumSet.noneOf(Direction.class), EnumSet.noneOf(Direction.class), node);
                         map.put(mut.toImmutable(), flow);
                     }
+                    if (flow.distance.getValue() >= distance) {
+                        break;
+                    } else if (flow.distance.getValue() < distance) {
+                        flow.push.clear();
+                        flow.pull.clear();
+                    }
 
-
-                    var dirs = new ArrayList<Direction>();
-                    for (var d : Direction.values()) {
-                        if (d != direction.getOpposite() && node.get().getNode() instanceof DirectionCheckingNode check && check.canConnectDir(d)) {
-                            dirs.add(d);
+                    dirsI = 0;
+                    for (int i = 0; i < DIRECTIONS.length; i++) {
+                        var d = DIRECTIONS[i];
+                        if (d != direction.getOpposite() && node.getNode() instanceof DirectionCheckingNode check && check.canConnectDir(d)) {
+                            dirs[dirsI++] = d;
                         }
                     }
-                    /*for (var conn : node.get().getConnections()) {
-                        var other = conn.other(node.get());
-                        var otherDir = Direction.fromVector(
-                                other.getBlockPos().getX() - node.get().getBlockPos().getX(),
-                                other.getBlockPos().getY() - node.get().getBlockPos().getY(),
-                                other.getBlockPos().getZ() - node.get().getBlockPos().getZ()
-                        );
-                        if (otherDir != direction.getOpposite()) {
-                            dirs.add(otherDir);
-                        }
-                    }*/
 
-                    if (dirs.isEmpty()) {
+                    if (dirsI == 0) {
                         break;
                     }
-                    var main = (reverse ? flow.getFirst() : flow.getSecond());
-
-                    var remove = main[direction.getOpposite().ordinal()] <= 0;
-
-                    main[direction.getOpposite().ordinal()] += distance;
-                    main[direction.ordinal()] -= distance;
-                    var multi = reverse ? flow.getSecond() : flow.getFirst();
-                    for (var d : dirs) {
-                        multi[d.ordinal()] += distance;
+                    var main = (isPulling ? flow.push : flow.pull);
+                    var multi = isPulling ? flow.pull : flow.push;
+                    if (!main.add(direction.getOpposite())) {
+                        break;
                     }
 
-                    if (remove) {
-                        distance--;
+                    for (var i = 0; i < dirsI; i++) {
+                        multi.add(dirs[i]);
                     }
-                    if (dirs.size() == 1) {
-                        direction = dirs.get(0);
+
+                    flow.distance.setValue(distance--);
+                    if (dirsI == 1) {
+                        direction = dirs[0];
                     } else {
                         var cur = mut.toImmutable();
-                        for (var d : dirs) {
-                            states.push(new LastState(d, cur, distance / dirs.size()));
+                        boolean canContinue = false;
+                        for (var i = 0; i < dirsI; i++) {
+                            var d = dirs[i];
+                            if (d == direction) {
+                                canContinue = true;
+                                continue;
+                            }
+                            states.push(new LastState(d, cur, distance));
                         }
-                        break;
+                        if (!canContinue) {
+                            break;
+                        }
                     }
                 }
             } while (!states.isEmpty());
             map.forEach((pos, flow) -> {
                 var curr = this.currentFlow.computeIfAbsent(pos, CurrentFlow::new);
-                var push = flow.getFirst();
-                var pull = flow.getSecond();
-                for (var dir : Direction.values()) {
-                    if (push[dir.ordinal()] > 0) {
-                        curr.push.add(new DirectionalFlow(pump.getBlockPos(), dir, push[dir.ordinal()]));
-                    }
-
-                    if (pull[dir.ordinal()] > 0) {
-                        curr.pull.add(new DirectionalFlow(pump.getBlockPos(), dir, pull[dir.ordinal()]));
-                    }
-                    push[dir.ordinal()] = 0;
-                    pull[dir.ordinal()] = 0;
+                var push = flow.push;
+                var pull = flow.pull;
+                var distancex = flow.distance.getValue();
+                for (var dir : push) {
+                    curr.push.add(new DirectionalFlow(pump.getBlockPos(), dir, distancex));
                 }
+                for (var dir : pull) {
+                    curr.pull.add(new DirectionalFlow(pump.getBlockPos(), dir, distancex));
+                }
+
+                push.clear();
+                pull.clear();
+                flow.distance.setValue(0);
             });
         }
 
-        //if (ModInit.DEV_ENV) {
-        //    ModInit.LOGGER.info("Rebuilding pipes took " + (System.currentTimeMillis() - time) + "ms");
-        //}
+        if (ModInit.DEV_ENV) {
+            ModInit.LOGGER.info("Rebuilding pipes took {}ms", System.currentTimeMillis() - time);
+        }
     }
 
     private void invalidate() {
@@ -240,7 +255,7 @@ public class FlowData implements GraphEntity<FlowData> {
         return new FlowData();
     }
 
-    private record LastState(Direction direction, BlockPos start, double distance) {};
+    private record LastState(Direction direction, BlockPos start, int distance) {};
 
     private static class CurrentFlow {
         List<DirectionalFlow> push = new ArrayList<>();
@@ -251,6 +266,9 @@ public class FlowData implements GraphEntity<FlowData> {
     }
 
     private record DirectionalFlow(BlockPos source, Direction direction, double strength) {
+    }
+
+    private record CurrentState(MutableInt distance, EnumSet<Direction> pull, EnumSet<Direction> push, NodeHolder<BlockNode> node) {
     }
 
     public interface FlowConsumer {

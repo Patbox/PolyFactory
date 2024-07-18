@@ -19,14 +19,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
 
-public record PumpNode(Direction flowDirection, boolean reverse, Direction direction) implements FunctionalNode, DirectionNode {
+public record PumpNode(Direction flowDirection, boolean isPulling, Direction direction) implements FunctionalNode, DirectionNode {
     public static final CacheCategory<PumpNode> CACHE = CacheCategory.of(PumpNode.class);
     public PumpNode(Direction flowDirection, boolean reverse) {
         this(flowDirection, reverse, reverse ? flowDirection.getOpposite() : flowDirection);
     }
 
     public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("pump"), Codec.mapPair(Direction.CODEC.fieldOf("direction"), Codec.BOOL.fieldOf("reverse"))
-            .xmap(x -> new PumpNode(x.getFirst(), x.getSecond()), x -> new Pair<>(x.flowDirection, x.reverse)).codec());
+            .xmap(x -> new PumpNode(x.getFirst(), x.getSecond()), x -> new Pair<>(x.flowDirection, x.isPulling)).codec());
 
     @Override
     public @NotNull BlockNodeType getType() {
