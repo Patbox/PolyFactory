@@ -391,6 +391,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
     private class Gui extends SimpleGui {
         private static final Text CURRENT_HEAT = Text.translatable("text.polyfactory.current_heat").styled(x -> x.withItalic(false));
         private int lastFluidUpdate = -1;
+        private int delayTick = -1;
 
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X3, player, false);
@@ -446,7 +447,10 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(MixerBlockEntity.this.pos)) > (18*18)) {
                 this.close();
             }
-            if (MixerBlockEntity.this.fluidContainer.updateId() != this.lastFluidUpdate) {
+            if (MixerBlockEntity.this.fluidContainer.updateId() != this.lastFluidUpdate && delayTick < 0) {
+                delayTick = 3;
+            }
+            if (this.delayTick-- == 0) {
                 this.updateTitleAndFluid();
             }
 

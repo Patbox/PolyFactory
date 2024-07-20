@@ -1,6 +1,9 @@
 package eu.pb4.polyfactory.fluid;
 
 import com.mojang.serialization.RecordBuilder;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
+import eu.pb4.polyfactory.item.component.FluidComponent;
+import eu.pb4.polyfactory.item.tool.UniversalFluidContainerItem;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
@@ -21,6 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
@@ -78,6 +82,28 @@ public class FluidContainer {
 
     @Nullable
     public ItemStack interactWith(ServerPlayerEntity player, ItemStack stack) {
+        if (stack.getItem() instanceof UniversalFluidContainerItem item) {
+            var mode = stack.getOrDefault(FactoryDataComponents.FLUID_INTERACTION_MODE, FluidInteractionMode.EXTRACT);
+            var fluids = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
+            var topFluid = this.topFluid();
+            if (mode == FluidInteractionMode.EXTRACT && topFluid != null) {
+                var maxAmount = item.capacity() - fluids.stored();
+                var extract = this.extract(topFluid, maxAmount, false);
+                stack.set(FactoryDataComponents.FLUID, fluids.insert(topFluid, extract));
+            } else if (mode == FluidInteractionMode.INSERT) {
+                for (var fluid : fluids.fluids()) {
+                    var extract = fluids.get(fluid);
+                    var leftover = this.insert(fluid, extract, false);
+                    if (leftover != extract) {
+                        stack.set(FactoryDataComponents.FLUID, fluids.with(fluid, leftover));
+                        break;
+                    }
+                }
+            }
+
+            return ItemStack.EMPTY;
+        }
+
         var inserts = FluidBehaviours.FLUID_INSERT.get(stack.getItem());
         if (inserts != null) {
             for (var x : inserts) {
@@ -315,5 +341,13 @@ public class FluidContainer {
 
     public long empty() {
         return this.capacity - this.stored;
+    }
+
+    public Object2LongMap<FluidInstance<?>> asMap() {
+        return Object2LongMaps.unmodifiable(this.storedFluids);
+    }
+
+    public List<FluidInstance<?>> orderList() {
+        return Collections.unmodifiableList(this.fluids);
     }
 }

@@ -16,6 +16,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
@@ -37,15 +38,16 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
     }
 
     @Override
-    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        var stack = player.getStackInHand(Hand.MAIN_HAND);
         if (world.getBlockEntity(pos) instanceof DrainBlockEntity be) {
             var copy = stack.copy();
             var x = be.getFluidContainer().interactWith((ServerPlayerEntity) player, player.getMainHandStack());
             if (x == null) {
-                return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                return ActionResult.PASS;
             }
             if (stack.isEmpty() && ItemStack.areEqual(stack, copy)) {
-                return ItemActionResult.FAIL;
+                return ActionResult.FAIL;
             }
 
             if (stack.isEmpty()) {
@@ -59,11 +61,12 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
                     player.getInventory().offerOrDrop(x);
                 }
             }
-            return ItemActionResult.SUCCESS;
+            return ActionResult.SUCCESS;
         }
 
-        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+        return super.onUse(state, world, pos, player, hit);
     }
+
 
     @Override
     public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {

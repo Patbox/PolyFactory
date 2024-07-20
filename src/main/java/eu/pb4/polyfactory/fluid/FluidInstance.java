@@ -3,9 +3,14 @@ package eu.pb4.polyfactory.fluid;
 import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.FactoryRegistries;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
+import net.minecraft.world.World;
 
 import java.util.Comparator;
 import java.util.IdentityHashMap;
@@ -81,5 +86,33 @@ public record FluidInstance<T>(FluidType<T> type, T data) {
 
     public boolean isDefault() {
         return Objects.equals(this.type.defaultData(), this.data);
+    }
+
+    public FluidStack<T> stackOf(long amount) {
+        return new FluidStack<>(this, amount);
+    }
+
+    public FluidStack<T> ofBottle() {
+        return new FluidStack<T>(this, FluidConstants.BOTTLE);
+    }
+
+    public FluidStack<T> ofBucket() {
+        return new FluidStack<>(this, FluidConstants.BUCKET);
+    }
+
+    public Identifier texture() {
+        return this.type.texture();
+    }
+
+    public ParticleEffect particle() {
+        return this.type.particleGetter().apply(this.data);
+    }
+
+    public long getMaxFlow(ServerWorld world) {
+        return this.type.maxFlow().getMaxFlow(world, this.data);
+    }
+
+    public double getFlowSpeedMultiplier(ServerWorld world) {
+        return this.type.flowSpeedMultiplier().getSpeedMultiplier(world, this.data);
     }
 }

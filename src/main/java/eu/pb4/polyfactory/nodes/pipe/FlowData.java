@@ -15,7 +15,6 @@ import net.minecraft.util.math.Direction;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.*;
 import java.util.function.BooleanSupplier;
 
@@ -205,9 +204,9 @@ public class FlowData implements GraphEntity<FlowData> {
             });
         }
 
-        if (ModInit.DEV_ENV) {
-            ModInit.LOGGER.info("Rebuilding pipes took {}ms", System.currentTimeMillis() - time);
-        }
+        //if (ModInit.DEV_ENV) {
+        //    ModInit.LOGGER.info("Rebuilding pipes took {}ms", System.currentTimeMillis() - time);
+        //}
     }
 
     private void invalidate() {

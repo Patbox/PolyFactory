@@ -19,6 +19,7 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.wrench.WrenchItem;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.Block;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
@@ -118,6 +119,7 @@ public class FactoryItems {
     public static final Item PIPE = register(FactoryBlocks.PIPE);
     public static final Item PUMP = register(FactoryBlocks.PUMP);
     public static final Item DRAIN = register(FactoryBlocks.DRAIN);
+    public static final UniversalFluidContainerItem STEEL_BUCKET = register("steel_bucket", new UniversalFluidContainerItem(FluidConstants.BUCKET * 2, new Item.Settings().maxCount(1)));
 
 
     public static final Item DEBUG_PIPE_FLOW = register("debug/pipe_flow", BaseDebugItem.onBlockInteract("Pipe Flow", 0xff8800, (ctx) -> {
@@ -224,6 +226,7 @@ public class FactoryItems {
                     entries.add(TINY_POTATO_SPRING);
 
                     // Other items
+                    entries.add(STEEL_BUCKET);
                     entries.add(DYNAMITE);
                     entries.add(SPRAY_CAN);
 

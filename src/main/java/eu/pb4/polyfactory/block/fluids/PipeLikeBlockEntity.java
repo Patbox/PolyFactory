@@ -10,6 +10,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -57,30 +58,47 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
     }
 
     public void pushFluid(Direction direction, double strength) {
-        var amount = Math.min(Math.min((long) (strength * FluidConstants.BOTTLE), FluidConstants.BOTTLE), this.maxPush);
-        var be = world.getBlockEntity(mut.set(pos).move(direction));
-        if (be instanceof FluidInput fluidInput) {
+        mut.set(pos).move(direction);
+        var pushedBlockState = world.getBlockState(mut);
+        FluidInput fluidInput = null;
+        if (pushedBlockState.getBlock() instanceof FluidInput.Getter getter) {
+            fluidInput = getter.getFluidInput((ServerWorld) world, mut, direction.getOpposite());
+        } else if (world.getBlockEntity(mut) instanceof FluidInput f) {
+            fluidInput = f;
+        }
+
+        if (fluidInput != null) {
             var fluid = this.container.topFluid();
-            var extracted = this.container.extract(fluid, amount, false);
-            var leftover = fluidInput.insertFluid(fluid, extracted, direction.getOpposite());
-            if (leftover != 0) {
-                this.container.insert(fluid, leftover, false);
+            if (fluid != null) {
+                var maxFlow = fluid.getMaxFlow((ServerWorld) world);
+                var amount = Math.min(Math.min((long) (strength * maxFlow * fluid.getFlowSpeedMultiplier((ServerWorld) world)),
+                        maxFlow), this.maxPush);
+
+                var extracted = this.container.extract(fluid, amount, false);
+                var leftover = fluidInput.insertFluid(fluid, extracted, direction.getOpposite());
+                if (leftover != 0) {
+                    this.container.insert(fluid, leftover, false);
+                }
+                this.maxPush -= extracted - leftover;
             }
-            this.maxPush -= extracted - leftover;
             return;
         }
-        var pushedBlockState = world.getBlockState(mut);
 
         if (pushedBlockState == this.pushState[direction.ordinal()]) {
-            this.pushOverflow[direction.ordinal()] += amount;
             var possibilities = FluidBehaviours.BLOCK_STATE_TO_FLUID_INSERT.get(pushedBlockState);
             if (possibilities != null) {
                 for (var insert : possibilities) {
-                    if (insert != null && this.pushOverflow[direction.ordinal()] >= insert.getLeft().amount() && this.container.canExtract(insert.getLeft(), true)) {
-                        world.setBlockState(mut, insert.getRight());
-                        this.container.extract(insert.getLeft(), false);
-                        this.pushOverflow[direction.ordinal()] = 0;
-                        break;
+                    if (insert != null && this.container.canExtract(insert.getLeft(), true)) {
+                        var maxFlow = insert.getLeft().instance().getMaxFlow((ServerWorld) world);
+                        var amount = Math.min(Math.min((long) (strength * maxFlow * insert.getLeft().instance().getFlowSpeedMultiplier((ServerWorld) world)),
+                                maxFlow), this.maxPush);
+                        this.pushOverflow[direction.ordinal()] += amount;
+                        if (this.pushOverflow[direction.ordinal()] >= insert.getLeft().amount()) {
+                            world.setBlockState(mut, insert.getRight());
+                            this.container.extract(insert.getLeft(), false);
+                            this.pushOverflow[direction.ordinal()] = 0;
+                            break;
+                        }
                     }
                 }
             }
@@ -91,28 +109,43 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
     }
 
     public void pullFluid(Direction direction, double strength) {
-        var amount = Math.min(Math.min((long) (strength * FluidConstants.BOTTLE), FluidConstants.BOTTLE), this.container.empty());
-        var be = world.getBlockEntity(mut.set(pos).move(direction));
-        var currentFluid = this.container.topFluid();
+        mut.set(pos).move(direction);
+        var pulledBlockState = world.getBlockState(mut);
 
-        if (be instanceof FluidOutput fluidOutput) {
+        var currentFluid = this.container.topFluid();
+        FluidOutput fluidOutput = null;
+        if (pulledBlockState.getBlock() instanceof FluidOutput.Getter getter) {
+            fluidOutput = getter.getFluidOutput((ServerWorld) world, mut, direction.getOpposite());
+        } else if (world.getBlockEntity(mut) instanceof FluidOutput f) {
+            fluidOutput = f;
+        }
+
+        if (fluidOutput != null) {
             var fluid = fluidOutput.getTopFluid(direction.getOpposite());
             if (fluid == null || (fluid.equals(currentFluid))) {
                 return;
             }
+            var maxFlow = fluid.getMaxFlow((ServerWorld) world);
+            var amount = Math.min(Math.min((long) (strength * maxFlow * fluid.getFlowSpeedMultiplier((ServerWorld) world)),
+                    maxFlow), this.container.empty());
+
             var extracted = fluidOutput.extractFluid(fluid, amount, direction.getOpposite());
             this.container.insert(fluid, extracted, false);
             return;
         }
-        var pulledBlockState = world.getBlockState(mut);
 
         if (pulledBlockState == this.pullState[direction.ordinal()]) {
-            this.pullOverflow[direction.ordinal()] += amount;
             var extract = FluidBehaviours.BLOCK_STATE_TO_FLUID_EXTRACT.get(pulledBlockState);
-            if (extract != null && this.pullOverflow[direction.ordinal()] >= extract.getLeft().amount() && this.container.canInsert(extract.getLeft(), true)) {
-                world.setBlockState(mut, extract.getRight());
-                this.container.insert(extract.getLeft(), false);
-                this.pullOverflow[direction.ordinal()] = 0;
+            if (extract != null && this.container.canInsert(extract.getLeft(), true)) {
+                var maxFlow = extract.getLeft().instance().getMaxFlow((ServerWorld) world);
+                var amount = Math.min(Math.min((long) (strength * maxFlow * extract.getLeft().instance().getFlowSpeedMultiplier((ServerWorld) world)),
+                        maxFlow), this.container.empty());
+                this.pullOverflow[direction.ordinal()] += amount;
+                if (this.pullOverflow[direction.ordinal()] >= extract.getLeft().amount()) {
+                    world.setBlockState(mut, extract.getRight());
+                    this.container.insert(extract.getLeft(), false);
+                    this.pullOverflow[direction.ordinal()] = 0;
+                }
             }
         } else {
             this.pullState[direction.ordinal()] = pulledBlockState;

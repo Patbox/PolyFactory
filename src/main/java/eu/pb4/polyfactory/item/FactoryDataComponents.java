@@ -5,6 +5,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.data.DataContainer;
+import eu.pb4.polyfactory.fluid.FluidInteractionMode;
+import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
@@ -31,7 +33,8 @@ public class FactoryDataComponents {
     public static final ComponentType<Boolean> READ_ONLY = register("read_only", ComponentType.<Boolean>builder().codec(Codec.BOOL).build());
 
     public static final ComponentType<Integer> CHANNEL = register("channel", ComponentType.<Integer>builder().codec(Codec.INT).build());
-
+    public static final ComponentType<FluidComponent> FLUID = register("fluid", ComponentType.<FluidComponent>builder().codec(FluidComponent.CODEC).build());
+    public static final ComponentType<FluidInteractionMode> FLUID_INTERACTION_MODE = register("fluid_interaction_mode", ComponentType.<FluidInteractionMode>builder().codec(FluidInteractionMode.CODEC).build());
 
     public static void register() {
 

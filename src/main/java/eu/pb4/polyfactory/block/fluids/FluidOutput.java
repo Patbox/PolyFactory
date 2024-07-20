@@ -3,6 +3,8 @@ package eu.pb4.polyfactory.block.fluids;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidType;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 public interface FluidOutput {
@@ -21,5 +23,9 @@ public interface FluidOutput {
         };
 
         FluidContainer getFluidContainer(Direction direction);
+    }
+
+    interface Getter {
+        FluidOutput getFluidOutput(ServerWorld world, BlockPos pos, Direction direction);
     }
 }
