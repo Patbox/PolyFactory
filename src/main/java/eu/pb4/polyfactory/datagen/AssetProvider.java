@@ -41,6 +41,7 @@ class AssetProvider implements DataProvider {
         FactoryModels.COLORED_CABLE.generateModels(assetWriter);
         FactoryModels.COLORED_WALL_CABLE.generateModels(assetWriter);
         FactoryModels.PIPE.generateModels(assetWriter);
+        FactoryModels.FLUID_TANK.generateModels(assetWriter);
     }
 
     @Override

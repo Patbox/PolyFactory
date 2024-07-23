@@ -198,7 +198,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_plate", InventoryChangedCriterion.Conditions.items(FactoryItems.WOODEN_PLATE))
                 .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.PIPE, 2)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.PIPE, 3)
                 .pattern("ppp")
                 .pattern("i i")
                 .pattern("ppp")
@@ -206,6 +206,26 @@ class RecipesProvider extends FabricRecipeProvider {
                 .input('i', Items.COPPER_INGOT)
                 .criterion("get_copper", InventoryChangedCriterion.Conditions.items(Items.COPPER_INGOT))
                 .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.DRAIN, 1)
+                .pattern("pip")
+                .pattern("p p")
+                .pattern("ppp")
+                .input('p', FactoryItems.COPPER_PLATE)
+                .input('i', Items.IRON_INGOT)
+                .criterion("get_copper", InventoryChangedCriterion.Conditions.items(Items.COPPER_INGOT))
+                .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.FLUID_TANK, 1)
+                .pattern("pgp")
+                .pattern("gcg")
+                .pattern("pgp")
+                .input('p', FactoryItems.COPPER_PLATE)
+                .input('g', Items.TINTED_GLASS)
+                .input('c', Items.COPPER_BLOCK)
+                .criterion("get_copper", InventoryChangedCriterion.Conditions.items(Items.COPPER_INGOT))
+                .offerTo(exporter);
+
 
 
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.PUMP, 1)

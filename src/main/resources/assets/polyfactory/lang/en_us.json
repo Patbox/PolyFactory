@@ -61,6 +61,7 @@
   "block.polyfactory.pump": "Mechanical Pump",
   "block.polyfactory.pipe": "Copper Pipe",
   "block.polyfactory.drain": "Fluid Drain",
+  "block.polyfactory.fluid_tank": "Fluid Tank",
 
   "item.polyfactory.mod_icon": "Mod Icon",
   "item.polyfactory.windmill_sail": "Windmill Sail",

@@ -107,29 +107,7 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
 
     @Override
     public void getItemFrom(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
-        /*var inputDir = self.getBlockState().get(INPUT_FACING);
-        if (!conveyor.isContainerEmpty() || pushDirection == inputDir || inputDir.getOpposite() != relative || self.getBlockState().get(PART) == Part.TOP) {
-            return;
-        }
 
-        var be = (PressBlockEntity) self.getBlockEntity();
-
-        var out = be.getContainerHolder(2);
-
-        if (out.isContainerEmpty()) {
-            return;
-        }
-        var stack = out.getContainer().get();
-
-        var amount = Math.min(stack.getCount(), out.getMaxStackCount(stack));
-
-        if (stack.getCount() == amount) {
-            conveyor.pushAndAttach(out.pullAndRemove());
-        } else {
-            stack.decrement(amount);
-            conveyor.setMovementPosition(pushDirection == inputDir.getOpposite() ? 0 : 0.5);
-            conveyor.pushNew(stack.copyWithCount(amount));
-        }*/
     }
 
     @Override

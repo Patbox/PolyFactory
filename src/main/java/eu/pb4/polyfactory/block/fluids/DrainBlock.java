@@ -119,7 +119,7 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
                 this.currentFluid = type;
             }
             if (this.positionFluid != position) {
-                this.fluid.setTranslation(new Vector3f(0, -6f / 16f + position * 10f / 16f, 0));
+                this.fluid.setTranslation(new Vector3f(0, -7f / 16f + position * 11f / 16f + 0.1f, 0));
                 this.positionFluid = position;
             }
         }

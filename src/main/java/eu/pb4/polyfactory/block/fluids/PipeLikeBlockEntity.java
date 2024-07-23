@@ -8,10 +8,12 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
@@ -47,10 +49,15 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
     }
 
     public void preTick() {
+        this.container.tick((ServerWorld) world, pos, 0, this::dropItem);
         for (int i = 0; i < this.pullOverflow.length; i++) {
             this.pullOverflow[i] = Math.max(0, this.pullOverflow[i] - 0.01);
             this.pushOverflow[i] = Math.max(0, this.pushOverflow[i] - 0.01);
         }
+    }
+
+    private void dropItem(ItemStack stack) {
+        ItemScatterer.spawn(world, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, stack);
     }
 
     public void postTick() {

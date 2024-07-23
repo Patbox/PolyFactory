@@ -120,6 +120,7 @@ public class FactoryItems {
     public static final Item PUMP = register(FactoryBlocks.PUMP);
     public static final Item DRAIN = register(FactoryBlocks.DRAIN);
     public static final UniversalFluidContainerItem STEEL_BUCKET = register("steel_bucket", new UniversalFluidContainerItem(FluidConstants.BUCKET * 2, new Item.Settings().maxCount(1)));
+    public static final Item FLUID_TANK = register(FactoryBlocks.FLUID_TANK);
 
 
     public static final Item DEBUG_PIPE_FLOW = register("debug/pipe_flow", BaseDebugItem.onBlockInteract("Pipe Flow", 0xff8800, (ctx) -> {
@@ -189,6 +190,7 @@ public class FactoryItems {
                     entries.add(PIPE);
                     entries.add(PUMP);
                     entries.add(DRAIN);
+                    entries.add(FLUID_TANK);
 
                     // Data
                     entries.add(CABLE);
@@ -226,7 +228,6 @@ public class FactoryItems {
                     entries.add(TINY_POTATO_SPRING);
 
                     // Other items
-                    entries.add(STEEL_BUCKET);
                     entries.add(DYNAMITE);
                     entries.add(SPRAY_CAN);
 
@@ -312,6 +313,7 @@ public class FactoryItems {
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(EXPERIENCE_BUCKET, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(STEEL_BUCKET, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     })).build()
             );
         }

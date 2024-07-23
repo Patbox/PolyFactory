@@ -7,6 +7,8 @@ public interface FactoryModels {
     DirectionConnectingModel COLORED_CABLE = new DirectionConnectingModel(id("block/cable_colored"), true);
     DirectionConnectingModel COLORED_WALL_CABLE = new DirectionConnectingModel(id("block/cable_colored_wall"), true);
     DirectionConnectingModel PIPE = new DirectionConnectingModel(id("block/pipe"), false);
+    MultiElementConnectedModel FLUID_TANK = new MultiElementConnectedModel(id("block/fluid_tank"), id("block/fluids/tank/side"),
+            id("block/fluids/tank/bottom"), MultiElementConnectedModel.WITH_INNER);
 
     static void load() {
     }

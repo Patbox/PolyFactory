@@ -3,10 +3,7 @@ package eu.pb4.polyfactory.block.property;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.util.TriState;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Properties;
+import net.minecraft.state.property.*;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Direction;
 
@@ -19,6 +16,10 @@ public interface FactoryProperties {
     LazyEnumProperty<TriState> TRI_STATE_WEST = LazyEnumProperty.of("west", TriState.class);
     LazyEnumProperty<TriState> TRI_STATE_UP = LazyEnumProperty.of("up", TriState.class);
     LazyEnumProperty<TriState> TRI_STATE_DOWN = LazyEnumProperty.of("down", TriState.class);
+
+    EnumProperty<ConnectablePart> CONNECTABLE_PART_X = EnumProperty.of("part_x", ConnectablePart.class);
+    EnumProperty<ConnectablePart> CONNECTABLE_PART_Y = EnumProperty.of("part_y", ConnectablePart.class);
+    EnumProperty<ConnectablePart> CONNECTABLE_PART_Z = EnumProperty.of("part_z", ConnectablePart.class);
 
     Map<Direction, BooleanProperty> DIRECTIONS = ImmutableMap.copyOf((Map) Util.make(Maps.newEnumMap(Direction.class), (directions) -> {
         directions.put(Direction.NORTH, Properties.NORTH);

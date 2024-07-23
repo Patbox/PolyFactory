@@ -12,6 +12,7 @@ import eu.pb4.polyfactory.block.data.providers.*;
 import eu.pb4.polyfactory.block.electric.ElectricGeneratorBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.fluids.DrainBlock;
+import eu.pb4.polyfactory.block.fluids.FluidTankBlock;
 import eu.pb4.polyfactory.block.fluids.PipeBlock;
 import eu.pb4.polyfactory.block.fluids.PumpBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.PlacerBlock;
@@ -112,6 +113,7 @@ public class FactoryBlocks {
     public static final PipeBlock PIPE = register("pipe", new PipeBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
     public static final PumpBlock PUMP = register("pump", new PumpBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
     public static final DrainBlock DRAIN = register("drain", new DrainBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
+    public static final FluidTankBlock FLUID_TANK = register("fluid_tank", new FluidTankBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
 
     public static void register() {
         var s = System.currentTimeMillis();
