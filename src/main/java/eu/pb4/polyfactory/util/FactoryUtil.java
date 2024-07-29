@@ -49,6 +49,7 @@ public class FactoryUtil {
     public static final List<Direction> REORDERED_DIRECTIONS = List.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
     public static final GameProfile GENERIC_PROFILE = new GameProfile(Util.NIL_UUID, "[PolyFactory]");
     public static final Vec3d HALF_BELOW = new Vec3d(0, -0.5, 0);
+    public static final List<Direction> HORIZONTAL_DIRECTIONS = List.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
 
     private static final List<Runnable> RUN_NEXT_TICK = new ArrayList<>();
 

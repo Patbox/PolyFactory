@@ -53,7 +53,7 @@ public class MultiElementConnectedModel {
             for (var y : ConnectablePart.values()) {
                 for (var z : ConnectablePart.values()) {
                     var i = index(x, y, z);
-                    if (this.models[i] != null) {
+                    if (this.models[i] == null) {
                         this.models[i] = BaseItemProvider.requestModel(base.withSuffixedPath("/" + x.asString() + "_" + y.asString() + "_" + z.asString()));
                     }
                 }

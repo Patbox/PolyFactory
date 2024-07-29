@@ -11,10 +11,7 @@ import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlockEntity;
 import eu.pb4.polyfactory.block.data.providers.ItemReaderBlockEntity;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlockEntity;
-import eu.pb4.polyfactory.block.fluids.DrainBlock;
-import eu.pb4.polyfactory.block.fluids.DrainBlockEntity;
-import eu.pb4.polyfactory.block.fluids.PipeBlockEntity;
-import eu.pb4.polyfactory.block.fluids.PumpBlockEntity;
+import eu.pb4.polyfactory.block.fluids.*;
 import eu.pb4.polyfactory.block.mechanical.machines.*;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlockEntity;
@@ -127,6 +124,7 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<PipeBlockEntity> PIPE = register("pipe", BlockEntityType.Builder.create(PipeBlockEntity::new, FactoryBlocks.PIPE));
     public static final BlockEntityType<PumpBlockEntity> PUMP = register("pump", BlockEntityType.Builder.create(PumpBlockEntity::new, FactoryBlocks.PUMP));
     public static final BlockEntityType<DrainBlockEntity> DRAIN = register("drain", BlockEntityType.Builder.create(DrainBlockEntity::new, FactoryBlocks.DRAIN));
+    public static final BlockEntityType<FluidTankBlockEntity> FLUID_TANK = register("fluid_tank", BlockEntityType.Builder.create(FluidTankBlockEntity::new, FactoryBlocks.FLUID_TANK));
 
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;

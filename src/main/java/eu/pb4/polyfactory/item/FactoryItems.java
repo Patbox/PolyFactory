@@ -79,8 +79,6 @@ public class FactoryItems {
 
     public static final Item CREATIVE_MOTOR = register(FactoryBlocks.CREATIVE_MOTOR);
     public static final Item CREATIVE_CONTAINER = register(FactoryBlocks.CREATIVE_CONTAINER);
-
-    public static final Item ROTATION_DEBUG = register(FactoryBlocks.ROTATION_DEBUG);
     public static final Item TACHOMETER = register(FactoryBlocks.TACHOMETER);
     public static final Item STRESSOMETER = register(FactoryBlocks.STRESSOMETER);
     public static final Item ITEM_COUNTER = register(FactoryBlocks.ITEM_COUNTER);
@@ -121,23 +119,6 @@ public class FactoryItems {
     public static final Item DRAIN = register(FactoryBlocks.DRAIN);
     public static final UniversalFluidContainerItem STEEL_BUCKET = register("steel_bucket", new UniversalFluidContainerItem(FluidConstants.BUCKET * 2, new Item.Settings().maxCount(1)));
     public static final Item FLUID_TANK = register(FactoryBlocks.FLUID_TANK);
-
-
-    public static final Item DEBUG_PIPE_FLOW = register("debug/pipe_flow", BaseDebugItem.onBlockInteract("Pipe Flow", 0xff8800, (ctx) -> {
-        var player = ctx.getPlayer();
-        var world = ctx.getWorld();
-        var pos = ctx.getBlockPos();
-        assert player != null;
-        player.sendMessage(Text.literal("# Push: ").formatted(Formatting.YELLOW));
-        NetworkComponent.Pipe.getLogic((ServerWorld) world, pos).runPushFlows(pos, () -> true, (direction, strength) -> {
-            player.sendMessage(Text.literal(direction.asString() + "=" + strength));
-        });
-        player.sendMessage(Text.literal("# Pull: ").formatted(Formatting.YELLOW));
-        NetworkComponent.Pipe.getLogic((ServerWorld) world, pos).runPullFlows(pos, () -> true, (direction, strength) -> {
-            player.sendMessage(Text.literal(direction.asString() + "=" + strength));
-        });
-    }));
-
     public static void register() {
         FuelRegistry.INSTANCE.add(SAW_DUST, 60);
         FuelRegistry.INSTANCE.add(WOODEN_PLATE, 120);
@@ -305,11 +286,10 @@ public class FactoryItems {
 
         if (ModInit.DEV_MODE) {
             PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(ModInit.ID, "experimental"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
-                    .icon(DEBUG_PIPE_FLOW::getDefaultStack)
+                    .icon(FactoryDebugItems.DEBUG_PIPE_FLOW::getDefaultStack)
                     .displayName(Text.translatable("itemgroup." + ModInit.ID + ".experimental"))
                     .entries(((context, entries) -> {
-                        entries.add(DEBUG_PIPE_FLOW, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        FactoryDebugItems.addItemGroup(context, entries);
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(EXPERIENCE_BUCKET, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
@@ -348,5 +328,9 @@ public class FactoryItems {
         Registry.register(Registries.ITEM, id, item);
         item.onRegistered(id);
         return item;
+    }
+
+    static {
+        FactoryDebugItems.DEBUG_PIPE_FLOW.hasRecipeRemainder();
     }
 }

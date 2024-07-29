@@ -152,6 +152,10 @@ public class FluidContainer {
         return canExtract(stack.instance(), stack.amount(), strict);
     }
 
+    public void insertExact(FluidInstance<?> instance, long amount) {
+        insert(instance, amount, true);
+    }
+
     public long insert(FluidStack<?> stack, boolean strict) {
         return insert(stack.instance(), stack.amount(), strict);
     }
@@ -165,9 +169,26 @@ public class FluidContainer {
     }
 
     public long set(FluidInstance<?> type, long amount) {
-        return amount == 0 ? this.storedFluids.removeLong(amount) : this.storedFluids.put(type, amount);
+        if (amount == 0) {
+            this.fluids.remove(type);
+            var current = this.storedFluids.removeLong(amount);
+            this.stored -= current;
+            this.markDirty.run();
+            return current;
+        }
+        var current = this.storedFluids.put(type, amount);
+        this.stored += amount - current;
+        if (current == 0) {
+            this.fluids.add(type);
+            this.fluids.sort(FluidInstance.DENSITY_COMPARATOR_REVERSED);
+        }
+        this.markDirty.run();
+        return current;
     }
 
+    public boolean doesNotContain(FluidInstance<?> type) {
+        return !contains(type);
+    }
     public boolean contains(FluidInstance<?> type) {
         return this.storedFluids.getOrDefault(type, 0) > 0;
     }
@@ -324,6 +345,11 @@ public class FluidContainer {
         return this.fluids.isEmpty() ? null : this.fluids.getLast();
     }
 
+    @Nullable
+    public FluidInstance<?> bottomFluid() {
+        return this.fluids.isEmpty() ? null : this.fluids.getFirst();
+    }
+
     public float getFilledPercentage() {
         return (float) (((double) this.stored) / capacity);
     }
@@ -340,7 +366,7 @@ public class FluidContainer {
     }
 
     public long empty() {
-        return this.capacity - this.stored;
+        return Math.max(this.capacity - this.stored, 0);
     }
 
     public Object2LongMap<FluidInstance<?>> asMap() {
@@ -349,5 +375,12 @@ public class FluidContainer {
 
     public List<FluidInstance<?>> orderList() {
         return Collections.unmodifiableList(this.fluids);
+    }
+
+    public void clear() {
+        this.storedFluids.clear();
+        this.fluids.clear();
+        this.stored = 0;
+        this.markDirty.run();
     }
 }

@@ -36,6 +36,10 @@ public enum ConnectablePart implements StringIdentifiable {
         return this == NEGATIVE;
     }
 
+    public boolean hasNext() {
+        return negative() || middle();
+    }
+
     @Override
     public String asString() {
         return this.name().toLowerCase(Locale.ROOT);

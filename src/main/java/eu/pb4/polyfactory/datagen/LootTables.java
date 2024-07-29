@@ -65,6 +65,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.PIPE);
         this.addDrop(FactoryBlocks.PUMP);
         this.addDrop(FactoryBlocks.DRAIN);
+        this.addDrop(FactoryBlocks.FLUID_TANK);
 
         this.addDrop(FactoryBlocks.DATA_MEMORY, LootTable.builder().pool(LootPool.builder()
                 .conditionally(SurvivesExplosionLootCondition.builder())
