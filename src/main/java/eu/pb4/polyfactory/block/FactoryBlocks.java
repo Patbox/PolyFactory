@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block;
 
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlock;
+import eu.pb4.polyfactory.block.creative.CreativeDrainBlock;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
 import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.data.io.ArithmeticOperatorBlock;
@@ -113,6 +114,7 @@ public class FactoryBlocks {
     public static final PipeBlock PIPE = register("pipe", new PipeBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
     public static final PumpBlock PUMP = register("pump", new PumpBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
     public static final DrainBlock DRAIN = register("drain", new DrainBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
+    public static final CreativeDrainBlock CREATIVE_DRAIN = register("creative_drain", new CreativeDrainBlock(AbstractBlock.Settings.copy(DRAIN).dropsNothing().strength(-1)));
     public static final FluidTankBlock FLUID_TANK = register("fluid_tank", new FluidTankBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
 
     public static void register() {

@@ -61,6 +61,7 @@
   "block.polyfactory.pump": "Mechanical Pump",
   "block.polyfactory.pipe": "Copper Pipe",
   "block.polyfactory.drain": "Fluid Drain",
+  "block.polyfactory.creative_drain": "Creative Fluid Drain",
   "block.polyfactory.fluid_tank": "Fluid Tank",
 
   "item.polyfactory.mod_icon": "Mod Icon",
@@ -171,6 +172,8 @@
 
   "text.polyfactory.half.bottom": "Bottom",
   "text.polyfactory.half.top": "Top",
+
+  "text.polyfactory.fluid_component.stored_fluidstext.polyfactory.fluid_component.stored_fluids": "Stored Fluids:",
 
   "text.polyfactory.char_per_sec": "%s char/sec",
   "data_type.polyfactory.string": "String",

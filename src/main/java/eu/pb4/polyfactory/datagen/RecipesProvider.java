@@ -7,6 +7,9 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.*;
+import eu.pb4.polyfactory.recipe.fluid.PotionAddDrainRecipe;
+import eu.pb4.polyfactory.recipe.fluid.PotionRemoveDrainRecipe;
+import eu.pb4.polyfactory.recipe.fluid.SimpleDrainRecipe;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.ArtificialDyeMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.ColoringMixingRecipe;
@@ -37,10 +40,12 @@ import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
@@ -910,6 +915,16 @@ class RecipesProvider extends FabricRecipeProvider {
                 .offerTo(exporter);
 
         exporter.accept(id("crafting/prt_key_setter"), new PRTKeySetterCraftingRecipe(CraftingRecipeCategory.MISC), null);
+
+        exporter.accept(id("drain/from_lava_bucket"), SimpleDrainRecipe.fromItem(Items.LAVA_BUCKET, FactoryFluids.LAVA.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY_LAVA), null);
+        exporter.accept(id("drain/to_lava_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.LAVA.ofBucket(), Items.LAVA_BUCKET, SoundEvents.ITEM_BUCKET_FILL_LAVA), null);
+        exporter.accept(id("drain/from_water_bucket"), SimpleDrainRecipe.fromItem(Items.WATER_BUCKET, FactoryFluids.WATER.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY), null);
+        exporter.accept(id("drain/to_water_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.WATER.ofBucket(), Items.WATER_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
+        exporter.accept(id("drain/from_milk_bucket"), SimpleDrainRecipe.fromItem(Items.MILK_BUCKET, FactoryFluids.MILK.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY), null);
+        exporter.accept(id("drain/to_milk_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.MILK.ofBucket(), Items.MILK_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
+
+        exporter.accept(id("drain/from_potion"), new PotionAddDrainRecipe(Ingredient.ofItems(Items.POTION), Optional.empty(), FluidConstants.BOTTLE, Items.GLASS_BOTTLE.getDefaultStack(), Registries.SOUND_EVENT.getEntry(SoundEvents.ITEM_BOTTLE_EMPTY), false), null);
+        exporter.accept(id("drain/to_potion"), new PotionRemoveDrainRecipe(Ingredient.ofItems(Items.GLASS_BOTTLE), Optional.empty(), FluidConstants.BOTTLE, Items.POTION.getDefaultStack(), Registries.SOUND_EVENT.getEntry(SoundEvents.ITEM_BOTTLE_FILL), true), null);
     }
 
     public void of(RecipeExporter exporter, RecipeEntry<?>... recipes) {

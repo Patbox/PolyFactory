@@ -79,7 +79,7 @@ public class PolydexCompatImpl {
     }
 
     private static void createFluidEntries(MinecraftServer server, PolydexEntry.EntryConsumer consumer) {
-        for (var fluid : FactoryRegistries.FLUID_TYPES) {
+        /*for (var fluid : FactoryRegistries.FLUID_TYPES) {
             if (fluid.dataCodec() == Unit.CODEC) {
                 consumer.accept(PolydexEntry.of(FactoryRegistries.FLUID_TYPES.getId(fluid), new PolydexFluidStack(fluid.defaultInstance(), 0, 1)));
             }
@@ -87,27 +87,11 @@ public class PolydexCompatImpl {
 
         for (var potion : Registries.POTION.getIndexedEntries()) {
             consumer.accept(PolydexEntry.of(id("potion/" + potion.getKey().get().getValue().toUnderscoreSeparatedString()), new PolydexFluidStack(FactoryFluids.POTION.toInstance(PotionContentsComponent.DEFAULT.with(potion)), 0, 1)));
-        }
+        }*/
     }
 
     private static void createPages(MinecraftServer server, Consumer<PolydexPage> polydexPageConsumer) {
-        for (var x : FluidBehaviours.FLUID_INSERT.entrySet()) {
-            var from = Registries.ITEM.getId(x.getKey());
-            for (var value : x.getValue()) {
-                var to = FactoryRegistries.FLUID_TYPES.getId(value.fluid().type());
 
-                var fromStack = x.getKey().getDefaultStack();
-                fromStack.applyChanges(value.predicate().toChanges());
-
-                polydexPageConsumer.accept(new FluidsPage(
-                        id("fluids/" + to.getNamespace() + "/" + to.getPath() + "/from/" + from.getNamespace() + "/"
-                                + from.getPath() + (value.fluid().instance().isDefault() ? "" : "/" + value.fluid().instance().data().hashCode())),
-                        new StrictPolydexIngredient<>(PolydexStack.of(fromStack)),
-                        PolydexStack.of(value.result()),
-                        new PolydexFluidStack(value.fluid())
-                ));
-            }
-        }
     }
 
     private static PolydexEntry seperateColoredItems(ItemStack stack) {

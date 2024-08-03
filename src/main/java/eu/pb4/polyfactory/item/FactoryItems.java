@@ -117,6 +117,7 @@ public class FactoryItems {
     public static final Item PIPE = register(FactoryBlocks.PIPE);
     public static final Item PUMP = register(FactoryBlocks.PUMP);
     public static final Item DRAIN = register(FactoryBlocks.DRAIN);
+    public static final Item CREATIVE_DRAIN = register(FactoryBlocks.CREATIVE_DRAIN);
     public static final UniversalFluidContainerItem STEEL_BUCKET = register("steel_bucket", new UniversalFluidContainerItem(FluidConstants.BUCKET * 2, new Item.Settings().maxCount(1)));
     public static final Item FLUID_TANK = register(FactoryBlocks.FLUID_TANK);
     public static void register() {
@@ -245,6 +246,7 @@ public class FactoryItems {
                     // Creative
                     entries.add(CREATIVE_MOTOR);
                     entries.add(CREATIVE_CONTAINER);
+                    entries.add(CREATIVE_DRAIN);
                 })).build()
         );
 

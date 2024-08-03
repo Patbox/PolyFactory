@@ -1,12 +1,17 @@
 package eu.pb4.polyfactory.block.fluids;
 
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.block.ItemUseLimiter;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.models.FactoryModels;
+import eu.pb4.polyfactory.models.fluid.TopFluidViewModel;
+import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
+import eu.pb4.polyfactory.recipe.input.DrainInput;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -14,20 +19,23 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsage;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, BlockEntityProvider {
+public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, BlockEntityProvider, ItemUseLimiter.All {
     public DrainBlock(Settings settings) {
         super(settings);
     }
@@ -41,26 +49,23 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         var stack = player.getStackInHand(Hand.MAIN_HAND);
         if (world.getBlockEntity(pos) instanceof DrainBlockEntity be) {
+            var container = be.getFluidContainer();
             var copy = stack.copy();
-            var x = be.getFluidContainer().interactWith((ServerPlayerEntity) player, player.getMainHandStack());
-            if (x == null) {
-                return ActionResult.PASS;
+                var input = DrainInput.of(copy, be.catalyst(), container, !(player instanceof FakePlayer));
+            var optional = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, world);
+            if (optional.isEmpty()) {
+                return super.onUse(state, world, pos, player, hit);
             }
-            if (stack.isEmpty() && ItemStack.areEqual(stack, copy)) {
-                return ActionResult.FAIL;
+            var recipe = optional.get().value();
+            var itemOut = recipe.craft(input, player.getRegistryManager());
+            for (var fluid : recipe.fluidInput(input)) {
+                container.extract(fluid, false);
             }
-
-            if (stack.isEmpty()) {
-                player.setStackInHand(Hand.MAIN_HAND, x);
-            } else if (!x.isEmpty()) {
-                if (player.isCreative()) {
-                    if (!player.getInventory().contains(x)) {
-                        player.getInventory().insertStack(x);
-                    }
-                } else {
-                    player.getInventory().offerOrDrop(x);
-                }
+            player.setStackInHand(Hand.MAIN_HAND, ItemUsage.exchangeStack(stack, player, itemOut));
+            for (var fluid : recipe.fluidOutput(input)) {
+                container.insert(fluid, false);
             }
+            world.playSound(null, pos, recipe.soundEvent().value(), SoundCategory.BLOCKS);
             return ActionResult.SUCCESS;
         }
 
@@ -96,32 +101,24 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
 
     public static final class Model extends BlockModel {
         private final ItemDisplayElement main;
-        private final ItemDisplayElement fluid;
-        private FluidInstance<?> currentFluid = null;
-        private float positionFluid = -1;
+        private final ItemDisplayElement catalyst;
+        private final TopFluidViewModel fluid;
         private Model(BlockState state) {
             this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.main.setScale(new Vector3f(2f));
-            this.fluid = ItemDisplayElementUtil.createSimple();
-
+            this.fluid = new TopFluidViewModel(this, -7f / 16f + 0.1f, 11f / 16f, 0.5f);
+            this.catalyst = ItemDisplayElementUtil.createSimple();
+            this.catalyst.setViewRange(0.4f);
             this.addElement(this.main);
-            this.addElement(this.fluid);
+            this.addElement(this.catalyst);
         }
 
-        public void setFluid(@Nullable FluidInstance type, float position) {
-            if (type == null || position < 0.01) {
-                this.fluid.setItem(ItemStack.EMPTY);
-                this.currentFluid = null;
-                this.positionFluid = -1;
-            }
-            if (this.currentFluid != type) {
-                this.fluid.setItem(FactoryModels.FLAT_FULL.get(type));
-                this.currentFluid = type;
-            }
-            if (this.positionFluid != position) {
-                this.fluid.setTranslation(new Vector3f(0, -7f / 16f + position * 11f / 16f + 0.1f, 0));
-                this.positionFluid = position;
-            }
+        public void setFluid(@Nullable FluidInstance<?> type, float position) {
+            this.fluid.setFluid(type, position);
+        }
+
+        public void setCatalyst(ItemStack catalyst) {
+            this.catalyst.setItem(catalyst);
         }
     }
 }

@@ -1,0 +1,11 @@
+{
+	"parent": "polyfactory:block/drain",
+	"textures": {
+		"0": "polyfactory:block/fluids/creative_drain_top",
+		"2": "polyfactory:block/fluids/drain_mesh",
+		"3": "polyfactory:block/fluids/creative_drain_side",
+		"4": "polyfactory:block/fluids/creative_drain_bottom",
+		"5": "polyfactory:block/fluids/creative_drain_inside",
+		"particle": "polyfactory:block/fluids/creative_drain_top"
+	}
+}

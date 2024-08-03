@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.AbovePlacingLimiter;
+import eu.pb4.factorytools.api.block.ItemUseLimiter;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
@@ -46,7 +47,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 
-public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, AbovePlacingLimiter {
+public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, AbovePlacingLimiter, ItemUseLimiter.All {
     public static final Property<Direction> INPUT_FACING = DirectionProperty.of("input_facing", x -> x.getAxis() != Direction.Axis.Y);
 
     public GrinderBlock(Settings settings) {

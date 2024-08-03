@@ -15,7 +15,6 @@ import net.minecraft.world.World;
 import java.util.List;
 
 public interface MixingRecipe extends Recipe<MixingInput>, PolymerRecipe {
-
      Iterable<ItemStack> remainders();
      void applyRecipeUse(MixerBlockEntity inventory, World world);
 

@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.source;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.block.ItemUseLimiter;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
@@ -29,6 +30,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -49,7 +52,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 
-public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider,  BarrierBasedWaterloggable, WrenchableBlock {
+public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider,  BarrierBasedWaterloggable, WrenchableBlock, ItemUseLimiter.All {
     public static final DirectionProperty FACING = Properties.FACING;
 
     public HandCrankBlock(Settings settings) {
@@ -148,6 +151,11 @@ public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlo
     @Override
     public List<WrenchAction> getWrenchActions() {
         return List.of(WrenchAction.FACING);
+    }
+
+    @Override
+    public boolean preventUseItemWhileTargetingBlock(ServerPlayerEntity player, BlockState state, World world, BlockHitResult result, ItemStack stack, Hand hand) {
+        return All.super.preventUseItemWhileTargetingBlock(player, state, world, result, stack, hand) && (state.get(WATERLOGGED) ? !stack.isOf(Items.BUCKET) : !stack.isOf(Items.WATER_BUCKET));
     }
 
     public final class Model extends RotationAwareModel {

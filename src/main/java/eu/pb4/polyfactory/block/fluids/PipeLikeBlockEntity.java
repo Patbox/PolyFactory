@@ -2,12 +2,15 @@ package eu.pb4.polyfactory.block.fluids;
 
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidContainer;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
+import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.util.DebugTextProvider;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
@@ -46,6 +49,27 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
         super.readNbt(nbt, registryLookup);
         this.container.fromNbt(registryLookup, nbt, "fluid");
         this.maxPush = this.container.stored();
+    }
+
+    @Override
+    protected void readComponents(ComponentsAccess components) {
+        super.readComponents(components);
+        var f = components.get(FactoryDataComponents.FLUID);
+        if (f != null) {
+            f.copyTo(this.container);
+        }
+    }
+
+    @Override
+    protected void addComponents(ComponentMap.Builder componentMapBuilder) {
+        super.addComponents(componentMapBuilder);
+        componentMapBuilder.add(FactoryDataComponents.FLUID, FluidComponent.copyFrom(this.container));
+    }
+
+    @Override
+    public void removeFromCopiedStackNbt(NbtCompound nbt) {
+        super.removeFromCopiedStackNbt(nbt);
+        nbt.remove("fluid");
     }
 
     public void preTick() {
@@ -129,7 +153,7 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
 
         if (fluidOutput != null) {
             var fluid = fluidOutput.getTopFluid(direction.getOpposite());
-            if (fluid == null || (fluid.equals(currentFluid))) {
+            if (fluid == null || (currentFluid != null && !currentFluid.equals(fluid))) {
                 return;
             }
             var maxFlow = fluid.getMaxFlow((ServerWorld) world);

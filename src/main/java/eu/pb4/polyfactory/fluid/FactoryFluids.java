@@ -2,13 +2,11 @@ package eu.pb4.polyfactory.fluid;
 
 import eu.pb4.polyfactory.FactoryRegistries;
 import eu.pb4.polyfactory.ModInit;
-import eu.pb4.polyfactory.block.data.WallWithCableBlock;
+import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.item.FactoryItems;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeveledCauldronBlock;
-import net.minecraft.block.WallBlock;
-import net.minecraft.block.Waterloggable;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
@@ -30,7 +28,7 @@ public class FactoryFluids {
     public static final FluidType<Unit> WATER = register(Identifier.ofVanilla("water"),
             FluidType.of().density(100).fluid(Fluids.WATER).color(0x3b3bed).particle(ParticleTypes.DRIPPING_WATER).build());
     public static final FluidType<Unit> LAVA = register(Identifier.ofVanilla("lava"),
-            FluidType.of().density(1000).fluid(Fluids.LAVA).particle(ParticleTypes.DRIPPING_LAVA)
+            FluidType.of().density(1000).fluid(Fluids.LAVA).particle(ParticleTypes.DRIPPING_LAVA).brightness(15).heat(BlockHeat.LAVA)
                     .flowSpeedMultiplier(((world, data) -> world.getDimension().ultrawarm() ? 1 : 0.5))
                     .maxFlow(((world, data) -> world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
     @SuppressWarnings("OptionalGetWithoutIsPresent")
@@ -38,7 +36,7 @@ public class FactoryFluids {
             FluidType.of().density(200).particle(EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, 0xFFFFFF))
                     .flowSpeedMultiplier(0.95)
                     .build());
-    public static final FluidType<Unit> XP = register(Identifier.ofVanilla("xp"),
+    public static final FluidType<Unit> EXPERIENCE = register(Identifier.ofVanilla("experience"),
             FluidType.of().density(50).particle(EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, 0x55FF55))
                     .flowSpeedMultiplier(1.3).maxFlow(FluidConstants.BOTTLE * 2)
                     .build());
@@ -56,25 +54,6 @@ public class FactoryFluids {
                     }).particle((data) -> EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, data.getColor())).build());
 
     public static void register() {
-        FluidBehaviours.addStaticRelation(Items.WATER_BUCKET, Items.BUCKET, WATER.ofBucket(), SoundEvents.ITEM_BUCKET_EMPTY, SoundEvents.ITEM_BUCKET_FILL);
-        FluidBehaviours.addStaticRelation(Items.LAVA_BUCKET, Items.BUCKET, LAVA.ofBucket(), SoundEvents.ITEM_BUCKET_EMPTY_LAVA, SoundEvents.ITEM_BUCKET_FILL_LAVA);
-        FluidBehaviours.addStaticRelation(Items.MILK_BUCKET, Items.BUCKET, MILK.ofBucket(), SoundEvents.ITEM_BUCKET_EMPTY, SoundEvents.ITEM_BUCKET_FILL);
-        FluidBehaviours.addStaticRelation(FactoryItems.EXPERIENCE_BUCKET, Items.BUCKET, XP.ofBucket(), SoundEvents.ITEM_BUCKET_EMPTY, SoundEvents.ITEM_BUCKET_FILL);
-
-        FluidBehaviours.addStaticRelation(Items.POTION,
-                ComponentPredicate.of(ComponentMap.builder().add(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT.with(Potions.WATER)).build()),
-                Items.GLASS_BOTTLE, WATER.ofBottle(), SoundEvents.ITEM_BOTTLE_EMPTY, SoundEvents.ITEM_BOTTLE_FILL);
-
-        for (var potion : Registries.POTION.getIndexedEntries()) {
-            if (potion == Potions.WATER) {
-                continue;
-            }
-            FluidBehaviours.addStaticRelation(Items.POTION,
-                    ComponentPredicate.of(ComponentMap.builder().add(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT.with(potion)).build()),
-                    Items.GLASS_BOTTLE, POTION.ofBottle(PotionContentsComponent.DEFAULT.with(potion)), SoundEvents.ITEM_BOTTLE_EMPTY, SoundEvents.ITEM_BOTTLE_FILL);
-        }
-
-
         FluidBehaviours.addBlockStateConversions(Blocks.WATER.getDefaultState(), Blocks.AIR.getDefaultState(), WATER.ofBucket());
         FluidBehaviours.addBlockStateConversions(Blocks.LAVA.getDefaultState(), Blocks.AIR.getDefaultState(), LAVA.ofBucket());
         FluidBehaviours.addBlockStateConversions(Blocks.WATER_CAULDRON.getDefaultState().with(LeveledCauldronBlock.LEVEL, 3),
@@ -84,10 +63,6 @@ public class FactoryFluids {
         FluidBehaviours.addBlockStateConversions(Blocks.WATER_CAULDRON.getDefaultState().with(LeveledCauldronBlock.LEVEL, 1),
                 Blocks.CAULDRON.getDefaultState(), WATER.ofBottle());
         FluidBehaviours.addBlockStateConversions(Blocks.LAVA_CAULDRON.getDefaultState(), Blocks.CAULDRON.getDefaultState(), LAVA.ofBucket());
-
-        if (ModInit.DEV_MODE) {
-            FluidBehaviours.addStaticRelation(Items.EXPERIENCE_BOTTLE, Items.GLASS_BOTTLE, XP.ofBottle(), SoundEvents.ITEM_BOTTLE_EMPTY, SoundEvents.ITEM_BOTTLE_FILL);
-        }
     }
 
     public static <T> FluidType<T> register(Identifier identifier, FluidType<T> item) {

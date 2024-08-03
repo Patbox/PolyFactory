@@ -4,7 +4,9 @@ import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.FactoryRegistries;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.minecraft.entity.decoration.Brightness;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -12,10 +14,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.world.World;
 
-import java.util.Comparator;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public record FluidInstance<T>(FluidType<T> type, T data) {
     public static final Comparator<FluidInstance<?>> DENSITY_COMPARATOR = Comparator.comparingInt(FluidInstance::density);
@@ -104,6 +103,10 @@ public record FluidInstance<T>(FluidType<T> type, T data) {
         return this.type.texture();
     }
 
+    public float heat() {
+        return this.type.heat();
+    }
+
     public ParticleEffect particle() {
         return this.type.particleGetter().apply(this.data);
     }
@@ -114,5 +117,13 @@ public record FluidInstance<T>(FluidType<T> type, T data) {
 
     public double getFlowSpeedMultiplier(ServerWorld world) {
         return this.type.flowSpeedMultiplier().getSpeedMultiplier(world, this.data);
+    }
+
+    public Optional<Brightness> brightness() {
+        return this.type.brightness();
+    }
+
+    public boolean isIn(TagKey<FluidType<?>> tag) {
+        return FactoryRegistries.FLUID_TYPES.getEntry(this.type).isIn(tag);
     }
 }

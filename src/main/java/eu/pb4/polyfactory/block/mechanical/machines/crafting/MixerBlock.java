@@ -14,6 +14,7 @@ import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.factorytools.api.util.WorldPointer;
+import eu.pb4.polyfactory.models.fluid.TopFluidViewModel;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
@@ -126,16 +127,14 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement whisk;
         private final ItemDisplayElement main;
-        private final ItemDisplayElement fluid;
+        private final TopFluidViewModel fluid;
         private final ItemDisplayElement gearA;
         private final ItemDisplayElement gearB;
         private float rotation;
         private boolean active;
-        private FluidInstance<?> currentFluid = null;
-        private float positionFluid = -1;
 
         private Model(BlockState state) {
-            this.fluid = ItemDisplayElementUtil.createSimple();
+            this.fluid = new TopFluidViewModel(this, -4f / 16f, 10f / 16f, 0.5f);
             this.main = ItemDisplayElementUtil.createSimple(FactoryItems.MIXER);
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
@@ -150,7 +149,6 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
             this.updateStatePos(state);
             var dir = state.get(INPUT_FACING);
             this.updateAnimation(true,  true, 0, (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
-            this.addElement(this.fluid);
             this.addElement(this.whisk);
             this.addElement(this.main);
             this.addElement(this.gearA);
@@ -216,19 +214,7 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
         }
 
         public void setFluid(@Nullable FluidInstance<?> type, float position) {
-            if (type == null || position < 0.01) {
-                this.fluid.setItem(ItemStack.EMPTY);
-                this.currentFluid = null;
-                this.positionFluid = -1;
-            }
-            if (this.currentFluid != type) {
-                this.fluid.setItem(FactoryModels.FLAT_FULL.get(type));
-                this.currentFluid = type;
-            }
-            if (this.positionFluid != position) {
-                this.fluid.setTranslation(new Vector3f(0, -4f / 16f + position * 10f / 16f, 0));
-                this.positionFluid = position;
-            }
+            this.fluid.setFluid(type, position);
         }
 
         public void rotate(float speed) {

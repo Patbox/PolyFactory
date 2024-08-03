@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.fluids.FluidInputOutput;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
@@ -9,6 +10,8 @@ import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidType;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
+import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.MixingInput;
@@ -26,6 +29,7 @@ import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
@@ -114,6 +118,28 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
     }
 
     @Override
+    protected void readComponents(ComponentsAccess components) {
+        super.readComponents(components);
+        var f = components.get(FactoryDataComponents.FLUID);
+        if (f != null) {
+            this.fluidContainer.clear();
+            f.extractTo(this.fluidContainer);
+        }
+    }
+
+    @Override
+    protected void addComponents(ComponentMap.Builder componentMapBuilder) {
+        super.addComponents(componentMapBuilder);
+        componentMapBuilder.add(FactoryDataComponents.FLUID, FluidComponent.copyFrom(this.fluidContainer));
+    }
+
+    @Override
+    public void removeFromCopiedStackNbt(NbtCompound nbt) {
+        super.removeFromCopiedStackNbt(nbt);
+        nbt.remove("fluid");
+    }
+
+    @Override
     public int[] getAvailableSlots(Direction side) {
         var facing = this.getCachedState().get(MixerBlock.INPUT_FACING);
         return facing.getOpposite() == side || side == Direction.DOWN ? OUTPUT_SLOTS : INPUT_SLOTS;
@@ -144,21 +170,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             }
         }
         self.state = null;
-        var belowBlock = world.getBlockState(pos.down());
-
-        if (belowBlock.isIn(BlockTags.CAMPFIRES)) {
-            self.temperature = 0.5f;
-        } else if (belowBlock.isIn(BlockTags.FIRE)) {
-            self.temperature = 0.6f;
-        } else if (belowBlock.isOf(Blocks.LAVA)) {
-            self.temperature = 0.8f;
-        } else if (belowBlock.isOf(Blocks.TORCH)) {
-            self.temperature = 0.2f;
-        } else if (belowBlock.isOf(Blocks.TORCHFLOWER)) {
-            self.temperature = 0.1f;
-        } else {
-            self.temperature = 0;
-        }
+        self.temperature = BlockHeat.get(world, pos.down());
 
         self.fluidContainer.tick((ServerWorld) world, pos, self.temperature, self::addToOutputOrDrop);
         self.model.setFluid(self.fluidContainer.topFluid(), self.fluidContainer.getFilledPercentage());

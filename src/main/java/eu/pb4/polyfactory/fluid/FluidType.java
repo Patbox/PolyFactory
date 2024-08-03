@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.FactoryRegistries;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.minecraft.entity.decoration.Brightness;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
@@ -21,14 +22,15 @@ import java.util.function.Function;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public record FluidType<T>(int density, Codec<T> dataCodec, T defaultData,
+public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaultData,
                            Optional<Fluid> backingFluid,
                            Optional<Identifier> textureOverride,
                            Optional<ColorProvider<T>> color,
                            Optional<BiFunction<FluidType<T>, T, Text>> name,
                            Function<T, ParticleEffect> particleGetter,
                            MaxFlowProvider<T> maxFlow,
-                           FlowSpeedProvider<T> flowSpeedMultiplier
+                           FlowSpeedProvider<T> flowSpeedMultiplier,
+                           Optional<Brightness> brightness
 ) {
 
     private static final Map<Fluid, FluidType<?>> FLUID_TO_TYPE = new IdentityHashMap<>();
@@ -131,8 +133,11 @@ public record FluidType<T>(int density, Codec<T> dataCodec, T defaultData,
         private final Codec<T> dataCodec;
         private final T defaultData;
         private int density = 0;
+        private float heat = 0;
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         private Optional<Fluid> fluid = Optional.empty();
+        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+        private Optional<Brightness> brightness = Optional.empty();
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         private Optional<Identifier> texture = Optional.empty();
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -150,6 +155,11 @@ public record FluidType<T>(int density, Codec<T> dataCodec, T defaultData,
 
         public Builder<T> density(int density) {
             this.density = density;
+            return this;
+        }
+
+        public Builder<T> heat(float heat) {
+            this.heat = heat;
             return this;
         }
 
@@ -181,6 +191,15 @@ public record FluidType<T>(int density, Codec<T> dataCodec, T defaultData,
             return this;
         }
 
+        public Builder<T> brightness(int light) {
+            return this.brightness(new Brightness(light, light));
+        }
+
+        public Builder<T> brightness(Brightness brightness) {
+            this.brightness = Optional.ofNullable(brightness);
+            return this;
+        }
+
         public Builder<T> particle(ParticleEffect particle) {
             return particle(x -> particle);
         }
@@ -206,8 +225,8 @@ public record FluidType<T>(int density, Codec<T> dataCodec, T defaultData,
         }
 
         public FluidType<T> build() {
-            return new FluidType<>(this.density, this.dataCodec, this.defaultData, this.fluid, this.texture,
-                    this.color, this.name, this.particleGetter, this.maxFlow, this.flowSpeedMultiplier);
+            return new FluidType<>(this.density, this.heat, this.dataCodec, this.defaultData, this.fluid, this.texture,
+                    this.color, this.name, this.particleGetter, this.maxFlow, this.flowSpeedMultiplier, this.brightness);
         }
     }
 }

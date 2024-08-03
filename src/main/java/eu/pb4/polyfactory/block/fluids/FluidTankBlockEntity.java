@@ -1,14 +1,18 @@
 package eu.pb4.polyfactory.block.fluids;
 
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
+import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
+import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
@@ -29,6 +33,7 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
     @Nullable
     private FluidTankBlock.Model model;
     private boolean postInitialRead = false;
+    private float temperature = 0;
 
     public FluidTankBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.FLUID_TANK, pos, state);
@@ -52,6 +57,27 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
             updateModel();
             this.postInitialRead = true;
         }
+    }
+    @Override
+    protected void readComponents(ComponentsAccess components) {
+        super.readComponents(components);
+        var f = components.get(FactoryDataComponents.FLUID);
+        if (f != null) {
+            this.container.clear();
+            f.extractTo(this.container);
+        }
+    }
+
+    @Override
+    protected void addComponents(ComponentMap.Builder componentMapBuilder) {
+        super.addComponents(componentMapBuilder);
+        componentMapBuilder.add(FactoryDataComponents.FLUID, FluidComponent.copyFrom(this.container));
+    }
+
+    @Override
+    public void removeFromCopiedStackNbt(NbtCompound nbt) {
+        super.removeFromCopiedStackNbt(nbt);
+        nbt.remove("fluid");
     }
 
     @Override
@@ -101,12 +127,6 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
             return;
         }
         tank.postInitialRead = true;
-        if (tank.container.isEmpty()) {
-            tank.updateModel();
-            return;
-        }
-        tank.container.tick((ServerWorld) world, pos, 0, tank::dropItem);
-
         updateVertical(world, tank, pos, state);
         updateHorizontal(world, tank, pos, state);
         updateVertical(world, tank, pos, state);
@@ -119,6 +139,7 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
         if ((y.single() || y.negative()) && tank.model != null) {
             tank.model.setFluidBelow(null);
         }
+        tank.container.tick((ServerWorld) world, pos, 0, tank::dropItem);
         tank.updateModel();
     }
 
@@ -129,6 +150,7 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
     private static void updateVertical(World world, FluidTankBlockEntity tank, BlockPos pos, BlockState state) {
         var y = state.get(FluidTankBlock.PART_Y);
         if ((y.middle() || y.positive()) && world.getBlockEntity(pos.offset(Direction.DOWN)) instanceof FluidTankBlockEntity below) {
+            tank.temperature = below.temperature;
             if (below.container.isNotFull()) {
                 while (below.container.isNotFull() && tank.container.isNotEmpty()) {
                     var ownBottomFluid = tank.container.bottomFluid();
@@ -156,6 +178,8 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
             if (tank.model != null) {
                 tank.model.setFluidBelow(below.container.topFluid());
             }
+        } else {
+            tank.temperature = BlockHeat.get(world.getBlockState(pos.down()));
         }
     }
 

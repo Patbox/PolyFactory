@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.block.ItemUseLimiter;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
@@ -38,7 +39,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public abstract class TallItemMachineBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, InventoryProvider, RotationUser, MovingItemConsumer, MovingItemProvider {
+public abstract class TallItemMachineBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, InventoryProvider, RotationUser, MovingItemConsumer, MovingItemProvider, ItemUseLimiter.All {
     public static final Property<Part> PART = EnumProperty.of("part", Part.class);
     public static final BooleanProperty HAS_CONVEYOR = BooleanProperty.of("has_conveyor");
     public static final Property<Direction> INPUT_FACING = DirectionProperty.of("input_facing", x -> x.getAxis() != Direction.Axis.Y);

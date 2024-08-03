@@ -1,18 +1,24 @@
 package eu.pb4.polyfactory.fluid;
 
+import com.mojang.datafixers.types.templates.Tag;
 import com.mojang.serialization.RecordBuilder;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.item.tool.UniversalFluidContainerItem;
+import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
+import eu.pb4.polyfactory.recipe.input.DrainInput;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import it.unimi.dsi.fastutil.objects.*;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.*;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -20,6 +26,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,6 +57,10 @@ public class FluidContainer {
 
     public static FluidContainer singleFluid(long maxStorage, Runnable markDirty) {
         return new FluidContainer(maxStorage, markDirty, (self, type) -> self.isEmpty() || self.contains(type));
+    }
+
+    public static FluidContainer onlyInTag(long maxStorage, TagKey<FluidType<?>> tag, Runnable markDirty) {
+        return new FluidContainer(maxStorage, markDirty, (self, type) -> type.isIn(tag));
     }
 
     public boolean isEmpty() {
@@ -104,44 +115,23 @@ public class FluidContainer {
             return ItemStack.EMPTY;
         }
 
-        var inserts = FluidBehaviours.FLUID_INSERT.get(stack.getItem());
-        if (inserts != null) {
-            for (var x : inserts) {
-                if (x.predicate().test(stack)) {
-                    if (this.canInsert(x.fluid(), true)) {
-                        stack.decrementUnlessCreative(1, player);
-                        this.insert(x.fluid(), true);
-                        player.playSoundToPlayer(x.sound(), SoundCategory.BLOCKS, 1, 1);
-                        return x.result().copy();
-                    }
-                    return ItemStack.EMPTY;
-                }
-            }
+        var copy = stack.copy();
+        var input = DrainInput.of(copy, ItemStack.EMPTY, this, !(player instanceof FakePlayer));
+        var optional = player.getWorld().getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, player.getWorld());
+        if (optional.isEmpty()) {
+            return null;
         }
-
-        var extractMap = FluidBehaviours.FLUID_EXTRACT.get(stack.getItem());
-        if (extractMap != null) {
-            for (var f : this.storedFluids.keySet()) {
-                var extracts = extractMap.get(f.type());
-                if (extracts != null && !extracts.isEmpty()) {
-                    for (var x : extracts) {
-                        if (x.predicate().test(stack)) {
-                            if (this.canExtract(x.fluid(), true)) {
-                                stack.decrementUnlessCreative(1, player);
-                                this.extract(x.fluid(), true);
-                                player.playSoundToPlayer(x.sound(), SoundCategory.BLOCKS, 1, 1);
-                                return x.result().copy();
-                            }
-                        }
-                    }
-                    return ItemStack.EMPTY;
-                }
-            }
+        var recipe = optional.get().value();
+        var itemOut = recipe.craft(input, player.getRegistryManager());
+        for (var fluid : recipe.fluidInput(input)) {
+            this.extract(fluid, false);
         }
-
-
-
-        return null;
+        stack.decrementUnlessCreative(1, player);
+        for (var fluid : recipe.fluidOutput(input)) {
+            this.insert(fluid, false);
+        }
+        player.playSoundToPlayer(recipe.soundEvent().value(), SoundCategory.BLOCKS, 0.5f, 1f);
+        return itemOut;
     }
 
     public boolean canInsert(FluidStack<?> stack, boolean strict) {

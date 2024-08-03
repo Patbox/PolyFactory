@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.block.ItemUseLimiter;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.factorytools.api.block.FactoryBlock;
@@ -45,7 +46,7 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
-public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser {
+public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, ItemUseLimiter.All {
     public static final Property<Direction> FACING = Properties.HORIZONTAL_FACING;
 
     public MCrafterBlock(Settings settings) {

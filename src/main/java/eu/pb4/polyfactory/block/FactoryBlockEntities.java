@@ -3,6 +3,8 @@ package eu.pb4.polyfactory.block;
 import com.google.common.collect.ImmutableSet;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlockEntity;
+import eu.pb4.polyfactory.block.creative.CreativeDrainBlock;
+import eu.pb4.polyfactory.block.creative.CreativeDrainBlockEntity;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlockEntity;
 import eu.pb4.polyfactory.block.data.CableBlockEntity;
 import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlockEntity;
@@ -124,6 +126,7 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<PipeBlockEntity> PIPE = register("pipe", BlockEntityType.Builder.create(PipeBlockEntity::new, FactoryBlocks.PIPE));
     public static final BlockEntityType<PumpBlockEntity> PUMP = register("pump", BlockEntityType.Builder.create(PumpBlockEntity::new, FactoryBlocks.PUMP));
     public static final BlockEntityType<DrainBlockEntity> DRAIN = register("drain", BlockEntityType.Builder.create(DrainBlockEntity::new, FactoryBlocks.DRAIN));
+    public static final BlockEntityType<CreativeDrainBlockEntity> CREATIVE_DRAIN = register("creative_drain", BlockEntityType.Builder.create(CreativeDrainBlockEntity::new, FactoryBlocks.CREATIVE_DRAIN));
     public static final BlockEntityType<FluidTankBlockEntity> FLUID_TANK = register("fluid_tank", BlockEntityType.Builder.create(FluidTankBlockEntity::new, FactoryBlocks.FLUID_TANK));
 
     public static void register() {

@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.models;
+package eu.pb4.polyfactory.models.fluid;
 
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.polyfactory.FactoryRegistries;

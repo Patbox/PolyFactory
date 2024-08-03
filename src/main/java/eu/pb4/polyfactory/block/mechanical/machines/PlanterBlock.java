@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
+import eu.pb4.factorytools.api.block.ItemUseLimiter;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.factorytools.api.block.FactoryBlock;
@@ -50,7 +51,7 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
-public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, BarrierBasedWaterloggable {
+public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, BarrierBasedWaterloggable, ItemUseLimiter.All {
     public PlanterBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));

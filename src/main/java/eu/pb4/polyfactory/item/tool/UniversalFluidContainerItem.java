@@ -31,7 +31,6 @@ public class UniversalFluidContainerItem extends ModeledItem {
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         super.appendTooltip(stack, context, tooltip, type);
         tooltip.add(Text.literal(stack.getOrDefault(FactoryDataComponents.FLUID_INTERACTION_MODE, FluidInteractionMode.EXTRACT).name()));
-        stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT).appendTooltip(tooltip::add);
     }
 
     @Override
