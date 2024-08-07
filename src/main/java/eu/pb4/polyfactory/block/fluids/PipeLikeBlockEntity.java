@@ -30,6 +30,8 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
     protected BlockState[] pushState = new BlockState[pushOverflow.length];
 
     protected long maxPush = 0;
+    private int[] particleCounter = {1, 3, 5, 6, 8, 4};
+
     public PipeLikeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
@@ -113,6 +115,22 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
                 this.maxPush -= extracted - leftover;
             }
             return;
+        }
+
+        if (pushedBlockState.isAir() && (this.particleCounter[direction.ordinal()]++ % 10) == 0) {
+            var fluid = this.container.topFluid();
+            if (fluid != null) {
+                var particle = fluid.particle();
+                if (particle != null) {
+                    ((ServerWorld) world).spawnParticles(particle,
+                            this.pos.getX() + 0.5 + direction.getOffsetX() * 0.6,
+                            this.pos.getY() + 0.5 + direction.getOffsetY() * 0.6,
+                            this.pos.getZ() + 0.5 + direction.getOffsetZ() * 0.6,
+                            0,
+                            direction.getOffsetX() * 0.1, direction.getOffsetY() * 0.1, direction.getOffsetZ() * 0.1, 0.2
+                    );
+                }
+            }
         }
 
         if (pushedBlockState == this.pushState[direction.ordinal()]) {

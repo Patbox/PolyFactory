@@ -62,6 +62,9 @@ class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
                 .add(Items.END_CRYSTAL, Items.ENDER_EYE, Items.EXPERIENCE_BOTTLE, Items.GLASS_BOTTLE, Items.POTION, Items.WHEAT)
         ;
 
+        this.getOrCreateTagBuilder(FactoryItemTags.DRAIN_CATALYST).add(Items.ECHO_SHARD);
+        this.getOrCreateTagBuilder(FactoryItemTags.XP_CONVERSION_CATALYST).add(Items.ECHO_SHARD);
+
         this.copy(FactoryBlockTags.STRIPPED_LOGS, FactoryItemTags.STRIPPED_LOGS);
     }
 }

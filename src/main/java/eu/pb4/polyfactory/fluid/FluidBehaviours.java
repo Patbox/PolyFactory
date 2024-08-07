@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.fluid;
 
 
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface FluidBehaviours {
+    long EXPERIENCE_ORB_TO_FLUID = 500;
     Map<BlockState, Pair<FluidStack<Unit>, BlockState>> BLOCK_STATE_TO_FLUID_EXTRACT = new IdentityHashMap<>();
     Map<BlockState, List<Pair<FluidStack<?>, BlockState>>> BLOCK_STATE_TO_FLUID_INSERT = new IdentityHashMap<>();
 

@@ -12,10 +12,7 @@ import eu.pb4.polyfactory.block.data.output.*;
 import eu.pb4.polyfactory.block.data.providers.*;
 import eu.pb4.polyfactory.block.electric.ElectricGeneratorBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
-import eu.pb4.polyfactory.block.fluids.DrainBlock;
-import eu.pb4.polyfactory.block.fluids.FluidTankBlock;
-import eu.pb4.polyfactory.block.fluids.PipeBlock;
-import eu.pb4.polyfactory.block.fluids.PumpBlock;
+import eu.pb4.polyfactory.block.fluids.*;
 import eu.pb4.polyfactory.block.mechanical.machines.PlacerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlock;
@@ -114,6 +111,7 @@ public class FactoryBlocks {
     public static final PipeBlock PIPE = register("pipe", new PipeBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
     public static final PumpBlock PUMP = register("pump", new PumpBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
     public static final DrainBlock DRAIN = register("drain", new DrainBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
+    public static final MDrainBlock MECHANICAL_DRAIN = register("mechanical_drain", new MDrainBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
     public static final CreativeDrainBlock CREATIVE_DRAIN = register("creative_drain", new CreativeDrainBlock(AbstractBlock.Settings.copy(DRAIN).dropsNothing().strength(-1)));
     public static final FluidTankBlock FLUID_TANK = register("fluid_tank", new FluidTankBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
 

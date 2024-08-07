@@ -19,6 +19,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -119,4 +121,7 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
         this.markDirty();
     }
 
+    public void onBroken(World world, BlockPos pos) {
+        ItemScatterer.spawn(world, pos, DefaultedList.copyOf(ItemStack.EMPTY, this.catalyst));
+    }
 }

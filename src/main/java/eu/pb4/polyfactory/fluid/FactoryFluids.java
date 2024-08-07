@@ -26,9 +26,9 @@ import net.minecraft.util.Unit;
 
 public class FactoryFluids {
     public static final FluidType<Unit> WATER = register(Identifier.ofVanilla("water"),
-            FluidType.of().density(100).fluid(Fluids.WATER).color(0x3b3bed).particle(ParticleTypes.DRIPPING_WATER).build());
+            FluidType.of().density(100).fluid(Fluids.WATER).color(0x3b3bed).particle(ParticleTypes.FALLING_WATER).build());
     public static final FluidType<Unit> LAVA = register(Identifier.ofVanilla("lava"),
-            FluidType.of().density(1000).fluid(Fluids.LAVA).particle(ParticleTypes.DRIPPING_LAVA).brightness(15).heat(BlockHeat.LAVA)
+            FluidType.of().density(1000).fluid(Fluids.LAVA).particle(ParticleTypes.FALLING_LAVA).brightness(15).heat(BlockHeat.LAVA)
                     .flowSpeedMultiplier(((world, data) -> world.getDimension().ultrawarm() ? 1 : 0.5))
                     .maxFlow(((world, data) -> world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
     @SuppressWarnings("OptionalGetWithoutIsPresent")

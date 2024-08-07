@@ -614,7 +614,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
                     base.rotateX( (this.direction.getAxis() == Direction.Axis.X ? -1 : 1) * MathHelper.HALF_PI / 2 * -this.value.value);
                 }
 
-                movingItemContainer.setRotation(base);
+                movingItemContainer.setRotation(base.mul(Direction.NORTH.getRotationQuaternion()));
             }
         }
 

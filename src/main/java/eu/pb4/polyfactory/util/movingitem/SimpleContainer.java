@@ -6,6 +6,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
@@ -122,6 +123,20 @@ public class SimpleContainer implements ContainerHolder {
             return this.movingItem.get();
         }
         return ItemStack.EMPTY;
+    }
+
+    @Nullable
+    public Vec3d getPos() {
+        if (this.movingItem != null) {
+            return this.movingItem.getCurrentPos();
+        }
+        return null;
+    }
+
+    public void tick() {
+        if (this.movingItem != null) {
+            this.movingItem.tick();
+        }
     }
 
     public interface AddedCallback {

@@ -293,6 +293,19 @@ public class FluidContainer {
         return Object2LongMaps.unmodifiable(this.storedFluids);
     }
 
+    public boolean replace(FluidInstance<?> oldFluid, FluidInstance<?> newFluid) {
+        if (this.doesNotContain(oldFluid)) {
+            return false;
+        }
+
+        var oldAmount = this.get(oldFluid);
+        var newAmount = this.get(newFluid);
+        this.set(oldFluid, 0);
+        this.set(newFluid, oldAmount + newAmount);
+        return true;
+    }
+
+
     public GuiElementInterface guiElement(boolean interactable) {
         return new GuiElementInterface() {
             @Override

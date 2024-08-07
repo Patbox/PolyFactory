@@ -922,6 +922,8 @@ class RecipesProvider extends FabricRecipeProvider {
         exporter.accept(id("drain/to_water_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.WATER.ofBucket(), Items.WATER_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
         exporter.accept(id("drain/from_milk_bucket"), SimpleDrainRecipe.fromItem(Items.MILK_BUCKET, FactoryFluids.MILK.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY), null);
         exporter.accept(id("drain/to_milk_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.MILK.ofBucket(), Items.MILK_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
+        exporter.accept(id("drain/from_experience_bucket"), SimpleDrainRecipe.fromItem(FactoryItems.EXPERIENCE_BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY), null);
+        exporter.accept(id("drain/to_experience_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), FactoryItems.EXPERIENCE_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
 
         exporter.accept(id("drain/from_potion"), new PotionAddDrainRecipe(Ingredient.ofItems(Items.POTION), Optional.empty(), FluidConstants.BOTTLE, Items.GLASS_BOTTLE.getDefaultStack(), Registries.SOUND_EVENT.getEntry(SoundEvents.ITEM_BOTTLE_EMPTY), false), null);
         exporter.accept(id("drain/to_potion"), new PotionRemoveDrainRecipe(Ingredient.ofItems(Items.GLASS_BOTTLE), Optional.empty(), FluidConstants.BOTTLE, Items.POTION.getDefaultStack(), Registries.SOUND_EVENT.getEntry(SoundEvents.ITEM_BOTTLE_FILL), true), null);

@@ -26,11 +26,10 @@ public class MovingItem implements VirtualElement, StackReference {
     private ItemStack stackCurrent;
     private final ItemDisplayElement[] itemDisplay = new ItemDisplayElement[4];
     private final ItemDisplayElement riddenBase;
-    private Vec3d pos;
-    private Vec3d lastPos;
     private float globalScale = 1;
     private int tick;
     private boolean isFirstMove = true;
+    private Vec3d pos = Vec3d.ZERO;
 
     @Deprecated
     public MovingItem(ItemStack stack) {
@@ -40,7 +39,6 @@ public class MovingItem implements VirtualElement, StackReference {
     public MovingItem(ItemStack stack, Vec3d pos) {
         this.stack = stack.copy();
         this.stackCurrent = stack.copy();
-        this.setPos(pos);
 
         for (var i = 0; i < 4; i++) {
             this.itemDisplay[i] = new LodItemDisplayElement();
@@ -55,6 +53,7 @@ public class MovingItem implements VirtualElement, StackReference {
         }
         this.riddenBase = this.itemDisplay[0];
         this.riddenBase.setSendPositionUpdates(true);
+        this.setPos(pos);
     }
 
     public MovingItem split(ContainerHolder aware) {
@@ -62,7 +61,7 @@ public class MovingItem implements VirtualElement, StackReference {
     }
 
     public MovingItem split(int newCount) {
-        var x = new MovingItem(this.stack.copyWithCount(newCount), this.pos);
+        var x = new MovingItem(this.stack.copyWithCount(newCount), this.getCurrentPos());
         this.stack.decrement(newCount);
         return x;
     }
@@ -101,10 +100,21 @@ public class MovingItem implements VirtualElement, StackReference {
     }
 
     public void setPos(Vec3d vec3d) {
-        if (this.lastPos == null) {
-            this.lastPos = vec3d;
+        this.setOverridePos(vec3d);
+        for (var x : this.itemDisplay) {
+            x.setOverridePos(vec3d);
         }
+    }
+
+    @Nullable
+    @Override
+    public void setOverridePos(Vec3d vec3d) {
         this.pos = vec3d;
+    }
+
+    @Override
+    public @Nullable Vec3d getOverridePos() {
+        return this.pos;
     }
 
     @Override
@@ -155,18 +165,12 @@ public class MovingItem implements VirtualElement, StackReference {
         }
 
         for (var x : this.itemDisplay) {
-            if (x.isDirty()) {
-                x.tick();
-            }
+            x.tick();
         }
-        if (!this.pos.equals(this.lastPos)) {
-            this.riddenBase.setOffset(this.pos.subtract(this.getHolder().getPos()));
-            this.riddenBase.notifyMove(this.lastPos, this.pos, this.lastPos.subtract(this.pos));
-            if (this.isFirstMove) {
-                this.riddenBase.setTeleportDuration(4);
-                this.isFirstMove = false;
-            }
-            this.lastPos = this.pos;
+
+        if (this.isFirstMove) {
+            this.riddenBase.setTeleportDuration(4);
+            this.isFirstMove = false;
         }
     }
 
@@ -182,15 +186,13 @@ public class MovingItem implements VirtualElement, StackReference {
     }
 
     public void setRotation(Quaternionf quaternionf) {
-        var tr = quaternionf.mul(Direction.NORTH.getRotationQuaternion(), new Quaternionf());
-
-        if (tr.equals(this.itemDisplay[0].getLeftRotation(), 0.05f)) {
+        if (quaternionf.equals(this.itemDisplay[0].getLeftRotation(), 0.05f)) {
             return;
         }
 
         for (var i = 0; i < 4; i++) {
             var display = this.itemDisplay[i];
-            display.setLeftRotation(tr);
+            display.setLeftRotation(quaternionf);
             var e = i % 2 == 1;
             display.setTranslation(new Vector3f( (e ? i : -i) * 0.01f, i * 0.03f, (e ? i : -i) * 0.01f).rotate(quaternionf));
             if (display.isDirty()) {

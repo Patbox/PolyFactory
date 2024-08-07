@@ -139,7 +139,7 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
         if ((y.single() || y.negative()) && tank.model != null) {
             tank.model.setFluidBelow(null);
         }
-        tank.container.tick((ServerWorld) world, pos, 0, tank::dropItem);
+        tank.container.tick((ServerWorld) world, pos, tank.temperature, tank::dropItem);
         tank.updateModel();
     }
 

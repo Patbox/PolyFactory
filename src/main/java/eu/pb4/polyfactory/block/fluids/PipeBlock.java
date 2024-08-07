@@ -5,34 +5,30 @@ import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.block.property.LazyEnumProperty;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.nodes.generic.SelectiveSideNode;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -41,8 +37,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe {
+public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe, WrenchableBlock {
 
+    public static final BooleanProperty LOCKED = FactoryProperties.LOCKED;
     public static final LazyEnumProperty<TriState> NORTH = FactoryProperties.TRI_STATE_NORTH;
     public static final LazyEnumProperty<TriState> SOUTH = FactoryProperties.TRI_STATE_SOUTH;
 
@@ -50,11 +47,13 @@ public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnect
     public static final LazyEnumProperty<TriState> WEST = FactoryProperties.TRI_STATE_WEST;
     public static final LazyEnumProperty<TriState> UP = FactoryProperties.TRI_STATE_UP;
     public static final LazyEnumProperty<TriState> DOWN = FactoryProperties.TRI_STATE_DOWN;
+
+    private static final List<WrenchAction> WRENCH_ACTIONS = List.of(WrenchAction.of("locked", LOCKED));
     public static final Map<Direction, LazyEnumProperty<TriState>> FACING_PROPERTIES = FactoryProperties.TRI_STATE_DIRECTIONS;
 
     public PipeBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(NORTH, TriState.FALSE).with(SOUTH, TriState.FALSE)
+        this.setDefaultState(this.getDefaultState().with(LOCKED, false).with(NORTH, TriState.FALSE).with(SOUTH, TriState.FALSE)
                 .with(EAST, TriState.FALSE).with(WEST, TriState.FALSE).with(UP, TriState.FALSE).with(DOWN, TriState.FALSE).with(WATERLOGGED, false));
     }
 
@@ -85,7 +84,7 @@ public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnect
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(NORTH, SOUTH, EAST, WEST, UP, DOWN, WATERLOGGED);
+        builder.add(LOCKED, NORTH, SOUTH, EAST, WEST, UP, DOWN, WATERLOGGED);
     }
 
     @Override
@@ -101,6 +100,10 @@ public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnect
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         tickWater(state, world, pos);
+        if (state.get(LOCKED)) {
+            return state;
+        }
+
         var i = 0;
 
         Direction lastKnown = null;
@@ -149,7 +152,7 @@ public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnect
 
     @Override
     public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
-        return true;
+        return !state.get(LOCKED) || checkModelDirection(state, dir);
     }
 
     @Override
@@ -181,6 +184,11 @@ public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnect
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
         return Blocks.COPPER_BLOCK.getDefaultState();
+    }
+
+    @Override
+    public List<WrenchAction> getWrenchActions() {
+        return WRENCH_ACTIONS;
     }
 
     public static class PipeModel extends BlockModel {

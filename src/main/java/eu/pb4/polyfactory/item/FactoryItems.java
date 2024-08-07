@@ -109,7 +109,7 @@ public class FactoryItems {
     public static final Item DYNAMITE = register("dynamite", new DynamiteItem(new Item.Settings().maxCount(16)));
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
     public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING);
-    public static final Item EXPERIENCE_BUCKET = register("experience_bucket", new XpBucketItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
+    public static final Item EXPERIENCE_BUCKET = register("experience_bucket", new ModeledItem(new Item.Settings().maxCount(1)));
     public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
@@ -117,6 +117,7 @@ public class FactoryItems {
     public static final Item PIPE = register(FactoryBlocks.PIPE);
     public static final Item PUMP = register(FactoryBlocks.PUMP);
     public static final Item DRAIN = register(FactoryBlocks.DRAIN);
+    public static final Item MECHANICAL_DRAIN = register(FactoryBlocks.MECHANICAL_DRAIN);
     public static final Item CREATIVE_DRAIN = register(FactoryBlocks.CREATIVE_DRAIN);
     public static final UniversalFluidContainerItem STEEL_BUCKET = register("steel_bucket", new UniversalFluidContainerItem(FluidConstants.BUCKET * 2, new Item.Settings().maxCount(1)));
     public static final Item FLUID_TANK = register(FactoryBlocks.FLUID_TANK);
@@ -172,6 +173,7 @@ public class FactoryItems {
                     entries.add(PIPE);
                     entries.add(PUMP);
                     entries.add(DRAIN);
+                    entries.add(MECHANICAL_DRAIN);
                     entries.add(FLUID_TANK);
 
                     // Data
@@ -212,6 +214,7 @@ public class FactoryItems {
                     // Other items
                     entries.add(DYNAMITE);
                     entries.add(SPRAY_CAN);
+                    entries.add(EXPERIENCE_BUCKET);
 
                     // Generic Materials
                     entries.add(SAW_DUST);
@@ -294,7 +297,6 @@ public class FactoryItems {
                         FactoryDebugItems.addItemGroup(context, entries);
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(EXPERIENCE_BUCKET, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(STEEL_BUCKET, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     })).build()
             );

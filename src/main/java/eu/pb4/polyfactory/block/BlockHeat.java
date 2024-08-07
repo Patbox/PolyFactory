@@ -16,6 +16,10 @@ public final class BlockHeat {
     public static float get(World world, BlockPos pos) {
         return get(world.getBlockState(pos));
     }
+
+    public static float getReceived(World world, BlockPos pos) {
+        return get(world, pos.down());
+    }
     public static float get(BlockState state) {
         if (state.isIn(BlockTags.CAMPFIRES) && state.get(CampfireBlock.LIT)) {
             return CAMPFIRE;

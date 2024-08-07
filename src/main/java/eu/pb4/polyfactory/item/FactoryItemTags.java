@@ -11,6 +11,8 @@ public class FactoryItemTags {
     public static final TagKey<Item> STRIPPED_LOGS = of("stripped_logs");
     public static final TagKey<Item> ROOT_ADVANCEMENT = of("root_advancement");
     public static final TagKey<Item> PLACER_USABLE = of("placer_usable");
+    public static final TagKey<Item> DRAIN_CATALYST = of("drain_catalyst");
+    public static final TagKey<Item> XP_CONVERSION_CATALYST = of("xp_conversion_catalyst");
 
     private static TagKey<Item> of(String path) {
         return TagKey.of(RegistryKeys.ITEM, ModInit.id(path));

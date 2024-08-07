@@ -47,4 +47,5 @@ public interface FactoryProperties {
     BooleanProperty POSITIVE_CONNECTED = BooleanProperty.of("positive_connected");
     BooleanProperty NEGATIVE_CONNECTED = BooleanProperty.of("negative_connected");
     DirectionProperty HORIZONTAL_DIRECTION = DirectionProperty.of("direction", Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
+    BooleanProperty LOCKED = BooleanProperty.of("locked");
 }
