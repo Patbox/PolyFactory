@@ -118,6 +118,7 @@ public class FactoryItems {
     public static final Item PUMP = register(FactoryBlocks.PUMP);
     public static final Item DRAIN = register(FactoryBlocks.DRAIN);
     public static final Item MECHANICAL_DRAIN = register(FactoryBlocks.MECHANICAL_DRAIN);
+    public static final Item MECHANICAL_SPOUT = register(FactoryBlocks.MECHANICAL_SPOUT);
     public static final Item CREATIVE_DRAIN = register(FactoryBlocks.CREATIVE_DRAIN);
     public static final UniversalFluidContainerItem STEEL_BUCKET = register("steel_bucket", new UniversalFluidContainerItem(FluidConstants.BUCKET * 2, new Item.Settings().maxCount(1)));
     public static final Item FLUID_TANK = register(FactoryBlocks.FLUID_TANK);
@@ -174,6 +175,7 @@ public class FactoryItems {
                     entries.add(PUMP);
                     entries.add(DRAIN);
                     entries.add(MECHANICAL_DRAIN);
+                    entries.add(MECHANICAL_SPOUT);
                     entries.add(FLUID_TANK);
 
                     // Data

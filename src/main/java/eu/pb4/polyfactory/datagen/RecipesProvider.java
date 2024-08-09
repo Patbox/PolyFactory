@@ -7,9 +7,7 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.*;
-import eu.pb4.polyfactory.recipe.fluid.PotionAddDrainRecipe;
-import eu.pb4.polyfactory.recipe.fluid.PotionRemoveDrainRecipe;
-import eu.pb4.polyfactory.recipe.fluid.SimpleDrainRecipe;
+import eu.pb4.polyfactory.recipe.fluid.*;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.ArtificialDyeMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.ColoringMixingRecipe;
@@ -927,6 +925,13 @@ class RecipesProvider extends FabricRecipeProvider {
 
         exporter.accept(id("drain/from_potion"), new PotionAddDrainRecipe(Ingredient.ofItems(Items.POTION), Optional.empty(), FluidConstants.BOTTLE, Items.GLASS_BOTTLE.getDefaultStack(), Registries.SOUND_EVENT.getEntry(SoundEvents.ITEM_BOTTLE_EMPTY), false), null);
         exporter.accept(id("drain/to_potion"), new PotionRemoveDrainRecipe(Ingredient.ofItems(Items.GLASS_BOTTLE), Optional.empty(), FluidConstants.BOTTLE, Items.POTION.getDefaultStack(), Registries.SOUND_EVENT.getEntry(SoundEvents.ITEM_BOTTLE_FILL), true), null);
+
+        exporter.accept(id("spout/to_lava_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.LAVA.ofBucket(), Items.LAVA_BUCKET, SoundEvents.ITEM_BUCKET_FILL_LAVA), null);
+        exporter.accept(id("spout/to_water_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.WATER.ofBucket(), Items.WATER_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
+        exporter.accept(id("spout/to_milk_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.MILK.ofBucket(), Items.MILK_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
+        exporter.accept(id("spout/to_experience_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), FactoryItems.EXPERIENCE_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
+
+        exporter.accept(id("spout/to_potion"), new PotionSpoutRecipe(Ingredient.ofItems(Items.GLASS_BOTTLE), FluidConstants.BOTTLE, Items.POTION.getDefaultStack(), Registries.SOUND_EVENT.getEntry(SoundEvents.ITEM_BOTTLE_FILL)), null);
     }
 
     public void of(RecipeExporter exporter, RecipeEntry<?>... recipes) {

@@ -9,13 +9,11 @@ import net.minecraft.util.math.Direction;
 public interface FluidInput {
     long insertFluid(FluidInstance<?> type, long amount, Direction direction);
 
-    interface ContainerBased extends FluidInput {
+    interface ContainerBased extends FluidInput, FluidContainerOwner {
         @Override
         default long insertFluid(FluidInstance<?> type, long amount, Direction direction) {
             return getFluidContainer(direction).insert(type, amount, false);
         }
-
-        FluidContainer getFluidContainer(Direction direction);
     }
 
     interface Getter {

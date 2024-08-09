@@ -38,7 +38,7 @@ import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, BlockEntityProvider, ItemUseLimiter {
+public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, BlockEntityProvider, ItemUseLimiter.All {
     public DrainBlock(Settings settings) {
         super(settings);
     }
@@ -109,19 +109,6 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
         }
 
         super.onSteppedOn(world, pos, state, entity);
-    }
-
-    @Override
-    public boolean preventUseItemWhileTargetingBlock(ServerPlayerEntity player, BlockState blockState, World world, BlockHitResult result, ItemStack stack, Hand hand) {
-        if (world.getBlockEntity(result.getBlockPos()) instanceof DrainBlockEntity be) {
-            var input = DrainInput.of(stack.copy(), be.catalyst(), be.getFluidContainer(), true);
-            var optional = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, world);
-            if (optional.isPresent()) {
-                return true;
-            }
-        }
-
-        return stack.isIn(FactoryItemTags.DRAIN_CATALYST);
     }
 
     @Override

@@ -12,7 +12,9 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Items;
+import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.EntityEffectParticleEffect;
+import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
@@ -23,12 +25,16 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
+import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.math.MathHelper;
+import org.joml.Vector3f;
 
 public class FactoryFluids {
     public static final FluidType<Unit> WATER = register(Identifier.ofVanilla("water"),
-            FluidType.of().density(100).fluid(Fluids.WATER).color(0x3b3bed).particle(ParticleTypes.FALLING_WATER).build());
+            FluidType.of().density(100).fluid(Fluids.WATER).color(0x3b3bed)
+                    .particle(new ItemStackParticleEffect(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE.getDefaultStack())).build());
     public static final FluidType<Unit> LAVA = register(Identifier.ofVanilla("lava"),
-            FluidType.of().density(1000).fluid(Fluids.LAVA).particle(ParticleTypes.FALLING_LAVA).brightness(15).heat(BlockHeat.LAVA)
+            FluidType.of().density(1000).fluid(Fluids.LAVA).brightness(15).heat(BlockHeat.LAVA)
                     .flowSpeedMultiplier(((world, data) -> world.getDimension().ultrawarm() ? 1 : 0.5))
                     .maxFlow(((world, data) -> world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
     @SuppressWarnings("OptionalGetWithoutIsPresent")
@@ -37,9 +43,7 @@ public class FactoryFluids {
                     .flowSpeedMultiplier(0.95)
                     .build());
     public static final FluidType<Unit> EXPERIENCE = register(Identifier.ofVanilla("experience"),
-            FluidType.of().density(50).particle(EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, 0x55FF55))
-                    .flowSpeedMultiplier(1.3).maxFlow(FluidConstants.BOTTLE * 2)
-                    .build());
+            FluidType.of().density(50).flowSpeedMultiplier(1.3).maxFlow(FluidConstants.BOTTLE * 2).build());
     public static final FluidType<PotionContentsComponent> POTION = register(Identifier.ofVanilla("potion"),
             FluidType.of(PotionContentsComponent.CODEC, PotionContentsComponent.DEFAULT).density(150).texture(WATER.texture())
                             .color(PotionContentsComponent::getColor).flowSpeedMultiplier(0.95).name((t, d) -> {
@@ -51,7 +55,7 @@ public class FactoryFluids {
                             return Text.translatable("fluid_type.minecraft.potion.strong", base);
                         }
                         return base;
-                    }).particle((data) -> EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, data.getColor())).build());
+                    }).particle((data) -> EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, data.data().getColor())).build());
 
     public static void register() {
         FluidBehaviours.addBlockStateConversions(Blocks.WATER.getDefaultState(), Blocks.AIR.getDefaultState(), WATER.ofBucket());

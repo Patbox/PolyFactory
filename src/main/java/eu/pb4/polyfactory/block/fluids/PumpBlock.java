@@ -120,7 +120,7 @@ public class PumpBlock extends NetworkBlock implements FactoryBlock, RotationUse
 
     @Override
     public Collection<BlockNode> createPipeNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new PumpNode(state.get(FACING), false), new PumpNode(state.get(FACING), true));
+        return List.of(new PumpNode(state.get(FACING), false, PumpNode.DEFAULT_RANGE), new PumpNode(state.get(FACING), true, PumpNode.DEFAULT_RANGE));
     }
 
     @Override

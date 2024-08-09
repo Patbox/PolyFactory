@@ -108,7 +108,7 @@ public record FluidInstance<T>(FluidType<T> type, T data) {
     }
 
     public ParticleEffect particle() {
-        return this.type.particleGetter().apply(this.data);
+        return this.type.particleGetter().apply(this);
     }
 
     public long getMaxFlow(ServerWorld world) {

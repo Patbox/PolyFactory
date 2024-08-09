@@ -2,10 +2,12 @@ package eu.pb4.polyfactory.fluid;
 
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.FactoryRegistries;
+import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.entity.decoration.Brightness;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
@@ -27,7 +29,7 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
                            Optional<Identifier> textureOverride,
                            Optional<ColorProvider<T>> color,
                            Optional<BiFunction<FluidType<T>, T, Text>> name,
-                           Function<T, ParticleEffect> particleGetter,
+                           Function<FluidInstance<T>, ParticleEffect> particleGetter,
                            MaxFlowProvider<T> maxFlow,
                            FlowSpeedProvider<T> flowSpeedMultiplier,
                            Optional<Brightness> brightness
@@ -144,7 +146,7 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         private Optional<ColorProvider<T>> color = Optional.empty();
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         private Optional<BiFunction<FluidType<T>, T, Text>> name = Optional.empty();
-        private Function<T, ParticleEffect> particleGetter = (x) -> ParticleTypes.DRIPPING_WATER;
+        private Function<FluidInstance<T>, ParticleEffect> particleGetter = (x) -> new ItemStackParticleEffect(ParticleTypes.ITEM, FactoryModels.FLAT_FULL.get(x));
         private MaxFlowProvider<T> maxFlow = (w, x) -> FluidConstants.BOTTLE;
         private FlowSpeedProvider<T> flowSpeedMultiplier = (w, x) -> 1;
 
@@ -203,7 +205,7 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         public Builder<T> particle(ParticleEffect particle) {
             return particle(x -> particle);
         }
-        public Builder<T> particle(Function<T, ParticleEffect> particle) {
+        public Builder<T> particle(Function<FluidInstance<T>, ParticleEffect> particle) {
             this.particleGetter = particle;
             return this;
         }

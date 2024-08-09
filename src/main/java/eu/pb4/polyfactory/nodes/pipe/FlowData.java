@@ -21,7 +21,6 @@ import java.util.function.BooleanSupplier;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class FlowData implements GraphEntity<FlowData> {
-    public static final int RANGE = 32;
     public static final Direction[] DIRECTIONS = Direction.values();
     public static final Codec<FlowData> CODEC = Codec.unit(FlowData::new);
     public static final GraphEntityType<FlowData> TYPE = GraphEntityType.of(id("flow_data"), CODEC, FlowData::new, FlowData::split);
@@ -33,7 +32,6 @@ public class FlowData implements GraphEntity<FlowData> {
         public void setSourceStrength(BlockPos pos, double strength) {}
     };
     private GraphEntityContext ctx;
-
     private final Map<BlockPos, CurrentFlow> currentFlow = new HashMap<>();
     private final Object2DoubleMap<BlockPos> sourceStrength = new Object2DoubleOpenHashMap<>();
     private boolean isInvalid = true;
@@ -74,7 +72,7 @@ public class FlowData implements GraphEntity<FlowData> {
             }
             var s = this.sourceStrength.getDouble(flow.source);
             if (s > 0) {
-                var x = ((RANGE - flow.strength) / RANGE);
+                var x = ((flow.range - flow.strength) / flow.range);
                 consumer.consume(flow.direction,  s * (1 - x * x * x) * (s * flow.strength / total));
             }
         }
@@ -105,7 +103,7 @@ public class FlowData implements GraphEntity<FlowData> {
             Direction direction;
             int distance;
             var mut = new BlockPos.Mutable();
-            states.add(new LastState(pump.getNode().direction(), pump.getBlockPos(), RANGE));
+            states.add(new LastState(pump.getNode().direction(), pump.getBlockPos(), pump.getNode().range()));
 
             var nodeMap = ((SimpleBlockGraphAccessor) this.ctx.getGraph()).getNodesInPos();
 
@@ -192,10 +190,10 @@ public class FlowData implements GraphEntity<FlowData> {
                 var pull = flow.pull;
                 var distancex = flow.distance.getValue();
                 for (var dir : push) {
-                    curr.push.add(new DirectionalFlow(pump.getBlockPos(), dir, distancex));
+                    curr.push.add(new DirectionalFlow(pump.getBlockPos(), dir, distancex, pump.getNode().range()));
                 }
                 for (var dir : pull) {
-                    curr.pull.add(new DirectionalFlow(pump.getBlockPos(), dir, distancex));
+                    curr.pull.add(new DirectionalFlow(pump.getBlockPos(), dir, distancex, pump.getNode().range()));
                 }
 
                 push.clear();
@@ -264,7 +262,7 @@ public class FlowData implements GraphEntity<FlowData> {
         }
     }
 
-    private record DirectionalFlow(BlockPos source, Direction direction, double strength) {
+    private record DirectionalFlow(BlockPos source, Direction direction, double strength, int range) {
     }
 
     private record CurrentState(MutableInt distance, EnumSet<Direction> pull, EnumSet<Direction> push, NodeHolder<BlockNode> node) {

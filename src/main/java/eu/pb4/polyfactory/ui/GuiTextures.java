@@ -19,6 +19,8 @@ public class GuiTextures {
     public static final Function<Text, Text> PRESS = background("press");
     public static final Function<Text, Text> MIXER = background("mixer");
     public static final Function<Text, Text> MECHANICAL_DRAIN = background("mechanical_drain");
+    public static final Function<Text, Text> MECHANICAL_SPOUT = background("mechanical_spout");
+    public static final Function<Text, Text> MECHANICAL_SPOUT_NO_CONN = background("mechanical_spout_noconn");
     public static final Function<Text, Text> STEAM_ENGINE = background("steam_engine");
     public static final Function<Text, Text> CENTER_SLOT_GENERIC = background("center_slot");
     public static final Function<Text, Text> FILL3 = background("fill3");
@@ -40,8 +42,15 @@ public class GuiTextures {
     public static final char POLYDEX_OFFSET_N = UiResourceCreator.space(-168);
     public static final char MIXER_FLUID_OFFSET = UiResourceCreator.space(28 - 8);
     public static final char MIXER_FLUID_OFFSET_N = UiResourceCreator.space(-28 + 8);
-    public static final char MECHANICAL_DRAIN_FLUID_OFFSET = UiResourceCreator.space(121 - 8);
-    public static final char MECHANICAL_DRAIN_FLUID_OFFSET_N = UiResourceCreator.space(-121 + 8);
+    public static final char MECHANICAL_DRAIN_FLUID_OFFSET = UiResourceCreator.space(118 - 8);
+    public static final char MECHANICAL_DRAIN_FLUID_OFFSET_N = UiResourceCreator.space(-118 + 8);
+    public static final char MECHANICAL_SPOUT_FLUID_OFFSET = UiResourceCreator.space(46 - 8);
+    public static final char MECHANICAL_SPOUT_FLUID_OFFSET_N = UiResourceCreator.space(-46 + 8);
+
+    public static final char DRAIN_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(111 - 8 + 7);
+    public static final char DRAIN_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-111 + 8 - 7);
+    public static final char SPOUT_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(39 - 8 + 7);
+    public static final char SPOUT_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-39 + 8 - 7);
     public static final char MIXER_POLYDEX_FLUID_OFFSET_1 = UiResourceCreator.space(28 - 8 + 7);
     public static final char MIXER_POLYDEX_FLUID_OFFSET_2 = UiResourceCreator.space(108);
     public static final char MIXER_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-28 + 8 - 7 - 108);

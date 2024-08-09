@@ -11,7 +11,7 @@ public interface FluidOutput {
     long extractFluid(FluidInstance<?> type, long amount, Direction direction);
     FluidInstance<?> getTopFluid(Direction direction);
 
-    interface ContainerBased extends FluidOutput {
+    interface ContainerBased extends FluidOutput, FluidContainerOwner {
         @Override
         default long extractFluid(FluidInstance<?> type, long amount, Direction direction) {
             return getFluidContainer(direction).extract(type, amount, false);
@@ -21,8 +21,6 @@ public interface FluidOutput {
         default FluidInstance<?> getTopFluid(Direction direction) {
             return getFluidContainer(direction).topFluid();
         };
-
-        FluidContainer getFluidContainer(Direction direction);
     }
 
     interface Getter {

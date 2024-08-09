@@ -7,8 +7,8 @@ import com.kneelawk.graphlib.api.graph.user.BlockNodeType;
 import com.kneelawk.graphlib.api.util.CacheCategory;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
@@ -19,14 +19,22 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
 
-public record PumpNode(Direction flowDirection, boolean isPulling, Direction direction) implements FunctionalNode, DirectionNode {
+public record PumpNode(Direction flowDirection, boolean isPulling, Direction direction, int range) implements FunctionalNode, DirectionNode {
+    public static final int DEFAULT_RANGE = 32;
+    public static final int SPOUT_RANGE = 8;
+
+    public static final Codec<PumpNode> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Direction.CODEC.fieldOf("direction").forGetter(PumpNode::direction),
+            Codec.BOOL.fieldOf("reverse").forGetter(PumpNode::isPulling),
+            Codec.INT.optionalFieldOf("range", DEFAULT_RANGE).forGetter(PumpNode::range)
+    ).apply(instance, PumpNode::new));
+
     public static final CacheCategory<PumpNode> CACHE = CacheCategory.of(PumpNode.class);
-    public PumpNode(Direction flowDirection, boolean reverse) {
-        this(flowDirection, reverse, reverse ? flowDirection.getOpposite() : flowDirection);
+    public PumpNode(Direction flowDirection, boolean reverse, int maxStrength) {
+        this(flowDirection, reverse, reverse ? flowDirection.getOpposite() : flowDirection, maxStrength);
     }
 
-    public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("pump"), Codec.mapPair(Direction.CODEC.fieldOf("direction"), Codec.BOOL.fieldOf("reverse"))
-            .xmap(x -> new PumpNode(x.getFirst(), x.getSecond()), x -> new Pair<>(x.flowDirection, x.isPulling)).codec());
+    public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("pump"), CODEC);
 
     @Override
     public @NotNull BlockNodeType getType() {

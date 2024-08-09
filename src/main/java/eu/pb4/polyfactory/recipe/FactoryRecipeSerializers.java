@@ -3,9 +3,7 @@ package eu.pb4.polyfactory.recipe;
 import com.mojang.serialization.MapCodec;
 import eu.pb4.factorytools.api.recipe.LazyRecipeSerializer;
 import eu.pb4.polyfactory.ModInit;
-import eu.pb4.polyfactory.recipe.fluid.PotionAddDrainRecipe;
-import eu.pb4.polyfactory.recipe.fluid.PotionRemoveDrainRecipe;
-import eu.pb4.polyfactory.recipe.fluid.SimpleDrainRecipe;
+import eu.pb4.polyfactory.recipe.fluid.*;
 import eu.pb4.polyfactory.recipe.mixing.ArtificialDyeMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.ColoringMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
@@ -41,6 +39,8 @@ public class FactoryRecipeSerializers {
     public static final LazyRecipeSerializer<SimpleDrainRecipe> DRAIN_SIMPLE = register("drain/simple", SimpleDrainRecipe.CODEC);
     public static final LazyRecipeSerializer<PotionAddDrainRecipe> DRAIN_POTION_ADD = register("drain/potion_add", PotionAddDrainRecipe.CODEC);
     public static final LazyRecipeSerializer<PotionRemoveDrainRecipe> DRAIN_POTION_REMOVE = register("drain/potion_remove", PotionRemoveDrainRecipe.CODEC);
+    public static final LazyRecipeSerializer<SimpleSpoutRecipe> SPOUT_SIMPLE = register("spout/simple", SimpleSpoutRecipe.CODEC);
+    public static final LazyRecipeSerializer<PotionSpoutRecipe> SPOUT_POTION = register("spout/potion", PotionSpoutRecipe.CODEC);
 
 
     public static void register() {
