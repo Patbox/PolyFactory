@@ -97,13 +97,13 @@ public class FactoryBlockEntities {
             FabricBlockEntityTypeBuilder.create(CreativeMotorBlockEntity::new).addBlock(FactoryBlocks.CREATIVE_MOTOR));
     public static final BlockEntityType<ChanneledDataBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache", FabricBlockEntityTypeBuilder
             .create(ChanneledDataBlockEntity::new).addBlocks(FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
-                    FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER));
+                    FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER, FactoryBlocks.BLOCK_OBSERVER, FactoryBlocks.DATA_MEMORY));
 
     public static final BlockEntityType<HologramProjectorBlockEntity> HOLOGRAM_PROJECTOR = register("hologram_projector", FabricBlockEntityTypeBuilder
             .create(HologramProjectorBlockEntity::new).addBlocks(FactoryBlocks.HOLOGRAM_PROJECTOR));
 
     public static final BlockEntityType<WirelessRedstoneBlockEntity> WIRELESS_REDSTONE = register("wireless_redstone", FabricBlockEntityTypeBuilder
-            .create(WirelessRedstoneBlockEntity::new).addBlock(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER));
+            .create(WirelessRedstoneBlockEntity::new).addBlocks(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER, FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER));
     public static final BlockEntityType<CableBlockEntity> CABLE = register("cable", FabricBlockEntityTypeBuilder
             .create(CableBlockEntity::new).addBlock(FactoryBlocks.CABLE));
     public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader", FabricBlockEntityTypeBuilder

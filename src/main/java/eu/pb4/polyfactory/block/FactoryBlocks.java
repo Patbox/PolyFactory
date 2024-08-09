@@ -36,6 +36,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,6 +127,13 @@ public class FactoryBlocks {
             var lt = server.getReloadableRegistries().getLootTable(block.getLootTableKey());
             if (lt == LootTable.EMPTY) {
                 ModInit.LOGGER.warn("Missing loot table? " + block.getLootTableKey().getValue());
+            }
+
+            if (block instanceof BlockEntityProvider provider) {
+                var be = provider.createBlockEntity(BlockPos.ORIGIN, block.getDefaultState());
+                if (be != null && !be.getType().supports(block.getDefaultState())) {
+                    ModInit.LOGGER.warn("Unsupported BE!!!! {} | {}", Registries.BLOCK.getId(block), Registries.BLOCK_ENTITY_TYPE.getId(be.getType()));
+                }
             }
         }
     }
