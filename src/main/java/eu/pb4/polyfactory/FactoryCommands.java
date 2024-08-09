@@ -30,28 +30,14 @@ public class FactoryCommands {
         dispatcher.register(literal("polyfactory")
                 .requires((x) -> x.hasPermissionLevel(3))
                 .then(literal("debug")
-                        .then(literal("packetinfo")
-                                .then(argument("enable", BoolArgumentType.bool())
-                                        .executes(FactoryCommands::togglePacketDebug)
-                                )
-                                .executes(FactoryCommands::printPacketInfo)
-                        )
                         .then(literal("list_models").executes(FactoryCommands::listModels))
                         .then(literal("enable_lod")
                                 .then(argument("enable", BoolArgumentType.bool())
                                         .executes(FactoryCommands::enableLod)
                                 )
                         )
-                        //.then(literal("run_asset_generator")
-                        //        .executes(FactoryCommands::assetGenerator)
-                        //)
                 )
         );
-    }
-
-    private static int assetGenerator(CommandContext<ServerCommandSource> serverCommandSourceCommandContext) {
-
-        return 0;
     }
 
     private static int enableLod(CommandContext<ServerCommandSource> context) {
@@ -86,23 +72,4 @@ public class FactoryCommands {
 
         return 0;
     }
-
-    private static int togglePacketDebug(CommandContext<ServerCommandSource> context) {
-        DebugData.enabled = BoolArgumentType.getBool(context, "enable");
-        context.getSource().sendFeedback(() -> Text.literal("Packet debug: " + DebugData.enabled), false);
-        return 0;
-    }
-
-    private static int printPacketInfo(CommandContext<ServerCommandSource> context) {
-        DebugData.printPacketCalls(((aClass, entries) -> {
-            var x = aClass.getName().split("\\.");
-            context.getSource().sendFeedback(() -> Text.literal(x[x.length - 1]).append(":"), false);
-            for (var entry : entries) {
-                var y = entry.getKey().getName().split("\\.");
-
-                context.getSource().sendFeedback(() -> Text.literal("- ").append(y[y.length - 1]).append(" - ").append(entry.getIntValue() + ""), false);
-            }
-        }));
-        return 0;
-    };
 }

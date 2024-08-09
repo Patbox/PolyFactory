@@ -101,13 +101,13 @@ public class FactoryBlockEntities {
             BlockEntityType.Builder.create(CreativeMotorBlockEntity::new, FactoryBlocks.CREATIVE_MOTOR));
     public static final BlockEntityType<ChanneledDataBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache",
             BlockEntityType.Builder.create(ChanneledDataBlockEntity::new, FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
-                    FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER));
+                    FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER, FactoryBlocks.BLOCK_OBSERVER, FactoryBlocks.DATA_MEMORY));
 
     public static final BlockEntityType<HologramProjectorBlockEntity> HOLOGRAM_PROJECTOR = register("hologram_projector",
             BlockEntityType.Builder.create(HologramProjectorBlockEntity::new, FactoryBlocks.HOLOGRAM_PROJECTOR));
 
     public static final BlockEntityType<WirelessRedstoneBlockEntity> WIRELESS_REDSTONE = register("wireless_redstone",
-            BlockEntityType.Builder.create(WirelessRedstoneBlockEntity::new, FactoryBlocks.WIRELESS_REDSTONE_RECEIVER));
+            BlockEntityType.Builder.create(WirelessRedstoneBlockEntity::new, FactoryBlocks.WIRELESS_REDSTONE_RECEIVER, FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER));
     public static final BlockEntityType<CableBlockEntity> CABLE = register("cable", BlockEntityType.Builder.create(CableBlockEntity::new,
             Util.make(new ArrayList<Block>(), (a) -> {
                 a.add(FactoryBlocks.CABLE);
