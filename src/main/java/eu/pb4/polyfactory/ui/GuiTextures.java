@@ -47,10 +47,10 @@ public class GuiTextures {
     public static final char MECHANICAL_SPOUT_FLUID_OFFSET = UiResourceCreator.space(46 - 8);
     public static final char MECHANICAL_SPOUT_FLUID_OFFSET_N = UiResourceCreator.space(-46 + 8);
 
-    public static final char DRAIN_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(111 - 8 + 7);
-    public static final char DRAIN_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-111 + 8 - 7);
-    public static final char SPOUT_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(39 - 8 + 7);
-    public static final char SPOUT_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-39 + 8 - 7);
+    public static final char DRAIN_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(111 + 7);
+    public static final char DRAIN_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-111 - 7);
+    public static final char SPOUT_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(39 + 7);
+    public static final char SPOUT_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-39 - 7);
     public static final char MIXER_POLYDEX_FLUID_OFFSET_1 = UiResourceCreator.space(28 - 8 + 7);
     public static final char MIXER_POLYDEX_FLUID_OFFSET_2 = UiResourceCreator.space(108);
     public static final char MIXER_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-28 + 8 - 7 - 108);

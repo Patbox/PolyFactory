@@ -1,8 +1,11 @@
-- Added Pipes
-- Added Pumps
-- Added Fluid Drains - a block player can put or take fluid from.
-- Added Mechanical Fluid Drains - automatic Fluid Drain, with limitation that it can't take fluids out.
-- You can now put Cables within wall blocks
-- Mechanical Mixers can now store fluids and use them as part of recipes.
+- Added new fluid system! This can be used for transport, storage and crafting with fluids.
+  - Currently available fluids: Water, Lava, Milk, Experience, Potion (all types).
+  - Added Copper Pipes - Transport fluids anywhere you need them!
+  - Added Mechanical Pumps - Gives fluids a little push (or pull) needed for them to move in the pipes.
+  - Added Fluid Drains - A block player can use to put or take fluids to/from.
+  - Added Mechanical Fluid Drains - Automatic Fluid Drain, with limitation that it can't take fluids out.
+  - Mechanical Mixers can now store fluids and use them as part of recipes.
+- You can now put Cables within wall blocks.
+- Tweaked Mechanical Press textures.
 - New Grinder recipe:
  - Nether Wart Block -> 1-5 Nether Wards

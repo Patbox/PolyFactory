@@ -219,6 +219,28 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_copper", InventoryChangedCriterion.Conditions.items(Items.COPPER_INGOT))
                 .offerTo(exporter);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.MECHANICAL_DRAIN, 1)
+                .pattern("s")
+                .pattern("a")
+                .pattern("d")
+                .input('d', FactoryItems.DRAIN)
+                .input('s', FactoryItems.GENERIC_MACHINE_PART)
+                .input('a', FactoryItems.AXLE)
+                .criterion("get_copper", InventoryChangedCriterion.Conditions.items(FactoryItems.DRAIN))
+                .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.MECHANICAL_SPOUT, 1)
+                .pattern(" s ")
+                .pattern("cac")
+                .pattern("pdp")
+                .input('d', Items.SMOOTH_STONE)
+                .input('p', ItemTags.PLANKS)
+                .input('s', FactoryItems.GENERIC_MACHINE_PART)
+                .input('a', FactoryItems.PIPE)
+                .input('c', FactoryItems.COPPER_PLATE)
+                .criterion("get_copper", InventoryChangedCriterion.Conditions.items(Items.COPPER_INGOT))
+                .offerTo(exporter);
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.FLUID_TANK, 1)
                 .pattern("pgp")
                 .pattern("gcg")

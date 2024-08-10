@@ -24,6 +24,9 @@ import eu.pb4.polyfactory.recipe.ColoringCraftingRecipe;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.recipe.ShapelessNbtCopyRecipe;
+import eu.pb4.polyfactory.recipe.fluid.DrainRecipe;
+import eu.pb4.polyfactory.recipe.fluid.SimpleDrainRecipe;
+import eu.pb4.polyfactory.recipe.fluid.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
@@ -51,7 +54,6 @@ import java.util.function.Consumer;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class PolydexCompatImpl {
-    public static final PolydexCategory FLUIDS_CATEGORY = PolydexCategory.of(id("fluids"));
     private static final HoverDisplayBuilder.ComponentType MACHINE_STATE = Util.make(() -> {
         //noinspection ResultOfMethodCallIgnored
         HoverDisplayBuilder.NAME.index();
@@ -66,6 +68,8 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(GenericMixingRecipe.class, MixerRecipePage::new);
         PolydexPage.registerRecipeViewer(GrindingRecipe.class, GrindingRecipePage::new);
         PolydexPage.registerRecipeViewer(ColoringCraftingRecipe.class, ColoringCraftingRecipePage::new);
+        PolydexPage.registerRecipeViewer(SimpleSpoutRecipe.class, SimpleSpoutRecipePage::new);
+        PolydexPage.registerRecipeViewer(SimpleDrainRecipe.class, SimpleDrainRecipePage::new);
         PolydexPage.register(PolydexCompatImpl::createPages);
 
         PolydexEntry.registerProvider(PolydexCompatImpl::createFluidEntries);
@@ -189,6 +193,17 @@ public class PolydexCompatImpl {
         }
         for (var x : fluids) {
             list.add(new PolydexFluidStack(x.instance(), x.required(), 1));
+        }
+        return list;
+    }
+
+    public static List<PolydexIngredient<?>> createIngredientsReg(List<CountedIngredient> input, List<FluidStack<?>> fluids) {
+        var list = new ArrayList<PolydexIngredient<?>>(input.size());
+        for (var x : input) {
+            list.add(PolydexIngredient.of(x.ingredient(), Math.max(x.count(), 1), 1));
+        }
+        for (var x : fluids) {
+            list.add(new PolydexFluidStack(x.instance(), x.amount(), 1));
         }
         return list;
     }

@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.fluids;
 
+import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
@@ -11,6 +12,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.ComponentMap;
+import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
@@ -30,7 +32,7 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
     protected BlockState[] pushState = new BlockState[pushOverflow.length];
 
     protected long maxPush = 0;
-    private int[] particleCounter = {1, 3, 5, 6, 8, 4};
+    private final int[] particleCounter = {1, 3, 5, 6, 8, 4};
 
     public PipeLikeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -116,9 +118,19 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
             }
             return;
         }
+        var fluid = this.container.topFluid();
+
+        if (pushedBlockState.isAir() && fluid != null && fluid.type() == FactoryFluids.EXPERIENCE && this.container.get(fluid) >= FluidBehaviours.EXPERIENCE_ORB_TO_FLUID && world.random.nextBoolean()) {
+            var max =(int) Math.min(this.container.get(fluid) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID, 30);
+            var amount = max <= 1 ? 1 : world.random.nextBetween(1, max);
+            this.container.extract(fluid, amount * FluidBehaviours.EXPERIENCE_ORB_TO_FLUID, false);
+            var x = new ExperienceOrbEntity(world, this.pos.getX() + 0.5 + direction.getOffsetX() * 0.7,
+                    this.pos.getY() + 0.5 + direction.getOffsetY() * 0.7,
+                    this.pos.getZ() + 0.5 + direction.getOffsetZ() * 0.7, amount);
+            world.spawnEntity(x);
+        }
 
         if (pushedBlockState.isAir() && (this.particleCounter[direction.ordinal()]++ % 10) == 0) {
-            var fluid = this.container.topFluid();
             if (fluid != null) {
                 var particle = fluid.particle();
                 if (particle != null) {

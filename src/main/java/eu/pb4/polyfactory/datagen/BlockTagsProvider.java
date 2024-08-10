@@ -114,6 +114,10 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.AXLE_WITH_LARGE_GEAR)
                 .add(FactoryBlocks.PIPE)
                 .add(FactoryBlocks.PUMP)
+                .add(FactoryBlocks.MECHANICAL_DRAIN)
+                .add(FactoryBlocks.MECHANICAL_SPOUT)
+                .add(FactoryBlocks.DRAIN)
+                .add(FactoryBlocks.FLUID_TANK)
                 .add(FactoryBlocks.WALL_WITH_CABLE.values().toArray(new Block[0]))
         ;
 
