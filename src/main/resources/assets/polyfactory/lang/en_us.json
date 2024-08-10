@@ -86,6 +86,8 @@
   "item.polyfactory.crushed_raw_gold": "Crushed Raw Gold",
   "item.polyfactory.netherrack_dust": "Netherrack Dust",
   "item.polyfactory.experience_bucket": "Liquid Experience Bucket",
+  "item.polyfactory.honey_bucket": "Liquid Honey Bucket",
+  "item.polyfactory.slime_bucket": "Liquid Slime Bucket",
   "item.polyfactory.ender_dust": "Ender Dust",
   "item.polyfactory.ender_infused_amethyst_shard": "Ender infused Amethyst Shard",
   "item.polyfactory.redstone_chip": "Redstone Chip",
@@ -203,6 +205,8 @@
   "recipe_type.polyfactory.press": "Press",
   "recipe_type.polyfactory.mixer": "Mixer",
   "recipe_type.polyfactory.grinding": "Grinder",
+  "recipe_type.polyfactory.drain": "Drain",
+  "recipe_type.polyfactory.spout": "Spout",
 
   "stat.polyfactory.taters_clicked": "Potatoes Clicked",
   "subtitles.polyfactory.block.press.craft": "Mechanical Press presses",

@@ -69,7 +69,7 @@ public abstract class DrainRecipePage<T extends DrainRecipe> extends Prioritized
 
     @Override
     public ItemStack entryIcon(@Nullable PolydexEntry entry, ServerPlayerEntity player) {
-        return this.output.getFirst().toTypeDisplayItemStack(player);
+        return this.ingredients.getFirst().asStacks().getFirst().toTypeDisplayItemStack(player);
     }
 
     @Override
@@ -92,7 +92,7 @@ public abstract class DrainRecipePage<T extends DrainRecipe> extends Prioritized
 
         var fluid = GuiTextures.EMPTY_BUILDER.get();
         fluid.setName(Text.translatable("text.polyfactory.polydex.created_fluids"));
-        for (var stack : getBaseFluids()) {
+        for (var stack : getResultFluids()) {
             fluid.addLoreLine(stack.toTextRequired().setStyle(Style.EMPTY.withColor(Formatting.GRAY).withItalic(false)));
         }
 

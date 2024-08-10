@@ -28,6 +28,7 @@ import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
 import net.minecraft.item.DyeItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -895,7 +896,19 @@ class RecipesProvider extends FabricRecipeProvider {
                         List.of(CountedIngredient.ofItems(2, FactoryItems.ENDER_DUST),
                                 CountedIngredient.ofItems(1, Items.AMETHYST_SHARD)
                         ),
-                        5, 5, 10f, 0.6f, new ItemStack(FactoryItems.ENDER_INFUSED_AMETHYST_SHARD))
+                        5, 5, 10f, 0.6f, new ItemStack(FactoryItems.ENDER_INFUSED_AMETHYST_SHARD)),
+                GenericMixingRecipe.ofCounted("honey_block_to_liquid", "",
+                        List.of(CountedIngredient.ofItems(1, Items.HONEY_BLOCK)),
+                        List.of(),
+                        6, 3, 10f, 0.3f, ItemStack.EMPTY, List.of(FactoryFluids.HONEY.ofBucket())),
+                GenericMixingRecipe.ofCounted("slime_block_to_liquid", "slime_to_liquid",
+                        List.of(CountedIngredient.ofItems(1, Items.SLIME_BLOCK)),
+                        List.of(),
+                        8, 3, 10f, 0.3f, ItemStack.EMPTY, List.of(FactoryFluids.SLIME.ofBucket())),
+                GenericMixingRecipe.ofCounted("slime_ball_to_liquid", "slime_to_liquid",
+                        List.of(CountedIngredient.ofItems(1, Items.SLIME_BALL)),
+                        List.of(),
+                        1, 3, 10f, 0.3f, ItemStack.EMPTY, List.of(FactoryFluids.SLIME.of(FluidConstants.BLOCK / 9)))
         );
 
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_GEAR, 3)
@@ -944,6 +957,12 @@ class RecipesProvider extends FabricRecipeProvider {
         exporter.accept(id("drain/to_milk_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.MILK.ofBucket(), Items.MILK_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
         exporter.accept(id("drain/from_experience_bucket"), SimpleDrainRecipe.fromItem(FactoryItems.EXPERIENCE_BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY), null);
         exporter.accept(id("drain/to_experience_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), FactoryItems.EXPERIENCE_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
+        exporter.accept(id("drain/from_honey_bucket"), SimpleDrainRecipe.fromItem(FactoryItems.HONEY_BUCKET, FactoryFluids.HONEY.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY), null);
+        exporter.accept(id("drain/to_honey_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.HONEY.ofBucket(), FactoryItems.HONEY_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
+        exporter.accept(id("drain/from_honey_bottle"), SimpleDrainRecipe.fromItem(Items.HONEY_BOTTLE, FactoryFluids.HONEY.of(FluidConstants.BUCKET / 4), Items.GLASS_BOTTLE, SoundEvents.ITEM_BOTTLE_EMPTY), null);
+        exporter.accept(id("drain/to_honey_bottle"), SimpleDrainRecipe.toItem(Items.GLASS_BOTTLE, FactoryFluids.HONEY.of(FluidConstants.BUCKET / 4), Items.HONEY_BOTTLE, SoundEvents.ITEM_BOTTLE_FILL), null);
+        exporter.accept(id("drain/from_slime_bucket"), SimpleDrainRecipe.fromItem(FactoryItems.SLIME_BUCKET, FactoryFluids.SLIME.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY), null);
+        exporter.accept(id("drain/to_slime_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactoryItems.SLIME_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
 
         exporter.accept(id("drain/from_potion"), new PotionAddDrainRecipe(Ingredient.ofItems(Items.POTION), Optional.empty(), FluidConstants.BOTTLE, Items.GLASS_BOTTLE.getDefaultStack(), Registries.SOUND_EVENT.getEntry(SoundEvents.ITEM_BOTTLE_EMPTY), false), null);
         exporter.accept(id("drain/to_potion"), new PotionRemoveDrainRecipe(Ingredient.ofItems(Items.GLASS_BOTTLE), Optional.empty(), FluidConstants.BOTTLE, Items.POTION.getDefaultStack(), Registries.SOUND_EVENT.getEntry(SoundEvents.ITEM_BOTTLE_FILL), true), null);
@@ -952,6 +971,10 @@ class RecipesProvider extends FabricRecipeProvider {
         exporter.accept(id("spout/to_water_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.WATER.ofBucket(), Items.WATER_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
         exporter.accept(id("spout/to_milk_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.MILK.ofBucket(), Items.MILK_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
         exporter.accept(id("spout/to_experience_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), FactoryItems.EXPERIENCE_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
+        exporter.accept(id("spout/to_honey_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.HONEY.ofBucket(), FactoryItems.HONEY_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
+        exporter.accept(id("spout/to_honey_bottle"), SimpleSpoutRecipe.toItem(Items.GLASS_BOTTLE, FactoryFluids.HONEY.of(FluidConstants.BUCKET / 4),
+                Items.HONEY_BOTTLE, SoundEvents.ITEM_BOTTLE_FILL), null);
+        exporter.accept(id("spout/to_slime_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactoryItems.SLIME_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
 
         exporter.accept(id("spout/to_potion"), new PotionSpoutRecipe(Ingredient.ofItems(Items.GLASS_BOTTLE), FluidConstants.BOTTLE, Items.POTION.getDefaultStack(), Registries.SOUND_EVENT.getEntry(SoundEvents.ITEM_BOTTLE_FILL)), null);
         exporter.accept(id("spout/experience_repair"), new RepairSpoutRecipe(), null);

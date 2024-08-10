@@ -23,6 +23,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.Block;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
+import net.minecraft.component.type.FoodComponent;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -110,6 +111,9 @@ public class FactoryItems {
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
     public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING);
     public static final Item EXPERIENCE_BUCKET = register("experience_bucket", new ModeledItem(new Item.Settings().maxCount(1)));
+    public static final Item SLIME_BUCKET = register("slime_bucket", new ModeledItem(new Item.Settings().maxCount(1)));
+    public static final Item HONEY_BUCKET = register("honey_bucket", new HoneyBucketItem(new Item.Settings()
+            .food(new FoodComponent.Builder().nutrition(18).saturationModifier(0.2F).build()).maxCount(1)));
     public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
@@ -196,7 +200,6 @@ public class FactoryItems {
                     entries.add(DATA_MEMORY);
                     entries.add(ARITHMETIC_OPERATOR);
 
-
                     // Redstone?
                     entries.add(WIRELESS_REDSTONE_RECEIVER);
                     entries.add(WIRELESS_REDSTONE_TRANSMITTER);
@@ -216,6 +219,8 @@ public class FactoryItems {
                     // Other items
                     entries.add(DYNAMITE);
                     entries.add(SPRAY_CAN);
+                    entries.add(HONEY_BUCKET);
+                    entries.add(SLIME_BUCKET);
                     entries.add(EXPERIENCE_BUCKET);
 
                     // Generic Materials

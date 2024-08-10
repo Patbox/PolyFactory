@@ -59,6 +59,16 @@ public class MixerRecipePage extends PrioritizedRecipePage<GenericMixingRecipe> 
     }
 
     @Override
+    public ItemStack entryIcon(@Nullable PolydexEntry entry, ServerPlayerEntity player) {
+        var x = super.entryIcon(entry, player);
+        if (x.isEmpty() && this.outputFluids.length != 0) {
+            return this.outputFluids[0].toTypeDisplayItemStack(player);
+        }
+
+        return x;
+    }
+
+    @Override
     public List<PolydexIngredient<?>> ingredients() {
         return ingredients;
     }

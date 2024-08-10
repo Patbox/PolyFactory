@@ -68,6 +68,12 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
                 output, List.of(), mixingTime, minimumSpeed, optimalSpeed, minTemperature, 2f));
     }
 
+    public static RecipeEntry<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStack output, List<FluidStack<?>> fluidOutput) {
+        return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe(group, ingredient,
+                fluidInput,
+                output, fluidOutput, mixingTime, minimumSpeed, optimalSpeed, minTemperature, 2f));
+    }
+
     public Iterable<ItemStack> remainders() {
         return () -> Iterators.transform(this.input.iterator(), (a) -> a.leftOver().copy());
     }

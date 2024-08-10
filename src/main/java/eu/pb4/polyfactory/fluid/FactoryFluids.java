@@ -57,6 +57,11 @@ public class FactoryFluids {
                         return base;
                     }).particle((data) -> EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, data.data().getColor())).build());
 
+    public static final FluidType<Unit> HONEY = register(Identifier.ofVanilla("honey"),
+            FluidType.of().density(500).flowSpeedMultiplier(0.6).maxFlow(FluidConstants.BOTTLE * 2 / 3).build());
+
+    public static final FluidType<Unit> SLIME = register(Identifier.ofVanilla("slime"),
+            FluidType.of().density(600).flowSpeedMultiplier(0.6).maxFlow(FluidConstants.BOTTLE * 2 / 3).build());
     public static void register() {
         FluidBehaviours.addBlockStateConversions(Blocks.WATER.getDefaultState(), Blocks.AIR.getDefaultState(), WATER.ofBucket());
         FluidBehaviours.addBlockStateConversions(Blocks.LAVA.getDefaultState(), Blocks.AIR.getDefaultState(), LAVA.ofBucket());
