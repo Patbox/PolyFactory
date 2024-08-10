@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
+import eu.pb4.polyfactory.recipe.input.DrainInput;
 import eu.pb4.polyfactory.recipe.input.SpoutInput;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -65,5 +66,18 @@ public record RepairSpoutRecipe() implements SpoutRecipe {
     @Override
     public RegistryEntry<SoundEvent> soundEvent() {
         return Registries.SOUND_EVENT.getEntry(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP);
+    }
+
+    @Override
+    public double maxSpeed(SpoutInput input) {
+        return FactoryFluids.EXPERIENCE.defaultInstance().getMaxFlow(input.world()) / 5d;
+    }
+
+    @Override
+    public double time(SpoutInput input) {
+        var stack = input.stack().copy();
+        int i = EnchantmentHelper.getRepairWithXp(input.world(), stack, (int) (input.getFluid(FactoryFluids.EXPERIENCE.defaultInstance()) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID));
+        int j = Math.min(i, stack.getDamage());
+        return j / FactoryFluids.EXPERIENCE.defaultInstance().getFlowSpeedMultiplier(input.world()) / FactoryFluids.EXPERIENCE.defaultInstance().getMaxFlow(input.world());
     }
 }

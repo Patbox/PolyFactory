@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.recipe.fluid;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.input.DrainInput;
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 public record SimpleDrainRecipe(Ingredient item, ComponentPredicate predicate, Optional<Ingredient> catalyst, List<FluidStack<?>> fluidInput, List<FluidStack<?>> fluidOutput,
-                                ItemStack output, RegistryEntry<SoundEvent> soundEvent, boolean requirePlayer) implements DrainRecipe {
+                                ItemStack output, RegistryEntry<SoundEvent> soundEvent, boolean requirePlayer, double maxSpeed, double time) implements DrainRecipe {
     public static final MapCodec<SimpleDrainRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("item").forGetter(SimpleDrainRecipe::item),
                     ComponentPredicate.CODEC.fieldOf("item_predicate").forGetter(SimpleDrainRecipe::predicate),
@@ -30,16 +31,20 @@ public record SimpleDrainRecipe(Ingredient item, ComponentPredicate predicate, O
                     FluidStack.CODEC.listOf().optionalFieldOf("fluid_output", List.of()).forGetter(SimpleDrainRecipe::fluidOutput),
                     ItemStack.UNCOUNTED_CODEC.fieldOf("result").forGetter(SimpleDrainRecipe::output),
                     SoundEvent.ENTRY_CODEC.fieldOf("sound").forGetter(SimpleDrainRecipe::soundEvent),
-                    Codec.BOOL.optionalFieldOf("require_player", false).forGetter(SimpleDrainRecipe::requirePlayer)
+                    Codec.BOOL.optionalFieldOf("require_player", false).forGetter(SimpleDrainRecipe::requirePlayer),
+                    Codec.DOUBLE.fieldOf("max_speed").forGetter(SimpleDrainRecipe::maxSpeed),
+                    Codec.DOUBLE.fieldOf("time").forGetter(SimpleDrainRecipe::time)
             ).apply(x, SimpleDrainRecipe::new)
     );
 
     public static SimpleDrainRecipe fromItem(Item item, FluidStack<?> stack, Item out, SoundEvent sound) {
-        return new SimpleDrainRecipe(Ingredient.ofItems(item), ComponentPredicate.EMPTY, Optional.empty(), List.of(), List.of(stack), out.getDefaultStack(), Registries.SOUND_EVENT.getEntry(sound), false);
+        return new SimpleDrainRecipe(Ingredient.ofItems(item), ComponentPredicate.EMPTY, Optional.empty(), List.of(), List.of(stack), out.getDefaultStack(),
+                Registries.SOUND_EVENT.getEntry(sound), false, SpoutRecipe.getMaxSpeed(stack.instance(), stack.amount()), SpoutRecipe.getTime(stack.instance(), stack.amount()));
     }
 
     public static SimpleDrainRecipe toItem(Item item, FluidStack<?> stack, Item out, SoundEvent sound) {
-        return new SimpleDrainRecipe(Ingredient.ofItems(item), ComponentPredicate.EMPTY, Optional.empty(), List.of(stack), List.of(), out.getDefaultStack(), Registries.SOUND_EVENT.getEntry(sound), true);
+        return new SimpleDrainRecipe(Ingredient.ofItems(item), ComponentPredicate.EMPTY, Optional.empty(), List.of(stack), List.of(), out.getDefaultStack(),
+                Registries.SOUND_EVENT.getEntry(sound), true, SpoutRecipe.getMaxSpeed(stack.instance(), stack.amount()), SpoutRecipe.getTime(stack.instance(), stack.amount()));
     }
 
     @Override
@@ -89,5 +94,15 @@ public record SimpleDrainRecipe(Ingredient item, ComponentPredicate predicate, O
     @Override
     public List<FluidStack<?>> fluidInput(DrainInput input) {
         return this.fluidInput;
+    }
+
+    @Override
+    public double maxSpeed(DrainInput input) {
+        return this.maxSpeed;
+    }
+
+    @Override
+    public double time(DrainInput input) {
+        return this.time;
     }
 }

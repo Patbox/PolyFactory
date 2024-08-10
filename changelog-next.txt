@@ -1,5 +1,5 @@
 - Added new fluid system! This can be used for transport, storage and crafting with fluids.
-  - Currently available fluids: Water, Lava, Milk, Experience, Potion (all types).
+  - Currently available fluids: Water, Lava, Milk, Experience, Potion (all types), Slime and Honey.
   - Added Copper Pipes - Transport fluids anywhere you need them!
   - Added Mechanical Pumps - Gives fluids a little push (or pull) needed for them to move in the pipes.
   - Added Fluid Drains - A block player can use to put or take fluids to/from.

@@ -964,8 +964,8 @@ class RecipesProvider extends FabricRecipeProvider {
         exporter.accept(id("drain/from_slime_bucket"), SimpleDrainRecipe.fromItem(FactoryItems.SLIME_BUCKET, FactoryFluids.SLIME.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY), null);
         exporter.accept(id("drain/to_slime_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactoryItems.SLIME_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
 
-        exporter.accept(id("drain/from_potion"), new PotionAddDrainRecipe(Ingredient.ofItems(Items.POTION), Optional.empty(), FluidConstants.BOTTLE, Items.GLASS_BOTTLE.getDefaultStack(), Registries.SOUND_EVENT.getEntry(SoundEvents.ITEM_BOTTLE_EMPTY), false), null);
-        exporter.accept(id("drain/to_potion"), new PotionRemoveDrainRecipe(Ingredient.ofItems(Items.GLASS_BOTTLE), Optional.empty(), FluidConstants.BOTTLE, Items.POTION.getDefaultStack(), Registries.SOUND_EVENT.getEntry(SoundEvents.ITEM_BOTTLE_FILL), true), null);
+        exporter.accept(id("drain/from_potion"), PotionAddDrainRecipe.of(Items.POTION,  FluidConstants.BOTTLE, Items.GLASS_BOTTLE, SoundEvents.ITEM_BOTTLE_EMPTY), null);
+        exporter.accept(id("drain/to_potion"), PotionRemoveDrainRecipe.of(Items.GLASS_BOTTLE, FluidConstants.BOTTLE, Items.POTION, SoundEvents.ITEM_BOTTLE_FILL), null);
 
         exporter.accept(id("spout/to_lava_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.LAVA.ofBucket(), Items.LAVA_BUCKET, SoundEvents.ITEM_BUCKET_FILL_LAVA), null);
         exporter.accept(id("spout/to_water_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.WATER.ofBucket(), Items.WATER_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
@@ -976,7 +976,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 Items.HONEY_BOTTLE, SoundEvents.ITEM_BOTTLE_FILL), null);
         exporter.accept(id("spout/to_slime_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactoryItems.SLIME_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
 
-        exporter.accept(id("spout/to_potion"), new PotionSpoutRecipe(Ingredient.ofItems(Items.GLASS_BOTTLE), FluidConstants.BOTTLE, Items.POTION.getDefaultStack(), Registries.SOUND_EVENT.getEntry(SoundEvents.ITEM_BOTTLE_FILL)), null);
+        exporter.accept(id("spout/to_potion"), PotionSpoutRecipe.of(Items.GLASS_BOTTLE, FluidConstants.BOTTLE, Items.POTION, SoundEvents.ITEM_BOTTLE_FILL), null);
         exporter.accept(id("spout/experience_repair"), new RepairSpoutRecipe(), null);
     }
 

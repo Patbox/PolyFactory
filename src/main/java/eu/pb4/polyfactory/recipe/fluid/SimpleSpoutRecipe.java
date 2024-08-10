@@ -1,9 +1,11 @@
 package eu.pb4.polyfactory.recipe.fluid;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
+import eu.pb4.polyfactory.recipe.input.DrainInput;
 import eu.pb4.polyfactory.recipe.input.SpoutInput;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -20,19 +22,22 @@ import java.util.List;
 import java.util.Optional;
 
 public record SimpleSpoutRecipe(Ingredient item, ComponentPredicate predicate, List<FluidStack<?>> fluidInput,
-                                ItemStack output, RegistryEntry<SoundEvent> soundEvent) implements SpoutRecipe {
+                                ItemStack output, RegistryEntry<SoundEvent> soundEvent, double maxSpeed, double time) implements SpoutRecipe {
     public static final MapCodec<SimpleSpoutRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("item").forGetter(SimpleSpoutRecipe::item),
                     ComponentPredicate.CODEC.fieldOf("item_predicate").forGetter(SimpleSpoutRecipe::predicate),
                     FluidStack.CODEC.listOf().optionalFieldOf("fluid_input", List.of()).forGetter(SimpleSpoutRecipe::fluidInput),
                     ItemStack.UNCOUNTED_CODEC.fieldOf("result").forGetter(SimpleSpoutRecipe::output),
-                    SoundEvent.ENTRY_CODEC.fieldOf("sound").forGetter(SimpleSpoutRecipe::soundEvent)
+                    SoundEvent.ENTRY_CODEC.fieldOf("sound").forGetter(SimpleSpoutRecipe::soundEvent),
+                    Codec.DOUBLE.fieldOf("max_speed").forGetter(SimpleSpoutRecipe::maxSpeed),
+                    Codec.DOUBLE.fieldOf("time").forGetter(SimpleSpoutRecipe::time)
             ).apply(x, SimpleSpoutRecipe::new)
     );
     
 
     public static SimpleSpoutRecipe toItem(Item item, FluidStack<?> stack, Item out, SoundEvent sound) {
-        return new SimpleSpoutRecipe(Ingredient.ofItems(item), ComponentPredicate.EMPTY, List.of(stack), out.getDefaultStack(), Registries.SOUND_EVENT.getEntry(sound));
+        return new SimpleSpoutRecipe(Ingredient.ofItems(item), ComponentPredicate.EMPTY, List.of(stack), out.getDefaultStack(),
+                Registries.SOUND_EVENT.getEntry(sound), SpoutRecipe.getMaxSpeed(stack.instance(), stack.amount()), SpoutRecipe.getTime(stack.instance(), stack.amount()));
     }
 
     @Override
@@ -72,5 +77,15 @@ public record SimpleSpoutRecipe(Ingredient item, ComponentPredicate predicate, L
     @Override
     public List<FluidStack<?>> fluidInput(SpoutInput input) {
         return this.fluidInput;
+    }
+
+    @Override
+    public double maxSpeed(SpoutInput input) {
+        return this.maxSpeed;
+    }
+
+    @Override
+    public double time(SpoutInput input) {
+        return this.time;
     }
 }

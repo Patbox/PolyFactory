@@ -125,7 +125,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
         }
         var inputStack = self.getStack(INPUT_FIRST);
 
-        var input = DrainInput.of(inputStack.copy(), self.catalyst(), self.fluidContainer, false);
+        var input = self.asInput();
 
         if (self.currentRecipe == null || !self.currentRecipe.value().matches(input, world)) {
             self.process = 0;
@@ -152,7 +152,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
         self.model.rotate((float) fullSpeed);
         self.model.tick();
 
-        if (self.process >= 1) {
+        if (self.process >= self.currentRecipe.value().time(input)) {
             var itemOut = self.currentRecipe.value().craft(input, world.getRegistryManager());
             var currentOutput = self.getStack(OUTPUT_FIRST);
             if (currentOutput.isEmpty()) {
@@ -177,8 +177,9 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             self.updateInputPosition();
             self.markDirty();
         } else {
-            var d = 1;
-            var speed = Math.min(Math.max(Math.abs(fullSpeed), 0), d) / 120;
+            var strength = fullSpeed / 50 / 20;
+            var max = self.currentRecipe.value().maxSpeed(input);
+            var speed = Math.min(Math.abs(strength) * max, max);
             self.speedScale = speed;
             if (speed > 0) {
                 self.process += speed;
@@ -197,6 +198,10 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
             self.state = rot.getStateTextOrElse(TOO_SLOW_TEXT);
         }
+    }
+
+    private DrainInput asInput() {
+        return DrainInput.of(this.getStack(0).copy(), this.catalyst(), this.fluidContainer, false);
     }
 
     private void updateInputPosition() {
@@ -449,7 +454,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
         private float progress() {
             return MDrainBlockEntity.this.currentRecipe != null
-                    ? (float) MathHelper.clamp(MDrainBlockEntity.this.process, 0, 1)
+                    ? (float) MathHelper.clamp(MDrainBlockEntity.this.process / MDrainBlockEntity.this.currentRecipe.value().time(asInput()), 0, 1)
                     : 0;
         }
 

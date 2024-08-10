@@ -17,6 +17,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -115,12 +116,12 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
     }
 
     public interface MaxFlowProvider<T> {
-        long getMaxFlow(ServerWorld world, T data);
+        long getMaxFlow(@Nullable ServerWorld world, T data);
     }
 
 
     public interface FlowSpeedProvider<T> {
-        double getSpeedMultiplier(ServerWorld world, T data);
+        double getSpeedMultiplier(@Nullable ServerWorld world, T data);
     }
 
     public static <T> Builder<T> of(Codec<T> dataCodec, T defaultData) {

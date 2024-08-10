@@ -35,8 +35,8 @@ public class FactoryFluids {
                     .particle(new ItemStackParticleEffect(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE.getDefaultStack())).build());
     public static final FluidType<Unit> LAVA = register(Identifier.ofVanilla("lava"),
             FluidType.of().density(1000).fluid(Fluids.LAVA).brightness(15).heat(BlockHeat.LAVA)
-                    .flowSpeedMultiplier(((world, data) -> world.getDimension().ultrawarm() ? 1 : 0.5))
-                    .maxFlow(((world, data) -> world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
+                    .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
+                    .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     public static final FluidType<Unit> MILK = register(Identifier.ofVanilla("milk"),
             FluidType.of().density(200).particle(EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, 0xFFFFFF))

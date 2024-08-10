@@ -80,6 +80,10 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
     public MSpoutBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.MECHANICAL_SPOUT, pos, state);
     }
+
+    private SpoutInput asInput() {
+        return SpoutInput.of(this.getStack(INPUT_FIRST).copy(), fluidContainer, (ServerWorld) world);
+    }
     public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
         var self = (MSpoutBlockEntity) t;
 
@@ -126,7 +130,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
 
         var inputStack = self.getStack(INPUT_FIRST);
 
-        var input = SpoutInput.of(inputStack.copy(), container, (ServerWorld) world);
+        var input = self.asInput();
 
         if (self.currentRecipe == null || !self.currentRecipe.value().matches(input, world)) {
             self.process = 0;
@@ -149,7 +153,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
         self.model.setActive(true);
         self.model.tick();
 
-        if (self.process >= 1) {
+        if (self.process >= self.currentRecipe.value().time(input)) {
             var itemOut = self.currentRecipe.value().craft(input, world.getRegistryManager());
             var currentOutput = self.getStack(OUTPUT_FIRST);
             if (currentOutput.isEmpty()) {
@@ -170,8 +174,8 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             self.process = 0;
             self.markDirty();
         } else {
-            var d = 1;
-            var speed = Math.min(Math.max(Math.abs(fullSpeed), 0), d) / 120;
+            var max = self.currentRecipe.value().maxSpeed(input);
+            var speed = Math.min(Math.abs(strength) * max, max);
             self.speedScale = speed;
             if (speed > 0) {
                 self.process += speed;
@@ -336,7 +340,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
 
         private float progress() {
             return MSpoutBlockEntity.this.currentRecipe != null
-                    ? (float) MathHelper.clamp(MSpoutBlockEntity.this.process, 0, 1)
+                    ? (float) MathHelper.clamp(MSpoutBlockEntity.this.process / MSpoutBlockEntity.this.currentRecipe.value().time(asInput()), 0, 1)
                     : 0;
         }
 

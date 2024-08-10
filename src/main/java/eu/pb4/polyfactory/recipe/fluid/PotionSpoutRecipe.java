@@ -5,14 +5,18 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidStack;
+import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.input.SpoutInput;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
@@ -21,14 +25,21 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Optional;
 
-public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, RegistryEntry<SoundEvent> soundEvent) implements SpoutRecipe {
+public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, RegistryEntry<SoundEvent> soundEvent, double maxSpeed, double time) implements SpoutRecipe {
     public static final MapCodec<PotionSpoutRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("item").forGetter(PotionSpoutRecipe::item),
                     Codec.LONG.fieldOf("amount").forGetter(PotionSpoutRecipe::amount),
                     ItemStack.UNCOUNTED_CODEC.fieldOf("result").forGetter(PotionSpoutRecipe::output),
-                    SoundEvent.ENTRY_CODEC.fieldOf("sound").forGetter(PotionSpoutRecipe::soundEvent)
+                    SoundEvent.ENTRY_CODEC.fieldOf("sound").forGetter(PotionSpoutRecipe::soundEvent),
+                    Codec.DOUBLE.fieldOf("max_speed").forGetter(PotionSpoutRecipe::maxSpeed),
+                    Codec.DOUBLE.fieldOf("time").forGetter(PotionSpoutRecipe::time)
             ).apply(x, PotionSpoutRecipe::new)
     );
+
+    public static PotionSpoutRecipe of(Item item, long amount, Item result, SoundEvent sound) {
+        return new PotionSpoutRecipe(Ingredient.ofItems(item), amount, result.getDefaultStack(), Registries.SOUND_EVENT.getEntry(sound),
+                SpoutRecipe.getMaxSpeed(FactoryFluids.POTION.defaultInstance(), amount), SpoutRecipe.getTime(FactoryFluids.POTION.defaultInstance(), amount));
+    }
 
     @Override
     public boolean matches(SpoutInput input, World world) {
@@ -82,5 +93,15 @@ public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, 
             }
         }
         return List.of();
+    }
+
+    @Override
+    public double maxSpeed(SpoutInput input) {
+        return this.maxSpeed;
+    }
+
+    @Override
+    public double time(SpoutInput input) {
+        return this.time;
     }
 }
