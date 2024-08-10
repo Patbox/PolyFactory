@@ -126,7 +126,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
 
         var inputStack = self.getStack(INPUT_FIRST);
 
-        var input = SpoutInput.of(inputStack.copy(), container);
+        var input = SpoutInput.of(inputStack.copy(), container, (ServerWorld) world);
 
         if (self.currentRecipe == null || !self.currentRecipe.value().matches(input, world)) {
             self.process = 0;

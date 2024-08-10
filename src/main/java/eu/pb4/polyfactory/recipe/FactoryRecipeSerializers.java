@@ -41,6 +41,7 @@ public class FactoryRecipeSerializers {
     public static final LazyRecipeSerializer<PotionRemoveDrainRecipe> DRAIN_POTION_REMOVE = register("drain/potion_remove", PotionRemoveDrainRecipe.CODEC);
     public static final LazyRecipeSerializer<SimpleSpoutRecipe> SPOUT_SIMPLE = register("spout/simple", SimpleSpoutRecipe.CODEC);
     public static final LazyRecipeSerializer<PotionSpoutRecipe> SPOUT_POTION = register("spout/potion", PotionSpoutRecipe.CODEC);
+    public static final LazyRecipeSerializer<RepairSpoutRecipe> SPOUT_EXPERIENCE_REPAIR = register("spout/experience_repair", RepairSpoutRecipe.CODEC);
 
 
     public static void register() {

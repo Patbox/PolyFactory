@@ -19,7 +19,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -75,5 +77,15 @@ public abstract class SpoutRecipePage<T extends SpoutRecipe> extends Prioritized
     public void createPage(@Nullable PolydexEntry entry, ServerPlayerEntity player, PageBuilder layer) {
         layer.setIngredient(3, 2, this.ingredients.getFirst());
         layer.setOutput(6, 2, this.output);
+
+        var fluid = GuiTextures.EMPTY_BUILDER.get();
+        fluid.setName(Text.translatable("text.polyfactory.polydex.required_fluids"));
+        for (var stack : getBaseFluids()) {
+            fluid.addLoreLine(stack.toTextRequired().setStyle(Style.EMPTY.withColor(Formatting.GRAY).withItalic(false)));
+        }
+
+        layer.set(2, 1, fluid);
+        layer.set(2, 2, fluid);
+        layer.set(2, 3, fluid);
     }
 }

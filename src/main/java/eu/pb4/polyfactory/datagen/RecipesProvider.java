@@ -954,6 +954,7 @@ class RecipesProvider extends FabricRecipeProvider {
         exporter.accept(id("spout/to_experience_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), FactoryItems.EXPERIENCE_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
 
         exporter.accept(id("spout/to_potion"), new PotionSpoutRecipe(Ingredient.ofItems(Items.GLASS_BOTTLE), FluidConstants.BOTTLE, Items.POTION.getDefaultStack(), Registries.SOUND_EVENT.getEntry(SoundEvents.ITEM_BOTTLE_FILL)), null);
+        exporter.accept(id("spout/experience_repair"), new RepairSpoutRecipe(), null);
     }
 
     public void of(RecipeExporter exporter, RecipeEntry<?>... recipes) {

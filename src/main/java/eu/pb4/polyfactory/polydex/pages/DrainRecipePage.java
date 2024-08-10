@@ -19,7 +19,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -87,5 +89,15 @@ public abstract class DrainRecipePage<T extends DrainRecipe> extends Prioritized
             layer.setIngredient(2, 3, this.ingredients.get(1));
         }
         layer.setOutput(5, 2, this.displayResult);
+
+        var fluid = GuiTextures.EMPTY_BUILDER.get();
+        fluid.setName(Text.translatable("text.polyfactory.polydex.created_fluids"));
+        for (var stack : getBaseFluids()) {
+            fluid.addLoreLine(stack.toTextRequired().setStyle(Style.EMPTY.withColor(Formatting.GRAY).withItalic(false)));
+        }
+
+        layer.set(6, 1, fluid);
+        layer.set(6, 2, fluid);
+        layer.set(6, 3, fluid);
     }
 }
