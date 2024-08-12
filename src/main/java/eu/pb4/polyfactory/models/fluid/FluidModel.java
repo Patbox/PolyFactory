@@ -4,14 +4,12 @@ import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.polyfactory.FactoryRegistries;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidType;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
-import it.unimi.dsi.fastutil.objects.Object2IntFunction;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import org.jetbrains.annotations.Nullable;
@@ -30,13 +28,6 @@ public class FluidModel {
             }
             """.replace(" ", "").replace("\n", "");
 
-    private static final Item[] COLOR_ITEMS = new Item[] {
-            Items.LEATHER_HELMET,
-            Items.LEATHER_CHESTPLATE,
-            Items.LEATHER_LEGGINGS,
-            Items.LEATHER_BOOTS,
-            Items.LEATHER_HORSE_ARMOR,
-    };
     private final Identifier baseModel;
     private final List<Pair<Identifier, Identifier>> textures = new ArrayList<>();
     private final Map<FluidType<?>, ItemStack> model = new IdentityHashMap<>();
@@ -75,7 +66,7 @@ public class FluidModel {
     private void addTextures(Identifier id, FluidType<?> object) {
         this.textures.add(new Pair<>(id, object.texture()));
         this.model.put(object, BaseItemProvider.requestModel(
-                object.color().isEmpty() ? BaseItemProvider.requestModel() : COLOR_ITEMS[(coloredIndex++) % COLOR_ITEMS.length],
+                FactoryUtil.requestModelBase(object.modelRenderType()),
                 this.baseModel.withSuffixedPath("/" + id.getNamespace() + "/" + id.getPath())));
     }
 

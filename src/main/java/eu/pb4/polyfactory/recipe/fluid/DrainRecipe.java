@@ -14,8 +14,11 @@ public interface DrainRecipe extends Recipe<DrainInput> {
     List<FluidStack<?>> fluidOutput(DrainInput input);
     List<FluidStack<?>> fluidInput(DrainInput input);
 
+    default int decreasedInputItemAmount(DrainInput input) {
+        return 1;
+    }
+
     RegistryEntry<SoundEvent> soundEvent();
-    double maxSpeed(DrainInput input);
     double time(DrainInput input);
 
     default boolean requirePlayer() {

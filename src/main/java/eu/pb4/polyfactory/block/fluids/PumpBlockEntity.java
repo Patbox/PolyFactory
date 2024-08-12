@@ -36,6 +36,11 @@ public class PumpBlockEntity extends PipeLikeBlockEntity implements FluidInput.C
         this.speed = nbt.getDouble("speed");
     }
 
+    @Override
+    protected boolean hasDirection(Direction direction) {
+        return direction.getAxis() == this.getCachedState().get(PumpBlock.FACING).getAxis();
+    }
+
     public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
         if (!(t instanceof PumpBlockEntity pump)) {
             return;

@@ -12,10 +12,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class LivingEntityMixin {
     @Shadow public abstract LivingEntity getLastAttacker();
 
-    @Inject(method = "dropXp", at = @At("HEAD"), cancellable = true)
+    /*@Inject(method = "dropXp", at = @At("HEAD"), cancellable = true)
     private void dontDropXpForMiners(CallbackInfo ci) {
         if (this.getLastAttacker() instanceof MinerBlockEntity.MinerPlayer) {
             ci.cancel();
         }
-    }
+    }*/
 }

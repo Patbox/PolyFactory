@@ -110,6 +110,8 @@ public class FactoryBlocks {
     public static final TinyPotatoSpringBlock TINY_POTATO_SPRING = register("tiny_potato_spring", new TinyPotatoSpringBlock(AbstractBlock.Settings.create().strength(1).nonOpaque()));
     public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", new RotationalDebugBlock(AbstractBlock.Settings.create().strength(-1, -1)));
     public static final PipeBlock PIPE = register("pipe", new PipeBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
+    public static final Map<Block, PipeInWallBlock> WALL_WITH_PIPE = PipeInWallBlock.MAP;
+
     public static final PumpBlock PUMP = register("pump", new PumpBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
     public static final DrainBlock DRAIN = register("drain", new DrainBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
     public static final MDrainBlock MECHANICAL_DRAIN = register("mechanical_drain", new MDrainBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
@@ -123,6 +125,7 @@ public class FactoryBlocks {
             if (block instanceof WallBlock wallBlock) {
                 var id = Registries.BLOCK.getId(wallBlock);
                 register("wall_with_cable/" + id.getNamespace() + "/" + id.getPath(), new WallWithCableBlock(wallBlock));
+                register("wall_with_pipe/" + id.getNamespace() + "/" + id.getPath(), new PipeInWallBlock(wallBlock));
             }
         }
 

@@ -899,15 +899,15 @@ class RecipesProvider extends FabricRecipeProvider {
                         5, 5, 10f, 0.6f, new ItemStack(FactoryItems.ENDER_INFUSED_AMETHYST_SHARD)),
                 GenericMixingRecipe.ofCounted("honey_block_to_liquid", "",
                         List.of(CountedIngredient.ofItems(1, Items.HONEY_BLOCK)),
-                        List.of(),
+                        null,
                         6, 3, 10f, 0.3f, ItemStack.EMPTY, List.of(FactoryFluids.HONEY.ofBucket())),
                 GenericMixingRecipe.ofCounted("slime_block_to_liquid", "slime_to_liquid",
                         List.of(CountedIngredient.ofItems(1, Items.SLIME_BLOCK)),
-                        List.of(),
+                        null,
                         8, 3, 10f, 0.3f, ItemStack.EMPTY, List.of(FactoryFluids.SLIME.ofBucket())),
                 GenericMixingRecipe.ofCounted("slime_ball_to_liquid", "slime_to_liquid",
                         List.of(CountedIngredient.ofItems(1, Items.SLIME_BALL)),
-                        List.of(),
+                        null,
                         1, 3, 10f, 0.3f, ItemStack.EMPTY, List.of(FactoryFluids.SLIME.of(FluidConstants.BLOCK / 9)))
         );
 
@@ -975,9 +975,12 @@ class RecipesProvider extends FabricRecipeProvider {
         exporter.accept(id("spout/to_honey_bottle"), SimpleSpoutRecipe.toItem(Items.GLASS_BOTTLE, FactoryFluids.HONEY.of(FluidConstants.BUCKET / 4),
                 Items.HONEY_BOTTLE, SoundEvents.ITEM_BOTTLE_FILL), null);
         exporter.accept(id("spout/to_slime_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactoryItems.SLIME_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
-
         exporter.accept(id("spout/to_potion"), PotionSpoutRecipe.of(Items.GLASS_BOTTLE, FluidConstants.BOTTLE, Items.POTION, SoundEvents.ITEM_BOTTLE_FILL), null);
         exporter.accept(id("spout/experience_repair"), new RepairSpoutRecipe(), null);
+
+        exporter.accept(id("spout/sticky_piston"), SimpleSpoutRecipe.toItem(Items.PISTON, FactoryFluids.SLIME.of(FluidConstants.BLOCK / 10), Items.STICKY_PISTON, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
+        exporter.accept(id("spout/sticky_conveyor"), SimpleSpoutRecipe.toItem(FactoryItems.CONVEYOR, FactoryFluids.SLIME.of(FluidConstants.BLOCK / 10), FactoryItems.STICKY_CONVEYOR, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
+
     }
 
     public void of(RecipeExporter exporter, RecipeEntry<?>... recipes) {

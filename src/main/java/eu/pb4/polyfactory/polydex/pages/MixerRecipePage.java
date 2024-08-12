@@ -17,6 +17,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -120,8 +121,8 @@ public class MixerRecipePage extends PrioritizedRecipePage<GenericMixingRecipe> 
         layer.setOutput(6, 2, this.recipe.output());
         layer.set(5, 3, GuiElementBuilder.from(GuiTextures.EMPTY.getItemStack()).setName(REQUIRED_HEAT).asStack());
         layer.set(4, 3,
-                GuiTextures.FLAME_OFFSET_RIGHT.getNamed(Math.max(this.recipe.minimumTemperature(), 0), REQUIRED_HEAT),
-                GuiTextures.FLAME_OFFSET_RIGHT.getNamed(Math.min(this.recipe.maxTemperature(), 1),  REQUIRED_HEAT));
+                GuiTextures.TEMPERATURE_OFFSET_RIGHT.getNamed(MathHelper.clamp(this.recipe.minimumTemperature(), -1, 1), REQUIRED_HEAT),
+                GuiTextures.TEMPERATURE_OFFSET_RIGHT.getNamed(MathHelper.clamp(this.recipe.maxTemperature(), -1, 1),  REQUIRED_HEAT));
 
     }
 }

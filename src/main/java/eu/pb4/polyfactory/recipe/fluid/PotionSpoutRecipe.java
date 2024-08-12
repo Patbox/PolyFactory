@@ -25,20 +25,19 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Optional;
 
-public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, RegistryEntry<SoundEvent> soundEvent, double maxSpeed, double time) implements SpoutRecipe {
+public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, RegistryEntry<SoundEvent> soundEvent, double time) implements SpoutRecipe {
     public static final MapCodec<PotionSpoutRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("item").forGetter(PotionSpoutRecipe::item),
                     Codec.LONG.fieldOf("amount").forGetter(PotionSpoutRecipe::amount),
                     ItemStack.UNCOUNTED_CODEC.fieldOf("result").forGetter(PotionSpoutRecipe::output),
                     SoundEvent.ENTRY_CODEC.fieldOf("sound").forGetter(PotionSpoutRecipe::soundEvent),
-                    Codec.DOUBLE.fieldOf("max_speed").forGetter(PotionSpoutRecipe::maxSpeed),
                     Codec.DOUBLE.fieldOf("time").forGetter(PotionSpoutRecipe::time)
             ).apply(x, PotionSpoutRecipe::new)
     );
 
     public static PotionSpoutRecipe of(Item item, long amount, Item result, SoundEvent sound) {
         return new PotionSpoutRecipe(Ingredient.ofItems(item), amount, result.getDefaultStack(), Registries.SOUND_EVENT.getEntry(sound),
-                SpoutRecipe.getMaxSpeed(FactoryFluids.POTION.defaultInstance(), amount), SpoutRecipe.getTime(FactoryFluids.POTION.defaultInstance(), amount));
+                SpoutRecipe.getTime(FactoryFluids.POTION.defaultInstance(), amount));
     }
 
     @Override
@@ -93,11 +92,6 @@ public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, 
             }
         }
         return List.of();
-    }
-
-    @Override
-    public double maxSpeed(SpoutInput input) {
-        return this.maxSpeed;
     }
 
     @Override

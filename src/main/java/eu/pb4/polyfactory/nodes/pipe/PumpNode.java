@@ -10,6 +10,7 @@ import com.kneelawk.graphlib.api.util.HalfLink;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.nodes.AxisNode;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.generic.FunctionalNode;
@@ -19,12 +20,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
 
-public record PumpNode(Direction flowDirection, boolean isPulling, Direction direction, int range) implements FunctionalNode, DirectionNode {
+public record PumpNode(Direction flowDirection, boolean isPulling, Direction direction, int range) implements FunctionalNode, AxisNode {
     public static final int DEFAULT_RANGE = 32;
     public static final int SPOUT_RANGE = 8;
 
     public static final Codec<PumpNode> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Direction.CODEC.fieldOf("direction").forGetter(PumpNode::direction),
+            Direction.CODEC.fieldOf("direction").forGetter(PumpNode::flowDirection),
             Codec.BOOL.fieldOf("reverse").forGetter(PumpNode::isPulling),
             Codec.INT.optionalFieldOf("range", DEFAULT_RANGE).forGetter(PumpNode::range)
     ).apply(instance, PumpNode::new));
@@ -49,5 +50,10 @@ public record PumpNode(Direction flowDirection, boolean isPulling, Direction dir
     @Override
     public void onConnectionsChanged(@NotNull NodeHolder<BlockNode> self) {
 
+    }
+
+    @Override
+    public Direction.Axis axis() {
+        return this.direction.getAxis();
     }
 }

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 public record PotionAddDrainRecipe(Ingredient item, Optional<Ingredient> catalyst, long amount, ItemStack output, RegistryEntry<SoundEvent> soundEvent,
-                                   boolean requirePlayer, double maxSpeed, double time) implements DrainRecipe {
+                                   boolean requirePlayer, double time) implements DrainRecipe {
     public static final MapCodec<PotionAddDrainRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("item").forGetter(PotionAddDrainRecipe::item),
                     Ingredient.ALLOW_EMPTY_CODEC.optionalFieldOf("catalyst").forGetter(PotionAddDrainRecipe::catalyst),
@@ -32,14 +32,13 @@ public record PotionAddDrainRecipe(Ingredient item, Optional<Ingredient> catalys
                     ItemStack.UNCOUNTED_CODEC.fieldOf("result").forGetter(PotionAddDrainRecipe::output),
                     SoundEvent.ENTRY_CODEC.fieldOf("sound").forGetter(PotionAddDrainRecipe::soundEvent),
                     Codec.BOOL.optionalFieldOf("require_player", false).forGetter(PotionAddDrainRecipe::requirePlayer),
-                    Codec.DOUBLE.fieldOf("max_speed").forGetter(PotionAddDrainRecipe::maxSpeed),
                     Codec.DOUBLE.fieldOf("time").forGetter(PotionAddDrainRecipe::time)
             ).apply(x, PotionAddDrainRecipe::new)
     );
 
     public static PotionAddDrainRecipe of(Item item, long amount, Item result, SoundEvent sound) {
         return new PotionAddDrainRecipe(Ingredient.ofItems(item), Optional.empty(), amount, result.getDefaultStack(), Registries.SOUND_EVENT.getEntry(sound),
-                false, SpoutRecipe.getMaxSpeed(FactoryFluids.POTION.defaultInstance(), amount), SpoutRecipe.getTime(FactoryFluids.POTION.defaultInstance(), amount));
+                false, SpoutRecipe.getTime(FactoryFluids.POTION.defaultInstance(), amount));
     }
 
     @Override
@@ -84,11 +83,6 @@ public record PotionAddDrainRecipe(Ingredient item, Optional<Ingredient> catalys
     @Override
     public List<FluidStack<?>> fluidInput(DrainInput input) {
         return List.of();
-    }
-
-    @Override
-    public double maxSpeed(DrainInput input) {
-        return this.maxSpeed;
     }
 
     @Override

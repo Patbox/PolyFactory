@@ -123,7 +123,10 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container", BlockEntityType.Builder
             .create(ColorableBlockEntity::new, FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP));
 
-    public static final BlockEntityType<PipeBlockEntity> PIPE = register("pipe", BlockEntityType.Builder.create(PipeBlockEntity::new, FactoryBlocks.PIPE));
+    public static final BlockEntityType<PipeBlockEntity> PIPE = register("pipe", BlockEntityType.Builder.create(PipeBlockEntity::new, Util.make(new ArrayList<Block>(), (a) -> {
+        a.add(FactoryBlocks.PIPE);
+        a.addAll(FactoryBlocks.WALL_WITH_PIPE.values());
+    }).toArray(Block[]::new)));
     public static final BlockEntityType<PumpBlockEntity> PUMP = register("pump", BlockEntityType.Builder.create(PumpBlockEntity::new, FactoryBlocks.PUMP));
     public static final BlockEntityType<DrainBlockEntity> DRAIN = register("drain", BlockEntityType.Builder.create(DrainBlockEntity::new, FactoryBlocks.DRAIN));
     public static final BlockEntityType<MDrainBlockEntity> MECHANICAL_DRAIN = register("mechanical_drain", BlockEntityType.Builder.create(MDrainBlockEntity::new, FactoryBlocks.MECHANICAL_DRAIN));

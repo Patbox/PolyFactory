@@ -22,7 +22,7 @@ import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
-public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.ContainerBased, DebugTextProvider {
+public abstract class PipeLikeBlockEntity extends BlockEntity implements FluidInput.ContainerBased, DebugTextProvider {
     public static final long CAPACITY = FluidConstants.BLOCK;
     protected final FluidContainer container = FluidContainer.singleFluid(CAPACITY, this::markDirty);
     protected final BlockPos.Mutable mut = new BlockPos.Mutable();
@@ -30,7 +30,6 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
     protected BlockState[] pullState = new BlockState[pullOverflow.length];
     protected final double[] pushOverflow = new double[Direction.values().length];
     protected BlockState[] pushState = new BlockState[pushOverflow.length];
-
     protected long maxPush = 0;
     private final int[] particleCounter = {1, 3, 5, 6, 8, 4};
 
@@ -121,7 +120,7 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
         var fluid = this.container.topFluid();
 
         if (pushedBlockState.isAir() && fluid != null && fluid.type() == FactoryFluids.EXPERIENCE && this.container.get(fluid) >= FluidBehaviours.EXPERIENCE_ORB_TO_FLUID && world.random.nextBoolean()) {
-            var max =(int) Math.min(this.container.get(fluid) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID, 30);
+            var max = (int) Math.min(this.container.get(fluid) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID, 30);
             var amount = max <= 1 ? 1 : world.random.nextBetween(1, max);
             this.container.extract(fluid, amount * FluidBehaviours.EXPERIENCE_ORB_TO_FLUID, false);
             var x = new ExperienceOrbEntity(world, this.pos.getX() + 0.5 + direction.getOffsetX() * 0.7,
@@ -130,16 +129,16 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
             world.spawnEntity(x);
         }
 
-        if (pushedBlockState.isAir() && (this.particleCounter[direction.ordinal()]++ % 10) == 0) {
+        if (pushedBlockState.isAir() && (this.particleCounter[direction.ordinal()]++ % 3) == 0) {
             if (fluid != null) {
                 var particle = fluid.particle();
                 if (particle != null) {
                     ((ServerWorld) world).spawnParticles(particle,
-                            this.pos.getX() + 0.5 + direction.getOffsetX() * 0.6,
-                            this.pos.getY() + 0.5 + direction.getOffsetY() * 0.6,
-                            this.pos.getZ() + 0.5 + direction.getOffsetZ() * 0.6,
+                            this.pos.getX() + 0.5 + direction.getOffsetX() * 0.55,
+                            this.pos.getY() + 0.5 + direction.getOffsetY() * 0.55,
+                            this.pos.getZ() + 0.5 + direction.getOffsetZ() * 0.55,
                             0,
-                            direction.getOffsetX() * 0.1, direction.getOffsetY() * 0.1, direction.getOffsetZ() * 0.1, 0.2
+                            direction.getOffsetX() * 0.1, direction.getOffsetY() * 0.1, direction.getOffsetZ() * 0.1, 0.4
                     );
                 }
             }
@@ -221,6 +220,8 @@ public class PipeLikeBlockEntity extends BlockEntity implements FluidInput.Conta
 
     @Override
     public FluidContainer getFluidContainer(Direction direction) {
-        return this.container;
+        return this.hasDirection(direction) ? this.container : null;
     }
+
+    protected abstract boolean hasDirection(Direction direction);
 }

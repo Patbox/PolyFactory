@@ -110,15 +110,15 @@ public class FactoryItems {
     public static final Item DYNAMITE = register("dynamite", new DynamiteItem(new Item.Settings().maxCount(16)));
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
     public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING);
-    public static final Item EXPERIENCE_BUCKET = register("experience_bucket", new ModeledItem(new Item.Settings().maxCount(1)));
-    public static final Item SLIME_BUCKET = register("slime_bucket", new ModeledItem(new Item.Settings().maxCount(1)));
-    public static final Item HONEY_BUCKET = register("honey_bucket", new HoneyBucketItem(new Item.Settings()
+    public static final Item EXPERIENCE_BUCKET = register("experience_bucket", new ModeledItem(new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final Item SLIME_BUCKET = register("slime_bucket", new ModeledItem(new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final Item HONEY_BUCKET = register("honey_bucket", new HoneyBucketItem(new Item.Settings().recipeRemainder(Items.BUCKET)
             .food(new FoodComponent.Builder().nutrition(18).saturationModifier(0.2F).build()).maxCount(1)));
     public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
     public static final Item SPRAY_CAN = register("spray_can", new DyeSprayItem(new Item.Settings().maxCount(1)));
-    public static final Item PIPE = register(FactoryBlocks.PIPE);
+    public static final Item PIPE = register("pipe", new PipeItem(FactoryBlocks.PIPE, new Item.Settings()));
     public static final Item PUMP = register(FactoryBlocks.PUMP);
     public static final Item DRAIN = register(FactoryBlocks.DRAIN);
     public static final Item MECHANICAL_DRAIN = register(FactoryBlocks.MECHANICAL_DRAIN);

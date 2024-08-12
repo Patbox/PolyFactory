@@ -12,6 +12,7 @@ import eu.pb4.polyfactory.mixin.ExperienceOrbEntityAccessor;
 import eu.pb4.polyfactory.models.fluid.TopFluidViewModel;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.DrainInput;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.fabricmc.fabric.api.entity.FakePlayer;
@@ -24,7 +25,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsage;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -79,7 +79,7 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
             for (var fluid : recipe.fluidInput(input)) {
                 container.extract(fluid, false);
             }
-            player.setStackInHand(Hand.MAIN_HAND, ItemUsage.exchangeStack(stack, player, itemOut));
+            player.setStackInHand(Hand.MAIN_HAND, FactoryUtil.exchangeStack(stack, recipe.decreasedInputItemAmount(input), player, itemOut));
             for (var fluid : recipe.fluidOutput(input)) {
                 container.insert(fluid, false);
             }

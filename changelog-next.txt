@@ -7,5 +7,6 @@
   - Mechanical Mixers can now store fluids and use them as part of recipes.
 - You can now put Cables within wall blocks.
 - Tweaked Mechanical Press textures.
+- Mobs killed by the Mechanical Miner can now drop XP.
 - New Grinder recipe:
  - Nether Wart Block -> 1-5 Nether Wards

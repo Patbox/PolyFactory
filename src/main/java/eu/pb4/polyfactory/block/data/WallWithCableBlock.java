@@ -147,7 +147,7 @@ public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlo
 
     @Override
     public MutableText getName() {
-        return Text.translatable(this.getTranslationKey(), this.backing.getName());
+        return Text.translatable("block.polyfactory.wall_with_cable", this.backing.getName());
     }
 
     @Override

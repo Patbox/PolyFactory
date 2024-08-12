@@ -17,6 +17,7 @@ import java.util.function.Function;
 public record WrenchAction(String id, Text name, WrenchValueGetter value, WrenchApplyAction action, WrenchApplyAction alt) {
     public static final WrenchAction FACING = ofDirection(Properties.FACING);
     public static final WrenchAction AXIS = of("axis", Properties.AXIS);
+    public static final WrenchAction HORIZONTAL_AXIS = of("axis", Properties.HORIZONTAL_AXIS);
     public static final WrenchAction FACING_HORIZONTAL = ofDirection("facing", Properties.HORIZONTAL_FACING );
     public static final WrenchAction HALF = of("half", Properties.BLOCK_HALF, t -> Text.translatable("text.polyfactory.half." + t.asString()));
     public static final WrenchAction CHANNEL = ofChannel("channel", ChannelContainer.class,

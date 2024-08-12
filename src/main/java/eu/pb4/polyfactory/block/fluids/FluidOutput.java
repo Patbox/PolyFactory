@@ -6,21 +6,28 @@ import eu.pb4.polyfactory.fluid.FluidType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.Nullable;
 
 public interface FluidOutput {
     long extractFluid(FluidInstance<?> type, long amount, Direction direction);
+    @Nullable
     FluidInstance<?> getTopFluid(Direction direction);
 
     interface ContainerBased extends FluidOutput, FluidContainerOwner {
         @Override
         default long extractFluid(FluidInstance<?> type, long amount, Direction direction) {
-            return getFluidContainer(direction).extract(type, amount, false);
+            var x = getFluidContainer(direction);
+
+            return x != null ? x.extract(type, amount, false) : 0;
         }
 
         @Override
+        @Nullable
         default FluidInstance<?> getTopFluid(Direction direction) {
-            return getFluidContainer(direction).topFluid();
-        };
+            var x = getFluidContainer(direction);
+
+            return x != null ? x.topFluid() : null;
+        }
     }
 
     interface Getter {

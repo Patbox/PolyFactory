@@ -25,6 +25,6 @@ public class SimpleSpoutRecipePage extends SpoutRecipePage<SimpleSpoutRecipe> {
     }
     @Override
     protected CountedIngredient getBaseIngredient() {
-        return new CountedIngredient(this.recipe.item(), 1, ItemStack.EMPTY);
+        return this.recipe.item();
     }
 }

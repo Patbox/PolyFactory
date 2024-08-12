@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.FactoryRegistries;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.ModelRenderType;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.entity.decoration.Brightness;
 import net.minecraft.fluid.Fluid;
@@ -28,6 +29,7 @@ import static eu.pb4.polyfactory.ModInit.id;
 public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaultData,
                            Optional<Fluid> backingFluid,
                            Optional<Identifier> textureOverride,
+                           ModelRenderType modelRenderType,
                            Optional<ColorProvider<T>> color,
                            Optional<BiFunction<FluidType<T>, T, Text>> name,
                            Function<FluidInstance<T>, ParticleEffect> particleGetter,
@@ -110,7 +112,6 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         return new FluidInstance<>(this, data);
     }
 
-
     public interface ColorProvider<T> {
         int getColor(T data);
     }
@@ -137,6 +138,7 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         private final T defaultData;
         private int density = 0;
         private float heat = 0;
+        private ModelRenderType modelRenderType = ModelRenderType.SOLID;
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         private Optional<Fluid> fluid = Optional.empty();
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -179,13 +181,24 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
             return this;
         }
 
+        public Builder<T> modelRenderType(ModelRenderType type) {
+            this.modelRenderType = type;
+            return this;
+        }
+
+        public Builder<T> transparent() {
+            return this.modelRenderType == ModelRenderType.SOLID ? this.modelRenderType(ModelRenderType.TRANSPARENT) : this;
+        }
+
         public Builder<T> color(int color) {
             this.color = Optional.of((x) -> color);
+            this.modelRenderType = ModelRenderType.COLORED;
             return this;
         }
 
         public Builder<T> color(ColorProvider<T> colorProvider) {
             this.color = Optional.of(colorProvider);
+            this.modelRenderType = ModelRenderType.COLORED;
             return this;
         }
 
@@ -228,7 +241,7 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         }
 
         public FluidType<T> build() {
-            return new FluidType<>(this.density, this.heat, this.dataCodec, this.defaultData, this.fluid, this.texture,
+            return new FluidType<>(this.density, this.heat, this.dataCodec, this.defaultData, this.fluid, this.texture, this.modelRenderType,
                     this.color, this.name, this.particleGetter, this.maxFlow, this.flowSpeedMultiplier, this.brightness);
         }
     }

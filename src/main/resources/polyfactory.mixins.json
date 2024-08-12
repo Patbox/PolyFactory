@@ -11,6 +11,7 @@
     "SimpleBlockGraphAccessor",
     "block.BlockMixin",
     "block.StateManagerMixin",
+    "block.WallBlockMixin",
     "block.WorldChunkMixin",
     "datafixer.ItemStackComponentizationFixMixin",
     "datafixer.Schema1460Mixin",

@@ -1,8 +1,6 @@
 package eu.pb4.polyfactory.block.fluids;
 
-import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
-import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
@@ -16,7 +14,6 @@ import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.fluid.DrainRecipe;
 import eu.pb4.polyfactory.recipe.input.DrainInput;
-import eu.pb4.polyfactory.recipe.input.MixingInput;
 import eu.pb4.polyfactory.ui.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.TagLimitedSlot;
@@ -24,20 +21,14 @@ import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
-import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsage;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.particle.ItemStackParticleEffect;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
@@ -60,8 +51,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
-import java.util.ArrayList;
-
 public class MDrainBlockEntity extends TallItemMachineBlockEntity implements FluidInputOutput.ContainerBased {
 
     public static final int CATALYST_FIRST = 2;
@@ -83,6 +72,8 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
     private MDrainBlock.Model model;
     private boolean inventoryChanged = false;
     private final FluidContainer fluidContainer = new FluidContainer(FLUID_CAPACITY, this::markDirty);
+    private float visualProgress;
+
     public MDrainBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.MECHANICAL_DRAIN, pos, state);
     }
@@ -105,6 +96,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
         if (self.isInputEmpty()) {
             self.process = 0;
+            self.visualProgress = 0;
             self.updateInputPosition();
             self.speedScale = 0;
             self.active = false;
@@ -115,6 +107,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
         if (self.currentRecipe == null && !self.inventoryChanged) {
             self.process = 0;
+            self.visualProgress = 0;
             self.updateInputPosition();
             self.speedScale = 0;
             self.active = false;
@@ -129,6 +122,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
         if (self.currentRecipe == null || !self.currentRecipe.value().matches(input, world)) {
             self.process = 0;
+            self.visualProgress = 0;
             self.updateInputPosition();
             self.speedScale = 0;
             self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, world).orElse(null);
@@ -162,7 +156,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             } else {
                 return;
             }
-            inputStack.decrement(1);
+            inputStack.decrement(self.currentRecipe.value().decreasedInputItemAmount(input));
             if (inputStack.isEmpty()) {
                 self.setStack(INPUT_FIRST, ItemStack.EMPTY);
             }
@@ -174,15 +168,16 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             }
             world.playSound(null, pos, self.currentRecipe.value().soundEvent().value(), SoundCategory.BLOCKS);
             self.process = 0;
+            self.visualProgress = 0;
             self.updateInputPosition();
             self.markDirty();
         } else {
             var strength = fullSpeed / 50 / 20;
-            var max = self.currentRecipe.value().maxSpeed(input);
-            var speed = Math.min(Math.abs(strength) * max, max);
+            var speed = Math.min(Math.abs(strength) * 1, 1);
             self.speedScale = speed;
             if (speed > 0) {
                 self.process += speed;
+                self.visualProgress = (float) (self.process / self.currentRecipe.value().time(input));
                 markDirty(world, pos, self.getCachedState());
                 var ppos = self.containers[0].getPos();
                 var fluid = Util.getRandomOrEmpty(self.currentRecipe.value().fluidOutput(input), world.random);
@@ -219,7 +214,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             Quaternionf rot;
             var dir = this.getCachedState().get(MDrainBlock.INPUT_FACING);
             if (id == INPUT_FIRST) {
-                base = base.add(0, 0.50, 0).offset(dir, -(this.process - 0.5) * (8 / 16f)).offset(dir.rotateYClockwise(), -4 / 16f);
+                base = base.add(0, 0.50, 0).offset(dir, -(this.visualProgress - 0.5) * (8 / 16f)).offset(dir.rotateYClockwise(), -4 / 16f);
                 rot = Direction.UP.getRotationQuaternion()
                         .rotateY(-dir.rotateYClockwise().asRotation() * MathHelper.RADIANS_PER_DEGREE)
                         .rotateX(MathHelper.PI * 3 / 4);
@@ -330,7 +325,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
         for (var fluid : recipe.fluidInput(input)) {
             container.extract(fluid, false);
         }
-        player.setStackInHand(Hand.MAIN_HAND, ItemUsage.exchangeStack(stack, player, itemOut));
+        player.setStackInHand(Hand.MAIN_HAND, FactoryUtil.exchangeStack(stack, recipe.decreasedInputItemAmount(input), player, itemOut));
         for (var fluid : recipe.fluidOutput(input)) {
             container.insert(fluid, false);
         }
@@ -453,9 +448,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
         }
 
         private float progress() {
-            return MDrainBlockEntity.this.currentRecipe != null
-                    ? (float) MathHelper.clamp(MDrainBlockEntity.this.process / MDrainBlockEntity.this.currentRecipe.value().time(asInput()), 0, 1)
-                    : 0;
+            return MDrainBlockEntity.this.visualProgress;
         }
 
         @Override

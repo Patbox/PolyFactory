@@ -3,31 +3,20 @@ package eu.pb4.polyfactory.fluid;
 import eu.pb4.polyfactory.FactoryRegistries;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.BlockHeat;
-import eu.pb4.polyfactory.item.FactoryItems;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeveledCauldronBlock;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Items;
-import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.EntityEffectParticleEffect;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.potion.Potion;
-import net.minecraft.potion.Potions;
-import net.minecraft.predicate.ComponentPredicate;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.MathHelper;
-import org.joml.Vector3f;
 
 public class FactoryFluids {
     public static final FluidType<Unit> WATER = register(Identifier.ofVanilla("water"),
@@ -39,7 +28,7 @@ public class FactoryFluids {
                     .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     public static final FluidType<Unit> MILK = register(Identifier.ofVanilla("milk"),
-            FluidType.of().density(200).particle(EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, 0xFFFFFF))
+            FluidType.of().density(200)
                     .flowSpeedMultiplier(0.95)
                     .build());
     public static final FluidType<Unit> EXPERIENCE = register(Identifier.ofVanilla("experience"),
@@ -58,10 +47,10 @@ public class FactoryFluids {
                     }).particle((data) -> EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, data.data().getColor())).build());
 
     public static final FluidType<Unit> HONEY = register(Identifier.ofVanilla("honey"),
-            FluidType.of().density(500).flowSpeedMultiplier(0.6).maxFlow(FluidConstants.BOTTLE * 2 / 3).build());
+            FluidType.of().density(500).transparent().flowSpeedMultiplier(0.6).maxFlow(FluidConstants.BOTTLE * 2 / 3).build());
 
     public static final FluidType<Unit> SLIME = register(Identifier.ofVanilla("slime"),
-            FluidType.of().density(600).flowSpeedMultiplier(0.6).maxFlow(FluidConstants.BOTTLE * 2 / 3).build());
+            FluidType.of().density(600).transparent().flowSpeedMultiplier(0.6).maxFlow(FluidConstants.BOTTLE * 2 / 3).build());
     public static void register() {
         FluidBehaviours.addBlockStateConversions(Blocks.WATER.getDefaultState(), Blocks.AIR.getDefaultState(), WATER.ofBucket());
         FluidBehaviours.addBlockStateConversions(Blocks.LAVA.getDefaultState(), Blocks.AIR.getDefaultState(), LAVA.ofBucket());
@@ -72,6 +61,9 @@ public class FactoryFluids {
         FluidBehaviours.addBlockStateConversions(Blocks.WATER_CAULDRON.getDefaultState().with(LeveledCauldronBlock.LEVEL, 1),
                 Blocks.CAULDRON.getDefaultState(), WATER.ofBottle());
         FluidBehaviours.addBlockStateConversions(Blocks.LAVA_CAULDRON.getDefaultState(), Blocks.CAULDRON.getDefaultState(), LAVA.ofBucket());
+
+        FluidBehaviours.addBlockStateInsert(Blocks.SLIME_BLOCK.getDefaultState(), Blocks.AIR.getDefaultState(), SLIME.ofBucket());
+        FluidBehaviours.addBlockStateInsert(Blocks.HONEY_BLOCK.getDefaultState(), Blocks.AIR.getDefaultState(), HONEY.ofBucket());
     }
 
     public static <T> FluidType<T> register(Identifier identifier, FluidType<T> item) {

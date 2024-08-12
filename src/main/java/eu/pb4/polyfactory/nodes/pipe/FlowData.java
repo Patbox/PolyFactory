@@ -6,7 +6,6 @@ import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.*;
 import com.kneelawk.graphlib.api.util.LinkPos;
 import com.mojang.serialization.Codec;
-import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.mixin.SimpleBlockGraphAccessor;
 import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
 import it.unimi.dsi.fastutil.objects.*;
@@ -46,9 +45,10 @@ public class FlowData implements GraphEntity<FlowData> {
     public void runPullFlows(BlockPos pos, BooleanSupplier canContinue, FlowConsumer consumer) {
         runFlows(pos, false, canContinue, consumer);
     }
+
     public void runFlows(BlockPos pos, boolean push, BooleanSupplier canContinue, FlowConsumer consumer) {
-        if (this.isInvalid) {
-            this.rebuild();
+        if (this.isInvalid && !this.rebuild()) {
+            return;
         }
         var current = this.currentFlow.get(pos);
         if (current == null || !canContinue.getAsBoolean()) {
@@ -86,9 +86,9 @@ public class FlowData implements GraphEntity<FlowData> {
         }
     }
 
-    private void rebuild() {
+    private boolean rebuild() {
         if (!this.isInvalid || this.ctx == null) {
-            return;
+            return false;
         }
         var time = System.currentTimeMillis();
         this.isInvalid = false;
@@ -184,6 +184,7 @@ public class FlowData implements GraphEntity<FlowData> {
                     }
                 }
             } while (!states.isEmpty());
+
             map.forEach((pos, flow) -> {
                 var curr = this.currentFlow.computeIfAbsent(pos, CurrentFlow::new);
                 var push = flow.push;
@@ -202,9 +203,7 @@ public class FlowData implements GraphEntity<FlowData> {
             });
         }
 
-        //if (ModInit.DEV_ENV) {
-        //    ModInit.LOGGER.info("Rebuilding pipes took {}ms", System.currentTimeMillis() - time);
-        //}
+        return true;
     }
 
     private void invalidate() {

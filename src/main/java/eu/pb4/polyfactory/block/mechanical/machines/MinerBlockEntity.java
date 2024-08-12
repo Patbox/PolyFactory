@@ -338,7 +338,5 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         public void setLastAttackedTicks(int tick) {
             this.lastAttackedTicks = tick;
         }
-
-
     }
 }

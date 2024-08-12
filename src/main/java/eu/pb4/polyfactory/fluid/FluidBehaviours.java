@@ -1,12 +1,7 @@
 package eu.pb4.polyfactory.fluid;
 
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.BlockState;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.predicate.ComponentPredicate;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Pair;
 import net.minecraft.util.Unit;
 
@@ -24,6 +19,7 @@ public interface FluidBehaviours {
         BLOCK_STATE_TO_FLUID_EXTRACT.put(withFluid, new Pair<>(fluid, withoutFluid));
         BLOCK_STATE_TO_FLUID_INSERT.computeIfAbsent(withoutFluid, (a) -> new ArrayList<>()).add(new Pair<>(fluid, withFluid));
     }
-
-    record Result(ComponentPredicate predicate, FluidStack<?> fluid, ItemStack result, SoundEvent sound) {};
+    static void addBlockStateInsert(BlockState withFluid, BlockState withoutFluid, FluidStack<Unit> fluid) {
+        BLOCK_STATE_TO_FLUID_INSERT.computeIfAbsent(withoutFluid, (a) -> new ArrayList<>()).add(new Pair<>(fluid, withFluid));
+    }
 }

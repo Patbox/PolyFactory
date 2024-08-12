@@ -40,11 +40,11 @@ public class SimpleDrainRecipePage extends DrainRecipePage<SimpleDrainRecipe> {
     protected List<CountedIngredient> getBaseIngredient() {
         if (this.recipe.catalyst().isPresent()) {
             return List.of(
-                    new CountedIngredient(this.recipe.item(), 1, ItemStack.EMPTY),
+                    this.recipe.item(),
                     new CountedIngredient(this.recipe.catalyst().get(), 0, ItemStack.EMPTY)
             );
         }
 
-        return List.of(new CountedIngredient(this.recipe.item(), 1, ItemStack.EMPTY));
+        return List.of(this.recipe.item());
     }
 }

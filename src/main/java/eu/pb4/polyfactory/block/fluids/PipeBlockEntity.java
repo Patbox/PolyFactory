@@ -35,4 +35,9 @@ public class PipeBlockEntity extends PipeLikeBlockEntity {
         }
         pipe.postTick();
     }
+
+    @Override
+    protected boolean hasDirection(Direction direction) {
+        return ((PipeBaseBlock) this.getCachedState().getBlock()).checkModelDirection(this.getCachedState(), direction);
+    }
 }

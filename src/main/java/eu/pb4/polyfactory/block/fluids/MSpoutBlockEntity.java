@@ -1,38 +1,26 @@
 package eu.pb4.polyfactory.block.fluids;
 
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
-import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.fluid.FluidContainer;
-import eu.pb4.polyfactory.fluid.FluidType;
-import eu.pb4.polyfactory.item.FactoryDataComponents;
-import eu.pb4.polyfactory.item.FactoryItemTags;
-import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
-import eu.pb4.polyfactory.recipe.fluid.DrainRecipe;
 import eu.pb4.polyfactory.recipe.fluid.SpoutRecipe;
-import eu.pb4.polyfactory.recipe.input.DrainInput;
 import eu.pb4.polyfactory.recipe.input.SpoutInput;
 import eu.pb4.polyfactory.ui.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
-import eu.pb4.polyfactory.ui.TagLimitedSlot;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
-import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsage;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.registry.RegistryWrapper;
@@ -43,11 +31,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.Util;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -163,7 +147,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             } else {
                 return;
             }
-            inputStack.decrement(1);
+            inputStack.decrement(self.currentRecipe.value().decreasedInputItemAmount(input));
             if (inputStack.isEmpty()) {
                 self.setStack(INPUT_FIRST, ItemStack.EMPTY);
             }
@@ -174,8 +158,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             self.process = 0;
             self.markDirty();
         } else {
-            var max = self.currentRecipe.value().maxSpeed(input);
-            var speed = Math.min(Math.abs(strength) * max, max);
+            var speed = Math.min(Math.abs(strength) * 1, 1);
             self.speedScale = speed;
             if (speed > 0) {
                 self.process += speed;

@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.CableBlock;
 import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
+import eu.pb4.polyfactory.block.fluids.PipeInWallBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -103,6 +104,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addColored(FactoryBlocks.INVERTED_CAGED_LAMP);
 
         FactoryBlocks.WALL_WITH_CABLE.values().forEach(this::addWallWithCable);
+        FactoryBlocks.WALL_WITH_PIPE.values().forEach(this::addWallWithPipe);
     }
 
     private void addAxle(Block block, Item item) {
@@ -141,6 +143,18 @@ class LootTables extends FabricBlockLootTableProvider {
                         .with(ItemEntry.builder(FactoryItems.CABLE)
                                 .apply(() -> CopyColorLootFunction.INSTANCE)
                         )
+                )
+                .pool(LootPool.builder()
+                        .conditionally(SurvivesExplosionLootCondition.builder())
+                        .rolls(ConstantLootNumberProvider.create(1.0F))
+                        .with(ItemEntry.builder(block.getBacking())))
+        );
+    }
+
+    private void addWallWithPipe(PipeInWallBlock block) {
+        this.addDrop(block, LootTable.builder()
+                .pool(LootPool.builder()
+                        .with(ItemEntry.builder(FactoryItems.PIPE))
                 )
                 .pool(LootPool.builder()
                         .conditionally(SurvivesExplosionLootCondition.builder())

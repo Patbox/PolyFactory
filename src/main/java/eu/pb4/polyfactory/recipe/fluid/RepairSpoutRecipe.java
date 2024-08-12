@@ -69,15 +69,9 @@ public record RepairSpoutRecipe() implements SpoutRecipe {
     }
 
     @Override
-    public double maxSpeed(SpoutInput input) {
-        return FactoryFluids.EXPERIENCE.defaultInstance().getMaxFlow(input.world()) / 5d;
-    }
-
-    @Override
     public double time(SpoutInput input) {
         var stack = input.stack().copy();
         int i = EnchantmentHelper.getRepairWithXp(input.world(), stack, (int) (input.getFluid(FactoryFluids.EXPERIENCE.defaultInstance()) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID));
-        int j = Math.min(i, stack.getDamage());
-        return j / FactoryFluids.EXPERIENCE.defaultInstance().getFlowSpeedMultiplier(input.world()) / FactoryFluids.EXPERIENCE.defaultInstance().getMaxFlow(input.world());
+        return Math.min(i, stack.getDamage()) * 50;
     }
 }

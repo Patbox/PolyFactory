@@ -5,6 +5,7 @@ import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
@@ -22,13 +23,19 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -37,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe, WrenchableBlock {
+public class PipeBlock extends PipeBaseBlock implements WrenchableBlock {
 
     public static final BooleanProperty LOCKED = FactoryProperties.LOCKED;
     public static final LazyEnumProperty<TriState> NORTH = FactoryProperties.TRI_STATE_NORTH;
@@ -47,14 +54,13 @@ public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnect
     public static final LazyEnumProperty<TriState> WEST = FactoryProperties.TRI_STATE_WEST;
     public static final LazyEnumProperty<TriState> UP = FactoryProperties.TRI_STATE_UP;
     public static final LazyEnumProperty<TriState> DOWN = FactoryProperties.TRI_STATE_DOWN;
-
     private static final List<WrenchAction> WRENCH_ACTIONS = List.of(WrenchAction.of("locked", LOCKED));
     public static final Map<Direction, LazyEnumProperty<TriState>> FACING_PROPERTIES = FactoryProperties.TRI_STATE_DIRECTIONS;
 
     public PipeBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(LOCKED, false).with(NORTH, TriState.FALSE).with(SOUTH, TriState.FALSE)
-                .with(EAST, TriState.FALSE).with(WEST, TriState.FALSE).with(UP, TriState.FALSE).with(DOWN, TriState.FALSE).with(WATERLOGGED, false));
+                .with(EAST, TriState.FALSE).with(WEST, TriState.FALSE).with(UP, TriState.FALSE).with(DOWN, TriState.FALSE));
     }
 
     @Nullable
@@ -84,17 +90,7 @@ public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnect
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(LOCKED, NORTH, SOUTH, EAST, WEST, UP, DOWN, WATERLOGGED);
-    }
-
-    @Override
-    protected void updateNetworkAt(WorldAccess world, BlockPos pos) {
-        NetworkComponent.Pipe.updatePipeAt(world, pos);
-    }
-
-    @Override
-    protected boolean isSameNetworkType(Block block) {
-        return block instanceof NetworkComponent.Pipe;
+        builder.add(LOCKED, NORTH, SOUTH, EAST, WEST, UP, DOWN);
     }
 
     @Override
@@ -128,11 +124,30 @@ public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnect
         return state;
     }
 
+    @Override
+    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof WallBlock wallBlock) {
+            var convert = PipeInWallBlock.MAP.get(wallBlock);
+            if (convert != null) {
+                stack.decrementUnlessCreative(1, player);
+                var convertState = Objects.requireNonNull(convert.getPlacementState(new ItemPlacementContext(world, player, hand, stack, hit)));
+                var container = world.getBlockEntity(pos) instanceof PipeBlockEntity be ? be.container : null;
+                world.setBlockState(pos, convertState);
+                if (container != null && world.getBlockEntity(pos) instanceof PipeBlockEntity be) {
+                    container.forEach(be.container::set);
+                }
+                return ItemActionResult.SUCCESS;
+            }
+        }
+
+        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+    }
+
     protected boolean canConnectTo(WorldAccess world, BlockPos neighborPos, BlockState neighborState, Direction direction) {
         return neighborState.getBlock() instanceof PipeConnectable connectable && connectable.canPipeConnect(world, neighborPos, neighborState, direction);
     }
 
-    public static EnumSet<Direction> getDirections(BlockState state) {
+    public EnumSet<Direction> getDirections(BlockState state) {
         var list = new ArrayList<Direction>(6);
 
         for (var dir : Direction.values()) {
@@ -144,84 +159,18 @@ public class PipeBlock extends NetworkBlock implements FactoryBlock, PipeConnect
         return list.isEmpty() ? EnumSet.noneOf(Direction.class) : EnumSet.copyOf(list);
     }
 
-
-    @Override
-    public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
-    }
-
     @Override
     public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
-        return !state.get(LOCKED) || checkModelDirection(state, dir);
+        return !state.get(LOCKED) || super.canPipeConnect(world, pos, state, dir);
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new PipeModel(initialBlockState);
-    }
-
-    private static boolean checkModelDirection(BlockState state, Direction direction) {
+    public boolean checkModelDirection(BlockState state, Direction direction) {
         return state.get(FACING_PROPERTIES.get(direction)).orElse(true);
-    }
-
-    @Nullable
-    @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new PipeBlockEntity(pos, state);
-    }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return PipeBlockEntity::tick;
-    }
-
-    @Override
-    public Collection<BlockNode> createPipeNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new SelectiveSideNode(getDirections(state)));
-    }
-
-    @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
-        return Blocks.COPPER_BLOCK.getDefaultState();
     }
 
     @Override
     public List<WrenchAction> getWrenchActions() {
         return WRENCH_ACTIONS;
-    }
-
-    public static class PipeModel extends BlockModel {
-        private final ItemDisplayElement pipe;
-        private BlockState state;
-
-        public PipeModel(BlockState state) {
-            this.pipe = ItemDisplayElementUtil.createSimple();
-            this.pipe.setViewRange(0.5f);
-            this.pipe.setYaw(180);
-            this.state = state;
-            updateModel();
-            this.addElement(this.pipe);
-        }
-
-        @Override
-        public void notifyUpdate(HolderAttachment.UpdateType updateType) {
-            if (updateType == BlockAwareAttachment.BLOCK_STATE_UPDATE) {
-                this.setState(this.blockState());
-            }
-        }
-
-        protected void setState(BlockState blockState) {
-            this.state = blockState;
-            updateModel();
-        }
-
-        protected void updateModel() {
-            this.pipe.setItem(FactoryModels.PIPE.get(this.state, PipeBlock::checkModelDirection));
-
-            if (this.pipe.getHolder() == this) {
-                this.pipe.tick();
-            }
-        }
     }
 }

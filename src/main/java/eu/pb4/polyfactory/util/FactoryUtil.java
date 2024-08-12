@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.util;
 
 import com.mojang.authlib.GameProfile;
+import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
@@ -52,7 +53,6 @@ public class FactoryUtil {
     public static final List<Direction> HORIZONTAL_DIRECTIONS = List.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
 
     private static final List<Runnable> RUN_NEXT_TICK = new ArrayList<>();
-
     private static final Item[] COLORED_MODEL_ITEMS = new Item[]{
             Items.LEATHER_HELMET,
             Items.LEATHER_CHESTPLATE,
@@ -61,10 +61,59 @@ public class FactoryUtil {
             Items.LEATHER_HORSE_ARMOR
     };
 
+    private static final Item[] TRANSPARENT_MODEL_ITEMS = new Item[] {
+            Items.WHITE_STAINED_GLASS,
+            Items.ORANGE_STAINED_GLASS,
+            Items.MAGENTA_STAINED_GLASS,
+            Items.LIGHT_BLUE_STAINED_GLASS,
+            Items.YELLOW_STAINED_GLASS,
+            Items.LIME_STAINED_GLASS,
+            Items.PINK_STAINED_GLASS,
+            Items.GRAY_STAINED_GLASS,
+            Items.LIGHT_GRAY_STAINED_GLASS,
+            Items.CYAN_STAINED_GLASS,
+            Items.PURPLE_STAINED_GLASS,
+            Items.BLUE_STAINED_GLASS,
+            Items.BROWN_STAINED_GLASS,
+            Items.GREEN_STAINED_GLASS,
+            Items.RED_STAINED_GLASS,
+            Items.BLACK_STAINED_GLASS,
+            Items.WHITE_STAINED_GLASS_PANE,
+            Items.ORANGE_STAINED_GLASS_PANE,
+            Items.MAGENTA_STAINED_GLASS_PANE,
+            Items.LIGHT_BLUE_STAINED_GLASS_PANE,
+            Items.YELLOW_STAINED_GLASS_PANE,
+            Items.LIME_STAINED_GLASS_PANE,
+            Items.PINK_STAINED_GLASS_PANE,
+            Items.GRAY_STAINED_GLASS_PANE,
+            Items.LIGHT_GRAY_STAINED_GLASS_PANE,
+            Items.CYAN_STAINED_GLASS_PANE,
+            Items.PURPLE_STAINED_GLASS_PANE,
+            Items.BLUE_STAINED_GLASS_PANE,
+            Items.BROWN_STAINED_GLASS_PANE,
+            Items.GREEN_STAINED_GLASS_PANE,
+            Items.RED_STAINED_GLASS_PANE,
+            Items.BLACK_STAINED_GLASS_PANE
+    };
+
+
     private static int coloredModelIndex = 0;
+    private static int transparentModelIndex = 0;
 
     public static Item requestColoredItem() {
         return COLORED_MODEL_ITEMS[(coloredModelIndex++) % COLORED_MODEL_ITEMS.length];
+    }
+
+    public static Item requestTransparentItem() {
+        return TRANSPARENT_MODEL_ITEMS[(transparentModelIndex++) % TRANSPARENT_MODEL_ITEMS.length];
+    }
+
+    public static Item requestModelBase(ModelRenderType type) {
+        return switch (type) {
+            case SOLID -> BaseItemProvider.requestModel();
+            case TRANSPARENT -> requestTransparentItem();
+            case COLORED -> requestColoredItem();
+        };
     }
 
     public static void runNextTick(Runnable runnable) {
@@ -124,6 +173,32 @@ public class FactoryUtil {
         }
 
         return value;
+    }
+
+    public static ItemStack exchangeStack(ItemStack inputStack, int subtractedAmount, PlayerEntity player, ItemStack outputStack, boolean creativeOverride) {
+        boolean bl = player.isInCreativeMode();
+        if (creativeOverride && bl) {
+            if (!player.getInventory().contains(outputStack)) {
+                player.getInventory().insertStack(outputStack);
+            }
+
+            return inputStack;
+        } else {
+            inputStack.decrementUnlessCreative(subtractedAmount, player);
+            if (inputStack.isEmpty()) {
+                return outputStack;
+            } else {
+                if (!player.getInventory().insertStack(outputStack)) {
+                    player.dropItem(outputStack, false);
+                }
+
+                return inputStack;
+            }
+        }
+    }
+
+    public static ItemStack exchangeStack(ItemStack inputStack, int subtractedAmount, PlayerEntity player, ItemStack outputStack) {
+        return exchangeStack(inputStack, subtractedAmount, player, outputStack, true);
     }
 
     public static int tryInserting(World world, BlockPos pos, ItemStack itemStack, Direction direction) {

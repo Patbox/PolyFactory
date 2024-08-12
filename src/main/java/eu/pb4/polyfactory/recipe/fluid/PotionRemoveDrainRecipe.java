@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 public record PotionRemoveDrainRecipe(Ingredient item, Optional<Ingredient> catalyst, long amount, ItemStack output, RegistryEntry<SoundEvent> soundEvent,
-                                      boolean requirePlayer, double maxSpeed, double time) implements DrainRecipe {
+                                      boolean requirePlayer, double time) implements DrainRecipe {
     public static final MapCodec<PotionRemoveDrainRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("item").forGetter(PotionRemoveDrainRecipe::item),
                     Ingredient.ALLOW_EMPTY_CODEC.optionalFieldOf("catalyst").forGetter(PotionRemoveDrainRecipe::catalyst),
@@ -32,14 +32,13 @@ public record PotionRemoveDrainRecipe(Ingredient item, Optional<Ingredient> cata
                     ItemStack.UNCOUNTED_CODEC.fieldOf("result").forGetter(PotionRemoveDrainRecipe::output),
                     SoundEvent.ENTRY_CODEC.fieldOf("sound").forGetter(PotionRemoveDrainRecipe::soundEvent),
                     Codec.BOOL.optionalFieldOf("require_player", false).forGetter(PotionRemoveDrainRecipe::requirePlayer),
-                    Codec.DOUBLE.fieldOf("max_speed").forGetter(PotionRemoveDrainRecipe::maxSpeed),
                     Codec.DOUBLE.fieldOf("time").forGetter(PotionRemoveDrainRecipe::time)
             ).apply(x, PotionRemoveDrainRecipe::new)
     );
 
     public static PotionRemoveDrainRecipe of(Item item, long amount, Item result, SoundEvent sound) {
         return new PotionRemoveDrainRecipe(Ingredient.ofItems(item), Optional.empty(), amount, result.getDefaultStack(), Registries.SOUND_EVENT.getEntry(sound),
-                true, SpoutRecipe.getMaxSpeed(FactoryFluids.POTION.defaultInstance(), amount), SpoutRecipe.getTime(FactoryFluids.POTION.defaultInstance(), amount));
+                true, SpoutRecipe.getTime(FactoryFluids.POTION.defaultInstance(), amount));
     }
 
     @Override
@@ -100,11 +99,6 @@ public record PotionRemoveDrainRecipe(Ingredient item, Optional<Ingredient> cata
             }
         }
         return List.of();
-    }
-
-    @Override
-    public double maxSpeed(DrainInput input) {
-        return this.maxSpeed;
     }
 
     @Override

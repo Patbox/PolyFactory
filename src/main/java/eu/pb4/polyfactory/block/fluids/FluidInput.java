@@ -12,7 +12,9 @@ public interface FluidInput {
     interface ContainerBased extends FluidInput, FluidContainerOwner {
         @Override
         default long insertFluid(FluidInstance<?> type, long amount, Direction direction) {
-            return getFluidContainer(direction).insert(type, amount, false);
+            var x = getFluidContainer(direction);
+
+            return x != null ? x.insert(type, amount, false) : amount;
         }
     }
 

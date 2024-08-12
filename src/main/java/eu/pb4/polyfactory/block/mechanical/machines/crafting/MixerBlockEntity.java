@@ -422,7 +422,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             this.setSlotRedirect(2 + 18, new Slot(MixerBlockEntity.this, 4, 4, 0));
             this.setSlotRedirect(3 + 18, new Slot(MixerBlockEntity.this, 5, 5, 0));
             this.setSlot(4 + 9, GuiTextures.PROGRESS_HORIZONTAL_OFFSET_RIGHT.get(progress()));
-            this.setSlot(4 + 9 + 9, GuiTextures.FLAME_OFFSET_RIGHT.getNamed(MathHelper.clamp(MixerBlockEntity.this.temperature, 0, 1), CURRENT_HEAT));
+            this.setSlot(4 + 9 + 9, GuiTextures.TEMPERATURE_OFFSET_RIGHT.getNamed(MathHelper.clamp(MixerBlockEntity.this.temperature, -1, 1), CURRENT_HEAT));
             this.setSlot(5 + 9 + 9, GuiElementBuilder.from(GuiTextures.EMPTY.getItemStack()).setName(CURRENT_HEAT));
             this.setSlotRedirect(6, new FurnaceOutputSlot(player, MixerBlockEntity.this, 6, 3, 0));
             this.setSlotRedirect(6 + 9, new FurnaceOutputSlot(player, MixerBlockEntity.this, 7, 3, 0));
@@ -467,7 +467,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             }
 
             this.setSlot(4 + 9, GuiTextures.PROGRESS_HORIZONTAL_OFFSET_RIGHT.get(progress()));
-            this.setSlot(4 + 9 + 9, GuiTextures.FLAME_OFFSET_RIGHT.getNamed(MathHelper.clamp(MixerBlockEntity.this.temperature, 0, 1), CURRENT_HEAT));
+            this.setSlot(4 + 9 + 9, GuiTextures.TEMPERATURE_OFFSET_RIGHT.getNamed(MathHelper.clamp(MixerBlockEntity.this.temperature, -1, 1), CURRENT_HEAT));
             super.onTick();
         }
     }
