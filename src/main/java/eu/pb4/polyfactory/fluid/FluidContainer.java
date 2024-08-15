@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.fluid;
 
-import com.mojang.datafixers.types.templates.Tag;
 import com.mojang.serialization.RecordBuilder;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
@@ -13,7 +12,6 @@ import eu.pb4.sgui.api.elements.GuiElementInterface;
 import it.unimi.dsi.fastutil.objects.*;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.*;
 import net.minecraft.particle.ParticleTypes;
@@ -26,7 +24,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +33,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class FluidContainer {
     private final Object2LongMap<FluidInstance<?>> storedFluids = new Object2LongOpenHashMap<>();
@@ -45,6 +43,7 @@ public class FluidContainer {
     private int updateId = 0;
     private final BiPredicate<FluidContainer, FluidInstance<?>> canInsert;
     private long stored = 0;
+    private float fluidTemperature;
 
     public FluidContainer(long maxStorage, Runnable markDirty) {
         this(maxStorage, markDirty, (a, x) -> true);
@@ -57,6 +56,10 @@ public class FluidContainer {
 
     public static FluidContainer singleFluid(long maxStorage, Runnable markDirty) {
         return new FluidContainer(maxStorage, markDirty, (self, type) -> self.isEmpty() || self.contains(type));
+    }
+
+    public static FluidContainer filteredSingleFluid(long maxStorage, Predicate<FluidInstance<?>> filter, Runnable markDirty) {
+        return new FluidContainer(maxStorage, markDirty, (self, type) -> (self.isEmpty() || self.contains(type)) && filter.test(type));
     }
 
     public static FluidContainer onlyInTag(long maxStorage, TagKey<FluidType<?>> tag, Runnable markDirty) {
@@ -83,8 +86,8 @@ public class FluidContainer {
                 world.playSound(null, pos, SoundEvents.BLOCK_LAVA_EXTINGUISH, SoundCategory.BLOCKS);
             }
         } else if (temperature > 0.5) {
-            this.extract(FactoryFluids.WATER.defaultInstance(), (long) (temperature * 10), false);
-            if (world.getRandom().nextFloat() > 0.5 && world.getTime() % 5 == 0) {
+            var x = this.extract(FactoryFluids.WATER.defaultInstance(), (long) (temperature * 10), false);
+            if (x != 0 && world.getRandom().nextFloat() > 0.5 && world.getTime() % 5 == 0) {
                 world.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.1, 0.1, 0.1, 0.1);
             }
         }
@@ -163,6 +166,8 @@ public class FluidContainer {
             this.fluids.remove(type);
             var current = this.storedFluids.removeLong(amount);
             this.stored -= current;
+            this.updateTemperature();
+            this.updateId++;
             this.markDirty.run();
             return current;
         }
@@ -172,6 +177,8 @@ public class FluidContainer {
             this.fluids.add(type);
             this.fluids.sort(FluidInstance.DENSITY_COMPARATOR_REVERSED);
         }
+        this.updateTemperature();
+        this.updateId++;
         this.markDirty.run();
         return current;
     }
@@ -203,6 +210,7 @@ public class FluidContainer {
         }
         this.stored = next;
         this.updateId++;
+        this.updateTemperature();
         this.markDirty.run();
         return amount - inserted;
     }
@@ -227,6 +235,7 @@ public class FluidContainer {
         }
         this.stored -= extracted;
         this.updateId++;
+        this.updateTemperature();
         this.markDirty.run();
         return extracted;
     }
@@ -252,12 +261,16 @@ public class FluidContainer {
         return this.stored;
     }
 
+    public float fluidTemperature() {
+        return this.fluidTemperature;
+    }
+
     public NbtElement toNbt(RegistryWrapper.WrapperLookup lookup) {
         var nbt = new NbtList();
         var ops = lookup.getOps(NbtOps.INSTANCE);
 
         storedFluids.forEach((a, b) -> {
-            var x = FluidInstance.CODEC.encode(a, ops, new RecordBuilder.MapBuilder<>(ops));
+            var x = FluidInstance.MAP_CODEC.encode(a, ops, new RecordBuilder.MapBuilder<>(ops));
             x.add("amount", NbtLong.of(b));
             nbt.add(x.build(new NbtCompound()).getOrThrow());
         });
@@ -272,7 +285,7 @@ public class FluidContainer {
         this.stored = 0;
         for (var t : nbt) {
             var cp = (NbtCompound) t;
-            var type = FluidInstance.CODEC.decode(ops, ops.getMap(cp).getOrThrow()).getOrThrow();
+            var type = FluidInstance.MAP_CODEC.decode(ops, ops.getMap(cp).getOrThrow()).getOrThrow();
 
             var value = cp.getLong("amount");
             if (value != 0) {
@@ -280,9 +293,18 @@ public class FluidContainer {
                 this.stored += value;
             }
         }
+        this.updateTemperature();
         this.fluids.addAll(this.storedFluids.keySet());
         this.fluids.sort(FluidInstance.DENSITY_COMPARATOR_REVERSED);
         this.updateId++;
+    }
+
+    private void updateTemperature() {
+        float temperature = 0;
+        for (var fluid : fluids) {
+            temperature += (fluid.heat() * get(fluid)) / this.stored;
+        }
+        this.fluidTemperature = temperature;
     }
 
     public int updateId() {

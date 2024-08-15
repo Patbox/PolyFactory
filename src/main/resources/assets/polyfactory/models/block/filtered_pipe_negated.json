@@ -1,0 +1,9 @@
+{
+	"parent": "polyfactory:block/filtered_pipe",
+	"textures": {
+		"0": "polyfactory:block/fluids/pipe",
+		"1": "polyfactory:block/fluids/pipe_front",
+		"2": "polyfactory:block/fluids/filtered_pipe_negated",
+		"particle": "polyfactory:block/fluids/pipe"
+	}
+}

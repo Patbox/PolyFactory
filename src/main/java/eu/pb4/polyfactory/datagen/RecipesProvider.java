@@ -16,6 +16,7 @@ import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.recipe.press.FillSprayCanPressRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
+import eu.pb4.polyfactory.util.FactorySoundEvents;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
@@ -209,6 +210,16 @@ class RecipesProvider extends FabricRecipeProvider {
                 .input('p', FactoryItems.COPPER_PLATE)
                 .input('i', Items.COPPER_INGOT)
                 .criterion("get_copper", InventoryChangedCriterion.Conditions.items(Items.COPPER_INGOT))
+                .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.FILTERED_PIPE, 1)
+                .pattern(" w ")
+                .pattern("pgp")
+                .pattern(" w ")
+                .input('p', FactoryItems.PIPE)
+                .input('w', FactoryItems.STEEL_PLATE)
+                .input('g', FactoryItems.TREATED_DRIED_KELP)
+                .criterion("get_copper", InventoryChangedCriterion.Conditions.items(FactoryItems.PIPE))
                 .offerTo(exporter);
 
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.DRAIN, 1)
@@ -957,12 +968,12 @@ class RecipesProvider extends FabricRecipeProvider {
         exporter.accept(id("drain/to_milk_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.MILK.ofBucket(), Items.MILK_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
         exporter.accept(id("drain/from_experience_bucket"), SimpleDrainRecipe.fromItem(FactoryItems.EXPERIENCE_BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY), null);
         exporter.accept(id("drain/to_experience_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), FactoryItems.EXPERIENCE_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
-        exporter.accept(id("drain/from_honey_bucket"), SimpleDrainRecipe.fromItem(FactoryItems.HONEY_BUCKET, FactoryFluids.HONEY.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY), null);
-        exporter.accept(id("drain/to_honey_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.HONEY.ofBucket(), FactoryItems.HONEY_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
+        exporter.accept(id("drain/from_honey_bucket"), SimpleDrainRecipe.fromItem(FactoryItems.HONEY_BUCKET, FactoryFluids.HONEY.ofBucket(), Items.BUCKET, FactorySoundEvents.ITEM_BUCKET_EMPTY_HONEY), null);
+        exporter.accept(id("drain/to_honey_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.HONEY.ofBucket(), FactoryItems.HONEY_BUCKET, FactorySoundEvents.ITEM_BUCKET_FILL_HONEY), null);
         exporter.accept(id("drain/from_honey_bottle"), SimpleDrainRecipe.fromItem(Items.HONEY_BOTTLE, FactoryFluids.HONEY.of(FluidConstants.BUCKET / 4), Items.GLASS_BOTTLE, SoundEvents.ITEM_BOTTLE_EMPTY), null);
         exporter.accept(id("drain/to_honey_bottle"), SimpleDrainRecipe.toItem(Items.GLASS_BOTTLE, FactoryFluids.HONEY.of(FluidConstants.BUCKET / 4), Items.HONEY_BOTTLE, SoundEvents.ITEM_BOTTLE_FILL), null);
-        exporter.accept(id("drain/from_slime_bucket"), SimpleDrainRecipe.fromItem(FactoryItems.SLIME_BUCKET, FactoryFluids.SLIME.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY), null);
-        exporter.accept(id("drain/to_slime_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactoryItems.SLIME_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
+        exporter.accept(id("drain/from_slime_bucket"), SimpleDrainRecipe.fromItem(FactoryItems.SLIME_BUCKET, FactoryFluids.SLIME.ofBucket(), Items.BUCKET, FactorySoundEvents.ITEM_BUCKET_EMPTY_SLIME), null);
+        exporter.accept(id("drain/to_slime_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactoryItems.SLIME_BUCKET, FactorySoundEvents.ITEM_BUCKET_FILL_SLIME), null);
 
         exporter.accept(id("drain/from_potion"), PotionAddDrainRecipe.of(Items.POTION,  FluidConstants.BOTTLE, Items.GLASS_BOTTLE, SoundEvents.ITEM_BOTTLE_EMPTY), null);
         exporter.accept(id("drain/to_potion"), PotionRemoveDrainRecipe.of(Items.GLASS_BOTTLE, FluidConstants.BOTTLE, Items.POTION, SoundEvents.ITEM_BOTTLE_FILL), null);
@@ -971,10 +982,10 @@ class RecipesProvider extends FabricRecipeProvider {
         exporter.accept(id("spout/to_water_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.WATER.ofBucket(), Items.WATER_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
         exporter.accept(id("spout/to_milk_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.MILK.ofBucket(), Items.MILK_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
         exporter.accept(id("spout/to_experience_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), FactoryItems.EXPERIENCE_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
-        exporter.accept(id("spout/to_honey_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.HONEY.ofBucket(), FactoryItems.HONEY_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
+        exporter.accept(id("spout/to_honey_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.HONEY.ofBucket(), FactoryItems.HONEY_BUCKET, FactorySoundEvents.ITEM_BUCKET_FILL_HONEY), null);
         exporter.accept(id("spout/to_honey_bottle"), SimpleSpoutRecipe.toItem(Items.GLASS_BOTTLE, FactoryFluids.HONEY.of(FluidConstants.BUCKET / 4),
                 Items.HONEY_BOTTLE, SoundEvents.ITEM_BOTTLE_FILL), null);
-        exporter.accept(id("spout/to_slime_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactoryItems.SLIME_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
+        exporter.accept(id("spout/to_slime_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactoryItems.SLIME_BUCKET, FactorySoundEvents.ITEM_BUCKET_FILL_SLIME), null);
         exporter.accept(id("spout/to_potion"), PotionSpoutRecipe.of(Items.GLASS_BOTTLE, FluidConstants.BOTTLE, Items.POTION, SoundEvents.ITEM_BOTTLE_FILL), null);
         exporter.accept(id("spout/experience_repair"), new RepairSpoutRecipe(), null);
 

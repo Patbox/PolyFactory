@@ -43,5 +43,81 @@
         "name": "block/copper_bulb/turn_on"
       }
     ]
+  },
+  "item.bucket.empty_slime": {
+    "sounds": [
+      {
+        "name": "item/bucket/empty1",
+        "pitch": 0.7
+      },
+      {
+        "name": "item/bucket/empty1",
+        "pitch": 0.6
+      },
+      {
+        "name": "item/bucket/empty2",
+        "pitch": 0.7
+      },
+      {
+        "name": "item/bucket/empty3",
+        "pitch": 0.7
+      }
+    ],
+    "subtitle": "subtitles.item.bucket.empty"
+  },
+  "item.bucket.fill_slime": {
+    "sounds": [
+      {
+        "name": "item/bucket/fill1",
+        "pitch": 0.7
+      },
+      {
+        "name": "item/bucket/fill2",
+        "pitch": 0.7
+      },
+      {
+        "name": "item/bucket/fill3",
+        "pitch": 0.7
+      }
+    ],
+    "subtitle": "subtitles.item.bucket.fill"
+  },
+  "item.bucket.empty_honey": {
+    "sounds": [
+      {
+        "name": "item/bucket/empty1",
+        "pitch": 0.7
+      },
+      {
+        "name": "item/bucket/empty1",
+        "pitch": 0.6
+      },
+      {
+        "name": "item/bucket/empty2",
+        "pitch": 0.7
+      },
+      {
+        "name": "item/bucket/empty3",
+        "pitch": 0.7
+      }
+    ],
+    "subtitle": "subtitles.item.bucket.empty"
+  },
+  "item.bucket.fill_honey": {
+    "sounds": [
+      {
+        "name": "item/bucket/fill1",
+        "pitch": 0.7
+      },
+      {
+        "name": "item/bucket/fill2",
+        "pitch": 0.7
+      },
+      {
+        "name": "item/bucket/fill3",
+        "pitch": 0.7
+      }
+    ],
+    "subtitle": "subtitles.item.bucket.fill"
   }
 }

@@ -119,6 +119,7 @@ public class FactoryItems {
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
     public static final Item SPRAY_CAN = register("spray_can", new DyeSprayItem(new Item.Settings().maxCount(1)));
     public static final Item PIPE = register("pipe", new PipeItem(FactoryBlocks.PIPE, new Item.Settings()));
+    public static final Item FILTERED_PIPE = register(FactoryBlocks.FILTERED_PIPE);
     public static final Item PUMP = register(FactoryBlocks.PUMP);
     public static final Item DRAIN = register(FactoryBlocks.DRAIN);
     public static final Item MECHANICAL_DRAIN = register(FactoryBlocks.MECHANICAL_DRAIN);
@@ -176,6 +177,7 @@ public class FactoryItems {
 
                     // Fluids
                     entries.add(PIPE);
+                    entries.add(FILTERED_PIPE);
                     entries.add(PUMP);
                     entries.add(DRAIN);
                     entries.add(MECHANICAL_DRAIN);

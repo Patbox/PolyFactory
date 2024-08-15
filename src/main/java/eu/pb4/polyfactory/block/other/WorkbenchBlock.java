@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.other;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.block.ItemUseLimiter;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
@@ -50,7 +51,7 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
-public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityProvider, BarrierBasedWaterloggable {
+public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityProvider, BarrierBasedWaterloggable, ItemUseLimiter.All {
 
     public WorkbenchBlock(Settings settings) {
         super(settings);

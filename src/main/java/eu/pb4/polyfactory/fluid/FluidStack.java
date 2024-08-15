@@ -2,12 +2,11 @@ package eu.pb4.polyfactory.fluid;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import net.minecraft.text.MutableText;
 
 public record FluidStack<T>(FluidInstance<T> instance, long amount) {
     public static final Codec<FluidStack<?>> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            FluidInstance.CODEC.forGetter(FluidStack::instance),
+            FluidInstance.MAP_CODEC.forGetter(FluidStack::instance),
             Codec.LONG.fieldOf("amount").forGetter(FluidStack::amount)
     ).apply(instance, FluidStack::new));
 

@@ -42,7 +42,7 @@ public class TopFluidViewModel extends RotationAwareModel {
             this.positionFluid = -1;
         }
         if (this.currentFluid != type) {
-            this.fluid.setItem(FactoryModels.FLAT_FULL.get(type));
+            this.fluid.setItem(FactoryModels.FLUID_FLAT_FULL.get(type));
             this.fluid.setBrightness(type.brightness().orElse(null));
             this.currentFluid = type;
         }

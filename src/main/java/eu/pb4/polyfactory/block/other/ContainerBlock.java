@@ -1,13 +1,10 @@
 package eu.pb4.polyfactory.block.other;
 
-import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.block.*;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
-import eu.pb4.factorytools.api.block.AttackableBlock;
-import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
-import eu.pb4.factorytools.api.block.SneakBypassingBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -47,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 
 
-public class ContainerBlock extends Block implements FactoryBlock, BlockEntityProvider, AttackableBlock, SneakBypassingBlock, BarrierBasedWaterloggable {
+public class ContainerBlock extends Block implements FactoryBlock, BlockEntityProvider, AttackableBlock, SneakBypassingBlock, BarrierBasedWaterloggable, ItemUseLimiter {
     public final int maxStackCount;
     public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
@@ -68,6 +65,11 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         tickWater(state, world, pos);
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    }
+
+    @Override
+    public boolean preventUseItemWhileTargetingBlock(ServerPlayerEntity player, BlockState blockState, World world, BlockHitResult result, ItemStack stack, Hand hand) {
+        return result.getSide() == blockState.get(FACING);
     }
 
     @Override

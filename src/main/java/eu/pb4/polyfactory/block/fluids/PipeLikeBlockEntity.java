@@ -23,8 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 public abstract class PipeLikeBlockEntity extends BlockEntity implements FluidInput.ContainerBased, DebugTextProvider {
-    public static final long CAPACITY = FluidConstants.BLOCK;
-    protected final FluidContainer container = FluidContainer.singleFluid(CAPACITY, this::markDirty);
+    protected final FluidContainer container = this.createContainer();
     protected final BlockPos.Mutable mut = new BlockPos.Mutable();
     protected final double[] pullOverflow = new double[Direction.values().length];
     protected BlockState[] pullState = new BlockState[pullOverflow.length];
@@ -76,7 +75,7 @@ public abstract class PipeLikeBlockEntity extends BlockEntity implements FluidIn
     }
 
     public void preTick() {
-        this.container.tick((ServerWorld) world, pos, 0, this::dropItem);
+        this.container.tick((ServerWorld) world, pos, this.container.fluidTemperature(), this::dropItem);
         for (int i = 0; i < this.pullOverflow.length; i++) {
             this.pullOverflow[i] = Math.max(0, this.pullOverflow[i] - 0.01);
             this.pushOverflow[i] = Math.max(0, this.pushOverflow[i] - 0.01);
@@ -211,6 +210,10 @@ public abstract class PipeLikeBlockEntity extends BlockEntity implements FluidIn
             this.pullState[direction.ordinal()] = pulledBlockState;
             this.pullOverflow[direction.ordinal()] = 0;
         }
+    }
+
+    protected FluidContainer createContainer() {
+        return FluidContainer.singleFluid(FluidConstants.BLOCK, this::markDirty);
     }
 
     @Override

@@ -2,10 +2,7 @@ package eu.pb4.polyfactory.block.other;
 
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
-import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
-import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.factorytools.api.block.RedstoneConnectable;
-import eu.pb4.factorytools.api.block.SneakBypassingBlock;
+import eu.pb4.factorytools.api.block.*;
 import eu.pb4.factorytools.api.util.VirtualDestroyStage;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
@@ -64,7 +61,7 @@ import org.joml.Vector3f;
 import java.util.List;
 
 
-public class WirelessRedstoneBlock extends Block implements FactoryBlock, RedstoneConnectable, BlockEntityProvider, WrenchableBlock, SneakBypassingBlock, BarrierBasedWaterloggable {
+public class WirelessRedstoneBlock extends Block implements FactoryBlock, RedstoneConnectable, BlockEntityProvider, WrenchableBlock, SneakBypassingBlock, BarrierBasedWaterloggable, ItemUseLimiter {
     public static DirectionProperty FACING = Properties.FACING;
     public static BooleanProperty POWERED = Properties.POWERED;
     public WirelessRedstoneBlock(Settings settings) {
@@ -104,6 +101,11 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         tickWater(state, world, pos);
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    }
+
+    @Override
+    public boolean preventUseItemWhileTargetingBlock(ServerPlayerEntity player, BlockState blockState, World world, BlockHitResult result, ItemStack stack, Hand hand) {
+        return !player.shouldCancelInteraction() && result.getSide() == blockState.get(FACING).getOpposite();
     }
 
     @Override

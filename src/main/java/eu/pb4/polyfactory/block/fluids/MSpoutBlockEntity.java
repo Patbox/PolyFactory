@@ -83,7 +83,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
 
         var rot = RotationUser.getRotation(world, posAbove);
         var fullSpeed = rot.speed();
-        var strength = fullSpeed / 50 / 20;
+        var strength = fullSpeed / 60 / 20;
         NetworkComponent.Pipe.forEachLogic((ServerWorld) world, posAbove, l -> l.setSourceStrength(posAbove, strength));
 
         var container = world.getBlockEntity(pos.up(2)) instanceof FluidContainerOwner owner ? owner.getFluidContainer(Direction.DOWN) : null;

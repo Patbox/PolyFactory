@@ -4,8 +4,6 @@ import eu.pb4.polydex.api.v1.recipe.PolydexStack;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.models.FactoryModels;
-import eu.pb4.sgui.api.GuiHelpers;
-import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -53,7 +51,7 @@ public class PolydexFluidStack implements PolydexStack<FluidInstance<?>> {
     }
 
     public ItemStack toItemStack(ServerPlayerEntity player) {
-        return GuiElementBuilder.from(FactoryModels.FLAT_FULL.get(this.fluid)).hideDefaultTooltip().setName(this.fluid.getName()).asStack();
+        return GuiElementBuilder.from(FactoryModels.FLUID_FLAT_FULL.get(this.fluid)).hideDefaultTooltip().setName(this.fluid.getName()).asStack();
     }
 
     @Override
@@ -61,7 +59,7 @@ public class PolydexFluidStack implements PolydexStack<FluidInstance<?>> {
         if (this.amount == 0) {
             return toItemStack(player);
         }
-        return GuiElementBuilder.from(FactoryModels.FLAT_FULL.get(this.fluid)).hideDefaultTooltip().setName(this.fluid.toLabeledAmount(this.amount)).asStack();
+        return GuiElementBuilder.from(FactoryModels.FLUID_FLAT_FULL.get(this.fluid)).hideDefaultTooltip().setName(this.fluid.toLabeledAmount(this.amount)).asStack();
     }
 
     public FluidInstance<?> getBacking() {

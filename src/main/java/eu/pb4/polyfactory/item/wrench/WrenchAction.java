@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.item.wrench;
 
 import eu.pb4.polyfactory.block.data.ChannelContainer;
+import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.nodes.data.DataStorage;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.state.property.DirectionProperty;
@@ -24,6 +25,7 @@ public record WrenchAction(String id, Text name, WrenchValueGetter value, Wrench
         ChannelContainer::channel, ChannelContainer::setChannel
     );
     public static final WrenchAction FACING_HOPPER = ofDirection("rotation", Properties.HOPPER_FACING);
+    public static final WrenchAction NEGATED = of("negated", FactoryProperties.NEGATED);
 
     public WrenchAction(String id, Text name, WrenchValueGetter value, WrenchApplyAction action) {
         this(id, name, value, action, action);

@@ -170,7 +170,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             }
         }
         self.state = null;
-        self.temperature = BlockHeat.getReceived(world, pos);
+        self.temperature = BlockHeat.getReceived(world, pos) + self.fluidContainer.fluidTemperature();
 
         self.fluidContainer.tick((ServerWorld) world, pos, self.temperature, self::addToOutputOrDrop);
         self.model.setFluid(self.fluidContainer.topFluid(), self.fluidContainer.getFilledPercentage());

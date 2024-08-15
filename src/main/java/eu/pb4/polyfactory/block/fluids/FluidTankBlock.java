@@ -9,12 +9,10 @@ import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.models.fluid.MultiFluidViewModel;
-import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -29,14 +27,10 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-
-import java.util.*;
-import java.util.function.Consumer;
 
 public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectable, BlockEntityProvider {
     public static final EnumProperty<ConnectablePart> PART_X = FactoryProperties.CONNECTABLE_PART_X;
@@ -139,7 +133,7 @@ public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectab
         private final MultiFluidViewModel fluid;
 
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(FactoryModels.FLUID_TANK.get(state));
+            this.main = ItemDisplayElementUtil.createSimple(FactoryModels.BLOCK_FLUID_TANK.get(state));
             this.main.setScale(new Vector3f(2f));
             this.main.setYaw(180);
             this.fluid = new MultiFluidViewModel(this, state.get(PART_X), state.get(PART_Z));
@@ -152,7 +146,7 @@ public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectab
             if (updateType == BlockAwareAttachment.BLOCK_STATE_UPDATE) {
                 var state = this.blockState();
                 this.fluid.update(state.get(PART_X), state.get(PART_Z));
-                this.main.setItem(FactoryModels.FLUID_TANK.get(state));
+                this.main.setItem(FactoryModels.BLOCK_FLUID_TANK.get(state));
             }
         }
 

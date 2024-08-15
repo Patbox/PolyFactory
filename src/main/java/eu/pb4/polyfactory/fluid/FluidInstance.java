@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.fluid;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.FactoryRegistries;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
@@ -12,7 +13,6 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
-import net.minecraft.world.World;
 
 import java.util.*;
 
@@ -23,7 +23,8 @@ public record FluidInstance<T>(FluidType<T> type, T data) {
     private static final Map<FluidType<?>, MapCodec<FluidInstance<?>>> BASE_CODECS = new IdentityHashMap<>();
     private static final Map<FluidType<?>, FluidInstance<Object>> DEFAULTS = new IdentityHashMap<>();
 
-    public static final MapCodec<FluidInstance<?>> CODEC = FluidType.CODEC.dispatchMap(FluidInstance::type, BASE_CODECS::get);
+    public static final MapCodec<FluidInstance<?>> MAP_CODEC = FluidType.CODEC.dispatchMap(FluidInstance::type, BASE_CODECS::get);
+    public static final Codec<FluidInstance<?>> CODEC = MAP_CODEC.codec();
 
     public static <T> FluidInstance<T> getDefault(FluidType<T> tFluidType) {
         //noinspection unchecked

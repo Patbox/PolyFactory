@@ -3,20 +3,26 @@ package eu.pb4.polyfactory.fluid;
 import eu.pb4.polyfactory.FactoryRegistries;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.BlockHeat;
+import eu.pb4.polyfactory.item.FactoryItems;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeveledCauldronBlock;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particle.EntityEffectParticleEffect;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
+
+import java.util.function.Function;
 
 public class FactoryFluids {
     public static final FluidType<Unit> WATER = register(Identifier.ofVanilla("water"),
@@ -64,6 +70,30 @@ public class FactoryFluids {
 
         FluidBehaviours.addBlockStateInsert(Blocks.SLIME_BLOCK.getDefaultState(), Blocks.AIR.getDefaultState(), SLIME.ofBucket());
         FluidBehaviours.addBlockStateInsert(Blocks.HONEY_BLOCK.getDefaultState(), Blocks.AIR.getDefaultState(), HONEY.ofBucket());
+
+        FluidBehaviours.addItemToFluidLink(Items.BUCKET, (FluidInstance<?>) null);
+        FluidBehaviours.addItemToFluidLink(Items.WATER_BUCKET, WATER.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(Items.LAVA_BUCKET, LAVA.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(Items.MILK_BUCKET, MILK.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(FactoryItems.EXPERIENCE_BUCKET, EXPERIENCE.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(FactoryItems.SLIME_BUCKET, SLIME.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(Items.SLIME_BALL, SLIME.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(Items.SLIME_BLOCK, SLIME.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(FactoryItems.HONEY_BUCKET, HONEY.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(Items.HONEY_BLOCK, HONEY.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(Items.HONEY_BOTTLE, HONEY.defaultInstance());
+
+        Function<ItemStack, FluidInstance<?>> potionFunction = (stack) -> {
+            var x = stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
+            if (x.potion().isPresent() && x.potion().get() == Potions.WATER) {
+                return WATER.defaultInstance();
+            }
+            return POTION.toInstance(x);
+        };
+
+        FluidBehaviours.addItemToFluidLink(Items.POTION, potionFunction);
+        FluidBehaviours.addItemToFluidLink(Items.SPLASH_POTION, potionFunction);
+        FluidBehaviours.addItemToFluidLink(Items.LINGERING_POTION, potionFunction);
     }
 
     public static <T> FluidType<T> register(Identifier identifier, FluidType<T> item) {

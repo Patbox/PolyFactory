@@ -2,7 +2,6 @@ package eu.pb4.polyfactory.models.fluid;
 
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.property.ConnectablePart;
-import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -65,7 +64,7 @@ public class MultiFluidViewModel {
         var layer = this.fluidLayers.get(instance);
 
         if (layer == null) {
-            var modelTop = FactoryModels.FLAT_FULL.get(instance);
+            var modelTop = FactoryModels.FLUID_FLAT_FULL.get(instance);
             var parts = new EnumMap<Direction, ItemDisplayElement>(Direction.class);
             for (var dir : Direction.values()) {
                 var model = ItemDisplayElementUtil.createSimple(modelTop);
@@ -199,7 +198,7 @@ public class MultiFluidViewModel {
         public void setup(float position, float amount) {
             this.parts.get(Direction.DOWN).setTranslation(new Vector3f(0, -8f / 16f + (position) * 15.9f / 16f + 0.001f, 0));
             this.parts.get(Direction.UP).setTranslation(new Vector3f(0, -8f / 16f + (position + amount) * 15.9f / 16f + 0.001f, 0));
-            var side = FactoryModels.FLAT_SCALED[MultiFluidViewModel.textureId(amount)].get(instance);
+            var side = FactoryModels.FLUID_FLAT_SCALED[MultiFluidViewModel.textureId(amount)].get(instance);
             for (var dir : FactoryUtil.HORIZONTAL_DIRECTIONS) {
                 var part = this.parts.get(dir);
                 part.setTranslation(new Vector3f(0, 0.49f, -(-8f / 16f + (position + amount / 2) * 15.9f / 16f + 0.001f)));

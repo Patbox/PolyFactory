@@ -1,12 +1,15 @@
 - Added new fluid system! This can be used for transport, storage and crafting with fluids.
   - Currently available fluids: Water, Lava, Milk, Experience, Potion (all types), Slime and Honey.
   - Added Copper Pipes - Transport fluids anywhere you need them!
+  - Added Filtered Copper Pipes - filter out fluids, so they go where you need them to!
   - Added Mechanical Pumps - Gives fluids a little push (or pull) needed for them to move in the pipes.
   - Added Fluid Drains - A block player can use to put or take fluids to/from.
   - Added Mechanical Fluid Drains - Automatic Fluid Drain, with limitation that it can't take fluids out.
   - Mechanical Mixers can now store fluids and use them as part of recipes.
+- Added Experience Bucket, Slime Bucket and Honey Bucket.
 - You can now put Cables within wall blocks.
 - Tweaked Mechanical Press textures.
 - Mobs killed by the Mechanical Miner can now drop XP.
 - New Grinder recipe:
  - Nether Wart Block -> 1-5 Nether Wards
+- Fixed some block interactions also triggering item use when they shouldn't (for example placing water with a bucket).

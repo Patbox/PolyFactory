@@ -64,6 +64,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.TACHOMETER);
         this.addDrop(FactoryBlocks.STRESSOMETER);
         this.addDrop(FactoryBlocks.PIPE);
+        this.addDrop(FactoryBlocks.FILTERED_PIPE);
         this.addDrop(FactoryBlocks.PUMP);
         this.addDrop(FactoryBlocks.DRAIN);
         this.addDrop(FactoryBlocks.MECHANICAL_DRAIN);

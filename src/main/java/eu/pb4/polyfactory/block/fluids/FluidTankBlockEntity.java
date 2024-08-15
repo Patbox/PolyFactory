@@ -33,7 +33,7 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
     @Nullable
     private FluidTankBlock.Model model;
     private boolean postInitialRead = false;
-    private float temperature = 0;
+    private float blockTemperature = 0;
 
     public FluidTankBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.FLUID_TANK, pos, state);
@@ -139,7 +139,7 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
         if ((y.single() || y.negative()) && tank.model != null) {
             tank.model.setFluidBelow(null);
         }
-        tank.container.tick((ServerWorld) world, pos, tank.temperature, tank::dropItem);
+        tank.container.tick((ServerWorld) world, pos, tank.blockTemperature, tank::dropItem);
         tank.updateModel();
     }
 
@@ -150,7 +150,7 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
     private static void updateVertical(World world, FluidTankBlockEntity tank, BlockPos pos, BlockState state) {
         var y = state.get(FluidTankBlock.PART_Y);
         if ((y.middle() || y.positive()) && world.getBlockEntity(pos.offset(Direction.DOWN)) instanceof FluidTankBlockEntity below) {
-            tank.temperature = below.temperature;
+            tank.blockTemperature = below.blockTemperature;
             if (below.container.isNotFull()) {
                 while (below.container.isNotFull() && tank.container.isNotEmpty()) {
                     var ownBottomFluid = tank.container.bottomFluid();
@@ -179,7 +179,7 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
                 tank.model.setFluidBelow(below.container.topFluid());
             }
         } else {
-            tank.temperature = BlockHeat.get(world.getBlockState(pos.down()));
+            tank.blockTemperature = BlockHeat.get(world.getBlockState(pos.down())) + tank.container.fluidTemperature();
         }
     }
 

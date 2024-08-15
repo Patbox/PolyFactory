@@ -89,7 +89,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             }
         }
         self.state = null;
-        var temp = BlockHeat.getReceived(world, pos);
+        var temp = BlockHeat.getReceived(world, pos) + self.fluidContainer.fluidTemperature();
 
         self.fluidContainer.tick((ServerWorld) world, pos, temp, self::addToOutputOrDrop);
         self.model.setFluid(self.fluidContainer.topFluid(), self.fluidContainer.getFilledPercentage());
