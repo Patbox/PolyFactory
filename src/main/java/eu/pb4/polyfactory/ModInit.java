@@ -60,13 +60,13 @@ public class ModInit implements ModInitializer {
 			LOGGER.warn("=====================================================");
 		}
 		FactoryRegistries.setup();
-		FactoryFluids.register();
 		FactoryBlocks.register();
 		FactoryPoi.register();
 		FactoryBlockEntities.register();
 		FactoryEnchantmentEffectComponents.register();
 		FactoryDataComponents.register();
 		FactoryItems.register();
+		FactoryFluids.register();
 		FactoryEntities.register();
 		FactoryNodes.register();
 		FactoryRecipeTypes.register();

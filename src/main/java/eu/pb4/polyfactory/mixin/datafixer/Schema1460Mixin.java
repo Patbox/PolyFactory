@@ -96,6 +96,9 @@ public abstract class Schema1460Mixin extends Schema {
         schema.registerSimple(map, mod("pump"));
         schema.registerSimple(map, mod("pipe"));
         schema.registerSimple(map, mod("drain"));
+        schema.registerSimple(map, mod("filtered_pipe"));
+        schema.registerSimple(map, mod("fluid_tank"));
+        schema.registerSimple(map, mod("portable_fluid_tank"));
     }
 
     @Inject(method = "registerTypes", at = @At("HEAD"))

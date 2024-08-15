@@ -3,28 +3,20 @@ package eu.pb4.polyfactory.polydex;
 import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polydex.api.v1.hover.HoverDisplayBuilder;
 import eu.pb4.polydex.api.v1.recipe.*;
-import eu.pb4.polydex.impl.book.view.PotionRecipePage;
-import eu.pb4.polydex.mixin.BrewingRecipeRegistryAccessor;
-import eu.pb4.polyfactory.FactoryRegistries;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
-import eu.pb4.polyfactory.fluid.FactoryFluids;
-import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ColoredItem;
-import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.polydex.pages.*;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.polyfactory.recipe.ColoringCraftingRecipe;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import eu.pb4.factorytools.api.recipe.OutputStack;
-import eu.pb4.polyfactory.recipe.ShapelessNbtCopyRecipe;
-import eu.pb4.polyfactory.recipe.fluid.DrainRecipe;
 import eu.pb4.polyfactory.recipe.fluid.SimpleDrainRecipe;
 import eu.pb4.polyfactory.recipe.fluid.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
@@ -37,14 +29,12 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.sgui.api.elements.GuiElement;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
 
 import java.util.ArrayList;
@@ -60,7 +50,7 @@ public class PolydexCompatImpl {
 
         return HoverDisplayBuilder.ComponentType.of(id("machine_state"), true);
     });
-
+    private static final HoverDisplayBuilder.ComponentType FILLED = HoverDisplayBuilder.ComponentType.of(id("filled_amount"), HoverDisplayBuilder.ComponentType.Visibility.ALWAYS);
     private static final HoverDisplayBuilder.ComponentType DEBUG_DATA = HoverDisplayBuilder.ComponentType.of(id("debug_data"), HoverDisplayBuilder.ComponentType.Visibility.NEVER);
 
     public static void register() {
@@ -160,6 +150,13 @@ public class PolydexCompatImpl {
             var text = provider.getDebugText();
             if (text != null) {
                 hoverDisplayBuilder.setComponent(DEBUG_DATA, text);
+            }
+        }
+
+        if (entity instanceof FilledStateProvider provider) {
+            var text = provider.getFilledStateText();
+            if (text != null) {
+                hoverDisplayBuilder.setComponent(FILLED, Text.empty().append(text).withColor(0xd6d6d6));
             }
         }
 

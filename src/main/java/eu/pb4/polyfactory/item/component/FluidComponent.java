@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
@@ -19,11 +20,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidInstance<?>> fluids, long stored, boolean showTooltip) implements TooltipAppender {
-    public static final FluidComponent DEFAULT = new FluidComponent(Object2LongMaps.emptyMap(), List.of(), 0, true);
+public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidInstance<?>> fluids, long stored, long capacity, boolean showTooltip) implements TooltipAppender {
+    public static final FluidComponent DEFAULT = new FluidComponent(Object2LongMaps.emptyMap(), List.of(), 0, -1, true);
     public static final Codec<FluidComponent> SIMPLE_CODEC = FluidStack.CODEC.listOf().xmap(FluidComponent::fromStacks, FluidComponent::toStacks);
     public static final Codec<FluidComponent> CODEC =  Codec.withAlternative(RecordCodecBuilder.create(instance -> instance.group(
             FluidStack.CODEC.listOf().fieldOf("fluids").forGetter(FluidComponent::toStacks),
+            Codec.LONG.optionalFieldOf("capacity", -1L).forGetter(FluidComponent::capacity),
             Codec.BOOL.optionalFieldOf("show_tooltip", true).forGetter(FluidComponent::showTooltip)
     ).apply(instance, FluidComponent::fromStacks)), SIMPLE_CODEC);
 
@@ -31,6 +33,9 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
         return fromStacks(fluidStacks, true);
     }
     private static FluidComponent fromStacks(Collection<FluidStack<?>> fluidStacks, boolean showTooltip) {
+        return fromStacks(fluidStacks, -1, showTooltip);
+    }
+    private static FluidComponent fromStacks(Collection<FluidStack<?>> fluidStacks, long capacity, boolean showTooltip) {
         var map = new Object2LongOpenHashMap<FluidInstance<?>>();
         var list = new ArrayList<FluidInstance<?>>();
         long stored = 0;
@@ -41,11 +46,15 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
         }
 
         list.sort(FluidInstance.DENSITY_COMPARATOR_REVERSED);
-        return new FluidComponent(map, list, stored, showTooltip);
+        return new FluidComponent(map, list, stored, capacity, showTooltip);
     }
 
     public static FluidComponent copyFrom(FluidContainer container) {
-        return new FluidComponent(new Object2LongOpenHashMap<>(container.asMap()), new ArrayList<>(container.orderList()), container.stored(), true);
+        return new FluidComponent(new Object2LongOpenHashMap<>(container.asMap()), new ArrayList<>(container.orderList()), container.stored(), container.capacity(), true);
+    }
+
+    public static FluidComponent empty(long capacity) {
+        return new FluidComponent(Object2LongMaps.emptyMap(), List.of(), 0, capacity, true);
     }
 
     public List<FluidStack<?>> toStacks() {
@@ -64,11 +73,35 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
                 list.add(fluid.stackOf(leftover));
             }
         }
-        return FluidComponent.fromStacks(list, this.showTooltip);
+        return FluidComponent.fromStacks(list, this.capacity, this.showTooltip);
     }
 
-    public FluidComponent insert(FluidInstance<?> fluid, long amount) {
-        return with(fluid, this.map.getOrDefault(fluid, 0) + amount);
+    public Result insert(FluidInstance<?> fluid, long amount, boolean strict) {
+        if (this.capacity == -1) {
+            return new Result(with(fluid, this.get(fluid) + amount), 0);
+        }
+        if (strict && this.stored + amount > this.capacity) {
+            return new Result(this, amount);
+        }
+
+        var maxAmount = Math.min(this.capacity - this.stored, amount);
+        if (maxAmount == 0) {
+            return new Result(this, amount);
+        }
+
+        return new Result(with(fluid, this.get(fluid) + maxAmount), amount - maxAmount);
+    }
+
+    public Result extract(FluidInstance<?> fluid, long amount, boolean strict) {
+        if (strict && get(fluid) < amount) {
+            return new Result(this, 0);
+        }
+
+        var maxAmount = Math.min(get(fluid), amount);
+        if (maxAmount == 0) {
+            return new Result(this, 0);
+        }
+        return new Result(with(fluid, this.get(fluid) - maxAmount), maxAmount);
     }
 
     public long get(FluidInstance<?> fluid) {
@@ -81,7 +114,7 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
             newMap.removeLong(fluid);
             var list = new ArrayList<>(this.fluids);
             list.remove(fluid);
-            return new FluidComponent(newMap, list, this.stored - this.map.getOrDefault(fluid, 0), true);
+            return new FluidComponent(newMap, list, this.stored - this.map.getOrDefault(fluid, 0), this.capacity, this.showTooltip);
         } else if (amount != this.map.getOrDefault(fluid, 0)) {
             var newMap = new Object2LongOpenHashMap<>(this.map);
             newMap.put(fluid, amount);
@@ -90,7 +123,7 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
                 list.add(fluid);
                 list.sort(FluidInstance.DENSITY_COMPARATOR_REVERSED);
             }
-            return new FluidComponent(newMap, list, this.stored - this.map.getOrDefault(fluid, 0) + amount, true);
+            return new FluidComponent(newMap, list, this.stored - this.map.getOrDefault(fluid, 0) + amount, this.capacity, this.showTooltip);
         }
         return this;
     }
@@ -102,7 +135,7 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
 
 
     public FluidComponent withShowTooltip(boolean value) {
-        return new FluidComponent(this.map, this.fluids, this.stored, value);
+        return new FluidComponent(this.map, this.fluids, this.stored, this.capacity, value);
     }
 
     public boolean isEmpty() {
@@ -118,5 +151,11 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
         for (var fluid : fluids) {
             tooltip.accept(Text.literal(" ").append(fluid.toLabeledAmount(this.map.getOrDefault(fluid, 0))).formatted(Formatting.GRAY));
         }
+
+        if (this.capacity != -1) {
+            tooltip.accept(Text.translatable("text.polyfactory.x_out_of_y", FactoryUtil.fluidText(this.stored), FactoryUtil.fluidText(this.capacity)).formatted(Formatting.YELLOW));
+        }
     }
+
+    public record Result(FluidComponent component, long fluidAmount) {}
 }

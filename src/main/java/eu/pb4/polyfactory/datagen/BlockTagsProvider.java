@@ -119,6 +119,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.MECHANICAL_SPOUT)
                 .add(FactoryBlocks.DRAIN)
                 .add(FactoryBlocks.FLUID_TANK)
+                .add(FactoryBlocks.PORTABLE_FLUID_TANK)
                 .add(FactoryBlocks.WALL_WITH_CABLE.values().toArray(new Block[0]))
         ;
 

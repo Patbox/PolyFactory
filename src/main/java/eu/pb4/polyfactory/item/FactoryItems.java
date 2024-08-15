@@ -6,8 +6,11 @@ import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.factorytools.api.item.MultiBlockItem;
 import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
+import eu.pb4.polyfactory.block.fluids.PortableFluidTankBlock;
+import eu.pb4.polyfactory.block.fluids.PortableFluidTankBlockEntity;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.block.*;
+import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.item.debug.BaseDebugItem;
 import eu.pb4.polyfactory.item.tool.*;
 import eu.pb4.polyfactory.item.util.*;
@@ -33,6 +36,8 @@ import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
+
+import java.util.function.Consumer;
 
 public class FactoryItems {
     public static final Item MOD_ICON = register("mod_icon", new ModeledItem(new Item.Settings()));
@@ -127,6 +132,8 @@ public class FactoryItems {
     public static final Item CREATIVE_DRAIN = register(FactoryBlocks.CREATIVE_DRAIN);
     public static final UniversalFluidContainerItem STEEL_BUCKET = register("steel_bucket", new UniversalFluidContainerItem(FluidConstants.BUCKET * 2, new Item.Settings().maxCount(1)));
     public static final Item FLUID_TANK = register(FactoryBlocks.FLUID_TANK);
+    public static final Item PORTABLE_FLUID_TANK = register(FactoryBlocks.PORTABLE_FLUID_TANK,
+            (s) -> s.maxCount(1).component(FactoryDataComponents.FLUID, FluidComponent.empty(PortableFluidTankBlockEntity.CAPACITY)));
     public static void register() {
         FuelRegistry.INSTANCE.add(SAW_DUST, 60);
         FuelRegistry.INSTANCE.add(WOODEN_PLATE, 120);
@@ -183,6 +190,7 @@ public class FactoryItems {
                     entries.add(MECHANICAL_DRAIN);
                     entries.add(MECHANICAL_SPOUT);
                     entries.add(FLUID_TANK);
+                    entries.add(PORTABLE_FLUID_TANK);
 
                     // Data
                     entries.add(CABLE);
@@ -328,16 +336,23 @@ public class FactoryItems {
     }
 
     public static <E extends Block & PolymerBlock> FactoryBlockItem register(E block) {
+        return register(block, (s) -> {});
+    }
+    public static <E extends Block & PolymerBlock> FactoryBlockItem register(E block, Consumer<Item.Settings> settingsConsumer) {
         var id = Registries.BLOCK.getId(block);
         FactoryBlockItem item;
-        if (block instanceof MultiBlock multiBlock) {
-            item = new MultiBlockItem(multiBlock, new Item.Settings());
-        } else if (block instanceof AbstractCableBlock cableBlock) {
-            item = new CabledBlockItem((AbstractCableBlock & PolymerBlock) cableBlock, new Item.Settings());
-        } else {
-            item = new FactoryBlockItem(block, new Item.Settings());
-        }
+        var settings = new Item.Settings();
+        settingsConsumer.accept(settings);
 
+        if (block instanceof MultiBlock multiBlock) {
+            item = new MultiBlockItem(multiBlock, settings);
+        } else if (block instanceof AbstractCableBlock cableBlock) {
+            item = new CabledBlockItem((AbstractCableBlock & PolymerBlock) cableBlock, settings);
+        } else if (block instanceof PortableFluidTankBlock) {
+            item = new PortableFluidTankBlockItem(block, settings);
+        } else {
+            item = new FactoryBlockItem(block, settings);
+        }
         Registry.register(Registries.ITEM, id, item);
         item.onRegistered(id);
         return item;

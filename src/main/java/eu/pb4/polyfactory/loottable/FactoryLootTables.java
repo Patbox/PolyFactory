@@ -15,6 +15,7 @@ public class FactoryLootTables {
         register("copy_color", CopyColorLootFunction.TYPE);
         register("copy_cached_data", CopyCachedDataLootFunction.TYPE);
         register("copy_read_only", CopyReadOnlyLootFunction.TYPE);
+        register("copy_fluids", CopyFluidsLootFunction.TYPE);
     }
 
 

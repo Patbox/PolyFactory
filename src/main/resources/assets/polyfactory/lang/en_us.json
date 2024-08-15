@@ -67,6 +67,7 @@
   "block.polyfactory.mechanical_spout": "Mechanical Spout",
   "block.polyfactory.creative_drain": "Creative Fluid Drain",
   "block.polyfactory.fluid_tank": "Fluid Tank",
+  "block.polyfactory.portable_fluid_tank": "Portable Fluid Tank",
 
   "item.polyfactory.mod_icon": "Mod Icon",
   "item.polyfactory.windmill_sail": "Windmill Sail",
@@ -181,7 +182,9 @@
   "text.polyfactory.half.bottom": "Bottom",
   "text.polyfactory.half.top": "Top",
 
-  "text.polyfactory.fluid_component.stored_fluidstext.polyfactory.fluid_component.stored_fluids": "Stored Fluids:",
+  "text.polyfactory.fluid_component.stored_fluids": "Stored Fluids:",
+
+  "text.polyfactory.x_out_of_y": "%s / %s",
 
   "text.polyfactory.char_per_sec": "%s char/sec",
   "data_type.polyfactory.string": "String",

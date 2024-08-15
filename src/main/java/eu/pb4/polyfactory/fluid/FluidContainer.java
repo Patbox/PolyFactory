@@ -103,7 +103,7 @@ public class FluidContainer {
             if (mode == FluidInteractionMode.EXTRACT && topFluid != null) {
                 var maxAmount = item.capacity() - fluids.stored();
                 var extract = this.extract(topFluid, maxAmount, false);
-                stack.set(FactoryDataComponents.FLUID, fluids.insert(topFluid, extract));
+                stack.set(FactoryDataComponents.FLUID, fluids.insert(topFluid, extract, false).component());
             } else if (mode == FluidInteractionMode.INSERT) {
                 for (var fluid : fluids.fluids()) {
                     var extract = fluids.get(fluid);

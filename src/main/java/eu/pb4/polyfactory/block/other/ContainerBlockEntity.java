@@ -21,11 +21,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("UnstableApiUsage")
-public class ContainerBlockEntity extends LockableBlockEntity implements BlockEntityExtraListener {
+public class ContainerBlockEntity extends LockableBlockEntity implements BlockEntityExtraListener, FilledStateProvider {
     static  {
         ItemStorage.SIDED.registerForBlockEntity((self, dir) -> self.storage, FactoryBlockEntities.CONTAINER);
     }
@@ -160,5 +163,10 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     public void onListenerUpdate(WorldChunk chunk) {
         this.model = BlockBoundAttachment.get(chunk, this.pos).holder() instanceof ContainerBlock.Model model ? model : null;
         this.updateStackWithTick();
+    }
+
+    @Override
+    public @Nullable Text getFilledStateText() {
+        return Text.translatable("text.polyfactory.x_out_of_y", this.storage.amount, this.storage.getCapacity());
     }
 }

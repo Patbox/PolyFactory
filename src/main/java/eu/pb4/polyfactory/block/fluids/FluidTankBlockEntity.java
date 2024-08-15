@@ -104,6 +104,11 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
         return this.container;
     }
 
+    @Override
+    public @Nullable FluidContainer getMainFluidContainer() {
+        return this.container;
+    }
+
     private void onFluidChanged() {
         this.markDirty();
     }

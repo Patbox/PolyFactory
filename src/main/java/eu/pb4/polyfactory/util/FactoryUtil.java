@@ -145,8 +145,10 @@ public class FactoryUtil {
         } else if (amount >= 81) {
             long buckets = amount / (FluidConstants.BLOCK / 1000);
             return Text.literal((buckets) + "mB");
-        } else {
+        } else if (amount != 0) {
             return Text.literal((amount) + "d");
+        } else {
+            return Text.literal("0");
         }
     }
 

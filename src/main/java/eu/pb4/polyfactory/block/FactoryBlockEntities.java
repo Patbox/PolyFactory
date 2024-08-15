@@ -136,6 +136,8 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<MSpoutBlockEntity> MECHANICAL_SPOUT = register("mechanical_spout", BlockEntityType.Builder.create(MSpoutBlockEntity::new, FactoryBlocks.MECHANICAL_SPOUT));
     public static final BlockEntityType<CreativeDrainBlockEntity> CREATIVE_DRAIN = register("creative_drain", BlockEntityType.Builder.create(CreativeDrainBlockEntity::new, FactoryBlocks.CREATIVE_DRAIN));
     public static final BlockEntityType<FluidTankBlockEntity> FLUID_TANK = register("fluid_tank", BlockEntityType.Builder.create(FluidTankBlockEntity::new, FactoryBlocks.FLUID_TANK));
+    public static final BlockEntityType<PortableFluidTankBlockEntity> PORTABLE_FLUID_TANK = register("portable_fluid_tank",
+            BlockEntityType.Builder.create(PortableFluidTankBlockEntity::new, FactoryBlocks.PORTABLE_FLUID_TANK));
 
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;

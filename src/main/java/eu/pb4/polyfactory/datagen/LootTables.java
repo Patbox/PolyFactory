@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.loottable.CopyCachedDataLootFunction;
 import eu.pb4.polyfactory.loottable.CopyColorLootFunction;
+import eu.pb4.polyfactory.loottable.CopyFluidsLootFunction;
 import eu.pb4.polyfactory.loottable.CopyReadOnlyLootFunction;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
@@ -70,6 +71,12 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.MECHANICAL_DRAIN);
         this.addDrop(FactoryBlocks.MECHANICAL_SPOUT);
         this.addDrop(FactoryBlocks.FLUID_TANK);
+        this.addDrop(FactoryBlocks.PORTABLE_FLUID_TANK, LootTable.builder().pool(LootPool.builder()
+                .conditionally(SurvivesExplosionLootCondition.builder())
+                .rolls(ConstantLootNumberProvider.create(1.0F))
+                .with(ItemEntry.builder(FactoryBlocks.PORTABLE_FLUID_TANK)
+                        .apply(() -> CopyFluidsLootFunction.INSTANCE)
+                )));
 
         this.addDrop(FactoryBlocks.DATA_MEMORY, LootTable.builder().pool(LootPool.builder()
                 .conditionally(SurvivesExplosionLootCondition.builder())

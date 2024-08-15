@@ -35,6 +35,7 @@ import net.minecraft.loot.LootTable;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -119,6 +120,7 @@ public class FactoryBlocks {
     public static final MSpoutBlock MECHANICAL_SPOUT = register("mechanical_spout", new MSpoutBlock(AbstractBlock.Settings.copy(SPLITTER).nonOpaque()));
     public static final CreativeDrainBlock CREATIVE_DRAIN = register("creative_drain", new CreativeDrainBlock(AbstractBlock.Settings.copy(DRAIN).dropsNothing().strength(-1)));
     public static final FluidTankBlock FLUID_TANK = register("fluid_tank", new FluidTankBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
+    public static final PortableFluidTankBlock PORTABLE_FLUID_TANK = register("portable_fluid_tank", new PortableFluidTankBlock(AbstractBlock.Settings.create().mapColor(MapColor.ORANGE).strength(2.0F).nonOpaque().sounds(BlockSoundGroup.COPPER)));
 
     public static void register() {
         var s = System.currentTimeMillis();

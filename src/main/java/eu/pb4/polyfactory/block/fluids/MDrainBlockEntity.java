@@ -382,6 +382,11 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
         return this.fluidContainer;
     }
 
+    @Override
+    public @Nullable FluidContainer getMainFluidContainer() {
+        return this.fluidContainer;
+    }
+
 
     public ItemStack catalyst() {
         return this.getStack(CATALYST_FIRST);

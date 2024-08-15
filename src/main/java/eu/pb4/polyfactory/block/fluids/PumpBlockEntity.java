@@ -17,7 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class PumpBlockEntity extends PipeLikeBlockEntity implements FluidInput.ContainerBased, DebugTextProvider {
+public class PumpBlockEntity extends PipeLikeBlockEntity {
     private double speed;
 
     public PumpBlockEntity(BlockPos pos, BlockState state) {

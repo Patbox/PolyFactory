@@ -400,6 +400,16 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         return this.fluidContainer;
     }
 
+    @Override
+    public @Nullable FluidContainer getMainFluidContainer() {
+        return this.fluidContainer;
+    }
+
+    @Override
+    public Text getFilledStateText() {
+        return null;
+    }
+
     private class Gui extends SimpleGui {
         private static final Text CURRENT_HEAT = Text.translatable("text.polyfactory.current_heat").styled(x -> x.withItalic(false));
         private int lastFluidUpdate = -1;

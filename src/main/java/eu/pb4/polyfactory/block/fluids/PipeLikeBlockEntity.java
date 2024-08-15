@@ -21,6 +21,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class PipeLikeBlockEntity extends BlockEntity implements FluidInput.ContainerBased, DebugTextProvider {
     protected final FluidContainer container = this.createContainer();
@@ -37,6 +38,11 @@ public abstract class PipeLikeBlockEntity extends BlockEntity implements FluidIn
     }
 
     public FluidContainer getFluidContainer() {
+        return this.container;
+    }
+
+    @Override
+    public @Nullable FluidContainer getMainFluidContainer() {
         return this.container;
     }
 
