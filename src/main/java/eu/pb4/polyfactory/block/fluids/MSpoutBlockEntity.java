@@ -6,6 +6,8 @@ import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.fluid.FluidContainer;
+import eu.pb4.polyfactory.fluid.FluidContainerImpl;
+import eu.pb4.polyfactory.fluid.FluidContainerUtil;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.fluid.SpoutRecipe;
@@ -305,7 +307,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
                             .append(MSpoutBlockEntity.this.getCachedState().getBlock().getName()))
                     : GuiTextures.MECHANICAL_SPOUT_NO_CONN.apply(MSpoutBlockEntity.this.getCachedState().getBlock().getName());
 
-            var fluidSlot = fluidContainer != null ? fluidContainer.guiElement(false) : GuiElement.EMPTY;
+            var fluidSlot = FluidContainerUtil.guiElement(fluidContainer, false);
 
             //noinspection PointlessArithmeticExpression
             this.setSlot(2 + 0 * 9, fluidSlot);

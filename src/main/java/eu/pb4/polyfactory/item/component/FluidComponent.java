@@ -50,7 +50,7 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
     }
 
     public static FluidComponent copyFrom(FluidContainer container) {
-        return new FluidComponent(new Object2LongOpenHashMap<>(container.asMap()), new ArrayList<>(container.orderList()), container.stored(), container.capacity(), true);
+        return new FluidComponent(new Object2LongOpenHashMap<>(container.asMap()), new ArrayList<>(container.fluids()), container.stored(), container.capacity(), true);
     }
 
     public static FluidComponent empty(long capacity) {
@@ -144,10 +144,9 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
 
     @Override
     public void appendTooltip(Item.TooltipContext context, Consumer<Text> tooltip, TooltipType type) {
-        if (!this.showTooltip || this.isEmpty()) {
+        if (!this.showTooltip) {
             return;
         }
-        //tooltip.accept(Text.translatable("text.polyfactory.fluid_component.stored_fluids").formatted(Formatting.GRAY));
         for (var fluid : fluids) {
             tooltip.accept(Text.literal(" ").append(fluid.toLabeledAmount(this.map.getOrDefault(fluid, 0))).formatted(Formatting.GRAY));
         }
@@ -155,6 +154,10 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
         if (this.capacity != -1) {
             tooltip.accept(Text.translatable("text.polyfactory.x_out_of_y", FactoryUtil.fluidText(this.stored), FactoryUtil.fluidText(this.capacity)).formatted(Formatting.YELLOW));
         }
+    }
+
+    public FluidComponent clear() {
+        return new FluidComponent(Object2LongMaps.emptyMap(), List.of(), 0, this.capacity, this.showTooltip);
     }
 
     public record Result(FluidComponent component, long fluidAmount) {}

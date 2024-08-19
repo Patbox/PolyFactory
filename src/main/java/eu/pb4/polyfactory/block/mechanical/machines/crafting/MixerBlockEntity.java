@@ -9,6 +9,8 @@ import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.fluid.FluidContainer;
+import eu.pb4.polyfactory.fluid.FluidContainerImpl;
+import eu.pb4.polyfactory.fluid.FluidContainerUtil;
 import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
@@ -27,7 +29,6 @@ import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.player.PlayerEntity;
@@ -39,7 +40,6 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
@@ -75,7 +75,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
     private boolean active;
     private final SimpleContainer[] containers = SimpleContainer.createArray(9, this::addMoving, this::removeMoving);
     private final List<ItemStack> stacks = new InventoryList(this, INPUT_FIRST, OUTPUT_FIRST);
-    private final FluidContainer fluidContainer = new FluidContainer(FLUID_CAPACITY, this::markDirty);
+    private final FluidContainerImpl fluidContainer = new FluidContainerImpl(FLUID_CAPACITY, this::markDirty);
     private MixerBlock.Model model;
     private boolean inventoryChanged = false;
     private double speedScale;
@@ -172,7 +172,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         self.state = null;
         self.temperature = BlockHeat.getReceived(world, pos) + self.fluidContainer.fluidTemperature();
 
-        self.fluidContainer.tick((ServerWorld) world, pos, self.temperature, self::addToOutputOrDrop);
+        FluidContainerUtil.tick(self.fluidContainer, (ServerWorld) world, pos, self.temperature, self::addToOutputOrDrop);
         self.model.setFluid(self.fluidContainer.topFluid(), self.fluidContainer.getFilledPercentage());
 
         if (self.isInputEmpty()) {
@@ -194,7 +194,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             return;
         }
 
-        var input = new MixingInput(self.stacks, self.fluidContainer.map());
+        var input = new MixingInput(self.stacks, self.fluidContainer.asMap());
 
         if (self.inventoryChanged && (self.currentRecipe == null || !self.currentRecipe.value().matches(input, world))) {
             self.process = 0;
@@ -311,7 +311,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         var stack = player.getMainHandStack();
         var copy = stack.copy();
-        var x = this.fluidContainer.interactWith((ServerPlayerEntity) player, player.getMainHandStack());
+        var x = FluidContainerUtil.interactWith(this.fluidContainer, (ServerPlayerEntity) player, player.getMainHandStack());
         if (x == null) {
             return super.onUse(state, world, pos, player, hit);
         }
@@ -419,7 +419,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             super(ScreenHandlerType.GENERIC_9X3, player, false);
             this.updateTitleAndFluid();
             this.setSlot(9, PolydexCompat.getButton(FactoryRecipeTypes.MIXER));
-            var fluidSlot = fluidContainer.guiElement(true);
+            var fluidSlot = FluidContainerUtil.guiElement(fluidContainer, true);
 
             this.setSlot(1, fluidSlot);
             this.setSlot(1 + 9, fluidSlot);

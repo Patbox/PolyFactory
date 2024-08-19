@@ -1,14 +1,11 @@
 package eu.pb4.polyfactory.block.fluids;
 
-import eu.pb4.polyfactory.fluid.FactoryFluids;
-import eu.pb4.polyfactory.fluid.FluidBehaviours;
-import eu.pb4.polyfactory.fluid.FluidContainer;
+import eu.pb4.polyfactory.fluid.*;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.util.DebugTextProvider;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.ComponentMap;
@@ -24,7 +21,7 @@ import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class PipeLikeBlockEntity extends BlockEntity implements FluidInput.ContainerBased, DebugTextProvider {
-    protected final FluidContainer container = this.createContainer();
+    protected final FluidContainerImpl container = this.createContainer();
     protected final BlockPos.Mutable mut = new BlockPos.Mutable();
     protected final double[] pullOverflow = new double[Direction.values().length];
     protected BlockState[] pullState = new BlockState[pullOverflow.length];
@@ -81,7 +78,7 @@ public abstract class PipeLikeBlockEntity extends BlockEntity implements FluidIn
     }
 
     public void preTick() {
-        this.container.tick((ServerWorld) world, pos, this.container.fluidTemperature(), this::dropItem);
+        FluidContainerUtil.tick(this.container, (ServerWorld) world, pos, this.container.fluidTemperature(), this::dropItem);
         for (int i = 0; i < this.pullOverflow.length; i++) {
             this.pullOverflow[i] = Math.max(0, this.pullOverflow[i] - 0.01);
             this.pushOverflow[i] = Math.max(0, this.pushOverflow[i] - 0.01);
@@ -218,8 +215,8 @@ public abstract class PipeLikeBlockEntity extends BlockEntity implements FluidIn
         }
     }
 
-    protected FluidContainer createContainer() {
-        return FluidContainer.singleFluid(FluidConstants.BLOCK, this::markDirty);
+    protected FluidContainerImpl createContainer() {
+        return FluidContainerImpl.singleFluid(FluidConstants.BLOCK, this::markDirty);
     }
 
     @Override

@@ -31,6 +31,7 @@ import eu.pb4.polyfactory.block.other.*;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.NoteBlockInstrument;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.loot.LootTable;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -120,7 +121,8 @@ public class FactoryBlocks {
     public static final MSpoutBlock MECHANICAL_SPOUT = register("mechanical_spout", new MSpoutBlock(AbstractBlock.Settings.copy(SPLITTER).nonOpaque()));
     public static final CreativeDrainBlock CREATIVE_DRAIN = register("creative_drain", new CreativeDrainBlock(AbstractBlock.Settings.copy(DRAIN).dropsNothing().strength(-1)));
     public static final FluidTankBlock FLUID_TANK = register("fluid_tank", new FluidTankBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
-    public static final PortableFluidTankBlock PORTABLE_FLUID_TANK = register("portable_fluid_tank", new PortableFluidTankBlock(AbstractBlock.Settings.create().mapColor(MapColor.ORANGE).strength(2.0F).nonOpaque().sounds(BlockSoundGroup.COPPER)));
+    public static final PortableFluidTankBlock PORTABLE_FLUID_TANK = register("portable_fluid_tank", new PortableFluidTankBlock(AbstractBlock.Settings.create()
+            .mapColor(MapColor.ORANGE).strength(2.0F).nonOpaque().sounds(BlockSoundGroup.COPPER).pistonBehavior(PistonBehavior.DESTROY)));
 
     public static void register() {
         var s = System.currentTimeMillis();

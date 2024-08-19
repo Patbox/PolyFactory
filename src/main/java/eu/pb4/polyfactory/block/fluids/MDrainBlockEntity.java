@@ -6,6 +6,8 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.fluid.FluidContainer;
+import eu.pb4.polyfactory.fluid.FluidContainerImpl;
+import eu.pb4.polyfactory.fluid.FluidContainerUtil;
 import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItemTags;
@@ -71,7 +73,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
     private boolean active;
     private MDrainBlock.Model model;
     private boolean inventoryChanged = false;
-    private final FluidContainer fluidContainer = new FluidContainer(FLUID_CAPACITY, this::markDirty);
+    private final FluidContainerImpl fluidContainer = new FluidContainerImpl(FLUID_CAPACITY, this::markDirty);
     private float visualProgress;
 
     public MDrainBlockEntity(BlockPos pos, BlockState state) {
@@ -91,7 +93,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
         self.state = null;
         var temp = BlockHeat.getReceived(world, pos) + self.fluidContainer.fluidTemperature();
 
-        self.fluidContainer.tick((ServerWorld) world, pos, temp, self::addToOutputOrDrop);
+        FluidContainerUtil.tick(self.fluidContainer, (ServerWorld) world, pos, temp, self::addToOutputOrDrop);
         self.model.setFluid(self.fluidContainer.topFluid(), self.fluidContainer.getFilledPercentage());
 
         if (self.isInputEmpty()) {
@@ -408,7 +410,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             super(ScreenHandlerType.GENERIC_9X3, player, false);
             this.updateTitleAndFluid();
             this.setSlot(9, PolydexCompat.getButton(FactoryRecipeTypes.DRAIN));
-            var fluidSlot = fluidContainer.guiElement(true);
+            var fluidSlot = FluidContainerUtil.guiElement(fluidContainer, true);
 
 
             //noinspection PointlessArithmeticExpression

@@ -3,6 +3,8 @@ package eu.pb4.polyfactory.block.fluids;
 import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.fluid.FluidContainer;
+import eu.pb4.polyfactory.fluid.FluidContainerImpl;
+import eu.pb4.polyfactory.fluid.FluidContainerUtil;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
@@ -20,8 +22,8 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class PortableFluidTankBlockEntity extends BlockEntity implements FluidInputOutput.ContainerBased {
-    public static final long CAPACITY = FluidConstants.BLOCK * 3;
-    private final FluidContainer container = new FluidContainer(CAPACITY, this::onFluidChanged);
+    public static final long CAPACITY = FluidConstants.BLOCK * 4;
+    private final FluidContainerImpl container = new FluidContainerImpl(CAPACITY, this::onFluidChanged);
     private float blockTemperature = 0;
 
     public PortableFluidTankBlockEntity(BlockPos pos, BlockState state) {
@@ -82,7 +84,7 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
             return;
         }
         tank.blockTemperature = BlockHeat.get(world.getBlockState(pos.down())) + tank.container.fluidTemperature();
-        tank.container.tick((ServerWorld) world, pos, tank.blockTemperature, tank::dropItem);
+        FluidContainerUtil.tick(tank.container, (ServerWorld) world, pos, tank.blockTemperature, tank::dropItem);
     }
 
     private void dropItem(ItemStack stack) {

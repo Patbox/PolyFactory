@@ -55,7 +55,7 @@ public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeC
         if (state.getBlock() instanceof PipeConnectable connectable && connectable.canPipeConnect(ctx.getWorld(), sidePos, state, ctx.getSide())) {
             return this.getDefaultState().with(FACING, ctx.getSide().getOpposite());
         }
-        return this.getDefaultState().with(FACING, ctx.getSide());
+        return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getSide()));
     }
 
     @Override

@@ -14,7 +14,7 @@ import java.util.List;
 public record SpoutInput(ItemStack stack, Object2LongMap<FluidInstance<?>> fluidsAmount, List<FluidInstance<?>> fluids, ServerWorld world) implements RecipeInput {
     public static SpoutInput of(ItemStack stack, @Nullable FluidContainer fluidContainer, ServerWorld world) {
         return new SpoutInput(stack, fluidContainer != null ? fluidContainer.asMap() : Object2LongMaps.emptyMap(),
-                fluidContainer != null ? fluidContainer.orderList() : List.of(), world);
+                fluidContainer != null ? fluidContainer.fluids() : List.of(), world);
     }
 
     @Override

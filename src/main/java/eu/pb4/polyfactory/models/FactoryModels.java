@@ -1,11 +1,16 @@
 package eu.pb4.polyfactory.models;
 
+import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.polyfactory.models.fluid.FluidModel;
+import eu.pb4.polymer.resourcepack.api.PolymerModelData;
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
 public interface FactoryModels {
+    PolymerModelData PLACEHOLDER = PolymerResourcePackUtils.requestModel(BaseItemProvider.requestItem(), Identifier.ofVanilla("missing"));
     FluidModel FLUID_FLAT_FULL = new FluidModel(id("block/fluid/flat_model"));
 
     FluidModel[] FLUID_FLAT_SCALED = Util.make(new FluidModel[16], (arr) -> {

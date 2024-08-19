@@ -2,12 +2,11 @@ package eu.pb4.polyfactory.block.fluids;
 
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidContainer;
+import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
-import eu.pb4.polyfactory.util.DebugTextProvider;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.BlockState;
@@ -17,8 +16,6 @@ import net.minecraft.component.ComponentMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -29,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.ContainerBased, BlockEntityExtraListener {
     public static final long CAPACITY = FluidConstants.BLOCK;
-    private final FluidContainer container = new FluidContainer(CAPACITY, this::onFluidChanged);
+    private final FluidContainerImpl container = new FluidContainerImpl(CAPACITY, this::onFluidChanged);
 
     private ItemStack catalyst = ItemStack.EMPTY;
     @Nullable
@@ -110,7 +107,7 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
         var x = BlockAwareAttachment.get(chunk, pos);
         if (x != null && x.holder() instanceof DrainBlock.Model model) {
             this.model = model;
-            this.model.setCatalyst(this.catalyst);
+            this.updateModel();
         }
     }
 
@@ -128,5 +125,20 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
 
     public void onBroken(World world, BlockPos pos) {
         ItemScatterer.spawn(world, pos, DefaultedList.copyOf(ItemStack.EMPTY, this.catalyst));
+    }
+
+    public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
+        if (!(t instanceof DrainBlockEntity be)) {
+            return;
+        }
+
+        if (world.hasRain(pos.up())) {
+            // Actually done some math:
+            // For 49 cauldrons, it took 4 days to get 18 lvl-1, 15 lvl-2 and 4 lvl-3.
+            // So 60 bottles total. 15 bottles per day, 15×27000 = 405000 droplets per day
+            // 405000÷24000 = 16,875 droplets per tick. Then halved it and rounded down to just 8 droplets per tick (as it felt too fast).
+            // Writing this, so I can remember why I choose this value.
+            be.container.insert(FactoryFluids.WATER.defaultInstance(), 8, false);
+        }
     }
 }

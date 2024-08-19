@@ -4,7 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.fluid.FluidContainer;
+import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
@@ -49,8 +49,8 @@ public class FilteredPipeBlockEntity extends PipeLikeBlockEntity implements Bloc
     }
 
     @Override
-    protected FluidContainer createContainer() {
-        return FluidContainer.filteredSingleFluid(FluidConstants.BLOCK, this::checkFluid, this::markFluidDirty);
+    protected FluidContainerImpl createContainer() {
+        return FluidContainerImpl.filteredSingleFluid(FluidConstants.BLOCK, this::checkFluid, this::markFluidDirty);
     }
 
     private boolean checkFluid(FluidInstance<?> instance) {

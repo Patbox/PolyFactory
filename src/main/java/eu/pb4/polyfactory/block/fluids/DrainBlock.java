@@ -21,6 +21,8 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -117,6 +119,12 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
             be.onBroken(world, pos);
         }
         super.onStateReplaced(state, world, pos, newState, moved);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return DrainBlockEntity::ticker;
     }
 
     @Override

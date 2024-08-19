@@ -134,6 +134,8 @@ public class FactoryItems {
     public static final Item FLUID_TANK = register(FactoryBlocks.FLUID_TANK);
     public static final Item PORTABLE_FLUID_TANK = register(FactoryBlocks.PORTABLE_FLUID_TANK,
             (s) -> s.maxCount(1).component(FactoryDataComponents.FLUID, FluidComponent.empty(PortableFluidTankBlockEntity.CAPACITY)));
+
+    public static final FluidLauncherItem FLUID_LAUNCHER = register("fluid_launcher", new FluidLauncherItem(new Item.Settings().maxCount(1)));
     public static void register() {
         FuelRegistry.INSTANCE.add(SAW_DUST, 60);
         FuelRegistry.INSTANCE.add(WOODEN_PLATE, 120);
@@ -315,6 +317,7 @@ public class FactoryItems {
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(STEEL_BUCKET, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(FLUID_LAUNCHER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     })).build()
             );
         }

@@ -1,7 +1,8 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"texture": "polyfactory:block/fluid/experience"
+		"texture": "polyfactory:block/fluid/experience",
+		"particle": "#texture"
 	},
 	"elements": [
 		{

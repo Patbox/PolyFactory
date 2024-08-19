@@ -11,7 +11,7 @@ import java.util.List;
 public record DrainInput(ItemStack stack, ItemStack catalyst, Object2LongMap<FluidInstance<?>> fluidsAmount, List<FluidInstance<?>> fluids, long stored, long capacity,
                          boolean isPlayer) implements RecipeInput {
     public static DrainInput of(ItemStack stack, ItemStack catalyst, FluidContainer fluidContainer, boolean isPlayer) {
-        return new DrainInput(stack, catalyst, fluidContainer.asMap(), fluidContainer.orderList(), fluidContainer.stored(), fluidContainer.capacity(), isPlayer);
+        return new DrainInput(stack, catalyst, fluidContainer.asMap(), fluidContainer.fluids(), fluidContainer.stored(), fluidContainer.capacity(), isPlayer);
     }
 
     @Override

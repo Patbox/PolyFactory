@@ -28,11 +28,7 @@ import net.minecraft.data.server.recipe.CookingRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.item.*;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
@@ -672,6 +668,16 @@ class RecipesProvider extends FabricRecipeProvider {
         offerBlasting(exporter, List.of(FactoryItems.CRUSHED_RAW_COPPER), RecipeCategory.MISC, Items.COPPER_INGOT, 0.5F, 100, "copper_ingot");
         offerBlasting(exporter, List.of(FactoryItems.CRUSHED_RAW_GOLD), RecipeCategory.MISC, Items.GOLD_INGOT, 0.7F, 100, "gold_ingot");
 
+
+        for (var entry : HoneycombItem.UNWAXED_TO_WAXED_BLOCKS.get().entrySet()) {
+            var id1 = Registries.BLOCK.getId(entry.getKey());
+            var id2 = Registries.BLOCK.getId(entry.getValue());
+
+            of(exporter,
+                    GenericPressRecipe.of(id1.toUnderscoreSeparatedString() + "_to_" + id2.toUnderscoreSeparatedString(),
+                            Ingredient.ofItems(entry.getKey()), 1, 2f, new ItemStack(entry.getValue(), 1)));
+        }
+
         of(exporter,
                 GenericPressRecipe.of("purpur_block", Ingredient.ofItems(Items.POPPED_CHORUS_FRUIT), 4, 5f, new ItemStack(Items.PURPUR_BLOCK, 1)),
                 GenericPressRecipe.of("sponge", Ingredient.ofItems(Items.WET_SPONGE), 1, 5f, new ItemStack(Items.SPONGE, 1)),
@@ -927,7 +933,11 @@ class RecipesProvider extends FabricRecipeProvider {
                 GenericMixingRecipe.ofCounted("slime_ball_to_liquid", "slime_to_liquid",
                         List.of(CountedIngredient.ofItems(1, Items.SLIME_BALL)),
                         null,
-                        1, 3, 10f, 0.3f, ItemStack.EMPTY, List.of(FactoryFluids.SLIME.of(FluidConstants.BLOCK / 9)))
+                        1, 3, 10f, 0.3f, ItemStack.EMPTY, List.of(FactoryFluids.SLIME.of(FluidConstants.BLOCK / 9))),
+                GenericMixingRecipe.ofCounted("mud", "",
+                        List.of(CountedIngredient.ofItems(1, Items.DIRT)),
+                        List.of(FluidInputStack.from(FactoryFluids.WATER.ofBottle())),
+                        1, 6, 18f, 0f, Items.MUD.getDefaultStack(), List.of())
         );
 
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_GEAR, 3)

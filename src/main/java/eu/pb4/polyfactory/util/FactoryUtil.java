@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
+import eu.pb4.sgui.api.GuiHelpers;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
@@ -17,6 +18,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
@@ -27,11 +29,13 @@ import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -42,7 +46,9 @@ import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -51,6 +57,7 @@ public class FactoryUtil {
     public static final GameProfile GENERIC_PROFILE = new GameProfile(Util.NIL_UUID, "[PolyFactory]");
     public static final Vec3d HALF_BELOW = new Vec3d(0, -0.5, 0);
     public static final List<Direction> HORIZONTAL_DIRECTIONS = List.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
+    public static final List<EquipmentSlot> ARMOR_EQUIPMENT = Arrays.stream(EquipmentSlot.values()).filter(x -> x.getType() == EquipmentSlot.Type.HUMANOID_ARMOR).toList();
 
     private static final List<Runnable> RUN_NEXT_TICK = new ArrayList<>();
     private static final Item[] COLORED_MODEL_ITEMS = new Item[]{
@@ -387,6 +394,30 @@ public class FactoryUtil {
 
     public static BlockPos findFurthestFluidBlockForPlacement(BlockState target, BlockPos start) {
         return start;
+    }
+
+    public static Consumer<ItemStack> getItemConsumer(Entity entity) {
+        if (entity instanceof PlayerEntity player) {
+            return player.getInventory()::offerOrDrop;
+        } else if (entity instanceof Inventory inventory) {
+            return stack -> {
+                tryInsertingRegular(inventory, stack);
+                if (!stack.isEmpty()) {
+                    entity.dropStack(stack);
+                }
+            };
+        }
+
+        return entity::dropStack;
+    }
+
+    public static void sendSlotUpdate(Entity entity, Hand hand) {
+        if (entity instanceof ServerPlayerEntity player ) {
+            GuiHelpers.sendSlotUpdate(player, player.playerScreenHandler.syncId, hand == Hand.MAIN_HAND
+                    ? PlayerScreenHandler.HOTBAR_START + player.getInventory().selectedSlot
+                    : PlayerScreenHandler.OFFHAND_ID,
+                    player.getStackInHand(hand), player.playerScreenHandler.nextRevision());
+        }
     }
 
     public enum MovableResult {

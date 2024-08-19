@@ -119,5 +119,40 @@
       }
     ],
     "subtitle": "subtitles.item.bucket.fill"
+  },
+  "item.fluid_launcher.shoot_water": {
+    "sounds": [
+      {
+        "name": "liquid/swim1",
+        "pitch": 1.8,
+        "volume": 0.8
+      },
+      {
+        "name": "liquid/swim2",
+        "pitch": 1.8,
+        "volume": 0.8
+      },
+      {
+        "name": "liquid/swim3",
+        "pitch": 1.8,
+        "volume": 0.8
+      },
+      {
+        "name": "liquid/swim4",
+        "pitch": 1.8,
+        "volume": 0.8
+      }
+    ],
+    "subtitle": "subtitles.polyfactory.fluid_launcher.shoot_water"
+  },
+  "item.fluid_launcher.shoot_lava": {
+    "sounds": [
+      {
+        "name": "mob/ghast/fireball4",
+        "pitch": 1.8,
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "subtitles.polyfactory.fluid_launcher.shoot_lava"
   }
 }

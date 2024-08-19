@@ -4,6 +4,8 @@ import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.fluid.FluidContainer;
+import eu.pb4.polyfactory.fluid.FluidContainerImpl;
+import eu.pb4.polyfactory.fluid.FluidContainerUtil;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
@@ -28,7 +30,7 @@ import java.util.ArrayList;
 
 public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutput.ContainerBased, BlockEntityExtraListener {
     public static final long CAPACITY = FluidConstants.BLOCK * 6;
-    private final FluidContainer container = new FluidContainer(CAPACITY, this::onFluidChanged);
+    private final FluidContainerImpl container = new FluidContainerImpl(CAPACITY, this::onFluidChanged);
 
     @Nullable
     private FluidTankBlock.Model model;
@@ -144,7 +146,7 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
         if ((y.single() || y.negative()) && tank.model != null) {
             tank.model.setFluidBelow(null);
         }
-        tank.container.tick((ServerWorld) world, pos, tank.blockTemperature, tank::dropItem);
+        FluidContainerUtil.tick(tank.container, (ServerWorld) world, pos, tank.blockTemperature, tank::dropItem);
         tank.updateModel();
     }
 

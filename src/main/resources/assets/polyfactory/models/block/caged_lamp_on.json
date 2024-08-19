@@ -1,4 +1,5 @@
 {
+	"credit": "Made with Blockbench",
 	"textures": {
 		"0": "polyfactory:block/lamp/cage_mesh",
 		"1": "polyfactory:block/lamp/on_cage",
