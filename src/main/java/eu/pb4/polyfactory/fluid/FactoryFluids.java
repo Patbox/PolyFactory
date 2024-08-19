@@ -3,7 +3,11 @@ package eu.pb4.polyfactory.fluid;
 import eu.pb4.polyfactory.FactoryRegistries;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.BlockHeat;
+import eu.pb4.polyfactory.entity.FactoryEntities;
+import eu.pb4.polyfactory.entity.splash.PotionSplashEntity;
+import eu.pb4.polyfactory.fluid.shooting.ShootSplashed;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.util.FactorySoundEvents;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeveledCauldronBlock;
@@ -27,10 +31,13 @@ import java.util.function.Function;
 public class FactoryFluids {
     public static final FluidType<Unit> WATER = register(Identifier.ofVanilla("water"),
             FluidType.of().density(100).fluid(Fluids.WATER).color(0x3b3bed)
-                    .particle(new ItemStackParticleEffect(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE.getDefaultStack())).build());
+                    .particle(new ItemStackParticleEffect(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE.getDefaultStack()))
+                    .shootingBehavior(ShootSplashed.of(FactoryEntities.WATER_SPLASH, 300, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
+                    .build());
     public static final FluidType<Unit> LAVA = register(Identifier.ofVanilla("lava"),
             FluidType.of().density(1000).fluid(Fluids.LAVA).brightness(15).heat(BlockHeat.LAVA)
                     .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
+                    .shootingBehavior(ShootSplashed.of(FactoryEntities.LAVA_SPLASH, 400, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_LAVA))
                     .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     public static final FluidType<Unit> MILK = register(Identifier.ofVanilla("milk"),
@@ -50,7 +57,9 @@ public class FactoryFluids {
                             return Text.translatable("fluid_type.minecraft.potion.strong", base);
                         }
                         return base;
-                    }).particle((data) -> EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, data.data().getColor())).build());
+                    }).particle((data) -> EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, data.data().getColor()))
+                    .shootingBehavior(new ShootSplashed<>(PotionSplashEntity::of, 4, FluidConstants.BOTTLE / 20, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
+                    .build());
 
     public static final FluidType<Unit> HONEY = register(Identifier.ofVanilla("honey"),
             FluidType.of().density(500).transparent().flowSpeedMultiplier(0.6).maxFlow(FluidConstants.BOTTLE * 2 / 3).build());

@@ -15,6 +15,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
@@ -37,6 +38,11 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
 
     public T getData() {
         return this.data;
+    }
+
+    @Override
+    protected Text getDefaultName() {
+        return Text.translatable("entity.polyfactory.splash", this.fluid.getName(this.getData()));
     }
 
     @Override

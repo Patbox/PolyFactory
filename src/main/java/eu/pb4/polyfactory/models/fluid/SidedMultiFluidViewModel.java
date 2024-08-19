@@ -21,18 +21,18 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class MultiFluidViewModel {
-    private final Map<FluidInstance<?>, MultiFluidViewModel.Layer> fluidLayers = new Object2ObjectOpenHashMap<>();
+public class SidedMultiFluidViewModel {
+    private final Map<FluidInstance<?>, SidedMultiFluidViewModel.Layer> fluidLayers = new Object2ObjectOpenHashMap<>();
     private final ElementHolder holder;
-    private MultiFluidViewModel.Layer topLayer;
-    private MultiFluidViewModel.Layer bottomLayer;
+    private SidedMultiFluidViewModel.Layer topLayer;
+    private SidedMultiFluidViewModel.Layer bottomLayer;
     private FluidInstance<?> fluidAbove;
     private FluidInstance<?> fluidBelow;
     private float position = 0;
     private ConnectablePart xPart;
     private ConnectablePart zPart;
 
-    public MultiFluidViewModel(ElementHolder holder, ConnectablePart xPart, ConnectablePart zPart) {
+    public SidedMultiFluidViewModel(ElementHolder holder, ConnectablePart xPart, ConnectablePart zPart) {
         this.holder = holder;
         this.xPart = xPart;
         this.zPart = zPart;
@@ -77,7 +77,7 @@ public class MultiFluidViewModel {
                 instance.brightness().ifPresent(model::setBrightness);
             }
 
-            layer = new MultiFluidViewModel.Layer(instance, parts);
+            layer = new SidedMultiFluidViewModel.Layer(instance, parts);
             this.fluidLayers.put(instance, layer);
         }
         layer.setup(this.position, amount);
@@ -128,7 +128,7 @@ public class MultiFluidViewModel {
     }
 
     private record Layer(FluidInstance<?> instance, EnumMap<Direction, ItemDisplayElement> parts) {
-        public void update(MultiFluidViewModel model) {
+        public void update(SidedMultiFluidViewModel model) {
             if (model.bottomLayer == this && instance.equals(model.fluidAbove)) {
                 model.removeElement(parts.get(Direction.UP));
             } else {
@@ -173,7 +173,7 @@ public class MultiFluidViewModel {
             }
         }
 
-        public void updateTop(MultiFluidViewModel model) {
+        public void updateTop(SidedMultiFluidViewModel model) {
             if (instance.equals(model.fluidAbove)) {
                 model.removeElement(parts.get(Direction.UP));
             } else {
@@ -181,7 +181,7 @@ public class MultiFluidViewModel {
             }
         }
 
-        public void updateBottom(MultiFluidViewModel model) {
+        public void updateBottom(SidedMultiFluidViewModel model) {
             if (instance.equals(model.fluidBelow)) {
                 model.removeElement(parts.get(Direction.DOWN));
             } else {
@@ -189,7 +189,7 @@ public class MultiFluidViewModel {
             }
         }
 
-        public void destroy(MultiFluidViewModel model) {
+        public void destroy(SidedMultiFluidViewModel model) {
             for (var part : parts.values()) {
                 model.removeElement(part);
             }
@@ -198,7 +198,7 @@ public class MultiFluidViewModel {
         public void setup(float position, float amount) {
             this.parts.get(Direction.DOWN).setTranslation(new Vector3f(0, -8f / 16f + (position) * 15.9f / 16f + 0.001f, 0));
             this.parts.get(Direction.UP).setTranslation(new Vector3f(0, -8f / 16f + (position + amount) * 15.9f / 16f + 0.001f, 0));
-            var side = FactoryModels.FLUID_FLAT_SCALED[MultiFluidViewModel.textureId(amount)].get(instance);
+            var side = FactoryModels.FLUID_FLAT_SCALED[SidedMultiFluidViewModel.textureId(amount)].get(instance);
             for (var dir : FactoryUtil.HORIZONTAL_DIRECTIONS) {
                 var part = this.parts.get(dir);
                 part.setTranslation(new Vector3f(0, 0.49f, -(-8f / 16f + (position + amount / 2) * 15.9f / 16f + 0.001f)));

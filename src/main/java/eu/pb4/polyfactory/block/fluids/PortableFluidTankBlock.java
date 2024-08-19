@@ -2,14 +2,13 @@ package eu.pb4.polyfactory.block.fluids;
 
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import eu.pb4.polyfactory.block.property.ConnectablePart;
-import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.fluid.FluidContainer;
-import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.models.FactoryModels;
-import eu.pb4.polyfactory.models.fluid.MultiFluidViewModel;
+import eu.pb4.polyfactory.models.fluid.SimpleMultiFluidViewModel;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -22,11 +21,11 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -35,11 +34,14 @@ import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
+import static eu.pb4.polyfactory.ModInit.id;
+
 public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeConnectable, BlockEntityProvider, BarrierBasedWaterloggable {
     public static final DirectionProperty FACING = Properties.FACING;
     public PortableFluidTankBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
+        PortableFluidTankBlock.Model.BASE_MODEL.isEmpty();
     }
 
     @Override
@@ -98,10 +100,13 @@ public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeC
     }
 
     public static final class Model extends BlockModel {
+        public static final ItemStack BASE_MODEL = BaseItemProvider.requestModel(FactoryUtil.requestTransparentItem(), id("block/portable_fluid_tank"));
+        public static final ItemStack WATERLOGGED_MODEL = BaseItemProvider.requestModel(FactoryUtil.requestTransparentItem(), id("block/portable_fluid_tank_waterlogged"));
         private final ItemDisplayElement main;
+        private final SimpleMultiFluidViewModel fluid = new SimpleMultiFluidViewModel(this, FactoryModels.FLUID_PORTABLE_FLUID_TANK_VERTICAL, 16);
 
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.main = ItemDisplayElementUtil.createSimple(state.get(WATERLOGGED) ? WATERLOGGED_MODEL : BASE_MODEL);
             this.main.setScale(new Vector3f(2f));
             updateStatePos(state);
             this.addElement(this.main);
@@ -119,15 +124,27 @@ public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeC
                 p = 180;
             }
 
+            if (dir.getAxis() == Direction.Axis.Y) {
+                this.fluid.setRotation(0, 0);
+                this.fluid.setModels(FactoryModels.FLUID_PORTABLE_FLUID_TANK_VERTICAL, 16);
+            } else {
+                this.fluid.setRotation(0, dir.getAxis() == Direction.Axis.Z ? 90f : 0);
+                this.fluid.setModels(FactoryModels.FLUID_PORTABLE_FLUID_TANK_HORIZONTAL, 12);
+            }
 
             this.main.setYaw(y);
             this.main.setPitch(p);
+        }
+
+        public void setFluid(FluidContainer container) {
+            this.fluid.setFluids(container::provideRender, container::doesNotContain);
         }
 
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             super.notifyUpdate(updateType);
             if (updateType == BlockAwareAttachment.BLOCK_STATE_UPDATE) {
+                this.main.setItem(this.blockState().get(WATERLOGGED) ? WATERLOGGED_MODEL : BASE_MODEL);
                 updateStatePos(this.blockState());
             }
         }

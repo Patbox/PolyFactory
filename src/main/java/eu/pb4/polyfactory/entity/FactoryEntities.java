@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.entity;
 
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.entity.splash.LavaSplashEntity;
+import eu.pb4.polyfactory.entity.splash.PotionSplashEntity;
 import eu.pb4.polyfactory.entity.splash.WaterSplashEntity;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -18,11 +19,13 @@ public class FactoryEntities {
             .dimensions(0.25f, 0.25f));
 
     public static final EntityType<WaterSplashEntity> WATER_SPLASH = register("water_splash",
-            EntityType.Builder.create(WaterSplashEntity::new, SpawnGroup.MISC).dimensions(0.25f, 0.25f).maxTrackingRange(16).trackingTickInterval(4));
+            EntityType.Builder.create(WaterSplashEntity::new, SpawnGroup.MISC).dimensions(0.25f, 0.25f).maxTrackingRange(8).trackingTickInterval(4));
+    //private static final ParticleEffect PARTICLE = EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, WATER_COLOR);
 
     public static final EntityType<LavaSplashEntity> LAVA_SPLASH = register("lava_splash",
-            EntityType.Builder.create(LavaSplashEntity::new, SpawnGroup.MISC).dimensions(0.25f, 0.25f).maxTrackingRange(16).trackingTickInterval(1));
-
+            EntityType.Builder.create(LavaSplashEntity::new, SpawnGroup.MISC).dimensions(0.25f, 0.25f).maxTrackingRange(8).trackingTickInterval(4));
+    public static final EntityType<PotionSplashEntity> POTION_SPLASH = register("potion_splash",
+            EntityType.Builder.create(PotionSplashEntity::new, SpawnGroup.MISC).dimensions(0.25f, 0.25f).maxTrackingRange(8).trackingTickInterval(4));
     public static void register() {
 
     }

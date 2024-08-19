@@ -8,7 +8,7 @@ import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.models.FactoryModels;
-import eu.pb4.polyfactory.models.fluid.MultiFluidViewModel;
+import eu.pb4.polyfactory.models.fluid.SidedMultiFluidViewModel;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -130,13 +130,13 @@ public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectab
 
     public static final class Model extends BlockModel {
         private final ItemDisplayElement main;
-        private final MultiFluidViewModel fluid;
+        private final SidedMultiFluidViewModel fluid;
 
         private Model(BlockState state) {
             this.main = ItemDisplayElementUtil.createSimple(FactoryModels.BLOCK_FLUID_TANK.get(state));
             this.main.setScale(new Vector3f(2f));
             this.main.setYaw(180);
-            this.fluid = new MultiFluidViewModel(this, state.get(PART_X), state.get(PART_Z));
+            this.fluid = new SidedMultiFluidViewModel(this, state.get(PART_X), state.get(PART_Z));
             this.addElement(this.main);
         }
 

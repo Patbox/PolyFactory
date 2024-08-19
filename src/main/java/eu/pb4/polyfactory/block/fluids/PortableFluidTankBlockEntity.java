@@ -1,12 +1,15 @@
 package eu.pb4.polyfactory.block.fluids;
 
+import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
+import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -19,12 +22,15 @@ import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
 
-public class PortableFluidTankBlockEntity extends BlockEntity implements FluidInputOutput.ContainerBased {
+public class PortableFluidTankBlockEntity extends BlockEntity implements FluidInputOutput.ContainerBased, BlockEntityExtraListener {
     public static final long CAPACITY = FluidConstants.BLOCK * 4;
     private final FluidContainerImpl container = new FluidContainerImpl(CAPACITY, this::onFluidChanged);
     private float blockTemperature = 0;
+    @Nullable
+    private PortableFluidTankBlock.Model model;
 
     public PortableFluidTankBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.PORTABLE_FLUID_TANK, pos, state);
@@ -44,6 +50,9 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
         this.container.fromNbt(registryLookup, nbt, "fluid");
+        if (this.model != null) {
+            this.model.setFluid(this.container);
+        }
     }
     @Override
     protected void readComponents(ComponentsAccess components) {
@@ -78,7 +87,11 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
 
     private void onFluidChanged() {
         this.markDirty();
+        if (this.model != null) {
+            this.model.setFluid(this.container);
+        }
     }
+
     public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
         if (!(t instanceof PortableFluidTankBlockEntity tank)) {
             return;
@@ -89,5 +102,14 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
 
     private void dropItem(ItemStack stack) {
         ItemScatterer.spawn(world, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, stack);
+    }
+
+    @Override
+    public void onListenerUpdate(WorldChunk chunk) {
+        var x = BlockAwareAttachment.get(chunk, pos);
+        if (x != null && x.holder() instanceof PortableFluidTankBlock.Model model) {
+            this.model = model;
+            this.model.setFluid(this.container);
+        }
     }
 }

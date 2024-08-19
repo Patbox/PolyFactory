@@ -1,6 +1,6 @@
 {
   "itemgroup.polyfactory": "PolyFactory",
-  "itemgroup.polyfactory.color": "PolyFactory: Colored Variants",
+  "itemgroup.polyfactory.variants": "PolyFactory: Variants",
   "itemgroup.polyfactory.experimental": "PolyFactory: Experimental",
   "block.polyfactory.conveyor": "Item Conveyor",
   "block.polyfactory.sticky_conveyor": "Sticky Item Conveyor",
@@ -68,6 +68,8 @@
   "block.polyfactory.creative_drain": "Creative Fluid Drain",
   "block.polyfactory.fluid_tank": "Fluid Tank",
   "block.polyfactory.portable_fluid_tank": "Portable Fluid Tank",
+  "block.polyfactory.portable_fluid_tank.empty": "Empty Portable Fluid Tank",
+  "block.polyfactory.portable_fluid_tank.typed": "Portable Fluid Tank (%s)",
 
   "item.polyfactory.mod_icon": "Mod Icon",
   "item.polyfactory.windmill_sail": "Windmill Sail",
@@ -207,6 +209,7 @@
   "fluid_type.minecraft.potion.strong": "Strong %s",
 
   "entity.polyfactory.dynamite": "Dynamite",
+  "entity.polyfactory.splash": "Splash of %s",
 
   "enchantment.polyfactory.ignore_movement": "Stable Ground",
   "recipe_type.polyfactory.press": "Press",

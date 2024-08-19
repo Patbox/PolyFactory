@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.fluid;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.FactoryRegistries;
+import eu.pb4.polyfactory.fluid.shooting.FluidShootingBehavior;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.entity.decoration.Brightness;
@@ -126,5 +127,9 @@ public record FluidInstance<T>(FluidType<T> type, T data) {
 
     public boolean isIn(TagKey<FluidType<?>> tag) {
         return FactoryRegistries.FLUID_TYPES.getEntry(this.type).isIn(tag);
+    }
+
+    public FluidShootingBehavior<T> shootingBehavior() {
+        return this.type.shootingBehavior();
     }
 }

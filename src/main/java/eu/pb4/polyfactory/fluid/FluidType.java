@@ -2,6 +2,8 @@ package eu.pb4.polyfactory.fluid;
 
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.FactoryRegistries;
+import eu.pb4.polyfactory.fluid.shooting.FluidShootingBehavior;
+import eu.pb4.polyfactory.fluid.shooting.NoOpFluidShootingBehavior;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.ModelRenderType;
@@ -35,7 +37,8 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
                            Function<FluidInstance<T>, ParticleEffect> particleGetter,
                            MaxFlowProvider<T> maxFlow,
                            FlowSpeedProvider<T> flowSpeedMultiplier,
-                           Optional<Brightness> brightness
+                           Optional<Brightness> brightness,
+                           FluidShootingBehavior<T> shootingBehavior
 ) {
 
     private static final Map<Fluid, FluidType<?>> FLUID_TO_TYPE = new IdentityHashMap<>();
@@ -152,6 +155,7 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         private Function<FluidInstance<T>, ParticleEffect> particleGetter = (x) -> new ItemStackParticleEffect(ParticleTypes.ITEM, FactoryModels.FLUID_FLAT_FULL.get(x));
         private MaxFlowProvider<T> maxFlow = (w, x) -> FluidConstants.BOTTLE;
         private FlowSpeedProvider<T> flowSpeedMultiplier = (w, x) -> 1;
+        private FluidShootingBehavior<T> shootingBehavior = new NoOpFluidShootingBehavior<>();
 
         private Builder(Codec<T> dataCodec, T defaultData) {
             this.dataCodec = dataCodec;
@@ -240,9 +244,14 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
             return this;
         }
 
+        public Builder<T> shootingBehavior(FluidShootingBehavior<T> behavior) {
+            this.shootingBehavior = behavior;
+            return this;
+        }
+
         public FluidType<T> build() {
             return new FluidType<>(this.density, this.heat, this.dataCodec, this.defaultData, this.fluid, this.texture, this.modelRenderType,
-                    this.color, this.name, this.particleGetter, this.maxFlow, this.flowSpeedMultiplier, this.brightness);
+                    this.color, this.name, this.particleGetter, this.maxFlow, this.flowSpeedMultiplier, this.brightness, this.shootingBehavior);
         }
     }
 }

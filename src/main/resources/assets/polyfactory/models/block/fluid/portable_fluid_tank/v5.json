@@ -1,0 +1,22 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"texture": "polyfactory:block/fluids/tank/portable_side_placeholder"
+	},
+	"elements": [
+		{
+			"from": [2.025, 0.005, 2.025],
+			"to": [13.975, 15.995, 13.975],
+			"rotation": {"angle": 0, "axis": "y", "origin": [2, 1, 2]},
+			"faces": {
+				"north": {"uv": [0, 0, 12, 5], "texture": "#texture", "tintindex": 0},
+				"east": {"uv": [0, 0, 12, 5], "texture": "#texture", "tintindex": 0},
+				"south": {"uv": [0, 0, 12, 5], "texture": "#texture", "tintindex": 0},
+				"west": {"uv": [0, 0, 12, 5], "texture": "#texture", "tintindex": 0},
+				"up": {"uv": [0, 0, 12, 12], "texture": "#texture", "tintindex": 0},
+				"down": {"uv": [0, 0, 12, 12], "texture": "#texture", "tintindex": 0}
+			}
+		}
+	],
+	"display": {}
+}

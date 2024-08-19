@@ -51,7 +51,7 @@ public class WaterSplashEntity extends SplashEntity<Unit> {
 
             if (entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
                 if (livingEntity.hurtByWater()) {
-                    livingEntity.damage(this.getDamageSources().indirectMagic(this, this.getOwner()), 0.6F);
+                    livingEntity.damage(this.getDamageSources().indirectMagic(this, this.getOwner()), 1F);
                 }
 
                 if (livingEntity.isOnFire() && livingEntity.isAlive()) {

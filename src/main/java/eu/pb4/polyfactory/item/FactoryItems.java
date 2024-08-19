@@ -5,10 +5,12 @@ import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.factorytools.api.item.MultiBlockItem;
 import eu.pb4.factorytools.api.block.MultiBlock;
+import eu.pb4.polyfactory.FactoryRegistries;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.block.fluids.PortableFluidTankBlock;
 import eu.pb4.polyfactory.block.fluids.PortableFluidTankBlockEntity;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.item.block.*;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.item.debug.BaseDebugItem;
@@ -27,15 +29,13 @@ import net.minecraft.block.Block;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.component.type.FoodComponent;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Rarity;
+import net.minecraft.util.*;
 
 import java.util.function.Consumer;
 
@@ -272,9 +272,9 @@ public class FactoryItems {
                 })).build()
         );
 
-        PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(ModInit.ID, "color"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
+        PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(ModInit.ID, "variants"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
                 .icon(() -> ColoredItem.stack(CABLE, 1, DyeColor.RED))
-                .displayName(Text.translatable("itemgroup." + ModInit.ID + ".color"))
+                .displayName(Text.translatable("itemgroup." + ModInit.ID + ".variants"))
                 .entries(((context, entries) -> {
 
                     for (var dye : DyeColor.values()) {
@@ -300,11 +300,26 @@ public class FactoryItems {
                         entries.add(ColoredItem.stack(INVERTED_CAGED_LAMP, 1, DyeColorExtra.getColor(dye)));
                     }
 
+                    for (var fluid : FactoryRegistries.FLUID_TYPES) {
+                        if (fluid.defaultData() == Unit.INSTANCE) {
+                            var stack = PORTABLE_FLUID_TANK.getDefaultStack();
+                            stack.apply(FactoryDataComponents.FLUID, FluidComponent.DEFAULT, x -> x.with(fluid.defaultInstance(), x.capacity()));
+                            entries.add(stack);
+                        }
+                    }
+
+                    for (var potion : Registries.POTION.getIndexedEntries()) {
+                        var stack = PORTABLE_FLUID_TANK.getDefaultStack();
+                        stack.apply(FactoryDataComponents.FLUID, FluidComponent.DEFAULT, x -> x.with(FactoryFluids.POTION.toInstance(PotionContentsComponent.DEFAULT.with(potion)), x.capacity()));
+                        entries.add(stack);
+                    }
+
                     for (var dye : DyeColor.values()) {
                         var x = ColoredItem.stack(SPRAY_CAN, 1, DyeColorExtra.getColor(dye));
                         x.set(FactoryDataComponents.USES_LEFT, 128);
                         entries.add(x);
                     }
+
                 })).build()
         );
 
