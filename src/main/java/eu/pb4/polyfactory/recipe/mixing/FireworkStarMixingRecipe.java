@@ -28,7 +28,7 @@ public record FireworkStarMixingRecipe(double time,
     );
 
     @Override
-    public Iterable<ItemStack> remainders() {
+    public Iterable<ItemStack> remainders(MixingInput input) {
         return Collections.emptyList();
     }
 
@@ -46,12 +46,12 @@ public record FireworkStarMixingRecipe(double time,
     }
 
     @Override
-    public float minimumTemperature() {
+    public float minimumTemperature(MixingInput input) {
         return 0;
     }
 
     @Override
-    public float maxTemperature() {
+    public float maxTemperature(MixingInput input) {
         return 0.3f;
     }
 
@@ -81,5 +81,20 @@ public record FireworkStarMixingRecipe(double time,
     @Override
     public RecipeSerializer<?> getSerializer() {
         return FactoryRecipeSerializers.MIXING_FIREWORK;
+    }
+
+    @Override
+    public double optimalSpeed(MixingInput input) {
+        return this.optimalSpeed;
+    }
+
+    @Override
+    public double minimumSpeed(MixingInput input) {
+        return this.minimumSpeed;
+    }
+
+    @Override
+    public double time(MixingInput input) {
+        return this.time;
     }
 }

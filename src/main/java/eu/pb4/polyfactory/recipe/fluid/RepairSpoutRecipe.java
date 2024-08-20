@@ -72,6 +72,6 @@ public record RepairSpoutRecipe() implements SpoutRecipe {
     public double time(SpoutInput input) {
         var stack = input.stack().copy();
         int i = EnchantmentHelper.getRepairWithXp(input.world(), stack, (int) (input.getFluid(FactoryFluids.EXPERIENCE.defaultInstance()) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID));
-        return Math.min(i, stack.getDamage()) * 50;
+        return Math.min(i, stack.getDamage()) / 10f;
     }
 }

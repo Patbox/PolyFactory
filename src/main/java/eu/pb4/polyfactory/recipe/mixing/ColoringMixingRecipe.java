@@ -15,7 +15,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.registry.Registries;
 import net.minecraft.world.World;
 
@@ -105,7 +104,7 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
     }
 
     @Override
-    public Iterable<ItemStack> remainders() {
+    public Iterable<ItemStack> remainders(MixingInput input) {
         return List.of();
     }
 
@@ -129,5 +128,30 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
                 inventory.setStack(i, ItemStack.EMPTY);
             }
         }
+    }
+
+    @Override
+    public double optimalSpeed(MixingInput input) {
+        return this.optimalSpeed;
+    }
+
+    @Override
+    public double minimumSpeed(MixingInput input) {
+        return this.minimumSpeed;
+    }
+
+    @Override
+    public float minimumTemperature(MixingInput input) {
+        return this.minimumTemperature;
+    }
+
+    @Override
+    public float maxTemperature(MixingInput input) {
+        return this.maxTemperature;
+    }
+
+    @Override
+    public double time(MixingInput input) {
+        return this.time;
     }
 }

@@ -20,6 +20,7 @@ import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.recipe.fluid.SimpleDrainRecipe;
 import eu.pb4.polyfactory.recipe.fluid.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
+import eu.pb4.polyfactory.recipe.mixing.BrewingMixingRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
@@ -55,7 +56,8 @@ public class PolydexCompatImpl {
 
     public static void register() {
         PolydexPage.registerRecipeViewer(GenericPressRecipe.class, PressRecipePage::new);
-        PolydexPage.registerRecipeViewer(GenericMixingRecipe.class, MixerRecipePage::new);
+        PolydexPage.registerRecipeViewer(GenericMixingRecipe.class, GenericMixerRecipePage::new);
+        PolydexPage.registerRecipeViewer(BrewingMixingRecipe.class, BrewingMixerRecipePage::new);
         PolydexPage.registerRecipeViewer(GrindingRecipe.class, GrindingRecipePage::new);
         PolydexPage.registerRecipeViewer(ColoringCraftingRecipe.class, ColoringCraftingRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleSpoutRecipe.class, SimpleSpoutRecipePage::new);

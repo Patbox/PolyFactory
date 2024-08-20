@@ -3,16 +3,15 @@ package eu.pb4.polyfactory.datagen;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
+import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.mixin.BrewingRecipeRegistryAccessor;
 import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.polyfactory.recipe.fluid.*;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
-import eu.pb4.polyfactory.recipe.mixing.ArtificialDyeMixingRecipe;
-import eu.pb4.polyfactory.recipe.mixing.ColoringMixingRecipe;
-import eu.pb4.polyfactory.recipe.mixing.FireworkStarMixingRecipe;
-import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
+import eu.pb4.polyfactory.recipe.mixing.*;
 import eu.pb4.polyfactory.recipe.press.FillSprayCanPressRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
@@ -29,19 +28,25 @@ import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
 import net.minecraft.item.*;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.Potions;
+import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
+import net.minecraft.resource.featuretoggle.FeatureSet;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
@@ -670,11 +675,9 @@ class RecipesProvider extends FabricRecipeProvider {
 
 
         for (var entry : HoneycombItem.UNWAXED_TO_WAXED_BLOCKS.get().entrySet()) {
-            var id1 = Registries.BLOCK.getId(entry.getKey());
-            var id2 = Registries.BLOCK.getId(entry.getValue());
-
+            //noinspection deprecation
             of(exporter,
-                    GenericPressRecipe.of(id1.toUnderscoreSeparatedString() + "_to_" + id2.toUnderscoreSeparatedString(),
+                    GenericPressRecipe.of(getShortString(entry.getKey().getRegistryEntry()) + "_to_" + getShortString(entry.getValue().getRegistryEntry()),
                             Ingredient.ofItems(entry.getKey()), 1, 2f, new ItemStack(entry.getValue(), 1)));
         }
 
@@ -940,6 +943,26 @@ class RecipesProvider extends FabricRecipeProvider {
                         1, 6, 18f, 0f, Items.MUD.getDefaultStack(), List.of())
         );
 
+        for (var recipe : ((BrewingRecipeRegistryAccessor) BrewingRecipeRegistry.create(FeatureSet.of(FeatureFlags.VANILLA))).getPotionRecipes()) {
+            var from = FactoryFluids.getPotion(recipe.from());
+            var to = FactoryFluids.getPotion(recipe.to());
+            var b = new StringBuilder("mixing/brewing/");
+            b.append(getShortString(recipe.from()));
+            b.append("_with_");
+            for (var stack : recipe.ingredient().getMatchingStacks()) {
+                //noinspection deprecation
+                b.append(getShortString(stack.getItem().getRegistryEntry()));
+                b.append("_");
+            }
+            b.append("to_");
+            b.append(getShortString(recipe.to()));
+            exporter.accept(
+                    id(b.toString()),
+                    new BrewingMixingRecipe(getShortString(recipe.to()).replace("long_", "").replace("strong_", ""), recipe.ingredient(), from, to, FluidConstants.BOTTLE, FluidConstants.BOTTLE * 6,
+                            20, 15, 30, 0.7f, 2f), null
+            );
+        }
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.STEEL_GEAR, 3)
                 .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .pattern(" i ")
@@ -978,39 +1001,47 @@ class RecipesProvider extends FabricRecipeProvider {
 
         exporter.accept(id("crafting/prt_key_setter"), new PRTKeySetterCraftingRecipe(CraftingRecipeCategory.MISC), null);
 
-        exporter.accept(id("drain/from_lava_bucket"), SimpleDrainRecipe.fromItem(Items.LAVA_BUCKET, FactoryFluids.LAVA.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY_LAVA), null);
-        exporter.accept(id("drain/to_lava_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.LAVA.ofBucket(), Items.LAVA_BUCKET, SoundEvents.ITEM_BUCKET_FILL_LAVA), null);
-        exporter.accept(id("drain/from_water_bucket"), SimpleDrainRecipe.fromItem(Items.WATER_BUCKET, FactoryFluids.WATER.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY), null);
-        exporter.accept(id("drain/to_water_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.WATER.ofBucket(), Items.WATER_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
-        exporter.accept(id("drain/from_milk_bucket"), SimpleDrainRecipe.fromItem(Items.MILK_BUCKET, FactoryFluids.MILK.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY), null);
-        exporter.accept(id("drain/to_milk_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.MILK.ofBucket(), Items.MILK_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
-        exporter.accept(id("drain/from_experience_bucket"), SimpleDrainRecipe.fromItem(FactoryItems.EXPERIENCE_BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), Items.BUCKET, SoundEvents.ITEM_BUCKET_EMPTY), null);
-        exporter.accept(id("drain/to_experience_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), FactoryItems.EXPERIENCE_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
-        exporter.accept(id("drain/from_honey_bucket"), SimpleDrainRecipe.fromItem(FactoryItems.HONEY_BUCKET, FactoryFluids.HONEY.ofBucket(), Items.BUCKET, FactorySoundEvents.ITEM_BUCKET_EMPTY_HONEY), null);
-        exporter.accept(id("drain/to_honey_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.HONEY.ofBucket(), FactoryItems.HONEY_BUCKET, FactorySoundEvents.ITEM_BUCKET_FILL_HONEY), null);
-        exporter.accept(id("drain/from_honey_bottle"), SimpleDrainRecipe.fromItem(Items.HONEY_BOTTLE, FactoryFluids.HONEY.of(FluidConstants.BUCKET / 4), Items.GLASS_BOTTLE, SoundEvents.ITEM_BOTTLE_EMPTY), null);
-        exporter.accept(id("drain/to_honey_bottle"), SimpleDrainRecipe.toItem(Items.GLASS_BOTTLE, FactoryFluids.HONEY.of(FluidConstants.BUCKET / 4), Items.HONEY_BOTTLE, SoundEvents.ITEM_BOTTLE_FILL), null);
-        exporter.accept(id("drain/from_slime_bucket"), SimpleDrainRecipe.fromItem(FactoryItems.SLIME_BUCKET, FactoryFluids.SLIME.ofBucket(), Items.BUCKET, FactorySoundEvents.ITEM_BUCKET_EMPTY_SLIME), null);
-        exporter.accept(id("drain/to_slime_bucket"), SimpleDrainRecipe.toItem(Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactoryItems.SLIME_BUCKET, FactorySoundEvents.ITEM_BUCKET_FILL_SLIME), null);
 
-        exporter.accept(id("drain/from_potion"), PotionAddDrainRecipe.of(Items.POTION,  FluidConstants.BOTTLE, Items.GLASS_BOTTLE, SoundEvents.ITEM_BOTTLE_EMPTY), null);
-        exporter.accept(id("drain/to_potion"), PotionRemoveDrainRecipe.of(Items.GLASS_BOTTLE, FluidConstants.BOTTLE, Items.POTION, SoundEvents.ITEM_BOTTLE_FILL), null);
+        fluidBase(exporter, Items.LAVA_BUCKET, Items.BUCKET, FactoryFluids.LAVA.ofBucket(), SoundEvents.ITEM_BUCKET_FILL_LAVA, SoundEvents.ITEM_BUCKET_EMPTY_LAVA);
+        fluidBase(exporter, Items.WATER_BUCKET, Items.BUCKET, FactoryFluids.WATER.ofBucket(), SoundEvents.ITEM_BUCKET_FILL, SoundEvents.ITEM_BUCKET_EMPTY);
+        fluidBase(exporter, Items.MILK_BUCKET, Items.BUCKET, FactoryFluids.MILK.ofBucket(), SoundEvents.ITEM_BUCKET_FILL, SoundEvents.ITEM_BUCKET_EMPTY);
+        fluidBase(exporter, Items.POWDER_SNOW_BUCKET, Items.BUCKET, FactoryFluids.SNOW.ofBucket(), SoundEvents.ITEM_BUCKET_FILL_POWDER_SNOW, SoundEvents.ITEM_BUCKET_EMPTY_POWDER_SNOW);
+        fluidBase(exporter, FactoryItems.HONEY_BUCKET, Items.BUCKET, FactoryFluids.HONEY.ofBucket(), FactorySoundEvents.ITEM_BUCKET_FILL_HONEY, FactorySoundEvents.ITEM_BUCKET_EMPTY_HONEY);
+        fluidBase(exporter, Items.HONEY_BOTTLE, Items.GLASS_BOTTLE, FactoryFluids.HONEY.ofBottle(), SoundEvents.ITEM_BOTTLE_FILL, SoundEvents.ITEM_BOTTLE_EMPTY);
+        fluidBase(exporter, FactoryItems.SLIME_BUCKET, Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactorySoundEvents.ITEM_BUCKET_FILL_SLIME, FactorySoundEvents.ITEM_BUCKET_EMPTY_SLIME);
+        fluidBase(exporter, FactoryItems.EXPERIENCE_BUCKET, Items.BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), SoundEvents.ITEM_BUCKET_FILL, SoundEvents.ITEM_BUCKET_EMPTY);
 
-        exporter.accept(id("spout/to_lava_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.LAVA.ofBucket(), Items.LAVA_BUCKET, SoundEvents.ITEM_BUCKET_FILL_LAVA), null);
-        exporter.accept(id("spout/to_water_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.WATER.ofBucket(), Items.WATER_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
-        exporter.accept(id("spout/to_milk_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.MILK.ofBucket(), Items.MILK_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
-        exporter.accept(id("spout/to_experience_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), FactoryItems.EXPERIENCE_BUCKET, SoundEvents.ITEM_BUCKET_FILL), null);
-        exporter.accept(id("spout/to_honey_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.HONEY.ofBucket(), FactoryItems.HONEY_BUCKET, FactorySoundEvents.ITEM_BUCKET_FILL_HONEY), null);
-        exporter.accept(id("spout/to_honey_bottle"), SimpleSpoutRecipe.toItem(Items.GLASS_BOTTLE, FactoryFluids.HONEY.of(FluidConstants.BUCKET / 4),
-                Items.HONEY_BOTTLE, SoundEvents.ITEM_BOTTLE_FILL), null);
-        exporter.accept(id("spout/to_slime_bucket"), SimpleSpoutRecipe.toItem(Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactoryItems.SLIME_BUCKET, FactorySoundEvents.ITEM_BUCKET_FILL_SLIME), null);
-        exporter.accept(id("spout/to_potion"), PotionSpoutRecipe.of(Items.GLASS_BOTTLE, FluidConstants.BOTTLE, Items.POTION, SoundEvents.ITEM_BOTTLE_FILL), null);
+        fluidBasePotion(exporter, Items.POTION, Items.GLASS_BOTTLE, FluidConstants.BOTTLE, SoundEvents.ITEM_BOTTLE_FILL, SoundEvents.ITEM_BOTTLE_EMPTY);
+
         exporter.accept(id("spout/experience_repair"), new RepairSpoutRecipe(), null);
-
         exporter.accept(id("spout/sticky_piston"), SimpleSpoutRecipe.toItem(Items.PISTON, FactoryFluids.SLIME.of(FluidConstants.BLOCK / 10), Items.STICKY_PISTON, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
         exporter.accept(id("spout/sticky_conveyor"), SimpleSpoutRecipe.toItem(FactoryItems.CONVEYOR, FactoryFluids.SLIME.of(FluidConstants.BLOCK / 10), FactoryItems.STICKY_CONVEYOR, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
-
     }
+
+    private void fluidBase(RecipeExporter exporter, Item withFluid, Item emptyContainer, FluidStack<?> fluid, SoundEvent fillSound, SoundEvent emptySound) {
+        var base = Registries.ITEM.getId(withFluid).getPath();
+
+        exporter.accept(id("drain/from_" + base), SimpleDrainRecipe.fromItem(withFluid, fluid, emptyContainer, emptySound), null);
+        exporter.accept(id("drain/to_" + base), SimpleDrainRecipe.toItem(emptyContainer, fluid, withFluid, fillSound), null);
+        exporter.accept(id("spout/to_" + base), SimpleSpoutRecipe.toItem(emptyContainer, fluid, withFluid, fillSound), null);
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private void fluidBasePotion(RecipeExporter exporter, Item withFluid, Item emptyContainer, long fluid, SoundEvent fillSound, SoundEvent emptySound) {
+        var base = Registries.ITEM.getId(withFluid).getPath();
+
+        exporter.accept(id("drain/from_" + base), PotionAddDrainRecipe.of(withFluid,  fluid, emptyContainer, emptySound), null);
+        exporter.accept(id("drain/to_" + base), PotionRemoveDrainRecipe.of(emptyContainer, fluid, withFluid, fillSound), null);
+        exporter.accept(id("spout/to_" + base), PotionSpoutRecipe.of(emptyContainer, fluid, withFluid, fillSound), null);
+    }
+
+    private String getShortString(RegistryEntry<?> entry) {
+        //noinspection OptionalGetWithoutIsPresent
+        var key = entry.getKey().get().getValue();
+
+        return key.getNamespace().equals(Identifier.DEFAULT_NAMESPACE) ? key.getPath().replace("/", "_") : key.toUnderscoreSeparatedString();
+    }
+
 
     public void of(RecipeExporter exporter, RecipeEntry<?>... recipes) {
         for (var recipe : recipes) {

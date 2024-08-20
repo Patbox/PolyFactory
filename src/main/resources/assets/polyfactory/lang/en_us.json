@@ -204,6 +204,7 @@
   "fluid_type.minecraft.milk": "Milk",
   "fluid_type.minecraft.honey": "Honey",
   "fluid_type.minecraft.slime": "Slime",
+  "fluid_type.minecraft.snow": "Snow",
   "fluid_type.minecraft.potion": "Potion",
   "fluid_type.minecraft.potion.long": "Long %s",
   "fluid_type.minecraft.potion.strong": "Strong %s",

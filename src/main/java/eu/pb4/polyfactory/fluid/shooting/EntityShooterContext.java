@@ -26,7 +26,7 @@ public record EntityShooterContext(LivingEntity entity) implements ShooterContex
 
     @Override
     public Vec3d position() {
-        return entity.getEyePos().subtract(0, -0.1, 0).add(rotation().multiply(0.5));
+        return entity.getEyePos().subtract(0, 0.1, 0).add(rotation().multiply(0.5));
     }
 
     @Override

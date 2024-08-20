@@ -194,7 +194,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             return;
         }
 
-        var input = new MixingInput(self.stacks, self.fluidContainer.asMap());
+        var input = new MixingInput(self.stacks, self.fluidContainer.asMap(), self.fluidContainer.stored(), self.fluidContainer.capacity(), world);
 
         if (self.inventoryChanged && (self.currentRecipe == null || !self.currentRecipe.value().matches(input, world))) {
             self.process = 0;
@@ -213,9 +213,9 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         self.inventoryChanged = false;
 
 
-        if (self.temperature < self.currentRecipe.value().minimumTemperature() || self.temperature > self.currentRecipe.value().maxTemperature()) {
+        if (self.temperature < self.currentRecipe.value().minimumTemperature(input) || self.temperature > self.currentRecipe.value().maxTemperature(input)) {
             self.active = false;
-            self.state = self.temperature < self.currentRecipe.value().minimumTemperature() ? TOO_COLD_TEXT : TOO_HOT_TEXT;
+            self.state = self.temperature < self.currentRecipe.value().minimumTemperature(input) ? TOO_COLD_TEXT : TOO_HOT_TEXT;
             self.model.setActive(false);
             self.model.tick();
             return;
@@ -228,11 +228,12 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         self.model.rotate((float) fullSpeed);
         self.model.tick();
 
-        if (self.process >= self.currentRecipe.value().time()) {
+        if (self.process >= self.currentRecipe.value().time(input)) {
             var output = self.currentRecipe.value().craft(input, world.getRegistryManager());
+            var outFluid = self.currentRecipe.value().fluidOutput(input);
 
             var emptyFluids = self.fluidContainer.empty();
-            for (var f : self.currentRecipe.value().fluidOutput()) {
+            for (var f : outFluid) {
                 emptyFluids -= f.amount();
             }
             if (emptyFluids < 0) {
@@ -243,7 +244,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             {
                 var items = new ArrayList<ItemStack>();
                 items.add(output.copy());
-                for (var x : self.currentRecipe.value().remainders()) {
+                for (var x : self.currentRecipe.value().remainders(input)) {
                     items.add(x.copy());
                 }
 
@@ -261,6 +262,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
                     }
                 }
             }
+
             self.currentRecipe.value().applyRecipeUse(self, world);
             self.process = 0;
 
@@ -270,17 +272,17 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             }
 
             FactoryUtil.insertBetween(self, OUTPUT_FIRST, self.size(), output);
-            for (var x : self.currentRecipe.value().remainders()) {
+            for (var x : self.currentRecipe.value().remainders(input)) {
                 FactoryUtil.insertBetween(self, OUTPUT_FIRST, self.size(), x);
             }
 
-            for (var f : self.currentRecipe.value().fluidOutput()) {
+            for (var f : outFluid) {
                 self.fluidContainer.insert(f, false);
             }
             self.markDirty();
         } else {
-            var d = Math.max(self.currentRecipe.value().optimalSpeed() - self.currentRecipe.value().minimumSpeed(), 1);
-            var speed = Math.min(Math.max(Math.abs(fullSpeed) - self.currentRecipe.value().minimumSpeed(), 0), d) / d / 20;
+            var d = Math.max(self.currentRecipe.value().optimalSpeed(input) - self.currentRecipe.value().minimumSpeed(input), 1);
+            var speed = Math.min(Math.max(Math.abs(fullSpeed) - self.currentRecipe.value().minimumSpeed(input), 0), d) / d / 20;
             self.speedScale = speed;
             if (speed > 0) {
                 self.process += speed;
@@ -353,10 +355,11 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
 
     public double getStress() {
         if (this.active) {
+            var input = new MixingInput(this.stacks, this.fluidContainer.asMap(), fluidContainer.stored(), fluidContainer.capacity(), world);
             return this.currentRecipe != null ?
-                    MathHelper.clamp(this.currentRecipe.value().optimalSpeed() * 0.6 * this.speedScale,
-                            this.currentRecipe.value().minimumSpeed() * 0.6,
-                            this.currentRecipe.value().optimalSpeed() * 0.6
+                    MathHelper.clamp(this.currentRecipe.value().optimalSpeed(input) * 0.6 * this.speedScale,
+                            this.currentRecipe.value().minimumSpeed(input) * 0.6,
+                            this.currentRecipe.value().optimalSpeed(input) * 0.6
                     ) : 1;
         }
         return 0;
@@ -460,7 +463,8 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
 
         private float progress() {
             return MixerBlockEntity.this.currentRecipe != null
-                    ? (float) MathHelper.clamp(MixerBlockEntity.this.process / MixerBlockEntity.this.currentRecipe.value().time(), 0, 1)
+                    ? (float) MathHelper.clamp(MixerBlockEntity.this.process / MixerBlockEntity.this.currentRecipe.value().time(
+                            new MixingInput(stacks, fluidContainer.asMap(), fluidContainer.stored(), fluidContainer.capacity(), world)), 0, 1)
                     : 0;
         }
 

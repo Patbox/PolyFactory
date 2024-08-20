@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
@@ -13,13 +14,15 @@ import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 public abstract class SplashEntity<T> extends ProjectileEntity implements PolymerEntity {
@@ -96,6 +99,11 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     @Override
     public void tick() {
         super.tick();
+
+        if (this.discardInBlock(this.getBlockStateAtPos())) {
+            this.discard();
+        }
+
         var velocity = this.getVelocity();
         HitResult hitResult = ProjectileUtil.getCollision(this, this::canHitX);
         if (hitResult.getType() != HitResult.Type.MISS) {
@@ -118,6 +126,16 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
         }
         this.setVelocity(this.getVelocity().multiply(0.99));
         this.applyGravity();
+    }
+
+    protected boolean discardInBlock(BlockState state) {
+        if (state.getFluidState().isIn(FluidTags.LAVA)) {
+            ((ServerWorld) this.getWorld()).spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
+                    0, 0, 0, 0, 0);
+            this.playExtinguishSound();
+        }
+
+        return !state.getFluidState().isEmpty();
     }
 
     protected double getParticleSpeed() {
@@ -150,5 +168,15 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     @Override
     public EntityType<?> getPolymerEntityType(ServerPlayerEntity player) {
         return EntityType.ITEM_DISPLAY;
+    }
+
+    @Override
+    protected SoundEvent getSplashSound() {
+        return SoundEvents.INTENTIONALLY_EMPTY;
+    }
+
+    @Override
+    protected SoundEvent getHighSpeedSplashSound() {
+        return SoundEvents.INTENTIONALLY_EMPTY;
     }
 }

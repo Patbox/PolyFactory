@@ -74,7 +74,7 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
                 output, fluidOutput, mixingTime, minimumSpeed, optimalSpeed, minTemperature, 2f));
     }
 
-    public Iterable<ItemStack> remainders() {
+    public Iterable<ItemStack> remainders(MixingInput input) {
         return () -> Iterators.transform(this.input.iterator(), (a) -> a.leftOver().copy());
     }
 
@@ -185,12 +185,11 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
         }
     }
 
-    @Override
     public List<FluidInputStack> fluidInput() {
         if (this.fluidInputs.isPresent()) {
             return this.fluidInputs.get();
         }
-        return MixingRecipe.super.fluidInput();
+        return List.of();
     }
 
     @Override
@@ -213,9 +212,27 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
     }
 
     @Override
-    public RecipeType<?> getType() {
-        return FactoryRecipeTypes.MIXER;
+    public double optimalSpeed(MixingInput input) {
+        return this.optimalSpeed;
     }
 
+    @Override
+    public double minimumSpeed(MixingInput input) {
+        return this.minimumSpeed;
+    }
 
+    @Override
+    public float minimumTemperature(MixingInput input) {
+        return this.minimumTemperature;
+    }
+
+    @Override
+    public float maxTemperature(MixingInput input) {
+        return this.maxTemperature;
+    }
+
+    @Override
+    public double time(MixingInput input) {
+        return this.time;
+    }
 }

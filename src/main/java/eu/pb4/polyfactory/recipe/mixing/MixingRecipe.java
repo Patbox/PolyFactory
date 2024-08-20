@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 import java.util.List;
 
 public interface MixingRecipe extends Recipe<MixingInput>, PolymerRecipe {
-     Iterable<ItemStack> remainders();
+     Iterable<ItemStack> remainders(MixingInput input);
      void applyRecipeUse(MixerBlockEntity inventory, World world);
 
     @Override
@@ -23,16 +23,13 @@ public interface MixingRecipe extends Recipe<MixingInput>, PolymerRecipe {
         return FactoryRecipeTypes.MIXER;
     }
 
-    double optimalSpeed();
-    double minimumSpeed();
-    float minimumTemperature();
-    float maxTemperature();
+    double optimalSpeed(MixingInput input);
+    double minimumSpeed(MixingInput input);
+    float minimumTemperature(MixingInput input);
+    float maxTemperature(MixingInput input);
 
-    double time();
-    default List<FluidInputStack> fluidInput() {
-        return List.of();
-    }
-    default List<FluidStack<?>> fluidOutput() {
+    double time(MixingInput input);
+    default List<FluidStack<?>> fluidOutput(MixingInput input) {
         return List.of();
     }
 

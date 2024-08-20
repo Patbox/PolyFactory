@@ -2,12 +2,11 @@ package eu.pb4.polyfactory.entity;
 
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.entity.splash.LavaSplashEntity;
+import eu.pb4.polyfactory.entity.splash.MilkSplashEntity;
 import eu.pb4.polyfactory.entity.splash.PotionSplashEntity;
 import eu.pb4.polyfactory.entity.splash.WaterSplashEntity;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
@@ -26,6 +25,9 @@ public class FactoryEntities {
             EntityType.Builder.create(LavaSplashEntity::new, SpawnGroup.MISC).dimensions(0.25f, 0.25f).maxTrackingRange(8).trackingTickInterval(4));
     public static final EntityType<PotionSplashEntity> POTION_SPLASH = register("potion_splash",
             EntityType.Builder.create(PotionSplashEntity::new, SpawnGroup.MISC).dimensions(0.25f, 0.25f).maxTrackingRange(8).trackingTickInterval(4));
+    public static final EntityType<MilkSplashEntity> MILK_SPLASH = register("milk_splash",
+            EntityType.Builder.create(MilkSplashEntity::new, SpawnGroup.MISC).dimensions(0.25f, 0.25f).maxTrackingRange(8).trackingTickInterval(4));
+
     public static void register() {
 
     }

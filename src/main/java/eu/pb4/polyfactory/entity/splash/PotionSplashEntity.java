@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.entity.splash;
 import eu.pb4.polyfactory.entity.FactoryEntities;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidInstance;
+import eu.pb4.polyfactory.mixin.StatusEffectInstanceAccessor;
 import net.minecraft.block.AbstractCandleBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CampfireBlock;
@@ -25,6 +26,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
 
@@ -54,11 +56,7 @@ public class PotionSplashEntity extends SplashEntity<PotionContentsComponent> {
         }
         for (var effect : data.getEffects()) {
             this.particles.add(effect.createParticle());
-            if (effect.getEffectType().value().isInstant()) {
-                this.effectInstances.add(effect);
-            } else {
-                this.effectInstances.add(new StatusEffectInstance(effect.getEffectType(), effect.getDuration() / 20, effect.getAmplifier(), effect.isAmbient(), effect.shouldShowParticles(), effect.shouldShowIcon()));
-            }
+            this.effectInstances.add(effect);
         }
     }
 
@@ -68,9 +66,28 @@ public class PotionSplashEntity extends SplashEntity<PotionContentsComponent> {
     }
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (this.random.nextFloat() < 0.4 && (entityHitResult.getEntity() instanceof LivingEntity livingEntity)) {
+        if (this.random.nextFloat() < 0.8 && (entityHitResult.getEntity() instanceof LivingEntity livingEntity)) {
             for (var effect : this.effectInstances) {
-                livingEntity.addStatusEffect(effect, this);
+                if (effect.getEffectType().value().isInstant()) {
+                    effect.getEffectType().value().applyInstantEffect(this, this.getOwner(), livingEntity, effect.getAmplifier(), 0.1);
+                    continue;
+                }
+
+                var current = livingEntity.getStatusEffect(effect.getEffectType());
+                if (current == null) {
+                    var newEffect = new StatusEffectInstance(effect);
+                    ((StatusEffectInstanceAccessor) newEffect).setDuration(effect.getDuration() / 60);
+                    livingEntity.addStatusEffect(newEffect, this);
+                } else if (current.getAmplifier() < effect.getAmplifier()) {
+                    var newEffect = new StatusEffectInstance(effect);
+                    ((StatusEffectInstanceAccessor) newEffect).setDuration(effect.getDuration() / 60);
+                    ((StatusEffectInstanceAccessor) newEffect).setHiddenEffect(current);
+                    livingEntity.setStatusEffect(newEffect, this);
+                } else if (current.getDuration() < effect.getDuration() && current.getAmplifier() == effect.getAmplifier()) {
+                    var newEffect = new StatusEffectInstance(current);
+                    ((StatusEffectInstanceAccessor) newEffect).setDuration(Math.min(effect.getDuration() / 60 + current.getDuration(), effect.getDuration()));
+                    livingEntity.setStatusEffect(newEffect, this);
+                }
             }
         }
         super.onEntityHit(entityHitResult);

@@ -5,10 +5,11 @@ import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.recipe.input.RecipeInput;
+import net.minecraft.world.World;
 
 import java.util.List;
 
-public record MixingInput(List<ItemStack> stacks, Object2LongMap<FluidInstance<?>> fluids) implements RecipeInput {
+public record MixingInput(List<ItemStack> stacks, Object2LongMap<FluidInstance<?>> fluids, long stored, long capacity, World world) implements RecipeInput {
     @Override
     public ItemStack getStackInSlot(int slot) {
         return this.stacks.get(slot);

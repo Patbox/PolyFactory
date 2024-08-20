@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.fluid.shooting.EntityShooterContext;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.models.FactoryModels;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
@@ -81,6 +82,11 @@ public class FluidLauncherItem extends Item implements PolymerItem, RegistryCall
         for (var container : containers) {
             if (fluid.shootingBehavior().canShoot(ctx, fluid, container)) {
                 fluid.shootingBehavior().continueShooting(ctx, fluid, -remainingUseTicks, container);
+                var vec = ctx.rotation().multiply(user.isOnGround() ? -0.002 : -0.05);
+                FactoryUtil.addSafeVelocity(user, vec);
+                if (user instanceof ServerPlayerEntity player) {
+                    FactoryUtil.sendVelocityDelta(player, vec);
+                }
                 return;
             }
         }
@@ -105,6 +111,11 @@ public class FluidLauncherItem extends Item implements PolymerItem, RegistryCall
                     stack.set(FactoryDataComponents.CURRENT_FLUID, f);
                     user.setCurrentHand(hand);
                     f.shootingBehavior().startShooting(ctx, f, container);
+                    var vec = ctx.rotation().multiply(user.isOnGround() ? -0.01 : -0.07);
+                    FactoryUtil.addSafeVelocity(user, vec);
+                    if (user instanceof ServerPlayerEntity player) {
+                        FactoryUtil.sendVelocityDelta(player, vec);
+                    }
                     return TypedActionResult.consume(stack);
                 }
             }

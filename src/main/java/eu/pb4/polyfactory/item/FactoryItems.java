@@ -31,6 +31,7 @@ import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.item.*;
+import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.world.ServerWorld;
@@ -309,9 +310,11 @@ public class FactoryItems {
                     }
 
                     for (var potion : Registries.POTION.getIndexedEntries()) {
-                        var stack = PORTABLE_FLUID_TANK.getDefaultStack();
-                        stack.apply(FactoryDataComponents.FLUID, FluidComponent.DEFAULT, x -> x.with(FactoryFluids.POTION.toInstance(PotionContentsComponent.DEFAULT.with(potion)), x.capacity()));
-                        entries.add(stack);
+                        if (potion != Potions.WATER) {
+                            var stack = PORTABLE_FLUID_TANK.getDefaultStack();
+                            stack.apply(FactoryDataComponents.FLUID, FluidComponent.DEFAULT, x -> x.with(FactoryFluids.getPotion(potion), x.capacity()));
+                            entries.add(stack);
+                        }
                     }
 
                     for (var dye : DyeColor.values()) {

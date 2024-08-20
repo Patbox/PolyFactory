@@ -14,7 +14,9 @@ import net.minecraft.particle.EntityEffectParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
@@ -61,6 +63,17 @@ public class LavaSplashEntity extends SplashEntity<Unit> {
             }
         }
         super.onEntityHit(entityHitResult);
+    }
+
+    @Override
+    protected boolean discardInBlock(BlockState state) {
+        if (state.getFluidState().isIn(FluidTags.WATER)) {
+            ((ServerWorld) this.getWorld()).spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
+                    0, 0, 0, 0, 0);
+            this.playExtinguishSound();
+        }
+
+        return !state.getFluidState().isEmpty();
     }
 
     @Override

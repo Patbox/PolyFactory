@@ -12,7 +12,6 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.minecraft.item.*;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.world.World;
 
@@ -23,24 +22,24 @@ public record ArtificialDyeMixingRecipe(double time,
                                         double optimalSpeed) implements MixingRecipe {
 
     public static final MapCodec<ArtificialDyeMixingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
-                    Codec.DOUBLE.fieldOf("time").forGetter(ArtificialDyeMixingRecipe::time),
-                    Codec.DOUBLE.optionalFieldOf("minimum_speed", 1d).forGetter(ArtificialDyeMixingRecipe::minimumSpeed),
-                    Codec.DOUBLE.optionalFieldOf("optimal_speed", 1d).forGetter(ArtificialDyeMixingRecipe::optimalSpeed)
+                    Codec.DOUBLE.fieldOf("time").forGetter(artificialDyeMixingRecipe -> artificialDyeMixingRecipe.time()),
+                    Codec.DOUBLE.optionalFieldOf("minimum_speed", 1d).forGetter(artificialDyeMixingRecipe -> artificialDyeMixingRecipe.minimumSpeed()),
+                    Codec.DOUBLE.optionalFieldOf("optimal_speed", 1d).forGetter(artificialDyeMixingRecipe -> artificialDyeMixingRecipe.optimalSpeed())
             ).apply(x, ArtificialDyeMixingRecipe::new)
     );
 
     @Override
-    public Iterable<ItemStack> remainders() {
+    public Iterable<ItemStack> remainders(MixingInput input) {
         return Collections.emptyList();
     }
 
     @Override
-    public float minimumTemperature() {
+    public float minimumTemperature(MixingInput input) {
         return 0.2f;
     }
 
     @Override
-    public float maxTemperature() {
+    public float maxTemperature(MixingInput input) {
         return 1f;
     }
 
@@ -178,5 +177,20 @@ public record ArtificialDyeMixingRecipe(double time,
     @Override
     public RecipeSerializer<?> getSerializer() {
         return FactoryRecipeSerializers.MIXING_ARTIFICIAL_DYE;
+    }
+
+    @Override
+    public double optimalSpeed(MixingInput input) {
+        return this.optimalSpeed;
+    }
+
+    @Override
+    public double minimumSpeed(MixingInput input) {
+        return this.minimumSpeed;
+    }
+
+    @Override
+    public double time(MixingInput input) {
+        return this.time;
     }
 }

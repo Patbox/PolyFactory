@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.entity.FactoryEntities;
 import eu.pb4.polyfactory.entity.splash.PotionSplashEntity;
+import eu.pb4.polyfactory.fluid.shooting.ShootSnowball;
 import eu.pb4.polyfactory.fluid.shooting.ShootSplashed;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.FactorySoundEvents;
@@ -22,15 +23,17 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 
+import java.util.IdentityHashMap;
 import java.util.function.Function;
 
 public class FactoryFluids {
     public static final FluidType<Unit> WATER = register(Identifier.ofVanilla("water"),
-            FluidType.of().density(100).fluid(Fluids.WATER).color(0x3b3bed)
+            FluidType.of().density(100).fluid(Fluids.WATER).color(0x385dc6)
                     .particle(new ItemStackParticleEffect(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE.getDefaultStack()))
                     .shootingBehavior(ShootSplashed.of(FactoryEntities.WATER_SPLASH, 300, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
                     .build());
@@ -41,8 +44,8 @@ public class FactoryFluids {
                     .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     public static final FluidType<Unit> MILK = register(Identifier.ofVanilla("milk"),
-            FluidType.of().density(200)
-                    .flowSpeedMultiplier(0.95)
+            FluidType.of().density(200).flowSpeedMultiplier(0.95)
+                    .shootingBehavior(ShootSplashed.of(FactoryEntities.MILK_SPLASH, 350, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
                     .build());
     public static final FluidType<Unit> EXPERIENCE = register(Identifier.ofVanilla("experience"),
             FluidType.of().density(50).flowSpeedMultiplier(1.3).maxFlow(FluidConstants.BOTTLE * 2).build());
@@ -58,7 +61,7 @@ public class FactoryFluids {
                         }
                         return base;
                     }).particle((data) -> EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, data.data().getColor()))
-                    .shootingBehavior(new ShootSplashed<>(PotionSplashEntity::of, 4, FluidConstants.BOTTLE / 20, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
+                    .shootingBehavior(new ShootSplashed<>(PotionSplashEntity::of, 4, FluidConstants.BOTTLE / 60, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
                     .build());
 
     public static final FluidType<Unit> HONEY = register(Identifier.ofVanilla("honey"),
@@ -66,8 +69,14 @@ public class FactoryFluids {
 
     public static final FluidType<Unit> SLIME = register(Identifier.ofVanilla("slime"),
             FluidType.of().density(600).transparent().flowSpeedMultiplier(0.6).maxFlow(FluidConstants.BOTTLE * 2 / 3).build());
+
+    public static final FluidType<Unit> SNOW = register(Identifier.ofVanilla("snow"),
+            FluidType.of().density(90).flowSpeedMultiplier(0.98).maxFlow(FluidConstants.BOTTLE * 4 / 5)
+                    .shootingBehavior(new ShootSnowball<>(FluidConstants.BLOCK / 4 / 20))
+                    .texture(Identifier.ofVanilla("block/powder_snow")).build());
     public static void register() {
         FluidBehaviours.addBlockStateConversions(Blocks.WATER.getDefaultState(), Blocks.AIR.getDefaultState(), WATER.ofBucket());
+        FluidBehaviours.addBlockStateConversions(Blocks.POWDER_SNOW.getDefaultState(), Blocks.AIR.getDefaultState(), SNOW.ofBucket());
         FluidBehaviours.addBlockStateConversions(Blocks.LAVA.getDefaultState(), Blocks.AIR.getDefaultState(), LAVA.ofBucket());
         FluidBehaviours.addBlockStateConversions(Blocks.WATER_CAULDRON.getDefaultState().with(LeveledCauldronBlock.LEVEL, 3),
                 Blocks.WATER_CAULDRON.getDefaultState().with(LeveledCauldronBlock.LEVEL, 2), WATER.ofBottle());
@@ -75,6 +84,15 @@ public class FactoryFluids {
                 Blocks.WATER_CAULDRON.getDefaultState().with(LeveledCauldronBlock.LEVEL, 1), WATER.ofBottle());
         FluidBehaviours.addBlockStateConversions(Blocks.WATER_CAULDRON.getDefaultState().with(LeveledCauldronBlock.LEVEL, 1),
                 Blocks.CAULDRON.getDefaultState(), WATER.ofBottle());
+
+        FluidBehaviours.addBlockStateConversions(Blocks.POWDER_SNOW_CAULDRON.getDefaultState().with(LeveledCauldronBlock.LEVEL, 3),
+                Blocks.POWDER_SNOW_CAULDRON.getDefaultState().with(LeveledCauldronBlock.LEVEL, 2), SNOW.ofBottle());
+        FluidBehaviours.addBlockStateConversions(Blocks.POWDER_SNOW_CAULDRON.getDefaultState().with(LeveledCauldronBlock.LEVEL, 2),
+                Blocks.POWDER_SNOW_CAULDRON.getDefaultState().with(LeveledCauldronBlock.LEVEL, 1), SNOW.ofBottle());
+        FluidBehaviours.addBlockStateConversions(Blocks.POWDER_SNOW_CAULDRON.getDefaultState().with(LeveledCauldronBlock.LEVEL, 1),
+                Blocks.CAULDRON.getDefaultState(), SNOW.ofBottle());
+
+
         FluidBehaviours.addBlockStateConversions(Blocks.LAVA_CAULDRON.getDefaultState(), Blocks.CAULDRON.getDefaultState(), LAVA.ofBucket());
 
         FluidBehaviours.addBlockStateInsert(Blocks.SLIME_BLOCK.getDefaultState(), Blocks.AIR.getDefaultState(), SLIME.ofBucket());
@@ -111,5 +129,13 @@ public class FactoryFluids {
 
     public static <T> FluidType<T> register(String path, FluidType<T> item) {
         return Registry.register(FactoryRegistries.FLUID_TYPES, Identifier.of(ModInit.ID, path), item);
+    }
+
+    public static FluidInstance<?> getPotion(RegistryEntry<Potion> potion) {
+        if (potion == Potions.WATER) {
+            return WATER.defaultInstance();
+        }
+
+        return POTION.toInstance(PotionContentsComponent.DEFAULT.with(potion));
     }
 }
