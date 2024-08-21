@@ -1,25 +1,41 @@
 package eu.pb4.polyfactory.fluid.shooting;
 
 import eu.pb4.polyfactory.entity.splash.SplashEntity;
-import eu.pb4.polyfactory.entity.splash.WaterSplashEntity;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.mixin.ProjectileEntityAccessor;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Unit;
 import org.joml.Vector3f;
 
-import java.util.UUID;
 import java.util.function.BiFunction;
 
-public record ShootSplashed<T>(BiFunction<ServerWorld, FluidInstance<T>, SplashEntity<T>> entityCreator, int splashPerTick, long amount, RegistryEntry<SoundEvent> soundEvent)
+public record ShootProjecticleEntity<T>(BiFunction<ServerWorld, FluidInstance<T>, ProjectileEntity> entityCreator,
+                                        int splashPerTick, long amount,
+                                        float baseSpeed, float extraSpeed,
+                                        float initialDivergence, float maxDivergence,
+                                        RegistryEntry<SoundEvent> soundEvent)
             implements FluidShootingBehavior<T> {
 
-    public static <T> FluidShootingBehavior<T> of(EntityType<? extends SplashEntity<T>> entityType, long amount, RegistryEntry<SoundEvent> soundEvent) {
-        return new ShootSplashed<>((world, fluid) -> entityType.create(world), 10, amount, soundEvent);
+    public static <T> FluidShootingBehavior<T> ofSplash(EntityType<? extends SplashEntity<T>> entityType, int splashPerTick, long amount, RegistryEntry<SoundEvent> soundEvent) {
+        return ofSplash(entityType, splashPerTick, amount, 2, 0.5f, 0.1f, 0.3f, soundEvent);
+    }
+    public static <T> FluidShootingBehavior<T> ofSplash(EntityType<? extends SplashEntity<T>> entityType, int splashPerTick, long amount, float baseSpeed, float extraSpeed,
+                                                        float initialDivergence, float maxDivergence, RegistryEntry<SoundEvent> soundEvent) {
+        return new ShootProjecticleEntity<>((world, fluid) -> {
+            var splash = entityType.create(world);
+            assert splash != null;
+            splash.setFluidData(fluid.data());
+            return splash;
+        }, splashPerTick, amount, baseSpeed, extraSpeed, initialDivergence, maxDivergence, soundEvent);
+    }
+
+    public static <T> FluidShootingBehavior<T> ofEntity(EntityType<? extends ProjectileEntity> entityType, int splashPerTick, long amount, float baseSpeed, float extraSpeed,
+                                                    float initialDivergence, float maxDivergence, RegistryEntry<SoundEvent> soundEvent) {
+        return new ShootProjecticleEntity<>((world, fluid) -> entityType.create(world), splashPerTick, amount, baseSpeed, extraSpeed, initialDivergence, maxDivergence, soundEvent);
     }
 
     @Override
@@ -29,12 +45,12 @@ public record ShootSplashed<T>(BiFunction<ServerWorld, FluidInstance<T>, SplashE
 
     @Override
     public void startShooting(ShooterContext context, FluidInstance<T> fluidInstance, FluidContainer container) {
-        shoot(context, 0.1f, fluidInstance, container);
+        shoot(context, initialDivergence, fluidInstance, container);
     }
 
     @Override
     public void continueShooting(ShooterContext context, FluidInstance<T> fluidInstance, int tick, FluidContainer container) {
-        shoot(context, Math.min(0.1f + (tick) / 100f, 0.3f), fluidInstance, container);
+        shoot(context, Math.min(initialDivergence + (tick) / 100f, maxDivergence), fluidInstance, container);
     }
 
     private void shoot(ShooterContext context, float divergence, FluidInstance<T> fluidInstance, FluidContainer container) {
@@ -54,7 +70,7 @@ public record ShootSplashed<T>(BiFunction<ServerWorld, FluidInstance<T>, SplashE
                     (float) random.nextTriangular(0, divergence),
                     (float) random.nextTriangular(0, divergence));
             vec.normalize();
-            vec.mul(2.0f + random.nextFloat() * 0.5f);
+            vec.mul(this.baseSpeed + random.nextFloat() * this.extraSpeed);
 
             projectile.setVelocity(vec.x, vec.y, vec.z);
             world.spawnEntity(projectile);

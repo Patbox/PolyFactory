@@ -1,7 +1,11 @@
 package eu.pb4.polyfactory.entity.splash;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Pair;
+import eu.pb4.common.protection.api.CommonProtection;
+import eu.pb4.polyfactory.entity.FluidDataOwner;
 import eu.pb4.polyfactory.fluid.FluidType;
+import eu.pb4.polyfactory.mixin.ProjectileEntityAccessor;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import net.minecraft.block.BlockState;
@@ -9,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.nbt.NbtCompound;
@@ -23,29 +28,40 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-public abstract class SplashEntity<T> extends ProjectileEntity implements PolymerEntity {
+public abstract class SplashEntity<T> extends ProjectileEntity implements PolymerEntity, FluidDataOwner<T> {
     private final FluidType<T> fluid;
     private T data;
     protected int existenceTime = 5;
+    @Nullable
+    private GameProfile profile;
     public SplashEntity(EntityType<? extends ProjectileEntity> entityType, World world, FluidType<T> fluidInstance) {
         super(entityType, world);
         this.fluid = fluidInstance;
         this.data = fluidInstance.defaultData();
     }
 
-    public void setData(T data) {
+    @Override
+    public void setFluidData(T data) {
         this.data = data;
     }
 
-    public T getData() {
+    @Override
+    public T getFluidData() {
         return this.data;
     }
 
     @Override
+    public FluidType<T> fluidType() {
+        return this.fluid;
+    }
+
+    @Override
     protected Text getDefaultName() {
-        return Text.translatable("entity.polyfactory.splash", this.fluid.getName(this.getData()));
+        return Text.translatable("entity.polyfactory.splash", this.fluid.getName(this.getFluidData()));
     }
 
     @Override
@@ -86,7 +102,7 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         super.onEntityHit(entityHitResult);
-        if (entityHitResult.getEntity() == this.getOwner()) {
+        if (entityHitResult.getEntity() == this.getOwner() || !this.canInteractEntity(entityHitResult.getEntity())) {
             return;
         }
         var velocity = this.getVelocity().multiply(0.008);
@@ -178,5 +194,31 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     @Override
     protected SoundEvent getHighSpeedSplashSound() {
         return SoundEvents.INTENTIONALLY_EMPTY;
+    }
+
+    protected GameProfile getProfile() {
+        if (this.getOwner() instanceof PlayerEntity player) {
+            this.profile = player.getGameProfile();
+        } else if (this.profile == null) {
+            var x = ((ProjectileEntityAccessor) this).getOwnerUuid();
+            this.profile = new GameProfile(x != null ? x : this.getUuid(), "Splash");
+        }
+        return this.profile;
+    }
+
+    protected boolean canDamageEntity(Entity entity) {
+        return CommonProtection.canDamageEntity(getWorld(), entity, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
+    }
+
+    protected boolean canInteractEntity(Entity entity) {
+        return CommonProtection.canInteractEntity(getWorld(), entity, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
+    }
+
+    protected boolean canBreakBlock(BlockPos pos) {
+        return CommonProtection.canBreakBlock(getWorld(), pos, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
+    }
+
+    protected boolean canPlaceBlock(BlockPos pos) {
+        return CommonProtection.canPlaceBlock(getWorld(), pos, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
     }
 }

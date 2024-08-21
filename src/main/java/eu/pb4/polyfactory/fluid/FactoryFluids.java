@@ -4,16 +4,16 @@ import eu.pb4.polyfactory.FactoryRegistries;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.entity.FactoryEntities;
-import eu.pb4.polyfactory.entity.splash.PotionSplashEntity;
-import eu.pb4.polyfactory.fluid.shooting.ShootSnowball;
-import eu.pb4.polyfactory.fluid.shooting.ShootSplashed;
+import eu.pb4.polyfactory.fluid.shooting.ShootProjecticleEntity;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.FactorySoundEvents;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.minecraft.block.BeehiveBlock;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeveledCauldronBlock;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -22,30 +22,32 @@ import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 
-import java.util.IdentityHashMap;
 import java.util.function.Function;
 
 public class FactoryFluids {
     public static final FluidType<Unit> WATER = register(Identifier.ofVanilla("water"),
             FluidType.of().density(100).fluid(Fluids.WATER).color(0x385dc6)
                     .particle(new ItemStackParticleEffect(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE.getDefaultStack()))
-                    .shootingBehavior(ShootSplashed.of(FactoryEntities.WATER_SPLASH, 300, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
+                    .shootingBehavior(ShootProjecticleEntity.ofSplash(FactoryEntities.WATER_SPLASH, 10,300, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
                     .build());
     public static final FluidType<Unit> LAVA = register(Identifier.ofVanilla("lava"),
             FluidType.of().density(1000).fluid(Fluids.LAVA).brightness(15).heat(BlockHeat.LAVA)
                     .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
-                    .shootingBehavior(ShootSplashed.of(FactoryEntities.LAVA_SPLASH, 400, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_LAVA))
+                    .shootingBehavior(ShootProjecticleEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_LAVA))
                     .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     public static final FluidType<Unit> MILK = register(Identifier.ofVanilla("milk"),
             FluidType.of().density(200).flowSpeedMultiplier(0.95)
-                    .shootingBehavior(ShootSplashed.of(FactoryEntities.MILK_SPLASH, 350, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
+                    .shootingBehavior(ShootProjecticleEntity.ofSplash(FactoryEntities.MILK_SPLASH, 10,350, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
                     .build());
     public static final FluidType<Unit> EXPERIENCE = register(Identifier.ofVanilla("experience"),
             FluidType.of().density(50).flowSpeedMultiplier(1.3).maxFlow(FluidConstants.BOTTLE * 2).build());
@@ -61,7 +63,7 @@ public class FactoryFluids {
                         }
                         return base;
                     }).particle((data) -> EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, data.data().getColor()))
-                    .shootingBehavior(new ShootSplashed<>(PotionSplashEntity::of, 4, FluidConstants.BOTTLE / 60, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
+                    .shootingBehavior(ShootProjecticleEntity.ofSplash(FactoryEntities.POTION_SPLASH, 4, FluidConstants.BOTTLE / 60, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
                     .build());
 
     public static final FluidType<Unit> HONEY = register(Identifier.ofVanilla("honey"),
@@ -72,7 +74,8 @@ public class FactoryFluids {
 
     public static final FluidType<Unit> SNOW = register(Identifier.ofVanilla("snow"),
             FluidType.of().density(90).flowSpeedMultiplier(0.98).maxFlow(FluidConstants.BOTTLE * 4 / 5)
-                    .shootingBehavior(new ShootSnowball<>(FluidConstants.BLOCK / 4 / 20))
+                    .shootingBehavior(ShootProjecticleEntity.ofEntity(EntityType.SNOWBALL, 1, FluidConstants.BLOCK / 4 / 20 / 2,
+                            1.7f, 0.5f, 0, 0.1f, Registries.SOUND_EVENT.getEntry(SoundEvents.ENTITY_SNOWBALL_THROW)))
                     .texture(Identifier.ofVanilla("block/powder_snow")).build());
     public static void register() {
         FluidBehaviours.addBlockStateConversions(Blocks.WATER.getDefaultState(), Blocks.AIR.getDefaultState(), WATER.ofBucket());
@@ -96,6 +99,8 @@ public class FactoryFluids {
         FluidBehaviours.addBlockStateConversions(Blocks.LAVA_CAULDRON.getDefaultState(), Blocks.CAULDRON.getDefaultState(), LAVA.ofBucket());
 
         FluidBehaviours.addBlockStateInsert(Blocks.SLIME_BLOCK.getDefaultState(), Blocks.AIR.getDefaultState(), SLIME.ofBucket());
+        FluidBehaviours.addBlockStateExtract(Blocks.BEEHIVE.getDefaultState().with(BeehiveBlock.HONEY_LEVEL, BeehiveBlock.FULL_HONEY_LEVEL),
+                Blocks.BEEHIVE.getDefaultState(), HONEY.of(FluidConstants.BLOCK / 4));
         FluidBehaviours.addBlockStateInsert(Blocks.HONEY_BLOCK.getDefaultState(), Blocks.AIR.getDefaultState(), HONEY.ofBucket());
 
         FluidBehaviours.addItemToFluidLink(Items.BUCKET, (FluidInstance<?>) null);

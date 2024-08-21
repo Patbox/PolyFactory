@@ -74,6 +74,10 @@ public class FactoryItems {
     public static final Item STEEL_INGOT = register("steel_ingot", new ModeledItem(new Item.Settings()));
     public static final Item STEEL_PLATE = register("steel_plate", new ModeledItem(new Item.Settings()));
     public static final Item COPPER_PLATE = register("copper_plate", new ModeledItem(new Item.Settings()));
+    public static final Item BRITTLE_GLASS_BOTTLE = register("brittle_glass_bottle", new ModeledItem(new Item.Settings()));
+    public static final Item BRITTLE_POTION = register("brittle_potion", new BrittlePotionItem(new Item.Settings().maxCount(1)));
+    public static final Item THROWABLE_GLASS_BOTTLE = register("throwable_glass_bottle", new ModeledItem(new Item.Settings()));
+    public static final Item LINGERING_THROWABLE_GLASS_BOTTLE = register("lingering_throwable_glass_bottle", new ModeledItem(new Item.Settings()));
     public static final Item STEEL_GEAR = register("steel_gear", new GearItem(FactoryBlocks.AXLE_WITH_GEAR, new Item.Settings()));
     public static final Item LARGE_STEEL_GEAR = register("large_steel_gear", new GearItem(FactoryBlocks.AXLE_WITH_LARGE_GEAR, new Item.Settings()));
     public static final Item GENERIC_MACHINE_PART = register("generic_machine_part", new ModeledItem(new Item.Settings()));
@@ -235,6 +239,8 @@ public class FactoryItems {
                     entries.add(HONEY_BUCKET);
                     entries.add(SLIME_BUCKET);
                     entries.add(EXPERIENCE_BUCKET);
+                    entries.add(THROWABLE_GLASS_BOTTLE);
+                    entries.add(BRITTLE_GLASS_BOTTLE);
 
                     // Generic Materials
                     entries.add(SAW_DUST);
@@ -315,6 +321,12 @@ public class FactoryItems {
                             stack.apply(FactoryDataComponents.FLUID, FluidComponent.DEFAULT, x -> x.with(FactoryFluids.getPotion(potion), x.capacity()));
                             entries.add(stack);
                         }
+                    }
+
+                    for (var potion : Registries.POTION.getIndexedEntries()) {
+                        var stack = BRITTLE_POTION.getDefaultStack();
+                        stack.apply(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT, x -> x.with(potion));
+                        entries.add(stack);
                     }
 
                     for (var dye : DyeColor.values()) {

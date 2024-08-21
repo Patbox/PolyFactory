@@ -31,6 +31,9 @@ public class MilkSplashEntity extends SplashEntity<Unit> {
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         if (this.random.nextFloat() < 0.4 && (entityHitResult.getEntity() instanceof LivingEntity livingEntity)) {
+            if (!this.canInteractEntity(livingEntity)) {
+                return;
+            }
             for (var effect : livingEntity.getStatusEffects()) {
                 effect = new StatusEffectInstance(effect);
                 ((StatusEffectInstanceAccessor) effect).setDuration(effect.getDuration() - 20);
@@ -38,15 +41,5 @@ public class MilkSplashEntity extends SplashEntity<Unit> {
             }
         }
         super.onEntityHit(entityHitResult);
-    }
-
-    @Override
-    protected double getParticleSpeed() {
-        return super.getParticleSpeed() * 2;
-    }
-
-    @Override
-    protected double getParticleCollisionSpeed() {
-        return super.getParticleCollisionSpeed() * 2;
     }
 }

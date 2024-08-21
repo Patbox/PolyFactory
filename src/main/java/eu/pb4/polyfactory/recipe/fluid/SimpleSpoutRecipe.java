@@ -19,11 +19,12 @@ import net.minecraft.world.World;
 import java.util.List;
 
 public record SimpleSpoutRecipe(CountedIngredient item, List<FluidStack<?>> fluidInput,
-                                ItemStack output, RegistryEntry<SoundEvent> soundEvent, double time) implements SpoutRecipe {
+                                ItemStack output, boolean copyComponents, RegistryEntry<SoundEvent> soundEvent, double time) implements SpoutRecipe {
     public static final MapCodec<SimpleSpoutRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     CountedIngredient.CODEC.fieldOf("item").forGetter(SimpleSpoutRecipe::item),
                     FluidStack.CODEC.listOf().optionalFieldOf("fluid_input", List.of()).forGetter(SimpleSpoutRecipe::fluidInput),
                     ItemStack.UNCOUNTED_CODEC.fieldOf("result").forGetter(SimpleSpoutRecipe::output),
+                    Codec.BOOL.optionalFieldOf("copy_components", false).forGetter(SimpleSpoutRecipe::copyComponents),
                     SoundEvent.ENTRY_CODEC.fieldOf("sound").forGetter(SimpleSpoutRecipe::soundEvent),
                     Codec.DOUBLE.fieldOf("time").forGetter(SimpleSpoutRecipe::time)
             ).apply(x, SimpleSpoutRecipe::new)
@@ -31,7 +32,12 @@ public record SimpleSpoutRecipe(CountedIngredient item, List<FluidStack<?>> flui
     
 
     public static SimpleSpoutRecipe toItem(Item item, FluidStack<?> stack, Item out, SoundEvent sound) {
-        return new SimpleSpoutRecipe(CountedIngredient.ofItems(1, item), List.of(stack), out.getDefaultStack(),
+        return new SimpleSpoutRecipe(CountedIngredient.ofItems(1, item), List.of(stack), out.getDefaultStack(), false,
+                Registries.SOUND_EVENT.getEntry(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()));
+    }
+
+    public static SimpleSpoutRecipe toItemCopy(Item item, FluidStack<?> stack, Item out, SoundEvent sound) {
+        return new SimpleSpoutRecipe(CountedIngredient.ofItems(1, item), List.of(stack), out.getDefaultStack(), true,
                 Registries.SOUND_EVENT.getEntry(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()));
     }
 
@@ -56,7 +62,12 @@ public record SimpleSpoutRecipe(CountedIngredient item, List<FluidStack<?>> flui
 
     @Override
     public ItemStack craft(SpoutInput input, RegistryWrapper.WrapperLookup lookup) {
-        return output.copy();
+        var out = output.copy();
+        if (this.copyComponents) {
+            out.applyChanges(input.stack().getComponentChanges());
+        }
+
+        return out;
     }
 
     @Override

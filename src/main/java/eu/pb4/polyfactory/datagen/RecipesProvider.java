@@ -1007,15 +1007,20 @@ class RecipesProvider extends FabricRecipeProvider {
         fluidBase(exporter, Items.MILK_BUCKET, Items.BUCKET, FactoryFluids.MILK.ofBucket(), SoundEvents.ITEM_BUCKET_FILL, SoundEvents.ITEM_BUCKET_EMPTY);
         fluidBase(exporter, Items.POWDER_SNOW_BUCKET, Items.BUCKET, FactoryFluids.SNOW.ofBucket(), SoundEvents.ITEM_BUCKET_FILL_POWDER_SNOW, SoundEvents.ITEM_BUCKET_EMPTY_POWDER_SNOW);
         fluidBase(exporter, FactoryItems.HONEY_BUCKET, Items.BUCKET, FactoryFluids.HONEY.ofBucket(), FactorySoundEvents.ITEM_BUCKET_FILL_HONEY, FactorySoundEvents.ITEM_BUCKET_EMPTY_HONEY);
-        fluidBase(exporter, Items.HONEY_BOTTLE, Items.GLASS_BOTTLE, FactoryFluids.HONEY.ofBottle(), SoundEvents.ITEM_BOTTLE_FILL, SoundEvents.ITEM_BOTTLE_EMPTY);
+        fluidBase(exporter, Items.HONEY_BOTTLE, Items.GLASS_BOTTLE, FactoryFluids.HONEY.of(FluidConstants.BLOCK / 4), SoundEvents.ITEM_BOTTLE_FILL, SoundEvents.ITEM_BOTTLE_EMPTY);
         fluidBase(exporter, FactoryItems.SLIME_BUCKET, Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactorySoundEvents.ITEM_BUCKET_FILL_SLIME, FactorySoundEvents.ITEM_BUCKET_EMPTY_SLIME);
         fluidBase(exporter, FactoryItems.EXPERIENCE_BUCKET, Items.BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), SoundEvents.ITEM_BUCKET_FILL, SoundEvents.ITEM_BUCKET_EMPTY);
 
         fluidBasePotion(exporter, Items.POTION, Items.GLASS_BOTTLE, FluidConstants.BOTTLE, SoundEvents.ITEM_BOTTLE_FILL, SoundEvents.ITEM_BOTTLE_EMPTY);
+        fluidBasePotion(exporter, Items.SPLASH_POTION, FactoryItems.THROWABLE_GLASS_BOTTLE, FluidConstants.BOTTLE, SoundEvents.ITEM_BOTTLE_FILL, SoundEvents.ITEM_BOTTLE_EMPTY);
+        fluidBasePotion(exporter, Items.LINGERING_POTION, FactoryItems.LINGERING_THROWABLE_GLASS_BOTTLE, FluidConstants.BOTTLE, SoundEvents.ITEM_BOTTLE_FILL, SoundEvents.ITEM_BOTTLE_EMPTY);
+        fluidBasePotion(exporter, FactoryItems.BRITTLE_POTION, FactoryItems.BRITTLE_GLASS_BOTTLE, FluidConstants.BOTTLE, SoundEvents.ITEM_BOTTLE_FILL, SoundEvents.ITEM_BOTTLE_EMPTY);
 
         exporter.accept(id("spout/experience_repair"), new RepairSpoutRecipe(), null);
         exporter.accept(id("spout/sticky_piston"), SimpleSpoutRecipe.toItem(Items.PISTON, FactoryFluids.SLIME.of(FluidConstants.BLOCK / 10), Items.STICKY_PISTON, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
         exporter.accept(id("spout/sticky_conveyor"), SimpleSpoutRecipe.toItem(FactoryItems.CONVEYOR, FactoryFluids.SLIME.of(FluidConstants.BLOCK / 10), FactoryItems.STICKY_CONVEYOR, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
+        exporter.accept(id("spout/brittle_glass_bottle"), SimpleSpoutRecipe.toItem(Items.GLASS_BOTTLE, FactoryFluids.LAVA.of(FluidConstants.BLOCK / 15), FactoryItems.BRITTLE_GLASS_BOTTLE, SoundEvents.BLOCK_GLASS_HIT), null);
+        exporter.accept(id("spout/brittle_potion"), SimpleSpoutRecipe.toItemCopy(Items.POTION, FactoryFluids.LAVA.of(FluidConstants.BLOCK / 15), FactoryItems.BRITTLE_POTION, SoundEvents.BLOCK_GLASS_HIT), null);
     }
 
     private void fluidBase(RecipeExporter exporter, Item withFluid, Item emptyContainer, FluidStack<?> fluid, SoundEvent fillSound, SoundEvent emptySound) {

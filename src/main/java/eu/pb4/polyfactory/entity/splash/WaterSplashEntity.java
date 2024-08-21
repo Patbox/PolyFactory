@@ -50,16 +50,16 @@ public class WaterSplashEntity extends SplashEntity<Unit> {
             var entity = entityHitResult.getEntity();
 
             if (entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
-                if (livingEntity.hurtByWater()) {
+                if (livingEntity.hurtByWater() && this.canDamageEntity(entity)) {
                     livingEntity.damage(this.getDamageSources().indirectMagic(this, this.getOwner()), 1F);
                 }
 
-                if (livingEntity.isOnFire() && livingEntity.isAlive()) {
+                if (livingEntity.isOnFire() && livingEntity.isAlive() && this.canInteractEntity(entity)) {
                     livingEntity.extinguishWithSound();
                 }
             }
 
-            if (entity instanceof AxolotlEntity axolotlEntity) {
+            if (entity instanceof AxolotlEntity axolotlEntity && this.canInteractEntity(entity)) {
                 axolotlEntity.hydrateFromPotion();
             }
         }
@@ -71,18 +71,12 @@ public class WaterSplashEntity extends SplashEntity<Unit> {
         return PARTICLE;
     }
 
-    @Override
-    protected double getParticleSpeed() {
-        return super.getParticleSpeed() * 2;
-    }
-
-    @Override
-    protected double getParticleCollisionSpeed() {
-        return super.getParticleCollisionSpeed() * 2;
-    }
-
     private void extinguishFire(BlockPos pos) {
         if (this.random.nextFloat() < 0.3) {
+            if (!this.canBreakBlock(pos)) {
+                return;
+            }
+
             BlockState blockState = this.getWorld().getBlockState(pos);
             if (blockState.isIn(BlockTags.FIRE)) {
                 this.getWorld().breakBlock(pos, false, this);

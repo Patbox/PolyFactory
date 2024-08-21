@@ -36,7 +36,7 @@ public class LavaSplashEntity extends SplashEntity<Unit> {
     }
     @Override
     protected void onBlockHit(BlockHitResult context) {
-        if (!this.getWorld().isClient && this.random.nextFloat() < 0.3) {
+        if (!this.getWorld().isClient && this.random.nextFloat() < 0.3 && this.canBreakBlock(context.getBlockPos())) {
             var blockPos = context.getBlockPos();
             var world = this.getWorld();
             var blockState = world.getBlockState(blockPos);
@@ -57,7 +57,7 @@ public class LavaSplashEntity extends SplashEntity<Unit> {
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         if (this.random.nextFloat() < 0.3) {
-            if (entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
+            if (entityHitResult.getEntity() instanceof LivingEntity livingEntity && this.canDamageEntity(livingEntity)) {
                 livingEntity.setOnFireFor(3);
                 livingEntity.damage(this.getDamageSources().create(DamageTypes.LAVA, this, this.getOwner()), 0.6F);
             }
@@ -79,5 +79,15 @@ public class LavaSplashEntity extends SplashEntity<Unit> {
     @Override
     public ParticleEffect getBaseParticle() {
         return ParticleTypes.FLAME;
+    }
+
+    @Override
+    protected double getParticleSpeed() {
+        return 0.12;
+    }
+
+    @Override
+    protected double getParticleCollisionSpeed() {
+        return 0.005;
     }
 }

@@ -36,4 +36,8 @@ public interface FluidBehaviours {
     static void addBlockStateInsert(BlockState withFluid, BlockState withoutFluid, FluidStack<Unit> fluid) {
         BLOCK_STATE_TO_FLUID_INSERT.computeIfAbsent(withoutFluid, (a) -> new ArrayList<>()).add(new Pair<>(fluid, withFluid));
     }
+
+    static void addBlockStateExtract(BlockState withFluid, BlockState withoutFluid, FluidStack<Unit> fluid) {
+        BLOCK_STATE_TO_FLUID_EXTRACT.put(withFluid, new Pair<>(fluid, withoutFluid));
+    }
 }
