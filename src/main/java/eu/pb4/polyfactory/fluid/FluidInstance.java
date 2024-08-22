@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.fluid;
 
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.FactoryRegistries;
@@ -7,13 +8,17 @@ import eu.pb4.polyfactory.fluid.shooting.FluidShootingBehavior;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.entity.decoration.Brightness;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -131,5 +136,17 @@ public record FluidInstance<T>(FluidType<T> type, T data) {
 
     public FluidShootingBehavior<T> shootingBehavior() {
         return this.type.shootingBehavior();
+    }
+
+    public NbtElement toNbt(RegistryWrapper.WrapperLookup lookup) {
+        return CODEC.encodeStart(lookup.getOps(NbtOps.INSTANCE), this).getOrThrow();
+    }
+
+    @Nullable
+    public static FluidInstance<?> fromNbt(RegistryWrapper.WrapperLookup lookup, NbtElement element) {
+        if (element == null) {
+            return null;
+        }
+        return CODEC.decode(lookup.getOps(NbtOps.INSTANCE), element).result().map(Pair::getFirst).orElse(null);
     }
 }

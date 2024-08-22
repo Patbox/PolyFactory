@@ -6,7 +6,7 @@ import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.entity.FactoryEntities;
 import eu.pb4.polyfactory.fluid.shooting.ShootProjecticleEntity;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.util.FactorySoundEvents;
+import eu.pb4.polyfactory.other.FactorySoundEvents;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.BeehiveBlock;
 import net.minecraft.block.Blocks;
@@ -25,7 +25,6 @@ import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -37,20 +36,22 @@ public class FactoryFluids {
     public static final FluidType<Unit> WATER = register(Identifier.ofVanilla("water"),
             FluidType.of().density(100).fluid(Fluids.WATER).color(0x385dc6)
                     .particle(new ItemStackParticleEffect(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE.getDefaultStack()))
-                    .shootingBehavior(ShootProjecticleEntity.ofSplash(FactoryEntities.WATER_SPLASH, 10,300, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
+                    .shootingBehavior(ShootProjecticleEntity.ofSplash(FactoryEntities.WATER_SPLASH, 10,300, FactorySoundEvents.FLUID_SHOOT_WATER))
                     .build());
     public static final FluidType<Unit> LAVA = register(Identifier.ofVanilla("lava"),
             FluidType.of().density(1000).fluid(Fluids.LAVA).brightness(15).heat(BlockHeat.LAVA)
                     .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
-                    .shootingBehavior(ShootProjecticleEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_LAVA))
+                    .shootingBehavior(ShootProjecticleEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
                     .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     public static final FluidType<Unit> MILK = register(Identifier.ofVanilla("milk"),
             FluidType.of().density(200).flowSpeedMultiplier(0.95)
-                    .shootingBehavior(ShootProjecticleEntity.ofSplash(FactoryEntities.MILK_SPLASH, 10,350, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
+                    .shootingBehavior(ShootProjecticleEntity.ofSplash(FactoryEntities.MILK_SPLASH, 10,350, FactorySoundEvents.FLUID_SHOOT_MILK))
                     .build());
     public static final FluidType<Unit> EXPERIENCE = register(Identifier.ofVanilla("experience"),
-            FluidType.of().density(50).flowSpeedMultiplier(1.3).maxFlow(FluidConstants.BOTTLE * 2).build());
+            FluidType.of().density(50).flowSpeedMultiplier(1.3).maxFlow(FluidConstants.BOTTLE * 2)
+                    .shootingBehavior(ShootProjecticleEntity.ofSplash(FactoryEntities.EXPERIENCE_SPLASH, 1, FluidBehaviours.EXPERIENCE_ORB_TO_FLUID, FactorySoundEvents.FLUID_SHOOT_EXPERIENCE))
+                    .build());
     public static final FluidType<PotionContentsComponent> POTION = register(Identifier.ofVanilla("potion"),
             FluidType.of(PotionContentsComponent.CODEC, PotionContentsComponent.DEFAULT).density(150).texture(WATER.texture())
                             .color(PotionContentsComponent::getColor).flowSpeedMultiplier(0.95).name((t, d) -> {
@@ -63,7 +64,7 @@ public class FactoryFluids {
                         }
                         return base;
                     }).particle((data) -> EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, data.data().getColor()))
-                    .shootingBehavior(ShootProjecticleEntity.ofSplash(FactoryEntities.POTION_SPLASH, 4, FluidConstants.BOTTLE / 60, FactorySoundEvents.ITEM_FLUID_LAUNCHER_SHOOT_WATER))
+                    .shootingBehavior(ShootProjecticleEntity.ofSplash(FactoryEntities.POTION_SPLASH, 4, FluidConstants.BOTTLE / 60, FactorySoundEvents.FLUID_SHOOT_POTION))
                     .build());
 
     public static final FluidType<Unit> HONEY = register(Identifier.ofVanilla("honey"),

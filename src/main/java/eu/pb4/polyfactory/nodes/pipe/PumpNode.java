@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
 
-public record PumpNode(Direction flowDirection, boolean isPulling, Direction direction, int range) implements FunctionalNode, AxisNode {
+public record PumpNode(Direction flowDirection, boolean isPulling, Direction direction, int range) implements FunctionalNode, DirectionNode {
     public static final int DEFAULT_RANGE = 32;
     public static final int SPOUT_RANGE = 8;
 
@@ -47,13 +47,10 @@ public record PumpNode(Direction flowDirection, boolean isPulling, Direction dir
         return self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.direction))
                 .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).toList();
     }
+
+
     @Override
     public void onConnectionsChanged(@NotNull NodeHolder<BlockNode> self) {
 
-    }
-
-    @Override
-    public Direction.Axis axis() {
-        return this.direction.getAxis();
     }
 }

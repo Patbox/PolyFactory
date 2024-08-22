@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.polyfactory.entity.DynamiteEntity;
-import eu.pb4.polyfactory.util.FactorySoundEvents;
+import eu.pb4.polyfactory.other.FactorySoundEvents;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.ProjectileDispenserBehavior;
 import net.minecraft.entity.player.PlayerEntity;

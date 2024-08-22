@@ -116,6 +116,7 @@ public class FactoryBlocks {
     public static final Map<Block, PipeInWallBlock> WALL_WITH_PIPE = PipeInWallBlock.MAP;
 
     public static final PumpBlock PUMP = register("pump", new PumpBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
+    public static final NozzleBlock NOZZLE = register("nozzle", new NozzleBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
     public static final DrainBlock DRAIN = register("drain", new DrainBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
     public static final MDrainBlock MECHANICAL_DRAIN = register("mechanical_drain", new MDrainBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
     public static final MSpoutBlock MECHANICAL_SPOUT = register("mechanical_spout", new MSpoutBlock(AbstractBlock.Settings.copy(SPLITTER).nonOpaque()));

@@ -144,7 +144,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             var currentOutput = self.getStack(OUTPUT_FIRST);
             if (currentOutput.isEmpty()) {
                 self.setStack(OUTPUT_FIRST, itemOut);
-            } else if (ItemStack.areItemsAndComponentsEqual(itemOut, currentOutput) && currentOutput.getCount() + itemOut.getCount() < itemOut.getMaxCount()) {
+            } else if (ItemStack.areItemsAndComponentsEqual(itemOut, currentOutput) && currentOutput.getCount() + itemOut.getCount() <= itemOut.getMaxCount()) {
                 currentOutput.increment(itemOut.getCount());
             } else {
                 return;

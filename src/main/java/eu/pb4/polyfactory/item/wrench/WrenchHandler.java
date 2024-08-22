@@ -5,16 +5,13 @@ import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
-import eu.pb4.polyfactory.util.FactorySoundEvents;
+import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import eu.pb4.sidebars.api.Sidebar;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import net.minecraft.advancement.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.s2c.play.AdvancementUpdateS2CPacket;
 import net.minecraft.scoreboard.number.BlankNumberFormat;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -23,7 +20,6 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -32,8 +28,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 public class WrenchHandler {
     private final Sidebar sidebar = new Sidebar(Sidebar.Priority.HIGH);

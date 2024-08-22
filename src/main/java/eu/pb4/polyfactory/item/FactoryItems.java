@@ -9,11 +9,9 @@ import eu.pb4.polyfactory.FactoryRegistries;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.block.fluids.PortableFluidTankBlock;
 import eu.pb4.polyfactory.block.fluids.PortableFluidTankBlockEntity;
-import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.item.block.*;
 import eu.pb4.polyfactory.item.component.FluidComponent;
-import eu.pb4.polyfactory.item.debug.BaseDebugItem;
 import eu.pb4.polyfactory.item.tool.*;
 import eu.pb4.polyfactory.item.util.*;
 import eu.pb4.polyfactory.util.DyeColorExtra;
@@ -34,7 +32,6 @@ import net.minecraft.item.*;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 
@@ -131,6 +128,7 @@ public class FactoryItems {
     public static final Item PIPE = register("pipe", new PipeItem(FactoryBlocks.PIPE, new Item.Settings()));
     public static final Item FILTERED_PIPE = register(FactoryBlocks.FILTERED_PIPE);
     public static final Item PUMP = register(FactoryBlocks.PUMP);
+    public static final Item NOZZLE = register(FactoryBlocks.NOZZLE);
     public static final Item DRAIN = register(FactoryBlocks.DRAIN);
     public static final Item MECHANICAL_DRAIN = register(FactoryBlocks.MECHANICAL_DRAIN);
     public static final Item MECHANICAL_SPOUT = register(FactoryBlocks.MECHANICAL_SPOUT);
@@ -140,7 +138,7 @@ public class FactoryItems {
     public static final Item PORTABLE_FLUID_TANK = register(FactoryBlocks.PORTABLE_FLUID_TANK,
             (s) -> s.maxCount(1).component(FactoryDataComponents.FLUID, FluidComponent.empty(PortableFluidTankBlockEntity.CAPACITY)));
 
-    public static final FluidLauncherItem FLUID_LAUNCHER = register("fluid_launcher", new FluidLauncherItem(new Item.Settings().maxCount(1)));
+    public static final PressureFluidGun PRESSURE_FLUID_GUN = register("pressure_fluid_gun", new PressureFluidGun(new Item.Settings().maxCount(1)));
     public static void register() {
         FuelRegistry.INSTANCE.add(SAW_DUST, 60);
         FuelRegistry.INSTANCE.add(WOODEN_PLATE, 120);
@@ -347,7 +345,8 @@ public class FactoryItems {
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(STEEL_BUCKET, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(FLUID_LAUNCHER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(PRESSURE_FLUID_GUN, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(NOZZLE, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     })).build()
             );
         }

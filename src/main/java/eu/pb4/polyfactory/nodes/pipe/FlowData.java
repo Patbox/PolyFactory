@@ -8,7 +8,9 @@ import com.kneelawk.graphlib.api.util.LinkPos;
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.mixin.SimpleBlockGraphAccessor;
 import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
+import eu.pb4.polyfactory.nodes.DirectionNode;
 import it.unimi.dsi.fastutil.objects.*;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -20,7 +22,23 @@ import java.util.function.BooleanSupplier;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class FlowData implements GraphEntity<FlowData> {
-    public static final Direction[] DIRECTIONS = Direction.values();
+    public static final Direction[][] DIRECTIONS = Util.make(new Direction[Direction.values().length][], arr -> {
+        for (var dir : Direction.values()) {
+            var preference = new Direction[Direction.values().length];
+            preference[0] = dir;
+            preference[1] = dir.getOpposite();
+            var startAxis = switch (dir.getAxis()) {
+                case Y, Z -> Direction.Axis.X;
+                case X -> Direction.Axis.Z;
+            };
+            preference[2] = Direction.from(startAxis, dir.getDirection());
+            preference[3] = preference[2].getOpposite();
+            preference[4] = preference[2].rotateClockwise(dir.getAxis());
+            preference[5] = preference[2].rotateCounterclockwise(dir.getAxis());
+
+            arr[dir.ordinal()] = preference;
+        }
+    });
     public static final Codec<FlowData> CODEC = Codec.unit(FlowData::new);
     public static final GraphEntityType<FlowData> TYPE = GraphEntityType.of(id("flow_data"), CODEC, FlowData::new, FlowData::split);
     public static FlowData EMPTY = new FlowData() {
@@ -34,6 +52,8 @@ public class FlowData implements GraphEntity<FlowData> {
     private final Map<BlockPos, CurrentFlow> currentFlow = new HashMap<>();
     private final Object2DoubleMap<BlockPos> sourceStrength = new Object2DoubleOpenHashMap<>();
     private boolean isInvalid = true;
+
+
 
     public FlowData() {
     }
@@ -97,6 +117,7 @@ public class FlowData implements GraphEntity<FlowData> {
         var dirs = new Direction[6];
         var dirsI = 0;
 
+
         for (var pump : this.ctx.getGraph().getCachedNodes(PumpNode.CACHE)) {
             states.clear();
             var isPulling = pump.getNode().isPulling();
@@ -143,17 +164,18 @@ public class FlowData implements GraphEntity<FlowData> {
                         flow.pull.clear();
                     }
 
+                    var directions = DIRECTIONS[direction.ordinal()];
+
                     dirsI = 0;
-                    for (int i = 0; i < DIRECTIONS.length; i++) {
-                        var d = DIRECTIONS[i];
-                        if (d != direction.getOpposite() && node.getNode() instanceof DirectionCheckingNode check && check.canConnectDir(d)) {
-                            dirs[dirsI++] = d;
+                    if (node.getNode() instanceof FlowNode check) {
+                        for (int i = 0; i < directions.length; i++) {
+                            var d = directions[i];
+                            if (d != direction.getOpposite() && check.canFlowIn(d)) {
+                                dirs[dirsI++] = d;
+                            }
                         }
                     }
 
-                    if (dirsI == 0) {
-                        break;
-                    }
                     var main = (isPulling ? flow.push : flow.pull);
                     var multi = isPulling ? flow.pull : flow.push;
                     if (!main.add(direction.getOpposite())) {
@@ -165,6 +187,22 @@ public class FlowData implements GraphEntity<FlowData> {
                     }
 
                     flow.distance.setValue(distance--);
+
+                    dirsI = 0;
+                    if (node.getNode() instanceof DirectionCheckingNode check) {
+                        for (int i = 0; i < directions.length; i++) {
+                            var d = directions[i];
+                            if (d != direction.getOpposite() && check.canConnectDir(d)) {
+                                dirs[dirsI++] = d;
+                            }
+                        }
+                    }
+
+
+                    if (dirsI == 0) {
+                        break;
+                    }
+
                     if (dirsI == 1) {
                         direction = dirs[0];
                     } else {

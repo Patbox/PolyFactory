@@ -9,7 +9,7 @@ import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.PressInput;
 import eu.pb4.polyfactory.recipe.press.PressRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
-import eu.pb4.polyfactory.util.FactorySoundEvents;
+import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;

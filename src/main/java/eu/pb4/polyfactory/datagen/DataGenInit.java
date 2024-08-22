@@ -13,7 +13,9 @@ public class DataGenInit implements DataGeneratorEntrypoint {
         pack.addProvider(EntityTagsProvider::new);
         pack.addProvider(LootTables::new);
         pack.addProvider(EnchantmentProvider::new);
-        pack.addProvider(EnchantmentTagProvider::new);
+        pack.addProvider(EnchantmentProvider.Tags::new);
+        pack.addProvider(DamageTypeProvider::new);
+        pack.addProvider(DamageTypeProvider.Tags::new);
         pack.addProvider(RecipesProvider::new);
         pack.addProvider(AdvancementsProvider::new);
         pack.addProvider(AssetProvider::new);

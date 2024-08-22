@@ -13,6 +13,9 @@ public interface ShooterContext {
     UUID uuid();
     Vec3d position();
     Vec3d rotation();
-
     SoundCategory soundCategory();
+
+    default float force() {
+        return 1;
+    }
 }

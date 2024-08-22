@@ -25,7 +25,6 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.network.packet.s2c.play.EntityEquipmentUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
@@ -36,12 +35,12 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FluidLauncherItem extends Item implements PolymerItem, RegistryCallbackItem {
+public class PressureFluidGun extends Item implements PolymerItem, RegistryCallbackItem {
     private PolymerModelData baseModel = FactoryModels.PLACEHOLDER;
     private PolymerModelData activeOthersModel = FactoryModels.PLACEHOLDER;
     private PolymerModelData activeSelfModel = FactoryModels.PLACEHOLDER;
 
-    public FluidLauncherItem(Settings settings) {
+    public PressureFluidGun(Settings settings) {
         super(settings);
     }
 

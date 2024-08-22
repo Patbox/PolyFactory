@@ -116,6 +116,7 @@ public abstract class PipeLikeBlockEntity extends BlockEntity implements FluidIn
                     this.container.insert(fluid, leftover, false);
                 }
                 this.maxPush -= extracted - leftover;
+                this.pushOverflow[direction.ordinal()] = 0;
             }
             return;
         }

@@ -15,7 +15,7 @@ import eu.pb4.polyfactory.recipe.mixing.*;
 import eu.pb4.polyfactory.recipe.press.FillSprayCanPressRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import eu.pb4.polyfactory.util.FactorySoundEvents;
+import eu.pb4.polyfactory.other.FactorySoundEvents;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
@@ -28,8 +28,6 @@ import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
 import net.minecraft.item.*;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.Potions;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
@@ -1019,8 +1017,8 @@ class RecipesProvider extends FabricRecipeProvider {
         exporter.accept(id("spout/experience_repair"), new RepairSpoutRecipe(), null);
         exporter.accept(id("spout/sticky_piston"), SimpleSpoutRecipe.toItem(Items.PISTON, FactoryFluids.SLIME.of(FluidConstants.BLOCK / 10), Items.STICKY_PISTON, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
         exporter.accept(id("spout/sticky_conveyor"), SimpleSpoutRecipe.toItem(FactoryItems.CONVEYOR, FactoryFluids.SLIME.of(FluidConstants.BLOCK / 10), FactoryItems.STICKY_CONVEYOR, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
-        exporter.accept(id("spout/brittle_glass_bottle"), SimpleSpoutRecipe.toItem(Items.GLASS_BOTTLE, FactoryFluids.LAVA.of(FluidConstants.BLOCK / 15), FactoryItems.BRITTLE_GLASS_BOTTLE, SoundEvents.BLOCK_GLASS_HIT), null);
-        exporter.accept(id("spout/brittle_potion"), SimpleSpoutRecipe.toItemCopy(Items.POTION, FactoryFluids.LAVA.of(FluidConstants.BLOCK / 15), FactoryItems.BRITTLE_POTION, SoundEvents.BLOCK_GLASS_HIT), null);
+        exporter.accept(id("spout/brittle_glass_bottle"), SimpleSpoutRecipe.toItem(Items.GLASS_BOTTLE, FactoryFluids.LAVA.of(FluidConstants.BLOCK / 30), FactoryItems.BRITTLE_GLASS_BOTTLE, SoundEvents.BLOCK_GLASS_HIT), null);
+        exporter.accept(id("spout/brittle_potion"), SimpleSpoutRecipe.toItemCopy(Items.POTION, FactoryFluids.LAVA.of(FluidConstants.BLOCK / 30), FactoryItems.BRITTLE_POTION, SoundEvents.BLOCK_GLASS_HIT), null);
     }
 
     private void fluidBase(RecipeExporter exporter, Item withFluid, Item emptyContainer, FluidStack<?> fluid, SoundEvent fillSound, SoundEvent emptySound) {

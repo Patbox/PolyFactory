@@ -10,6 +10,7 @@
   - Added Portable Fluid Tank - Portable version of the tank, which can store up to 4 buckets of fluid. Keeps stored fluids when broken, while still being placeable.
   - Mechanical Mixers can now store fluids and use them as an ingredient and result of a recipe.
 - Added Experience Bucket, Slime Bucket and Honey Bucket.
+- Added Brittle Glass Bottle and Brittle Potions - they break after drinking, instead of returning the glass bottle.
 - You can now put Cables within wall blocks.
 - Tweaked Mechanical Press textures.
 - Mobs killed by the Mechanical Miner can now drop XP.
@@ -21,5 +22,6 @@
  - Dirt + Water -> Mud
  - (Heated) Slime Block -> Slime (Fluid)
  - (Heated) Honey Block -> Honey (Fluid)
+ - (Heated) All potion recipes
 - Polydex: Wooden Containers now show how many items they can fit in.
 - Fixed some block interactions also triggering item use when they shouldn't (for example placing water with a bucket).

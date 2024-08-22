@@ -1,0 +1,28 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"particle": "polyfactory:block/fluid/experience",
+		"texture": "polyfactory:block/fluid/experience"
+	},
+	"elements": [
+		{
+			"from": [7, 7, 8],
+			"to": [10, 10, 8],
+			"rotation": {"angle": 0, "axis": "x", "origin": [8, 8, 8]},
+			"faces": {
+				"north": {"uv": [7, 10, 10, 7], "rotation": 180, "texture": "#texture", "tintindex": 0},
+				"east": {"uv": [7, 7, 10, 7], "rotation": 270, "texture": "#texture", "tintindex": 0},
+				"south": {"uv": [7, 7, 10, 10], "texture": "#texture", "tintindex": 0},
+				"west": {"uv": [7, 7, 10, 7], "rotation": 90, "texture": "#texture", "tintindex": 0},
+				"up": {"uv": [7, 7, 10, 7], "rotation": 180, "texture": "#texture", "tintindex": 0},
+				"down": {"uv": [7, 7, 10, 7], "texture": "#texture", "tintindex": 0}
+			}
+		}
+	],
+	"gui_light": "front",
+	"display": {
+		"gui": {
+			"rotation": [90, 0, 0]
+		}
+	}
+}

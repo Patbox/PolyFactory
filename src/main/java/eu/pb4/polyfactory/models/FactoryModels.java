@@ -14,6 +14,7 @@ import static eu.pb4.polyfactory.ModInit.id;
 public interface FactoryModels {
     PolymerModelData PLACEHOLDER = PolymerResourcePackUtils.requestModel(BaseItemProvider.requestItem(), Identifier.ofVanilla("missing"));
     FluidModel FLUID_FLAT_FULL = new FluidModel(id("block/fluid/flat_model"));
+    FluidModel FLUID_PARTICLE = new FluidModel(id("particle/fluid/particle"));
 
     FluidModel[] FLUID_FLAT_SCALED = Util.make(new FluidModel[16], (arr) -> {
        for (int i = 0; i < 15; i++) {

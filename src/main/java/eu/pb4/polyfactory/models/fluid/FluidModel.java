@@ -51,19 +51,22 @@ public class FluidModel {
 
         PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register((b) -> generateAssets(b::addData));
     }
-
-    public ItemStack get(@Nullable FluidInstance<?> type) {
-        if (type == null) {
-            return ItemStack.EMPTY;
-        }
-        var stack = this.model.getOrDefault(type.type(), ItemStack.EMPTY);
-        if (type.type().color().isEmpty()) {
+    public <T> ItemStack get(FluidType<T> fluid, T data) {
+        var stack = this.model.getOrDefault(fluid, ItemStack.EMPTY);
+        if (fluid.color().isEmpty()) {
             return stack;
         }
         stack = stack.copy();
         //noinspection unchecked
-        stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(((FluidType.ColorProvider<Object>) type.type().color().get()).getColor(type.data()), false));
+        stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(((FluidType.ColorProvider<Object>) fluid.color().get()).getColor(data), false));
         return stack;
+    }
+
+    public <T> ItemStack get(@Nullable FluidInstance<T> type) {
+        if (type == null) {
+            return ItemStack.EMPTY;
+        }
+        return get(type.type(), type.data());
     }
 
     private void addTextures(Identifier id, FluidType<?> object, Function<ModelRenderType, Item> function) {

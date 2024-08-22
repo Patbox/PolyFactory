@@ -14,6 +14,7 @@ import eu.pb4.polyfactory.nodes.mechanical.*;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.LargeGearNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
 import eu.pb4.polyfactory.nodes.pipe.FlowData;
+import eu.pb4.polyfactory.nodes.pipe.NozzleNode;
 import eu.pb4.polyfactory.nodes.pipe.PumpNode;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
@@ -91,6 +92,7 @@ public class FactoryNodes {
         });
         addSimpleNodes(universe);
         universe.addNodeType(PumpNode.TYPE);
+        universe.addNodeType(NozzleNode.TYPE);
         universe.addCacheCategory(PumpNode.CACHE);
         universe.addGraphEntityType(FlowData.TYPE);
 

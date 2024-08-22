@@ -6,6 +6,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNodeType;
 import com.kneelawk.graphlib.api.util.EmptyLinkKey;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.math.Direction;
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public record AllSideNode() implements BlockNode {
+public record AllSideNode() implements BlockNode, DirectionCheckingNode {
     public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("all_side"), AllSideNode::new);
 
     @Override
@@ -32,6 +33,11 @@ public record AllSideNode() implements BlockNode {
                     .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).forEach(list::add);
         }
         return list;
+    }
+
+    @Override
+    public boolean canConnectDir(Direction direction) {
+        return true;
     }
 
     @Override

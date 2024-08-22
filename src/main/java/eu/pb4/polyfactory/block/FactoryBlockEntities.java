@@ -131,6 +131,7 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<FilteredPipeBlockEntity> FILTERED_PIPE = register("filtered_pipe",
             BlockEntityType.Builder.create(FilteredPipeBlockEntity::new, FactoryBlocks.FILTERED_PIPE));
     public static final BlockEntityType<PumpBlockEntity> PUMP = register("pump", BlockEntityType.Builder.create(PumpBlockEntity::new, FactoryBlocks.PUMP));
+    public static final BlockEntityType<NozzleBlockEntity> NOZZLE = register("nozzle", BlockEntityType.Builder.create(NozzleBlockEntity::new, FactoryBlocks.NOZZLE));
     public static final BlockEntityType<DrainBlockEntity> DRAIN = register("drain", BlockEntityType.Builder.create(DrainBlockEntity::new, FactoryBlocks.DRAIN));
     public static final BlockEntityType<MDrainBlockEntity> MECHANICAL_DRAIN = register("mechanical_drain", BlockEntityType.Builder.create(MDrainBlockEntity::new, FactoryBlocks.MECHANICAL_DRAIN));
     public static final BlockEntityType<MSpoutBlockEntity> MECHANICAL_SPOUT = register("mechanical_spout", BlockEntityType.Builder.create(MSpoutBlockEntity::new, FactoryBlocks.MECHANICAL_SPOUT));

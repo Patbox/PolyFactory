@@ -120,7 +120,7 @@
     ],
     "subtitle": "subtitles.item.bucket.fill"
   },
-  "item.fluid_launcher.shoot_water": {
+  "fluid.shoot.water": {
     "sounds": [
       {
         "name": "liquid/swim1",
@@ -143,9 +143,58 @@
         "volume": 0.8
       }
     ],
-    "subtitle": "subtitles.polyfactory.fluid_launcher.shoot_water"
+    "subtitle": "subtitles.polyfactory.fluid.shoot.water"
   },
-  "item.fluid_launcher.shoot_lava": {
+  "fluid.shoot.milk": {
+    "sounds": [
+      {
+        "name": "liquid/swim1",
+        "pitch": 1.7,
+        "volume": 0.8
+      },
+      {
+        "name": "liquid/swim2",
+        "pitch": 1.7,
+        "volume": 0.8
+      },
+      {
+        "name": "liquid/swim3",
+        "pitch": 1.7,
+        "volume": 0.8
+      },
+      {
+        "name": "liquid/swim4",
+        "pitch": 1.7,
+        "volume": 0.8
+      }
+    ],
+    "subtitle": "subtitles.polyfactory.fluid.shoot.milk"
+  },
+  "fluid.shoot.potion": {
+    "sounds": [
+      {
+        "name": "liquid/swim1",
+        "pitch": 1.75,
+        "volume": 0.8
+      },
+      {
+        "name": "liquid/swim2",
+        "pitch": 1.75,
+        "volume": 0.8
+      },
+      {
+        "name": "liquid/swim3",
+        "pitch": 1.75,
+        "volume": 0.8
+      },
+      {
+        "name": "liquid/swim4",
+        "pitch": 1.75,
+        "volume": 0.8
+      }    ],
+    "subtitle": "subtitles.polyfactory.fluid.shoot.potion"
+  },
+  "fluid.shoot.lava": {
     "sounds": [
       {
         "name": "mob/ghast/fireball4",
@@ -153,6 +202,16 @@
         "volume": 0.7
       }
     ],
-    "subtitle": "subtitles.polyfactory.fluid_launcher.shoot_lava"
+    "subtitle": "subtitles.polyfactory.fluid.shoot.lava"
+  },
+  "fluid.shoot.experience": {
+    "sounds": [
+      {
+        "name": "random/orb",
+        "pitch": 1.8,
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "subtitles.polyfactory.fluid.shoot.experience"
   }
 }

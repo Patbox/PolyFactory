@@ -62,6 +62,7 @@
   "block.polyfactory.pipe": "Copper Pipe",
   "block.polyfactory.filtered_pipe": "Filtered Copper Pipe",
   "block.polyfactory.wall_with_pipe": "%s with Copper Pipe",
+  "block.polyfactory.nozzle": "Fluid Nozzle",
   "block.polyfactory.drain": "Fluid Drain",
   "block.polyfactory.mechanical_drain": "Mechanical Fluid Drain",
   "block.polyfactory.mechanical_spout": "Mechanical Spout",
@@ -80,6 +81,7 @@
   "item.polyfactory.steel_alloy_mixture": "Steel Alloy Mixture",
   "item.polyfactory.steel_ingot": "Steel Ingot",
   "item.polyfactory.steel_plate": "Steel Plate",
+  "item.polyfactory.steel_mesh": "Steel Mesh",
   "item.polyfactory.steel_gear": "Steel Gear",
   "item.polyfactory.copper_plate": "Copper Plate",
   "item.polyfactory.steel_gear.tooltip": "Click [%s] on Axle to place",
@@ -108,7 +110,7 @@
   "item.polyfactory.spray_can.empty": "Empty Spray Can",
   "item.polyfactory.spray_can.colored": "%s Spray Can",
   "item.polyfactory.spray_can.colored.full": "%s Spray Can (%s)",
-  "item.polyfactory.fluid_launcher": "Fluid Launcher",
+  "item.polyfactory.pressure_fluid_gun": "Pressure Fluid Gun",
   "item.polyfactory.throwable_glass_bottle": "Throwable Glass Bottle",
   "item.polyfactory.lingering_throwable_glass_bottle": "Lingering Throwable Glass Bottle",
   "item.polyfactory.brittle_glass_bottle": "Brittle Glass Bottle",
@@ -216,6 +218,9 @@
   "entity.polyfactory.dynamite": "Dynamite",
   "entity.polyfactory.splash": "Splash of %s",
 
+  "death.polyfactory.experience_bolt": "%1$s was shot by %2$s",
+  "death.polyfactory.experience_bolt.item": "%1$s was shot by %2$s using %3$s",
+
   "enchantment.polyfactory.ignore_movement": "Stable Ground",
   "recipe_type.polyfactory.press": "Press",
   "recipe_type.polyfactory.mixer": "Mixer",
@@ -226,8 +231,11 @@
   "stat.polyfactory.taters_clicked": "Potatoes Clicked",
   "subtitles.polyfactory.block.press.craft": "Mechanical Press presses",
   "subtitles.polyfactory.entity.dynamite.throw": "Dynamite flies",
-  "subtitles.polyfactory.fluid_launcher.shoot_water": "Fluid Launcher shoots",
-  "subtitles.polyfactory.fluid_launcher.shoot_lava": "Fluid Launcher shoots",
+  "subtitles.polyfactory.fluid.shoot.water": "Water shoots out",
+  "subtitles.polyfactory.fluid.shoot.lava": "Flames shoot out",
+  "subtitles.polyfactory.fluid.shoot.milk": "Milk shoots out",
+  "subtitles.polyfactory.fluid.shoot.potion": "Potion shoots out",
+  "subtitles.polyfactory.fluid.shoot.experience": "Experience shoots out",
 
 
   "text.polyfactory.artificial_color": "Artificially Colored",

@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.entity.splash.SplashEntity;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.mixin.ProjectileEntityAccessor;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -13,7 +14,7 @@ import org.joml.Vector3f;
 
 import java.util.function.BiFunction;
 
-public record ShootProjecticleEntity<T>(BiFunction<ServerWorld, FluidInstance<T>, ProjectileEntity> entityCreator,
+public record ShootProjecticleEntity<T>(BiFunction<ServerWorld, FluidInstance<T>, Entity> entityCreator,
                                         int splashPerTick, long amount,
                                         float baseSpeed, float extraSpeed,
                                         float initialDivergence, float maxDivergence,
@@ -33,7 +34,7 @@ public record ShootProjecticleEntity<T>(BiFunction<ServerWorld, FluidInstance<T>
         }, splashPerTick, amount, baseSpeed, extraSpeed, initialDivergence, maxDivergence, soundEvent);
     }
 
-    public static <T> FluidShootingBehavior<T> ofEntity(EntityType<? extends ProjectileEntity> entityType, int splashPerTick, long amount, float baseSpeed, float extraSpeed,
+    public static <T> FluidShootingBehavior<T> ofEntity(EntityType<?> entityType, int splashPerTick, long amount, float baseSpeed, float extraSpeed,
                                                     float initialDivergence, float maxDivergence, RegistryEntry<SoundEvent> soundEvent) {
         return new ShootProjecticleEntity<>((world, fluid) -> entityType.create(world), splashPerTick, amount, baseSpeed, extraSpeed, initialDivergence, maxDivergence, soundEvent);
     }
@@ -61,19 +62,20 @@ public record ShootProjecticleEntity<T>(BiFunction<ServerWorld, FluidInstance<T>
         var random = context.random();
         var world = context.world();
         for (int i = 0; i < this.splashPerTick; i++) {
-            var projectile = entityCreator.apply(world, fluidInstance);
-            assert projectile != null;
-            ((ProjectileEntityAccessor) projectile).setOwnerUuid(context.uuid());
-            projectile.setPosition(pos);
+            var entity = entityCreator.apply(world, fluidInstance);
+            if (entity instanceof ProjectileEntity projectile) {
+                ((ProjectileEntityAccessor) projectile).setOwnerUuid(context.uuid());
+            }
+            entity.setPosition(pos);
             vec.set(rotation.x, rotation.y, rotation.z);
             vec.add((float) random.nextTriangular(0, divergence),
                     (float) random.nextTriangular(0, divergence),
                     (float) random.nextTriangular(0, divergence));
             vec.normalize();
-            vec.mul(this.baseSpeed + random.nextFloat() * this.extraSpeed);
+            vec.mul((this.baseSpeed + random.nextFloat() * this.extraSpeed) * context.force());
 
-            projectile.setVelocity(vec.x, vec.y, vec.z);
-            world.spawnEntity(projectile);
+            entity.setVelocity(vec.x, vec.y, vec.z);
+            world.spawnEntity(entity);
         }
         world.playSound(null, pos.x, pos.y, pos.z, this.soundEvent, context.soundCategory(), 1, (float) random.nextTriangular(1, 0.1));
     }

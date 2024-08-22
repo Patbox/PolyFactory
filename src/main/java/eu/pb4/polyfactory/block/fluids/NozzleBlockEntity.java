@@ -1,0 +1,187 @@
+package eu.pb4.polyfactory.block.fluids;
+
+import com.mojang.authlib.GameProfile;
+import eu.pb4.factorytools.api.block.OwnedBlockEntity;
+import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.fluid.FluidContainer;
+import eu.pb4.polyfactory.fluid.FluidContainerImpl;
+import eu.pb4.polyfactory.fluid.FluidInstance;
+import eu.pb4.polyfactory.fluid.shooting.ShooterContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
+import org.apache.commons.lang3.mutable.MutableDouble;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.UUID;
+
+public class NozzleBlockEntity extends BlockEntity implements FluidInput.ContainerBased, ShooterContext, OwnedBlockEntity {
+    protected final FluidContainerImpl container = new FluidContainerImpl(FluidConstants.BLOCK * 3 / 2, this::markDirty);
+    private double speed;
+    @Nullable
+    private FluidInstance<?> currentFluid;
+    private GameProfile owner;
+    private int tick = 0;
+
+    public NozzleBlockEntity(BlockPos pos, BlockState state) {
+        super(FactoryBlockEntities.NOZZLE, pos, state);
+    }
+
+    @Override
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
+        nbt.putDouble("speed", this.speed);
+        nbt.putInt("tick", this.tick);
+        nbt.put("fluid", this.container.toNbt(registryLookup));
+        if (this.currentFluid != null) {
+            nbt.put("current_fluid", this.currentFluid.toNbt(registryLookup));
+        }
+    }
+
+    @Override
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
+        this.speed = nbt.getDouble("speed");
+        this.tick = nbt.getInt("tick");
+        this.container.fromNbt(registryLookup, nbt, "fluid");
+        this.currentFluid = FluidInstance.fromNbt(registryLookup, nbt.get("current_fluid"));
+    }
+
+    public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
+        if (!(t instanceof NozzleBlockEntity nozzle)) {
+            return;
+        }
+
+        if (nozzle.container.isEmpty()) {
+            nozzle.stopShooting();
+            if (nozzle.speed != 0) {
+                nozzle.speed = 0;
+                nozzle.markDirty();
+            }
+            return;
+        }
+        var num = new MutableDouble();
+        var goodDir = nozzle.getCachedState().get(NozzleBlock.FACING);
+        NetworkComponent.Pipe.getLogic((ServerWorld) world, pos).runPushFlows(pos, () -> true, (dir, strength) -> {
+            if (dir == goodDir) {
+                num.add(strength);
+            } else {
+                num.subtract(strength);
+            }
+        });
+        var strength = num.doubleValue();
+        if (strength <= 0.01) {
+            nozzle.speed = 0;
+            nozzle.stopShooting();
+            return;
+        }
+        if (nozzle.speed != strength) {
+            nozzle.speed = strength;
+            nozzle.markDirty();
+        }
+
+        if (nozzle.currentFluid != null) {
+            //noinspection unchecked
+            var fluid = (FluidInstance<Object>) nozzle.currentFluid;
+            if (fluid.shootingBehavior().canShoot(nozzle, fluid, nozzle.container)) {
+                fluid.shootingBehavior().continueShooting(nozzle, fluid, nozzle.tick++, nozzle.container);
+                nozzle.markDirty();
+                return;
+            }
+
+            nozzle.stopShooting();
+        }
+
+        for (var f : nozzle.container.fluids()) {
+            //noinspection unchecked
+            var fluid = (FluidInstance<Object>) f;
+            if (fluid.shootingBehavior().canShoot(nozzle, fluid, nozzle.container)) {
+                nozzle.currentFluid = fluid;
+                nozzle.tick = 0;
+                fluid.shootingBehavior().startShooting(nozzle, fluid, nozzle.container);
+                nozzle.markDirty();
+            }
+        }
+    }
+
+    private void stopShooting() {
+        if (this.currentFluid == null) {
+            return;
+        }
+        //noinspection unchecked
+        var fluid = (FluidInstance<Object>) this.currentFluid;
+        fluid.shootingBehavior().stopShooting(this, fluid);
+        this.tick = 0;
+        this.currentFluid = null;
+        this.markDirty();
+    }
+
+    @Override
+    public @Nullable FluidContainer getFluidContainer(Direction direction) {
+        return direction == this.getCachedState().get(NozzleBlock.FACING).getOpposite() ? this.getMainFluidContainer() : null;
+    }
+
+    @Override
+    public @Nullable FluidContainer getMainFluidContainer() {
+        return this.container;
+    }
+
+    @Override
+    public Random random() {
+        return this.world.random;
+    }
+
+    @Override
+    public ServerWorld world() {
+        return (ServerWorld) this.world;
+    }
+
+    @Override
+    public UUID uuid() {
+        return this.owner != null ? this.owner.getId() : Util.NIL_UUID;
+    }
+
+    @Override
+    public Vec3d position() {
+        return Vec3d.ofCenter(this.pos).offset(this.getCachedState().get(NozzleBlock.FACING), 0.75);
+    }
+
+    @Override
+    public Vec3d rotation() {
+        return new Vec3d(this.getCachedState().get(NozzleBlock.FACING).getUnitVector());
+    }
+
+    @Override
+    public SoundCategory soundCategory() {
+        return SoundCategory.BLOCKS;
+    }
+
+    @Override
+    public GameProfile getOwner() {
+        return this.owner;
+    }
+
+    @Override
+    public void setOwner(GameProfile profile) {
+        this.owner = profile;
+        this.markDirty();
+    }
+
+    @Override
+    public float force() {
+        return (float) MathHelper.clamp(this.speed * 10, 0.4, 1);
+    }
+}

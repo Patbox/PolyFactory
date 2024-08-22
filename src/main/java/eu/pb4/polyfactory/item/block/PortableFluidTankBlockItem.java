@@ -1,7 +1,6 @@
 package eu.pb4.polyfactory.item.block;
 
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
-import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidContainerFromComponent;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
 import eu.pb4.polyfactory.fluid.FluidInstance;
@@ -15,7 +14,6 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.Block;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.BlockPlacementDispenserBehavior;
-import net.minecraft.block.dispenser.DispenserBehavior;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FireworkExplosionComponent;
 import net.minecraft.entity.Entity;
@@ -66,7 +64,7 @@ public class PortableFluidTankBlockItem extends FactoryBlockItem {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
-        if (context.getPlayer() != null && context.getPlayer().getStackInHand(context.getHand() == Hand.MAIN_HAND ? Hand.OFF_HAND : Hand.MAIN_HAND).isOf(FactoryItems.FLUID_LAUNCHER)) {
+        if (context.getPlayer() != null && context.getPlayer().getStackInHand(context.getHand() == Hand.MAIN_HAND ? Hand.OFF_HAND : Hand.MAIN_HAND).isOf(FactoryItems.PRESSURE_FLUID_GUN)) {
             return ActionResult.PASS;
         }
         return super.useOnBlock(context);
