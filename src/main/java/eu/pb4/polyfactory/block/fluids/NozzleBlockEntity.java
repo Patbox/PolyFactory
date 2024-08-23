@@ -17,10 +17,7 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.mutable.MutableDouble;
@@ -62,6 +59,10 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
 
     public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
         if (!(t instanceof NozzleBlockEntity nozzle)) {
+            return;
+        }
+
+        if (!nozzle.world().getChunkManager().chunkLoadingManager.getTicketManager().shouldTickEntities(ChunkPos.toLong(pos))) {
             return;
         }
 

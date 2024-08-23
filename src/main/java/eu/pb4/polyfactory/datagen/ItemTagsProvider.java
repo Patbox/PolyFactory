@@ -34,6 +34,18 @@ class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
                 .add(FactoryItems.ARTIFICIAL_DYE)
         ;
 
+        this.getOrCreateTagBuilder(ConventionalItemTags.RANGED_WEAPON_TOOLS)
+                .add(FactoryItems.PRESSURE_FLUID_GUN)
+        ;
+
+        this.getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
+                .add(FactoryItems.PRESSURE_FLUID_GUN)
+        ;
+
+        this.getOrCreateTagBuilder(ItemTags.VANISHING_ENCHANTABLE)
+                .add(FactoryItems.PRESSURE_FLUID_GUN)
+        ;
+
         this.getOrCreateTagBuilder(ItemTags.DYEABLE)
                 .add(FactoryItems.WINDMILL_SAIL)
         ;
@@ -47,6 +59,18 @@ class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
                 .add(FactoryItems.CABLE)
                 .add(FactoryItems.WINDMILL_SAIL)
                 .add(FactoryItems.AXLE)
+                .add(FactoryItems.COPPER_PLATE)
+                .add(FactoryItems.CRUSHED_RAW_COPPER)
+                .add(FactoryItems.CRUSHED_RAW_IRON)
+                .add(FactoryItems.CRUSHED_RAW_GOLD)
+                .add(FactoryItems.FLUID_TANK)
+                .add(FactoryItems.PORTABLE_FLUID_TANK)
+                .add(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)
+                .add(FactoryItems.PIPE)
+                .add(FactoryItems.PUMP)
+                .add(FactoryItems.SPRAY_CAN)
+                .add(FactoryItems.CONVEYOR)
+                .add(FactoryItems.SPLITTER)
                 ;
 
         this.getOrCreateTagBuilder(FactoryItemTags.PLACER_USABLE)

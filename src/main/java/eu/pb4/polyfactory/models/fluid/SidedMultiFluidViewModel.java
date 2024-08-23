@@ -201,7 +201,7 @@ public class SidedMultiFluidViewModel {
             var side = FactoryModels.FLUID_FLAT_SCALED[SidedMultiFluidViewModel.textureId(amount)].get(instance);
             for (var dir : FactoryUtil.HORIZONTAL_DIRECTIONS) {
                 var part = this.parts.get(dir);
-                part.setTranslation(new Vector3f(0, 0.49f, -(-8f / 16f + (position + amount / 2) * 15.9f / 16f + 0.001f)));
+                part.setTranslation(new Vector3f(0, 0.499f, -(-8f / 16f + (position + amount / 2) * 15.9f / 16f + 0.001f)));
                 part.setScale(new Vector3f(1, 1, amount));
                 part.setItem(side);
 

@@ -44,6 +44,13 @@ public class DamageTypeProvider extends FabricCodecDataProvider<DamageType> {
                     .addOptionalTag(FactoryDamageTypes.EXPERIENCE_SPLASH.getValue());
             this.getOrCreateTagBuilder(DamageTypeTags.IS_PROJECTILE)
                     .addOptionalTag(FactoryDamageTypes.EXPERIENCE_SPLASH.getValue());
+            this.getOrCreateTagBuilder(DamageTypeTags.ALWAYS_HURTS_ENDER_DRAGONS)
+                    .addOptionalTag(FactoryDamageTypes.EXPERIENCE_SPLASH.getValue());
+            this.getOrCreateTagBuilder(DamageTypeTags.PANIC_CAUSES)
+                    .addOptionalTag(FactoryDamageTypes.EXPERIENCE_SPLASH.getValue());
+            this.getOrCreateTagBuilder(DamageTypeTags.BYPASSES_EFFECTS)
+                    .addOptionalTag(FactoryDamageTypes.EXPERIENCE_SPLASH.getValue());
+
         }
     }
 }

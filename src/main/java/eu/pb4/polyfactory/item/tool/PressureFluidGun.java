@@ -5,6 +5,7 @@ import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.polyfactory.fluid.*;
 import eu.pb4.polyfactory.fluid.shooting.EntityShooterContext;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
+import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -44,6 +45,11 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
         super(settings);
     }
 
+    public static boolean isUsable(ItemStack stack) {
+        return stack.getDamage() < stack.getMaxDamage() - 1;
+    }
+
+
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
@@ -72,7 +78,7 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
         var ctx = new EntityShooterContext(user);
 
         var containers = findFluidContainer(user);
-        if (containers.isEmpty()) {
+        if (containers.isEmpty() || !isUsable(stack)) {
             fluid.shootingBehavior().stopShooting(ctx, fluid);
             stack.remove(FactoryDataComponents.CURRENT_FLUID);
             return;
@@ -81,6 +87,10 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
         for (var container : containers) {
             if (fluid.shootingBehavior().canShoot(ctx, fluid, container)) {
                 fluid.shootingBehavior().continueShooting(ctx, fluid, -remainingUseTicks, container);
+                if (remainingUseTicks % 20 == 0) {
+                    stack.damage(1, user, user.getActiveHand() == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
+                }
+
                 var vec = ctx.rotation().multiply(user.isOnGround() ? -0.002 : -0.05);
                 FactoryUtil.addSafeVelocity(user, vec);
                 if (user instanceof ServerPlayerEntity player) {
@@ -95,12 +105,12 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        var stack = user.getStackInHand(hand);
         var containers = findFluidContainer(user);
-        if (containers.isEmpty()) {
+        if (containers.isEmpty() || !isUsable(stack)) {
             return TypedActionResult.fail(user.getStackInHand(hand));
         }
 
-        var stack = user.getStackInHand(hand);
         var ctx = new EntityShooterContext(user);
 
         for (var container : containers) {
@@ -108,6 +118,7 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
             for (var f : ((List<FluidInstance<Object>>) (Object) container.fluids())) {
                 if (f.shootingBehavior().canShoot(ctx, f, container)) {
                     stack.set(FactoryDataComponents.CURRENT_FLUID, f);
+                    stack.damage(1, user, hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
                     user.setCurrentHand(hand);
                     f.shootingBehavior().startShooting(ctx, f, container);
                     var vec = ctx.rotation().multiply(user.isOnGround() ? -0.01 : -0.07);
@@ -156,6 +167,16 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
     }
 
     @Override
+    public int getEnchantability() {
+        return 5;
+    }
+
+    @Override
+    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
+        return ingredient.isOf(FactoryItems.COPPER_PLATE);
+    }
+
+    @Override
     public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, RegistryWrapper.WrapperLookup lookup, @Nullable ServerPlayerEntity player) {
         var out = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, lookup, player);
         if (this.useCrossbowModel(itemStack)) {
@@ -168,6 +189,7 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
                     .withShowInTooltip(false)
             );*/
         }
+        out.set(DataComponentTypes.DAMAGE, itemStack.get(DataComponentTypes.DAMAGE));
         return out;
     }
 

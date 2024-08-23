@@ -12,36 +12,35 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import org.joml.Vector3f;
 
-import java.util.function.BiFunction;
-
-public record ShootProjecticleEntity<T>(BiFunction<ServerWorld, FluidInstance<T>, Entity> entityCreator,
-                                        int splashPerTick, long amount,
-                                        float baseSpeed, float extraSpeed,
-                                        float initialDivergence, float maxDivergence,
-                                        RegistryEntry<SoundEvent> soundEvent)
+public record ShootProjectileEntity<T>(EntityCreator<T> entityCreator,
+                                       int splashPerTick, AmountGetter<T> amount,
+                                       float baseSpeed, float extraSpeed,
+                                       float initialDivergence, float maxDivergence,
+                                       RegistryEntry<SoundEvent> soundEvent)
             implements FluidShootingBehavior<T> {
 
     public static <T> FluidShootingBehavior<T> ofSplash(EntityType<? extends SplashEntity<T>> entityType, int splashPerTick, long amount, RegistryEntry<SoundEvent> soundEvent) {
         return ofSplash(entityType, splashPerTick, amount, 2, 0.5f, 0.1f, 0.3f, soundEvent);
     }
+
     public static <T> FluidShootingBehavior<T> ofSplash(EntityType<? extends SplashEntity<T>> entityType, int splashPerTick, long amount, float baseSpeed, float extraSpeed,
                                                         float initialDivergence, float maxDivergence, RegistryEntry<SoundEvent> soundEvent) {
-        return new ShootProjecticleEntity<>((world, fluid) -> {
+        return new ShootProjectileEntity<>((world, fluid, a) -> {
             var splash = entityType.create(world);
             assert splash != null;
             splash.setFluidData(fluid.data());
             return splash;
-        }, splashPerTick, amount, baseSpeed, extraSpeed, initialDivergence, maxDivergence, soundEvent);
+        }, splashPerTick, (w, a,b, c) -> amount, baseSpeed, extraSpeed, initialDivergence, maxDivergence, soundEvent);
     }
 
     public static <T> FluidShootingBehavior<T> ofEntity(EntityType<?> entityType, int splashPerTick, long amount, float baseSpeed, float extraSpeed,
                                                     float initialDivergence, float maxDivergence, RegistryEntry<SoundEvent> soundEvent) {
-        return new ShootProjecticleEntity<>((world, fluid) -> entityType.create(world), splashPerTick, amount, baseSpeed, extraSpeed, initialDivergence, maxDivergence, soundEvent);
+        return new ShootProjectileEntity<>((world, fluid, a) -> entityType.create(world), splashPerTick, (w, a, b, c) -> amount, baseSpeed, extraSpeed, initialDivergence, maxDivergence, soundEvent);
     }
 
     @Override
     public boolean canShoot(ShooterContext context, FluidInstance<T> fluidInstance, FluidContainer container) {
-        return container.get(fluidInstance) >= amount;
+        return container.get(fluidInstance) >= amount.getAmount(context.world(), container, fluidInstance, true);
     }
 
     @Override
@@ -55,6 +54,7 @@ public record ShootProjecticleEntity<T>(BiFunction<ServerWorld, FluidInstance<T>
     }
 
     private void shoot(ShooterContext context, float divergence, FluidInstance<T> fluidInstance, FluidContainer container) {
+        var amount = this.amount.getAmount(context.world(), container, fluidInstance, false);
         container.extract(fluidInstance, amount, false);
         var vec = new Vector3f();
         var pos = context.position();
@@ -62,7 +62,7 @@ public record ShootProjecticleEntity<T>(BiFunction<ServerWorld, FluidInstance<T>
         var random = context.random();
         var world = context.world();
         for (int i = 0; i < this.splashPerTick; i++) {
-            var entity = entityCreator.apply(world, fluidInstance);
+            var entity = entityCreator.createEntity(world, fluidInstance, amount);
             if (entity instanceof ProjectileEntity projectile) {
                 ((ProjectileEntityAccessor) projectile).setOwnerUuid(context.uuid());
             }
@@ -82,4 +82,13 @@ public record ShootProjecticleEntity<T>(BiFunction<ServerWorld, FluidInstance<T>
 
     @Override
     public void stopShooting(ShooterContext context, FluidInstance<T> fluidInstance) {}
+
+
+    public interface AmountGetter<T> {
+        long getAmount(ServerWorld world, FluidContainer container, FluidInstance<T> instance, boolean isCheck);
+    }
+
+    public interface EntityCreator<T> {
+        Entity createEntity(ServerWorld world, FluidInstance<T> fluid, long amount);
+    }
 }

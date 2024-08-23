@@ -119,6 +119,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.MECHANICAL_SPOUT)
                 .add(FactoryBlocks.DRAIN)
                 .add(FactoryBlocks.FLUID_TANK)
+                .add(FactoryBlocks.NOZZLE)
                 .add(FactoryBlocks.PORTABLE_FLUID_TANK)
                 .add(FactoryBlocks.WALL_WITH_CABLE.values().toArray(new Block[0]))
         ;
@@ -126,6 +127,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
         this.getOrCreateTagBuilder(FactoryBlockTags.UNCONNECTABLE)
                 .add(FactoryBlocks.PUMP)
                 .add(FactoryBlocks.PIPE)
+                .add(FactoryBlocks.NOZZLE)
                 .add(FactoryBlocks.FILTERED_PIPE)
                 .add(FactoryBlocks.AXLE)
                 .add(FactoryBlocks.AXLE_WITH_GEAR)

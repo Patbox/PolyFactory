@@ -21,6 +21,7 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.wrench.WrenchItem;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.item.v1.CustomDamageHandler;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.Block;
@@ -28,6 +29,8 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.*;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
@@ -138,7 +141,8 @@ public class FactoryItems {
     public static final Item PORTABLE_FLUID_TANK = register(FactoryBlocks.PORTABLE_FLUID_TANK,
             (s) -> s.maxCount(1).component(FactoryDataComponents.FLUID, FluidComponent.empty(PortableFluidTankBlockEntity.CAPACITY)));
 
-    public static final PressureFluidGun PRESSURE_FLUID_GUN = register("pressure_fluid_gun", new PressureFluidGun(new Item.Settings().maxCount(1)));
+    public static final PressureFluidGun PRESSURE_FLUID_GUN = register("pressure_fluid_gun", new PressureFluidGun(
+            new Item.Settings().maxCount(1).maxDamage(700)));
     public static void register() {
         FuelRegistry.INSTANCE.add(SAW_DUST, 60);
         FuelRegistry.INSTANCE.add(WOODEN_PLATE, 120);
@@ -196,6 +200,7 @@ public class FactoryItems {
                     entries.add(MECHANICAL_SPOUT);
                     entries.add(FLUID_TANK);
                     entries.add(PORTABLE_FLUID_TANK);
+                    entries.add(NOZZLE);
 
                     // Data
                     entries.add(CABLE);
@@ -222,6 +227,10 @@ public class FactoryItems {
 
                     // Electrical machines (tier 2)
 
+                    // Tools
+                    entries.add(DYNAMITE);
+                    entries.add(PRESSURE_FLUID_GUN);
+                    entries.add(SPRAY_CAN);
                     // Rest
                     entries.add(INVERTED_REDSTONE_LAMP);
                     entries.add(ColoredItem.stack(LAMP, 1, DyeColor.WHITE));
@@ -232,8 +241,7 @@ public class FactoryItems {
                     entries.add(TINY_POTATO_SPRING);
 
                     // Other items
-                    entries.add(DYNAMITE);
-                    entries.add(SPRAY_CAN);
+
                     entries.add(HONEY_BUCKET);
                     entries.add(SLIME_BUCKET);
                     entries.add(EXPERIENCE_BUCKET);
@@ -345,8 +353,6 @@ public class FactoryItems {
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(STEEL_BUCKET, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(PRESSURE_FLUID_GUN, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(NOZZLE, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     })).build()
             );
         }
