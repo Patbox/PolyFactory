@@ -13,6 +13,7 @@ import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
 import eu.pb4.polyfactory.nodes.generic.SimpleDirectionNode;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -45,15 +46,16 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
     public static final Property<Direction.Axis> AXIS = Properties.AXIS;
     public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
     public static final BooleanProperty POWERED = Properties.POWERED;
+    public static final BooleanProperty INVERTED = Properties.INVERTED;
 
     public ClutchBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false).with(POWERED, false));
+        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false).with(POWERED, false).with(INVERTED, false));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(AXIS).add(WATERLOGGED).add(POWERED);
+        builder.add(AXIS, WATERLOGGED, POWERED, INVERTED);
     }
 
     @Override
@@ -92,11 +94,11 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
         var ax = state.get(AXIS);
-        return state.get(POWERED)
-                ? List.of(
-                        new SimpleDirectionNode(Direction.from(ax, Direction.AxisDirection.POSITIVE)),
-                        new SimpleDirectionNode(Direction.from(ax, Direction.AxisDirection.NEGATIVE)))
-                : List.of(new SimpleAxisNode(state.get(AXIS)));
+        return state.get(POWERED) == state.get(INVERTED)
+                ? List.of(new SimpleAxisNode(state.get(AXIS)))
+                : List.of(
+                new SimpleDirectionNode(Direction.from(ax, Direction.AxisDirection.POSITIVE)),
+                new SimpleDirectionNode(Direction.from(ax, Direction.AxisDirection.NEGATIVE)));
     }
 
     @Override
@@ -111,13 +113,7 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
 
     @Override
     public BlockState rotate(BlockState state, BlockRotation rotation) {
-        var a = state.get(AXIS);
-
-        if (a == Direction.Axis.Y || rotation == BlockRotation.NONE || rotation == BlockRotation.CLOCKWISE_180) {
-            return state;
-        }
-
-        return state.with(AXIS, a == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X);
+        return FactoryUtil.rotateAxis(state, AXIS, rotation);
     }
 
     @Override
@@ -132,7 +128,7 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
 
     @Override
     public List<WrenchAction> getWrenchActions() {
-        return List.of(WrenchAction.AXIS);
+        return List.of(WrenchAction.AXIS, WrenchAction.INVERTED);
     }
 
 

@@ -54,7 +54,7 @@ public class FilteredPipeBlockEntity extends PipeLikeBlockEntity implements Bloc
     }
 
     private boolean checkFluid(FluidInstance<?> instance) {
-        return allowedFluid == null || allowedFluid.equals(instance) == !this.getCachedState().get(FilteredPipeBlock.NEGATED);
+        return allowedFluid == null || allowedFluid.equals(instance) == !this.getCachedState().get(FilteredPipeBlock.INVERTED);
     }
 
     private void markFluidDirty() {

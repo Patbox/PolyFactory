@@ -20,6 +20,7 @@ import eu.pb4.polyfactory.nodes.mechanical.UnconnectedGearMechanicalNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
 import eu.pb4.polyfactory.nodes.pipe.NozzleNode;
 import eu.pb4.polyfactory.nodes.pipe.PumpNode;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -38,8 +39,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -89,6 +93,16 @@ public class NozzleBlock extends NetworkBlock implements FactoryBlock, Wrenchabl
     }
 
     @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.transform(state, rotation::rotate, FACING);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.transform(state, mirror::apply, FACING);
+    }
+
+    @Override
     public FluidState getFluidState(BlockState state) {
         return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
     }
@@ -101,11 +115,6 @@ public class NozzleBlock extends NetworkBlock implements FactoryBlock, Wrenchabl
     @Override
     public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
-    }
-
-    @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return true;
     }
 
     @Nullable
@@ -165,6 +174,7 @@ public class NozzleBlock extends NetworkBlock implements FactoryBlock, Wrenchabl
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 updateStatePos(this.blockState());
+                this.tick();
             }
         }
     }

@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.HopperBlockEntity;
+import net.minecraft.block.enums.WallShape;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,9 +36,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -419,6 +418,43 @@ public class FactoryUtil {
                     player.getStackInHand(hand), player.playerScreenHandler.nextRevision());
         }
     }
+
+    public static BlockState rotateAxis(BlockState state, Property<Direction.Axis> axis, BlockRotation rotation) {
+        var a = state.get(axis);
+
+        if (a == Direction.Axis.Y || rotation == BlockRotation.NONE || rotation == BlockRotation.CLOCKWISE_180) {
+            return state;
+        }
+
+        return state.with(axis, a == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X);
+    }
+
+    public static <T extends Comparable<T>> BlockState rotate(BlockState state, Property<T> north, Property<T> south, Property<T> east, Property<T> west, BlockRotation rotation) {
+        return switch (rotation) {
+            case CLOCKWISE_180 -> state.with(north, state.get(south))
+                    .with(east, state.get(west))
+                    .with(south, state.get(north))
+                    .with(west, state.get(east));
+            case COUNTERCLOCKWISE_90 -> state.with(north, state.get(east))
+                    .with(east, state.get(south))
+                    .with(south, state.get(west))
+                    .with(west, state.get(north));
+            case CLOCKWISE_90 -> state.with(north, state.get(west))
+                    .with(east, state.get(north))
+                    .with(south, state.get(east))
+                    .with(west, state.get(south));
+            default -> state;
+        };
+    }
+
+    public static <T extends Comparable<T>> BlockState mirror(BlockState state, Property<T> north, Property<T> south, Property<T> east, Property<T> west, BlockMirror mirror) {
+        return switch (mirror) {
+            case LEFT_RIGHT -> state.with(north, state.get(south)).with(south, state.get(north));
+            case FRONT_BACK -> state.with(east, state.get(west)).with(west, state.get(east));
+            default -> state;
+        };
+    }
+    
 
     public enum MovableResult {
         SUCCESS_MOVABLE,

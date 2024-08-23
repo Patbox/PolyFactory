@@ -17,6 +17,7 @@ import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.nodes.mechanical.UnconnectedGearMechanicalNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
 import eu.pb4.polyfactory.nodes.pipe.PumpNode;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -37,6 +38,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -84,6 +87,16 @@ public class PumpBlock extends NetworkBlock implements FactoryBlock, RotationUse
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         tickWater(state, world, pos);
         return state;
+    }
+
+    @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.transform(state, rotation::rotate, FACING);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.transform(state, mirror::apply, FACING);
     }
 
     @Override

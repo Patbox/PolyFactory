@@ -9,11 +9,13 @@ import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.input.SpoutInput;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.Unit;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -38,6 +40,11 @@ public record SimpleSpoutRecipe(CountedIngredient item, List<FluidStack<?>> flui
 
     public static SimpleSpoutRecipe toItemCopy(Item item, FluidStack<?> stack, Item out, SoundEvent sound) {
         return new SimpleSpoutRecipe(CountedIngredient.ofItems(1, item), List.of(stack), out.getDefaultStack(), true,
+                Registries.SOUND_EVENT.getEntry(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()));
+    }
+
+    public static SimpleSpoutRecipe template(Item template, FluidStack<Unit> stack, Item out, SoundEvent sound) {
+        return new SimpleSpoutRecipe(CountedIngredient.ofItems(0, template), List.of(stack), out.getDefaultStack(), false,
                 Registries.SOUND_EVENT.getEntry(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()));
     }
 

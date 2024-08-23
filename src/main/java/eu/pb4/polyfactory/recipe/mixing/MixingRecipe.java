@@ -32,6 +32,9 @@ public interface MixingRecipe extends Recipe<MixingInput>, PolymerRecipe {
     default List<FluidStack<?>> fluidOutput(MixingInput input) {
         return List.of();
     }
+    default List<FluidInputStack> fluidInput(MixingInput input) {
+        return List.of();
+    }
 
     @Override
     default ItemStack createIcon() {

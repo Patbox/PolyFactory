@@ -14,6 +14,7 @@ import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.nodes.generic.SelectiveSideNode;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -33,6 +34,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
@@ -147,7 +150,7 @@ public class PipeBlock extends PipeBaseBlock implements WrenchableBlock {
         return neighborState.getBlock() instanceof PipeConnectable connectable && connectable.canPipeConnect(world, neighborPos, neighborState, direction);
     }
 
-    public EnumSet<Direction> getDirections(BlockState state) {
+    public EnumSet<Direction> getFlowDirections(BlockState state) {
         var list = new ArrayList<Direction>(6);
 
         for (var dir : Direction.values()) {
@@ -167,6 +170,16 @@ public class PipeBlock extends PipeBaseBlock implements WrenchableBlock {
     @Override
     public boolean checkModelDirection(BlockState state, Direction direction) {
         return state.get(FACING_PROPERTIES.get(direction)).orElse(true);
+    }
+
+    @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.rotate(state, NORTH, SOUTH, EAST, WEST, rotation);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.mirror(state, NORTH, SOUTH, EAST, WEST, mirror);
     }
 
     @Override

@@ -21,7 +21,6 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.wrench.WrenchItem;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.item.v1.CustomDamageHandler;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.Block;
@@ -29,8 +28,6 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.*;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
@@ -127,9 +124,11 @@ public class FactoryItems {
     public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
+    public static final Item TEMPLATE_BALL = register("template_ball", new ModeledItem(new Item.Settings()));
     public static final Item SPRAY_CAN = register("spray_can", new DyeSprayItem(new Item.Settings().maxCount(1)));
     public static final Item PIPE = register("pipe", new PipeItem(FactoryBlocks.PIPE, new Item.Settings()));
     public static final Item FILTERED_PIPE = register(FactoryBlocks.FILTERED_PIPE);
+    public static final Item REDSTONE_VALVE_PIPE = register(FactoryBlocks.REDSTONE_VALVE_PIPE);
     public static final Item PUMP = register(FactoryBlocks.PUMP);
     public static final Item NOZZLE = register(FactoryBlocks.NOZZLE);
     public static final Item DRAIN = register(FactoryBlocks.DRAIN);
@@ -194,6 +193,7 @@ public class FactoryItems {
                     // Fluids
                     entries.add(PIPE);
                     entries.add(FILTERED_PIPE);
+                    entries.add(REDSTONE_VALVE_PIPE);
                     entries.add(PUMP);
                     entries.add(DRAIN);
                     entries.add(MECHANICAL_DRAIN);

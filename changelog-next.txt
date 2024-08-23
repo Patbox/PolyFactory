@@ -2,6 +2,7 @@
   - Currently available fluids: Water, Lava, Milk, Experience, Potion (all types), Slime and Honey.
   - Added Copper Pipes - Transport fluids anywhere you need them!
   - Added Filtered Copper Pipes - filter out fluids, so they go where you need them to!
+  - Added Copper Pipes with Redstone Valve - Power it to prevent fluid flow or invert it to require power for it!
   - Added Mechanical Pumps - Gives fluids a little push (or pull) needed for them to move in the pipes.
   - Added Fluid Drains - A block player can use to put or take fluids to/from.
   - Added Mechanical Fluid Drains - Automatic Fluid Drain, with limitation that it can't take fluids out.
@@ -14,7 +15,7 @@
 - Added Experience Bucket, Slime Bucket and Honey Bucket.
 - Added Brittle Glass Bottle and Brittle Potions - they break after drinking, instead of returning the glass bottle.
 - You can now put Cables within wall blocks.
-- Tweaked Mechanical Press textures.
+- Clutches can now be inverted - Disconnect both sides unless powered.
 - Mobs killed by the Mechanical Miner can now drop XP.
 - New Grinder recipe:
  - Nether Wart Block -> 1-5 Nether Wards
@@ -26,4 +27,5 @@
  - (Heated) Honey Block -> Honey (Fluid)
  - (Heated) All potion recipes
 - Polydex: Wooden Containers now show how many items they can fit in.
+- Tweaked Mechanical Press textures.
 - Fixed some block interactions also triggering item use when they shouldn't (for example placing water with a bucket).

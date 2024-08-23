@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.fluids;
 
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -16,6 +17,7 @@ import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
@@ -82,7 +84,7 @@ public class PipeInWallBlock extends PipeBaseBlock implements WrenchableBlock {
         return state;
     }
 
-    public EnumSet<Direction> getDirections(BlockState state) {
+    public EnumSet<Direction> getFlowDirections(BlockState state) {
         var axis = state.get(AXIS);
         return EnumSet.of(Direction.get(Direction.AxisDirection.POSITIVE, axis), Direction.get(Direction.AxisDirection.NEGATIVE, axis));
     }
@@ -90,6 +92,11 @@ public class PipeInWallBlock extends PipeBaseBlock implements WrenchableBlock {
     @Override
     public boolean checkModelDirection(BlockState state, Direction direction) {
         return state.get(AXIS) == direction.getAxis();
+    }
+
+    @Override
+    protected BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.rotateAxis(state, AXIS, rotation);
     }
 
     @Override

@@ -7,17 +7,12 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.block.property.FactoryProperties;
-import eu.pb4.polyfactory.block.property.LazyEnumProperty;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.nodes.generic.SelectiveSideNode;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -27,11 +22,9 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -76,7 +69,7 @@ public abstract class PipeBaseBlock extends NetworkBlock implements FactoryBlock
         return new PipeModel(initialBlockState);
     }
 
-    public abstract EnumSet<Direction> getDirections(BlockState state);
+    public abstract EnumSet<Direction> getFlowDirections(BlockState state);
 
     public abstract boolean checkModelDirection(BlockState state, Direction direction);
 
@@ -94,7 +87,7 @@ public abstract class PipeBaseBlock extends NetworkBlock implements FactoryBlock
 
     @Override
     public Collection<BlockNode> createPipeNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new SelectiveSideNode(getDirections(state)));
+        return List.of(new SelectiveSideNode(getFlowDirections(state)));
     }
 
     @Override

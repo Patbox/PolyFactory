@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
+import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.fluid.SpoutRecipe;
@@ -34,10 +35,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -185,18 +183,25 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             assert c.getContainer() != null;
             var container = c.getContainer();
             Vec3d base = Vec3d.ofCenter(this.pos);
+            var scale = 0.75f;
             Quaternionf rot;
             var dir = this.getCachedState().get(MDrainBlock.INPUT_FACING);
             if (id == INPUT_FIRST) {
-                base = base.add(0, 10f / 16, 0);
-                rot = Direction.UP.getRotationQuaternion().rotateY(dir.asRotation() * MathHelper.RADIANS_PER_DEGREE);
+                if (container.get().isOf(FactoryItems.TEMPLATE_BALL)) {
+                    base = base.add(0, 8.2f / 16, 0);
+                    rot = RotationAxis.POSITIVE_Y.rotation(MathHelper.HALF_PI).mul(dir.getOpposite().getRotationQuaternion());
+                    scale = 1.25f;
+                } else {
+                    base = base.add(0, 10f / 16, 0);
+                    rot = Direction.UP.getRotationQuaternion().rotateY(dir.asRotation() * MathHelper.RADIANS_PER_DEGREE);
+                }
             } else {
-                base = base.add(0, 7.5 / 16, 0).offset(dir, -0.3);
-                rot = dir.getOpposite().getRotationQuaternion();
+                base = base.add(0, 7.5 / 16, 0).offset(dir, -0.4);
+                rot = RotationAxis.POSITIVE_Y.rotation(MathHelper.HALF_PI).mul(dir.getOpposite().getRotationQuaternion());
             }
 
             container.setPos(base);
-            container.scale(0.75f);
+            container.scale(scale);
             container.setRotation(rot);
         }
     }

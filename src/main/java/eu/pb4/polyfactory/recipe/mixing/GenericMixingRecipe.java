@@ -232,6 +232,16 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
     }
 
     @Override
+    public List<FluidStack<?>> fluidOutput(MixingInput input) {
+        return this.fluidOutput;
+    }
+
+    @Override
+    public List<FluidInputStack> fluidInput(MixingInput input) {
+        return this.fluidInputs.isPresent() ? this.fluidInputs.get() : List.of();
+    }
+
+    @Override
     public double time(MixingInput input) {
         return this.time;
     }

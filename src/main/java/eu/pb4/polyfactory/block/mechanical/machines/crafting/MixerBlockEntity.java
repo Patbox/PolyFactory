@@ -233,6 +233,11 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             var outFluid = self.currentRecipe.value().fluidOutput(input);
 
             var emptyFluids = self.fluidContainer.empty();
+            for (var x : self.currentRecipe.value().fluidInput(input)) {
+                emptyFluids -= x.used();
+            }
+
+
             for (var f : outFluid) {
                 emptyFluids -= f.amount();
             }

@@ -139,6 +139,8 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<FluidTankBlockEntity> FLUID_TANK = register("fluid_tank", BlockEntityType.Builder.create(FluidTankBlockEntity::new, FactoryBlocks.FLUID_TANK));
     public static final BlockEntityType<PortableFluidTankBlockEntity> PORTABLE_FLUID_TANK = register("portable_fluid_tank",
             BlockEntityType.Builder.create(PortableFluidTankBlockEntity::new, FactoryBlocks.PORTABLE_FLUID_TANK));
+    public static final BlockEntityType<RedstoneValvePipeBlockEntity> REDSTONE_VALVE_PIPE = register("redstone_valve_pipe",
+            BlockEntityType.Builder.create(RedstoneValvePipeBlockEntity::new, FactoryBlocks.REDSTONE_VALVE_PIPE));
 
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;

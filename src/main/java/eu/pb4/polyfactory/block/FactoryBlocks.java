@@ -113,6 +113,7 @@ public class FactoryBlocks {
     public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", new RotationalDebugBlock(AbstractBlock.Settings.create().strength(-1, -1)));
     public static final PipeBlock PIPE = register("pipe", new PipeBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
     public static final FilteredPipeBlock FILTERED_PIPE = register("filtered_pipe", new FilteredPipeBlock(AbstractBlock.Settings.copy(PIPE).nonOpaque()));
+    public static final RedstoneValvePipeBlock REDSTONE_VALVE_PIPE = register("redstone_valve_pipe", new RedstoneValvePipeBlock(AbstractBlock.Settings.copy(PIPE).nonOpaque()));
     public static final Map<Block, PipeInWallBlock> WALL_WITH_PIPE = PipeInWallBlock.MAP;
 
     public static final PumpBlock PUMP = register("pump", new PumpBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));

@@ -5,14 +5,26 @@
 		"1": "polyfactory:block/fluids/tank/portable_top",
 		"2": "polyfactory:block/fluids/tank/portable_top_connector",
 		"particle": "polyfactory:block/fluids/tank/portable_side",
-		"inner": "polyfactory:block/fluids/tank/portable_side_inner",
-		"texture": "polyfactory:block/fluids/tank/portable_side_placeholder"
+		"texture": "polyfactory:block/empty"
 	},
 	"elements": [
 		{
 			"from": [2, 0, 2],
 			"to": [14, 16, 14],
 			"rotation": {"angle": 0, "axis": "y", "origin": [2, 1, 2]},
+			"faces": {
+				"north": {"uv": [0, 0, 12, 16], "texture": "#0"},
+				"east": {"uv": [0, 0, 12, 16], "texture": "#0"},
+				"south": {"uv": [0, 0, 12, 16], "texture": "#0"},
+				"west": {"uv": [0, 0, 12, 16], "texture": "#0"},
+				"up": {"uv": [0, 0, 12, 12], "texture": "#1"},
+				"down": {"uv": [0, 0, 12, 12], "texture": "#1"}
+			}
+		},
+		{
+			"from": [14, 0, 2],
+			"to": [2, 16, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [14, 1, 2]},
 			"faces": {
 				"north": {"uv": [0, 0, 12, 16], "texture": "#0"},
 				"east": {"uv": [0, 0, 12, 16], "texture": "#0"},
@@ -36,20 +48,7 @@
 			}
 		},
 		{
-			"from": [2.0375, 0.0375, 2.0375],
-			"to": [13.9625, 15.9625, 13.9625],
-			"rotation": {"angle": 0, "axis": "y", "origin": [2, 1, 2]},
-			"faces": {
-				"north": {"uv": [0, 0, 12, 16], "texture": "#inner"},
-				"east": {"uv": [0, 0, 12, 16], "texture": "#inner"},
-				"south": {"uv": [0, 0, 12, 16], "texture": "#inner"},
-				"west": {"uv": [0, 0, 12, 16], "texture": "#inner"},
-				"up": {"uv": [0, 0, 12, 12], "texture": "#inner"},
-				"down": {"uv": [0, 0, 12, 12], "texture": "#inner"}
-			}
-		},
-		{
-			"from": [5, 16, 5],
+			"from": [5, 15.99, 5],
 			"to": [11, 17, 11],
 			"rotation": {"angle": 45, "axis": "y", "origin": [8, 16.5, 8]},
 			"faces": {

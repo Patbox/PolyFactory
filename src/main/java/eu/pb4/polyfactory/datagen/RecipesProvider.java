@@ -221,6 +221,17 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_copper", InventoryChangedCriterion.Conditions.items(FactoryItems.PIPE))
                 .offerTo(exporter);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.REDSTONE_VALVE_PIPE, 1)
+                .pattern("rwr")
+                .pattern("pwp")
+                .pattern("rwr")
+                .input('p', FactoryItems.PIPE)
+                .input('w', FactoryItems.STEEL_PLATE)
+                .input('r', Items.REDSTONE)
+                .criterion("get_copper", InventoryChangedCriterion.Conditions.items(FactoryItems.PIPE))
+                .offerTo(exporter);
+
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.DRAIN, 1)
                 .pattern("pip")
                 .pattern("p p")
@@ -1043,6 +1054,11 @@ class RecipesProvider extends FabricRecipeProvider {
         exporter.accept(id("spout/sticky_conveyor"), SimpleSpoutRecipe.toItem(FactoryItems.CONVEYOR, FactoryFluids.SLIME.of(FluidConstants.BLOCK / 10), FactoryItems.STICKY_CONVEYOR, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
         exporter.accept(id("spout/brittle_glass_bottle"), SimpleSpoutRecipe.toItem(Items.GLASS_BOTTLE, FactoryFluids.LAVA.of(FluidConstants.BLOCK / 30), FactoryItems.BRITTLE_GLASS_BOTTLE, SoundEvents.BLOCK_GLASS_HIT), null);
         exporter.accept(id("spout/brittle_potion"), SimpleSpoutRecipe.toItemCopy(Items.POTION, FactoryFluids.LAVA.of(FluidConstants.BLOCK / 30), FactoryItems.BRITTLE_POTION, SoundEvents.BLOCK_GLASS_HIT), null);
+        exporter.accept(id("spout/slimeball"), SimpleSpoutRecipe.template(Items.BOWL,
+                FactoryFluids.SLIME.of(FluidConstants.INGOT), Items.SLIME_BALL, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
+        exporter.accept(id("spout/snowball"), SimpleSpoutRecipe.template(Items.BOWL,
+                FactoryFluids.SNOW.of(FluidConstants.BLOCK / 4), Items.SNOWBALL, SoundEvents.BLOCK_SNOW_PLACE), null);
+
     }
 
     private void fluidBase(RecipeExporter exporter, Item withFluid, Item emptyContainer, FluidStack<?> fluid, SoundEvent fillSound, SoundEvent emptySound) {

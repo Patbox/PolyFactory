@@ -8,7 +8,6 @@ import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
@@ -39,8 +38,8 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -57,11 +56,11 @@ import static eu.pb4.polyfactory.ModInit.id;
 
 public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, WrenchableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe, ItemUseLimiter {
     public static final EnumProperty<Direction.Axis> AXIS = Properties.AXIS;
-    public static final BooleanProperty NEGATED = FactoryProperties.NEGATED;
+    public static final BooleanProperty INVERTED = Properties.INVERTED;
 
     public FilteredPipeBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false).with(NEGATED, false));
+        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false).with(INVERTED, false));
         Model.NEGATED.isEmpty();
     }
 
@@ -74,7 +73,7 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Wre
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(AXIS, NEGATED, WATERLOGGED);
+        builder.add(AXIS, INVERTED, WATERLOGGED);
     }
 
     @Override
@@ -154,8 +153,13 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Wre
     }
 
     @Override
+    protected BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.rotateAxis(state, AXIS, rotation);
+    }
+
+    @Override
     public List<WrenchAction> getWrenchActions() {
-        return List.of(WrenchAction.AXIS, WrenchAction.NEGATED);
+        return List.of(WrenchAction.AXIS, WrenchAction.INVERTED);
     }
 
     public static final class Model extends RotationAwareModel {
@@ -163,7 +167,7 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Wre
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement fluid;
         private Model(BlockState state, BlockPos pos) {
-            this.mainElement = ItemDisplayElementUtil.createSimple(state.get(FilteredPipeBlock.NEGATED) ? NEGATED : ItemDisplayElementUtil.getModel(state.getBlock().asItem()));
+            this.mainElement = ItemDisplayElementUtil.createSimple(state.get(FilteredPipeBlock.INVERTED) ? NEGATED : ItemDisplayElementUtil.getModel(state.getBlock().asItem()));
             this.mainElement.setScale(new Vector3f(2f));
             this.fluid = ItemDisplayElementUtil.createSimple();
             this.fluid.setScale(new Vector3f(2f));
@@ -195,7 +199,7 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Wre
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.mainElement.setItem(this.blockState().get(FilteredPipeBlock.NEGATED) ? NEGATED : ItemDisplayElementUtil.getModel(this.blockState().getBlock().asItem()));
+                this.mainElement.setItem(this.blockState().get(FilteredPipeBlock.INVERTED) ? NEGATED : ItemDisplayElementUtil.getModel(this.blockState().getBlock().asItem()));
                 updateStatePos(this.blockState());
             }
         }

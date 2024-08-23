@@ -97,13 +97,7 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, W
 
     @Override
     public BlockState rotate(BlockState state, BlockRotation rotation) {
-        var a = state.get(AXIS);
-
-        if (a == Direction.Axis.Y || rotation == BlockRotation.NONE || rotation == BlockRotation.CLOCKWISE_180) {
-            return state;
-        }
-
-        return state.with(AXIS, a == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X);
+       return FactoryUtil.rotateAxis(state, AXIS, rotation);
     }
 
     @Override

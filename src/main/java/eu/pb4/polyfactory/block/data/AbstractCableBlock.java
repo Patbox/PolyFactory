@@ -36,6 +36,8 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -228,6 +230,17 @@ public abstract class AbstractCableBlock extends NetworkBlock implements BlockEn
     private static boolean checkModelDirection(BlockState state, Direction direction) {
         return state.get(FACING_PROPERTIES.get(direction));
     }
+
+    @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.rotate(state, NORTH, SOUTH, EAST, WEST, rotation);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.mirror(state, NORTH, SOUTH, EAST, WEST, mirror);
+    }
+
 
     public static class BaseCableModel extends BlockModel {
         private final ItemDisplayElement cable;
