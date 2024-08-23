@@ -142,7 +142,7 @@ public class FactoryItems {
             (s) -> s.maxCount(1).component(FactoryDataComponents.FLUID, FluidComponent.empty(PortableFluidTankBlockEntity.CAPACITY)));
 
     public static final PressureFluidGun PRESSURE_FLUID_GUN = register("pressure_fluid_gun", new PressureFluidGun(
-            new Item.Settings().maxCount(1).maxDamage(700)));
+            new Item.Settings().maxCount(1).maxDamage(800)));
     public static void register() {
         FuelRegistry.INSTANCE.add(SAW_DUST, 60);
         FuelRegistry.INSTANCE.add(WOODEN_PLATE, 120);

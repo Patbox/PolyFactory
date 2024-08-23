@@ -283,6 +283,30 @@ class RecipesProvider extends FabricRecipeProvider {
                 .offerTo(exporter);
 
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.NOZZLE, 1)
+                .pattern(" c ")
+                .pattern("psc")
+                .pattern(" c ")
+                .input('p', FactoryItems.PIPE)
+                .input('c', FactoryItems.COPPER_PLATE)
+                .input('s', FactoryItems.STEEL_PLATE) // replace with something else?
+                .criterion("get_copper", InventoryChangedCriterion.Conditions.items(FactoryItems.PIPE))
+                .offerTo(exporter);
+
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.PRESSURE_FLUID_GUN, 1)
+                .pattern("ipn")
+                .pattern("sw ")
+                .input('p', FactoryItems.PIPE)
+                .input('n', FactoryItems.NOZZLE)
+                .input('i', Items.NETHERITE_INGOT)
+                .input('s', FactoryItems.STEEL_PLATE)
+                .input('w', FactoryItems.WOODEN_PLATE)
+                .criterion("get_copper", InventoryChangedCriterion.Conditions.items(FactoryItems.PIPE))
+                .offerTo(exporter);
+
+
+
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.FUNNEL, 1)
                 .pattern("wp ")
                 .pattern(" o ")

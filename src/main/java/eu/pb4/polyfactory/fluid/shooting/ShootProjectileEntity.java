@@ -45,7 +45,6 @@ public record ShootProjectileEntity<T>(EntityCreator<T> entityCreator,
 
     @Override
     public void startShooting(ShooterContext context, FluidInstance<T> fluidInstance, FluidContainer container) {
-        shoot(context, initialDivergence, fluidInstance, container);
     }
 
     @Override

@@ -8,6 +8,8 @@
   - Added Mechanical Spout - Easily pour fluids into/onto other items.
   - Added Fluid Tanks - Can store up to 6 buckets of fluid per block, while being able to connect with other fluid tanks.
   - Added Portable Fluid Tank - Portable version of the tank, which can store up to 4 buckets of fluid. Keeps stored fluids when broken, while still being placeable.
+  - Added Fluid Nozzle - Shoot out fluids easily, with different effects (similar to sources/base of them).
+  - Added Pressure Fluid Gun - Portable way to shoot fluids from Portable Fluid Tanks.
   - Mechanical Mixers can now store fluids and use them as an ingredient and result of a recipe.
 - Added Experience Bucket, Slime Bucket and Honey Bucket.
 - Added Brittle Glass Bottle and Brittle Potions - they break after drinking, instead of returning the glass bottle.

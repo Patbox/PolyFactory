@@ -67,6 +67,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.PIPE);
         this.addDrop(FactoryBlocks.FILTERED_PIPE);
         this.addDrop(FactoryBlocks.PUMP);
+        this.addDrop(FactoryBlocks.NOZZLE);
         this.addDrop(FactoryBlocks.DRAIN);
         this.addDrop(FactoryBlocks.MECHANICAL_DRAIN);
         this.addDrop(FactoryBlocks.MECHANICAL_SPOUT);

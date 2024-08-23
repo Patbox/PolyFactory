@@ -51,7 +51,7 @@ public class FactoryFluids {
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.MILK_SPLASH, 10,350, FactorySoundEvents.FLUID_SHOOT_MILK))
                     .build());
     public static final FluidType<Unit> EXPERIENCE = register(Identifier.ofVanilla("experience"),
-            FluidType.of().density(50).flowSpeedMultiplier(1.3).maxFlow(FluidConstants.BOTTLE * 2)
+            FluidType.of().density(50).flowSpeedMultiplier(1.3).maxFlow(FluidConstants.BOTTLE * 2).brightness(14).heat(BlockHeat.EXPERIENCE)
                     .shootingBehavior(new ShootProjectileEntity<>((world, fluid, amount) -> {
                         var xp = FactoryEntities.EXPERIENCE_SPLASH.create(world);
                         assert xp != null;
@@ -85,7 +85,7 @@ public class FactoryFluids {
             FluidType.of().density(600).transparent().flowSpeedMultiplier(0.6).maxFlow(FluidConstants.BOTTLE * 2 / 3).build());
 
     public static final FluidType<Unit> SNOW = register(Identifier.ofVanilla("snow"),
-            FluidType.of().density(90).flowSpeedMultiplier(0.98).maxFlow(FluidConstants.BOTTLE * 4 / 5)
+            FluidType.of().density(90).flowSpeedMultiplier(0.98).maxFlow(FluidConstants.BOTTLE * 4 / 5).heat(BlockHeat.SNOW)
                     .shootingBehavior(ShootProjectileEntity.ofEntity(EntityType.SNOWBALL, 1, FluidConstants.BLOCK / 4 / 20 / 2,
                             1.7f, 0.5f, 0, 0.1f, Registries.SOUND_EVENT.getEntry(SoundEvents.ENTITY_SNOWBALL_THROW)))
                     .texture(Identifier.ofVanilla("block/powder_snow")).build());

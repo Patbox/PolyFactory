@@ -106,6 +106,10 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         var stack = user.getStackInHand(hand);
+        if (stack.contains(FactoryDataComponents.CURRENT_FLUID)) {
+            return TypedActionResult.consume(stack);
+        }
+
         var containers = findFluidContainer(user);
         if (containers.isEmpty() || !isUsable(stack)) {
             return TypedActionResult.fail(user.getStackInHand(hand));
@@ -118,7 +122,6 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
             for (var f : ((List<FluidInstance<Object>>) (Object) container.fluids())) {
                 if (f.shootingBehavior().canShoot(ctx, f, container)) {
                     stack.set(FactoryDataComponents.CURRENT_FLUID, f);
-                    stack.damage(1, user, hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
                     user.setCurrentHand(hand);
                     f.shootingBehavior().startShooting(ctx, f, container);
                     var vec = ctx.rotation().multiply(user.isOnGround() ? -0.01 : -0.07);
