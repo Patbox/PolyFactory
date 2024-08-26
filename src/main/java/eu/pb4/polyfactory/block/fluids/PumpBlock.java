@@ -9,6 +9,7 @@ import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.GenericParts;
@@ -57,6 +58,19 @@ public class PumpBlock extends NetworkBlock implements FactoryBlock, RotationUse
     public PumpBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
+    }
+
+    @Override
+    public boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        if (world.getBlockEntity(pos) instanceof FilledStateProvider be) {
+            return (int) ((be.getFilledAmount() * 15) / be.getFillCapacity());
+        }
+        return 0;
     }
 
     @Nullable

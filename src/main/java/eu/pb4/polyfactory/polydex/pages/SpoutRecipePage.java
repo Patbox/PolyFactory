@@ -9,8 +9,7 @@ import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
-import eu.pb4.polyfactory.recipe.fluid.DrainRecipe;
-import eu.pb4.polyfactory.recipe.fluid.SpoutRecipe;
+import eu.pb4.polyfactory.recipe.spout.SpoutRecipe;
 import eu.pb4.polyfactory.ui.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
@@ -24,7 +23,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class SpoutRecipePage<T extends SpoutRecipe> extends PrioritizedRecipePage<T> {

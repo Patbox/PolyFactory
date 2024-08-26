@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.recipe.fluid;
+package eu.pb4.polyfactory.recipe.spout;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -9,7 +9,6 @@ import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.input.SpoutInput;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;

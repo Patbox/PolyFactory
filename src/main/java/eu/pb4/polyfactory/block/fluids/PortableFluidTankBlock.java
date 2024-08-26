@@ -5,6 +5,7 @@ import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.models.fluid.SimpleMultiFluidViewModel;
@@ -44,6 +45,19 @@ public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeC
         super(settings);
         this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
         PortableFluidTankBlock.Model.BASE_MODEL.isEmpty();
+    }
+
+    @Override
+    public boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        if (world.getBlockEntity(pos) instanceof FilledStateProvider be) {
+            return (int) ((be.getFilledAmount() * 15) / be.getFillCapacity());
+        }
+        return 0;
     }
 
     @Override

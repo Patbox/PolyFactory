@@ -10,6 +10,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class ExperienceSplashEntity extends SplashEntity<Unit> {
@@ -58,7 +59,7 @@ public class ExperienceSplashEntity extends SplashEntity<Unit> {
     }
 
     @Override
-    protected boolean discardInBlock(BlockState state) {
+    protected boolean discardInBlock(BlockState state, BlockPos blockPos) {
         return false;
     }
 

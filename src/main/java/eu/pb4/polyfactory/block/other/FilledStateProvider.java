@@ -6,4 +6,7 @@ import org.jetbrains.annotations.Nullable;
 public interface FilledStateProvider {
     @Nullable
     Text getFilledStateText();
+
+    long getFilledAmount();
+    long getFillCapacity();
 }

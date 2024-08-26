@@ -29,4 +29,12 @@ public record FluidInputStack(FluidInstance<?> instance, long required, long use
     public MutableText toTextRequired() {
         return this.instance.toLabeledAmount(required);
     }
+
+    public FluidStack<?> toUsed() {
+        return instance.stackOf(used);
+    }
+
+    public FluidStack<?> toRequired() {
+        return instance.stackOf(required);
+    }
 }

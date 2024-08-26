@@ -11,10 +11,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public record SpoutInput(ItemStack stack, Object2LongMap<FluidInstance<?>> fluidsAmount, List<FluidInstance<?>> fluids, ServerWorld world) implements RecipeInput {
+public record SpoutInput(ItemStack stack,  FluidContainerInput fluidContainer, ServerWorld world) implements RecipeInput {
     public static SpoutInput of(ItemStack stack, @Nullable FluidContainer fluidContainer, ServerWorld world) {
-        return new SpoutInput(stack, fluidContainer != null ? fluidContainer.asMap() : Object2LongMaps.emptyMap(),
-                fluidContainer != null ? fluidContainer.fluids() : List.of(), world);
+        return new SpoutInput(stack, FluidContainerInput.of(fluidContainer), world);
     }
 
     @Override
@@ -26,6 +25,8 @@ public record SpoutInput(ItemStack stack, Object2LongMap<FluidInstance<?>> fluid
         return 1;
     }
     public long getFluid(FluidInstance<?> type) {
-        return this.fluidsAmount.getOrDefault(type, 0);
+        return this.fluidContainer.get(type);
     }
-}
+    public List<FluidInstance<?>> fluids() {
+        return this.fluidContainer.fluids();
+    }}

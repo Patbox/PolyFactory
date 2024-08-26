@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.fluids;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.block.property.ConnectablePart;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.fluid.FluidContainer;
@@ -44,6 +45,19 @@ public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectab
     @Override
     public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
         return true;
+    }
+
+    @Override
+    public boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        if (world.getBlockEntity(pos) instanceof FilledStateProvider be) {
+            return (int) ((be.getFilledAmount() * 15) / be.getFillCapacity());
+        }
+        return 0;
     }
 
     @Nullable

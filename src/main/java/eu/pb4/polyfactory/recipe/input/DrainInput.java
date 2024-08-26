@@ -8,12 +8,10 @@ import net.minecraft.recipe.input.RecipeInput;
 
 import java.util.List;
 
-public record DrainInput(ItemStack stack, ItemStack catalyst, Object2LongMap<FluidInstance<?>> fluidsAmount, List<FluidInstance<?>> fluids, long stored, long capacity,
-                         boolean isPlayer) implements RecipeInput {
+public record DrainInput(ItemStack stack, ItemStack catalyst, FluidContainerInput fluidContainer, boolean isPlayer) implements RecipeInput {
     public static DrainInput of(ItemStack stack, ItemStack catalyst, FluidContainer fluidContainer, boolean isPlayer) {
-        return new DrainInput(stack, catalyst, fluidContainer.asMap(), fluidContainer.fluids(), fluidContainer.stored(), fluidContainer.capacity(), isPlayer);
+        return new DrainInput(stack, catalyst, FluidContainerInput.of(fluidContainer), isPlayer);
     }
-
     @Override
     public ItemStack getStackInSlot(int slot) {
         return slot == 0 ? stack : catalyst;
@@ -22,7 +20,11 @@ public record DrainInput(ItemStack stack, ItemStack catalyst, Object2LongMap<Flu
     public int getSize() {
         return 2;
     }
+
     public long getFluid(FluidInstance<?> type) {
-        return this.fluidsAmount.getOrDefault(type, 0);
+        return this.fluidContainer.get(type);
+    }
+    public List<FluidInstance<?>> fluids() {
+        return this.fluidContainer.fluids();
     }
 }

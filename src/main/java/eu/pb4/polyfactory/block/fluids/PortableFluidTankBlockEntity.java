@@ -96,7 +96,7 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
         if (!(t instanceof PortableFluidTankBlockEntity tank)) {
             return;
         }
-        tank.blockTemperature = BlockHeat.get(world.getBlockState(pos.down())) + tank.container.fluidTemperature();
+        tank.blockTemperature = BlockHeat.getReceived(world, pos) + tank.container.fluidTemperature();
         FluidContainerUtil.tick(tank.container, (ServerWorld) world, pos, tank.blockTemperature, tank::dropItem);
     }
 

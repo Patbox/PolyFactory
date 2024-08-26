@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.recipe.fluid;
+package eu.pb4.polyfactory.recipe.drain;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
+import eu.pb4.polyfactory.recipe.spout.SpoutRecipe;
 import eu.pb4.polyfactory.recipe.input.DrainInput;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
@@ -46,7 +47,7 @@ public record PotionAddDrainRecipe(Ingredient item, Optional<Ingredient> catalys
         return (!requirePlayer || input.isPlayer())
                 && item.test(input.stack())
                 && (catalyst.isEmpty() || catalyst.get().test(input.catalyst()))
-                && input.stored() + this.amount <= input.capacity();
+                && input.fluidContainer().stored() + this.amount <= input.fluidContainer().capacity();
     }
 
     @Override

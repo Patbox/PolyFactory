@@ -4,6 +4,8 @@ import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.block.ItemUseLimiter;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.block.other.ContainerBlockEntity;
+import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidInstance;
@@ -48,6 +50,19 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
     @Override
     public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
         return dir != Direction.UP;
+    }
+
+    @Override
+    public boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        if (world.getBlockEntity(pos) instanceof FilledStateProvider be) {
+            return (int) ((be.getFilledAmount() * 15) / be.getFillCapacity());
+        }
+        return 0;
     }
 
     @Override

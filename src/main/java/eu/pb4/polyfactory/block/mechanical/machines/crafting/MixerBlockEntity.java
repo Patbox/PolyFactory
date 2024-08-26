@@ -16,6 +16,7 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
+import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polyfactory.recipe.input.MixingInput;
 import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;
 import eu.pb4.polyfactory.ui.FluidTextures;
@@ -175,7 +176,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         FluidContainerUtil.tick(self.fluidContainer, (ServerWorld) world, pos, self.temperature, self::addToOutputOrDrop);
         self.model.setFluid(self.fluidContainer.topFluid(), self.fluidContainer.getFilledPercentage());
 
-        if (self.isInputEmpty()) {
+        if (self.isInputEmpty() && self.fluidContainer.isEmpty()) {
             self.process = 0;
             self.speedScale = 0;
             self.active = false;
@@ -194,7 +195,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             return;
         }
 
-        var input = new MixingInput(self.stacks, self.fluidContainer.asMap(), self.fluidContainer.stored(), self.fluidContainer.capacity(), world);
+        var input = new MixingInput(self.stacks, FluidContainerInput.of(self.fluidContainer), world);
 
         if (self.inventoryChanged && (self.currentRecipe == null || !self.currentRecipe.value().matches(input, world))) {
             self.process = 0;
@@ -360,7 +361,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
 
     public double getStress() {
         if (this.active) {
-            var input = new MixingInput(this.stacks, this.fluidContainer.asMap(), fluidContainer.stored(), fluidContainer.capacity(), world);
+            var input = new MixingInput(this.stacks, FluidContainerInput.of(fluidContainer), world);
             return this.currentRecipe != null ?
                     MathHelper.clamp(this.currentRecipe.value().optimalSpeed(input) * 0.6 * this.speedScale,
                             this.currentRecipe.value().minimumSpeed(input) * 0.6,
@@ -469,7 +470,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         private float progress() {
             return MixerBlockEntity.this.currentRecipe != null
                     ? (float) MathHelper.clamp(MixerBlockEntity.this.process / MixerBlockEntity.this.currentRecipe.value().time(
-                            new MixingInput(stacks, fluidContainer.asMap(), fluidContainer.stored(), fluidContainer.capacity(), world)), 0, 1)
+                            new MixingInput(stacks, FluidContainerInput.of(fluidContainer), world)), 0, 1)
                     : 0;
         }
 

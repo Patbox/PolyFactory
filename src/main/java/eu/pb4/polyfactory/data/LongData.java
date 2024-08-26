@@ -9,7 +9,7 @@ public record LongData(long value) implements DataContainer {
 
     public static final LongData ZERO = new LongData(0);
     @Override
-    public DataType type() {
+    public DataType<LongData> type() {
         return DataType.LONG;
     }
 
@@ -36,9 +36,5 @@ public record LongData(long value) implements DataContainer {
     @Override
     public boolean forceRight() {
         return true;
-    }
-
-    public static DataContainer fromNbt(NbtCompound compound) {
-        return new LongData(compound.getLong("value"));
     }
 }

@@ -1,33 +1,21 @@
 package eu.pb4.polyfactory.entity.splash;
 
 import eu.pb4.polyfactory.fluid.FactoryFluids;
-import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageTypes;
-import net.minecraft.entity.passive.AxolotlEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.EntityEffectParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldEvents;
 import net.minecraft.world.event.GameEvent;
 
 public class LavaSplashEntity extends SplashEntity<Unit> {
@@ -66,11 +54,17 @@ public class LavaSplashEntity extends SplashEntity<Unit> {
     }
 
     @Override
-    protected boolean discardInBlock(BlockState state) {
+    protected boolean discardInBlock(BlockState state, BlockPos blockPos) {
         if (state.getFluidState().isIn(FluidTags.WATER)) {
             ((ServerWorld) this.getWorld()).spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
                     0, 0, 0, 0, 0);
             this.playExtinguishSound();
+        } else if (state.isOf(Blocks.POWDER_SNOW)) {
+            ((ServerWorld) this.getWorld()).spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
+                    0, 0, 0, 0, 0);
+            this.playExtinguishSound();
+            this.getWorld().setBlockState(blockPos, Blocks.AIR.getDefaultState());
+            return true;
         }
 
         return !state.getFluidState().isEmpty();
@@ -88,6 +82,6 @@ public class LavaSplashEntity extends SplashEntity<Unit> {
 
     @Override
     protected double getParticleCollisionSpeed() {
-        return 0.005;
+        return 0.008;
     }
 }

@@ -169,4 +169,14 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     public @Nullable Text getFilledStateText() {
         return Text.translatable("text.polyfactory.x_out_of_y", this.storage.amount, this.storage.getCapacity());
     }
+
+    @Override
+    public long getFilledAmount() {
+        return this.storage.getAmount();
+    }
+
+    @Override
+    public long getFillCapacity() {
+        return this.storage.getCapacity();
+    }
 }

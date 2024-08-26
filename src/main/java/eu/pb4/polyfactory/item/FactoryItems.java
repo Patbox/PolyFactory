@@ -121,6 +121,10 @@ public class FactoryItems {
     public static final Item SLIME_BUCKET = register("slime_bucket", new ModeledItem(new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
     public static final Item HONEY_BUCKET = register("honey_bucket", new HoneyBucketItem(new Item.Settings().recipeRemainder(Items.BUCKET)
             .food(new FoodComponent.Builder().nutrition(18).saturationModifier(0.2F).build()).maxCount(1)));
+
+    public static final Item CRISPY_HONEY = register("crispy_honey", new ModeledItem(new Item.Settings()
+            .food(new FoodComponent.Builder().nutrition(4).saturationModifier(0.2F).snack().build())));
+
     public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
@@ -227,10 +231,7 @@ public class FactoryItems {
 
                     // Electrical machines (tier 2)
 
-                    // Tools
-                    entries.add(DYNAMITE);
-                    entries.add(PRESSURE_FLUID_GUN);
-                    entries.add(SPRAY_CAN);
+
                     // Rest
                     entries.add(INVERTED_REDSTONE_LAMP);
                     entries.add(ColoredItem.stack(LAMP, 1, DyeColor.WHITE));
@@ -241,12 +242,15 @@ public class FactoryItems {
                     entries.add(TINY_POTATO_SPRING);
 
                     // Other items
-
+                    entries.add(DYNAMITE);
+                    entries.add(PRESSURE_FLUID_GUN);
+                    entries.add(SPRAY_CAN);
                     entries.add(HONEY_BUCKET);
                     entries.add(SLIME_BUCKET);
                     entries.add(EXPERIENCE_BUCKET);
                     entries.add(THROWABLE_GLASS_BOTTLE);
                     entries.add(BRITTLE_GLASS_BOTTLE);
+                    entries.add(CRISPY_HONEY);
 
                     // Generic Materials
                     entries.add(SAW_DUST);

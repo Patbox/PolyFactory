@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public record MixingInput(List<ItemStack> stacks, Object2LongMap<FluidInstance<?>> fluids, long stored, long capacity, World world) implements RecipeInput {
+public record MixingInput(List<ItemStack> stacks, FluidContainerInput fluidContainer, World world) implements RecipeInput {
     @Override
     public ItemStack getStackInSlot(int slot) {
         return this.stacks.get(slot);
@@ -25,6 +25,14 @@ public record MixingInput(List<ItemStack> stacks, Object2LongMap<FluidInstance<?
     }
 
     public long getFluid(FluidInstance<?> type) {
-        return this.fluids.getOrDefault(type, 0);
+        return this.fluidContainer.get(type);
+    }
+    public List<FluidInstance<?>> fluids() {
+        return this.fluidContainer.fluids();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return RecipeInput.super.isEmpty() && fluidContainer.isEmpty();
     }
 }

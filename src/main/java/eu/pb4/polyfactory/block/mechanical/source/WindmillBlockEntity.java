@@ -3,8 +3,8 @@ package eu.pb4.polyfactory.block.mechanical.source;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
+import eu.pb4.polyfactory.other.FactoryBiomeTags;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBiomeTags;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
@@ -124,11 +124,12 @@ public class WindmillBlockEntity extends BlockEntity {
         }
 
         var biome = serverWorld.getBiome(pos);
-        if (biome.isIn(ConventionalBiomeTags.OCEAN)) {
-            speed *= 1.3;
-        } else if (biome.isIn(ConventionalBiomeTags.BEACH)
-                || biome.isIn(ConventionalBiomeTags.MOUNTAIN)) {
+        if (biome.isIn(FactoryBiomeTags.WINDMILL_HIGH_SPEED_BONUS)) {
+            speed *= 1.35;
+        } else if (biome.isIn(FactoryBiomeTags.WINDMILL_MIDDLE_SPEED_BONUS)) {
             speed *= 1.2;
+        } else if (biome.isIn(FactoryBiomeTags.WINDMILL_LOW_SPEED_BONUS)) {
+            speed *= 1.08;
         }
 
         if (serverWorld.isRaining()) {

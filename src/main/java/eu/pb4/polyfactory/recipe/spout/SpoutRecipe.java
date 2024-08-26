@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.recipe.fluid;
+package eu.pb4.polyfactory.recipe.spout;
 
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;

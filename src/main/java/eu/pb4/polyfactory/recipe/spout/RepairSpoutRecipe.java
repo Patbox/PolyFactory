@@ -1,19 +1,14 @@
-package eu.pb4.polyfactory.recipe.fluid;
+package eu.pb4.polyfactory.recipe.spout;
 
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
-import eu.pb4.polyfactory.recipe.input.DrainInput;
 import eu.pb4.polyfactory.recipe.input.SpoutInput;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.predicate.ComponentPredicate;
-import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;

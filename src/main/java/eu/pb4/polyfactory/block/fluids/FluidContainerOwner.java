@@ -14,13 +14,23 @@ public interface FluidContainerOwner extends FilledStateProvider {
 
     @Nullable
     FluidContainer getMainFluidContainer();
-
-
     @Override
     default Text getFilledStateText() {
         var main = getMainFluidContainer();
         return main != null ?
                 Text.translatable("text.polyfactory.x_out_of_y", FactoryUtil.fluidText(main.stored()), FactoryUtil.fluidText(main.capacity()))
                 : null;
+    }
+
+    @Override
+    default long getFillCapacity() {
+        var main = getMainFluidContainer();
+        return main != null ? main.capacity() : 0;
+    }
+
+    @Override
+    default long getFilledAmount() {
+        var main = getMainFluidContainer();
+        return main != null ? main.stored() : 0;
     }
 }

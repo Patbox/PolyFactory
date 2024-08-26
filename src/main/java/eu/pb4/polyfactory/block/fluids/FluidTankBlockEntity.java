@@ -186,7 +186,7 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
                 tank.model.setFluidBelow(below.container.topFluid());
             }
         } else {
-            tank.blockTemperature = BlockHeat.get(world.getBlockState(pos.down())) + tank.container.fluidTemperature();
+            tank.blockTemperature = BlockHeat.getReceived(world, pos) + tank.container.fluidTemperature();
         }
     }
 

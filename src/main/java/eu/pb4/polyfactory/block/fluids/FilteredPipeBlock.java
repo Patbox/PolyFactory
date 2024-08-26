@@ -8,6 +8,7 @@ import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
@@ -62,6 +63,19 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Wre
         super(settings);
         this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false).with(INVERTED, false));
         Model.NEGATED.isEmpty();
+    }
+
+    @Override
+    public boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        if (world.getBlockEntity(pos) instanceof FilledStateProvider be) {
+            return (int) ((be.getFilledAmount() * 15) / be.getFillCapacity());
+        }
+        return 0;
     }
 
     @Nullable

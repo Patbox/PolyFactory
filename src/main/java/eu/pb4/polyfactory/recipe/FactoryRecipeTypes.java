@@ -1,10 +1,11 @@
 package eu.pb4.polyfactory.recipe;
 
 import eu.pb4.polyfactory.ModInit;
-import eu.pb4.polyfactory.recipe.fluid.DrainRecipe;
-import eu.pb4.polyfactory.recipe.fluid.SpoutRecipe;
+import eu.pb4.polyfactory.recipe.drain.DrainRecipe;
+import eu.pb4.polyfactory.recipe.fluid.FluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;
 import eu.pb4.polyfactory.recipe.press.PressRecipe;
+import eu.pb4.polyfactory.recipe.spout.SpoutRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.Registries;
@@ -17,6 +18,7 @@ public class FactoryRecipeTypes {
     public static final RecipeType<MixingRecipe> MIXER = register("mixer");
     public static final RecipeType<DrainRecipe> DRAIN = register("drain");
     public static final RecipeType<SpoutRecipe> SPOUT = register("spout");
+    public static final RecipeType<FluidInteractionRecipe> FLUID_INTERACTION = register("fluid_interaction");
 
     public static void register() {
 

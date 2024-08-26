@@ -35,7 +35,7 @@
   "block.polyfactory.wither_skull_generator": "Wither Skull Generator",
   "block.polyfactory.tachometer": "Tachometer",
   "block.polyfactory.stressometer": "Stressometer",
-  "block.polyfactory.item_counter": "Item Counter",
+  "block.polyfactory.item_counter": "Storage Counter",
   "block.polyfactory.redstone_input": "Redstone Input",
   "block.polyfactory.redstone_output": "Redstone Output",
   "block.polyfactory.item_reader": "Item Reader",
@@ -116,6 +116,7 @@
   "item.polyfactory.lingering_throwable_glass_bottle": "Lingering Throwable Glass Bottle",
   "item.polyfactory.brittle_glass_bottle": "Brittle Glass Bottle",
   "item.polyfactory.brittle_potion": "Brittle %s",
+  "item.polyfactory.crispy_honey": "Crispy Honey",
 
   "block.polyfactory.colored_lamp": "Colored Lamp",
   "block.polyfactory.colored_lamp.colored": "%s Lamp",

@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.datagen;
 
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.factorytools.api.recipe.OutputStack;
+import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
@@ -9,7 +10,11 @@ import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.mixin.BrewingRecipeRegistryAccessor;
 import eu.pb4.polyfactory.recipe.*;
-import eu.pb4.polyfactory.recipe.fluid.*;
+import eu.pb4.polyfactory.recipe.drain.PotionAddDrainRecipe;
+import eu.pb4.polyfactory.recipe.drain.PotionRemoveDrainRecipe;
+import eu.pb4.polyfactory.recipe.fluid.RemovingFluidInteractionRecipe;
+import eu.pb4.polyfactory.recipe.fluid.SimpleFluidInteractionRecipe;
+import eu.pb4.polyfactory.recipe.spout.*;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.*;
 import eu.pb4.polyfactory.recipe.press.FillSprayCanPressRecipe;
@@ -28,6 +33,8 @@ import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
 import net.minecraft.item.*;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
@@ -45,6 +52,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
@@ -973,7 +981,11 @@ class RecipesProvider extends FabricRecipeProvider {
                 GenericMixingRecipe.ofCounted("mud", "",
                         List.of(CountedIngredient.ofItems(1, Items.DIRT)),
                         List.of(FluidInputStack.from(FactoryFluids.WATER.ofBottle())),
-                        1, 6, 18f, 0f, Items.MUD.getDefaultStack(), List.of())
+                        1, 6, 18f, 0f, Items.MUD.getDefaultStack(), List.of()),
+                GenericMixingRecipe.ofCounted("snow_fluid", "",
+                        List.of(),
+                        List.of(FluidInputStack.from(FactoryFluids.WATER.of(800))),
+                        1, 1, 3f, Float.NEGATIVE_INFINITY, -0.05f, ItemStack.EMPTY, List.of(FactoryFluids.SNOW.of(1000)))
         );
 
         for (var recipe : ((BrewingRecipeRegistryAccessor) BrewingRecipeRegistry.create(FeatureSet.of(FeatureFlags.VANILLA))).getPotionRecipes()) {
@@ -1059,7 +1071,37 @@ class RecipesProvider extends FabricRecipeProvider {
         exporter.accept(id("spout/snowball"), SimpleSpoutRecipe.template(Items.BOWL,
                 FactoryFluids.SNOW.of(FluidConstants.BLOCK / 4), Items.SNOWBALL, SoundEvents.BLOCK_SNOW_PLACE), null);
 
+
+        destructiveItemCreatingFluidInteraction(exporter, "water_lava", 1, List.of(FactoryFluids.WATER.of(6000), FactoryFluids.LAVA.of(3000)),
+                OutputStack.of(Items.FLINT, 0.15f, 1), ParticleTypes.LARGE_SMOKE, SoundEvents.BLOCK_LAVA_EXTINGUISH);
+        destructiveItemCreatingFluidInteraction(exporter, "milk_lava", 1, List.of(FactoryFluids.MILK.of(6000), FactoryFluids.LAVA.of(3000)),
+                OutputStack.of(Items.FLINT, 0.15f, 1), ParticleTypes.LARGE_SMOKE, SoundEvents.BLOCK_LAVA_EXTINGUISH);
+        destructiveItemCreatingFluidInteraction(exporter, "honey_lava", 1, List.of(FactoryFluids.HONEY.of(8000), FactoryFluids.LAVA.of(4000)),
+                OutputStack.of(FactoryItems.CRISPY_HONEY, 0.15f, 1), ParticleTypes.LARGE_SMOKE, SoundEvents.BLOCK_LAVA_EXTINGUISH);
+
+
+        exporter.accept(id("fluid_interaction/snow_melting"), new SimpleFluidInteractionRecipe(
+                List.of(FluidInputStack.from(FactoryFluids.SNOW.of(1000))),
+                List.of(FactoryFluids.WATER.of(800)),
+                List.of(),
+                Optional.empty(), Optional.empty(), 0, BlockHeat.TORCH, Float.POSITIVE_INFINITY, 1
+        ), null);
     }
+    private void destructiveItemCreatingFluidInteraction(RecipeExporter exporter, String name, int repeats, List<FluidStack<?>> fluids, OutputStack item, ParticleEffect particleEffect, SoundEvent soundEvent) {
+        var base = id("fluid_interaction/" + name);
+        var remove = id("fluid_interaction/" + name + "_leftover");
+
+        exporter.accept(base, new SimpleFluidInteractionRecipe(
+                fluids.stream().map(FluidInputStack::from).toList(), List.of(), List.of(item), Optional.of(particleEffect), Optional.of(Registries.SOUND_EVENT.getEntry(soundEvent)), 0.25f,
+                Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, repeats
+        ), null);
+
+        exporter.accept(remove, new RemovingFluidInteractionRecipe(
+                fluids.stream().map(FluidInputStack::from).toList(), Optional.of(particleEffect), Optional.of(Registries.SOUND_EVENT.getEntry(soundEvent)), 0.25f,
+                Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY
+        ), null);
+    }
+
 
     private void fluidBase(RecipeExporter exporter, Item withFluid, Item emptyContainer, FluidStack<?> fluid, SoundEvent fillSound, SoundEvent emptySound) {
         var base = Registries.ITEM.getId(withFluid).getPath();

@@ -2,6 +2,8 @@ package eu.pb4.polyfactory.mixin.machines;
 
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.providers.DataProviderBlock;
+import eu.pb4.polyfactory.block.other.FilledStateProvider;
+import eu.pb4.polyfactory.data.CapacityData;
 import eu.pb4.polyfactory.data.DataContainer;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.Block;
@@ -25,27 +27,34 @@ public abstract class WorldMixin implements WorldAccess {
 
     @Shadow @Nullable public abstract BlockEntity getBlockEntity(BlockPos pos);
 
-    @SuppressWarnings("UnstableApiUsage")
     @Inject(method = "updateComparators", at = @At("HEAD"))
     private void polyfactory$onComparatorUpdate(BlockPos pos, Block block, CallbackInfo ci) {
         //noinspection ConstantValue
         if (((Object) this) instanceof ServerWorld world) {
             long count = 0;
+            long max = 0;
 
-            var storage = ItemStorage.SIDED.find(world, pos, null);
-            if (storage == null) {
-                return;
-            }
+            if (world.getBlockEntity(pos) instanceof FilledStateProvider provider) {
+                count = provider.getFilledAmount();
+                max = provider.getFillCapacity();
+            } else {
+                var storage = ItemStorage.SIDED.find(world, pos, null);
+                if (storage == null) {
+                    return;
+                }
 
-            for (var x : storage) {
-                count += x.getAmount();
+                for (var x : storage) {
+                    count += x.getAmount();
+                    max += x.getCapacity();
+                }
             }
+            var data = new CapacityData(count, max);
 
             for (var dir : Direction.values()) {
                 var selfPos = pos.offset(dir);
                 var state = this.getBlockState(selfPos);
                 if (state.isOf(FactoryBlocks.ITEM_COUNTER) && state.get(DataProviderBlock.FACING) == dir.getOpposite()) {
-                    FactoryBlocks.ITEM_COUNTER.sendData(world, selfPos, DataContainer.of(count));
+                    FactoryBlocks.ITEM_COUNTER.sendData(world, selfPos, data);
                 }
             }
         }

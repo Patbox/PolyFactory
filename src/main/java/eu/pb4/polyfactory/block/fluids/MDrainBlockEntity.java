@@ -4,7 +4,9 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
+import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
@@ -14,7 +16,7 @@ import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
-import eu.pb4.polyfactory.recipe.fluid.DrainRecipe;
+import eu.pb4.polyfactory.recipe.drain.DrainRecipe;
 import eu.pb4.polyfactory.recipe.input.DrainInput;
 import eu.pb4.polyfactory.ui.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
@@ -29,10 +31,12 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
@@ -400,6 +404,13 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             this.model.setCatalyst(catalyst);
         }
         this.markDirty();
+    }
+
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        if (state.get(MDrainBlock.PART) == TallItemMachineBlock.Part.TOP) {
+            return ScreenHandler.calculateComparatorOutput((Inventory) this);
+        }
+        return (int) ((this.fluidContainer.stored() * 15) / this.fluidContainer.capacity());
     }
 
     private class Gui extends SimpleGui {

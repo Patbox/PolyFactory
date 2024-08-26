@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.RotationAwareModel;
@@ -29,7 +30,9 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.CustomModelDataComponent;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -47,6 +50,20 @@ import java.util.List;
 public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponent.Pipe, PipeConnectable {
     public MSpoutBlock(Settings settings) {
         super(settings);
+    }
+
+
+    @Override
+    public boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        if (world.getBlockEntity(pos) instanceof Inventory inventory) {
+            return ScreenHandler.calculateComparatorOutput(inventory);
+        }
+        return 0;
     }
 
     @Override

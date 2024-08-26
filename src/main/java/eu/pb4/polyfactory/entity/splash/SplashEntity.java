@@ -127,7 +127,7 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     public void tick() {
         super.tick();
 
-        if (this.discardInBlock(this.getBlockStateAtPos())) {
+        if (this.discardInBlock(this.getBlockStateAtPos(), this.getBlockPos())) {
             this.discard();
         }
 
@@ -185,7 +185,7 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
                     0, velocity.getX(), velocity.getY(), velocity.getZ(), this.getParticleSpeed());
         }
     }
-    protected boolean discardInBlock(BlockState state) {
+    protected boolean discardInBlock(BlockState state, BlockPos blockPos) {
         if (state.getFluidState().isIn(FluidTags.LAVA)) {
             ((ServerWorld) this.getWorld()).spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
                     0, 0, 0, 0, 0);

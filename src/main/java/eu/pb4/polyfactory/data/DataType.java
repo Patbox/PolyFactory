@@ -24,6 +24,7 @@ public record DataType<T extends DataContainer>(String id, MapCodec<T> codec) im
     public static final DataType<GameEventData> GAME_EVENT = new DataType<>("game_event", GameEventData.TYPE_CODEC);
     public static final DataType<BlockStateData> BLOCK_STATE = new DataType<>("block_state", BlockStateData.TYPE_CODEC);
     public static final DataType<ItemStackData> ITEM_STACK = new DataType<>("item_stack", ItemStackData.TYPE_CODEC);
+    public static final DataType<CapacityData> CAPACITY = new DataType<>("capacity", CapacityData.TYPE_CODEC);
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static final Codec<DataType<?>> CODEC = Codec.STRING.xmap(x -> TYPES.getOrDefault(x, (DataType) STRING), DataType::id);

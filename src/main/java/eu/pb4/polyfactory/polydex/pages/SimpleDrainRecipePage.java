@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.polydex.pages;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.polydex.api.v1.recipe.PolydexEntry;
 import eu.pb4.polyfactory.fluid.FluidStack;
-import eu.pb4.polyfactory.recipe.fluid.SimpleDrainRecipe;
+import eu.pb4.polyfactory.recipe.spout.SimpleDrainRecipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.server.network.ServerPlayerEntity;

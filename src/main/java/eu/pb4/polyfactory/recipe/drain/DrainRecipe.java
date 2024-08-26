@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.recipe.fluid;
+package eu.pb4.polyfactory.recipe.drain;
 
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;

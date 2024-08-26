@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.item.tool.UniversalFluidContainerItem;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.DrainInput;
+import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.elements.GuiElement;
@@ -30,8 +31,56 @@ public interface FluidContainerUtil {
     static void tick(FluidContainer container, ServerWorld world, BlockPos pos, float temperature, Consumer<ItemStack> stack) {
         tick(container, world, Vec3d.ofCenter(pos), temperature, stack);
     }
-    static void tick(FluidContainer container, ServerWorld world, Vec3d pos, float temperature, Consumer<ItemStack> stack) {
-        if (container.contains(FactoryFluids.WATER.defaultInstance()) && container.contains(FactoryFluids.LAVA.defaultInstance())) {
+    static void tick(FluidContainer container, ServerWorld world, Vec3d pos, float temperature, Consumer<ItemStack> stackConsumer) {
+        var input = FluidContainerInput.of(container, temperature);
+        var random = world.random;
+        for (var entry : world.getRecipeManager().listAllOfType(FactoryRecipeTypes.FLUID_INTERACTION)) {
+            var recipe = entry.value();
+            if (!entry.value().matches(input, world)) {
+                continue;
+            }
+
+            if (recipe.particleChance(input) < random.nextFloat()) {
+                var particle = recipe.particle(input, random);
+                if (particle != null) {
+                    world.spawnParticles(particle, pos.getX(), pos.getY(), pos.getZ(), 0, 0.1, 0.1, 0.1, 0.1);
+                }
+                var sound = recipe.soundEvent(input, random);
+                if (sound != null) {
+                    world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), sound, SoundCategory.BLOCKS, 1, 1);
+                }
+            }
+            var inputFluids = recipe.fluidInput(input, world.getRegistryManager());
+            var outputFluids = recipe.fluidOutput(input, world.getRegistryManager());
+            var outputItems = recipe.itemOutput(input, world.getRegistryManager());
+
+            for (var i = 0; i < recipe.maxApplyPerTick(); i++) {
+                for (var stack : inputFluids) {
+                    container.extract(stack.instance(), stack.used(), false);
+                }
+
+                for (var stack : outputFluids) {
+                    container.insert(stack, false);
+                }
+
+                for (var stack : outputItems) {
+                    for (var r = 0; r < stack.roll(); r++) {
+                        if (stack.chance() < random.nextFloat()) {
+                            stackConsumer.accept(stack.stack().copy());
+                        }
+                    }
+                }
+
+
+                if (!recipe.matches(input, world)) {
+                    break;
+                }
+            }
+        }
+
+
+
+        /*if (container.contains(FactoryFluids.WATER.defaultInstance()) && container.contains(FactoryFluids.LAVA.defaultInstance())) {
             container.extract(FactoryFluids.WATER.defaultInstance(), 5000, false);
             container.extract(FactoryFluids.LAVA.defaultInstance(), 2000, false);
 
@@ -50,7 +99,7 @@ public interface FluidContainerUtil {
             if (x != 0 && world.getRandom().nextFloat() > 0.5 && world.getTime() % 5 == 0) {
                 world.spawnParticles(ParticleTypes.SMOKE, pos.getX(), pos.getY(), pos.getZ(), 1, 0.1, 0.1, 0.1, 0.1);
             }
-        }
+        }*/
     }
 
     static ItemStack interactWith(FluidContainer container, ServerPlayerEntity player, ItemStack stack) {

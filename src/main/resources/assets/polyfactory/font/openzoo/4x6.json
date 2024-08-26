@@ -1,0 +1,26 @@
+{
+  "providers": [
+    {
+      "type": "bitmap",
+      "file": "polyfactory:font/openzoo/4x6.png",
+      "ascent": 7,
+      "chars": [
+        "\u0000☺☻♥♦♣♠•◘○◙♂♀♪♫☼►◄↕‼¶§▬↨↑↓→←∟↔▲▼",
+        "\u0000!\"#$%&'()*+,-./0123456789:;<=>?",
+        "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_",
+        "`abcdefghijklmnopqrstuvwxyz{|}~⌂",
+        "ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒ",
+        "áíóúñÑªº¿⌐¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐",
+        "└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀",
+        "αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■\u0000"
+      ]
+    },
+    {
+      "type": "reference",
+      "id": "minecraft:include/default",
+      "filter": {
+        "uniform": false
+      }
+    }
+  ]
+}

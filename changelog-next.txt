@@ -14,9 +14,12 @@
   - Mechanical Mixers can now store fluids and use them as an ingredient and result of a recipe.
 - Added Experience Bucket, Slime Bucket and Honey Bucket.
 - Added Brittle Glass Bottle and Brittle Potions - they break after drinking, instead of returning the glass bottle.
+- Renamed Item Counter to Storage Counter. Item's id got kept unchanged to allow for backward compatibility.
 - You can now put Cables within wall blocks.
 - Clutches can now be inverted - Disconnect both sides unless powered.
 - Mobs killed by the Mechanical Miner can now drop XP.
+- Mixers heat can now be negative (freezing).
+- Heat can now depend on biome.
 - New Grinder recipe:
  - Nether Wart Block -> 1-5 Nether Wards
 - New Press recipe:

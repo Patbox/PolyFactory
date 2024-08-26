@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
+import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.GenericParts;
@@ -59,6 +60,19 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
     @Override
     protected BlockEntity createSourceBlockEntity(BlockPos pos, BlockState state) {
         return new MDrainBlockEntity(pos, state);
+    }
+
+    @Override
+    public boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        if (world.getBlockEntity(pos) instanceof MDrainBlockEntity be) {
+            return be.getComparatorOutput(state, world, pos);
+        }
+        return 0;
     }
 
     @Nullable
