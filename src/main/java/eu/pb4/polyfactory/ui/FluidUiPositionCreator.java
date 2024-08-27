@@ -2,22 +2,15 @@ package eu.pb4.polyfactory.ui;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import eu.pb4.polyfactory.FactoryRegistries;
+import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.fluid.FluidType;
-import eu.pb4.polyfactory.util.ResourceUtils;
-import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import it.unimi.dsi.fastutil.chars.Char2IntMap;
 import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Reference2LongMap;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.minecraft.text.Style;
 import net.minecraft.util.Identifier;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;

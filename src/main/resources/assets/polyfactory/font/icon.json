@@ -1,0 +1,23 @@
+{
+  "providers": [
+    {
+      "type": "bitmap",
+      "file": "polyfactory:icon_t.png",
+      "ascent": 8,
+      "height": 10,
+      "chars": [
+        "012345",
+        "qwerty",
+        "asdfgh",
+        "zxcvbn",
+        "uiop[]"
+      ]
+    },
+    {
+      "type": "space",
+      "advances": {
+        " ": -1
+      }
+    }
+  ]
+}

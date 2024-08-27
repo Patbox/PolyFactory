@@ -1,10 +1,9 @@
 package eu.pb4.polyfactory.fluid;
 
-import eu.pb4.polyfactory.FactoryRegistries;
+import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.entity.FactoryEntities;
-import eu.pb4.polyfactory.entity.splash.ExperienceSplashEntity;
 import eu.pb4.polyfactory.fluid.shooting.ShootProjectileEntity;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.other.FactorySoundEvents;

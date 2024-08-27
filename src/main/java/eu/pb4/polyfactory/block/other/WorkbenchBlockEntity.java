@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
+import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlock;
 import eu.pb4.polyfactory.ui.WorkbenchScreenHandler;
@@ -39,6 +40,8 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
     private static final int[] INPUT_SLOTS = IntStream.range(0, 9).toArray();
     private final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(9, ItemStack.EMPTY);
     private final CraftingResultInventory result = new CraftingResultInventory();
+    @Nullable
+    private RecipeEntry<CraftingRecipe> currentRecipe;
 
     public WorkbenchBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.WORKBENCH, pos, state);
@@ -147,7 +150,7 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
 
     protected void updateResult() {
         ItemStack itemStack = ItemStack.EMPTY;
-        Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, this.createRecipeInput(), world);
+        Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, this.createRecipeInput(), world, this.currentRecipe);
         if (optional.isPresent()) {
             RecipeEntry<CraftingRecipe> recipeEntry = optional.get();
             CraftingRecipe craftingRecipe = recipeEntry.value();
@@ -157,6 +160,9 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
                     itemStack = itemStack2;
                 }
             //}
+            this.currentRecipe = recipeEntry;
+        } else {
+            this.currentRecipe = null;
         }
 
         result.setStack(0, itemStack);
@@ -195,5 +201,10 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
     @Override
     public void onListenerUpdate(WorldChunk chunk) {
         updateResult();
+    }
+
+    @Nullable
+    public RecipeEntry<CraftingRecipe> currentRecipe() {
+        return this.currentRecipe;
     }
 }

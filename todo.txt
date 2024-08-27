@@ -1,0 +1,6 @@
+- Revisit idea of electricity (and gadgets)
+- Make tachio/stressometer useful without displays.
+- lcd displays?
+- PolyComputers / better logic writing/programming that is nicer tha CC: Polymer
+- Visible items in workbench
+- Improve mechanical planter

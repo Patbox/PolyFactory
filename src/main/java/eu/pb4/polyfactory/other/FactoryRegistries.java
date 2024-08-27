@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory;
+package eu.pb4.polyfactory.other;
 
 import eu.pb4.polyfactory.fluid.FluidType;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;

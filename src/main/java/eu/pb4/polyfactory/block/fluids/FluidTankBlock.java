@@ -1,8 +1,10 @@
 package eu.pb4.polyfactory.block.fluids;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.block.property.ConnectablePart;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
@@ -63,7 +65,13 @@ public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectab
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return getBlockStateAt(ctx.getWorld(), ctx.getBlockPos());
+        var x = getBlockStateAt(ctx.getWorld(), ctx.getBlockPos());
+
+        if (ctx.getPlayer() instanceof ServerPlayerEntity player && (!x.get(PART_X).single() || !x.get(PART_Y).single() || !x.get(PART_Z).single())) {
+            TriggerCriterion.trigger(player, FactoryTriggers.FLUID_TANK_CONNECT);
+        }
+
+        return x;
     }
 
     @Override

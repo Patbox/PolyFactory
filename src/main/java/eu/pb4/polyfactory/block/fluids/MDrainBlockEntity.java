@@ -1,6 +1,8 @@
 package eu.pb4.polyfactory.block.fluids;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
@@ -27,6 +29,8 @@ import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.minecraft.advancement.criterion.Criteria;
+import net.minecraft.advancement.criterion.RecipeCraftedCriterion;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
@@ -56,6 +60,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
+
+import java.util.List;
 
 public class MDrainBlockEntity extends TallItemMachineBlockEntity implements FluidInputOutput.ContainerBased {
 
@@ -162,6 +168,10 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             } else {
                 return;
             }
+            if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity serverPlayer) {
+                Criteria.RECIPE_CRAFTED.trigger(serverPlayer, self.currentRecipe.id(), List.of(inputStack.copy(), self.catalyst()));
+            }
+
             inputStack.decrement(self.currentRecipe.value().decreasedInputItemAmount(input));
             if (inputStack.isEmpty()) {
                 self.setStack(INPUT_FIRST, ItemStack.EMPTY);
@@ -326,6 +336,11 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
         if (optional.isEmpty()) {
             return super.onUse(state, world, pos, player, hit);
         }
+        if (player instanceof ServerPlayerEntity serverPlayer) {
+            Criteria.RECIPE_CRAFTED.trigger(serverPlayer, optional.get().id(), List.of(stack.copy(), this.catalyst()));
+            TriggerCriterion.trigger(serverPlayer, FactoryTriggers.DRAIN_USE);
+        }
+
         var recipe = optional.get().value();
         var itemOut = recipe.craft(input, player.getRegistryManager());
         for (var fluid : recipe.fluidInput(input)) {

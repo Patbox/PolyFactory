@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.fluid;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import eu.pb4.polyfactory.FactoryRegistries;
+import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.fluid.shooting.FluidShootingBehavior;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;

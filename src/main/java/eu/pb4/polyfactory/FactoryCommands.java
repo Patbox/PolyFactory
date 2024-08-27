@@ -12,7 +12,10 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,8 +31,10 @@ public class FactoryCommands {
 
     private static void createCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
         dispatcher.register(literal("polyfactory")
-                .requires((x) -> x.hasPermissionLevel(3))
+                //.executes(FactoryCommands::about)
+                .then(literal("wiki").executes(FactoryCommands::wiki))
                 .then(literal("debug")
+                        .requires((x) -> x.hasPermissionLevel(3))
                         .then(literal("list_models").executes(FactoryCommands::listModels))
                         .then(literal("enable_lod")
                                 .then(argument("enable", BoolArgumentType.bool())
@@ -38,6 +43,20 @@ public class FactoryCommands {
                         )
                 )
         );
+    }
+
+    private static int about(CommandContext<ServerCommandSource> context) {
+        context.getSource().sendMessage(Text.literal("PolyFactory by Patbox"));
+        return 0;
+    }
+
+    private static int wiki(CommandContext<ServerCommandSource> context) {
+        var url = "https://modded.wiki/w/Mod:PolyFactory";
+        context.getSource().sendMessage(Text.translatable("text.polyfactory.wiki_link",
+                Text.literal(url)
+                        .setStyle(Style.EMPTY.withUnderline(true).withColor(Formatting.BLUE).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url)))
+        ).setStyle(Style.EMPTY.withColor(Formatting.YELLOW)));
+        return 0;
     }
 
     private static int enableLod(CommandContext<ServerCommandSource> context) {

@@ -74,8 +74,10 @@
   "block.polyfactory.portable_fluid_tank.typed": "Portable Fluid Tank (%s)",
 
   "item.polyfactory.mod_icon": "Mod Icon",
+  "item.polyfactory.fluid_model": "Fluid Model",
   "item.polyfactory.windmill_sail": "Windmill Sail",
   "item.polyfactory.dynamite": "Dynamite",
+  "item.polyfactory.sticky_dynamite": "Sticky Dynamite",
   "item.polyfactory.item_filter": "Item Filter",
   "item.polyfactory.item_filter.empty": "Empty Item Filter",
   "item.polyfactory.item_filter.with": "Item Filter (%s)",
@@ -117,6 +119,7 @@
   "item.polyfactory.brittle_glass_bottle": "Brittle Glass Bottle",
   "item.polyfactory.brittle_potion": "Brittle %s",
   "item.polyfactory.crispy_honey": "Crispy Honey",
+  "item.polyfactory.honeyed_apple": "Honeyed Apple",
 
   "block.polyfactory.colored_lamp": "Colored Lamp",
   "block.polyfactory.colored_lamp.colored": "%s Lamp",
@@ -150,6 +153,7 @@
   "item.polyfactory.wrench.action.read_only": "Read Only",
   "item.polyfactory.wrench.action.locked": "Locked",
   "item.polyfactory.wrench.action.half": "Half",
+  "item.polyfactory.wrench.action.radius": "Radius",
   "item.polyfactory.wrench.action.scale": "Scale",
   "item.polyfactory.wrench.action.offset": "Offset",
   "item.polyfactory.wrench.action.force_text": "Force Text",
@@ -159,6 +163,7 @@
   "item.polyfactory.wrench.action.scroll_loop": "Scroll Loop",
   "item.polyfactory.wrench.action.reverse": "Reverse",
   "item.polyfactory.wrench.action.inverted": "Inverted",
+  "item.polyfactory.wrench.action.spread": "Spread",
   "item.polyfactory.wrench.action.operation": "Operation",
   "item.polyfactory.wrench.action.facing_input_1": "Input A Facing",
   "item.polyfactory.wrench.action.facing_input_2": "Input B Facing",
@@ -196,6 +201,7 @@
   "text.polyfactory.fluid_component.stored_fluids": "Stored Fluids:",
 
   "text.polyfactory.x_out_of_y": "%s / %s",
+  "text.polyfactory.wiki_link": "Official PolyFactory Wiki: %s",
 
   "text.polyfactory.char_per_sec": "%s char/sec",
   "data_type.polyfactory.string": "String",
@@ -285,7 +291,7 @@
   "advancements.polyfactory.tachometer.description": "Place Tachometer or Stressometer to measure rotation!",
 
   "advancements.polyfactory.press.title": "Better with Plates",
-  "advancements.polyfactory.press.description": "Use Mechanical Press to craft Steel Plate or Wooden Plate",
+  "advancements.polyfactory.press.description": "Use Mechanical Press to craft Steel, Copper or Wooden Plate",
 
   "advancements.polyfactory.crafter.title": "Automatic Crafting",
   "advancements.polyfactory.crafter.description": "Craft something with Mechanical Crafter",
@@ -353,6 +359,51 @@
 
   "advancements.polyfactory.data_memory.title": "The storage device can now be safely removed from your computer.",
   "advancements.polyfactory.data_memory.description": "Store some data in Data Memory Block and then take it with you!",
+
+  "advancements.polyfactory.pipe.title": "Just like the screensaver!",
+  "advancements.polyfactory.pipe.description": "Place some Copper Pipes to transport fluids!",
+
+  "advancements.polyfactory.drain.title": "Down the Drain",
+  "advancements.polyfactory.drain.description": "Pour some fluid into the drain!",
+
+  "advancements.polyfactory.mechanical_spout.title": "Pour 10ml of liquid slowly...",
+  "advancements.polyfactory.mechanical_spout.description": "Pour some fluids with the Mechanical Spout!",
+
+  "advancements.polyfactory.honeyed_apple.title": "Sweet Creativity",
+  "advancements.polyfactory.honeyed_apple.description": "Craft Honeyed Apple!",
+
+  "advancements.polyfactory.crispy_honey.title": "Sweet Accidental Discovery",
+  "advancements.polyfactory.crispy_honey.description": "Mix Lava with Honey to get Crispy Honey!",
+
+  "advancements.polyfactory.brittle_glass_bottle.title": "Fragile!",
+  "advancements.polyfactory.brittle_glass_bottle.description": "Craft Brittle Glass Bottle!",
+
+  "advancements.polyfactory.fluid_tank.title": "Large Fluid Storage",
+  "advancements.polyfactory.fluid_tank.description": "Place some Fluid Tanks connected to each other.",
+
+  "advancements.polyfactory.portable_fluid_tank.title": "Better than Buckets",
+  "advancements.polyfactory.portable_fluid_tank.description": "Fill Portable Fluid Tank and pick it up.",
+
+  "advancements.polyfactory.nozzle.title": "Just a large sprinkler",
+  "advancements.polyfactory.nozzle.description": "Setup Nozzle and shoot some fluids out of it.",
+
+  "advancements.polyfactory.pressure_fluid_gun.title": "It's time to have fun...",
+  "advancements.polyfactory.pressure_fluid_gun.description": "Craft Pressure Fluid Gun.",
+
+  "advancements.polyfactory.nozzle_lava.title": "Flamethrower!",
+  "advancements.polyfactory.nozzle_lava.description": "Shoot out lava from Nozzle or Pressure Fluid Gun",
+
+  "advancements.polyfactory.pressure_fluid_gun_healing.title": "Meet the Medic",
+  "advancements.polyfactory.pressure_fluid_gun_healing.description": "It's time to heal with Pressure Fluid Gun!",
+
+  "advancements.polyfactory.dynamite.title": "Bombastic!",
+  "advancements.polyfactory.dynamite.description": "Get some Dynamite.",
+
+  "advancements.polyfactory.spray_can.title": "Paint the world!",
+  "advancements.polyfactory.spray_can.description": "Use Spray Can to dye some blocks.",
+
+  "advancements.polyfactory.crushed_raw_ore.title": "More ore per ore",
+  "advancements.polyfactory.crushed_raw_ore.description": "Crush raw ores to get more of them!",
 
   "advancements.polyfactory.tater_16.title": "Potato Beginner",
   "advancements.polyfactory.tater_16.description": "Click Potato on a Spring 16 times...",

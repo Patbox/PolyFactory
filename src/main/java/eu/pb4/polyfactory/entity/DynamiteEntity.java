@@ -9,12 +9,15 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
@@ -27,6 +30,7 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
 
     private int fuse = 80;
     private ItemStack itemStack = FactoryItems.DYNAMITE.getDefaultStack();
+    private BlockPos stickToBlock;
 
     public DynamiteEntity(EntityType<? extends ProjectileEntity> type, World world) {
         super(type, world);
@@ -55,8 +59,15 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
+        if (this.itemStack.isOf(FactoryItems.STICKY_DYNAMITE)) {
+            this.stickToBlock = blockHitResult.getBlockPos();
+            this.move(MovementType.SELF, this.getVelocity());
+            this.setVelocity(Vec3d.ZERO);
+            return;
+        }
+
         var axis = blockHitResult.getSide().getAxis();
-        this.setVelocity(this.getVelocity().multiply(axis == Direction.Axis.X ? -1 : 1, blockHitResult.getSide() == Direction.DOWN ? -1 : 1, axis == Direction.Axis.Z ? -1 : 1));
+        this.setVelocity(this.getVelocity().multiply(axis == Direction.Axis.X ? -0.25 : 0.25, blockHitResult.getSide() == Direction.DOWN ? -1 : 1, axis == Direction.Axis.Z ? -0.25 : 0.25));
     }
 
     public void tick() {
@@ -65,19 +76,41 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
         }
         super.tick();
 
-        if (!this.hasNoGravity()) {
-            this.setVelocity(this.getVelocity().add(0.0, -0.04, 0.0));
+        if (this.stickToBlock == null) {
+            HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit);
+            if (hitResult.getType() != HitResult.Type.MISS) {
+                this.hitOrDeflect(hitResult);
+            }
+        }
+        this.checkBlockCollision();
+        this.updateRotation();
+
+        boolean move = true;
+        if (this.stickToBlock != null) {
+            move = false;
+
+            var state = this.getWorld().getBlockState(this.stickToBlock);
+            if (state.getCollisionShape(this.getWorld(), this.stickToBlock).isEmpty()) {
+                this.stickToBlock = null;
+            }
         }
 
-        this.move(MovementType.SELF, this.getVelocity());
-        this.setVelocity(this.getVelocity().multiply(0.98));
+        if (move) {
+            this.move(MovementType.SELF, this.getVelocity());
 
-        if (this.isOnGround()) {
-            this.setVelocity(this.getVelocity().multiply(0.8, -0.8, 0.8));
-        }
+            if (!this.hasNoGravity()) {
+                this.setVelocity(this.getVelocity().add(0.0, -0.04, 0.0));
+            }
 
-        if (this.isTouchingWater()) {
-            this.setVelocity(this.getVelocity().multiply(0.8));
+            this.setVelocity(this.getVelocity().multiply(0.98));
+
+            if (this.isOnGround()) {
+                this.setVelocity(this.getVelocity().multiply(0.8, -0.8, 0.8));
+            }
+
+            if (this.isTouchingWater()) {
+                this.setVelocity(this.getVelocity().multiply(0.8));
+            }
         }
 
         if (this.isOnFire()) {

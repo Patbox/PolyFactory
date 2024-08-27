@@ -5,7 +5,7 @@ import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.factorytools.api.item.MultiBlockItem;
 import eu.pb4.factorytools.api.block.MultiBlock;
-import eu.pb4.polyfactory.FactoryRegistries;
+import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.block.fluids.PortableFluidTankBlock;
 import eu.pb4.polyfactory.block.fluids.PortableFluidTankBlockEntity;
@@ -38,7 +38,10 @@ import net.minecraft.util.*;
 import java.util.function.Consumer;
 
 public class FactoryItems {
+    // Util
     public static final Item MOD_ICON = register("mod_icon", new ModeledItem(new Item.Settings()));
+    public static final Item FLUID_MODEL = register("fluid_model", new FluidModelItem(new Item.Settings()));
+    // Actual items
     public static final WrenchItem WRENCH = register("wrench", new WrenchItem());
     public static final Item CONVEYOR = register(FactoryBlocks.CONVEYOR);
     public static final Item STICKY_CONVEYOR = register(FactoryBlocks.STICKY_CONVEYOR);
@@ -115,6 +118,7 @@ public class FactoryItems {
     public static final Item WORKBENCH = register(FactoryBlocks.WORKBENCH);
     public static final Item ARTIFICIAL_DYE = register("artificial_dye", new ArtificialDyeItem(new Item.Settings()));
     public static final Item DYNAMITE = register("dynamite", new DynamiteItem(new Item.Settings().maxCount(16)));
+    public static final Item STICKY_DYNAMITE = register("sticky_dynamite", new DynamiteItem(new Item.Settings().maxCount(16)));
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
     public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING);
     public static final Item EXPERIENCE_BUCKET = register("experience_bucket", new ModeledItem(new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
@@ -124,7 +128,8 @@ public class FactoryItems {
 
     public static final Item CRISPY_HONEY = register("crispy_honey", new ModeledItem(new Item.Settings()
             .food(new FoodComponent.Builder().nutrition(4).saturationModifier(0.2F).snack().build())));
-
+    public static final Item HONEYED_APPLE = register("honeyed_apple", new ModeledItem(new Item.Settings()
+            .food(new FoodComponent.Builder().nutrition(7).saturationModifier(1).build())));
     public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
@@ -243,6 +248,7 @@ public class FactoryItems {
 
                     // Other items
                     entries.add(DYNAMITE);
+                    entries.add(STICKY_DYNAMITE);
                     entries.add(PRESSURE_FLUID_GUN);
                     entries.add(SPRAY_CAN);
                     entries.add(HONEY_BUCKET);
@@ -251,6 +257,7 @@ public class FactoryItems {
                     entries.add(THROWABLE_GLASS_BOTTLE);
                     entries.add(BRITTLE_GLASS_BOTTLE);
                     entries.add(CRISPY_HONEY);
+                    entries.add(HONEYED_APPLE);
 
                     // Generic Materials
                     entries.add(SAW_DUST);

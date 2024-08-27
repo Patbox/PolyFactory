@@ -7,6 +7,7 @@ import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.block.data.output.HologramProjectorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
@@ -55,11 +56,16 @@ import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class NozzleBlock extends NetworkBlock implements FactoryBlock, WrenchableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe {
     public static final DirectionProperty FACING = Properties.FACING;
+    public static final WrenchAction SPREAD = WrenchAction.ofBlockEntityString("spread", NozzleBlockEntity.class,
+            x -> String.format(Locale.ROOT,"%.2f", x.extraSpread()),
+            (x, n) -> x.setExtraSpread(FactoryUtil.wrap(x.extraSpread() + (n ? 0.05f : -0.05f), 0f, 0.8f))
+    );
     public NozzleBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
@@ -155,7 +161,7 @@ public class NozzleBlock extends NetworkBlock implements FactoryBlock, Wrenchabl
 
     @Override
     public List<WrenchAction> getWrenchActions() {
-        return List.of(WrenchAction.FACING);
+        return List.of(WrenchAction.FACING, SPREAD);
     }
 
     public static final class Model extends BlockModel {

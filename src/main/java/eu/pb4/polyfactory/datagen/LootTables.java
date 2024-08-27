@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.block.data.CableBlock;
 import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
 import eu.pb4.polyfactory.block.fluids.PipeInWallBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -43,8 +44,8 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.GRINDER);
         this.addDrop(FactoryBlocks.PLACER);
         this.addDrop(FactoryBlocks.STEEL_BUTTON);
-        this.addDrop(FactoryBlocks.PRESS, (block) -> this.dropsWithProperty(block, PressBlock.PART, PressBlock.Part.MAIN));
-        this.addDrop(FactoryBlocks.MIXER, (block) -> this.dropsWithProperty(block, MixerBlock.PART, MixerBlock.Part.MAIN));
+        this.addTallMachineDrop(FactoryBlocks.PRESS);
+        this.addTallMachineDrop(FactoryBlocks.MIXER);
         this.addDrop(FactoryBlocks.HAND_CRANK);
         this.addDrop(FactoryBlocks.CONVEYOR);
         this.addDrop(FactoryBlocks.STICKY_CONVEYOR);
@@ -70,8 +71,8 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.PUMP);
         this.addDrop(FactoryBlocks.NOZZLE);
         this.addDrop(FactoryBlocks.DRAIN);
-        this.addDrop(FactoryBlocks.MECHANICAL_DRAIN);
-        this.addDrop(FactoryBlocks.MECHANICAL_SPOUT);
+        this.addTallMachineDrop(FactoryBlocks.MECHANICAL_DRAIN);
+        this.addTallMachineDrop(FactoryBlocks.MECHANICAL_SPOUT);
         this.addDrop(FactoryBlocks.FLUID_TANK);
         this.addDrop(FactoryBlocks.PORTABLE_FLUID_TANK, LootTable.builder().pool(LootPool.builder()
                 .conditionally(SurvivesExplosionLootCondition.builder())
@@ -115,6 +116,10 @@ class LootTables extends FabricBlockLootTableProvider {
 
         FactoryBlocks.WALL_WITH_CABLE.values().forEach(this::addWallWithCable);
         FactoryBlocks.WALL_WITH_PIPE.values().forEach(this::addWallWithPipe);
+    }
+
+    private void addTallMachineDrop(TallItemMachineBlock block) {
+        this.addDrop(block, (block2) -> this.dropsWithProperty(block2, MixerBlock.PART, MixerBlock.Part.MAIN));
     }
 
     private void addAxle(Block block, Item item) {

@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.factorytools.api.item.RegistryCallbackItem;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
+import eu.pb4.polyfactory.advancement.FluidShootsCriterion;
 import eu.pb4.polyfactory.fluid.*;
 import eu.pb4.polyfactory.fluid.shooting.EntityShooterContext;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
@@ -128,6 +129,7 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
                     FactoryUtil.addSafeVelocity(user, vec);
                     if (user instanceof ServerPlayerEntity player) {
                         FactoryUtil.sendVelocityDelta(player, vec);
+                        FluidShootsCriterion.triggerFluidLauncher(player, stack, f);
                     }
                     return TypedActionResult.consume(stack);
                 }

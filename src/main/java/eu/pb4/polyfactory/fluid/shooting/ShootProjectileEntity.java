@@ -10,6 +10,7 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public record ShootProjectileEntity<T>(EntityCreator<T> entityCreator,
@@ -59,6 +60,7 @@ public record ShootProjectileEntity<T>(EntityCreator<T> entityCreator,
         var pos = context.position();
         var rotation = context.rotation();
         var random = context.random();
+        divergence += context.extraSpread();
         var world = context.world();
         for (int i = 0; i < this.splashPerTick; i++) {
             var entity = entityCreator.createEntity(world, fluidInstance, amount);
@@ -76,7 +78,7 @@ public record ShootProjectileEntity<T>(EntityCreator<T> entityCreator,
             entity.setVelocity(vec.x, vec.y, vec.z);
             world.spawnEntity(entity);
         }
-        world.playSound(null, pos.x, pos.y, pos.z, this.soundEvent, context.soundCategory(), 1, (float) random.nextTriangular(1, 0.1));
+        world.playSound(null, pos.x, pos.y, pos.z, this.soundEvent, context.soundCategory(), 0.5f, (float) random.nextTriangular(1, 0.1));
     }
 
     @Override

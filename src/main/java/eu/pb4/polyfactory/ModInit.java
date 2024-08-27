@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory;
 
+import eu.pb4.polyfactory.advancement.PolyFactoryAdvancementCriteria;
 import eu.pb4.polyfactory.advancement.FactoryItemPredicates;
 import eu.pb4.polyfactory.block.FactoryPoi;
 import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlock;
@@ -18,6 +19,7 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryEnchantmentEffectComponents;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
 import eu.pb4.polyfactory.models.*;
+import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
@@ -73,6 +75,7 @@ public class ModInit implements ModInitializer {
 		FactoryRecipeSerializers.register();
 		FactoryLootTables.register();
 		FactoryCommands.register();
+		PolyFactoryAdvancementCriteria.register();
 		FactoryUtil.register();
 		FactoryItemPredicates.register();
 		PotatoWisdom.load();

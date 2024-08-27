@@ -18,4 +18,8 @@ public interface ShooterContext {
     default float force() {
         return 1;
     }
+
+    default float extraSpread() {
+        return 0;
+    }
 }

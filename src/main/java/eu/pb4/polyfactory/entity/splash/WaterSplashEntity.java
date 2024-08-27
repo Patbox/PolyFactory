@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.fluid.FactoryFluids;
 import net.minecraft.block.AbstractCandleBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CampfireBlock;
+import net.minecraft.block.FarmlandBlock;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.AxolotlEntity;
@@ -31,15 +32,20 @@ public class WaterSplashEntity extends SplashEntity<Unit> {
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        if (!this.getWorld().isClient && this.random.nextFloat() < 0.3) {
+        if (!this.getWorld().isClient) {
             Direction direction = blockHitResult.getSide();
-            BlockPos blockPos = blockHitResult.getBlockPos();
-            BlockPos blockPos2 = blockPos.offset(direction);
-            this.extinguishFire(blockPos2);
-            this.extinguishFire(blockPos2.offset(direction.getOpposite()));
+            BlockPos targetBlockPos = blockHitResult.getBlockPos();
+            var state = getWorld().getBlockState(targetBlockPos);
+            if (state.getBlock() instanceof FarmlandBlock && random.nextFloat() < 0.1) {
+                getWorld().setBlockState(targetBlockPos, state.with(FarmlandBlock.MOISTURE, FarmlandBlock.MAX_MOISTURE));
+            }
+
+            BlockPos sidePos = targetBlockPos.offset(direction);
+            this.extinguishFire(sidePos);
+            this.extinguishFire(sidePos.offset(direction.getOpposite()));
 
             for(Direction direction2 : Direction.Type.HORIZONTAL) {
-                this.extinguishFire(blockPos2.offset(direction2));
+                this.extinguishFire(sidePos.offset(direction2));
             }
         }
         super.onBlockHit(blockHitResult);
@@ -72,7 +78,7 @@ public class WaterSplashEntity extends SplashEntity<Unit> {
     }
 
     private void extinguishFire(BlockPos pos) {
-        if (this.random.nextFloat() < 0.3) {
+        if (this.random.nextFloat() < 0.1) {
             if (!this.canBreakBlock(pos)) {
                 return;
             }

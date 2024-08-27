@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.ui;
 
 import com.mojang.datafixers.util.Pair;
-import eu.pb4.polyfactory.FactoryRegistries;
+import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.util.ResourceUtils;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
@@ -15,8 +15,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.BiConsumer;
-
-import static eu.pb4.polyfactory.ModInit.id;
 
 public class FluidUiTextureCreator {
     private final Set<Pair<Identifier, Identifier>> textures = new HashSet<>();

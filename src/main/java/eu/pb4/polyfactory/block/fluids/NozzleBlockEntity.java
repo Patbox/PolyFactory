@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.fluids;
 
 import com.mojang.authlib.GameProfile;
 import eu.pb4.factorytools.api.block.OwnedBlockEntity;
+import eu.pb4.polyfactory.advancement.FluidShootsCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
@@ -9,11 +10,13 @@ import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.shooting.ShooterContext;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Util;
@@ -32,6 +35,7 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
     private FluidInstance<?> currentFluid;
     private GameProfile owner;
     private int tick = 0;
+    private float extraSpread = 0;
 
     public NozzleBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.NOZZLE, pos, state);
@@ -43,6 +47,7 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
         nbt.putDouble("speed", this.speed);
         nbt.putInt("tick", this.tick);
         nbt.put("fluid", this.container.toNbt(registryLookup));
+        nbt.putFloat("spread", this.extraSpread);
         if (this.currentFluid != null) {
             nbt.put("current_fluid", this.currentFluid.toNbt(registryLookup));
         }
@@ -55,6 +60,7 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
         this.tick = nbt.getInt("tick");
         this.container.fromNbt(registryLookup, nbt, "fluid");
         this.currentFluid = FluidInstance.fromNbt(registryLookup, nbt.get("current_fluid"));
+        this.extraSpread = nbt.getFloat("spread");
     }
 
     public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
@@ -113,7 +119,11 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
                 nozzle.currentFluid = fluid;
                 nozzle.tick = 0;
                 fluid.shootingBehavior().startShooting(nozzle, fluid, nozzle.container);
+                if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
+                    FluidShootsCriterion.triggerNozzle(player, fluid);
+                }
                 nozzle.markDirty();
+                break;
             }
         }
     }
@@ -173,6 +183,16 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
     @Override
     public GameProfile getOwner() {
         return this.owner;
+    }
+
+    @Override
+    public float extraSpread() {
+        return this.extraSpread;
+    }
+
+    public void setExtraSpread(float extraSpread) {
+        this.extraSpread = extraSpread;
+        this.markDirty();
     }
 
     @Override

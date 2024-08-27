@@ -11,6 +11,8 @@ import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -34,6 +36,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
+import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -48,10 +51,14 @@ import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
-public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, BarrierBasedWaterloggable, ItemUseLimiter.All {
+public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, BarrierBasedWaterloggable, ItemUseLimiter.All, WrenchableBlock {
+    private static final WrenchAction RADIUS_ACTION = WrenchAction.ofBlockEntityInt("radius", PlanterBlockEntity.class, 1, 3, 0,
+            PlanterBlockEntity::radius, PlanterBlockEntity::setRadius);
+
     public PlanterBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
@@ -158,14 +165,19 @@ public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock
         }
     }
 
-    public final class Model extends RotationAwareModel {
+    @Override
+    public List<WrenchAction> getWrenchActions() {
+        return List.of(RADIUS_ACTION);
+    }
+
+    public static final class Model extends RotationAwareModel {
         public static final ItemStack OUTPUT_1 = BaseItemProvider.requestModel(id("block/planter_output"));
         public static final ItemStack OUTPUT_2 = BaseItemProvider.requestModel(id("block/planter_output_2"));
 
         private final ItemDisplayElement output1;
         private final ItemDisplayElement output2;
         private final ItemDisplayElement main;
-        EightWayDirection direction = null;
+        private BlockPos target = null;
 
         private Model(ServerWorld world, BlockState state) {
             this.main = ItemDisplayElementUtil.createSimple(FactoryItems.PLANTER);
@@ -211,15 +223,19 @@ public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock
             }
         }
 
-        public void setDirection(EightWayDirection direction) {
-            if (this.direction == direction) {
+        public void setDirection(BlockPos selfPos, BlockPos target) {
+            if (target.equals(this.target)) {
                 return;
             }
-            this.direction = direction;
-            this.output1.setTranslation(new Vector3f(direction.getOffsetX(), 0, direction.getOffsetZ()).mul(3.016f / 16));
-            this.output2.setTranslation(new Vector3f(direction.getOffsetX(), 0, direction.getOffsetZ()).mul(3.016f / 16).add(0, 1 / 32f,0));
+            this.target = target;
+            var offset = target.subtract(selfPos);
+            var angle = Math.atan2(-offset.getX(), -offset.getZ());
 
-            this.output2.setLeftRotation(new Quaternionf().rotateY(-MathHelper.HALF_PI / 2 * direction.ordinal()));
+            var pos = new Vector3f(MathHelper.clamp(offset.getX(), -1, 1), 0, MathHelper.clamp(offset.getZ(), -1, 1)).mul(3.016f / 16);
+
+            this.output1.setTranslation(pos);
+            this.output2.setTranslation(new Vector3f(pos).add(0, 1 / 32f,0));
+            this.output2.setLeftRotation(new Quaternionf().rotateY((float) angle));
         }
     }
 }

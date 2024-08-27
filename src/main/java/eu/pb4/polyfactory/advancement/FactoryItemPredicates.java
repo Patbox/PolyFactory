@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.advancement;
 
 import eu.pb4.factorytools.api.util.ExtraItemPredicates;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.FireworkRocketItem;
@@ -10,6 +11,7 @@ import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
 public class FactoryItemPredicates {
     public static Identifier CUSTOM_FIREWORK_COLOR = id("custom_firework_color");
+    public static Identifier HAS_FLUIDS = id("has_fluids");
 
 
     public static void register() {
@@ -32,6 +34,15 @@ public class FactoryItemPredicates {
             }
 
             return false;
+        });
+
+        ExtraItemPredicates.PREDICATES.put(HAS_FLUIDS, stack -> {
+            var nbt = stack.get(FactoryDataComponents.FLUID);
+            if (nbt == null) {
+                return false;
+            }
+
+            return !nbt.isEmpty();
         });
     }
 

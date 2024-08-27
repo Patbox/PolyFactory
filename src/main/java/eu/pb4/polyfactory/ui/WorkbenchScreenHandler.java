@@ -1,5 +1,7 @@
 package eu.pb4.polyfactory.ui;
 
+import eu.pb4.polyfactory.block.other.WorkbenchBlockEntity;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -16,6 +18,7 @@ import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<CraftingRecipeInput, Recipe<CraftingRecipeInput>> {
 	private final RecipeInputInventory recipeInput;
@@ -24,14 +27,22 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<Crafting
 	private final PlayerEntity player;
 	private final Block block;
 
-	public WorkbenchScreenHandler(int syncId, Block block, PlayerInventory playerInventory, RecipeInputInventory input, CraftingResultInventory result, ScreenHandlerContext context) {
+	public WorkbenchScreenHandler(int syncId, Block block, PlayerInventory playerInventory, WorkbenchBlockEntity input, CraftingResultInventory result, ScreenHandlerContext context) {
 		super(ScreenHandlerType.CRAFTING, syncId);
 		this.result = result;
 		this.block = block;
 		this.context = context;
 		this.player = playerInventory.player;
 		this.recipeInput = input;
-		this.addSlot(new CraftingResultSlot(playerInventory.player, this.recipeInput, this.result, 0, 124, 35));
+		this.addSlot(new CraftingResultSlot(playerInventory.player, this.recipeInput, this.result, 0, 124, 35) {
+			@Override
+			protected void onCrafted(ItemStack stack) {
+				super.onCrafted(stack);
+				if (player instanceof ServerPlayerEntity serverPlayer) {
+					Criteria.RECIPE_CRAFTED.trigger(serverPlayer, input.currentRecipe().id(), input.getHeldStacks());
+				}
+			}
+		});
 
 		for(int i = 0; i < 3; ++i) {
 			for(int j = 0; j < 3; ++j) {

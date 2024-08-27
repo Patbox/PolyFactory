@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.models.fluid;
 
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
-import eu.pb4.polyfactory.FactoryRegistries;
+import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -58,7 +58,7 @@ public class FluidModel {
         }
         stack = stack.copy();
         //noinspection unchecked
-        stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(((FluidType.ColorProvider<Object>) fluid.color().get()).getColor(data), false));
+        stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent((fluid.color().get()).getColor(data), false));
         return stack;
     }
 

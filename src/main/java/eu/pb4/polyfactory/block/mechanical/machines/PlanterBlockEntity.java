@@ -40,6 +40,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
     protected GameProfile owner = null;
     protected double process = 0;
     private float stress = 0;
+    private int radius = 2;
     private PlanterBlock.Model model;
 
     public PlanterBlockEntity(BlockPos pos, BlockState state) {
@@ -53,6 +54,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
         if (this.owner != null) {
             nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
+        nbt.putInt("radius", this.radius);
         super.writeNbt(nbt, lookup);
     }
 
@@ -63,6 +65,12 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
         if (nbt.contains("owner")) {
             this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompound("owner"));
         }
+        if (nbt.contains("radius")) {
+            this.radius = nbt.getInt("radius");
+        } else {
+            this.radius = 1;
+        }
+
         super.readNbt(nbt, lookup);
     }
 
@@ -100,7 +108,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
     public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
         var self = (PlanterBlockEntity) t;
 
-        if (self.stack.isEmpty() || !(self.stack.getItem() instanceof BlockItem blockItem) ) {
+        if (self.stack.isEmpty() || !(self.stack.getItem() instanceof BlockItem blockItem)) {
             self.stress = 0;
             self.process = 0;
             return;
@@ -109,27 +117,23 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
 
         var speed = Math.abs(RotationUser.getRotation((ServerWorld) world, pos).speed()) * MathHelper.RADIANS_PER_DEGREE * 2.5f;
 
-        var mut = new BlockPos.Mutable();
-
-        EightWayDirection direction = null;
-
-        for (var dir : EightWayDirection.values()) {
-            for (int i = 0; i < 2; i++) {
-                mut.set(pos).move(dir.getOffsetX(), -i, dir.getOffsetZ());
+        BlockPos place = null;
+        for (var y = 0; y < 2; y++) {
+            for (var mut : BlockPos.iterateInSquare(pos.down(y), self.radius + 1, Direction.NORTH, Direction.WEST)) {
                 var targetState = world.getBlockState(mut);
-                if ((targetState.isAir() || targetState.isReplaceable())
+                if ((targetState.isAir() || (targetState.isReplaceable() && targetState.getFluidState().isEmpty()))
                         && placableState.canPlaceAt(world, mut)
                         && CommonProtection.canPlaceBlock(world, mut, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner, null)) {
-                    direction = dir;
+                    place = mut.toImmutable();
                     break;
                 }
             }
-            if (direction != null) {
+            if (place != null) {
                 break;
             }
         }
 
-        if (direction == null) {
+        if (place == null) {
             self.stress = 0;
             self.process = 0;
             return;
@@ -140,7 +144,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
         if (speed == 0) {
             return;
         }
-        self.model.setDirection(direction);
+        self.model.setDirection(pos, place);
 
         if (self.process == 0) {
             self.process += speed / 40;
@@ -151,10 +155,10 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
         if (self.process >= 1) {
             self.process = 0;
             self.stress = 0;
-            world.setBlockState(mut, placableState);
+            world.setBlockState(place, placableState);
             self.stack.decrement(1);
             world.playSound(null, pos, placableState.getSoundGroup().getPlaceSound(), SoundCategory.BLOCKS, 0.5f, 1.0f);
-            world.emitGameEvent(GameEvent.BLOCK_PLACE, mut.toImmutable(), GameEvent.Emitter.of(placableState));
+            world.emitGameEvent(GameEvent.BLOCK_PLACE, place, GameEvent.Emitter.of(placableState));
             if (self.owner != null && world.getPlayerByUuid(self.owner.getId()) instanceof ServerPlayerEntity serverPlayer) {
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.PLANTER_PLANTS);
             }
@@ -174,6 +178,15 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
     @Override
     public void onListenerUpdate(WorldChunk chunk) {
         this.model = (PlanterBlock.Model) BlockBoundAttachment.get(chunk, this.pos).holder();
+    }
+
+    public int radius() {
+        return this.radius;
+    }
+
+    public void setRadius(int radius) {
+        this.radius = radius;
+        this.markDirty();
     }
 
     private class Gui extends SimpleGui {

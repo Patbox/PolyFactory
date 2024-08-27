@@ -1,13 +1,18 @@
 package eu.pb4.polyfactory.datagen;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.impl.ExtraItemPredicate;
 import eu.pb4.polyfactory.advancement.FactoryItemPredicates;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
-import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.polyfactory.advancement.FluidShootsCriterion;
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.fluid.FactoryFluids;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.tool.DyeSprayItem;
 import eu.pb4.polyfactory.item.util.ColoredItem;
+import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryColors;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -19,9 +24,12 @@ import net.minecraft.advancement.AdvancementRequirements;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.advancement.criterion.ItemCriterion;
 import net.minecraft.advancement.criterion.RecipeCraftedCriterion;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Items;
 import net.minecraft.loot.condition.AnyOfLootCondition;
 import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
+import net.minecraft.potion.Potions;
+import net.minecraft.predicate.entity.LocationPredicate;
 import net.minecraft.predicate.item.ItemPredicate;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
@@ -145,6 +153,39 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .criterion("use3", RecipeCraftedCriterion.Conditions.create(id("grinding/logs_saw_dust")))
                 .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
                 .build(exporter, "polyfactory:main/base/grinder_dust");
+
+        var dynamite = Advancement.Builder.create()
+                .parent(grinder)
+                .display(
+                        FactoryItems.DYNAMITE,
+                        Text.translatable("advancements.polyfactory.dynamite.title"),
+                        Text.translatable("advancements.polyfactory.dynamite.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", InventoryChangedCriterion.Conditions.items(FactoryItems.DYNAMITE))
+                .build(exporter, "polyfactory:main/base/dynamite");
+
+        var crushedRawOre = Advancement.Builder.create()
+                .parent(grinder)
+                .display(
+                        FactoryItems.CRUSHED_RAW_IRON,
+                        Text.translatable("advancements.polyfactory.crushed_raw_ore.title"),
+                        Text.translatable("advancements.polyfactory.crushed_raw_ore.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("grinding/crushed_raw_copper")))
+                .criterion("use2", RecipeCraftedCriterion.Conditions.create(id("grinding/crushed_raw_iron")))
+                .criterion("use3", RecipeCraftedCriterion.Conditions.create(id("grinding/crushed_raw_gold")))
+                .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
+                .build(exporter, "polyfactory:main/base/crushed_raw_ore");
 
         // Grinder -> Gravel
 
@@ -438,6 +479,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 )
                 .criterion("use", RecipeCraftedCriterion.Conditions.create(id("press/steel_plate")))
                 .criterion("use2", RecipeCraftedCriterion.Conditions.create(id("press/wooden_plate")))
+                .criterion("use3", RecipeCraftedCriterion.Conditions.create(id("press/copper_plate")))
                 .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
                 .build(exporter, "polyfactory:main/base/press");
 
@@ -475,8 +517,25 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         )))
                 .build(exporter, "polyfactory:main/base/tachometer");
 
-
         // Steel -> Press
+
+        var sprayCan = Advancement.Builder.create()
+                .parent(grinder)
+                .display(
+                        new GuiElementBuilder(FactoryItems.SPRAY_CAN)
+                                .setComponent(FactoryDataComponents.COLOR, DyeColorExtra.getColor(DyeColor.BLUE))
+                                .setComponent(FactoryDataComponents.USES_LEFT, DyeSprayItem.MAX_USES)
+                                .asStack(),
+                        Text.translatable("advancements.polyfactory.spray_can.title"),
+                        Text.translatable("advancements.polyfactory.spray_can.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", ItemCriterion.Conditions.createItemUsedOnBlock(LocationPredicate.Builder.create(), ItemPredicate.Builder.create().items(FactoryItems.SPRAY_CAN)))
+                .build(exporter, "polyfactory:main/base/spray_can");
 
         var crafter = Advancement.Builder.create()
                 .parent(press)
@@ -627,5 +686,202 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 )
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.PLANTER_PLANTS))
                 .build(exporter, "polyfactory:main/base/planter");
+
+
+        // Plates -> Fluids
+
+        var pipe = Advancement.Builder.create()
+                .parent(press)
+                .display(
+                        FactoryItems.PIPE,
+                        Text.translatable("advancements.polyfactory.pipe.title"),
+                        Text.translatable("advancements.polyfactory.pipe.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", ItemCriterion.Conditions.createPlacedBlock(FactoryBlocks.PIPE))
+                .build(exporter, "polyfactory:main/base/pipe");
+        var drain = Advancement.Builder.create()
+                .parent(pipe)
+                .display(
+                        FactoryItems.DRAIN,
+                        Text.translatable("advancements.polyfactory.drain.title"),
+                        Text.translatable("advancements.polyfactory.drain.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.DRAIN_USE))
+                .build(exporter, "polyfactory:main/base/drain");
+        var mechanicalSpout = Advancement.Builder.create()
+                .parent(drain)
+                .display(
+                        FactoryItems.MECHANICAL_SPOUT,
+                        Text.translatable("advancements.polyfactory.mechanical_spout.title"),
+                        Text.translatable("advancements.polyfactory.mechanical_spout.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.SPOUT_CRAFT))
+                .build(exporter, "polyfactory:main/base/mechanical_spout");
+
+        var crispHoney = Advancement.Builder.create()
+                .parent(drain)
+                .display(
+                        FactoryItems.CRISPY_HONEY,
+                        Text.translatable("advancements.polyfactory.crispy_honey.title"),
+                        Text.translatable("advancements.polyfactory.crispy_honey.description"),
+                        null,
+                        AdvancementFrame.CHALLENGE,
+                        true,
+                        true,
+                        true
+                )
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("fluid_interaction/honey_lava"),
+                        List.of(ItemPredicate.Builder.create().items(FactoryItems.CRISPY_HONEY))))
+                .build(exporter, "polyfactory:main/base/crispy_honey");
+
+        var honeyedApple = Advancement.Builder.create()
+                .parent(mechanicalSpout)
+                .display(
+                        FactoryItems.HONEYED_APPLE,
+                        Text.translatable("advancements.polyfactory.honeyed_apple.title"),
+                        Text.translatable("advancements.polyfactory.honeyed_apple.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("spout/honeyed_apple")))
+                .build(exporter, "polyfactory:main/base/honeyed_apple");
+
+        var brittleGlassBottle = Advancement.Builder.create()
+                .parent(mechanicalSpout)
+                .display(
+                        FactoryItems.BRITTLE_POTION.getDefaultStack(),
+                        Text.translatable("advancements.polyfactory.brittle_glass_bottle.title"),
+                        Text.translatable("advancements.polyfactory.brittle_glass_bottle.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("spout/brittle_glass_bottle")))
+                .criterion("use2", RecipeCraftedCriterion.Conditions.create(id("spout/brittle_potion")))
+                .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
+                .build(exporter, "polyfactory:main/base/brittle_glass_bottle");
+
+
+        var fluidTank = Advancement.Builder.create()
+                .parent(pipe)
+                .display(
+                        FactoryItems.FLUID_TANK,
+                        Text.translatable("advancements.polyfactory.fluid_tank.title"),
+                        Text.translatable("advancements.polyfactory.fluid_tank.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.FLUID_TANK_CONNECT))
+                .build(exporter, "polyfactory:main/base/fluid_tank");
+        var portableFluidTank = Advancement.Builder.create()
+                .parent(fluidTank)
+                .display(
+                        FactoryItems.PORTABLE_FLUID_TANK,
+                        Text.translatable("advancements.polyfactory.portable_fluid_tank.title"),
+                        Text.translatable("advancements.polyfactory.portable_fluid_tank.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", InventoryChangedCriterion.Conditions.items(
+                        ExtraItemPredicate.withStatic(ItemPredicate.Builder.create().items(FactoryItems.PORTABLE_FLUID_TANK), FactoryItemPredicates.HAS_FLUIDS)
+                ))
+                .build(exporter, "polyfactory:main/base/portable_fluid_tank");
+
+        var nozzle = Advancement.Builder.create()
+                .parent(pipe)
+                .display(
+                        FactoryItems.NOZZLE,
+                        Text.translatable("advancements.polyfactory.nozzle.title"),
+                        Text.translatable("advancements.polyfactory.nozzle.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", FluidShootsCriterion.ofNozzle())
+                .build(exporter, "polyfactory:main/base/nozzle");
+
+
+
+        var pressureFluidGun = Advancement.Builder.create()
+                .parent(nozzle)
+                .display(
+                        FactoryItems.PRESSURE_FLUID_GUN,
+                        Text.translatable("advancements.polyfactory.pressure_fluid_gun.title"),
+                        Text.translatable("advancements.polyfactory.pressure_fluid_gun.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("pressure_fluid_gun")))
+                .build(exporter, "polyfactory:main/base/pressure_fluid_gun");
+
+        var pressureFluidGunHealing = Advancement.Builder.create()
+                .parent(pressureFluidGun)
+                .display(
+                        new GuiElementBuilder(FactoryItems.PRESSURE_FLUID_GUN).glow().asStack(),
+                        Text.translatable("advancements.polyfactory.pressure_fluid_gun_healing.title"),
+                        Text.translatable("advancements.polyfactory.pressure_fluid_gun_healing.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        true
+                )
+                .criterion("use", FluidShootsCriterion.ofFluidLauncher(
+                        FactoryFluids.getPotion(Potions.HEALING),
+                        FactoryFluids.getPotion(Potions.STRONG_HEALING),
+                        FactoryFluids.getPotion(Potions.REGENERATION),
+                        FactoryFluids.getPotion(Potions.STRONG_REGENERATION),
+                        FactoryFluids.getPotion(Potions.LONG_REGENERATION)
+                ))
+                .build(exporter, "polyfactory:main/base/pressure_fluid_gun_healing");
+
+
+        var nozzleLava = Advancement.Builder.create()
+                .parent(nozzle)
+                .display(
+                        new GuiElementBuilder(FactoryItems.NOZZLE).glow().asStack(),
+                        Text.translatable("advancements.polyfactory.nozzle_lava.title"),
+                        Text.translatable("advancements.polyfactory.nozzle_lava.description"),
+                        null,
+                        AdvancementFrame.GOAL,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", FluidShootsCriterion.ofNozzle(FactoryFluids.LAVA.defaultInstance()))
+                .criterion("use2", FluidShootsCriterion.ofFluidLauncher(FactoryFluids.LAVA.defaultInstance()))
+                .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
+                .build(exporter, "polyfactory:main/base/nozzle_lava");
     }
 }

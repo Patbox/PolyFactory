@@ -26,6 +26,9 @@ public interface FactoryTriggers {
     Identifier CRAFTER_CRAFTS_CRAFTER = id("crafterd_crafts_crafter");
     Identifier PLACER_PLACES = id("placer_places");
     Identifier HOLOGRAM_PROJECTOR_ACTIVATES = id("hologram_projector_activates");
+    Identifier DRAIN_USE = id("drain_use");
+    Identifier FLUID_TANK_CONNECT = id("fluid_tank_connect");
+    Identifier SPOUT_CRAFT = id("spout_craft");
 
     Identifier TATER_16 = id("tater_16");
     Identifier TATER_128 = id("tater_128");

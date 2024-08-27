@@ -131,7 +131,7 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
             this.discard();
         }
 
-        HitResult hitResult = ProjectileUtil.getCollision(this, this::canHitX);
+        HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit);
         if (hitResult.getType() != HitResult.Type.MISS) {
             this.hitOrDeflect(hitResult);
         }
@@ -211,10 +211,6 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     @Override
     public boolean canUsePortals(boolean allowVehicles) {
         return true;
-    }
-
-    protected boolean canHitX(Entity entity) {
-        return this.canHit(entity);
     }
 
     @Override

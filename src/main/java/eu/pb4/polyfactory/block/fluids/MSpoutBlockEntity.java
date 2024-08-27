@@ -1,6 +1,8 @@
 package eu.pb4.polyfactory.block.fluids;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
@@ -15,9 +17,11 @@ import eu.pb4.polyfactory.recipe.input.SpoutInput;
 import eu.pb4.polyfactory.ui.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
@@ -37,6 +41,8 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
+
+import java.util.List;
 
 public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
 
@@ -144,6 +150,10 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
                 currentOutput.increment(itemOut.getCount());
             } else {
                 return;
+            }
+            if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity serverPlayer) {
+                TriggerCriterion.trigger(serverPlayer, FactoryTriggers.SPOUT_CRAFT);
+                Criteria.RECIPE_CRAFTED.trigger(serverPlayer, self.currentRecipe.id(), List.of(inputStack.copy()));
             }
             inputStack.decrement(self.currentRecipe.value().decreasedInputItemAmount(input));
             if (inputStack.isEmpty()) {

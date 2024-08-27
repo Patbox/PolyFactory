@@ -1,5 +1,5 @@
 - Added new fluid system! This can be used for transport, storage and crafting with fluids.
-  - Currently available fluids: Water, Lava, Milk, Experience, Potion (all types), Slime and Honey.
+  - Currently available fluids: Water, Lava, Milk, Experience, Snow, Potion (all types), Slime and Honey.
   - Added Copper Pipes - Transport fluids anywhere you need them!
   - Added Filtered Copper Pipes - filter out fluids, so they go where you need them to!
   - Added Copper Pipes with Redstone Valve - Power it to prevent fluid flow or invert it to require power for it!
@@ -14,21 +14,18 @@
   - Mechanical Mixers can now store fluids and use them as an ingredient and result of a recipe.
 - Added Experience Bucket, Slime Bucket and Honey Bucket.
 - Added Brittle Glass Bottle and Brittle Potions - they break after drinking, instead of returning the glass bottle.
+- Added Sticky Dynamite.
+- Added Crispy Honey and Honeyed Apples - new food items.
 - Renamed Item Counter to Storage Counter. Item's id got kept unchanged to allow for backward compatibility.
 - You can now put Cables within wall blocks.
+- Mechanical Planters now have increased range of 2 blocks instead of 1. It can be changed with a wrench. Old planters will default to range of 1.
 - Clutches can now be inverted - Disconnect both sides unless powered.
 - Mobs killed by the Mechanical Miner can now drop XP.
 - Mixers heat can now be negative (freezing).
 - Heat can now depend on biome.
-- New Grinder recipe:
- - Nether Wart Block -> 1-5 Nether Wards
-- New Press recipe:
- - (Unwaxed) Copper Blocks + Honeycomb -> Waxed Copper Block
-- New Mixer recipes:
- - Dirt + Water -> Mud
- - (Heated) Slime Block -> Slime (Fluid)
- - (Heated) Honey Block -> Honey (Fluid)
- - (Heated) All potion recipes
+- New Grinder, Press and Mixer recipes.
+- New Advancements related to new and existing content.
 - Polydex: Wooden Containers now show how many items they can fit in.
 - Tweaked Mechanical Press textures.
+- Fixed Dynamite physics not working correctly.
 - Fixed some block interactions also triggering item use when they shouldn't (for example placing water with a bucket).

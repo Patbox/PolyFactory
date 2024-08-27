@@ -1,9 +1,11 @@
 package eu.pb4.polyfactory.block.fluids;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.block.ItemUseLimiter;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.other.ContainerBlockEntity;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
@@ -18,6 +20,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -41,6 +44,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+
+import java.util.List;
 
 public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, BlockEntityProvider, ItemUseLimiter.All {
     public DrainBlock(Settings settings) {
@@ -92,6 +97,10 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
                 return super.onUse(state, world, pos, player, hit);
             }
             var recipe = optional.get().value();
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                Criteria.RECIPE_CRAFTED.trigger(serverPlayer, optional.get().id(), List.of(stack.copy(), be.catalyst()));
+                TriggerCriterion.trigger(serverPlayer, FactoryTriggers.DRAIN_USE);
+            }
             var itemOut = recipe.craft(input, player.getRegistryManager());
             for (var fluid : recipe.fluidInput(input)) {
                 container.extract(fluid, false);

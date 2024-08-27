@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.fluid;
 
 import com.mojang.serialization.Codec;
-import eu.pb4.polyfactory.FactoryRegistries;
+import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.fluid.shooting.FluidShootingBehavior;
 import eu.pb4.polyfactory.fluid.shooting.NoOpFluidShootingBehavior;
 import eu.pb4.polyfactory.models.FactoryModels;

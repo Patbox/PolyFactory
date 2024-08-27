@@ -12,7 +12,7 @@ import net.minecraft.util.Util;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public interface FactoryModels {
-    PolymerModelData PLACEHOLDER = PolymerResourcePackUtils.requestModel(BaseItemProvider.requestItem(), Identifier.ofVanilla("missing"));
+    PolymerModelData PLACEHOLDER = PolymerResourcePackUtils.requestModel(BaseItemProvider.requestItem(), id("item/placeholder"));
     FluidModel FLUID_FLAT_FULL = new FluidModel(id("block/fluid/flat_model"));
     FluidModel FLUID_PARTICLE = new FluidModel(id("particle/fluid/particle"));
 
