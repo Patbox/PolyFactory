@@ -40,8 +40,8 @@ public class FluidContainerImpl implements FluidContainer {
         return new FluidContainerImpl(maxStorage, markDirty, (self, type) -> self.isEmpty() || self.contains(type));
     }
 
-    public static FluidContainerImpl filteredSingleFluid(long maxStorage, Predicate<FluidInstance<?>> filter, Runnable markDirty) {
-        return new FluidContainerImpl(maxStorage, markDirty, (self, type) -> (self.isEmpty() || self.contains(type)) && filter.test(type));
+    public static FluidContainerImpl filtered(long maxStorage, Predicate<FluidInstance<?>> filter, Runnable markDirty) {
+        return new FluidContainerImpl(maxStorage, markDirty, (self, type) -> filter.test(type));
     }
 
     public static FluidContainer onlyInTag(long maxStorage, TagKey<FluidType<?>> tag, Runnable markDirty) {

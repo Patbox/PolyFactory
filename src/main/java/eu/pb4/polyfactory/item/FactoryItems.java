@@ -127,9 +127,9 @@ public class FactoryItems {
             .food(new FoodComponent.Builder().nutrition(18).saturationModifier(0.2F).build()).maxCount(1)));
 
     public static final Item CRISPY_HONEY = register("crispy_honey", new ModeledItem(new Item.Settings()
-            .food(new FoodComponent.Builder().nutrition(4).saturationModifier(0.2F).snack().build())));
+            .food(new FoodComponent.Builder().nutrition(4).saturationModifier(0.6F).snack().build())));
     public static final Item HONEYED_APPLE = register("honeyed_apple", new ModeledItem(new Item.Settings()
-            .food(new FoodComponent.Builder().nutrition(7).saturationModifier(1).build())));
+            .food(new FoodComponent.Builder().nutrition(7).saturationModifier(1.5f).build())));
     public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", new ModeledItem(new Item.Settings()));
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
@@ -255,6 +255,7 @@ public class FactoryItems {
                     entries.add(SLIME_BUCKET);
                     entries.add(EXPERIENCE_BUCKET);
                     entries.add(THROWABLE_GLASS_BOTTLE);
+                    entries.add(LINGERING_THROWABLE_GLASS_BOTTLE);
                     entries.add(BRITTLE_GLASS_BOTTLE);
                     entries.add(CRISPY_HONEY);
                     entries.add(HONEYED_APPLE);

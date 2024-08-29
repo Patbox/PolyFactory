@@ -33,6 +33,10 @@ public record MixingInput(List<ItemStack> stacks, FluidContainerInput fluidConta
 
     @Override
     public boolean isEmpty() {
-        return RecipeInput.super.isEmpty() && fluidContainer.isEmpty();
+        return isSlotEmpty() && fluidContainer.isEmpty();
+    }
+
+    public boolean isSlotEmpty() {
+        return RecipeInput.super.isEmpty();
     }
 }

@@ -119,7 +119,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
 
         BlockPos place = null;
         for (var y = 0; y < 2; y++) {
-            for (var mut : BlockPos.iterateInSquare(pos.down(y), self.radius + 1, Direction.NORTH, Direction.WEST)) {
+            for (var mut : BlockPos.iterateInSquare(pos.down(y), self.radius, Direction.NORTH, Direction.WEST)) {
                 var targetState = world.getBlockState(mut);
                 if ((targetState.isAir() || (targetState.isReplaceable() && targetState.getFluidState().isEmpty()))
                         && placableState.canPlaceAt(world, mut)

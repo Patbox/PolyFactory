@@ -18,7 +18,7 @@ public class CreativeDrainBlockEntity extends DrainBlockEntity {
     }
 
     @Override
-    public long extractFluid(FluidInstance<?> type, long amount, Direction direction) {
+    public long extractFluid(FluidInstance<?> type, long amount, Direction direction, boolean change) {
         return Math.min(this.getFluidContainer(direction).get(type), amount);
     }
 }

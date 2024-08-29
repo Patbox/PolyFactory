@@ -184,16 +184,21 @@ public abstract class PipeLikeBlockEntity extends BlockEntity implements FluidIn
         }
 
         if (fluidOutput != null) {
-            var fluid = fluidOutput.getTopFluid(direction.getOpposite());
-            if (fluid == null || (currentFluid != null && !currentFluid.equals(fluid))) {
-                return;
+            for (var fluid : fluidOutput.getContainedFluids(direction.getOpposite())) {
+                if (fluid == null || (currentFluid != null && !currentFluid.equals(fluid))) {
+                    continue;
+                }
+                var maxFlow = fluid.getMaxFlow((ServerWorld) world);
+                var amount = Math.min(Math.min((long) (strength * maxFlow * fluid.getFlowSpeedMultiplier((ServerWorld) world)),
+                        maxFlow), this.container.empty());
+                var extracted = fluidOutput.extractFluid(fluid, amount, direction.getOpposite(), false);
+                var leftover = this.container.insert(fluid, extracted, false);
+                if (extracted != leftover) {
+                    fluidOutput.extractFluid(fluid, extracted - leftover, direction.getOpposite(), true);
+                    return;
+                }
             }
-            var maxFlow = fluid.getMaxFlow((ServerWorld) world);
-            var amount = Math.min(Math.min((long) (strength * maxFlow * fluid.getFlowSpeedMultiplier((ServerWorld) world)),
-                    maxFlow), this.container.empty());
 
-            var extracted = fluidOutput.extractFluid(fluid, amount, direction.getOpposite());
-            this.container.insert(fluid, extracted, false);
             return;
         }
 

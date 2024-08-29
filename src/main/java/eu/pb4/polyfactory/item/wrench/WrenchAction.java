@@ -90,14 +90,14 @@ public record WrenchAction(String id, Text name, WrenchValueGetter value, Wrench
     }
 
     public static <T> WrenchAction ofChannel(String id, Class<T> tClass, Function<T, Integer> get, BiConsumer<T, Integer> set) {
-        return  ofBlockEntityInt(id, tClass, 0, DataStorage.MAX_CHANNELS, 1, get, set);
+        return  ofBlockEntityInt(id, tClass, 0, DataStorage.MAX_CHANNELS - 1, 1, get, set);
     }
 
-    public static <T> WrenchAction ofBlockEntityInt(String id, Class<T> tClass, int min, int max, int displayOffset, Function<T, Integer> get, BiConsumer<T, Integer> set) {
-        return  ofBlockEntityString(id,
+    public static <T> WrenchAction ofBlockEntityInt(String id, Class<T> tClass, int minInclusive, int maxInclusive, int displayOffset, Function<T, Integer> get, BiConsumer<T, Integer> set) {
+        return ofBlockEntityString(id,
                 tClass,
                 x -> String.valueOf(get.apply(x) + displayOffset),
-                (x, n) -> set.accept(x,  min + (get.apply(x) + max - min + (n ? 1 : -1)) % (max - min))
+                (x, n) -> set.accept(x,  FactoryUtil.wrap(get.apply(x) + (n ? 1 : -1), minInclusive, maxInclusive))
         );
     }
 }

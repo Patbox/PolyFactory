@@ -3,25 +3,14 @@ package eu.pb4.polyfactory.block.fluids;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
-import eu.pb4.polyfactory.block.data.output.HologramProjectorBlockEntity;
-import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
-import eu.pb4.polyfactory.models.GenericParts;
-import eu.pb4.polyfactory.models.RotationAwareModel;
-import eu.pb4.polyfactory.nodes.generic.SimpleDirectionNode;
-import eu.pb4.polyfactory.nodes.mechanical.RotationData;
-import eu.pb4.polyfactory.nodes.mechanical.UnconnectedGearMechanicalNode;
-import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
 import eu.pb4.polyfactory.nodes.pipe.NozzleNode;
-import eu.pb4.polyfactory.nodes.pipe.PumpNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -34,6 +23,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
@@ -41,14 +32,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
@@ -58,7 +47,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-import static eu.pb4.polyfactory.ModInit.id;
 
 public class NozzleBlock extends NetworkBlock implements FactoryBlock, WrenchableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe {
     public static final DirectionProperty FACING = Properties.FACING;
@@ -104,6 +92,15 @@ public class NozzleBlock extends NetworkBlock implements FactoryBlock, Wrenchabl
     @Override
     protected boolean isSameNetworkType(Block block) {
         return block instanceof Pipe;
+    }
+
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        if (placer instanceof PlayerEntity player && world.getBlockEntity(pos) instanceof NozzleBlockEntity be) {
+            be.setOwner(player.getGameProfile());
+        }
+
+        super.onPlaced(world, pos, state, placer, itemStack);
     }
 
     @Override

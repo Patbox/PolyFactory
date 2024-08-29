@@ -56,7 +56,7 @@ import java.util.Objects;
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
 public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, BarrierBasedWaterloggable, ItemUseLimiter.All, WrenchableBlock {
-    private static final WrenchAction RADIUS_ACTION = WrenchAction.ofBlockEntityInt("radius", PlanterBlockEntity.class, 1, 3, 0,
+    private static final WrenchAction RADIUS_ACTION = WrenchAction.ofBlockEntityInt("radius", PlanterBlockEntity.class, 1, 2, 0,
             PlanterBlockEntity::radius, PlanterBlockEntity::setRadius);
 
     public PlanterBlock(Settings settings) {

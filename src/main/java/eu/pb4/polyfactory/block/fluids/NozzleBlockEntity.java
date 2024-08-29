@@ -2,9 +2,9 @@ package eu.pb4.polyfactory.block.fluids;
 
 import com.mojang.authlib.GameProfile;
 import eu.pb4.factorytools.api.block.OwnedBlockEntity;
+import eu.pb4.factorytools.api.util.LegacyNbtHelper;
 import eu.pb4.polyfactory.advancement.FluidShootsCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
@@ -51,6 +51,9 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
         if (this.currentFluid != null) {
             nbt.put("current_fluid", this.currentFluid.toNbt(registryLookup));
         }
+        if (this.owner != null) {
+            nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+        }
     }
 
     @Override
@@ -61,6 +64,7 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
         this.container.fromNbt(registryLookup, nbt, "fluid");
         this.currentFluid = FluidInstance.fromNbt(registryLookup, nbt.get("current_fluid"));
         this.extraSpread = nbt.getFloat("spread");
+        this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompound("owner"));
     }
 
     public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {

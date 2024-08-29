@@ -852,7 +852,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         Text.translatable("advancements.polyfactory.pressure_fluid_gun_healing.title"),
                         Text.translatable("advancements.polyfactory.pressure_fluid_gun_healing.description"),
                         null,
-                        AdvancementFrame.TASK,
+                        AdvancementFrame.GOAL,
                         true,
                         true,
                         true

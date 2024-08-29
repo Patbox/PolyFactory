@@ -110,10 +110,6 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
     @Override
     public boolean matches(MixingInput inventory, World world) {
         if (this.fluidInputs.isPresent()) {
-            /*if (this.fluidInputs.get().size() != inventory.fluids().size()) {
-                return false;
-            }*/
-
             for (var fluid : this.fluidInputs.get()) {
                 if (inventory.getFluid(fluid.instance()) < fluid.required()) {
                     return false;
@@ -152,6 +148,8 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
                     return false;
                 }
             }
+        } else if (!inventory.isSlotEmpty()) {
+            return false;
         }
 
         return true;

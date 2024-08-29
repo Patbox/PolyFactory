@@ -50,7 +50,7 @@ public class FilteredPipeBlockEntity extends PipeLikeBlockEntity implements Bloc
 
     @Override
     protected FluidContainerImpl createContainer() {
-        return FluidContainerImpl.filteredSingleFluid(FluidConstants.BLOCK, this::checkFluid, this::markFluidDirty);
+        return FluidContainerImpl.filtered(FluidConstants.BLOCK, this::checkFluid, this::markFluidDirty);
     }
 
     private boolean checkFluid(FluidInstance<?> instance) {
