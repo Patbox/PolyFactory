@@ -68,6 +68,7 @@ sourceSets {
 
 jar {
 	processResources.exclude('**/*.xcf')
+	processResources.exclude('.cache/**/*')
 }
 
 repositories {
