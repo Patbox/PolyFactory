@@ -81,6 +81,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         if (this.model != null) {
             this.model.setItem(stack.copyWithCount(1));
         }
+        this.markDirty();
     }
     @Override
     public int getMaxCountPerStack() {

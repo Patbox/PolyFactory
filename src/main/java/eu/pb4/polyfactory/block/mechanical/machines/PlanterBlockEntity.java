@@ -93,6 +93,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
     @Override
     public void setStack(ItemStack stack) {
         this.stack = stack;
+        this.markDirty();
     }
 
     @Override

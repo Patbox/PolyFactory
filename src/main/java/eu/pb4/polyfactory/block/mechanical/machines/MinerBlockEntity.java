@@ -110,6 +110,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         if (this.model != null) {
             this.model.setItem(stack);
         }
+        this.markDirty();
     }
 
     private void updateAttackCooldownPerTick() {
