@@ -53,17 +53,13 @@ public class ResourceUtils {
             for (var basePath : mod.getRootPaths()) {
                 var path = basePath.resolve(jarPath);
                 if (Files.exists(path)) {
-                    try {
-                        return path;
-                    } catch (Throwable e) {}
+                    return path;
                 }
             }
         }
-        var path = Objects.requireNonNull(PolymerCommonUtils.getClientJar()).resolve(jarPath);
+        var path = Objects.requireNonNull(PolymerCommonUtils.getClientJarRoot()).resolve(jarPath);
         if (Files.exists(path)) {
-            try {
-                return path;
-            } catch (Throwable e) {}
+            return path;
         }
         return null;
     }
