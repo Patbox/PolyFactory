@@ -163,6 +163,7 @@ public class MovingItem implements VirtualElement, StackReference {
         if (this.tick++ % 2 == 1) {
             return;
         }
+        this.checkItems();
 
         for (var x : this.itemDisplay) {
             x.tick();
@@ -172,6 +173,7 @@ public class MovingItem implements VirtualElement, StackReference {
             this.riddenBase.setTeleportDuration(4);
             this.isFirstMove = false;
         }
+
     }
 
     @Override

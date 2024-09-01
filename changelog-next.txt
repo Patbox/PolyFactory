@@ -1,2 +1,3 @@
-- Increased lava/flame damage when shoot from Nozzle/Pressure Gun
-- Fixed bug where some fluids wouldn't render in uis.
+- Fixed Mechanical Spouts and Mechanical Drains interactions with Conveyors.
+- Fixed Conveyors not ticking/updating item display correctly.
+- Fixed a crash.

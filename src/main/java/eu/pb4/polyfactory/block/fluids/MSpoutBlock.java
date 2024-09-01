@@ -1,23 +1,17 @@
 package eu.pb4.polyfactory.block.fluids;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.block.other.FilledStateProvider;
-import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.pipe.PumpNode;
-import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -28,8 +22,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
@@ -72,31 +64,9 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             return false;
         }
 
-        var be = (PressBlockEntity) self.getBlockEntity();
+        var be = (MSpoutBlockEntity) self.getBlockEntity();
 
-        if (self.getBlockState().get(INPUT_FACING).getOpposite() != pushDirection) {
-            var stack = be.getStack(1);
-            if (stack.isEmpty()) {
-                be.setStack(1, conveyor.pullAndDestroy().get());
-                return true;
-            }
-
-            var container = conveyor.getContainer();
-
-            if (ItemStack.areItemsAndComponentsEqual(container.get(), stack)) {
-                var i = Math.min(container.get().getCount(), stack.getMaxCount() - stack.getCount());
-                stack.increment(i);
-                container.get().decrement(i);
-            }
-
-            if (container.get().isEmpty()) {
-                conveyor.clearContainer();
-            }
-
-            return true;
-        }
-
-        var container = be.getContainerHolder(0);
+        var container = be.getContainerHolder(MSpoutBlockEntity.INPUT_FIRST);
 
         if (container.isContainerEmpty()) {
             container.pushAndAttach(conveyor.pullAndRemove());
@@ -128,9 +98,9 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             return;
         }
 
-        var be = (PressBlockEntity) self.getBlockEntity();
+        var be = (MSpoutBlockEntity) self.getBlockEntity();
 
-        var out = be.getContainerHolder(2);
+        var out = be.getContainerHolder(MSpoutBlockEntity.OUTPUT_FIRST);
 
         if (out.isContainerEmpty()) {
             return;

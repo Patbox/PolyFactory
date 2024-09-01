@@ -59,6 +59,9 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
         this.getOrCreateTagBuilder(FactoryBlockTags.CONVEYOR_SIDE_OUTPUT)
                 .add(FactoryBlocks.PRESS)
                 .add(FactoryBlocks.MIXER)
+                .add(FactoryBlocks.MECHANICAL_SPOUT)
+                .add(FactoryBlocks.MECHANICAL_DRAIN)
+                .add(FactoryBlocks.GRINDER)
                 .add(Blocks.HOPPER)
                 .add(Blocks.COMPOSTER)
         ;

@@ -573,8 +573,8 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
 
         @Override
         protected void onTick() {
-            if (this.movingItemContainer != null && this.getTick() % 2 == 0) {
-                this.movingItemContainer.checkItems();
+            if (this.movingItemContainer != null) {
+                this.movingItemContainer.tick();
             }
         }
 
@@ -692,11 +692,9 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
             }
 
             this.movingItemContainer = container;
+            container.scale(1);
             updateDelta(-1, this.delta);
             this.addElementWithoutUpdates(container);
-        }
-
-        public void tryTick() {
         }
     }
 }
