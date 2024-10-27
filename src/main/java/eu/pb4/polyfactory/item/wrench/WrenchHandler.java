@@ -115,7 +115,7 @@ public class WrenchHandler {
                     this.pos = null;
                     TriggerCriterion.trigger(player, FactoryTriggers.WRENCH);
                     player.playSoundToPlayer(FactorySoundEvents.ITEM_WRENCH_USE, SoundCategory.PLAYERS, 0.3f, player.getRandom().nextFloat() * 0.1f + 0.95f);
-                    return ActionResult.SUCCESS;
+                    return ActionResult.SUCCESS_SERVER;
                 }
                 return ActionResult.FAIL;
             }

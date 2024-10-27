@@ -1,15 +1,15 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
-import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.PressInput;
 import eu.pb4.polyfactory.recipe.press.PressRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
-import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -130,7 +130,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             self.currentItem2 = stack2.getStack().getItem();
             self.currentItemCount = stack.getStack().getCount();
             self.currentItemCount2 = stack2.getStack().getCount();
-            self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.PRESS, input, world).orElse(null);
+            self.currentRecipe = ((ServerWorld) world).getRecipeManager().getFirstMatch(FactoryRecipeTypes.PRESS, input, world).orElse(null);
 
             if (self.currentRecipe == null) {
                 self.model.tick();
@@ -222,7 +222,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
         this.writeInventoryNbt(nbt, lookup);
         nbt.putDouble("Progress", this.process);
         if (this.delayedOutput != null) {
-            nbt.put("DelayedOutput", this.delayedOutput.encodeAllowEmpty(lookup));
+            nbt.put("DelayedOutput", this.delayedOutput.toNbtAllowEmpty(lookup));
         }
         super.writeNbt(nbt, lookup);
     }

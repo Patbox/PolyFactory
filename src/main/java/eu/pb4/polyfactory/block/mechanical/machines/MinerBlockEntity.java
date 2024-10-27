@@ -2,19 +2,19 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.mojang.authlib.GameProfile;
 import eu.pb4.common.protection.api.CommonProtection;
-import eu.pb4.factorytools.api.util.LegacyNbtHelper;
-import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.factorytools.api.block.OwnedBlockEntity;
+import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
+import eu.pb4.factorytools.api.util.FactoryPlayer;
+import eu.pb4.factorytools.api.util.LegacyNbtHelper;
+import eu.pb4.factorytools.api.util.VirtualDestroyStage;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
-import eu.pb4.factorytools.api.block.OwnedBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.TagLimitedSlot;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.factorytools.api.util.FactoryPlayer;
-import eu.pb4.factorytools.api.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
@@ -24,8 +24,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.OperatorBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -63,7 +61,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("tool", this.currentTool.encodeAllowEmpty(lookup));
+        nbt.put("tool", this.currentTool.toNbtAllowEmpty(lookup));
         nbt.putDouble("progress", this.process);
         nbt.put("block_state", NbtHelper.fromBlockState(this.targetState));
         if (this.owner != null) {
@@ -80,7 +78,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         if (nbt.contains("owner")) {
             this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompound("owner"));
         }
-        this.targetState = NbtHelper.toBlockState(Registries.BLOCK.getReadOnlyWrapper(), nbt.getCompound("block_state"));
+        this.targetState = NbtHelper.toBlockState(Registries.BLOCK, nbt.getCompound("block_state"));
         this.lastAttackedTicks = nbt.getFloat("last_attacked_ticks");
         super.readNbt(nbt, lookup);
         this.updateAttackCooldownPerTick();
@@ -119,7 +117,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         var multiplier2 = new DoubleArrayList();
 
         this.getStack().applyAttributeModifiers(EquipmentSlot.MAINHAND, ((entityAttributeRegistryEntry, value) -> {
-            if (entityAttributeRegistryEntry == EntityAttributes.GENERIC_ATTACK_SPEED) {
+            if (entityAttributeRegistryEntry == EntityAttributes.ATTACK_SPEED) {
                 switch (value.operation()) {
                     case ADD_VALUE -> attackSpeed.updateAndGet(v -> v + value.value());
                     case ADD_MULTIPLIED_BASE -> multiplier.add(value.value());
@@ -204,12 +202,12 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
             player.setLastAttackedTicks(9999999);
 
             var attr = player.getAttributes();
-            var dmg = player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
+            var dmg = player.getAttributes().getCustomInstance(EntityAttributes.ATTACK_DAMAGE);
             if (dmg != null) {
                 dmg.setBaseValue(0);
                 dmg.clearModifiers();
                 self.getStack().applyAttributeModifiers(EquipmentSlot.MAINHAND, (type, value) -> {
-                    if (type == EntityAttributes.GENERIC_ATTACK_DAMAGE) {
+                    if (type == EntityAttributes.ATTACK_DAMAGE) {
                         dmg.addTemporaryModifier(value);
 
                     }

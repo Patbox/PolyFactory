@@ -1,14 +1,13 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import eu.pb4.factorytools.api.block.ItemUseLimiter;
+import eu.pb4.factorytools.api.block.FactoryBlock;
+
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
-import eu.pb4.factorytools.api.virtualentity.BlockModel;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -34,7 +33,6 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -42,11 +40,12 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
 
-public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, ItemUseLimiter.All {
+public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser {
     public static final Property<Direction> FACING = Properties.HORIZONTAL_FACING;
 
     public MCrafterBlock(Settings settings) {
@@ -64,7 +63,7 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState();
     }
 
@@ -75,7 +74,7 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.CRAFTER.getDefaultState();
     }
 
@@ -98,7 +97,7 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!player.isSneaking() && world.getBlockEntity(pos) instanceof MCrafterBlockEntity be) {
             be.openGui((ServerPlayerEntity) player);
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
         return super.onUse(state, world, pos, player, hit);

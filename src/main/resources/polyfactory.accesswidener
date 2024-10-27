@@ -3,3 +3,4 @@ accessWidener v1 named
 accessible class net/minecraft/datafixer/fix/ItemStackComponentizationFix$StackData
 accessible class net/minecraft/enchantment/EnchantmentHelper$ContextAwareConsumer
 accessible class net/minecraft/recipe/BrewingRecipeRegistry$Recipe
+accessible method net/minecraft/data/server/recipe/ShapedRecipeJsonBuilder <init> (Lnet/minecraft/registry/RegistryEntryLookup;Lnet/minecraft/recipe/book/RecipeCategory;Lnet/minecraft/item/ItemConvertible;I)V

@@ -88,7 +88,7 @@ public record RemovingFluidInteractionRecipe(List<FluidInputStack> fluidInput, O
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<RemovingFluidInteractionRecipe> getSerializer() {
         return FactoryRecipeSerializers.FLUID_INTERACTION_REMOVING;
     }
 }

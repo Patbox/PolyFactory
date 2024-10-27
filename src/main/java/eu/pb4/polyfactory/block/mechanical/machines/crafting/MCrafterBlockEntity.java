@@ -1,9 +1,9 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
-import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
-import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -25,10 +25,7 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.recipe.CraftingRecipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeMatcher;
-import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.*;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
@@ -171,7 +168,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
         var input = self.recipeInputProvider.createRecipeInput();
         if (self.currentRecipe == null || (self.itemsDirty && !self.currentRecipe.value().matches(input, world))) {
             self.process = 0;
-            self.currentRecipe = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, input, world).orElse(null);
+            self.currentRecipe = ((ServerWorld) world).getRecipeManager().getFirstMatch(RecipeType.CRAFTING, input, world).orElse(null);
             self.itemsDirty = false;
             if (self.currentRecipe == null) {
                 self.state = INCORRECT_ITEMS_TEXT;
@@ -185,7 +182,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
         if (self.process >= 8) {
             // Check space
             var output = self.currentRecipe.value().craft(input, world.getRegistryManager());
-            var remainder = self.currentRecipe.value().getRemainder(input);
+            var remainder = self.currentRecipe.value().getRecipeRemainders(input);
 
             {
                 var items = new ArrayList<ItemStack>();
@@ -318,9 +315,9 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
     }
 
     @Override
-    public void provideRecipeInputs(RecipeMatcher finder) {
+    public void provideRecipeInputs(RecipeFinder finder) {
         for (int i = 0; i < 9; i++) {
-            finder.addUnenchantedInput(this.getStack(i));
+            finder.addInput(this.getStack(i));
         }
     }
 

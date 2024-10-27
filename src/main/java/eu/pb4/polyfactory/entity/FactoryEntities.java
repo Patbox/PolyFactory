@@ -8,6 +8,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 
 public class FactoryEntities {
@@ -31,7 +33,8 @@ public class FactoryEntities {
     }
 
     public static <T extends Entity> EntityType<T> register(String path, EntityType.Builder<T> item) {
-        var x = Registry.register(Registries.ENTITY_TYPE, Identifier.of(ModInit.ID, path), item.build());
+        var id = Identifier.of(ModInit.ID, path);
+        var x = Registry.register(Registries.ENTITY_TYPE, id, item.build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, id)));
         PolymerEntityUtils.registerType(x);
         return x;
     }

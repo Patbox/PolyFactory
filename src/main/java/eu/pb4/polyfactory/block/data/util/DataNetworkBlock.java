@@ -5,8 +5,7 @@ import eu.pb4.polyfactory.block.network.NetworkComponent;
 import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldAccess;
-
-import java.util.Collection;
+import net.minecraft.world.WorldView;
 
 public abstract class DataNetworkBlock extends NetworkBlock implements NetworkComponent.Data {
     protected DataNetworkBlock(Settings settings) {
@@ -15,7 +14,7 @@ public abstract class DataNetworkBlock extends NetworkBlock implements NetworkCo
 
 
     @Override
-    protected void updateNetworkAt(WorldAccess world, BlockPos pos) {
+    protected void updateNetworkAt(WorldView world, BlockPos pos) {
         NetworkComponent.Data.updateDataAt(world, pos);
     }
 

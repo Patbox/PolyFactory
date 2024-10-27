@@ -9,6 +9,7 @@
     "ExperienceOrbEntityAccessor",
     "FallingBlockAccessor",
     "ProjectileEntityAccessor",
+    "ServerRecipeManagerAccessor",
     "ShapedRecipeAccessor",
     "SimpleBlockGraphAccessor",
     "StatusEffectInstanceAccessor",

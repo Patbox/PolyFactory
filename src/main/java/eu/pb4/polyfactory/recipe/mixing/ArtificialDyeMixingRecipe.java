@@ -96,9 +96,9 @@ public record ArtificialDyeMixingRecipe(double time,
 
             var color = DyeColorExtra.getColor(itemStack);
             if (color != -1) {
-                var r = ColorHelper.Argb.getRed(color);
-                var g = ColorHelper.Argb.getGreen(color);
-                var b = ColorHelper.Argb.getBlue(color);
+                var r = ColorHelper.getRed(color);
+                var g = ColorHelper.getGreen(color);
+                var b = ColorHelper.getBlue(color);
 
                 rgb[0] += r;
                 rgb[1] += g;
@@ -164,18 +164,9 @@ public record ArtificialDyeMixingRecipe(double time,
         }
     }
 
-    @Override
-    public boolean fits(int width, int height) {
-        return true;
-    }
 
     @Override
-    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
-        return FactoryItems.ARTIFICIAL_DYE.getDefaultStack();
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<ArtificialDyeMixingRecipe> getSerializer() {
         return FactoryRecipeSerializers.MIXING_ARTIFICIAL_DYE;
     }
 

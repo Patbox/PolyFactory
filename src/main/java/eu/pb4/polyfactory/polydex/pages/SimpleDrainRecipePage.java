@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.polydex.pages;
 
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
+import eu.pb4.factorytools.api.util.ItemComponentPredicate;
 import eu.pb4.polydex.api.v1.recipe.PolydexEntry;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.spout.SimpleDrainRecipe;
@@ -41,7 +42,7 @@ public class SimpleDrainRecipePage extends DrainRecipePage<SimpleDrainRecipe> {
         if (this.recipe.catalyst().isPresent()) {
             return List.of(
                     this.recipe.item(),
-                    new CountedIngredient(this.recipe.catalyst().get(), 0, ItemStack.EMPTY)
+                    new CountedIngredient(this.recipe.catalyst(), ItemComponentPredicate.EMPTY, 0, ItemStack.EMPTY)
             );
         }
 

@@ -2,14 +2,14 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.mojang.authlib.GameProfile;
 import eu.pb4.common.protection.api.CommonProtection;
-import eu.pb4.factorytools.api.util.LegacyNbtHelper;
-import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
+import eu.pb4.factorytools.api.block.OwnedBlockEntity;
+import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
+import eu.pb4.factorytools.api.util.LegacyNbtHelper;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
-import eu.pb4.factorytools.api.block.OwnedBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.TagLimitedSlot;
@@ -23,13 +23,15 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.event.GameEvent;
@@ -49,7 +51,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("stack", this.stack.encodeAllowEmpty(lookup));
+        nbt.put("stack", this.stack.toNbtAllowEmpty(lookup));
         nbt.putDouble("progress", this.process);
         if (this.owner != null) {
             nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));

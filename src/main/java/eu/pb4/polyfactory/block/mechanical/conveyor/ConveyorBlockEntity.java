@@ -1,10 +1,10 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
+import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.*;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -19,7 +19,10 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -217,7 +220,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         if (this.holdStack != null) {
-            nbt.put("HeldStack", this.holdStack.get().encodeAllowEmpty(lookup));
+            nbt.put("HeldStack", this.holdStack.get().toNbtAllowEmpty(lookup));
         }
         nbt.putDouble("Delta", this.delta);
     }

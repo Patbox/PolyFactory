@@ -27,8 +27,10 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 public class PortableFluidTankBlockItem extends FactoryBlockItem {
     public <T extends Block & PolymerBlock> PortableFluidTankBlockItem(T block, Settings settings) {
@@ -37,24 +39,23 @@ public class PortableFluidTankBlockItem extends FactoryBlockItem {
     }
 
     @Override
-    public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
+    public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
         var x = getMainFluid(itemStack);
         if (x != null) {
             return FactoryModels.ITEM_PORTABLE_FLUID_TANK.getRaw(x).getItem();
         }
 
-        return super.getPolymerItem(itemStack, player);
+        return super.getPolymerItem(itemStack, context);
     }
 
     @Override
-    public int getPolymerCustomModelData(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
+    public Identifier getPolymerItemModel(ItemStack itemStack, PacketContext context) {
         var x = getMainFluid(itemStack);
         if (x != null) {
-            //noinspection DataFlowIssue
-            return FactoryModels.ITEM_PORTABLE_FLUID_TANK.getRaw(x).get(DataComponentTypes.CUSTOM_MODEL_DATA).value();
+            return FactoryModels.ITEM_PORTABLE_FLUID_TANK.getRaw(x).get(DataComponentTypes.ITEM_MODEL);
         }
 
-        return super.getPolymerCustomModelData(itemStack, player);
+        return super.getPolymerItemModel(itemStack, context);
     }
 
     private FluidInstance<?> getMainFluid(ItemStack itemStack) {
@@ -90,8 +91,8 @@ public class PortableFluidTankBlockItem extends FactoryBlockItem {
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, RegistryWrapper.WrapperLookup lookup, @Nullable ServerPlayerEntity player) {
-        var base = super.getPolymerItemStack(itemStack, tooltipType, lookup, player);
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, PacketContext context) {
+        var base = super.getPolymerItemStack(itemStack, tooltipType, context);
         if (itemStack.contains(FactoryDataComponents.FLUID)) {
             var fluids = itemStack.get(FactoryDataComponents.FLUID);
             if (fluids != null && fluids.capacity() != -1) {

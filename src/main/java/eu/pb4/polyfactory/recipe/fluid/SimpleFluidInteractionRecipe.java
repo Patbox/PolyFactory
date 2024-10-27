@@ -89,7 +89,7 @@ public record SimpleFluidInteractionRecipe(List<FluidInputStack> fluidInput, Lis
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<SimpleFluidInteractionRecipe> getSerializer() {
         return FactoryRecipeSerializers.FLUID_INTERACTION_SIMPLE;
     }
 }

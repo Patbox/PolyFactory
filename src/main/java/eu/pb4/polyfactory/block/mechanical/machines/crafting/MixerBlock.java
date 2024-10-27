@@ -1,19 +1,16 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
+import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.fluids.PipeConnectable;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.fluid.FluidInstance;
-import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
-import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.models.GenericParts;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.models.RotationAwareModel;
-import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.models.fluid.TopFluidViewModel;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
@@ -30,16 +27,17 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 public class MixerBlock extends TallItemMachineBlock implements PipeConnectable {
     public MixerBlock(Settings settings) {
@@ -48,7 +46,7 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.ANVIL.getDefaultState();
     }
 
@@ -112,17 +110,13 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
     }
 
     @Override
-    public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
         return state.get(PART) == Part.MAIN;
     }
 
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack MODEL_PISTON = new ItemStack(BaseItemProvider.requestModel());
-
-        static {
-            MODEL_PISTON.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(MODEL_PISTON.getItem(), FactoryUtil.id("block/mixer_whisk")).value()));
-        }
+        public static final ItemStack MODEL_PISTON = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/mixer_whisk"));
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement whisk;

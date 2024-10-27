@@ -31,6 +31,8 @@ import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
 import net.minecraft.potion.Potions;
 import net.minecraft.predicate.entity.LocationPredicate;
 import net.minecraft.predicate.item.ItemPredicate;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
@@ -41,6 +43,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
+import static eu.pb4.polyfactory.util.FactoryUtil.recipeKey;
 
 class AdvancementsProvider extends FabricAdvancementProvider {
 
@@ -51,6 +54,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
 
     @Override
     public void generateAdvancement(RegistryWrapper.WrapperLookup registryLookup, Consumer<AdvancementEntry> exporter) {
+        var itemWrap = registryLookup.getOrThrow(RegistryKeys.ITEM);
         var root = Advancement.Builder.create()
                 .display(
                         FactoryItems.WINDMILL_SAIL,
@@ -63,7 +67,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         false
                 )
                 .criterion("any_item", InventoryChangedCriterion.Conditions.items(
-                        ItemPredicate.Builder.create().tag(FactoryItemTags.ROOT_ADVANCEMENT)
+                        ItemPredicate.Builder.create().tag(itemWrap, FactoryItemTags.ROOT_ADVANCEMENT)
                 ))
                 .build(exporter, "polyfactory:main/root");
 
@@ -72,6 +76,8 @@ class AdvancementsProvider extends FabricAdvancementProvider {
     }
 
     private void taters(RegistryWrapper.WrapperLookup registryLookup, AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
+        var itemWrap = registryLookup.getOrThrow(RegistryKeys.ITEM);
+
         var tater16 = Advancement.Builder.create()
                 .parent(root)
                 .display(
@@ -119,6 +125,8 @@ class AdvancementsProvider extends FabricAdvancementProvider {
     }
 
     private void base(RegistryWrapper.WrapperLookup registryLookup, AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
+        var itemWrap = registryLookup.getOrThrow(RegistryKeys.ITEM);
+
         // Start
 
         var handCrank = Advancement.Builder.create()
@@ -148,9 +156,9 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         false
                 )
-                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("grinding/coal_dust")))
-                .criterion("use2", RecipeCraftedCriterion.Conditions.create(id("grinding/planks_saw_dust")))
-                .criterion("use3", RecipeCraftedCriterion.Conditions.create(id("grinding/logs_saw_dust")))
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(recipeKey("grinding/coal_dust")))
+                .criterion("use2", RecipeCraftedCriterion.Conditions.create(recipeKey("grinding/planks_saw_dust")))
+                .criterion("use3", RecipeCraftedCriterion.Conditions.create(recipeKey("grinding/logs_saw_dust")))
                 .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
                 .build(exporter, "polyfactory:main/base/grinder_dust");
 
@@ -181,9 +189,9 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         false
                 )
-                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("grinding/crushed_raw_copper")))
-                .criterion("use2", RecipeCraftedCriterion.Conditions.create(id("grinding/crushed_raw_iron")))
-                .criterion("use3", RecipeCraftedCriterion.Conditions.create(id("grinding/crushed_raw_gold")))
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(recipeKey("grinding/crushed_raw_copper")))
+                .criterion("use2", RecipeCraftedCriterion.Conditions.create(recipeKey("grinding/crushed_raw_iron")))
+                .criterion("use3", RecipeCraftedCriterion.Conditions.create(recipeKey("grinding/crushed_raw_gold")))
                 .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
                 .build(exporter, "polyfactory:main/base/crushed_raw_ore");
 
@@ -218,9 +226,9 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         false
                 )
-                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("grinding/cobblestone_to_gravel")))
-                .criterion("use1", RecipeCraftedCriterion.Conditions.create(id("grinding/stone_to_cobblestone")))
-                .criterion("use2", RecipeCraftedCriterion.Conditions.create(id("grinding/gravel_to_sand")))
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(recipeKey("grinding/cobblestone_to_gravel")))
+                .criterion("use1", RecipeCraftedCriterion.Conditions.create(recipeKey("grinding/stone_to_cobblestone")))
+                .criterion("use2", RecipeCraftedCriterion.Conditions.create(recipeKey("grinding/gravel_to_sand")))
                 .criteriaMerger(AdvancementRequirements.CriterionMerger.AND)
                 .build(exporter, "polyfactory:main/base/gravel");
 
@@ -238,8 +246,8 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         false
                 )
-                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("steel_ingot")))
-                .criterion("use2", RecipeCraftedCriterion.Conditions.create(id("steel_ingot_blasting")))
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(recipeKey("steel_ingot")))
+                .criterion("use2", RecipeCraftedCriterion.Conditions.create(recipeKey("steel_ingot_blasting")))
                 .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
                 .build(exporter, "polyfactory:main/base/steel_ingot");
 
@@ -303,7 +311,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         true
                 )
-                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("mixing/cake")))
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(recipeKey("mixing/cake")))
                 .build(exporter, "polyfactory:main/base/cake");
 
         var dye = Advancement.Builder.create()
@@ -318,7 +326,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         false
                 )
-                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("mixing/artificial_dye")))
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(recipeKey("mixing/artificial_dye")))
                 .build(exporter, "polyfactory:main/base/mixer/artificial_dye");
 
         var firework = Advancement.Builder.create()
@@ -333,7 +341,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         false
                 )
-                .criterion("use", RecipeCraftedCriterion.Conditions.create(Identifier.of("firework_rocket"), List.of(
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(RegistryKey.of(RegistryKeys.RECIPE, Identifier.of("firework_rocket")), List.of(
                         ExtraItemPredicate.withStatic(ItemPredicate.Builder.create(), FactoryItemPredicates.CUSTOM_FIREWORK_COLOR))))
                 .build(exporter, "polyfactory:main/base/mixer/firework");
 
@@ -477,9 +485,9 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         false
                 )
-                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("press/steel_plate")))
-                .criterion("use2", RecipeCraftedCriterion.Conditions.create(id("press/wooden_plate")))
-                .criterion("use3", RecipeCraftedCriterion.Conditions.create(id("press/copper_plate")))
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(recipeKey("press/steel_plate")))
+                .criterion("use2", RecipeCraftedCriterion.Conditions.create(recipeKey("press/wooden_plate")))
+                .criterion("use3", RecipeCraftedCriterion.Conditions.create(recipeKey("press/copper_plate")))
                 .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
                 .build(exporter, "polyfactory:main/base/press");
 
@@ -534,7 +542,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         false
                 )
-                .criterion("use", ItemCriterion.Conditions.createItemUsedOnBlock(LocationPredicate.Builder.create(), ItemPredicate.Builder.create().items(FactoryItems.SPRAY_CAN)))
+                .criterion("use", ItemCriterion.Conditions.createItemUsedOnBlock(LocationPredicate.Builder.create(), ItemPredicate.Builder.create().items(itemWrap, FactoryItems.SPRAY_CAN)))
                 .build(exporter, "polyfactory:main/base/spray_can");
 
         var crafter = Advancement.Builder.create()
@@ -594,7 +602,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         false
                 )
-                .criterion("craft", RecipeCraftedCriterion.Conditions.create(id("workbench")))
+                .criterion("craft", RecipeCraftedCriterion.Conditions.create(recipeKey("workbench")))
                 .build(exporter, "polyfactory:main/base/workbench");
 
         var container = Advancement.Builder.create()
@@ -745,8 +753,8 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         true
                 )
-                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("fluid_interaction/honey_lava"),
-                        List.of(ItemPredicate.Builder.create().items(FactoryItems.CRISPY_HONEY))))
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(recipeKey("fluid_interaction/honey_lava"),
+                        List.of(ItemPredicate.Builder.create().items(itemWrap, FactoryItems.CRISPY_HONEY))))
                 .build(exporter, "polyfactory:main/base/crispy_honey");
 
         var honeyedApple = Advancement.Builder.create()
@@ -761,7 +769,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         false
                 )
-                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("spout/honeyed_apple")))
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(recipeKey("spout/honeyed_apple")))
                 .build(exporter, "polyfactory:main/base/honeyed_apple");
 
         var brittleGlassBottle = Advancement.Builder.create()
@@ -776,8 +784,8 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         false
                 )
-                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("spout/brittle_glass_bottle")))
-                .criterion("use2", RecipeCraftedCriterion.Conditions.create(id("spout/brittle_potion")))
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(recipeKey("spout/brittle_glass_bottle")))
+                .criterion("use2", RecipeCraftedCriterion.Conditions.create(recipeKey("spout/brittle_potion")))
                 .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
                 .build(exporter, "polyfactory:main/base/brittle_glass_bottle");
 
@@ -809,7 +817,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         false
                 )
                 .criterion("use", InventoryChangedCriterion.Conditions.items(
-                        ExtraItemPredicate.withStatic(ItemPredicate.Builder.create().items(FactoryItems.PORTABLE_FLUID_TANK), FactoryItemPredicates.HAS_FLUIDS)
+                        ExtraItemPredicate.withStatic(ItemPredicate.Builder.create().items(itemWrap, FactoryItems.PORTABLE_FLUID_TANK), FactoryItemPredicates.HAS_FLUIDS)
                 ))
                 .build(exporter, "polyfactory:main/base/portable_fluid_tank");
 
@@ -842,7 +850,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         true,
                         false
                 )
-                .criterion("use", RecipeCraftedCriterion.Conditions.create(id("pressure_fluid_gun")))
+                .criterion("use", RecipeCraftedCriterion.Conditions.create(recipeKey("pressure_fluid_gun")))
                 .build(exporter, "polyfactory:main/base/pressure_fluid_gun");
 
         var pressureFluidGunHealing = Advancement.Builder.create()

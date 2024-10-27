@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.item.tool.UniversalFluidContainerItem;
+import eu.pb4.polyfactory.mixin.ServerRecipeManagerAccessor;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.DrainInput;
 import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
@@ -17,6 +18,8 @@ import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -41,8 +44,8 @@ public interface FluidContainerUtil {
     static void tick(FluidContainer container, ServerWorld world, Vec3d pos, float temperature, Consumer<ItemStack> stackConsumer) {
         var input = FluidContainerInput.of(container, temperature);
         var random = world.random;
-        var list = new ArrayList<Pair<Identifier, List<ItemStack>>>();
-        for (var entry : world.getRecipeManager().listAllOfType(FactoryRecipeTypes.FLUID_INTERACTION)) {
+        var list = new ArrayList<Pair<RegistryKey<Recipe<?>>, List<ItemStack>>>();
+        for (var entry : ((ServerRecipeManagerAccessor) world.getRecipeManager()).getPreparedRecipes().getAll(FactoryRecipeTypes.FLUID_INTERACTION)) {
             var recipe = entry.value();
             if (!entry.value().matches(input, world)) {
                 continue;
@@ -121,7 +124,7 @@ public interface FluidContainerUtil {
 
         var copy = stack.copy();
         var input = DrainInput.of(copy, ItemStack.EMPTY, container, !(player instanceof FakePlayer));
-        var optional = player.getWorld().getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, player.getWorld());
+        var optional = player.getServerWorld().getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, player.getWorld());
         if (optional.isEmpty()) {
             return null;
         }

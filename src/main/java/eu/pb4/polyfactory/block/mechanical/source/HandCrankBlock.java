@@ -1,25 +1,24 @@
 package eu.pb4.polyfactory.block.mechanical.source;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import eu.pb4.factorytools.api.block.ItemUseLimiter;
-import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.mechanical.RotationConstants;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
+import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
-import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.generic.FunctionalNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -35,7 +34,7 @@ import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
@@ -45,15 +44,18 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
 
-public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider,  BarrierBasedWaterloggable, WrenchableBlock, ItemUseLimiter.All {
-    public static final DirectionProperty FACING = Properties.FACING;
+public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider,  BarrierBasedWaterloggable, WrenchableBlock {
+    public static final EnumProperty<Direction> FACING = Properties.FACING;
 
     public HandCrankBlock(Settings settings) {
         super(settings);
@@ -78,9 +80,9 @@ public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlo
         return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
     }
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        tickWater(state, world, pos);
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        tickWater(state, world, tickView, pos);
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
@@ -94,7 +96,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlo
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.POWER_HAND_CRANK);
             }
 
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
         return super.onUse(state, world, pos, player, hit);
@@ -128,7 +130,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlo
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.STRIPPED_OAK_LOG.getDefaultState();
     }
 
@@ -153,11 +155,6 @@ public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlo
         return List.of(WrenchAction.FACING);
     }
 
-    @Override
-    public boolean preventUseItemWhileTargetingBlock(ServerPlayerEntity player, BlockState state, World world, BlockHitResult result, ItemStack stack, Hand hand) {
-        return All.super.preventUseItemWhileTargetingBlock(player, state, world, result, stack, hand) && (state.get(WATERLOGGED) ? !stack.isOf(Items.BUCKET) : !stack.isOf(Items.WATER_BUCKET));
-    }
-
     public final class Model extends RotationAwareModel {
         private final ItemDisplayElement mainElement;
 
@@ -168,7 +165,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlo
         }
 
         private void updateAnimation(float speed, Direction facing) {
-            mat.identity();
+            var mat = mat();
             mat.rotate(facing.getOpposite().getRotationQuaternion());
             mat.rotateY(((float) ((facing.getDirection() == Direction.AxisDirection.NEGATIVE) ? speed : -speed)));
 

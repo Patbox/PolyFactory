@@ -10,8 +10,8 @@ import eu.pb4.polyfactory.nodes.pipe.FlowData;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 
 public interface NetworkComponent {
     interface Rotational extends NetworkComponent {
-        static void updateRotationalAt(WorldAccess world, BlockPos pos) {
+        static void updateRotationalAt(WorldView world, BlockPos pos) {
             if (world instanceof ServerWorld serverWorld) {
                 FactoryNodes.ROTATIONAL.getGraphWorld(serverWorld).updateNodes(pos);
             }
@@ -34,7 +34,7 @@ public interface NetworkComponent {
     }
 
     interface Pipe extends NetworkComponent {
-        static void updatePipeAt(WorldAccess world, BlockPos pos) {
+        static void updatePipeAt(WorldView world, BlockPos pos) {
             if (world instanceof ServerWorld serverWorld) {
                 FactoryNodes.PIPE.getGraphWorld(serverWorld).updateNodes(pos);
             }
@@ -58,7 +58,7 @@ public interface NetworkComponent {
     }
 
     interface RotationalConnector extends NetworkComponent {
-        static void updateRotationalConnectorAt(WorldAccess world, BlockPos pos) {
+        static void updateRotationalConnectorAt(WorldView world, BlockPos pos) {
             if (world instanceof ServerWorld serverWorld) {
                 FactoryNodes.ROTATIONAL_CONNECTOR.getGraphWorld(serverWorld).updateNodes(pos);
             }
@@ -67,7 +67,7 @@ public interface NetworkComponent {
     }
 
     interface Data extends NetworkComponent {
-        static void updateDataAt(WorldAccess world, BlockPos pos) {
+        static void updateDataAt(WorldView world, BlockPos pos) {
             if (world instanceof ServerWorld serverWorld) {
                 FactoryNodes.DATA.getGraphWorld(serverWorld).updateNodes(pos);
             }
@@ -97,7 +97,7 @@ public interface NetworkComponent {
     }
 
     interface Energy extends NetworkComponent {
-        static void updateEnergyAt(WorldAccess world, BlockPos pos) {
+        static void updateEnergyAt(WorldView world, BlockPos pos) {
             if (world instanceof ServerWorld serverWorld) {
                 FactoryNodes.ENERGY.getGraphWorld(serverWorld).updateNodes(pos);
             }

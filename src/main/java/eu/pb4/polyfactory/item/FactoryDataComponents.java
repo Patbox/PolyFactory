@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidInteractionMode;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;
+import eu.pb4.polymer.core.api.other.PolymerComponent;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -45,7 +46,7 @@ public class FactoryDataComponents {
 
     public static <T> ComponentType<T> register(String path, ComponentType<T> item) {
         Registry.register(Registries.DATA_COMPONENT_TYPE, Identifier.of(ModInit.ID, path), item);
-        PolymerItemUtils.markAsPolymer(item);
+        PolymerComponent.registerDataComponent(item);
         return item;
     }
 }

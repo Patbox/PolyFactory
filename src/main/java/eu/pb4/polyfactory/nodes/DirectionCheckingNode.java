@@ -19,7 +19,7 @@ public interface DirectionCheckingNode extends BlockNode, FlowNode {
     @Override
     default boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
         var d = other.other().getBlockPos().subtract(self.getBlockPos());
-        var dir = Direction.fromVector(d.getX(), d.getY(), d.getZ());
+        var dir = Direction.fromVector(d.getX(), d.getY(), d.getZ(), Direction.UP);
 
         return canConnectDir(dir);
     }

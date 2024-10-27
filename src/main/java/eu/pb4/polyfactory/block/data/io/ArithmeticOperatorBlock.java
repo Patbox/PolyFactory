@@ -10,7 +10,6 @@ import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;

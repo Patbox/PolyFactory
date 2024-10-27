@@ -1,20 +1,19 @@
 package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.factorytools.api.item.RegistryCallbackItem;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.polyfactory.advancement.FluidShootsCriterion;
-import eu.pb4.polyfactory.fluid.*;
+import eu.pb4.polyfactory.fluid.FluidContainer;
+import eu.pb4.polyfactory.fluid.FluidContainerFromComponent;
+import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.shooting.EntityShooterContext;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
-import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.PolymerItem;
-import eu.pb4.polymer.resourcepack.api.PolymerModelData;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
+import net.minecraft.component.type.ConsumableComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -23,13 +22,15 @@ import net.minecraft.inventory.StackReference;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.consume.UseAction;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.network.packet.s2c.play.EntityEquipmentUpdateS2CPacket;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -38,9 +39,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PressureFluidGun extends Item implements PolymerItem, RegistryCallbackItem {
-    private PolymerModelData baseModel = FactoryModels.PLACEHOLDER;
-    private PolymerModelData activeOthersModel = FactoryModels.PLACEHOLDER;
-    private PolymerModelData activeSelfModel = FactoryModels.PLACEHOLDER;
+    private Identifier baseModel = FactoryModels.PLACEHOLDER;
+    private Identifier activeOthersModel = FactoryModels.PLACEHOLDER;
+    private Identifier activeSelfModel = FactoryModels.PLACEHOLDER;
 
     public PressureFluidGun(Settings settings) {
         super(settings);
@@ -60,13 +61,14 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
     }
 
     @Override
-    public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
+    public boolean onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
         //noinspection unchecked
         var fluid = (FluidInstance<Object>) stack.get(FactoryDataComponents.CURRENT_FLUID);
         if (fluid != null) {
             fluid.shootingBehavior().stopShooting(new EntityShooterContext(user), fluid);
             stack.remove(FactoryDataComponents.CURRENT_FLUID);
         }
+        return false;
     }
 
     @Override
@@ -105,15 +107,15 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+    public ActionResult use(World world, PlayerEntity user, Hand hand) {
         var stack = user.getStackInHand(hand);
         if (stack.contains(FactoryDataComponents.CURRENT_FLUID)) {
-            return TypedActionResult.consume(stack);
+            return ActionResult.CONSUME;
         }
 
         var containers = findFluidContainer(user);
         if (containers.isEmpty() || !isUsable(stack)) {
-            return TypedActionResult.fail(user.getStackInHand(hand));
+            return ActionResult.FAIL;
         }
 
         var ctx = new EntityShooterContext(user);
@@ -131,12 +133,12 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
                         FactoryUtil.sendVelocityDelta(player, vec);
                         FluidShootsCriterion.triggerFluidLauncher(player, stack, f);
                     }
-                    return TypedActionResult.consume(stack);
+                    return ActionResult.CONSUME;
                 }
             }
         }
 
-        return TypedActionResult.fail(stack);
+        return ActionResult.FAIL;
     }
 
     private List<FluidContainer> findFluidContainer(LivingEntity user) {
@@ -162,30 +164,10 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
     }
 
     @Override
-    public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        return getModel(itemStack).item();
-    }
-
-    @Override
-    public int getPolymerCustomModelData(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        return getModel(itemStack).value();
-    }
-
-    @Override
-    public int getEnchantability() {
-        return 5;
-    }
-
-    @Override
-    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
-        return ingredient.isOf(FactoryItems.COPPER_PLATE);
-    }
-
-    @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, RegistryWrapper.WrapperLookup lookup, @Nullable ServerPlayerEntity player) {
-        var out = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, lookup, player);
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, PacketContext context) {
+        var out = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, context);
         if (this.useCrossbowModel(itemStack)) {
-            out.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.of(Items.STONE.getDefaultStack()));
+            out.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.of(Items.ARROW.getDefaultStack()));
             /*out.set(DataComponentTypes.ATTRIBUTE_MODIFIERS, out.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT)
                     .with(
                             EntityAttributes.GENERIC_ATTACK_SPEED,
@@ -194,16 +176,27 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
                     .withShowInTooltip(false)
             );*/
         }
+        //out.set(DataComponentTypes.CONSUMABLE, new ConsumableComponent(99999f, UseAction.BOW, Registries.SOUND_EVENT.getEntry(SoundEvents.INTENTIONALLY_EMPTY), false, List.of()));
         out.set(DataComponentTypes.DAMAGE, itemStack.get(DataComponentTypes.DAMAGE));
         return out;
     }
 
-    private PolymerModelData getModel(ItemStack itemStack) {
-        if (this.useCrossbowModel(itemStack)) {
+    @Override
+    public @Nullable Identifier getPolymerItemModel(ItemStack stack, PacketContext context) {
+        if (this.useCrossbowModel(stack)) {
             return this.activeOthersModel;
         }
 
-        return this.useActiveModel(itemStack) ? this.activeSelfModel : this.baseModel;
+        return this.useActiveModel(stack) ? this.activeSelfModel : this.baseModel;
+    }
+
+    @Override
+    public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
+        if (this.useCrossbowModel(itemStack)) {
+            return Items.CROSSBOW;
+        }
+
+        return Items.TRIAL_KEY;
     }
 
     private boolean useCrossbowModel(ItemStack itemStack) {
@@ -216,9 +209,8 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
 
     @Override
     public void onRegistered(Identifier selfId) {
-        var item = Identifier.of(selfId.getNamespace(), "item/" + selfId.getPath());
-        this.baseModel = PolymerResourcePackUtils.requestModel(BaseItemProvider.requestItem(), item);
-        this.activeSelfModel = PolymerResourcePackUtils.requestModel(this.baseModel.item(), item.withSuffixedPath("_active"));
-        this.activeOthersModel = PolymerResourcePackUtils.requestModel(Items.CROSSBOW, item.withSuffixedPath("_active"));
+        this.baseModel = selfId;
+        this.activeSelfModel = selfId.withSuffixedPath("_active");
+        this.activeOthersModel = selfId.withSuffixedPath("_active");
     }
 }

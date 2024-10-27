@@ -30,8 +30,8 @@ public class SplitterBlockEntity extends BlockEntity implements BlockEntityExtra
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("FilterStackLeft", this.filterStackLeft.encodeAllowEmpty(lookup));
-        nbt.put("FilterStackRight", this.filterStackRight.encodeAllowEmpty(lookup));
+        nbt.put("FilterStackLeft", this.filterStackLeft.toNbtAllowEmpty(lookup));
+        nbt.put("FilterStackRight", this.filterStackRight.toNbtAllowEmpty(lookup));
         nbt.putByte("CurPos", (byte) this.position);
     }
 

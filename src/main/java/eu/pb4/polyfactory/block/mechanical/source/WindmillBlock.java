@@ -3,13 +3,13 @@ package eu.pb4.polyfactory.block.mechanical.source;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -32,35 +32,37 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.BlockView;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
+
+import static eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils.bridgeModel;
 
 public class WindmillBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, WrenchableBlock, BlockEntityProvider, BarrierBasedWaterloggable {
     public static final int MAX_SAILS = 8;
     public static final BooleanProperty BIG = BooleanProperty.of("deco_big");
     public static final IntProperty SAIL_COUNT = IntProperty.of("sails", 1, MAX_SAILS);
-    public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
 
     @Override
     public FluidState getFluidState(BlockState state) {
@@ -81,9 +83,9 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        tickWater(state, world, pos);
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        tickWater(state, world, tickView, pos);
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
@@ -126,7 +128,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState();
     }
 
@@ -148,7 +150,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.OAK_PLANKS.getDefaultState();
     }
 
@@ -165,14 +167,8 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     public final class Model extends RotationAwareModel {
-        public static final ItemStack MODEL = new ItemStack(Items.LEATHER_HORSE_ARMOR);
-        public static final ItemStack MODEL_FLIP = new ItemStack(Items.LEATHER_HORSE_ARMOR);
-
-        static {
-            MODEL.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(MODEL.getItem(), FactoryUtil.id("block/windmill_sail")).value()));
-            MODEL_FLIP.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(MODEL_FLIP.getItem(), FactoryUtil.id("block/windmill_sail_flip")).value()));
-        }
-
+        public static final ItemStack MODEL = Util.make(new ItemStack(Items.LEATHER_HORSE_ARMOR), x -> x.set(DataComponentTypes.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/windmill_sail"))));
+        public static final ItemStack MODEL_FLIP = Util.make(new ItemStack(Items.LEATHER_HORSE_ARMOR), x -> x.set(DataComponentTypes.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/windmill_sail_flip"))));
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement center;
         private boolean big;

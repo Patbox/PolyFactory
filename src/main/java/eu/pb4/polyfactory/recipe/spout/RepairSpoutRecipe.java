@@ -36,17 +36,7 @@ public record RepairSpoutRecipe() implements SpoutRecipe {
     }
 
     @Override
-    public boolean fits(int width, int height) {
-        return true;
-    }
-
-    @Override
-    public ItemStack getResult(RegistryWrapper.WrapperLookup registriesLookup) {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<RepairSpoutRecipe> getSerializer() {
         return FactoryRecipeSerializers.SPOUT_EXPERIENCE_REPAIR;
     }
 

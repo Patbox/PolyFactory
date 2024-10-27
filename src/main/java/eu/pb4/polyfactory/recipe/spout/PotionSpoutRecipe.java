@@ -13,7 +13,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.IngredientPlacement;
 import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -24,7 +26,7 @@ import java.util.List;
 
 public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, RegistryEntry<SoundEvent> soundEvent, double time) implements SpoutRecipe {
     public static final MapCodec<PotionSpoutRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
-                    Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("item").forGetter(PotionSpoutRecipe::item),
+                    Ingredient.CODEC.fieldOf("item").forGetter(PotionSpoutRecipe::item),
                     Codec.LONG.fieldOf("amount").forGetter(PotionSpoutRecipe::amount),
                     ItemStack.UNCOUNTED_CODEC.fieldOf("result").forGetter(PotionSpoutRecipe::output),
                     SoundEvent.ENTRY_CODEC.fieldOf("sound").forGetter(PotionSpoutRecipe::soundEvent),
@@ -68,19 +70,10 @@ public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, 
     }
 
     @Override
-    public boolean fits(int width, int height) {
-        return true;
-    }
-
-    @Override
-    public ItemStack getResult(RegistryWrapper.WrapperLookup registriesLookup) {
-        return output;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<PotionSpoutRecipe> getSerializer() {
         return FactoryRecipeSerializers.SPOUT_POTION;
     }
+
     @Override
     public List<FluidStack<?>> fluidInput(SpoutInput input) {
         for (var key : input.fluids()) {

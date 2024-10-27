@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.item.tool;
 
-import eu.pb4.factorytools.api.item.ModeledItem;
+import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.entity.DynamiteEntity;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
 import net.minecraft.block.DispenserBlock;
@@ -10,14 +10,14 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ProjectileItem;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class DynamiteItem extends ModeledItem implements ProjectileItem {
+public class DynamiteItem extends SimplePolymerItem implements ProjectileItem {
 
     public DynamiteItem(Item.Settings settings) {
         super(settings);
@@ -25,7 +25,7 @@ public class DynamiteItem extends ModeledItem implements ProjectileItem {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+    public ActionResult use(World world, PlayerEntity user, Hand hand) {
         var stack = user.getStackInHand(hand);
 
         DynamiteEntity.spawn(user.getRotationVector(), user.getEyePos(), world, stack.copyWithCount(1));
@@ -38,7 +38,7 @@ public class DynamiteItem extends ModeledItem implements ProjectileItem {
             stack.decrement(1);
         }
 
-        return TypedActionResult.success(stack);
+        return ActionResult.SUCCESS_SERVER;
     }
 
     @Override

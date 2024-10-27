@@ -17,7 +17,7 @@ public record DrainInput(ItemStack stack, ItemStack catalyst, FluidContainerInpu
         return slot == 0 ? stack : catalyst;
     }
     @Override
-    public int getSize() {
+    public int size() {
         return 2;
     }
 

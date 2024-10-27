@@ -36,6 +36,11 @@ public abstract class SpoutRecipePage<T extends SpoutRecipe> extends Prioritized
         this.output = PolydexStack.of(getResultStack());
     }
 
+    @Override
+    public ItemStack getOutput(@Nullable PolydexEntry polydexEntry, MinecraftServer minecraftServer) {
+        return getResultStack();
+    }
+
     protected abstract ItemStack getResultStack();
     protected abstract List<FluidStack<?>> getBaseFluids();
     protected abstract CountedIngredient getBaseIngredient();

@@ -22,6 +22,11 @@ public class GrindingRecipePage extends PrioritizedRecipePage<GrindingRecipe> {
     }
 
     @Override
+    public ItemStack getOutput(@Nullable PolydexEntry polydexEntry, MinecraftServer minecraftServer) {
+        return this.recipe.output().getFirst().stack().copy();
+    }
+
+    @Override
     public @Nullable Text texture(ServerPlayerEntity player) {
         return PolydexTextures.GRINDER;
     }

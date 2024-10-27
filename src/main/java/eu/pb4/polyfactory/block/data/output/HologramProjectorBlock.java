@@ -4,10 +4,8 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.mapcanvas.api.font.DefaultFonts;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.data.CableConnectable;
@@ -33,12 +31,12 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.decoration.Brightness;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.DustColorTransitionParticleEffect;
 import net.minecraft.particle.ParticleEffect;
@@ -46,17 +44,24 @@ import net.minecraft.screen.ScreenTexts;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.*;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,7 +72,7 @@ import static eu.pb4.polyfactory.ModInit.id;
 
 public class HologramProjectorBlock extends DataNetworkBlock implements FactoryBlock, WrenchableBlock, BlockEntityProvider, CableConnectable, DataReceiver, BarrierBasedWaterloggable {
     public static final BooleanProperty ACTIVE = FactoryProperties.ACTIVE;
-    public static final DirectionProperty FACING = Properties.FACING;
+    public static final EnumProperty<Direction> FACING = Properties.FACING;
     public static final IntProperty FRONT = FactoryProperties.FRONT;
     private static final WrenchAction CHANGE_ROTATION = WrenchAction.of("front", (world, pos, side, state) -> {
         var axis = state.get(FACING).getAxis();
@@ -147,7 +152,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
     }
 
     @Override
-    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         return state.get(FACING).getOpposite() == dir;
     }
 
@@ -178,14 +183,14 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
     }*/
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        tickWater(state, world, pos);
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        tickWater(state, world, tickView, pos);
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
@@ -231,10 +236,10 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
     }
 
     public static class Model extends BlockModel {
-        private static final ItemStack ACTIVE_MODEL = BaseItemProvider.requestModel(id("block/hologram_projector_active"));
+        private static final ItemStack ACTIVE_MODEL = ItemDisplayElementUtil.getModel(id("block/hologram_projector_active"));
         private static final ParticleEffect EFFECT = new DustColorTransitionParticleEffect(
-                new Vector3f(153 / 256f, 250 / 256f, 255 / 256f),
-                new Vector3f(235 / 256f, 254 / 256f, 255 / 256f),
+                ColorHelper.getArgb(0, 153, 250, 255),
+                ColorHelper.getArgb(0, 235, 254, 255),
                 0.2f);
 
         private static final Random RANDOM = Random.create();
@@ -273,8 +278,8 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 var pos = getPos().offset(this.facing,  this.offset + this.scale / 2)
                         .add(RANDOM.nextFloat() * x * 2 - x, RANDOM.nextFloat() * y * 2 - y, RANDOM.nextFloat() * z * 2 - z);
                 this.sendPacket(new ParticleS2CPacket(new DustColorTransitionParticleEffect(
-                        new Vector3f(153 / 256f, 250 / 256f, 255 / 256f),
-                        new Vector3f(235 / 256f, 254 / 256f, 255 / 256f),
+                        ColorHelper.getArgb(133, 250, 255),
+                        ColorHelper.getArgb(235, 254, 255),
                         0.8f), false, pos.x, pos.y, pos.z, 0, 0, 0, 0, 0));
 
                 if (this.currentDisplay != null) {

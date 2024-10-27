@@ -6,26 +6,31 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftingResultInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeMatcher;
+import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
+import net.minecraft.recipe.*;
 import net.minecraft.recipe.book.RecipeBookCategory;
+import net.minecraft.recipe.book.RecipeBookType;
 import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.screen.AbstractRecipeScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.*;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import org.jetbrains.annotations.Nullable;
 
-public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<CraftingRecipeInput, Recipe<CraftingRecipeInput>> {
+import java.util.List;
+import java.util.Optional;
+
+public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler {
 	private final RecipeInputInventory recipeInput;
 	private final CraftingResultInventory result;
 	private final ScreenHandlerContext context;
 	private final PlayerEntity player;
 	private final Block block;
+	private boolean filling;
 
 	public WorkbenchScreenHandler(int syncId, Block block, PlayerInventory playerInventory, WorkbenchBlockEntity input, CraftingResultInventory result, ScreenHandlerContext context) {
 		super(ScreenHandlerType.CRAFTING, syncId);
@@ -59,21 +64,6 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<Crafting
 		for(int i = 0; i < 9; ++i) {
 			this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
 		}
-	}
-
-	@Override
-	public void populateRecipeFinder(RecipeMatcher finder) {
-		this.recipeInput.provideRecipeInputs(finder);
-	}
-
-	@Override
-	public void clearCraftingSlots() {
-
-	}
-
-	@Override
-	public boolean matches(RecipeEntry recipe) {
-		return recipe.value().matches(CraftingRecipeInput.create(3, 3, this.recipeInput.getHeldStacks()), this.player.getWorld());
 	}
 
 	@Override
@@ -140,32 +130,84 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<Crafting
 	}
 
 	@Override
-	public int getCraftingResultSlotIndex() {
-		return 0;
+	public PostFillAction fillInputSlots(boolean craftAll, boolean creative, RecipeEntry<?> recipe, ServerWorld world, PlayerInventory inventory) {
+		//noinspection unchecked
+		RecipeEntry<CraftingRecipe> recipeEntry =  (RecipeEntry<CraftingRecipe>) recipe;
+		this.onInputSlotFillStart();
+
+		AbstractRecipeScreenHandler.PostFillAction var8;
+		try {
+			List<Slot> list = this.slots.subList(1, 10);;
+			var8 = InputSlotFiller.fill(new InputSlotFiller.Handler<CraftingRecipe>() {
+				public void populateRecipeFinder(RecipeFinder finder) {
+					WorkbenchScreenHandler.this.populateRecipeFinder(finder);
+				}
+
+				public void clear() {
+
+				}
+
+				public boolean matches(RecipeEntry<CraftingRecipe> entry) {
+					return ((CraftingRecipe)entry.value()).matches(CraftingRecipeInput.create(3, 3, recipeInput.getHeldStacks()),
+							player.getWorld());
+				}
+			}, 3, 3, list, list, inventory, recipeEntry, craftAll, creative);
+		} finally {
+			this.onInputSlotFillFinish(world, recipeEntry);
+		}
+
+		return var8;
+	}
+
+	public void onInputSlotFillStart() {
+		this.filling = true;
+	}
+
+	public void onInputSlotFillFinish(ServerWorld world, RecipeEntry<CraftingRecipe> recipe) {
+		this.filling = false;
+		updateResult(this, world, this.player, this.recipeInput, this.result, recipe);
+	}
+
+	protected static void updateResult(ScreenHandler handler, ServerWorld world, PlayerEntity player, RecipeInputInventory craftingInventory, CraftingResultInventory resultInventory, @Nullable RecipeEntry<CraftingRecipe> recipe) {
+		CraftingRecipeInput craftingRecipeInput = craftingInventory.createRecipeInput();
+		ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity)player;
+		ItemStack itemStack = ItemStack.EMPTY;
+		Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingRecipeInput, world, recipe);
+		if (optional.isPresent()) {
+			RecipeEntry<CraftingRecipe> recipeEntry = (RecipeEntry)optional.get();
+			CraftingRecipe craftingRecipe = (CraftingRecipe)recipeEntry.value();
+			if (resultInventory.shouldCraftRecipe(serverPlayerEntity, recipeEntry)) {
+				ItemStack itemStack2 = craftingRecipe.craft(craftingRecipeInput, world.getRegistryManager());
+				if (itemStack2.isItemEnabled(world.getEnabledFeatures())) {
+					itemStack = itemStack2;
+				}
+			}
+		}
+
+		resultInventory.setStack(0, itemStack);
+		handler.setPreviousTrackedSlot(0, itemStack);
+		serverPlayerEntity.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(handler.syncId, handler.nextRevision(), 0, itemStack));
 	}
 
 	@Override
-	public int getCraftingWidth() {
-		return this.recipeInput.getWidth();
+	public void onContentChanged(Inventory inventory) {
+		if (!this.filling) {
+			this.context.run((world, pos) -> {
+				if (world instanceof ServerWorld serverWorld) {
+					updateResult(this, serverWorld, this.player, this.recipeInput, this.result, (RecipeEntry)null);
+				}
+			});
+		}
+
 	}
 
 	@Override
-	public int getCraftingHeight() {
-		return this.recipeInput.getHeight();
+	public void populateRecipeFinder(RecipeFinder finder) {
+		this.recipeInput.provideRecipeInputs(finder);
 	}
 
 	@Override
-	public int getCraftingSlotCount() {
-		return 10;
-	}
-
-	@Override
-	public RecipeBookCategory getCategory() {
-		return RecipeBookCategory.CRAFTING;
-	}
-
-	@Override
-	public boolean canInsertIntoSlot(int index) {
-		return index != this.getCraftingResultSlotIndex();
+	public RecipeBookType getCategory() {
+		return RecipeBookType.CRAFTING;
 	}
 }

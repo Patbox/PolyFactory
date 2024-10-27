@@ -2,25 +2,22 @@ package eu.pb4.polyfactory.ui;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.CanvasImage;
-import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import eu.pb4.mapcanvas.api.font.DefaultFonts;
 import eu.pb4.mapcanvas.api.utils.CanvasUtils;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.util.ResourceUtils;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
-import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import it.unimi.dsi.fastutil.chars.*;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -28,7 +25,6 @@ import net.minecraft.util.Pair;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -59,7 +55,7 @@ public class UiResourceCreator {
 
     private static final List<SlicedTexture> VERTICAL_PROGRESS = new ArrayList<>();
     private static final List<SlicedTexture> HORIZONTAL_PROGRESS = new ArrayList<>();
-    private static final List<Pair<PolymerModelData, String>> SIMPLE_MODEL = new ArrayList<>();
+    private static final List<Pair<Identifier, String>> SIMPLE_MODEL = new ArrayList<>();
     private static final Char2IntMap SPACES = new Char2IntOpenHashMap();
     private static final List<FontTexture> FONT_TEXTURES = new ArrayList<>();
     private static final List<String> TEXTURES_NUMBERS = new ArrayList<>();
@@ -68,35 +64,30 @@ public class UiResourceCreator {
     private static final char CHEST_SPACE0 = character++;
     private static final char CHEST_SPACE1 = character++;
 
-    public static Supplier<GuiElementBuilder> custom(String path) {
-        var model = PolymerResourcePackUtils.requestModel (Items.ALLIUM, id("sgui/" + path));
-        return () -> new GuiElementBuilder(model.item()).setName(Text.empty()).hideDefaultTooltip().setCustomModelData(model.value());
-    }
-
     public static Supplier<GuiElementBuilder> icon16(String path) {
         var model = genericIconRaw(Items.ALLIUM, path, BASE_MODEL);
-        return () -> new GuiElementBuilder(model.item()).setName(Text.empty()).hideDefaultTooltip().setCustomModelData(model.value());
+        return () -> new GuiElementBuilder(model).setName(Text.empty()).hideDefaultTooltip();
     }
 
     public static Supplier<GuiElementBuilder> icon32(String path) {
         var model = genericIconRaw(Items.ALLIUM, path, X32_MODEL);
-        return () -> new GuiElementBuilder(model.item()).setName(Text.empty()).hideDefaultTooltip().setCustomModelData(model.value());
+        return () -> new GuiElementBuilder(model).setName(Text.empty()).hideDefaultTooltip();
     }
 
     public static IntFunction<GuiElementBuilder> icon32Color(String path) {
         var model = genericIconRaw(Items.LEATHER_LEGGINGS, path, X32_MODEL);
         return (i) -> {
-            return new GuiElementBuilder(model.item()).setName(Text.empty()).hideDefaultTooltip().setCustomModelData(model.value()).setComponent(DataComponentTypes.DYED_COLOR, new DyedColorComponent(i, true));
+            return new GuiElementBuilder(model).setName(Text.empty()).hideDefaultTooltip().setComponent(DataComponentTypes.DYED_COLOR, new DyedColorComponent(i, true));
         };
     }
 
     public static IntFunction<GuiElementBuilder> icon16(String path, int size) {
-        var models = new PolymerModelData[size];
+        var models = new ItemStack[size];
 
         for (var i = 0; i < size; i++) {
             models[i] = genericIconRaw(Items.ALLIUM, path + "_" + i, BASE_MODEL);
         }
-        return (i) -> new GuiElementBuilder(models[i].item()).setName(Text.empty()).hideDefaultTooltip().setCustomModelData(models[i].value());
+        return (i) -> new GuiElementBuilder(models[i]).setName(Text.empty()).hideDefaultTooltip();
     }
 
     public static IntFunction<GuiElementBuilder> horizontalProgress16(String path, int start, int stop, boolean reverse) {
@@ -125,14 +116,14 @@ public class UiResourceCreator {
 
     public static IntFunction<GuiElementBuilder> genericProgress(String path, int start, int stop, boolean reverse, String base, List<SlicedTexture> progressType) {
 
-        var models = new PolymerModelData[stop - start];
+        var models = new ItemStack[stop - start];
 
         progressType.add(new SlicedTexture(path, start, stop, reverse));
 
         for (var i = start; i < stop; i++) {
             models[i - start] = genericIconRaw(Items.ALLIUM,  "gen/" + path + "_" + i, base);
         }
-        return (i) -> new GuiElementBuilder(models[i].item()).setName(Text.empty()).hideDefaultTooltip().setCustomModelData(models[i].value());
+        return (i) -> new GuiElementBuilder(models[i]).setName(Text.empty()).hideDefaultTooltip();
     }
 
     public static IntFunction<GuiElementBuilder>[] createNumbers(String prefix) {
@@ -149,10 +140,10 @@ public class UiResourceCreator {
     }
 
 
-    public static PolymerModelData genericIconRaw(Item item, String path, String base) {
-        var model = PolymerResourcePackUtils.requestModel(item, elementPath(path));
-        SIMPLE_MODEL.add(new Pair<>(model, base));
-        return model;
+    public static ItemStack genericIconRaw(Item item, String path, String base) {
+        var elementPath = elementPath(path);
+        SIMPLE_MODEL.add(new Pair<>(elementPath, base));
+        return ItemDisplayElementUtil.getModel(elementPath);
     }
 
     private static Identifier elementPath(String path) {
@@ -244,8 +235,8 @@ public class UiResourceCreator {
 
     public static void generateAssets(BiConsumer<String, byte[]> assetWriter) {
         for (var texture : SIMPLE_MODEL) {
-            assetWriter.accept("assets/" + texture.getLeft().modelPath().getNamespace() + "/models/" + texture.getLeft().modelPath().getPath() + ".json",
-                    ITEM_TEMPLATE.replace("|ID|", texture.getLeft().modelPath().toString()).replace("|BASE|", texture.getRight()).getBytes(StandardCharsets.UTF_8));
+            assetWriter.accept("assets/" + texture.getLeft().getNamespace() + "/models/" + texture.getLeft().getPath() + ".json",
+                    ITEM_TEMPLATE.replace("|ID|", texture.getLeft().toString()).replace("|BASE|", texture.getRight()).getBytes(StandardCharsets.UTF_8));
         }
 
         generateProgress(assetWriter, VERTICAL_PROGRESS, false);

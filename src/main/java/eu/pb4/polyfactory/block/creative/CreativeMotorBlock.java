@@ -2,7 +2,6 @@ package eu.pb4.polyfactory.block.creative;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.factorytools.api.block.ItemUseLimiter;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
@@ -19,20 +18,21 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
 
-public class CreativeMotorBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, ItemUseLimiter.All {
-    public static final DirectionProperty FACING = Properties.FACING;
+public class CreativeMotorBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser {
+    public static final EnumProperty<Direction> FACING = Properties.FACING;
 
     public CreativeMotorBlock(Settings settings) {
         super(settings);
@@ -58,12 +58,12 @@ public class CreativeMotorBlock extends RotationalNetworkBlock implements Factor
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.STONE.getDefaultState();
     }
 
@@ -86,7 +86,7 @@ public class CreativeMotorBlock extends RotationalNetworkBlock implements Factor
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!player.isSneaking() && hit.getSide() != state.get(FACING) && player.isCreative() && world.getBlockEntity(pos) instanceof CreativeMotorBlockEntity be && player instanceof ServerPlayerEntity serverPlayer) {
             be.openGui(serverPlayer);
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
         return ActionResult.PASS;
     }

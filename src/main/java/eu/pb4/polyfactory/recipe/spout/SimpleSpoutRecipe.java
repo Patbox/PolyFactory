@@ -76,18 +76,9 @@ public record SimpleSpoutRecipe(CountedIngredient item, List<FluidStack<?>> flui
         return out;
     }
 
-    @Override
-    public boolean fits(int width, int height) {
-        return true;
-    }
 
     @Override
-    public ItemStack getResult(RegistryWrapper.WrapperLookup registriesLookup) {
-        return output;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<SimpleSpoutRecipe> getSerializer() {
         return FactoryRecipeSerializers.SPOUT_SIMPLE;
     }
 

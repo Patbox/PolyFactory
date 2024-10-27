@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.block.fluids;
 
-import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;

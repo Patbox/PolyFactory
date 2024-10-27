@@ -1,8 +1,8 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
+import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
@@ -24,7 +24,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.input.SingleStackRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
@@ -125,7 +124,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
             self.process = 0;
             self.speedScale = 0;
             self.currentItem = stack.getItem();
-            self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.GRINDING, input, world).orElse(null);
+            self.currentRecipe = ((ServerWorld) world).getRecipeManager().getFirstMatch(FactoryRecipeTypes.GRINDING, input, world).orElse(null);
 
             if (self.currentRecipe == null) {
                 self.active = false;

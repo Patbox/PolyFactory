@@ -99,7 +99,7 @@ public class SimpleContainer implements ContainerHolder {
     }
 
     public NbtElement writeNbt(RegistryWrapper.WrapperLookup lookup) {
-        return this.movingItem == null ? new NbtCompound() : this.movingItem.get().encodeAllowEmpty(lookup);
+        return this.movingItem == null ? new NbtCompound() : this.movingItem.get().toNbtAllowEmpty(lookup);
     }
 
     public void readNbt(NbtCompound compound, RegistryWrapper.WrapperLookup lookup) {

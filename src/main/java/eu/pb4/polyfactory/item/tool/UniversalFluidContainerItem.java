@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.item.tool;
 
-import eu.pb4.factorytools.api.item.ModeledItem;
+import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.fluid.FluidInteractionMode;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
@@ -15,10 +15,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ClickType;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
-public class UniversalFluidContainerItem extends ModeledItem {
+public class UniversalFluidContainerItem extends SimplePolymerItem {
     private final long capacity;
 
     public UniversalFluidContainerItem(long capacity, Settings settings) {
@@ -58,8 +59,8 @@ public class UniversalFluidContainerItem extends ModeledItem {
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, RegistryWrapper.WrapperLookup lookup, @Nullable ServerPlayerEntity player) {
-        var out = super.getPolymerItemStack(itemStack, tooltipType, lookup, player);
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, PacketContext context) {
+        var out = super.getPolymerItemStack(itemStack, tooltipType, context);
         var fluids = itemStack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
         out.set(DataComponentTypes.MAX_DAMAGE, 1000);
         out.set(DataComponentTypes.DAMAGE, 1000 - (int) ((fluids.stored() / (double) this.capacity) * 999));

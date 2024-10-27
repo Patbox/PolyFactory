@@ -41,7 +41,7 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
 
     @Inject(method = "writeNbt", at = @At("TAIL"))
     private void writeFilterNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
-        nbt.put("polydex:filter", this.filterStack.encodeAllowEmpty(registryLookup));
+        nbt.put("polydex:filter", this.filterStack.toNbtAllowEmpty(registryLookup));
     }
 
     @Inject(method = "readNbt", at = @At("TAIL"))

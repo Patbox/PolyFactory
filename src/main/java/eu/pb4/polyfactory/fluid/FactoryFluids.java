@@ -14,6 +14,7 @@ import net.minecraft.block.LeveledCauldronBlock;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -52,7 +53,7 @@ public class FactoryFluids {
     public static final FluidType<Unit> EXPERIENCE = register(Identifier.ofVanilla("experience"),
             FluidType.of().density(50).flowSpeedMultiplier(1.3).maxFlow(FluidConstants.BOTTLE * 2).brightness(14).heat(BlockHeat.EXPERIENCE)
                     .shootingBehavior(new ShootProjectileEntity<>((world, fluid, amount) -> {
-                        var xp = FactoryEntities.EXPERIENCE_SPLASH.create(world);
+                        var xp = FactoryEntities.EXPERIENCE_SPLASH.create(world, SpawnReason.SPAWN_ITEM_USE);
                         assert xp != null;
                         xp.setAmount(amount / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID);
                         return xp;
@@ -65,7 +66,7 @@ public class FactoryFluids {
     public static final FluidType<PotionContentsComponent> POTION = register(Identifier.ofVanilla("potion"),
             FluidType.of(PotionContentsComponent.CODEC, PotionContentsComponent.DEFAULT).density(150).texture(WATER.texture())
                             .color(PotionContentsComponent::getColor).flowSpeedMultiplier(0.95).name((t, d) -> {
-                        var base = Text.translatable(Potion.finishTranslationKey(d.potion(), "item.minecraft.potion.effect."));
+                        var base = d.getName("item.minecraft.potion.effect.");
                         if (d.potion().isPresent() && d.potion().get().getKey().get().getValue().getPath().startsWith("long_")) {
                             return Text.translatable("fluid_type.minecraft.potion.long", base);
                         }

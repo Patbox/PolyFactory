@@ -8,7 +8,6 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
-import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
@@ -30,7 +29,6 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.advancement.criterion.RecipeCraftedCriterion;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
@@ -92,6 +90,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
     public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
         var self = (MDrainBlockEntity) t;
+        var serverWorld = (ServerWorld) world;
 
         if (self.model == null) {
             self.model = (MDrainBlock.Model) BlockBoundAttachment.get(world, pos).holder();
@@ -137,7 +136,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             self.visualProgress = 0;
             self.updateInputPosition();
             self.speedScale = 0;
-            self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, world).orElse(null);
+            self.currentRecipe = serverWorld.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, world).orElse(null);
 
             if (self.currentRecipe == null) {
                 self.active = false;
@@ -322,36 +321,38 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
                 stack.increment(1);
             }
             this.setCatalyst(ItemStack.EMPTY);
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         } else if (stack.isIn(FactoryItemTags.DRAIN_CATALYST) && hit.getSide() == Direction.UP && this.catalyst().isEmpty()) {
             this.setCatalyst(stack.copyWithCount(1));
             stack.decrementUnlessCreative(1, player);
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
-        var container = this.getFluidContainer();
-        var copy = stack.copy();
-        var input = DrainInput.of(copy, this.catalyst(), container, !(player instanceof FakePlayer));
-        var optional = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, world);
-        if (optional.isEmpty()) {
-            return super.onUse(state, world, pos, player, hit);
-        }
-        if (player instanceof ServerPlayerEntity serverPlayer) {
-            Criteria.RECIPE_CRAFTED.trigger(serverPlayer, optional.get().id(), List.of(stack.copy(), this.catalyst()));
-            TriggerCriterion.trigger(serverPlayer, FactoryTriggers.DRAIN_USE);
-        }
+        if (world instanceof ServerWorld serverWorld) {
+            var container = this.getFluidContainer();
+            var copy = stack.copy();
+            var input = DrainInput.of(copy, this.catalyst(), container, !(player instanceof FakePlayer));
+            var optional = serverWorld.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, world);
+            if (optional.isEmpty()) {
+                return super.onUse(state, world, pos, player, hit);
+            }
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                Criteria.RECIPE_CRAFTED.trigger(serverPlayer, optional.get().id(), List.of(stack.copy(), this.catalyst()));
+                TriggerCriterion.trigger(serverPlayer, FactoryTriggers.DRAIN_USE);
+            }
 
-        var recipe = optional.get().value();
-        var itemOut = recipe.craft(input, player.getRegistryManager());
-        for (var fluid : recipe.fluidInput(input)) {
-            container.extract(fluid, false);
+            var recipe = optional.get().value();
+            var itemOut = recipe.craft(input, player.getRegistryManager());
+            for (var fluid : recipe.fluidInput(input)) {
+                container.extract(fluid, false);
+            }
+            player.setStackInHand(Hand.MAIN_HAND, FactoryUtil.exchangeStack(stack, recipe.decreasedInputItemAmount(input), player, itemOut));
+            for (var fluid : recipe.fluidOutput(input)) {
+                container.insert(fluid, false);
+            }
+            world.playSound(null, pos, recipe.soundEvent().value(), SoundCategory.BLOCKS);
         }
-        player.setStackInHand(Hand.MAIN_HAND, FactoryUtil.exchangeStack(stack, recipe.decreasedInputItemAmount(input), player, itemOut));
-        for (var fluid : recipe.fluidOutput(input)) {
-            container.insert(fluid, false);
-        }
-        world.playSound(null, pos, recipe.soundEvent().value(), SoundCategory.BLOCKS);
-        return ActionResult.SUCCESS;
+        return ActionResult.SUCCESS_SERVER;
     }
 
     private void addToOutputOrDrop(ItemStack stack) {

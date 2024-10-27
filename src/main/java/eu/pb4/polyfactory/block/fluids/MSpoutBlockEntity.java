@@ -12,8 +12,8 @@ import eu.pb4.polyfactory.fluid.FluidContainerUtil;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
-import eu.pb4.polyfactory.recipe.spout.SpoutRecipe;
 import eu.pb4.polyfactory.recipe.input.SpoutInput;
+import eu.pb4.polyfactory.recipe.spout.SpoutRecipe;
 import eu.pb4.polyfactory.ui.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
@@ -123,7 +123,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
         if (self.currentRecipe == null || !self.currentRecipe.value().matches(input, world)) {
             self.process = 0;
             self.speedScale = 0;
-            self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.SPOUT, input, world).orElse(null);
+            self.currentRecipe = ((ServerWorld) world).getRecipeManager().getFirstMatch(FactoryRecipeTypes.SPOUT, input, world).orElse(null);
 
             if (self.currentRecipe == null) {
                 self.active = false;

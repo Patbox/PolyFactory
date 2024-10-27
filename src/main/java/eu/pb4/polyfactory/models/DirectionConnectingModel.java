@@ -2,12 +2,12 @@ package eu.pb4.polyfactory.models;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
-import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.ResourceUtils;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import net.minecraft.block.BlockState;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
@@ -18,6 +18,8 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
+import static eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils.bridgeModel;
+
 public class DirectionConnectingModel {
     public static final int SIZE = (int) Math.pow(2, 6);
     private final Identifier baseModel;
@@ -27,8 +29,8 @@ public class DirectionConnectingModel {
         this.baseModel = baseModel;
 
         for (var i = 0; i < SIZE; i++) {
-            this.models[i] = BaseItemProvider.requestModel(colored ? FactoryUtil.requestColoredItem()
-                    : BaseItemProvider.requestModel(), baseModel.withSuffixedPath("/" + i));
+            this.models[i] = (colored ? Items.LEATHER_HORSE_ARMOR : Items.PAPER).getDefaultStack();
+            this.models[i].set(DataComponentTypes.ITEM_MODEL, bridgeModel(baseModel.withSuffixedPath("/" + i)));
         }
     }
 

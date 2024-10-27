@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.item.wrench;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.nodes.data.DataStorage;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
@@ -67,11 +67,11 @@ public record WrenchAction(String id, Text name, WrenchValueGetter value, Wrench
                 WrenchValueGetter.ofBlockEntity(tClass, value), WrenchApplyAction.ofBlockEntity(tClass, change));
     }
 
-    public static WrenchAction ofDirection(DirectionProperty property) {
+    public static WrenchAction ofDirection(EnumProperty<Direction> property) {
         return ofDirection(property.getName(), property);
     }
 
-    public static WrenchAction ofDirection(String id, DirectionProperty property) {
+    public static WrenchAction ofDirection(String id, EnumProperty<Direction> property) {
         var reordered = new ArrayList<Direction>();
         for (var x : FactoryUtil.REORDERED_DIRECTIONS) {
             if (property.getValues().contains(x)) {

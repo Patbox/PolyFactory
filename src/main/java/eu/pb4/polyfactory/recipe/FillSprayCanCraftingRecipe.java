@@ -10,12 +10,15 @@ import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
+import net.minecraft.recipe.IngredientPlacement;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.world.World;
+
+import java.util.List;
 
 public record FillSprayCanCraftingRecipe(CraftingRecipeCategory category) implements CraftingRecipe {
     @Override
@@ -70,18 +73,18 @@ public record FillSprayCanCraftingRecipe(CraftingRecipeCategory category) implem
     }
 
     @Override
-    public boolean fits(int width, int height) {
-        return width * height >= 2;
-    }
-
-    @Override
-    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
-        return FactoryItems.SPRAY_CAN.getDefaultStack();
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<FillSprayCanCraftingRecipe> getSerializer() {
         return FactoryRecipeSerializers.CRAFTING_FILL_SPRAY_CAN;
+    }
+
+    @Override
+    public IngredientPlacement getIngredientPlacement() {
+        return IngredientPlacement.NONE;
+    }
+
+    @Override
+    public boolean isIgnoredInRecipeBook() {
+        return true;
     }
 
     @Override

@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.models;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -25,6 +26,8 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.function.BiConsumer;
 
+import static eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils.bridgeModel;
+
 public class ConveyorModels {
     public static final int FRAMES = 20;
 
@@ -34,40 +37,6 @@ public class ConveyorModels {
     public static final ItemStack[][] ANIMATION_UP_STICKY = new ItemStack[16][1 + FRAMES];
     public static final ItemStack[][] ANIMATION_DOWN = new ItemStack[16][1 + FRAMES];
     public static final ItemStack[][] ANIMATION_DOWN_STICKY = new ItemStack[16][1 + FRAMES];
-    private static final Item[] MODEL_ITEMS = new Item[]{
-            Items.WHITE_CARPET,
-            Items.ORANGE_CARPET,
-            Items.MAGENTA_CARPET,
-            Items.LIGHT_BLUE_CARPET,
-            Items.YELLOW_CARPET,
-            Items.LIME_CARPET,
-            Items.PINK_CARPET,
-            Items.GRAY_CARPET,
-            Items.LIGHT_GRAY_CARPET,
-            Items.CYAN_CARPET,
-            Items.PURPLE_CARPET,
-            Items.BLUE_CARPET,
-            Items.BROWN_CARPET,
-            Items.GREEN_CARPET,
-            Items.RED_CARPET,
-            Items.BLACK_CARPET,
-            Items.WHITE_TERRACOTTA,
-            Items.ORANGE_TERRACOTTA,
-            Items.MAGENTA_TERRACOTTA,
-            Items.LIGHT_BLUE_TERRACOTTA,
-            Items.YELLOW_TERRACOTTA,
-            Items.LIME_TERRACOTTA,
-            Items.PINK_TERRACOTTA,
-            Items.GRAY_TERRACOTTA,
-            Items.LIGHT_GRAY_TERRACOTTA,
-            Items.CYAN_TERRACOTTA,
-            Items.PURPLE_TERRACOTTA,
-            Items.BLUE_TERRACOTTA,
-            Items.BROWN_TERRACOTTA,
-            Items.GREEN_TERRACOTTA,
-            Items.RED_TERRACOTTA,
-            Items.BLACK_TERRACOTTA
-    };
     private static final String MODEL_JSON = """
             {
               "parent": "polyfactory:block/|SUBTYPE|conveyor|TYPE|",
@@ -93,18 +62,16 @@ public class ConveyorModels {
             }
             """;
     private static int currentItemIndex;
-    public static final ItemStack REGULAR_FAST = new ItemStack(MODEL_ITEMS[currentItemIndex++]);
-    public static final ItemStack UP_FAST = new ItemStack(MODEL_ITEMS[currentItemIndex++]);
-    public static final ItemStack DOWN_FAST = new ItemStack(MODEL_ITEMS[currentItemIndex++]);
-    public static final ItemStack STICKY_REGULAR_FAST = new ItemStack(MODEL_ITEMS[currentItemIndex++]);
-    public static final ItemStack STICKY_UP_FAST = new ItemStack(MODEL_ITEMS[currentItemIndex++]);
-    public static final ItemStack STICKY_DOWN_FAST = new ItemStack(MODEL_ITEMS[currentItemIndex++]);
+    public static final ItemStack REGULAR_FAST = new ItemStack(Items.PAPER);
+    public static final ItemStack UP_FAST = new ItemStack(Items.PAPER);
+    public static final ItemStack DOWN_FAST = new ItemStack(Items.PAPER);
+    public static final ItemStack STICKY_REGULAR_FAST = new ItemStack(Items.PAPER);
+    public static final ItemStack STICKY_UP_FAST = new ItemStack(Items.PAPER);
+    public static final ItemStack STICKY_DOWN_FAST = new ItemStack(Items.PAPER);
 
     private static void createItemModel(ItemStack[] array, String path, int i) {
-        var model = PolymerResourcePackUtils.requestModel(MODEL_ITEMS[currentItemIndex++ % MODEL_ITEMS.length], FactoryUtil.id(path));
-        var stack = new ItemStack(model.item());
-        stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(model.value()));
-        array[i == 0 ? 0 : (array.length - i)] = stack;
+        var model = ItemDisplayElementUtil.getModel(FactoryUtil.id(path));
+        array[i == 0 ? 0 : (array.length - i)] = model;
     }
 
     public static void registerAssetsEvents() {
@@ -135,8 +102,7 @@ public class ConveyorModels {
     }
 
     private static void createFast(ItemStack stack, String prefix, String suffix) {
-        var path = FactoryUtil.id("block/" + prefix + "conveyor" + suffix + "_fast");
-        stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(stack.getItem(), path).value()));
+        stack.set(DataComponentTypes.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/" + prefix + "conveyor" + suffix + "_fast")));
     }
 
     public static void generateModels(BiConsumer<String, byte[]> dataWriter) {

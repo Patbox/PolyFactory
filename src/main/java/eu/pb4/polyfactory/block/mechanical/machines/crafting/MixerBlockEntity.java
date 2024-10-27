@@ -1,13 +1,13 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
-import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.fluids.FluidInputOutput;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
-import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
@@ -200,7 +200,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         if (self.inventoryChanged && (self.currentRecipe == null || !self.currentRecipe.value().matches(input, world))) {
             self.process = 0;
             self.speedScale = 0;
-            self.currentRecipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.MIXER, input, world).orElse(null);
+            self.currentRecipe = ((ServerWorld) world).getRecipeManager().getFirstMatch(FactoryRecipeTypes.MIXER, input, world).orElse(null);
 
             if (self.currentRecipe == null) {
                 self.active = false;
@@ -339,7 +339,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             }
         }
 
-        return ActionResult.SUCCESS;
+        return ActionResult.SUCCESS_SERVER;
     }
 
     private void addToOutputOrDrop(ItemStack stack) {

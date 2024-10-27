@@ -9,28 +9,29 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.WallBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.WallShape;
 import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -72,8 +73,8 @@ public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlo
         return state;
     }
 
-    public WallWithCableBlock(WallBlock wallBlock) {
-        super(AbstractBlock.Settings.copy(wallBlock));
+    public WallWithCableBlock(Settings settings, WallBlock wallBlock) {
+        super(settings);
         this.backing = wallBlock;
         this.setDefaultState(this.getDefaultState());
         MAP.put(wallBlock, this);
@@ -81,7 +82,7 @@ public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlo
 
     @Override
     public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
-        return this.backing.getPickStack(world, pos, getPolymerBlockState(state));
+        return this.backing.getPickStack(world, pos, this.backing.getDefaultState());
     }
 
     @Nullable
@@ -99,15 +100,15 @@ public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlo
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        var x = ((WallBlockAccessor) this.backing).callGetStateForNeighborUpdate(this.getPolymerBlockState(state), direction, neighborState, world, pos, neighborPos);
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        var x = ((WallBlockAccessor) this.backing).callGetStateForNeighborUpdate(this.getPolymerBlockState(state, null), world, tickView, pos, direction, neighborPos, neighborState, random);
         for (var prop : SELF_TO_BACKING) {
             assert x != null;
             //noinspection unchecked,rawtypes
             state = state.with(prop.self, (Comparable) prop.backingToSelf.apply(x.get(prop.backing)));
         }
 
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
@@ -125,7 +126,7 @@ public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlo
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         var backing = this.backing.getDefaultState();
         for (var x : SELF_TO_BACKING) {
             //noinspection unchecked,rawtypes

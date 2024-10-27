@@ -34,7 +34,7 @@ public record BrewingMixingRecipe(String group,
                                   double optimalSpeed, float minimumTemperature, float maxTemperature) implements MixingRecipe {
     public static final MapCodec<BrewingMixingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.STRING.optionalFieldOf("group", "").forGetter(BrewingMixingRecipe::group),
-                    Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("ingredient").forGetter(BrewingMixingRecipe::ingredient),
+                    Ingredient.CODEC.fieldOf("ingredient").forGetter(BrewingMixingRecipe::ingredient),
                     FluidInstance.CODEC.fieldOf("from").forGetter(BrewingMixingRecipe::from),
                     FluidInstance.CODEC.fieldOf("to").forGetter(BrewingMixingRecipe::to),
                     Codec.LONG.fieldOf("min_amount").forGetter(BrewingMixingRecipe::minimumResult),
@@ -53,11 +53,6 @@ public record BrewingMixingRecipe(String group,
     @Override
     public String getGroup() {
         return this.group;
-    }
-
-    @Override
-    public DefaultedList<Ingredient> getIngredients() {
-        return DefaultedList.ofSize(1, this.ingredient);
     }
 
     @Override
@@ -123,16 +118,7 @@ public record BrewingMixingRecipe(String group,
     }
 
     @Override
-    public boolean fits(int width, int height) {
-        return true;
-    }
-
-    @Override
-    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
-        return ItemStack.EMPTY;
-    }
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<BrewingMixingRecipe> getSerializer() {
         return FactoryRecipeSerializers.MIXING_BREWING;
     }
 }

@@ -2,7 +2,10 @@ package eu.pb4.polyfactory.block.other;
 
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
-import eu.pb4.factorytools.api.block.*;
+import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
+import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.block.RedstoneConnectable;
+import eu.pb4.factorytools.api.block.SneakBypassingBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
@@ -22,7 +25,6 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.DyedColorComponent;
@@ -31,30 +33,38 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.block.WireOrientation;
 import net.minecraft.world.poi.PointOfInterestStorage;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
 
-public class WirelessRedstoneBlock extends Block implements FactoryBlock, RedstoneConnectable, BlockEntityProvider, WrenchableBlock, SneakBypassingBlock, BarrierBasedWaterloggable, ItemUseLimiter {
-    public static DirectionProperty FACING = Properties.FACING;
+public class WirelessRedstoneBlock extends Block implements FactoryBlock, RedstoneConnectable, BlockEntityProvider, WrenchableBlock, SneakBypassingBlock, BarrierBasedWaterloggable {
+    public static EnumProperty<Direction> FACING = Properties.FACING;
     public static BooleanProperty POWERED = Properties.POWERED;
     public WirelessRedstoneBlock(Settings settings) {
         super(settings);
@@ -90,27 +100,22 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        tickWater(state, world, pos);
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
-    }
-
-    @Override
-    public boolean preventUseItemWhileTargetingBlock(ServerPlayerEntity player, BlockState blockState, World world, BlockHitResult result, ItemStack stack, Hand hand) {
-        return !player.shouldCancelInteraction() && result.getSide() == blockState.get(FACING).getOpposite();
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        tickWater(state, world, tickView, pos);
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (world.getBlockEntity(pos) instanceof WirelessRedstoneBlockEntity be) {
             if (!player.isSneaking() && hit.getSide() == state.get(FACING).getOpposite()) {
-                return be.updateKey(player, hit, player.getMainHandStack()) ? ActionResult.SUCCESS : ActionResult.FAIL;
+                return be.updateKey(player, hit, player.getMainHandStack()) ? ActionResult.SUCCESS_SERVER : ActionResult.FAIL;
             }
 
             if (player.isSneaking() && player.getMainHandStack().isOf(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
                 player.getMainHandStack().set(FactoryDataComponents.REMOTE_KEYS, new Pair<>(be.key1(), be.key2()));
-                player.getItemCooldownManager().set(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, 5);
-                return ActionResult.SUCCESS;
+                player.getItemCooldownManager().set(player.getStackInHand(Hand.MAIN_HAND), 5);
+                return ActionResult.SUCCESS_SERVER;
             }
         }
 
@@ -139,7 +144,7 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
@@ -197,7 +202,7 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
         }
 
         @Override
-        public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
             if (!world.isClient) {
                 boolean bl = state.get(POWERED);
                 if (bl != world.isReceivingRedstonePower(pos)) {
@@ -267,9 +272,9 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
         private ItemStack createOverlay(BlockState state) {
             var model = state.isOf(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER) ? RedstoneOutputBlock.Model.OUTPUT_OVERLAY
                     : RedstoneOutputBlock.Model.INPUT_OVERLAY;
-            var stack = new ItemStack(model.item());
+            var stack = new ItemStack(Items.LEATHER_HORSE_ARMOR);
             stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(RedstoneWireBlock.getWireColor(state.get(POWERED) ? 15 : 0), false));
-            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(model.value()));
+            stack.set(DataComponentTypes.ITEM_MODEL, model);
             return stack;
         }
 

@@ -2,7 +2,6 @@ package eu.pb4.polyfactory.block.data.io;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.data.DataReceiver;
@@ -23,12 +22,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -43,7 +41,9 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
+import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -123,7 +123,8 @@ public final class DataMemoryBlock extends DataProviderBlock implements DataRece
         builder.add(POWERED);
     }
 
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+    @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
         if (!world.isClient) {
             boolean bl = state.get(POWERED);
             if (bl != world.isReceivingRedstonePower(pos)) {
@@ -139,6 +140,7 @@ public final class DataMemoryBlock extends DataProviderBlock implements DataRece
         }
     }
 
+    @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         if (state.get(POWERED) && !world.isReceivingRedstonePower(pos)) {
             world.setBlockState(pos, state.with(POWERED, false), 2);
@@ -168,7 +170,7 @@ public final class DataMemoryBlock extends DataProviderBlock implements DataRece
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
@@ -183,7 +185,7 @@ public final class DataMemoryBlock extends DataProviderBlock implements DataRece
     }
 
     public static class Model extends GenericDirectionalDataBlock.Model {
-        public static final ItemStack POWERED_MODEL = BaseItemProvider.requestModel(id("block/data_memory_powered"));
+        public static final ItemStack POWERED_MODEL = ItemDisplayElementUtil.getModel(id("block/data_memory_powered"));
 
         protected Model(BlockState state) {
             super(state, false);

@@ -1,7 +1,6 @@
 package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.factorytools.api.item.RegistryCallbackItem;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.block.data.output.NixieTubeBlock;
@@ -14,8 +13,6 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.core.api.item.PolymerItem;
-import eu.pb4.polymer.resourcepack.api.PolymerModelData;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
@@ -47,11 +44,12 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerItem, ColoredItem {
     public static final int MAX_USES = 128;
-    private PolymerModelData mainModel;
-    private PolymerModelData emptyModel;
+    private Identifier mainModel;
+    private Identifier emptyModel;
 
     public DyeSprayItem(Settings settings) {
         super(settings);
@@ -133,10 +131,9 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
                 setUses(stack, uses - 1);
             }
 
-            var p = new Vector3f(ColorHelper.Argb.getRed(color) / 255f, ColorHelper.Argb.getGreen(color) / 255f, ColorHelper.Argb.getBlue(color) / 255f);
-            ((ServerWorld) context.getWorld()).spawnParticles(new DustParticleEffect(p, 1), context.getHitPos().x, context.getHitPos().y, context.getHitPos().z, 10, 0.2f, 0.2f, 0.2f, 1);
+            ((ServerWorld) context.getWorld()).spawnParticles(new DustParticleEffect(color, 1), context.getHitPos().x, context.getHitPos().y, context.getHitPos().z, 10, 0.2f, 0.2f, 0.2f, 1);
 
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
         return ActionResult.FAIL;
     }
@@ -188,31 +185,27 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
     }
 
     @Override
-    public int getPolymerArmorColor(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        return ColoredItem.getColor(itemStack);
-    }
-
-    @Override
     public void onRegistered(Identifier selfId) {
-        this.mainModel = PolymerResourcePackUtils.requestModel(Items.LEATHER_HORSE_ARMOR, selfId.withPrefixedPath("item/"));
-        this.emptyModel = PolymerResourcePackUtils.requestModel(BaseItemProvider.requestItem(), selfId.withPrefixedPath("item/").withSuffixedPath("_empty"));
+        this.mainModel = selfId;
+        this.emptyModel = selfId.withSuffixedPath("_empty");
     }
 
     @Override
-    public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        return getUses(itemStack) == 0 ? this.emptyModel.item() : this.mainModel.item();
+    public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
+        return getUses(itemStack) == 0 ? Items.TRIAL_KEY : Items.LEATHER_HORSE_ARMOR;
     }
 
     @Override
-    public int getPolymerCustomModelData(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
-        return getUses(itemStack) == 0 ? this.emptyModel.value() : this.mainModel.value();
+    public Identifier getPolymerItemModel(ItemStack itemStack, PacketContext context) {
+        return getUses(itemStack) == 0 ? this.emptyModel : this.mainModel;
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType context, RegistryWrapper.WrapperLookup lookup, @Nullable ServerPlayerEntity player) {
-        var out = PolymerItem.super.getPolymerItemStack(itemStack, context, lookup, player);
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, PacketContext context) {
+        var out = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, context);
         var uses = getUses(itemStack);
 
+        out.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(ColoredItem.getColor(itemStack), false));
         out.set(DataComponentTypes.MAX_DAMAGE, MAX_USES);
         if (uses != 0) {
             out.set(DataComponentTypes.DAMAGE, MAX_USES - uses);

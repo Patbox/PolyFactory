@@ -51,6 +51,11 @@ public abstract class MixerRecipePage<T extends MixingRecipe> extends Prioritize
                 .append(Text.literal("" + GuiTextures.MIXER_POLYDEX_FLUID_OFFSET_N + GuiTextures.POLYDEX_OFFSET).setStyle(UiResourceCreator.STYLE));
     }
 
+    @Override
+    public ItemStack getOutput(@Nullable PolydexEntry polydexEntry, MinecraftServer minecraftServer) {
+        return getItemOutput();
+    }
+
     protected abstract List<FluidInputStack> getFluidInput();
     protected abstract List<CountedIngredient> getItemInput();
     protected abstract List<FluidStack<?>> getFluidOutput();

@@ -14,6 +14,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.Registries;
 import net.minecraft.world.World;
@@ -38,11 +40,11 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
 
 
     public static RecipeEntry<ColoringMixingRecipe> of(String id, Item item, double mixingTime, double minimumSpeed, double optimalSpeed) {
-        return new RecipeEntry<>(FactoryUtil.id("mixing/" + id), new ColoringMixingRecipe("", item, 12, mixingTime, minimumSpeed, optimalSpeed, -1, 2));
+        return new RecipeEntry<>(RegistryKey.of(RegistryKeys.RECIPE, FactoryUtil.id("mixing/" + id)), new ColoringMixingRecipe("", item, 12, mixingTime, minimumSpeed, optimalSpeed, -1, 2));
     }
 
     public static RecipeEntry<ColoringMixingRecipe> of(String id, Item item, int count, double mixingTime, double minimumSpeed, double optimalSpeed) {
-        return new RecipeEntry<>(FactoryUtil.id("mixing/" + id), new ColoringMixingRecipe("", item, count, mixingTime, minimumSpeed, optimalSpeed, -1, 2));
+        return new RecipeEntry<>(RegistryKey.of(RegistryKeys.RECIPE, FactoryUtil.id("mixing/" + id)), new ColoringMixingRecipe("", item, count, mixingTime, minimumSpeed, optimalSpeed, -1, 2));
     }
 
 
@@ -89,17 +91,7 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
     }
 
     @Override
-    public boolean fits(int width, int height) {
-        return width * height > 1;
-    }
-
-    @Override
-    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
-        return input.getDefaultStack();
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<ColoringMixingRecipe> getSerializer() {
         return FactoryRecipeSerializers.MIXING_COLORING;
     }
 

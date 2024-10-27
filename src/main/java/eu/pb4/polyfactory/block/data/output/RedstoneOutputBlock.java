@@ -12,8 +12,6 @@ import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverSelectiveSideNode;
 import eu.pb4.polyfactory.nodes.data.DataReceiverNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polymer.resourcepack.api.PolymerModelData;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
@@ -21,27 +19,28 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
+import static eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils.bridgeModel;
 
 public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataReceiver, RedstoneConnectable {
     public static final IntProperty POWER = Properties.POWER;
@@ -86,7 +85,7 @@ public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataR
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
@@ -101,8 +100,8 @@ public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataR
     }
 
     public static class Model extends GenericCabledDataBlock.Model {
-        public static final PolymerModelData OUTPUT_OVERLAY = PolymerResourcePackUtils.requestModel(Items.LEATHER_HELMET, id("block/redstone_output_overlay"));
-        public static final PolymerModelData INPUT_OVERLAY = PolymerResourcePackUtils.requestModel(Items.LEATHER_HELMET, id("block/redstone_input_overlay"));
+        public static final Identifier OUTPUT_OVERLAY = bridgeModel(id("block/redstone_output_overlay"));
+        public static final Identifier INPUT_OVERLAY =  bridgeModel(id("block/redstone_input_overlay"));
         private final ItemDisplayElement overlay;
 
         public Model(BlockState state) {
@@ -116,11 +115,9 @@ public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataR
         }
 
         private ItemStack createOverlay(BlockState state) {
-            var model = state.isOf(FactoryBlocks.REDSTONE_OUTPUT) ? OUTPUT_OVERLAY : INPUT_OVERLAY;
-            var stack = new ItemStack(model.item());
-            var display = new NbtCompound();
+            var stack = new ItemStack(Items.LEATHER_HORSE_ARMOR);
+            stack.set(DataComponentTypes.ITEM_MODEL, state.isOf(FactoryBlocks.REDSTONE_OUTPUT) ? OUTPUT_OVERLAY : INPUT_OVERLAY);
             stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(RedstoneWireBlock.getWireColor(state.get(POWER)), false));
-            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(model.value()));
             return stack;
         }
 

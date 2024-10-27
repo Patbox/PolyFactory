@@ -3,22 +3,20 @@ package eu.pb4.polyfactory.block.property;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import net.minecraft.state.property.Property;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import net.minecraft.state.property.Property;
-import net.minecraft.util.StringIdentifiable;
-
 public class LazyEnumProperty<T extends Enum<T>> extends Property<T> {
-    private final ImmutableSet<T> values;
+    private final List<T> values;
     private final Map<String, T> byName = Maps.newHashMap();
     private final Map<T, String> toName;
 
     protected LazyEnumProperty(String name, Class<T> type, Collection<T> values) {
         super(name, type);
-        this.values = ImmutableSet.copyOf(values);
+        this.values = List.copyOf(values);
         this.toName = new EnumMap<>(type);
         for (var enum_ : values) {
             var string = enum_.name().toLowerCase(Locale.ROOT);
@@ -32,12 +30,17 @@ public class LazyEnumProperty<T extends Enum<T>> extends Property<T> {
 
     }
 
-    public Collection<T> getValues() {
+    public List<T> getValues() {
         return this.values;
     }
 
     public Optional<T> parse(String name) {
         return Optional.ofNullable(this.byName.get(name));
+    }
+
+    @Override
+    public int ordinal(T value) {
+        return this.values.indexOf(value);
     }
 
     public String name(T enum_) {

@@ -12,6 +12,7 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Items;
 import net.minecraft.particle.*;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -55,9 +56,9 @@ public class WaterSplashEntity extends SplashEntity<Unit> {
         if (this.random.nextFloat() < 0.3) {
             var entity = entityHitResult.getEntity();
 
-            if (entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
+            if (getWorld() instanceof ServerWorld world && entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
                 if (livingEntity.hurtByWater() && this.canDamageEntity(entity)) {
-                    livingEntity.damage(this.getDamageSources().indirectMagic(this, this.getOwner()), 1F);
+                    livingEntity.damage(world, this.getDamageSources().indirectMagic(this, this.getOwner()), 1F);
                 }
 
                 if (livingEntity.isOnFire() && livingEntity.isAlive() && this.canInteractEntity(entity)) {

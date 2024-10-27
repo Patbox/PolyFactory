@@ -37,7 +37,7 @@ public class WindmillBlockEntity extends BlockEntity {
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         var list = new NbtList();
         for (var sail : this.sails) {
-            list.add(sail.encodeAllowEmpty(lookup));
+            list.add(sail.toNbtAllowEmpty(lookup));
         }
         nbt.put("Sails", list);
     }

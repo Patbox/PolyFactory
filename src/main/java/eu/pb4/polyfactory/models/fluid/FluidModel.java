@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.models.fluid;
 
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidType;
@@ -20,6 +19,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+
+import static eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils.bridgeModel;
 
 public class FluidModel {
     private static final String BASE_MODEL = """
@@ -71,9 +72,9 @@ public class FluidModel {
 
     private void addTextures(Identifier id, FluidType<?> object, Function<ModelRenderType, Item> function) {
         this.textures.add(new Pair<>(id, object.texture()));
-        this.model.put(object, BaseItemProvider.requestModel(
-                function.apply(object.modelRenderType()),
-                this.baseModel.withSuffixedPath("/" + id.getNamespace() + "/" + id.getPath())));
+        var stack = new ItemStack(function.apply(object.modelRenderType()));
+        stack.set(DataComponentTypes.ITEM_MODEL, bridgeModel(this.baseModel.withSuffixedPath("/" + id.getNamespace() + "/" + id.getPath())));
+        this.model.put(object, stack);
     }
 
     private void generateAssets(BiConsumer<String, byte[]> assetWriter) {

@@ -13,7 +13,7 @@ public record GrindingInput(ItemStack stack) implements RecipeInput {
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         return 1;
     }
 }

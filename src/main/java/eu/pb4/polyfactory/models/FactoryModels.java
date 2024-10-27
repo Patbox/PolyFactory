@@ -1,9 +1,7 @@
 package eu.pb4.polyfactory.models;
 
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.polyfactory.models.fluid.FluidModel;
 import eu.pb4.polyfactory.util.ModelRenderType;
-import eu.pb4.polymer.resourcepack.api.PolymerModelData;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
@@ -12,7 +10,7 @@ import net.minecraft.util.Util;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public interface FactoryModels {
-    PolymerModelData PLACEHOLDER = PolymerResourcePackUtils.requestModel(BaseItemProvider.requestItem(), id("item/placeholder"));
+    Identifier PLACEHOLDER = id("placeholder");
     FluidModel FLUID_FLAT_FULL = new FluidModel(id("block/fluid/flat_model"));
     FluidModel FLUID_PARTICLE = new FluidModel(id("particle/fluid/particle"));
 
@@ -37,7 +35,7 @@ public interface FactoryModels {
     });
 
     FluidModel ITEM_PORTABLE_FLUID_TANK = new FluidModel(id("item/portable_fluid_tank"),
-            (x) -> x == ModelRenderType.COLORED ? Items.FIREWORK_STAR : BaseItemProvider.requestItem());
+            (x) -> x == ModelRenderType.COLORED ? Items.FIREWORK_STAR : Items.TRIAL_KEY);
     DirectionConnectingModel COLORED_CABLE = new DirectionConnectingModel(id("block/cable_colored"), true);
     DirectionConnectingModel COLORED_WALL_CABLE = new DirectionConnectingModel(id("block/cable_colored_wall"), true);
     DirectionConnectingModel PIPE = new DirectionConnectingModel(id("block/pipe"), false);

@@ -29,9 +29,9 @@ public class DyedColorComponentMixin {
         int r = rx.get(), g = gx.get(), b = bx.get();
         for (var itemStack : ArtificialDyeItem.CURRENT_DYES.get()) {
             var color = ColoredItem.getColor(itemStack);
-            r += ColorHelper.Argb.getRed(color);
-            g += ColorHelper.Argb.getGreen(color);
-            b += ColorHelper.Argb.getBlue(color);
+            r += ColorHelper.getRed(color);
+            g += ColorHelper.getGreen(color);
+            b += ColorHelper.getBlue(color);
             i += Math.max(r, Math.max(g, b));
             c++;
         }

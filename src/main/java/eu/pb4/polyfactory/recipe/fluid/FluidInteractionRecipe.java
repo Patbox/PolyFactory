@@ -7,8 +7,11 @@ import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.recipe.IngredientPlacement;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.book.RecipeBookCategories;
+import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
@@ -32,22 +35,27 @@ public interface FluidInteractionRecipe extends Recipe<FluidContainerInput> {
     float particleChance(FluidContainerInput input);
 
     @Override
-    default RecipeType<?> getType() {
+    default RecipeType<FluidInteractionRecipe> getType() {
         return FactoryRecipeTypes.FLUID_INTERACTION;
-    }
-
-    @Override
-    default boolean fits(int width, int height) {
-        return true;
-    }
-
-    @Override
-    default ItemStack getResult(RegistryWrapper.WrapperLookup registriesLookup) {
-        return ItemStack.EMPTY;
     }
 
     @Override
     default ItemStack craft(FluidContainerInput input, RegistryWrapper.WrapperLookup lookup) {
         return ItemStack.EMPTY;
     };
+
+    @Override
+    default RecipeBookCategory getRecipeBookCategory() {
+        return RecipeBookCategories.CAMPFIRE;
+    }
+
+    @Override
+    default boolean isIgnoredInRecipeBook() {
+        return true;
+    }
+
+    @Override
+    default IngredientPlacement getIngredientPlacement() {
+        return IngredientPlacement.NONE;
+    }
 }

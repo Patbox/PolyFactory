@@ -1,11 +1,9 @@
 package eu.pb4.polyfactory.block.other;
 
-import com.mojang.datafixers.DataFix;
-import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
-import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
+import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -22,7 +20,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;

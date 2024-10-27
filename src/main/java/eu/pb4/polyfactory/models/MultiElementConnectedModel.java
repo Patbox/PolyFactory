@@ -1,12 +1,13 @@
 package eu.pb4.polyfactory.models;
 
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.property.ConnectablePart;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import net.minecraft.block.BlockState;
-import net.minecraft.item.Item;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.Identifier;
 
@@ -14,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.function.BiConsumer;
 
 import static eu.pb4.polyfactory.ModInit.id;
+import static eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils.bridgeModel;
 
 public class MultiElementConnectedModel {
     private final EnumProperty<ConnectablePart> PART_X = FactoryProperties.CONNECTABLE_PART_X;
@@ -54,7 +56,7 @@ public class MultiElementConnectedModel {
                 for (var z : ConnectablePart.values()) {
                     var i = index(x, y, z);
                     if (this.models[i] == null) {
-                        this.models[i] = BaseItemProvider.requestModel(base.withSuffixedPath("/" + x.asString() + "_" + y.asString() + "_" + z.asString()));
+                        this.models[i] = ItemDisplayElementUtil.getModel(base.withSuffixedPath("/" + x.asString() + "_" + y.asString() + "_" + z.asString()));
                     }
                 }
             }

@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.item.tool;
 
-import eu.pb4.factorytools.api.item.ModeledItem;
+import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsage;
@@ -9,7 +9,7 @@ import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 
-public class XpBucketItem extends ModeledItem {
+public class XpBucketItem extends SimplePolymerItem {
     public XpBucketItem(Settings settings) {
         super(settings);
     }
@@ -27,6 +27,6 @@ public class XpBucketItem extends ModeledItem {
             context.getStack().decrement(1);
         }
 
-        return ActionResult.SUCCESS;
+        return ActionResult.SUCCESS_SERVER;
     }
 }

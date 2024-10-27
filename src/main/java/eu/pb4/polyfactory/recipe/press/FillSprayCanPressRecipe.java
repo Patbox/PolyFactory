@@ -43,17 +43,7 @@ public record FillSprayCanPressRecipe(int amount) implements PressRecipe {
     }
 
     @Override
-    public boolean fits(int width, int height) {
-        return width * height >= 2;
-    }
-
-    @Override
-    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
-        return FactoryItems.SPRAY_CAN.getDefaultStack();
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<FillSprayCanPressRecipe> getSerializer() {
         return FactoryRecipeSerializers.PRESS_FILL_SPRAY_CAN;
     }
 }

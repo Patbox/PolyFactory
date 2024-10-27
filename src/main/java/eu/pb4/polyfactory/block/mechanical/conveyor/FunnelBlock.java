@@ -2,57 +2,61 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
+import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.FilterItem;
-import eu.pb4.factorytools.api.util.WorldPointer;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polyfactory.util.movingitem.MovingItemProvider;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.block.WireOrientation;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
 
 public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsumer, MovingItemProvider, WrenchableBlock, BlockEntityProvider, BarrierBasedWaterloggable {
-    public static final DirectionProperty FACING = Properties.FACING;
+    public static final EnumProperty<Direction> FACING = Properties.FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
     public static final EnumProperty<ConveyorLikeDirectional.TransferMode> MODE = EnumProperty.of("mode", ConveyorLikeDirectional.TransferMode.class,
             ConveyorLikeDirectional.TransferMode.FROM_CONVEYOR, ConveyorLikeDirectional.TransferMode.TO_CONVEYOR);
@@ -74,16 +78,16 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        tickWater(state, world, pos);
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        tickWater(state, world, tickView, pos);
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (!state.isOf(newState.getBlock())) {
             if (world.getBlockEntity(pos) instanceof FunnelBlockEntity be) {
-                ItemScatterer.spawn(world, pos.getX()  + 0.5, pos.getY()  + 0.5, pos.getZ() + 0.5, be.getFilter());
+                ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, be.getFilter());
             }
         }
         super.onStateReplaced(state, world, pos, newState, moved);
@@ -187,9 +191,10 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         }
     }
 
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+    @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
         this.updateEnabled(world, pos, state);
-        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
     }
 
     private void updateEnabled(World world, BlockPos pos, BlockState state) {
@@ -247,11 +252,11 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
             }
             be.setFilter(stack.copyWithCount(1));
             stack.decrement(1);
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         } else if (stack.isEmpty()) {
             player.setStackInHand(Hand.MAIN_HAND, be.getFilter());
             be.setFilter(ItemStack.EMPTY);
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
         return super.onUse(state, world, pos, player, hit);
@@ -268,12 +273,12 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.SPRUCE_PLANKS.getDefaultState();
     }
 
@@ -294,10 +299,10 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
     }
 
     public static final class Model extends BlockModel {
-        private static final ItemStack MODEL_IN = new ItemStack(BaseItemProvider.requestModel());
-        private static final ItemStack MODEL_OUT = new ItemStack(BaseItemProvider.requestModel());
-        private final ItemDisplayElement mainElement;
+        private static final ItemStack MODEL_IN = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/funnel_in"));
+        private static final ItemStack MODEL_OUT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/funnel_out"));
         final ItemDisplayElement filterElement;
+        private final ItemDisplayElement mainElement;
 
         private Model(ServerWorld world, BlockPos pos, BlockState state) {
             this.mainElement = new LodItemDisplayElement();
@@ -319,7 +324,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
 
         private void updateFacing(BlockState facing) {
             var rot = facing.get(FACING).getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
-            mat.identity();
+            var mat = mat();
             mat.rotate(rot);
             mat.scale(2.01f);
             var outModel = facing.get(MODE) == ConveyorLikeDirectional.TransferMode.FROM_CONVEYOR;
@@ -346,13 +351,6 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 this.updateFacing(this.blockState());
             }
-        }
-
-
-
-        static {
-            MODEL_IN.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(MODEL_IN.getItem(), FactoryUtil.id("block/funnel_in")).value()));
-            MODEL_OUT.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(MODEL_OUT.getItem(), FactoryUtil.id("block/funnel_out")).value()));
         }
     }
 

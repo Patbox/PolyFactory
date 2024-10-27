@@ -1,23 +1,21 @@
 package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.mechanical.AxleWithGearMechanicalNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.*;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
@@ -25,10 +23,9 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
-import org.joml.Matrix4fStack;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -46,7 +43,7 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
     }
 
     @Override
-    public void onPolymerBlockSend(BlockState blockState, BlockPos.Mutable pos, ServerPlayerEntity player) {}
+    public void onPolymerBlockSend(BlockState blockState, BlockPos.Mutable pos, PacketContext.NotNullWithPlayer player) {}
 
     @Override
     public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
@@ -79,14 +76,14 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
     }
 
     @Override
-    protected void updateNetworkAt(WorldAccess world, BlockPos pos) {
+    protected void updateNetworkAt(WorldView world, BlockPos pos) {
         super.updateNetworkAt(world, pos);
         NetworkComponent.RotationalConnector.updateRotationalConnectorAt(world, pos);
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack ITEM_MODEL_1 = new ItemStack(BaseItemProvider.requestModel());
-        public static final ItemStack ITEM_MODEL_2 = new ItemStack(BaseItemProvider.requestModel());
+        public static final ItemStack ITEM_MODEL_1 = ItemDisplayElementUtil.getModel( id("block/axle_with_gear_1"));
+        public static final ItemStack ITEM_MODEL_2 = ItemDisplayElementUtil.getModel( id("block/axle_with_gear_2"));
 
         private final ItemDisplayElement mainElement;
         private Model(ServerWorld world, BlockState state, BlockPos pos) {
@@ -128,11 +125,6 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
                         this.blockAware().getBlockState().get(AXIS));
                 this.mainElement.startInterpolationIfDirty();
             }
-        }
-
-        static {
-            ITEM_MODEL_1.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(ITEM_MODEL_1.getItem(), id("block/axle_with_gear_1")).value()));
-            ITEM_MODEL_2.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(ITEM_MODEL_2.getItem(), id("block/axle_with_gear_2")).value()));
         }
     }
 }

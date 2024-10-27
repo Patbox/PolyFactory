@@ -10,7 +10,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public abstract class AxisAndFacingBlock extends Block implements WrenchableBlock, FactoryBlock {
-    public static final DirectionProperty FACING = Properties.FACING;
+    public static final EnumProperty<Direction> FACING = Properties.FACING;
     public static final BooleanProperty FIRST_AXIS = FactoryProperties.FIRST_AXIS;
     public static final WrenchAction FIRST_AXIS_ACTION = WrenchAction.of("axis", (World world, BlockPos pos, Direction side, BlockState state) -> {
         return Text.literal(getAxis(state).asString());

@@ -83,30 +83,15 @@ public class ModInit implements ModInitializer {
 		FactoryModels.load();
 
 		ConveyorModels.registerAssetsEvents();
-		initModels();
 		UiResourceCreator.setup();
 		GuiTextures.register();
 		PolydexCompat.register();
 		PolymerResourcePackUtils.addModAssets(ID);
+		PolymerResourcePackUtils.addBridgedModelsFolder(id("block"), id("sgui"));
 		PolymerResourcePackUtils.markAsRequired();
 
 		FluidTextures.setup();
 
 		ServerPlayConnectionEvents.JOIN.register(FactorySecrets::onJoin);
-	}
-
-	@SuppressWarnings("ResultOfMethodCallIgnored")
-	private void initModels() {
-		AxleBlock.Model.ITEM_MODEL.getItem();
-		WindmillBlock.Model.MODEL.getItem();
-		AxleWithGearBlock.Model.ITEM_MODEL_1.getItem();
-		AxleWithLargeGearBlock.Model.GEAR_MODEL.getItem();
-		PlanterBlock.Model.OUTPUT_1.getItem();
-		TinyPotatoSpringBlock.Model.BASE_MODEL.getItem();
-		RedstoneOutputBlock.Model.OUTPUT_OVERLAY.item();
-		GenericParts.SMALL_GEAR.isEmpty();
-		DoubleInputTransformerBlock.Model.INPUT_A.getItem();
-		DataMemoryBlock.Model.POWERED_MODEL.getItem();
-		PumpBlock.Model.BLOCK_MODEL.getItem();
 	}
 }

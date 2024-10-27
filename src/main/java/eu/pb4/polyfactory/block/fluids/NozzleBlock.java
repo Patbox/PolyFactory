@@ -29,19 +29,22 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,7 +52,7 @@ import java.util.Locale;
 
 
 public class NozzleBlock extends NetworkBlock implements FactoryBlock, WrenchableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe {
-    public static final DirectionProperty FACING = Properties.FACING;
+    public static final EnumProperty<Direction> FACING = Properties.FACING;
     public static final WrenchAction SPREAD = WrenchAction.ofBlockEntityString("spread", NozzleBlockEntity.class,
             x -> String.format(Locale.ROOT,"%.2f", x.extraSpread()),
             (x, n) -> x.setExtraSpread(FactoryUtil.wrap(x.extraSpread() + (n ? 0.05f : -0.05f), 0f, 0.8f))
@@ -85,7 +88,7 @@ public class NozzleBlock extends NetworkBlock implements FactoryBlock, Wrenchabl
     }
 
     @Override
-    protected void updateNetworkAt(WorldAccess world, BlockPos pos) {
+    protected void updateNetworkAt(WorldView world, BlockPos pos) {
         Pipe.updatePipeAt(world, pos);
     }
 
@@ -104,9 +107,9 @@ public class NozzleBlock extends NetworkBlock implements FactoryBlock, Wrenchabl
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        tickWater(state, world, pos);
-        return state;
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        tickWater(state, world, tickView, pos);
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
@@ -125,7 +128,7 @@ public class NozzleBlock extends NetworkBlock implements FactoryBlock, Wrenchabl
     }
 
     @Override
-    public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
         return dir == state.get(FACING).getOpposite();
     }
 
@@ -152,7 +155,7 @@ public class NozzleBlock extends NetworkBlock implements FactoryBlock, Wrenchabl
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.COPPER_BLOCK.getDefaultState();
     }
 

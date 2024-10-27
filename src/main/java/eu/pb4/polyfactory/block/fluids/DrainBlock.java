@@ -2,11 +2,9 @@ package eu.pb4.polyfactory.block.fluids;
 
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.factorytools.api.block.ItemUseLimiter;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
-import eu.pb4.polyfactory.block.other.ContainerBlockEntity;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
@@ -42,18 +40,20 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
-public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, BlockEntityProvider, ItemUseLimiter.All {
+public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, BlockEntityProvider {
     public DrainBlock(Settings settings) {
         super(settings);
     }
 
     @Override
-    public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
         return dir != Direction.UP;
     }
 
@@ -73,7 +73,7 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         var stack = player.getStackInHand(Hand.MAIN_HAND);
-        if (world.getBlockEntity(pos) instanceof DrainBlockEntity be) {
+        if (world instanceof ServerWorld serverWorld && world.getBlockEntity(pos) instanceof DrainBlockEntity be) {
             if ((stack.isEmpty() || (ItemStack.areItemsAndComponentsEqual(stack, be.catalyst()) && stack.getCount() < stack.getMaxCount()))
                     && hit.getSide() == Direction.UP && !be.catalyst().isEmpty()) {
                 if (stack.isEmpty()) {
@@ -82,17 +82,17 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
                     stack.increment(1);
                 }
                 be.setCatalyst(ItemStack.EMPTY);
-                return ActionResult.SUCCESS;
+                return ActionResult.SUCCESS_SERVER;
             } else if (stack.isIn(FactoryItemTags.DRAIN_CATALYST) && hit.getSide() == Direction.UP && be.catalyst().isEmpty()) {
                 be.setCatalyst(stack.copyWithCount(1));
                 stack.decrementUnlessCreative(1, player);
-                return ActionResult.SUCCESS;
+                return ActionResult.SUCCESS_SERVER;
             }
 
             var container = be.getFluidContainer();
             var copy = stack.copy();
             var input = DrainInput.of(copy, be.catalyst(), container, !(player instanceof FakePlayer));
-            var optional = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, world);
+            var optional = serverWorld.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, world);
             if (optional.isEmpty()) {
                 return super.onUse(state, world, pos, player, hit);
             }
@@ -110,7 +110,7 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
                 container.insert(fluid, false);
             }
             world.playSound(null, pos, recipe.soundEvent().value(), SoundCategory.BLOCKS);
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
         return super.onUse(state, world, pos, player, hit);
@@ -168,12 +168,12 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.COPPER_BLOCK.getDefaultState();
     }
 

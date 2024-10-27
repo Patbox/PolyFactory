@@ -2,8 +2,8 @@ package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.GuiHelpers;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
@@ -11,30 +11,29 @@ import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.StackReference;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 
-public class FilterItem extends ModeledItem {
-    public FilterItem(Item item, Settings settings) {
-        super(item, settings);
+public class FilterItem extends SimplePolymerItem {
+    public FilterItem(Settings settings) {
+        super(settings);
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+    public ActionResult use(World world, PlayerEntity user, Hand hand) {
         var stack = user.getStackInHand(hand);
         if (user instanceof ServerPlayerEntity player) {
             new Gui(player, stack);
         }
-        return TypedActionResult.success(stack, true);
+        return ActionResult.SUCCESS_SERVER;
     }
 
     @Override

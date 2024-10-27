@@ -47,7 +47,7 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         nbt.put("fluid", this.container.toNbt(registryLookup));
-        nbt.put("catalyst", this.catalyst.encodeAllowEmpty(registryLookup));
+        nbt.put("catalyst", this.catalyst.toNbtAllowEmpty(registryLookup));
         updateModel();
     }
 

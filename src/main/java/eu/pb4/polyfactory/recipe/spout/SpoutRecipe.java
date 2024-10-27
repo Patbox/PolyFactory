@@ -4,8 +4,11 @@ import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.SpoutInput;
+import net.minecraft.recipe.IngredientPlacement;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.book.RecipeBookCategories;
+import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 
@@ -33,7 +36,22 @@ public interface SpoutRecipe extends Recipe<SpoutInput> {
     RegistryEntry<SoundEvent> soundEvent();
     double time(SpoutInput input);
     @Override
-    default RecipeType<?> getType() {
+    default RecipeType<SpoutRecipe> getType() {
         return FactoryRecipeTypes.SPOUT;
     };
+
+    @Override
+    default IngredientPlacement getIngredientPlacement() {
+        return IngredientPlacement.NONE;
+    }
+
+    @Override
+    default RecipeBookCategory getRecipeBookCategory() {
+        return RecipeBookCategories.CAMPFIRE;
+    }
+
+    @Override
+    default boolean isIgnoredInRecipeBook() {
+        return true;
+    }
 }

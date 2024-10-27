@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block.electric;
 
-import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
+import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.nodes.electric.EnergyData;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import net.minecraft.block.BlockState;

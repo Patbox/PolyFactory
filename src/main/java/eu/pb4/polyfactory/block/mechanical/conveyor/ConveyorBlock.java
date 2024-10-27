@@ -2,20 +2,20 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.mojang.serialization.Codec;
+import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.WorldPointer;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.factorytools.api.virtualentity.FastItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.item.FactoryEnchantmentEffectComponents;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
-import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.models.ConveyorModels;
-import eu.pb4.factorytools.api.virtualentity.FastItemDisplayElement;
 import eu.pb4.polyfactory.nodes.mechanical.ConveyorNode;
-import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItem;
@@ -28,7 +28,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.enums.BlockHalf;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -38,27 +37,31 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldEvents;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
 public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, ConveyorLikeDirectional, MovingItemConsumer {
-    public static final DirectionProperty DIRECTION = FactoryProperties.HORIZONTAL_DIRECTION;
+    public static final EnumProperty<Direction> DIRECTION = FactoryProperties.HORIZONTAL_DIRECTION;
     public static final EnumProperty<DirectionValue> VERTICAL = EnumProperty.of("vertical", DirectionValue.class);
 
 
@@ -109,7 +112,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
                 conveyor.setDelta(delta);
             }
 
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         } else if (x.isOf(Items.WET_SPONGE) && this == FactoryBlocks.STICKY_CONVEYOR) {
             var delta = 0d;
             MovingItem itemContainer = null;
@@ -130,7 +133,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
                 conveyor.setDelta(delta);
             }
 
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
 
@@ -140,7 +143,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
                 player.setStackInHand(Hand.MAIN_HAND, conveyor.getStack(0));
                 conveyor.setStack(0, ItemStack.EMPTY);
                 conveyor.setDelta(0);
-                return ActionResult.SUCCESS;
+                return ActionResult.SUCCESS_SERVER;
             }
         }
 
@@ -149,8 +152,8 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        state = super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
         if (direction.getAxis() == Direction.Axis.Y) {
             var vert = state.get(VERTICAL);
             if (vert.value != 0 && direction == Direction.UP) {
@@ -386,7 +389,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         if (state.get(VERTICAL) == DirectionValue.NONE || state.get(VERTICAL).stack) {
             return Blocks.BARRIER.getDefaultState();
         } else {
@@ -480,7 +483,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.SMOOTH_STONE.getDefaultState();
     }
 
@@ -552,6 +555,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
 
         private void updateAnimation(Direction dir, DirectionValue value) {
             if (dir != this.direction || value != this.value) {
+                var mat = mat();
                 mat.identity().translate(0, 0.5f, 0).rotateY((270 - dir.asRotation()) * MathHelper.RADIANS_PER_DEGREE);
                 if (value.value == -1 && !value.stack) {
                     mat.rotateY(MathHelper.PI);

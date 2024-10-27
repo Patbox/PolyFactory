@@ -1,10 +1,8 @@
 package eu.pb4.polyfactory.block.data.util;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.block.data.CableConnectable;
@@ -24,14 +22,10 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.State;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -40,13 +34,13 @@ import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public abstract class GenericCabledDataBlock extends AbstractCableBlock implements FactoryBlock, WrenchableBlock, BlockEntityProvider, CableConnectable {
-    public static final DirectionProperty FACING = Properties.FACING;
+    public static final EnumProperty<Direction> FACING = Properties.FACING;
 
     public final WrenchAction facingAction = WrenchAction.of("facing", WrenchValueGetter.ofProperty(Properties.FACING, FactoryUtil::asText),
             WrenchApplyAction.ofState(
@@ -137,7 +131,7 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
     }
 
     @Override
-    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         return state.get(FACING) != dir && state.get(HAS_CABLE) && super.canCableConnect(world, cableColor, pos, state, dir);
     }
 
@@ -147,12 +141,12 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 

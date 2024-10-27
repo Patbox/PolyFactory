@@ -1,16 +1,14 @@
 package eu.pb4.polyfactory.block.other;
 
-import eu.pb4.factorytools.api.block.*;
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.factorytools.api.block.AttackableBlock;
+import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
+import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.block.SneakBypassingBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
-import eu.pb4.factorytools.api.advancement.TriggerCriterion;
-import eu.pb4.factorytools.api.virtualentity.BlockModel;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.factorytools.api.util.VirtualDestroyStage;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -21,16 +19,16 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
@@ -38,15 +36,18 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 
-public class ContainerBlock extends Block implements FactoryBlock, BlockEntityProvider, AttackableBlock, SneakBypassingBlock, BarrierBasedWaterloggable, ItemUseLimiter {
+public class ContainerBlock extends Block implements FactoryBlock, BlockEntityProvider, AttackableBlock, SneakBypassingBlock, BarrierBasedWaterloggable {
     public final int maxStackCount;
-    public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+    public static EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
 
     public ContainerBlock(int maxStackCount, Settings settings) {
         super(settings);
@@ -62,14 +63,9 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        tickWater(state, world, pos);
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
-    }
-
-    @Override
-    public boolean preventUseItemWhileTargetingBlock(ServerPlayerEntity player, BlockState blockState, World world, BlockHitResult result, ItemStack stack, Hand hand) {
-        return result.getSide() == blockState.get(FACING);
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        tickWater(state, world, tickView, pos);
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
@@ -111,7 +107,7 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
                     }
                 }
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
         return super.onUse(state, world, pos, player, hit);
@@ -128,7 +124,7 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
                     be.setItemStack(ItemStack.EMPTY);
                 }
              }
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
         return ActionResult.PASS;
@@ -187,7 +183,7 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.OAK_PLANKS.getDefaultState();
     }
 

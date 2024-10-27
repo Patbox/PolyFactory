@@ -2,30 +2,28 @@ package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.AbovePlacingLimiter;
-import eu.pb4.factorytools.api.block.ItemUseLimiter;
+import eu.pb4.factorytools.api.block.FactoryBlock;
+
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
-import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
@@ -33,22 +31,26 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
 
-public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, AbovePlacingLimiter, ItemUseLimiter.All {
-    public static final Property<Direction> INPUT_FACING = DirectionProperty.of("input_facing", x -> x.getAxis() != Direction.Axis.Y);
+public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, AbovePlacingLimiter {
+    public static final Property<Direction> INPUT_FACING = EnumProperty.of("input_facing", Direction.class, x -> x.getAxis() != Direction.Axis.Y);
 
     public GrinderBlock(Settings settings) {
         super(settings);
@@ -67,7 +69,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState();
     }
 
@@ -103,15 +105,10 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
-    }
-
-    @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!player.isSneaking() && world.getBlockEntity(pos) instanceof GrinderBlockEntity be) {
             be.openGui((ServerPlayerEntity) player);
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
         return super.onUse(state, world, pos, player,  hit);
@@ -163,7 +160,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.BARREL.getDefaultState();
     }
 
@@ -175,11 +172,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack MODEL_STONE_WHEEL = new ItemStack(BaseItemProvider.requestModel());
-
-        static {
-            MODEL_STONE_WHEEL.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(MODEL_STONE_WHEEL.getItem(), FactoryUtil.id("block/grindstone_wheel")).value()));
-        }
+        public static final ItemStack MODEL_STONE_WHEEL = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/grindstone_wheel"));
 
         private final ItemDisplayElement stoneWheel;
         private final ItemDisplayElement main;
@@ -195,7 +188,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
         }
 
         private void updateAnimation(float speed, Direction direction) {
-            mat.identity();
+            var mat = mat();
             mat.rotate(direction.getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion()));
             mat.scale(2f);
 

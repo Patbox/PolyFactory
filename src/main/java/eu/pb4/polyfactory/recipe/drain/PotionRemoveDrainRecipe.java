@@ -27,8 +27,8 @@ import java.util.Optional;
 public record PotionRemoveDrainRecipe(Ingredient item, Optional<Ingredient> catalyst, long amount, ItemStack output, RegistryEntry<SoundEvent> soundEvent,
                                       boolean requirePlayer, double time) implements DrainRecipe {
     public static final MapCodec<PotionRemoveDrainRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
-                    Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("item").forGetter(PotionRemoveDrainRecipe::item),
-                    Ingredient.ALLOW_EMPTY_CODEC.optionalFieldOf("catalyst").forGetter(PotionRemoveDrainRecipe::catalyst),
+                    Ingredient.CODEC.fieldOf("item").forGetter(PotionRemoveDrainRecipe::item),
+                    Ingredient.CODEC.optionalFieldOf("catalyst").forGetter(PotionRemoveDrainRecipe::catalyst),
                     Codec.LONG.fieldOf("amount").forGetter(PotionRemoveDrainRecipe::amount),
                     ItemStack.UNCOUNTED_CODEC.fieldOf("result").forGetter(PotionRemoveDrainRecipe::output),
                     SoundEvent.ENTRY_CODEC.fieldOf("sound").forGetter(PotionRemoveDrainRecipe::soundEvent),
@@ -73,17 +73,7 @@ public record PotionRemoveDrainRecipe(Ingredient item, Optional<Ingredient> cata
     }
 
     @Override
-    public boolean fits(int width, int height) {
-        return true;
-    }
-
-    @Override
-    public ItemStack getResult(RegistryWrapper.WrapperLookup registriesLookup) {
-        return output;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<PotionRemoveDrainRecipe> getSerializer() {
         return FactoryRecipeSerializers.DRAIN_POTION_REMOVE;
     }
 

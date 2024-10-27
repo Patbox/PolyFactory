@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block;
 
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
-import net.minecraft.block.*;
+import net.minecraft.block.BlockState;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.poi.PointOfInterestType;

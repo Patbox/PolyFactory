@@ -30,10 +30,14 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectable, BlockEntityProvider {
     public static final EnumProperty<ConnectablePart> PART_X = FactoryProperties.CONNECTABLE_PART_X;
@@ -45,7 +49,7 @@ public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectab
     }
 
     @Override
-    public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
         return true;
     }
 
@@ -75,11 +79,11 @@ public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectab
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
         return getBlockStateAt(world, pos);
     }
 
-    private BlockState getBlockStateAt(WorldAccess world, BlockPos pos) {
+    private BlockState getBlockStateAt(WorldView world, BlockPos pos) {
         var x = ConnectablePart.SINGLE;
         var y = ConnectablePart.SINGLE;
         var z = ConnectablePart.SINGLE;
@@ -140,12 +144,12 @@ public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectab
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.COPPER_BLOCK.getDefaultState();
     }
 

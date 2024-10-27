@@ -2,20 +2,17 @@ package eu.pb4.polyfactory.block.mechanical.source;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.factorytools.api.block.ItemUseLimiter;
-import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.factorytools.api.block.MultiBlock;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.models.RotationAwareModel;
-import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
+import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -24,8 +21,6 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
@@ -35,10 +30,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -51,12 +45,13 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
 
-public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockEntityProvider, InventoryProvider, RotationUser, ItemUseLimiter.All {
-    public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockEntityProvider, InventoryProvider, RotationUser {
+    public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty LIT = Properties.LIT;
 
     public SteamEngineBlock(Settings settings) {
@@ -75,7 +70,7 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (getY(state) != 2 && !player.isSneaking() && world.getBlockEntity(getCenter(state, pos)) instanceof SteamEngineBlockEntity be) {
             be.openGui((ServerPlayerEntity) player);
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
         return super.onUse(state, world, pos, player, hit);
@@ -154,12 +149,12 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.DEEPSLATE_BRICKS.getDefaultState();
     }
 
@@ -175,15 +170,9 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
     }
 
     public final class Model extends RotationAwareModel {
-        public static final ItemStack AXLE = new ItemStack(BaseItemProvider.requestModel());
-        public static final ItemStack LIT = new ItemStack(BaseItemProvider.requestModel());
-        public static final ItemStack LINK = new ItemStack(BaseItemProvider.requestModel());
-
-        static {
-            AXLE.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(AXLE.getItem(), FactoryUtil.id("block/steam_engine_axle")).value()));
-            LINK.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(LINK.getItem(), FactoryUtil.id("block/steam_engine_link")).value()));
-            LIT.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(LIT.getItem(), FactoryUtil.id("block/steam_engine_lit")).value()));
-        }
+        public static final ItemStack AXLE = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/steam_engine_axle"));
+        public static final ItemStack LIT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/steam_engine_lit"));
+        public static final ItemStack LINK = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/steam_engine_link"));
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement main;
@@ -196,9 +185,9 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
             this.main.setScale(new Vector3f(2));
             var facing = state.get(FACING);
             var offset = new Vec3d(
-                     facing.getAxis() == Direction.Axis.Z ? 0.5f : 0,
+                    facing.getAxis() == Direction.Axis.Z ? 0.5f : 0,
                     -1,
-                     facing.getAxis() == Direction.Axis.X ? 0.5f : 0
+                    facing.getAxis() == Direction.Axis.X ? 0.5f : 0
             );
             this.main.setOffset(offset);
             this.main.setDisplayWidth(3);
@@ -243,14 +232,14 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
             var sin2 = MathHelper.sin(rotation - MathHelper.HALF_PI) * 0.6f;
 
             mat.identity()
-                    .translate(-8f / 16,  sin * -10 / 16f, cos * 10 / 16f)
+                    .translate(-8f / 16, sin * -10 / 16f, cos * 10 / 16f)
                     .rotateX(-sin2)
             ;
 
             this.rotatingA.setTransformation(mat);
 
             mat.identity()
-                    .translate(8f / 16,  sin * 10 / 16f, -cos * 10 / 16f)
+                    .translate(8f / 16, sin * 10 / 16f, -cos * 10 / 16f)
                     .rotateX(sin2)
             ;
 

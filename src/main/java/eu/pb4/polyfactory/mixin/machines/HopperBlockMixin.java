@@ -38,11 +38,11 @@ public class HopperBlockMixin {
             }
             be.polyfactory$setFilter(stack.copyWithCount(1));
             stack.decrement(1);
-            cir.setReturnValue(ActionResult.SUCCESS);
+            cir.setReturnValue(ActionResult.SUCCESS_SERVER);
         } else if (stack.isEmpty() && !be.polyfactory$getFilter().isEmpty() && player.isSneaking()) {
             player.setStackInHand(Hand.MAIN_HAND, be.polyfactory$getFilter());
             be.polyfactory$setFilter(ItemStack.EMPTY);
-            cir.setReturnValue(ActionResult.SUCCESS);
+            cir.setReturnValue(ActionResult.SUCCESS_SERVER);
         }
     }
 

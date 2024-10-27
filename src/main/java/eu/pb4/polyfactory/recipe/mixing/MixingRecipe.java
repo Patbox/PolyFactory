@@ -2,24 +2,25 @@ package eu.pb4.polyfactory.recipe.mixing;
 
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.fluid.FluidStack;
-import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.input.MixingInput;
-import eu.pb4.polymer.core.api.item.PolymerRecipe;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.IngredientPlacement;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.book.RecipeBookCategories;
+import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.world.World;
 
 import java.util.List;
 
-public interface MixingRecipe extends Recipe<MixingInput>, PolymerRecipe {
+public interface MixingRecipe extends Recipe<MixingInput> {
      Iterable<ItemStack> remainders(MixingInput input);
      void applyRecipeUse(MixerBlockEntity inventory, World world);
 
     @Override
-    default RecipeType<?> getType() {
+    default RecipeType<MixingRecipe> getType() {
         return FactoryRecipeTypes.MIXER;
     }
 
@@ -37,7 +38,17 @@ public interface MixingRecipe extends Recipe<MixingInput>, PolymerRecipe {
     }
 
     @Override
-    default ItemStack createIcon() {
-        return FactoryItems.MIXER.getDefaultStack();
+    default RecipeBookCategory getRecipeBookCategory() {
+        return RecipeBookCategories.CAMPFIRE;
+    }
+
+    @Override
+    default boolean isIgnoredInRecipeBook() {
+        return true;
+    }
+
+    @Override
+    default IngredientPlacement getIngredientPlacement() {
+        return IngredientPlacement.NONE;
     }
 }

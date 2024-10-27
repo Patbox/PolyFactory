@@ -2,16 +2,15 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.mojang.authlib.GameProfile;
 import eu.pb4.common.protection.api.CommonProtection;
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.factorytools.api.block.OwnedBlockEntity;
+import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.factorytools.api.util.FactoryPlayer;
 import eu.pb4.factorytools.api.util.LegacyNbtHelper;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
-import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.factorytools.api.block.OwnedBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItemTags;
-import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.PredicateLimitedSlot;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -32,6 +31,7 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
@@ -52,7 +52,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("stack", this.stack.encodeAllowEmpty(lookup));
+        nbt.put("stack", this.stack.toNbtAllowEmpty(lookup));
         nbt.putDouble("progress", this.process);
         if (this.owner != null) {
             nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
@@ -211,11 +211,16 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                 if (!actionResult.isAccepted()) {
                     actionResult = self.stack.useOnBlock(context);
                     if (!actionResult.isAccepted()) {
-                        var x = self.stack.use(world, self.getFakePlayer(), Hand.MAIN_HAND);
-                        self.setStack(x.getValue());
-                        ItemScatterer.spawn(world, pos, p.getInventory());
+                        actionResult = self.stack.use(world, self.getFakePlayer(), Hand.MAIN_HAND);
                     }
                 }
+                if (actionResult instanceof ActionResult.Success success ) {
+                    var newStack = success.getNewHandStack();
+                    if (newStack != null) {
+                        self.setStack(newStack);
+                    }
+                }
+                ItemScatterer.spawn(world, pos, p.getInventory());
             }
 
             if (self.owner != null && world.getPlayerByUuid(self.owner.getId()) instanceof ServerPlayerEntity serverPlayer) {

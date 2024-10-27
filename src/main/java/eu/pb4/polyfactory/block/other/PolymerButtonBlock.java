@@ -1,20 +1,22 @@
 package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.*;
+import net.minecraft.block.BlockSetType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ButtonBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
@@ -24,12 +26,12 @@ public class PolymerButtonBlock extends ButtonBlock implements FactoryBlock {
 
     public PolymerButtonBlock(String name, BlockSetType blockSetType, int pressTicks, Settings settings) {
         super(blockSetType, pressTicks, settings);
-        this.modelNormal = BaseItemProvider.requestModel(id("block/" + name + "_button"));
-        this.modelPressed = BaseItemProvider.requestModel(id("block/" + name + "_button_pressed"));
+        this.modelNormal = ItemDisplayElementUtil.getModel(id("block/" + name + "_button"));
+        this.modelPressed = ItemDisplayElementUtil.getModel(id("block/" + name + "_button_pressed"));
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.STONE_BUTTON.getStateWithProperties(state);
     }
 

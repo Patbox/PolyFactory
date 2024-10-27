@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.item.wrench;
 
-import eu.pb4.factorytools.api.item.ModeledItem;
+import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.item.util.SwitchActionItem;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,9 +20,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class WrenchItem extends ModeledItem implements SwitchActionItem {
-    public WrenchItem() {
-        super(new Settings().maxCount(1));
+public class WrenchItem extends SimplePolymerItem implements SwitchActionItem {
+    public WrenchItem(Settings settings) {
+        super(settings);
     }
 
 
@@ -56,7 +56,7 @@ public class WrenchItem extends ModeledItem implements SwitchActionItem {
 
         if (raycast.getType() == HitResult.Type.BLOCK
                 && raycast instanceof BlockHitResult result
-                && WrenchHandler.of(player).useAction(player, player.getServerWorld(), result.getBlockPos(), result.getSide(), true).shouldSwingHand()) {
+                && WrenchHandler.of(player).useAction(player, player.getServerWorld(), result.getBlockPos(), result.getSide(), true).isAccepted()) {
             player.swingHand(mainHand, true);
         }
 

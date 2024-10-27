@@ -1,14 +1,19 @@
 package eu.pb4.polyfactory.polydex.pages;
 
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
+import eu.pb4.factorytools.api.util.ItemComponentPredicate;
+import eu.pb4.polydex.api.v1.recipe.PolydexEntry;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.BrewingMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.server.MinecraftServer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 public class BrewingMixerRecipePage extends MixerRecipePage<BrewingMixingRecipe> {
 
@@ -23,7 +28,7 @@ public class BrewingMixerRecipePage extends MixerRecipePage<BrewingMixingRecipe>
 
     @Override
     protected List<CountedIngredient> getItemInput() {
-        return List.of(new CountedIngredient(this.recipe.ingredient(), 1, ItemStack.EMPTY));
+        return List.of(new CountedIngredient(Optional.of(this.recipe.ingredient()), ItemComponentPredicate.EMPTY, 1, ItemStack.EMPTY));
     }
 
     @Override

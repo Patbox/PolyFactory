@@ -1,24 +1,15 @@
 package eu.pb4.polyfactory.block.fluids;
 
-import eu.pb4.factorytools.api.block.ItemUseLimiter;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
-import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FluidInstance;
-import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.models.fluid.TopFluidViewModel;
-import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -28,10 +19,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -39,9 +27,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4fStack;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
@@ -52,7 +41,7 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.ANVIL.getDefaultState();
     }
 
@@ -151,14 +140,14 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
     }
 
     @Override
-    public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
         return state.get(PART) == Part.MAIN;
     }
 
 
     public static final class Model extends RotationAwareModel {
-        private static final ItemStack BASE_MODEL = BaseItemProvider.requestModel(BaseItemProvider.requestItem(), id("block/mechanical_drain"));
-        private static final ItemStack AXLE_MODEL = BaseItemProvider.requestModel(BaseItemProvider.requestItem(), id("block/mechanical_drain_axle"));
+        private static final ItemStack BASE_MODEL = ItemDisplayElementUtil.getModel(id("block/mechanical_drain"));
+        private static final ItemStack AXLE_MODEL = ItemDisplayElementUtil.getModel(id("block/mechanical_drain_axle"));
         private final ItemDisplayElement catalyst;
         private final ItemDisplayElement main;
         private final ItemDisplayElement axle;

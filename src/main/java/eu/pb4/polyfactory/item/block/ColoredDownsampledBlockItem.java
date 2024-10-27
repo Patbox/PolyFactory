@@ -54,9 +54,9 @@ public class ColoredDownsampledBlockItem extends FactoryBlockItem implements Fir
             return color;
         }
 
-        var r = ColorHelper.Argb.getRed(color) & 0b11110000;
-        var g = ColorHelper.Argb.getGreen(color) & 0b11110000;
-        var b = ColorHelper.Argb.getBlue(color) & 0b11110000;
+        var r = ColorHelper.getRed(color) & 0b11110000;
+        var g = ColorHelper.getGreen(color) & 0b11110000;
+        var b = ColorHelper.getBlue(color) & 0b11110000;
 
         var full = r + g + b;
         if (full < (1 << 5) * 2) {
@@ -65,7 +65,7 @@ public class ColoredDownsampledBlockItem extends FactoryBlockItem implements Fir
             b += 1 << 5;
         }
 
-        return ColorHelper.Argb.getArgb(0, r, g, b);
+        return ColorHelper.getArgb(0, r, g, b);
     }
 
     @Override

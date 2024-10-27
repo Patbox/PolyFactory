@@ -1,8 +1,8 @@
 package eu.pb4.polyfactory.block.data.providers;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
 import eu.pb4.polyfactory.block.data.DataProvider;
+import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
 import eu.pb4.polyfactory.block.data.util.GenericDirectionalDataBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.data.DataContainer;

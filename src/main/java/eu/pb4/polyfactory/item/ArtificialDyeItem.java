@@ -2,10 +2,11 @@ package eu.pb4.polyfactory.item;
 
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.factorytools.api.item.FireworkStarColoredItem;
-import eu.pb4.factorytools.api.item.ModeledItem;
+import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.SignChangingItem;
@@ -23,11 +24,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArtificialDyeItem extends ModeledItem implements SignChangingItem, FireworkStarColoredItem, ColoredItem {
+public class ArtificialDyeItem extends Item implements SignChangingItem, FireworkStarColoredItem, ColoredItem {
     public static final ThreadLocal<List<ItemStack>> CURRENT_DYES = ThreadLocal.withInitial(ArrayList::new);
 
     public ArtificialDyeItem(Settings settings) {
-        super(Items.FIREWORK_STAR, settings);
+        super(settings);
     }
 
 
@@ -77,9 +78,9 @@ public class ArtificialDyeItem extends ModeledItem implements SignChangingItem, 
                     var rgb = DyeColorExtra.getColor(possibleColor);
 
                     var possibleDistance = Math.sqrt(
-                            Math.abs(ColorHelper.Argb.getRed(rgb) - ColorHelper.Argb.getRed(color)) +
-                                    Math.abs(ColorHelper.Argb.getGreen(rgb) - ColorHelper.Argb.getGreen(color)) +
-                                    Math.abs(ColorHelper.Argb.getBlue(rgb) - ColorHelper.Argb.getBlue(color))
+                            Math.abs(ColorHelper.getRed(rgb) - ColorHelper.getRed(color)) +
+                                    Math.abs(ColorHelper.getGreen(rgb) - ColorHelper.getGreen(color)) +
+                                    Math.abs(ColorHelper.getBlue(rgb) - ColorHelper.getBlue(color))
                     );
 
                     if (possibleDistance < distance) {

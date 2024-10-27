@@ -36,6 +36,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
@@ -135,7 +136,7 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
         if (hitResult.getType() != HitResult.Type.MISS) {
             this.hitOrDeflect(hitResult);
         }
-        this.checkBlockCollision();
+        //this.checkBlockCollision();
         this.updateRotation();
 
         if (this.isAlive()) {
@@ -219,7 +220,7 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     }
 
     @Override
-    public EntityType<?> getPolymerEntityType(ServerPlayerEntity player) {
+    public EntityType<?> getPolymerEntityType(PacketContext player) {
         return EntityType.ITEM_DISPLAY;
     }
 

@@ -3,7 +3,10 @@ package eu.pb4.polyfactory.block.property;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.util.TriState;
-import net.minecraft.state.property.*;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Direction;
 
@@ -46,6 +49,6 @@ public interface FactoryProperties {
     IntProperty FRONT = IntProperty.of("front", 0, 3);
     BooleanProperty POSITIVE_CONNECTED = BooleanProperty.of("positive_connected");
     BooleanProperty NEGATIVE_CONNECTED = BooleanProperty.of("negative_connected");
-    DirectionProperty HORIZONTAL_DIRECTION = DirectionProperty.of("direction", Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
+    EnumProperty<Direction> HORIZONTAL_DIRECTION = EnumProperty.of("direction", Direction.class, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
     BooleanProperty LOCKED = BooleanProperty.of("locked");
 }

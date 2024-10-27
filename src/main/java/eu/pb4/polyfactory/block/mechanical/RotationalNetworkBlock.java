@@ -1,20 +1,11 @@
 package eu.pb4.polyfactory.block.mechanical;
 
-import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
+import net.minecraft.world.WorldView;
 
 public abstract class RotationalNetworkBlock extends NetworkBlock implements NetworkComponent.Rotational {
     protected RotationalNetworkBlock(Settings settings) {
@@ -22,7 +13,7 @@ public abstract class RotationalNetworkBlock extends NetworkBlock implements Net
     }
 
     @Override
-    protected void updateNetworkAt(WorldAccess world, BlockPos pos) {
+    protected void updateNetworkAt(WorldView world, BlockPos pos) {
         NetworkComponent.Rotational.updateRotationalAt(world, pos);
     }
 

@@ -1,16 +1,15 @@
 package eu.pb4.polyfactory.block.data;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
-import eu.pb4.factorytools.api.advancement.TriggerCriterion;
-import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
-import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.nodes.generic.SelectiveSideNode;
 import eu.pb4.polyfactory.util.ColorProvider;
@@ -42,13 +41,14 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.List;
 import java.util.function.BiPredicate;
 
 public abstract class AbstractCableBlock extends NetworkBlock implements BlockEntityProvider, CableConnectable, NetworkComponent.Data, NetworkComponent.Energy {
@@ -80,13 +80,13 @@ public abstract class AbstractCableBlock extends NetworkBlock implements BlockEn
             }
             world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS);
 
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         } else if (player.getStackInHand(hand).isOf(FactoryItems.TREATED_DRIED_KELP)
                 && setColor(state, world, pos, DEFAULT_COLOR)
         ) {
             world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS);
 
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
         return super.onUse(state, world, pos, player, hit);
@@ -166,7 +166,7 @@ public abstract class AbstractCableBlock extends NetworkBlock implements BlockEn
     }
 
     @Override
-    protected void updateNetworkAt(WorldAccess world, BlockPos pos) {
+    protected void updateNetworkAt(WorldView world, BlockPos pos) {
         NetworkComponent.Data.updateDataAt(world, pos);
         NetworkComponent.Energy.updateEnergyAt(world, pos);
     }
@@ -177,15 +177,15 @@ public abstract class AbstractCableBlock extends NetworkBlock implements BlockEn
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
         return isDirectionBlocked(state, direction) ? state : state.with(FACING_PROPERTIES.get(direction), canConnectTo(world, getColor(world, pos), neighborPos, neighborState, direction.getOpposite()));
     }
 
-    public static int getColor(WorldAccess world, BlockPos pos) {
+    public static int getColor(WorldView world, BlockPos pos) {
         return world.getBlockEntity(pos) instanceof ColorProvider be ? be.getColor() : DEFAULT_COLOR;
     }
 
-    protected boolean canConnectTo(WorldAccess world, int ownColor, BlockPos neighborPos, BlockState neighborState, Direction direction) {
+    protected boolean canConnectTo(WorldView world, int ownColor, BlockPos neighborPos, BlockState neighborState, Direction direction) {
         return neighborState.getBlock() instanceof CableConnectable connectable && connectable.canCableConnect(world, ownColor, neighborPos, neighborState, direction);
     }
 
@@ -216,7 +216,7 @@ public abstract class AbstractCableBlock extends NetworkBlock implements BlockEn
     }
 
     @Override
-    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         if (world.getBlockEntity(pos) instanceof ColorProvider be) {
             return be.getColor() == cableColor || be.isDefaultColor() || cableColor == DEFAULT_COLOR;
         }

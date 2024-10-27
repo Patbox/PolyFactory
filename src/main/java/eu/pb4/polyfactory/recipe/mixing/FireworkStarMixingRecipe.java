@@ -69,17 +69,7 @@ public record FireworkStarMixingRecipe(double time,
     }
 
     @Override
-    public boolean fits(int width, int height) {
-        return VANILLA.fits(width, height);
-    }
-
-    @Override
-    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
-        return VANILLA.getResult(registryManager);
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<FireworkStarMixingRecipe> getSerializer() {
         return FactoryRecipeSerializers.MIXING_FIREWORK;
     }
 

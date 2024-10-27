@@ -10,7 +10,7 @@ public record PressInput(ItemStack input, ItemStack pattern) implements RecipeIn
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         return 2;
     }
 }

@@ -16,7 +16,7 @@ public record MixingInput(List<ItemStack> stacks, FluidContainerInput fluidConta
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         return this.stacks.size();
     }
 

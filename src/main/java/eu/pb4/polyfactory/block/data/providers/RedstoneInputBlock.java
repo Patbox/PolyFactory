@@ -1,9 +1,9 @@
 package eu.pb4.polyfactory.block.data.providers;
 
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.factorytools.api.block.RedstoneConnectable;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
-import eu.pb4.factorytools.api.block.RedstoneConnectable;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.LongData;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -24,7 +24,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 public class RedstoneInputBlock extends CabledDataProviderBlock implements RedstoneConnectable {
     public static final IntProperty POWER = RedstoneOutputBlock.POWER;
@@ -55,7 +58,8 @@ public class RedstoneInputBlock extends CabledDataProviderBlock implements Redst
         return MathHelper.clamp(receivedRedstonePower, 0, 15);
     }
 
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+    @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
         if (!world.isClient) {
             var power = state.get(POWER);
             var dir = state.get(FACING);
@@ -68,7 +72,7 @@ public class RedstoneInputBlock extends CabledDataProviderBlock implements Redst
     }
 
     @Override
-    public int sendData(WorldAccess world, BlockPos selfPos, DataContainer data) {
+    public int sendData(WorldView world, BlockPos selfPos, DataContainer data) {
         var i = super.sendData(world, selfPos, data);
         if (i > 0 && FactoryUtil.getClosestPlayer((World) world, selfPos, 32) instanceof ServerPlayerEntity player) {
             TriggerCriterion.trigger(player, FactoryTriggers.REDSTONE_IN);
@@ -87,7 +91,7 @@ public class RedstoneInputBlock extends CabledDataProviderBlock implements Redst
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 }

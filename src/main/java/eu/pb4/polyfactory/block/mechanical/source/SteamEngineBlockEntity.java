@@ -1,21 +1,19 @@
 package eu.pb4.polyfactory.block.mechanical.source;
 
-import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
-import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.ui.FuelSlot;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventories;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
@@ -69,8 +67,8 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
                 var stack = self.getStack(i);
 
                 if (!stack.isEmpty()) {
-                    var value = FuelRegistry.INSTANCE.get(stack.getItem());
-                    if (value != null) {
+                    var value = world.getFuelRegistry().getFuelTicks(stack);
+                    if (value > 0) {
                         var remainder = stack.getRecipeRemainder();
                         stack.decrement(1);
                         self.fuelTicks = value * 10;
@@ -139,7 +137,7 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
 
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return AbstractFurnaceBlockEntity.canUseAsFuel(stack);
+        return this.world != null && this.world.getFuelRegistry().isFuel(stack);
     }
 
     @Override
@@ -157,9 +155,9 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X2, player, false);
             this.setTitle(GuiTextures.STEAM_ENGINE.apply(SteamEngineBlockEntity.this.getCachedState().getBlock().getName()));
-            this.setSlotRedirect(9 + 3, new FuelSlot(SteamEngineBlockEntity.this, 0, 0, 0));
-            this.setSlotRedirect(9 + 4, new FuelSlot(SteamEngineBlockEntity.this, 1, 1, 0));
-            this.setSlotRedirect(9 + 5, new FuelSlot(SteamEngineBlockEntity.this, 2, 2, 0));
+            this.setSlotRedirect(9 + 3, new FuelSlot(SteamEngineBlockEntity.this, 0, player.getServerWorld().getFuelRegistry()));
+            this.setSlotRedirect(9 + 4, new FuelSlot(SteamEngineBlockEntity.this, 1, player.getServerWorld().getFuelRegistry()));
+            this.setSlotRedirect(9 + 5, new FuelSlot(SteamEngineBlockEntity.this, 2, player.getServerWorld().getFuelRegistry()));
             this.setSlot(4, GuiTextures.FLAME.get(progress()));
             this.active = SteamEngineBlockEntity.this.fuelTicks > 0;
             this.open();

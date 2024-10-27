@@ -45,9 +45,9 @@ public class LavaSplashEntity extends SplashEntity<Unit> {
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         if (this.random.nextFloat() < 0.3) {
-            if (entityHitResult.getEntity() instanceof LivingEntity livingEntity && this.canDamageEntity(livingEntity)) {
+            if (this.getWorld() instanceof ServerWorld world && entityHitResult.getEntity() instanceof LivingEntity livingEntity && this.canDamageEntity(livingEntity)) {
                 livingEntity.setOnFireFor(3);
-                livingEntity.damage(this.getDamageSources().create(DamageTypes.LAVA, this, this.getOwner()), 1F);
+                livingEntity.damage(world, this.getDamageSources().create(DamageTypes.LAVA, this, this.getOwner()), 1F);
             }
         }
         super.onEntityHit(entityHitResult);

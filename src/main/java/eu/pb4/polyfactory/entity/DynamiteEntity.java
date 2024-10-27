@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.entity;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.data.DataTracker;
@@ -23,6 +23,7 @@ import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
@@ -82,7 +83,7 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
                 this.hitOrDeflect(hitResult);
             }
         }
-        this.checkBlockCollision();
+        //this.checkBlockCollision();
         this.updateRotation();
 
         boolean move = true;
@@ -136,7 +137,7 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
     }
 
     @Override
-    public EntityType<?> getPolymerEntityType(ServerPlayerEntity player) {
+    public EntityType<?> getPolymerEntityType(PacketContext context) {
         return EntityType.ITEM_DISPLAY;
     }
 
@@ -152,8 +153,8 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
     }
 
     @Override
-    public Vec3d getClientSidePosition(Vec3d vec3d) {
-        return vec3d.add(0, this.getHeight() / 2, 0);
+    public Vec3d getSyncedPos() {
+        return super.getSyncedPos().add(0, this.getHeight() / 2, 0);
     }
 
     @Override

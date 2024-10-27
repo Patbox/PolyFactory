@@ -2,13 +2,12 @@ package eu.pb4.polyfactory.block.electric;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.factorytools.api.block.ItemUseLimiter;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.AxisAndFacingNetworkBlock;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.electric.EnergyData;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
@@ -26,26 +25,27 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
 
-public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements FactoryBlock, CableConnectable, RotationUser, EnergyUser, ItemUseLimiter.All {
+public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements FactoryBlock, CableConnectable, RotationUser, EnergyUser  {
     public ElectricGeneratorBlock(Settings settings) {
         super(settings);
     }
 
     @Override
-    protected void updateNetworkAt(WorldAccess world, BlockPos pos) {
+    protected void updateNetworkAt(WorldView world, BlockPos pos) {
         Rotational.updateRotationalAt(world, pos);
         Energy.updateEnergyAt(world, pos);
     }
@@ -73,12 +73,12 @@ public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
@@ -101,7 +101,7 @@ public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!player.isSneaking() && hit.getSide() != state.get(FACING) && player.isCreative() && world.getBlockEntity(pos) instanceof ElectricMotorBlockEntity be && player instanceof ServerPlayerEntity serverPlayer) {
             be.openGui(serverPlayer);
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
         return ActionResult.PASS;
     }
@@ -112,7 +112,7 @@ public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements
     }
 
     @Override
-    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         return state.get(FACING) == dir;
     }
 
@@ -132,7 +132,7 @@ public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements
         }
 
         private void updateAnimation(float speed, BlockState state) {
-            mat.identity();
+            var mat = mat();
             switch (getAxis(state)) {
                 case X -> mat.rotate(Direction.EAST.getRotationQuaternion());
                 case Z -> mat.rotate(Direction.SOUTH.getRotationQuaternion());
@@ -159,7 +159,7 @@ public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements
         }
 
         private void updateStatePos(BlockState state) {
-            mat.identity();
+            var mat = mat();
             mat.rotate(state.get(FIRST_AXIS) ? MathHelper.HALF_PI : 0, state.get(FACING).getUnitVector());
             mat.rotate(state.get(FACING).getRotationQuaternion());
             mat.scale(2f);

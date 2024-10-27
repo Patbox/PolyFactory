@@ -180,7 +180,7 @@ public class PolydexCompatImpl {
     public static List<PolydexIngredient<?>> createIngredients(List<CountedIngredient> input) {
         var list = new ArrayList<PolydexIngredient<?>>(input.size());
         for (var x : input) {
-            list.add(PolydexIngredient.of(x.ingredient(), Math.max(x.count(), 1), 1));
+            list.add(PolydexIngredient.of(x.ingredient().orElse(null), Math.max(x.count(), 1), 1));
         }
         return list;
     }
@@ -188,7 +188,7 @@ public class PolydexCompatImpl {
     public static List<PolydexIngredient<?>> createIngredients(List<CountedIngredient> input, List<FluidInputStack> fluids) {
         var list = new ArrayList<PolydexIngredient<?>>(input.size());
         for (var x : input) {
-            list.add(PolydexIngredient.of(x.ingredient(), Math.max(x.count(), 1), 1));
+            list.add(PolydexIngredient.of(x.ingredient().orElse(null), Math.max(x.count(), 1), 1));
         }
         for (var x : fluids) {
             list.add(new PolydexFluidStack(x.instance(), x.required(), 1));
@@ -199,7 +199,7 @@ public class PolydexCompatImpl {
     public static List<PolydexIngredient<?>> createIngredientsReg(List<CountedIngredient> input, List<FluidStack<?>> fluids) {
         var list = new ArrayList<PolydexIngredient<?>>(input.size());
         for (var x : input) {
-            list.add(PolydexIngredient.of(x.ingredient(), Math.max(x.count(), 1), 1));
+            list.add(PolydexIngredient.of(x.ingredient().orElse(null), Math.max(x.count(), 1), 1));
         }
         for (var x : fluids) {
             list.add(new PolydexFluidStack(x.instance(), x.amount(), 1));

@@ -17,7 +17,7 @@ public abstract class PrioritizedRecipePage<T extends Recipe<?>> extends Abstrac
         super(recipe);
         var priotity = 0;
         try {
-            priotity = Registries.ITEM.getId(recipe.value().getResult(GLOBAL).getItem())
+            priotity = Registries.ITEM.getId(getOutput(null, null).getItem())
                     .getNamespace().startsWith(Identifier.DEFAULT_NAMESPACE) ? 0 : 10;
         } catch (Throwable e) {
             // No op

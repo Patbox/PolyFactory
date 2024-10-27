@@ -3,21 +3,15 @@ package eu.pb4.polyfactory.block.mechanical;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
-import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
-import eu.pb4.polyfactory.nodes.generic.SimpleDirectionNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.factorytools.api.util.VirtualDestroyStage;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
-import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -29,17 +23,13 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenTexts;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -47,8 +37,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -56,7 +49,7 @@ import java.util.List;
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
 public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider, WrenchableBlock {
-    public static final DirectionProperty FACING = Properties.FACING;
+    public static final EnumProperty<Direction> FACING = Properties.FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
     public static final BooleanProperty REVERSE = BooleanProperty.of("reverse");
 
@@ -81,9 +74,10 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
         super.onBlockAdded(state,world,pos, oldState, notify);
     }
 
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+    @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
         this.updateEnabled(world, pos, state);
-        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
     }
 
     private void updateEnabled(World world, BlockPos pos, BlockState state) {
@@ -126,12 +120,12 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
@@ -155,7 +149,7 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
         modifier.stress(0.1);
     }
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack ITEM_MODEL = new ItemStack(BaseItemProvider.requestModel());
+        public static final ItemStack ITEM_MODEL = ItemDisplayElementUtil.getModel(id("block/fan_rotating"));
 
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement fan;
@@ -165,6 +159,8 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
         private Model(BlockState state) {
             this.mainElement = ItemDisplayElementUtil.createSimple(FactoryItems.FAN);
             this.mainElement.setScale(new Vector3f(2f));
+            var rot = new Quaternionf().rotateX(MathHelper.HALF_PI);
+            this.mainElement.setRightRotation(rot);
 
             this.fan = LodItemDisplayElement.createSimple(ITEM_MODEL, 2, 0.2f, 0.4f);
             this.fan.setViewRange(0.3f);
@@ -183,10 +179,12 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
             float y = 0;
 
             if (dir.getAxis() != Direction.Axis.Y) {
-                p = 90;
+                p = 0;
                 y = dir.asRotation();
             } else if (dir == Direction.DOWN) {
-                p = 180;
+                p = 90;
+            } else {
+                p = -90;
             }
 
 
@@ -199,7 +197,8 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
         private void updateAnimation(double speed) {
             this.rotation += ((float) Math.min((this.reverse ? -speed : speed) * MathHelper.RADIANS_PER_DEGREE * 3, RotationConstants.MAX_ROTATION_PER_TICK_2)) % MathHelper.TAU;
 
-            mat.identity();
+            var mat = mat();
+            mat.rotateX(MathHelper.HALF_PI);
             mat.rotateY(this.rotation);
             mat.scale(2);
             this.fan.setTransformation(mat);
@@ -220,10 +219,6 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 updateStatePos(this.blockState());
             }
-        }
-
-        static {
-            ITEM_MODEL.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(ITEM_MODEL.getItem(), id("block/fan_rotating")).value()));
         }
     }
 }

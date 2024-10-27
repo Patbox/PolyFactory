@@ -3,14 +3,12 @@ package eu.pb4.polyfactory.block.data;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.base.AxisAndFacingBlock;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.data.DataContainer;
-import eu.pb4.polyfactory.data.StringData;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.nodes.DirectionNode;
@@ -23,20 +21,23 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.util.Identifier;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -44,9 +45,9 @@ import java.util.List;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public abstract class DoubleInputTransformerBlock extends DataNetworkBlock implements BlockEntityProvider, FactoryBlock, CableConnectable, DataProvider, DataReceiver, WrenchableBlock {
-    public static final DirectionProperty FACING_INPUT_1 = DirectionProperty.of("facing_input_1");
-    public static final DirectionProperty FACING_INPUT_2 = DirectionProperty.of("facing_input_2");
-    public static final DirectionProperty FACING_OUTPUT = DirectionProperty.of("facing_output");
+    public static final EnumProperty<Direction> FACING_INPUT_1 = EnumProperty.of("facing_input_1", Direction.class);
+    public static final EnumProperty<Direction> FACING_INPUT_2 = EnumProperty.of("facing_input_2", Direction.class);
+    public static final EnumProperty<Direction> FACING_OUTPUT = EnumProperty.of("facing_output", Direction.class);
 
      protected static final List<WrenchAction> WRENCH_ACTIONS = List.of(
             WrenchAction.ofDirection(FACING_INPUT_1),
@@ -92,12 +93,12 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
@@ -108,7 +109,7 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
     }
 
     @Override
-    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         return state.get(FACING_INPUT_1) == dir
                 || state.get(FACING_INPUT_2) == dir
                 || state.get(FACING_OUTPUT) == dir;
@@ -182,9 +183,9 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
     }
 
     public static class Model extends BlockModel {
-        public static final ItemStack INPUT_A = BaseItemProvider.requestModel(id("block/data_cube_connector_input_a"));
-        public static final ItemStack INPUT_B = BaseItemProvider.requestModel(id("block/data_cube_connector_input_b"));
-        public static final ItemStack OUTPUT = BaseItemProvider.requestModel(id("block/data_cube_connector_output"));
+        public static final ItemStack INPUT_A = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_input_a"));
+        public static final ItemStack INPUT_B = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_input_b"));
+        public static final ItemStack OUTPUT = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_output"));
         private final ItemDisplayElement base;
         private final ItemDisplayElement inputA;
         private final ItemDisplayElement inputB;
@@ -207,7 +208,7 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
             this.addElement(this.output);
         }
 
-        private void updateStatePos(BlockState state, DirectionProperty property, ItemDisplayElement element) {
+        private void updateStatePos(BlockState state, EnumProperty<Direction> property, ItemDisplayElement element) {
             var dir = state.get(property);
             float p = -90;
             float y = 0;

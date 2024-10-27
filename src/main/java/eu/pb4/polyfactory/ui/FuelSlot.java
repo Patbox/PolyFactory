@@ -1,18 +1,21 @@
 package eu.pb4.polyfactory.ui;
 
-import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.FuelRegistry;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 
 public class FuelSlot extends Slot {
-    public FuelSlot(Inventory inventory, int index, int x, int y) {
-        super(inventory, index, x, y);
+    private final FuelRegistry fuelRegistry;
+
+    public FuelSlot(Inventory inventory, int index, FuelRegistry fuelRegistry) {
+        super(inventory, index, index, 0);
+        this.fuelRegistry = fuelRegistry;
     }
 
     public boolean canInsert(ItemStack stack) {
-        return FuelRegistry.INSTANCE.get(stack.getItem()) != null || isBucket(stack);
+        return fuelRegistry.isFuel(stack) || isBucket(stack);
     }
 
     public int getMaxItemCount(ItemStack stack) {

@@ -4,6 +4,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeMatcher;
 
 import java.util.ArrayList;
@@ -32,13 +33,6 @@ public record WrappingInputRecipeInput(Inventory source, int start, int size, in
         }
 
         return stacks;
-    }
-
-    @Override
-    public void provideRecipeInputs(RecipeMatcher finder) {
-        for (int i = 0; i < size; i++) {
-            finder.addInput(this.getStack(i));
-        }
     }
 
     @Override
@@ -87,6 +81,13 @@ public record WrappingInputRecipeInput(Inventory source, int start, int size, in
     public void clear() {
         for (int i = 0; i < this.size; i++) {
             this.setStack(i, ItemStack.EMPTY);
+        }
+    }
+
+    @Override
+    public void provideRecipeInputs(RecipeFinder finder) {
+        for (int i = 0; i < this.size; i++) {
+            finder.addInput(this.getStack(i));
         }
     }
 }

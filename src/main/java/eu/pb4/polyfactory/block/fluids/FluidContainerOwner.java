@@ -4,7 +4,6 @@ import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 

@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(AbstractCauldronBlock.class)
@@ -13,7 +14,7 @@ public class AbstractCauldronBlockMixin implements PipeConnectable {
 
     @SuppressWarnings("AddedMixinMembersNamePattern")
     @Override
-    public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
         return true;
     }
 }

@@ -1,37 +1,39 @@
 package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ColoredItem;
-import eu.pb4.factorytools.api.virtualentity.BlockModel;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.block.*;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.RedstoneLampBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FireworkExplosionComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtIntArray;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
+
+import static eu.pb4.polyfactory.ModInit.id;
 
 public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockEntityProvider, BlockStateNameProvider {
     private final boolean inverted;
@@ -71,7 +73,7 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState();
     }
 
@@ -105,12 +107,12 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
     }
 
     @Override
-    public boolean isTransparent(BlockState state, BlockView world, BlockPos pos) {
+    protected boolean isTransparent(BlockState state) {
         return true;
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.GLASS.getDefaultState();
     }
 
@@ -145,7 +147,8 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
         }
 
         private void updateModel() {
-            var stack = ItemDisplayElementUtil.getModel(this.state.get(LIT) == this.inverted ? FactoryItems.LAMP : FactoryItems.INVERTED_LAMP).copy();
+            var stack = new ItemStack(Items.FIREWORK_STAR);
+            stack.set(DataComponentTypes.ITEM_MODEL, this.state.get(LIT) == this.inverted ? id("colored_lamp") : id("inverted_colored_lamp"));
             stack.set(DataComponentTypes.FIREWORK_EXPLOSION, new FireworkExplosionComponent(FireworkExplosionComponent.Type.BURST, IntList.of(this.color), IntList.of(), false, false));
             this.main.setItem(stack);
             this.tick();

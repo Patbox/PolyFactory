@@ -2,7 +2,6 @@ package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
-import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlock;
 import eu.pb4.polyfactory.ui.WorkbenchScreenHandler;
@@ -16,10 +15,7 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.CraftingRecipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeMatcher;
-import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.*;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
@@ -142,9 +138,9 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
     }
 
     @Override
-    public void provideRecipeInputs(RecipeMatcher finder) {
+    public void provideRecipeInputs(RecipeFinder finder) {
         for (int i = 0; i < 9; i++) {
-            finder.addUnenchantedInput(this.getStack(i));
+            finder.addInput(this.getStack(i));
         }
     }
 

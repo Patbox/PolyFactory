@@ -40,6 +40,11 @@ public abstract class DrainRecipePage<T extends DrainRecipe> extends Prioritized
         this.output.addAll(PolydexCompatImpl.createFluids(getResultFluids()));
     }
 
+    @Override
+    public ItemStack getOutput(@Nullable PolydexEntry polydexEntry, MinecraftServer minecraftServer) {
+        return getResultStack();
+    }
+
     protected abstract ItemStack getResultStack();
     protected abstract List<FluidStack<?>> getBaseFluids();
     protected abstract List<FluidStack<?>> getResultFluids();

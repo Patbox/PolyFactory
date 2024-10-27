@@ -10,10 +10,13 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 public class FluidModelItem extends Item implements PolymerItem {
     public <T extends Block & PolymerBlock> FluidModelItem(Settings settings) {
@@ -21,24 +24,24 @@ public class FluidModelItem extends Item implements PolymerItem {
     }
 
     @Override
-    public Item getPolymerItem(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
+    public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
         var x = getFluid(itemStack);
         if (x != null) {
             return FactoryModels.FLUID_FLAT_FULL.getRaw(x).getItem();
         }
 
-        return FactoryModels.PLACEHOLDER.item();
+        return Items.PAPER;
     }
 
     @Override
-    public int getPolymerCustomModelData(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
+    public Identifier getPolymerItemModel(ItemStack itemStack, PacketContext context) {
         var x = getFluid(itemStack);
         if (x != null) {
             //noinspection DataFlowIssue
-            return FactoryModels.FLUID_FLAT_FULL.getRaw(x).get(DataComponentTypes.CUSTOM_MODEL_DATA).value();
+            return FactoryModels.FLUID_FLAT_FULL.getRaw(x).get(DataComponentTypes.ITEM_MODEL);
         }
 
-        return FactoryModels.PLACEHOLDER.value();
+        return FactoryModels.PLACEHOLDER;
     }
 
     private FluidInstance<?> getFluid(ItemStack itemStack) {
@@ -46,8 +49,8 @@ public class FluidModelItem extends Item implements PolymerItem {
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, RegistryWrapper.WrapperLookup lookup, @Nullable ServerPlayerEntity player) {
-        var base = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, lookup, player);
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, PacketContext context) {
+        var base = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, context);
 
         //noinspection unchecked
         var x = (FluidInstance<Object>) getFluid(itemStack);

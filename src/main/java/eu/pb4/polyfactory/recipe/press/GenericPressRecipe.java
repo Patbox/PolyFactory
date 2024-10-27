@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.factorytools.api.recipe.OutputStack;
+import eu.pb4.factorytools.api.util.ItemComponentPredicate;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.*;
@@ -20,6 +21,7 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Optional;
 
 public record GenericPressRecipe(CountedIngredient inputA, CountedIngredient inputB, List<OutputStack> output, double minimumSpeed) implements PressRecipe {
     public static final MapCodec<GenericPressRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
@@ -31,19 +33,19 @@ public record GenericPressRecipe(CountedIngredient inputA, CountedIngredient inp
     );
 
     public static RecipeEntry<GenericPressRecipe> of(String string, CountedIngredient inputA, CountedIngredient inputB, double minimumSpeed, OutputStack... outputs) {
-        return new RecipeEntry<>(FactoryUtil.id("press/" + string), new GenericPressRecipe(inputA, inputB, List.of(outputs), minimumSpeed));
+        return new RecipeEntry<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe(inputA, inputB, List.of(outputs), minimumSpeed));
     }
 
     public static RecipeEntry<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, OutputStack... outputs) {
-        return new RecipeEntry<>(FactoryUtil.id("press/" + string), new GenericPressRecipe(new CountedIngredient(ingredient, inputCount, ItemStack.EMPTY), CountedIngredient.EMPTY, List.of(outputs), minimumSpeed));
+        return new RecipeEntry<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe(new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY), CountedIngredient.EMPTY, List.of(outputs), minimumSpeed));
     }
 
     public static RecipeEntry<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, ItemStack output) {
-        return new RecipeEntry<>(FactoryUtil.id("press/" + string), new GenericPressRecipe(new CountedIngredient(ingredient, inputCount, ItemStack.EMPTY), CountedIngredient.EMPTY, List.of(new OutputStack(output, 1, 1)),  minimumSpeed));
+        return new RecipeEntry<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe(new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY), CountedIngredient.EMPTY, List.of(new OutputStack(output, 1, 1)),  minimumSpeed));
     }
 
     public static RecipeEntry<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, ItemConvertible output) {
-        return new RecipeEntry<>(FactoryUtil.id("press/" + string), new GenericPressRecipe(new CountedIngredient(ingredient, inputCount, ItemStack.EMPTY), CountedIngredient.EMPTY, List.of(new OutputStack(output.asItem().getDefaultStack(), 1, 1)), minimumSpeed));
+        return new RecipeEntry<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe(new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY), CountedIngredient.EMPTY, List.of(new OutputStack(output.asItem().getDefaultStack(), 1, 1)), minimumSpeed));
     }
 
     @Override
@@ -79,29 +81,10 @@ public record GenericPressRecipe(CountedIngredient inputA, CountedIngredient inp
         return ItemStack.EMPTY;
     }
 
-    @Override
-    public boolean fits(int width, int height) {
-        return true;
-    }
-
-    @Deprecated
-    @Override
-    public ItemStack getResult(RegistryWrapper.WrapperLookup registryManager) {
-        return this.output.isEmpty() ? ItemStack.EMPTY : this.output.get(0).stack();
-    }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<GenericPressRecipe> getSerializer() {
         return FactoryRecipeSerializers.PRESS_GENERIC;
     }
 
-    @Override
-    public DefaultedList<Ingredient> getIngredients() {
-        return DefaultedList.copyOf(null, this.inputA.ingredient(), this.inputB.ingredient());
-    }
-
-    @Override
-    public ItemStack createIcon() {
-        return FactoryItems.PRESS.getDefaultStack();
-    }
 }

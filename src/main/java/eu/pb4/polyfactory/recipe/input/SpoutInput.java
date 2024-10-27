@@ -21,7 +21,7 @@ public record SpoutInput(ItemStack stack,  FluidContainerInput fluidContainer, S
         return stack;
     }
     @Override
-    public int getSize() {
+    public int size() {
         return 1;
     }
     public long getFluid(FluidInstance<?> type) {

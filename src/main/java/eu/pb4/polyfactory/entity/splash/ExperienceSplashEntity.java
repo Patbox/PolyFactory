@@ -7,6 +7,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -40,8 +41,8 @@ public class ExperienceSplashEntity extends SplashEntity<Unit> {
     }
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (this.canDamageEntity(entityHitResult.getEntity())) {
-            entityHitResult.getEntity().damage(this.getDamageSources().create(FactoryDamageTypes.EXPERIENCE_SPLASH, this, this.getOwner()), 0.5F * amount);
+        if (this.getWorld() instanceof ServerWorld world && this.canDamageEntity(entityHitResult.getEntity())) {
+            entityHitResult.getEntity().damage(world, this.getDamageSources().create(FactoryDamageTypes.EXPERIENCE_SPLASH, this, this.getOwner()), 0.5F * amount);
         }
         super.onEntityHit(entityHitResult);
     }

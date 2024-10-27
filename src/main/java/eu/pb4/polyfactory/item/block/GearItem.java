@@ -6,7 +6,7 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.factorytools.api.item.ModeledItem;
+import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -18,7 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import java.util.List;
 
-public class GearItem extends ModeledItem {
+public class GearItem extends SimplePolymerItem {
     private final AxleWithGearBlock block;
 
     public GearItem(AxleWithGearBlock block, Settings settings) {
@@ -56,7 +56,7 @@ public class GearItem extends ModeledItem {
             }
 
 
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
         return super.useOnBlock(context);

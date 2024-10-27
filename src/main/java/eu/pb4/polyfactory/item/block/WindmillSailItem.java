@@ -7,11 +7,12 @@ import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
 import eu.pb4.factorytools.api.item.FireworkStarColoredItem;
-import eu.pb4.factorytools.api.item.ModeledItem;
+import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
@@ -20,9 +21,9 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
 
-public class WindmillSailItem extends ModeledItem implements FireworkStarColoredItem {
+public class WindmillSailItem extends Item implements FireworkStarColoredItem {
     public WindmillSailItem(Settings settings) {
-        super(Items.FIREWORK_STAR, settings);
+        super(settings);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class WindmillSailItem extends ModeledItem implements FireworkStarColored
                 be.addSail(0, context.getStack());
             }
 
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         } else if (oldState.isOf(FactoryBlocks.WINDMILL)) {
             var count = oldState.get(WindmillBlock.SAIL_COUNT) + 1;
             if (count > WindmillBlock.MAX_SAILS) {
@@ -82,7 +83,7 @@ public class WindmillSailItem extends ModeledItem implements FireworkStarColored
                         RotationData.State.SPECIAL.clear();
                     }
                 }
-                return ActionResult.SUCCESS;
+                return ActionResult.SUCCESS_SERVER;
             }
         }
 

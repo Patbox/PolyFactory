@@ -80,9 +80,10 @@ public class PRTKeySetterCraftingRecipe extends SpecialCraftingRecipe {
         return x;
     }
 
+
     @Override
-    public DefaultedList<ItemStack> getRemainder(CraftingRecipeInput inventory) {
-        DefaultedList<ItemStack> defaultedList = DefaultedList.ofSize(inventory.getSize(), ItemStack.EMPTY);
+    public DefaultedList<ItemStack> getRecipeRemainders(CraftingRecipeInput inventory) {
+        DefaultedList<ItemStack> defaultedList = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
 
         for(int i = 0; i < defaultedList.size(); ++i) {
             if (!inventory.getStackInSlot(i).isOf(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
@@ -93,13 +94,9 @@ public class PRTKeySetterCraftingRecipe extends SpecialCraftingRecipe {
         return defaultedList;
     }
 
-    @Override
-    public boolean fits(int width, int height) {
-        return width * height >= 1;
-    }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<PRTKeySetterCraftingRecipe> getSerializer() {
         return FactoryRecipeSerializers.CRAFTING_PRT_KEY_SETTER;
     }
 }

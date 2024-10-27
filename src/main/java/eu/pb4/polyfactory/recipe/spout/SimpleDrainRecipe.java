@@ -25,7 +25,7 @@ public record SimpleDrainRecipe(CountedIngredient item, Optional<Ingredient> cat
                                 ItemStack output, RegistryEntry<SoundEvent> soundEvent, boolean requirePlayer, double time) implements DrainRecipe {
     public static final MapCodec<SimpleDrainRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     CountedIngredient.CODEC.fieldOf("item").forGetter(SimpleDrainRecipe::item),
-                    Ingredient.ALLOW_EMPTY_CODEC.optionalFieldOf("catalyst").forGetter(SimpleDrainRecipe::catalyst),
+                    Ingredient.CODEC.optionalFieldOf("catalyst").forGetter(SimpleDrainRecipe::catalyst),
                     FluidStack.CODEC.listOf().optionalFieldOf("fluid_input", List.of()).forGetter(SimpleDrainRecipe::fluidInput),
                     FluidStack.CODEC.listOf().optionalFieldOf("fluid_output", List.of()).forGetter(SimpleDrainRecipe::fluidOutput),
                     ItemStack.UNCOUNTED_CODEC.fieldOf("result").forGetter(SimpleDrainRecipe::output),
@@ -75,17 +75,7 @@ public record SimpleDrainRecipe(CountedIngredient item, Optional<Ingredient> cat
     }
 
     @Override
-    public boolean fits(int width, int height) {
-        return true;
-    }
-
-    @Override
-    public ItemStack getResult(RegistryWrapper.WrapperLookup registriesLookup) {
-        return output;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<SimpleDrainRecipe> getSerializer() {
         return FactoryRecipeSerializers.DRAIN_SIMPLE;
     }
 

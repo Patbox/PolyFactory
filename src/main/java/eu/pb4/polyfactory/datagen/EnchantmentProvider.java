@@ -35,7 +35,7 @@ public class EnchantmentProvider extends FabricCodecDataProvider<Enchantment> {
     @Override
     protected void configure(BiConsumer<Identifier, Enchantment> provider, RegistryWrapper.WrapperLookup lookup) {
         provider.accept(FactoryEnchantments.IGNORE_MOVEMENT.getValue(), Enchantment.builder(
-                Enchantment.definition(lookup.getWrapperOrThrow(RegistryKeys.ITEM).getOrThrow(ItemTags.FOOT_ARMOR_ENCHANTABLE), 1 , 1,
+                Enchantment.definition(lookup.getOrThrow(RegistryKeys.ITEM).getOrThrow(ItemTags.FOOT_ARMOR_ENCHANTABLE), 1 , 1,
                         Enchantment.constantCost (5), Enchantment.constantCost(45), 6, AttributeModifierSlot.FEET))
                         .addNonListEffect(FactoryEnchantmentEffectComponents.CONVEYOR_PUSH_MULTIPLIER, new SetEnchantmentEffect(new EnchantmentLevelBasedValue.Constant(0)))
                         .addNonListEffect(FactoryEnchantmentEffectComponents.FAN_PUSH_MULTIPLIER, new SetEnchantmentEffect(new EnchantmentLevelBasedValue.Constant(0)))

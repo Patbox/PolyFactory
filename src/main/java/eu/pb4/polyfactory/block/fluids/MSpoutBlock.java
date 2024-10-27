@@ -25,16 +25,16 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4fStack;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -135,7 +135,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.ANVIL.getDefaultState();
     }
 
@@ -145,7 +145,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
     }
 
     @Override
-    protected void updateNetworkAt(WorldAccess world, BlockPos pos) {
+    protected void updateNetworkAt(WorldView world, BlockPos pos) {
         NetworkComponent.Rotational.updateRotationalAt(world, pos);
         NetworkComponent.Pipe.updatePipeAt(world, pos);
     }
@@ -156,7 +156,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
     }
 
     @Override
-    public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
         return dir == Direction.UP;
     }
 

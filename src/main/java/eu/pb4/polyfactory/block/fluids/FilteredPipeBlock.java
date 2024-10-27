@@ -3,8 +3,6 @@ package eu.pb4.polyfactory.block.fluids;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.factorytools.api.block.ItemUseLimiter;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
@@ -45,17 +43,21 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, WrenchableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe, ItemUseLimiter {
+public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, WrenchableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe {
     public static final EnumProperty<Direction.Axis> AXIS = Properties.AXIS;
     public static final BooleanProperty INVERTED = Properties.INVERTED;
 
@@ -91,7 +93,7 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Wre
     }
 
     @Override
-    protected void updateNetworkAt(WorldAccess world, BlockPos pos) {
+    protected void updateNetworkAt(WorldView world, BlockPos pos) {
         Pipe.updatePipeAt(world, pos);
     }
 
@@ -107,21 +109,16 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Wre
         if (func != null && world.getBlockEntity(pos) instanceof FilteredPipeBlockEntity be) {
             be.setAllowedFluid(func.apply(stack));
             be.markDirty();
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
         return super.onUse(state, world, pos, player, hit);
     }
 
     @Override
-    public boolean preventUseItemWhileTargetingBlock(ServerPlayerEntity player, BlockState blockState, World world, BlockHitResult result, ItemStack stack, Hand hand) {
-        return FluidBehaviours.ITEM_TO_FLUID.containsKey(stack.getItem());
-    }
-
-    @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        tickWater(state, world, pos);
-        return state;
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        tickWater(state, world, tickView, pos);
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
@@ -130,7 +127,7 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Wre
     }
 
     @Override
-    public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
         return dir.getAxis() == state.get(AXIS);
     }
 
@@ -162,7 +159,7 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Wre
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.COPPER_BLOCK.getDefaultState();
     }
 
@@ -177,7 +174,7 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Wre
     }
 
     public static final class Model extends RotationAwareModel {
-        private static final ItemStack NEGATED = BaseItemProvider.requestModel(FactoryUtil.requestTransparentItem(), id("block/filtered_pipe_negated"));
+        private static final ItemStack NEGATED = ItemDisplayElementUtil.getModel(id("block/filtered_pipe_negated"));
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement fluid;
         private Model(BlockState state, BlockPos pos) {

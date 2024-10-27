@@ -2,8 +2,8 @@ package eu.pb4.polyfactory.block.electric;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.factorytools.api.block.ItemUseLimiter;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
@@ -11,7 +11,6 @@ import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.electric.EnergyData;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
@@ -27,33 +26,33 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
 
-public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, BlockEntityProvider, CableConnectable, RotationUser, EnergyUser, WrenchableBlock, ItemUseLimiter.All {
-    public static final DirectionProperty FACING = Properties.FACING;
+public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, BlockEntityProvider, CableConnectable, RotationUser, EnergyUser, WrenchableBlock {
+    public static final EnumProperty<Direction> FACING = Properties.FACING;
 
     public ElectricMotorBlock(Settings settings) {
         super(settings);
     }
 
     @Override
-    protected void updateNetworkAt(WorldAccess world, BlockPos pos) {
+    protected void updateNetworkAt(WorldView world, BlockPos pos) {
         NetworkComponent.Rotational.updateRotationalAt(world, pos);
         NetworkComponent.Energy.updateEnergyAt(world, pos);
     }
@@ -90,12 +89,12 @@ public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, Bl
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
@@ -135,7 +134,7 @@ public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, Bl
     }
 
     @Override
-    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         return state.get(FACING) == dir.getOpposite();
     }
 
@@ -160,9 +159,9 @@ public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, Bl
         }
 
         private void updateAnimation(float speed, Direction facing) {
-            mat.identity();
+            var mat = mat();
             mat.rotate(facing.getOpposite().getRotationQuaternion());
-            mat.rotateY(((float) ((facing.getDirection() == Direction.AxisDirection.NEGATIVE) ? speed : -speed)));
+            mat.rotateY((facing.getDirection() == Direction.AxisDirection.NEGATIVE) ? speed : -speed);
 
             mat.scale(2f);
             this.axle.setTransformation(mat);

@@ -3,36 +3,25 @@ package eu.pb4.polyfactory.block.mechanical;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
-import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.factorytools.api.item.AutoModeledPolymerItem;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.factorytools.api.util.VirtualDestroyStage;
 import eu.pb4.polymer.common.impl.CommonImplUtils;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.core.impl.networking.PolymerServerProtocol;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
-import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
-import eu.pb4.polymer.virtualentity.api.BlockWithMovingElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.block.*;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -41,12 +30,18 @@ import net.minecraft.state.property.Property;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, WrenchableBlock, BarrierBasedWaterloggable {
     public static final Property<Direction.Axis> AXIS = Properties.AXIS;
@@ -63,9 +58,9 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, W
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        tickWater(state, world, pos);
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        tickWater(state, world, tickView, pos);
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Nullable
@@ -80,7 +75,7 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, W
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.STRIPPED_OAK_LOG.getDefaultState();
     }
 
@@ -100,8 +95,10 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, W
        return FactoryUtil.rotateAxis(state, AXIS, rotation);
     }
 
+
     @Override
-    public void onPolymerBlockSend(BlockState blockState, BlockPos.Mutable pos, ServerPlayerEntity player) {
+    public void onPolymerBlockSend(BlockState blockState, BlockPos.Mutable pos, PacketContext.NotNullWithPlayer context) {
+        var player = context.getPlayer();
         if (pos.getSquaredDistanceFromCenter(player.getX(), player.getY(), player.getZ()) < 16 * 16) {
             player.networkHandler.sendPacket(new BlockUpdateS2CPacket(pos.toImmutable(), Blocks.LIGHTNING_ROD.getDefaultState()
                     .with(Properties.FACING, Direction.from(blockState.get(AXIS), Direction.AxisDirection.POSITIVE))
@@ -112,7 +109,7 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, W
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return Blocks.BARRIER.getDefaultState().with(WATERLOGGED, state.get(WATERLOGGED));
     }
 
@@ -133,8 +130,8 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, W
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack ITEM_MODEL = new ItemStack(FactoryItems.AXLE.getPolymerItem());
-        public static final ItemStack ITEM_MODEL_SHORT = new ItemStack(BaseItemProvider.requestItem());
+        public static final ItemStack ITEM_MODEL = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/axle"));
+        public static final ItemStack ITEM_MODEL_SHORT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/axle_short"));
         private final ItemDisplayElement mainElement;
         private final Set<ServerPlayNetworkHandler> viewingClose = new ObjectOpenCustomHashSet<>(CommonImplUtils.IDENTITY_HASH);
         private final List<ServerPlayNetworkHandler> sentRod = new ArrayList<>();
@@ -148,7 +145,7 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, W
         }
 
         private void updateAnimation(float rotation, Direction.Axis axis) {
-            mat.identity();
+            var mat = mat();
             switch (axis) {
                 case X -> mat.rotate(Direction.EAST.getRotationQuaternion());
                 case Z -> mat.rotate(Direction.SOUTH.getRotationQuaternion());
@@ -213,11 +210,6 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, W
                 this.updateAnimation(this.getRotation(), this.blockAware().getBlockState().get(AXIS));
                 this.mainElement.startInterpolationIfDirty();
             }
-        }
-
-        static {
-            ITEM_MODEL.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(AutoModeledPolymerItem.MODELS.get(FactoryItems.AXLE).value()));
-            ITEM_MODEL_SHORT.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(ITEM_MODEL_SHORT.getItem(), FactoryUtil.id("block/axle_short")).value()));
         }
     }
 }

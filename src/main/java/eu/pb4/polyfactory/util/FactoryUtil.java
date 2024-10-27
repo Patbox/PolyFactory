@@ -1,7 +1,6 @@
 package eu.pb4.polyfactory.util;
 
 import com.mojang.authlib.GameProfile;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
@@ -28,11 +27,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
@@ -47,6 +50,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -59,66 +63,12 @@ public class FactoryUtil {
     public static final List<EquipmentSlot> ARMOR_EQUIPMENT = Arrays.stream(EquipmentSlot.values()).filter(x -> x.getType() == EquipmentSlot.Type.HUMANOID_ARMOR).toList();
 
     private static final List<Runnable> RUN_NEXT_TICK = new ArrayList<>();
-    private static final Item[] COLORED_MODEL_ITEMS = new Item[]{
-            Items.LEATHER_HELMET,
-            Items.LEATHER_CHESTPLATE,
-            Items.LEATHER_LEGGINGS,
-            Items.LEATHER_BOOTS,
-            Items.LEATHER_HORSE_ARMOR
-    };
-
-    private static final Item[] TRANSPARENT_MODEL_ITEMS = new Item[] {
-            Items.WHITE_STAINED_GLASS,
-            Items.ORANGE_STAINED_GLASS,
-            Items.MAGENTA_STAINED_GLASS,
-            Items.LIGHT_BLUE_STAINED_GLASS,
-            Items.YELLOW_STAINED_GLASS,
-            Items.LIME_STAINED_GLASS,
-            Items.PINK_STAINED_GLASS,
-            Items.GRAY_STAINED_GLASS,
-            Items.LIGHT_GRAY_STAINED_GLASS,
-            Items.CYAN_STAINED_GLASS,
-            Items.PURPLE_STAINED_GLASS,
-            Items.BLUE_STAINED_GLASS,
-            Items.BROWN_STAINED_GLASS,
-            Items.GREEN_STAINED_GLASS,
-            Items.RED_STAINED_GLASS,
-            Items.BLACK_STAINED_GLASS,
-            Items.WHITE_STAINED_GLASS_PANE,
-            Items.ORANGE_STAINED_GLASS_PANE,
-            Items.MAGENTA_STAINED_GLASS_PANE,
-            Items.LIGHT_BLUE_STAINED_GLASS_PANE,
-            Items.YELLOW_STAINED_GLASS_PANE,
-            Items.LIME_STAINED_GLASS_PANE,
-            Items.PINK_STAINED_GLASS_PANE,
-            Items.GRAY_STAINED_GLASS_PANE,
-            Items.LIGHT_GRAY_STAINED_GLASS_PANE,
-            Items.CYAN_STAINED_GLASS_PANE,
-            Items.PURPLE_STAINED_GLASS_PANE,
-            Items.BLUE_STAINED_GLASS_PANE,
-            Items.BROWN_STAINED_GLASS_PANE,
-            Items.GREEN_STAINED_GLASS_PANE,
-            Items.RED_STAINED_GLASS_PANE,
-            Items.BLACK_STAINED_GLASS_PANE
-    };
-
-
-    private static int coloredModelIndex = 0;
-    private static int transparentModelIndex = 0;
-
-    public static Item requestColoredItem() {
-        return COLORED_MODEL_ITEMS[(coloredModelIndex++) % COLORED_MODEL_ITEMS.length];
-    }
-
-    public static Item requestTransparentItem() {
-        return TRANSPARENT_MODEL_ITEMS[(transparentModelIndex++) % TRANSPARENT_MODEL_ITEMS.length];
-    }
 
     public static Item requestModelBase(ModelRenderType type) {
         return switch (type) {
-            case SOLID -> BaseItemProvider.requestModel();
-            case TRANSPARENT -> requestTransparentItem();
-            case COLORED -> requestColoredItem();
+            case SOLID -> Items.STONE;
+            case TRANSPARENT -> Items.FEATHER;
+            case COLORED -> Items.LEATHER_HORSE_ARMOR;
         };
     }
 
@@ -159,8 +109,7 @@ public class FactoryUtil {
     }
 
     public static void sendVelocityDelta(ServerPlayerEntity player, Vec3d delta) {
-        player.networkHandler.sendPacket(new ExplosionS2CPacket(player.getX(),  player.getY() - 9999, player.getZ(), 0, List.of(), delta, Explosion.DestructionType.KEEP,
-                ParticleTypes.BUBBLE, ParticleTypes.BUBBLE, Registries.SOUND_EVENT.getEntry(SoundEvents.INTENTIONALLY_EMPTY)));
+        player.networkHandler.sendPacket(new ExplosionS2CPacket(new Vec3d(player.getX(),  player.getY() - 9999, player.getZ()), Optional.of(delta), ParticleTypes.BUBBLE, Registries.SOUND_EVENT.getEntry(SoundEvents.INTENTIONALLY_EMPTY)));
     }
 
     public static float wrap(float value, float min, float max) {
@@ -402,12 +351,12 @@ public class FactoryUtil {
             return stack -> {
                 tryInsertingRegular(inventory, stack);
                 if (!stack.isEmpty()) {
-                    entity.dropStack(stack);
+                    entity.dropStack((ServerWorld) entity.getWorld(), stack);
                 }
             };
         }
 
-        return entity::dropStack;
+        return (stack) -> entity.dropStack((ServerWorld) entity.getWorld(), stack);
     }
 
     public static void sendSlotUpdate(Entity entity, Hand hand) {
@@ -454,7 +403,11 @@ public class FactoryUtil {
             default -> state;
         };
     }
-    
+
+    public static RegistryKey<Recipe<?>> recipeKey(String s) {
+        return RegistryKey.of(RegistryKeys.RECIPE, id(s));
+    }
+
 
     public enum MovableResult {
         SUCCESS_MOVABLE,

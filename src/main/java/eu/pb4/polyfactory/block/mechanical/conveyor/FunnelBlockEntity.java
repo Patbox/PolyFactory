@@ -36,7 +36,7 @@ public class FunnelBlockEntity extends BlockEntity implements BlockEntityExtraLi
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("FilterStack", this.filterStack.encodeAllowEmpty(lookup));
+        nbt.put("FilterStack", this.filterStack.toNbtAllowEmpty(lookup));
     }
 
     @Override

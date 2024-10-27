@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.mixin.ProjectileEntityAccessor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
@@ -27,7 +28,7 @@ public record ShootProjectileEntity<T>(EntityCreator<T> entityCreator,
     public static <T> FluidShootingBehavior<T> ofSplash(EntityType<? extends SplashEntity<T>> entityType, int splashPerTick, long amount, float baseSpeed, float extraSpeed,
                                                         float initialDivergence, float maxDivergence, RegistryEntry<SoundEvent> soundEvent) {
         return new ShootProjectileEntity<>((world, fluid, a) -> {
-            var splash = entityType.create(world);
+            var splash = entityType.create(world, SpawnReason.SPAWN_ITEM_USE);
             assert splash != null;
             splash.setFluidData(fluid.data());
             return splash;
@@ -36,7 +37,7 @@ public record ShootProjectileEntity<T>(EntityCreator<T> entityCreator,
 
     public static <T> FluidShootingBehavior<T> ofEntity(EntityType<?> entityType, int splashPerTick, long amount, float baseSpeed, float extraSpeed,
                                                     float initialDivergence, float maxDivergence, RegistryEntry<SoundEvent> soundEvent) {
-        return new ShootProjectileEntity<>((world, fluid, a) -> entityType.create(world), splashPerTick, (w, a, b, c) -> amount, baseSpeed, extraSpeed, initialDivergence, maxDivergence, soundEvent);
+        return new ShootProjectileEntity<>((world, fluid, a) -> entityType.create(world, SpawnReason.SPAWN_ITEM_USE), splashPerTick, (w, a, b, c) -> amount, baseSpeed, extraSpeed, initialDivergence, maxDivergence, soundEvent);
     }
 
     @Override

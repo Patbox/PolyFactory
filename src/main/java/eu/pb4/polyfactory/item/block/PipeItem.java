@@ -50,7 +50,7 @@ public class PipeItem extends FactoryBlockItem {
                 world.playSound(null, blockPos, this.getPlaceSound(this.getBlock().getDefaultState()), SoundCategory.BLOCKS, (blockSoundGroup.getVolume() + 1.0F) / 2.0F, blockSoundGroup.getPitch() * 0.8F);
                 world.emitGameEvent(GameEvent.BLOCK_PLACE, blockPos, GameEvent.Emitter.of(playerEntity, blockState2));
                 itemStack.decrementUnlessCreative(1, playerEntity);
-                return ActionResult.SUCCESS;
+                return ActionResult.SUCCESS_SERVER;
             }
         }
 

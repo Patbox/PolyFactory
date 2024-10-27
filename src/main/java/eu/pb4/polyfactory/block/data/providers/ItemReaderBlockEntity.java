@@ -1,8 +1,8 @@
 package eu.pb4.polyfactory.block.data.providers;
 
-import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
@@ -61,7 +61,7 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.writeNbt(nbt, lookup);
-        nbt.put("stack", this.stack.encodeAllowEmpty(lookup));
+        nbt.put("stack", this.stack.toNbtAllowEmpty(lookup));
         nbt.putInt("page", this.page);
     }
 

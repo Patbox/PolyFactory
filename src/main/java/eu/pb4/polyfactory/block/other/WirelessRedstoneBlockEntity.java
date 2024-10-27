@@ -31,8 +31,8 @@ public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements 
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("key1", this.key1.encodeAllowEmpty(lookup));
-        nbt.put("key2", this.key2.encodeAllowEmpty(lookup));
+        nbt.put("key1", this.key1.toNbtAllowEmpty(lookup));
+        nbt.put("key2", this.key2.toNbtAllowEmpty(lookup));
         super.writeNbt(nbt, lookup);
     }
 

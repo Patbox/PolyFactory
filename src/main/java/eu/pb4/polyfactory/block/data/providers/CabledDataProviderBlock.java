@@ -11,6 +11,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -34,7 +35,7 @@ public class CabledDataProviderBlock extends GenericCabledDataBlock implements D
         return null;
     }
 
-    public int sendData(WorldAccess world, BlockPos selfPos, DataContainer data) {
+    public int sendData(WorldView world, BlockPos selfPos, DataContainer data) {
         if (world instanceof ServerWorld serverWorld && world.getBlockEntity(selfPos) instanceof ChanneledDataCache be) {
             be.setCachedData(data);
             return Data.getLogic(serverWorld, selfPos).pushDataUpdate(selfPos, be.channel(), data, null);

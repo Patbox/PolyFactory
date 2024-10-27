@@ -5,19 +5,15 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.util.movingitem.InventorySimpleContainerProvider;
 import eu.pb4.polyfactory.util.movingitem.MovingItem;
-import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,6 +65,6 @@ public abstract class TallItemMachineBlockEntity extends LockableBlockEntity imp
 
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         this.openGui((ServerPlayerEntity) player);
-        return ActionResult.SUCCESS;
+        return ActionResult.SUCCESS_SERVER;
     }
 }

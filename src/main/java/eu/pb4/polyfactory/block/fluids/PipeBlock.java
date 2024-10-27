@@ -1,48 +1,32 @@
 package eu.pb4.polyfactory.block.fluids;
 
-import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
-import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.factorytools.api.virtualentity.BlockModel;
-import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import eu.pb4.polyfactory.block.data.WallWithCableBlock;
-import eu.pb4.polyfactory.block.network.NetworkBlock;
-import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.block.property.LazyEnumProperty;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
-import eu.pb4.polyfactory.models.FactoryModels;
-import eu.pb4.polyfactory.nodes.generic.SelectiveSideNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
-import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
-import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.fabricmc.fabric.api.util.TriState;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.WallBlock;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -96,9 +80,10 @@ public class PipeBlock extends PipeBaseBlock implements WrenchableBlock {
         builder.add(LOCKED, NORTH, SOUTH, EAST, WEST, UP, DOWN);
     }
 
+
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        tickWater(state, world, pos);
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        tickWater(state, world, tickView, pos);
         if (state.get(LOCKED)) {
             return state;
         }
@@ -128,7 +113,7 @@ public class PipeBlock extends PipeBaseBlock implements WrenchableBlock {
     }
 
     @Override
-    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof WallBlock wallBlock) {
             var convert = PipeInWallBlock.MAP.get(wallBlock);
             if (convert != null) {
@@ -139,14 +124,14 @@ public class PipeBlock extends PipeBaseBlock implements WrenchableBlock {
                 if (container != null && world.getBlockEntity(pos) instanceof PipeBlockEntity be) {
                     container.forEach(be.container::set);
                 }
-                return ItemActionResult.SUCCESS;
+                return ActionResult.SUCCESS_SERVER;
             }
         }
 
         return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
     }
 
-    protected boolean canConnectTo(WorldAccess world, BlockPos neighborPos, BlockState neighborState, Direction direction) {
+    protected boolean canConnectTo(WorldView world, BlockPos neighborPos, BlockState neighborState, Direction direction) {
         return neighborState.getBlock() instanceof PipeConnectable connectable && connectable.canPipeConnect(world, neighborPos, neighborState, direction);
     }
 
@@ -163,7 +148,7 @@ public class PipeBlock extends PipeBaseBlock implements WrenchableBlock {
     }
 
     @Override
-    public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
         return !state.get(LOCKED) || super.canPipeConnect(world, pos, state, dir);
     }
 

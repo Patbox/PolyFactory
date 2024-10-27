@@ -1,24 +1,19 @@
 package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
-import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.LargeGearNode;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldView;
 import org.joml.Matrix4fStack;
 
@@ -48,7 +43,7 @@ public class AxleWithLargeGearBlock extends AxleWithGearBlock {
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack GEAR_MODEL = new ItemStack(BaseItemProvider.requestModel());
+        public static final ItemStack GEAR_MODEL = ItemDisplayElementUtil.getModel(id("block/large_gear"));
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement mainElement;
@@ -89,10 +84,6 @@ public class AxleWithLargeGearBlock extends AxleWithGearBlock {
                 this.mainElement.startInterpolationIfDirty();
                 this.gear.startInterpolationIfDirty();
             }
-        }
-
-        static {
-            GEAR_MODEL.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(GEAR_MODEL.getItem(), id("block/large_gear")).value()));
         }
     }
 }

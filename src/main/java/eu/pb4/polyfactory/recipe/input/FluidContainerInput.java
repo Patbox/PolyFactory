@@ -30,7 +30,7 @@ public record FluidContainerInput(Object2LongMap<FluidInstance<?>> fluidsAmount,
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         return 0;
     }
 

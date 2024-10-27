@@ -3,15 +3,12 @@ package eu.pb4.polyfactory.block.fluids;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.WallBlock;
 import net.minecraft.block.enums.WallShape;
-import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
@@ -20,10 +17,16 @@ import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.IdentityHashMap;
+import java.util.List;
 
 public class PipeInWallBlock extends PipeBaseBlock implements WrenchableBlock {
     public static final EnumProperty<Direction.Axis> AXIS = Properties.HORIZONTAL_AXIS;
@@ -31,8 +34,8 @@ public class PipeInWallBlock extends PipeBaseBlock implements WrenchableBlock {
     public static final IdentityHashMap<Block, PipeInWallBlock> MAP = new IdentityHashMap<>();
     private final WallBlock backing;
 
-    public PipeInWallBlock(WallBlock wallBlock) {
-        super(AbstractBlock.Settings.copy(wallBlock));
+    public PipeInWallBlock(Settings settings, WallBlock wallBlock) {
+        super(settings);
         this.backing = wallBlock;
         MAP.put(wallBlock, this);
     }
@@ -51,12 +54,7 @@ public class PipeInWallBlock extends PipeBaseBlock implements WrenchableBlock {
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
-        return getPolymerBlockState(state);
-    }
-
-    @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         var a = state.get(AXIS) == Direction.Axis.X ? WallBlock.NORTH_SHAPE : WallBlock.WEST_SHAPE;
         var b = state.get(AXIS) == Direction.Axis.X ? WallBlock.SOUTH_SHAPE : WallBlock.EAST_SHAPE;
 
@@ -79,9 +77,9 @@ public class PipeInWallBlock extends PipeBaseBlock implements WrenchableBlock {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        tickWater(state, world, pos);
-        return state;
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        tickWater(state, world, tickView, pos);
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     public EnumSet<Direction> getFlowDirections(BlockState state) {

@@ -1,14 +1,14 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
-import eu.pb4.factorytools.api.virtualentity.BlockModel;
-import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.WorldPointer;
+import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
-import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
@@ -21,27 +21,30 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.block.WireOrientation;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
@@ -50,7 +53,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
     public static final BooleanProperty ENABLED = Properties.ENABLED;
     public static final BooleanProperty DISTRIBUTE = BooleanProperty.of("distribute");
     public static final BooleanProperty BLOCKING = BooleanProperty.of("blocking");
-    public static DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+    public static EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
 
     public SplitterBlock(Settings settings) {
         super(settings);
@@ -59,9 +62,9 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        tickWater(state, world, pos);
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        tickWater(state, world, tickView, pos);
+        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
@@ -129,9 +132,10 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
         }
     }
 
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+    @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
         this.updateEnabled(world, pos, state);
-        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
     }
 
     private void updateEnabled(World world, BlockPos pos, BlockState state) {
@@ -207,7 +211,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
                     }
                 }
             }
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
         return ActionResult.FAIL;
@@ -224,7 +228,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.SMOOTH_STONE.getDefaultState();
     }
 

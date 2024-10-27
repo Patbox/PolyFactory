@@ -23,16 +23,19 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
 
 public abstract class PipeBaseBlock extends NetworkBlock implements FactoryBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe {
     public PipeBaseBlock(Settings settings) {
@@ -59,7 +62,7 @@ public abstract class PipeBaseBlock extends NetworkBlock implements FactoryBlock
     }
 
     @Override
-    protected void updateNetworkAt(WorldAccess world, BlockPos pos) {
+    protected void updateNetworkAt(WorldView world, BlockPos pos) {
         Pipe.updatePipeAt(world, pos);
     }
 
@@ -74,7 +77,7 @@ public abstract class PipeBaseBlock extends NetworkBlock implements FactoryBlock
     }
 
     @Override
-    public boolean canPipeConnect(WorldAccess world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
         return checkModelDirection(state, dir);
     }
 
@@ -105,7 +108,7 @@ public abstract class PipeBaseBlock extends NetworkBlock implements FactoryBlock
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
         return Blocks.COPPER_BLOCK.getDefaultState();
     }
 

@@ -28,6 +28,7 @@
   "block.polyfactory.electric_motor": "电动马达",
   "block.polyfactory.electric_generator": "发电机",
   "block.polyfactory.wither_skull_generator": "凋灵头颅生成器",
+  "block.polyfactory.stressometer": "应力表",
   "block.polyfactory.redstone_input": "红石信号接收器",
   "block.polyfactory.redstone_output": "红石信号输出器",
   "block.polyfactory.block_observer": "方块观察者",
