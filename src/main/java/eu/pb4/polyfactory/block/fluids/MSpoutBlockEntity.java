@@ -251,7 +251,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
 
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return slot == OUTPUT_FIRST;
+        return slot != OUTPUT_FIRST;
     }
 
     @Override

@@ -87,7 +87,7 @@ public class ModInit implements ModInitializer {
 		GuiTextures.register();
 		PolydexCompat.register();
 		PolymerResourcePackUtils.addModAssets(ID);
-		PolymerResourcePackUtils.addBridgedModelsFolder(id("block"), id("sgui"));
+		PolymerResourcePackUtils.addBridgedModelsFolder(id("block"), id("sgui"), id("particle"));
 		PolymerResourcePackUtils.markAsRequired();
 
 		FluidTextures.setup();

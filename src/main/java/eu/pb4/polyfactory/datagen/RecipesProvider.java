@@ -757,6 +757,13 @@ class RecipesProvider extends FabricRecipeProvider {
                         new RecipeEntry<>(recipeKey("press/spray_can_fill"), new FillSprayCanPressRecipe(12))
                 );
 
+                for (var i = 0; i < 5; i++) {
+                    of(exporter, GenericPressRecipe.of("throwable_glass_bottle_" + i, "throwable_glass_bottle", CountedIngredient.ofItems(5 - i, Items.GLASS_BOTTLE),
+                            CountedIngredient.ofItems(1, Items.GUNPOWDER), 7 - i, new OutputStack(new ItemStack(FactoryItems.THROWABLE_GLASS_BOTTLE, 5 - i), 1, 1)));
+                    of(exporter, GenericPressRecipe.of("lingering_throwable_glass_bottle_" + i, "lingering_throwable_glass_bottle", CountedIngredient.ofItems(5 - i, FactoryItems.THROWABLE_GLASS_BOTTLE),
+                            CountedIngredient.ofItemsRemainder(1, Items.DRAGON_BREATH, Items.GLASS_BOTTLE), 7 - i, new OutputStack(new ItemStack(FactoryItems.LINGERING_THROWABLE_GLASS_BOTTLE, 5 - i), 1, 1)));
+                }
+
                 of(exporter,
                         new RecipeEntry<>(recipeKey("crafting/spray_can_fill"), new FillSprayCanCraftingRecipe(CraftingRecipeCategory.MISC)),
                         new RecipeEntry<>(recipeKey("crafting/inverted_colored_lamp"),

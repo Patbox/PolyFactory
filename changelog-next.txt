@@ -1,3 +1,5 @@
-- Fixed Mechanical Spouts and Mechanical Drains interactions with Conveyors.
-- Fixed Conveyors not ticking/updating item display correctly.
-- Fixed a crash.
+- Added recipes for Throwable and Lingering Glass Bottles. You can make them in the Mechanical Press
+- Portable Fluid Tanks can now be rotated with Wrench.
+- Changed Mechanical Crafter's gui textures to match vanilla Crafter.
+- Fixed Hoppers putting items in wrong slots for Mechanical Drain and Mechanical Spout.
+- Fixed shoot out experience not having model.
