@@ -38,6 +38,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
@@ -373,7 +374,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
 
         private void setLockableSlot(int uiIndex, int slot, int x, int y) {
             if (this.lockedSlots.get(slot)) {
-                this.setSlot(uiIndex, GuiTextures.LOCKED_SLOT.get());
+                this.setSlot(uiIndex, GuiTextures.LOCKED_SLOT.get().hideTooltip());
             } else {
                 this.setSlotRedirect(uiIndex, new Slot(MCrafterBlockEntity.this, x + y * 3, x, y));
             }
@@ -383,16 +384,16 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
         public boolean onAnyClick(int index, ClickType type, SlotActionType action) {
             var x = index % 9 - 1;
             var y = index / 9;
-            if (x >= 0 && y >= 0 && x < 3 && y < 3) {
+            if ((type == ClickType.MOUSE_LEFT || type == ClickType.MOUSE_RIGHT) && x >= 0 && y >= 0 && x < 3 && y < 3) {
                 var slot = x + y * 3;
                 var locked = MCrafterBlockEntity.this.lockedSlots.get(slot);
                 if (locked) {
                     MCrafterBlockEntity.this.lockedSlots.set(slot, false);
-                    GuiUtils.playClickSound(player);
+                    player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.4f, 1);
                     return true;
                 } else if (MCrafterBlockEntity.this.getStack(slot).isEmpty() && this.getPlayer().currentScreenHandler.getCursorStack().isEmpty()) {
                     MCrafterBlockEntity.this.lockedSlots.set(slot, true);
-                    GuiUtils.playClickSound(player);
+                    player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.4f, 0.75f);
                     return true;
                 }
             }

@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.datagen;
 
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.factorytools.api.recipe.OutputStack;
+import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidStack;
@@ -775,7 +776,12 @@ class RecipesProvider extends FabricRecipeProvider {
                                 Ingredient.ofItems(FactoryItems.LAMP),
                                 DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(FactoryItems.METAL_GRID))))
         );
-
+        for (var i = 0; i < 5; i++) {
+            of(exporter, GenericPressRecipe.of("throwable_glass_bottle_" + i, "throwable_glass_bottle", CountedIngredient.ofItems(5 - i, Items.GLASS_BOTTLE),
+                    CountedIngredient.ofItems(1, Items.GUNPOWDER), 7 - i, new OutputStack(new ItemStack(FactoryItems.THROWABLE_GLASS_BOTTLE, 5 - i), 1, 1)));
+            of(exporter, GenericPressRecipe.of("lingering_throwable_glass_bottle_" + i, "lingering_throwable_glass_bottle", CountedIngredient.ofItems(5 - i, FactoryItems.THROWABLE_GLASS_BOTTLE),
+                    CountedIngredient.ofItemsRemainder(1, Items.DRAGON_BREATH, Items.GLASS_BOTTLE), 7 - i, new OutputStack(new ItemStack(FactoryItems.LINGERING_THROWABLE_GLASS_BOTTLE, 5 - i), 1, 1)));
+        }
 
         {
             var x = new CompShapedRecipeJsonBuilder(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
@@ -1094,6 +1100,11 @@ class RecipesProvider extends FabricRecipeProvider {
                 Optional.empty(), Optional.empty(), 0, BlockHeat.TORCH, Float.POSITIVE_INFINITY, 1
         ), null);
     }
+
+    private Identifier recipeKey(String s) {
+        return ModInit.id(s);
+    }
+
     private void destructiveItemCreatingFluidInteraction(RecipeExporter exporter, String name, int repeats, List<FluidStack<?>> fluids, OutputStack item, ParticleEffect particleEffect, SoundEvent soundEvent) {
         var base = id("fluid_interaction/" + name);
         var remove = id("fluid_interaction/" + name + "_leftover");

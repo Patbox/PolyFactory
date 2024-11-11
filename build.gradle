@@ -1,17 +1,5 @@
-buildscript {
-	dependencies {
-		classpath "de.guntram.mcmod:crowdin-translate:1.4+1.19.3"
-	}
-	repositories {
-		maven {
-			name = 'CrowdinTranslate source'
-			url = "https://minecraft.guntram.de/maven/"
-		}
-	}
-}
-
 plugins {
-	id 'fabric-loom' version '1.6.+'
+	id 'fabric-loom' version '1.7.+'
 	id "com.modrinth.minotaur" version "2.+"
 	id 'maven-publish'
 }
@@ -21,12 +9,6 @@ targetCompatibility = JavaVersion.VERSION_21
 
 archivesBaseName = project.archives_base_name
 group = project.maven_group
-
-apply plugin: 'de.guntram.mcmod.crowdin-translate'
-crowdintranslate.crowdinProjectName = 'patbox-mods'
-crowdintranslate.jsonSourceName = 'polyfactory'
-crowdintranslate.minecraftProjectName = 'polyfactory'
-crowdintranslate.verbose = false
 
 
 if (System.getenv("CI") != null) {
