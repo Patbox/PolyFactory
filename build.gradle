@@ -80,7 +80,7 @@ dependencies {
 	modImplementation 'eu.pb4:polymer-core:0.10.2+1.21.3'
 	modImplementation 'eu.pb4:polymer-resource-pack:0.10.2+1.21.3'
 	modImplementation 'eu.pb4:polymer-autohost:0.10.2+1.21.3'
-	modImplementation 'eu.pb4:polymer-virtual-entity:0.102+1.21.3'
+	modImplementation 'eu.pb4:polymer-virtual-entity:0.10.2+1.21.3'
 	modImplementation include('eu.pb4:map-canvas-api:0.5.0+1.21.3')
 	modImplementation include('eu.pb4:common-protection-api:1.0.0')
 	modImplementation include('eu.pb4:sidebar-api:0.5.1+1.21.1')
