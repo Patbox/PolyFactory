@@ -15,7 +15,7 @@ public record SimpleItemFilter(ItemStack item) implements ItemFilter {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SimpleItemFilter that = (SimpleItemFilter) o;
-        return that.item.isEmpty() == this.item.isEmpty() && ItemStack.areItemsAndComponentsEqual(that.item, that.item);
+        return ItemStack.areItemsAndComponentsEqual(that.item, this.item);
     }
 
     @Override

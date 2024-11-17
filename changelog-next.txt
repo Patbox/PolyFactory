@@ -1,1 +1,2 @@
 - Fixed Pipes not being able to pull Honey from Bee Hives if they didn't face north.
+- Fixed Item Splitters thinking that left and right filters are equal when they aren't.
