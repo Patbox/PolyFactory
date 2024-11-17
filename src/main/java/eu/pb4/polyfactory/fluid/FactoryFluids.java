@@ -111,8 +111,13 @@ public class FactoryFluids {
         FluidBehaviours.addBlockStateConversions(Blocks.LAVA_CAULDRON.getDefaultState(), Blocks.CAULDRON.getDefaultState(), LAVA.ofBucket());
 
         FluidBehaviours.addBlockStateInsert(Blocks.SLIME_BLOCK.getDefaultState(), Blocks.AIR.getDefaultState(), SLIME.ofBucket());
-        FluidBehaviours.addBlockStateExtract(Blocks.BEEHIVE.getDefaultState().with(BeehiveBlock.HONEY_LEVEL, BeehiveBlock.FULL_HONEY_LEVEL),
-                Blocks.BEEHIVE.getDefaultState(), HONEY.of(FluidConstants.BLOCK / 4));
+
+        for (var dir : BeehiveBlock.FACING.getValues()) {
+            FluidBehaviours.addBlockStateExtract(Blocks.BEEHIVE.getDefaultState().with(BeehiveBlock.FACING, dir).with(BeehiveBlock.HONEY_LEVEL, BeehiveBlock.FULL_HONEY_LEVEL),
+                    Blocks.BEEHIVE.getDefaultState().with(BeehiveBlock.FACING, dir), HONEY.of(FluidConstants.BLOCK / 4));
+        }
+
+
         FluidBehaviours.addBlockStateInsert(Blocks.HONEY_BLOCK.getDefaultState(), Blocks.AIR.getDefaultState(), HONEY.ofBucket());
 
         FluidBehaviours.addItemToFluidLink(Items.BUCKET, (FluidInstance<?>) null);

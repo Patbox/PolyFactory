@@ -15,6 +15,7 @@ public class FactoryBlockTags {
     public static final TagKey<Block> WIND_PASSTHROUGH = of("wind_passthrough");
     public static final TagKey<Block> SPRAY_CAN_COLORABLE = of("spray_can_colorable");
     public static final TagKey<Block> CONCRETE = of("concrete");
+    public static final TagKey<Block> PIPE_CONNECTABLE = of("pipe_connectable");
     public static final TagKey<Block> UNCONNECTABLE = of("unconnectable");
 
     private static TagKey<Block> of(String path) {

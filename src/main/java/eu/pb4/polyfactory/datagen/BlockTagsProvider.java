@@ -81,6 +81,11 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.METAL_GRID)
         ;
 
+        this.getOrCreateTagBuilder(FactoryBlockTags.PIPE_CONNECTABLE)
+                .addOptionalTag(BlockTags.CAULDRONS)
+                .add(Blocks.BEEHIVE)
+        ;
+
         this.getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE)
                 .addOptionalTag(FactoryBlockTags.CONVEYORS)
                 .add(FactoryBlocks.FAN,

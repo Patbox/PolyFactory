@@ -1,5 +1,1 @@
-- Added recipes for Throwable and Lingering Glass Bottles. You can make them in the Mechanical Press
-- Portable Fluid Tanks can now be rotated with Wrench.
-- Changed Mechanical Crafter's gui textures to match vanilla Crafter.
-- Fixed Hoppers putting items in wrong slots for Mechanical Drain and Mechanical Spout.
-- Fixed shoot out experience not having model.
+- Fixed Pipes not being able to pull Honey from Bee Hives if they didn't face north.

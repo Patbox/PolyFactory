@@ -20,7 +20,6 @@
     "datafixer.ItemStackComponentizationFixMixin",
     "datafixer.Schema1460Mixin",
     "datafixer.Schema3818_3Mixin",
-    "fluid.AbstractCauldronBlockMixin",
     "machines.FallingBlockEntityMixin",
     "machines.HopperBlockEntityMixin",
     "machines.HopperBlockMixin",

@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.fluids;
 
+import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.block.property.LazyEnumProperty;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
@@ -132,7 +133,8 @@ public class PipeBlock extends PipeBaseBlock implements WrenchableBlock {
     }
 
     protected boolean canConnectTo(WorldView world, BlockPos neighborPos, BlockState neighborState, Direction direction) {
-        return neighborState.getBlock() instanceof PipeConnectable connectable && connectable.canPipeConnect(world, neighborPos, neighborState, direction);
+        return (neighborState.getBlock() instanceof PipeConnectable connectable && connectable.canPipeConnect(world, neighborPos, neighborState, direction))
+                || neighborState.isIn(FactoryBlockTags.PIPE_CONNECTABLE);
     }
 
     public EnumSet<Direction> getFlowDirections(BlockState state) {
