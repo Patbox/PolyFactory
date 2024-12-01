@@ -19,6 +19,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneLampBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.FireworkExplosionComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -33,6 +34,8 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
+import java.util.List;
+
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockEntityProvider, BlockStateNameProvider {
@@ -45,8 +48,8 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
-        var stack = super.getPickStack(world, pos, state);
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
+        var stack = super.getPickStack(world, pos, state, includeData);
         if (world.getBlockEntity(pos) instanceof ColorableBlockEntity be && !be.isDefaultColor()) {
             ColoredItem.setColor(stack, be.getColor());
         }
@@ -149,7 +152,7 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
         private void updateModel() {
             var stack = new ItemStack(Items.FIREWORK_STAR);
             stack.set(DataComponentTypes.ITEM_MODEL, this.state.get(LIT) == this.inverted ? id("colored_lamp") : id("inverted_colored_lamp"));
-            stack.set(DataComponentTypes.FIREWORK_EXPLOSION, new FireworkExplosionComponent(FireworkExplosionComponent.Type.BURST, IntList.of(this.color), IntList.of(), false, false));
+            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), IntList.of(this.color)));
             this.main.setItem(stack);
             this.tick();
         }

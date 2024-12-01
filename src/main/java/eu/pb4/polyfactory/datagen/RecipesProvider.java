@@ -28,7 +28,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.data.server.recipe.*;
+import net.minecraft.data.recipe.*;
 import net.minecraft.item.*;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
@@ -1006,7 +1006,7 @@ class RecipesProvider extends FabricRecipeProvider {
                     var b = new StringBuilder("mixing/brewing/");
                     b.append(getShortString(recipe.from()));
                     b.append("_with_");
-                    for (var stack : recipe.ingredient().getMatchingItems()) {
+                    for (var stack : recipe.ingredient().getMatchingItems().toList()) {
                         //noinspection deprecation
                         b.append(getShortString(stack));
                         b.append("_");

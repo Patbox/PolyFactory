@@ -19,6 +19,7 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -56,7 +57,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.Collection;
 import java.util.List;
 
-import static eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils.bridgeModel;
+import static eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras.bridgeModel;
 
 public class WindmillBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, WrenchableBlock, BlockEntityProvider, BarrierBasedWaterloggable {
     public static final int MAX_SAILS = 8;
@@ -89,7 +90,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
         if (world.getBlockEntity(pos) instanceof WindmillBlockEntity be) {
             return be.getSails().isEmpty() ? FactoryItems.WINDMILL_SAIL.getDefaultStack() : be.getSails().get(0).copyWithCount(1);
         }
@@ -239,12 +240,12 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
                 color = this.blockEntity.getSailColor(i);
             }
 
-            c.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(color, false));
+            c.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), IntList.of(color)));
             return c;
         }
 
         private void updateAnimation(float speed, Direction direction, boolean reverse) {
-            this.center.setYaw(direction.asRotation() - 90);
+            this.center.setYaw(direction.getPositiveHorizontalDegrees() - 90);
             mat.identity();
             mat.rotateX(((float) (reverse ? speed : -speed)));
 
@@ -261,7 +262,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
                 mat.pushMatrix();
                 mat.rotateX((MathHelper.TAU / sails.length) * i);
                 mat.rotateY(-MathHelper.HALF_PI);
-                this.sails[i].setYaw(direction.asRotation() - 90);
+                this.sails[i].setYaw(direction.getPositiveHorizontalDegrees() - 90);
                 mat.translate(0, 0, 0.008f * i);
                 if (this.big) {
                     mat.scale(2);

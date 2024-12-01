@@ -51,6 +51,6 @@ public class BrittlePotionItem extends Item implements PolymerItem {
 
     @Override
     public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
-        return Items.POTION;
+        return Items.TRIAL_KEY;
     }
 }

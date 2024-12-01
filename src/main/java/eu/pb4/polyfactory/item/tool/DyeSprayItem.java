@@ -12,13 +12,18 @@ import eu.pb4.polyfactory.block.other.SmallLampBlock;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
+import eu.pb4.polyfactory.util.SimpleColoredItem;
 import eu.pb4.polymer.core.api.item.PolymerItem;
+import it.unimi.dsi.fastutil.booleans.BooleanList;
+import it.unimi.dsi.fastutil.floats.FloatList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -46,10 +51,10 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerItem, ColoredItem {
+import java.util.List;
+
+public class DyeSprayItem extends Item implements PolymerItem, ColoredItem {
     public static final int MAX_USES = 128;
-    private Identifier mainModel;
-    private Identifier emptyModel;
 
     public DyeSprayItem(Settings settings) {
         super(settings);
@@ -185,19 +190,8 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
     }
 
     @Override
-    public void onRegistered(Identifier selfId) {
-        this.mainModel = selfId;
-        this.emptyModel = selfId.withSuffixedPath("_empty");
-    }
-
-    @Override
     public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
-        return getUses(itemStack) == 0 ? Items.TRIAL_KEY : Items.LEATHER_HORSE_ARMOR;
-    }
-
-    @Override
-    public Identifier getPolymerItemModel(ItemStack itemStack, PacketContext context) {
-        return getUses(itemStack) == 0 ? this.emptyModel : this.mainModel;
+        return Items.TRIAL_KEY;
     }
 
     @Override
@@ -205,7 +199,8 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
         var out = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, context);
         var uses = getUses(itemStack);
 
-        out.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(ColoredItem.getColor(itemStack), false));
+        out.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(FloatList.of((float) uses / MAX_USES),
+                BooleanList.of(uses != 0), List.of(), IntList.of(ColoredItem.getColor(itemStack))));
         out.set(DataComponentTypes.MAX_DAMAGE, MAX_USES);
         if (uses != 0) {
             out.set(DataComponentTypes.DAMAGE, MAX_USES - uses);

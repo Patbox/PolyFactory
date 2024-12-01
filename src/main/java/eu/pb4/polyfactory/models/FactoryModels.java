@@ -28,14 +28,13 @@ public interface FactoryModels {
         }
     });
 
+    FluidModel FLUID_PORTABLE_FLUID_TANK_ITEM = new FluidModel(id("block/fluid/portable_fluid_tank/item"));
+
     FluidModel[] FLUID_PORTABLE_FLUID_TANK_HORIZONTAL = Util.make(new FluidModel[12], (arr) -> {
         for (int i = 0; i < 12; i++) {
             arr[i] = new FluidModel(id("block/fluid/portable_fluid_tank/h" + (i + 1)));
         }
     });
-
-    FluidModel ITEM_PORTABLE_FLUID_TANK = new FluidModel(id("item/portable_fluid_tank"),
-            (x) -> x == ModelRenderType.COLORED ? Items.FIREWORK_STAR : Items.TRIAL_KEY);
     DirectionConnectingModel COLORED_CABLE = new DirectionConnectingModel(id("block/cable_colored"), true);
     DirectionConnectingModel COLORED_WALL_CABLE = new DirectionConnectingModel(id("block/cable_colored_wall"), true);
     DirectionConnectingModel PIPE = new DirectionConnectingModel(id("block/pipe"), false);

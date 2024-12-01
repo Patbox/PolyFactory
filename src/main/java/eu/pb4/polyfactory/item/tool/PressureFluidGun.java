@@ -38,11 +38,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PressureFluidGun extends Item implements PolymerItem, RegistryCallbackItem {
-    private Identifier baseModel = FactoryModels.PLACEHOLDER;
-    private Identifier activeOthersModel = FactoryModels.PLACEHOLDER;
-    private Identifier activeSelfModel = FactoryModels.PLACEHOLDER;
-
+public class PressureFluidGun extends Item implements PolymerItem {
     public PressureFluidGun(Settings settings) {
         super(settings);
     }
@@ -182,15 +178,6 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
     }
 
     @Override
-    public @Nullable Identifier getPolymerItemModel(ItemStack stack, PacketContext context) {
-        if (this.useCrossbowModel(stack)) {
-            return this.activeOthersModel;
-        }
-
-        return this.useActiveModel(stack) ? this.activeSelfModel : this.baseModel;
-    }
-
-    @Override
     public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
         if (this.useCrossbowModel(itemStack)) {
             return Items.CROSSBOW;
@@ -205,12 +192,5 @@ public class PressureFluidGun extends Item implements PolymerItem, RegistryCallb
 
     private boolean useActiveModel(ItemStack itemStack) {
         return itemStack.contains(FactoryDataComponents.CURRENT_FLUID);
-    }
-
-    @Override
-    public void onRegistered(Identifier selfId) {
-        this.baseModel = selfId;
-        this.activeSelfModel = selfId.withSuffixedPath("_active");
-        this.activeOthersModel = selfId.withSuffixedPath("_active");
     }
 }

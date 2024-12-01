@@ -182,11 +182,11 @@ public class PressBlock extends TallItemMachineBlock {
         private void updateStatePos(BlockState state) {
             var direction = state.get(INPUT_FACING);
 
-            this.main.setYaw(direction.asRotation());
-            this.pistonItem.setYaw(direction.asRotation());
-            this.piston.setYaw(direction.asRotation());
-            this.gearA.setYaw(direction.asRotation());
-            this.gearB.setYaw(direction.asRotation());
+            this.main.setYaw(direction.getPositiveHorizontalDegrees());
+            this.pistonItem.setYaw(direction.getPositiveHorizontalDegrees());
+            this.piston.setYaw(direction.getPositiveHorizontalDegrees());
+            this.gearA.setYaw(direction.getPositiveHorizontalDegrees());
+            this.gearB.setYaw(direction.getPositiveHorizontalDegrees());
         }
 
         private void updateAnimation(boolean b, boolean c, float rotation, boolean negative) {

@@ -159,7 +159,7 @@ public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeC
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.asRotation();
+                y = dir.getPositiveHorizontalDegrees();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             } else {

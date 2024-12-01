@@ -167,7 +167,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                     p.setYaw(0);
                     p.setPitch(90);
                 } else  {
-                    p.setYaw(dir.asRotation());
+                    p.setYaw(dir.getPositiveHorizontalDegrees());
                     p.setPitch(0);
                 }
 
@@ -200,7 +200,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                     p.setYaw(0);
                     p.setPitch(90);
                 } else  {
-                    p.setYaw(dir.asRotation());
+                    p.setYaw(dir.getPositiveHorizontalDegrees());
                     p.setPitch(0);
                 }
 

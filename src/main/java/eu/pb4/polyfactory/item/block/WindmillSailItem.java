@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
 import eu.pb4.factorytools.api.item.FireworkStarColoredItem;
+import eu.pb4.polyfactory.util.SimpleColoredItem;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
@@ -21,7 +22,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Direction;
 
-public class WindmillSailItem extends Item implements FireworkStarColoredItem {
+public class WindmillSailItem extends Item implements SimpleColoredItem {
     public WindmillSailItem(Settings settings) {
         super(settings);
     }

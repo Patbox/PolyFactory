@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.factorytools.api.item.FireworkStarColoredItem;
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
+import eu.pb4.polyfactory.util.SimpleColoredItem;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.Block;
 import net.minecraft.item.tooltip.TooltipType;
@@ -15,7 +16,7 @@ import net.minecraft.util.math.ColorHelper;
 
 import java.util.List;
 
-public class ColoredDownsampledBlockItem extends FactoryBlockItem implements FireworkStarColoredItem, ColoredItem {
+public class ColoredDownsampledBlockItem extends FactoryBlockItem implements SimpleColoredItem, ColoredItem {
     private final int defaultColor;
 
     public <T extends Block & PolymerBlock> ColoredDownsampledBlockItem(T block, int defaultColor, Settings settings) {

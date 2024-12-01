@@ -180,7 +180,7 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
         private void updateStatePos(BlockState state) {
             var direction = state.get(INPUT_FACING);
 
-            this.main.setYaw(direction.asRotation());
+            this.main.setYaw(direction.getPositiveHorizontalDegrees());
         }
 
         private void updateAnimation(float rotation, Direction.Axis axis) {

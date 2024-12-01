@@ -185,9 +185,9 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
         private void updateStatePos(BlockState state) {
             var direction = state.get(INPUT_FACING);
 
-            this.main.setYaw(direction.asRotation());
-            this.gearA.setYaw(direction.asRotation());
-            this.gearB.setYaw(direction.asRotation());
+            this.main.setYaw(direction.getPositiveHorizontalDegrees());
+            this.gearA.setYaw(direction.getPositiveHorizontalDegrees());
+            this.gearB.setYaw(direction.getPositiveHorizontalDegrees());
         }
 
         private void updateAnimation(float rotation, boolean negative) {

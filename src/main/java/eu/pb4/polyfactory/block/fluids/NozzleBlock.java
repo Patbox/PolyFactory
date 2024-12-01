@@ -181,7 +181,7 @@ public class NozzleBlock extends NetworkBlock implements FactoryBlock, Wrenchabl
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.asRotation();
+                y = dir.getPositiveHorizontalDegrees();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             }

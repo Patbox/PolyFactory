@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.item.tool;
 
+import eu.pb4.polyfactory.util.SimpleColoredItem;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.block.other.WirelessRedstoneBlock;
@@ -26,7 +27,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
-public class WirelessRedstoneTransmitterItem extends Item implements PolymerItem, ColoredItem {
+public class WirelessRedstoneTransmitterItem extends Item implements SimpleColoredItem, ColoredItem {
     public WirelessRedstoneTransmitterItem(Settings settings) {
         super(settings);
     }
@@ -60,14 +61,8 @@ public class WirelessRedstoneTransmitterItem extends Item implements PolymerItem
         return 0x888888;
     }
 
-
     @Override
-    public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
-        return Items.LEATHER_HORSE_ARMOR;
-    }
-
-    @Override
-    public void modifyBasePolymerItemStack(ItemStack out, ItemStack stack, PacketContext context) {
-        out.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(stack.getOrDefault(FactoryDataComponents.COLOR, 0x888888), false));
+    public int getItemColor(ItemStack stack) {
+        return stack.getOrDefault(FactoryDataComponents.COLOR, 0x888888);
     }
 }

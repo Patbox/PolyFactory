@@ -72,7 +72,7 @@ public class SidedMultiFluidViewModel {
                 parts.put(dir, model);
                 if (dir.getAxis() != Direction.Axis.Y) {
                     model.setPitch(90);
-                    model.setYaw(dir.asRotation());
+                    model.setYaw(dir.getPositiveHorizontalDegrees());
                 }
                 instance.brightness().ifPresent(model::setBrightness);
             }

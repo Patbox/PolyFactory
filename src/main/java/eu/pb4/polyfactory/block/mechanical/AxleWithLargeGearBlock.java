@@ -28,7 +28,7 @@ public class AxleWithLargeGearBlock extends AxleWithGearBlock {
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
         return FactoryItems.LARGE_STEEL_GEAR.getDefaultStack();
     }
 

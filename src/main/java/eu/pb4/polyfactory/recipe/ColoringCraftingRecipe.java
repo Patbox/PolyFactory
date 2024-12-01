@@ -115,12 +115,12 @@ public record ColoringCraftingRecipe(String group, Item input, Ingredient dye, i
         var list = new ArrayList<RecipeDisplay>();
 
         var anyColorBase = new ArrayList<SlotDisplay>();
-        for (var dye : this.dye.getMatchingItems()) {
+        for (var dye : this.dye.getMatchingItems().toList()) {
             anyColorBase.add(new SlotDisplay.StackSlotDisplay(ColoredItem.stackCrafting(this.input, 1, DyeColorExtra.getColor(dye.value().getDefaultStack()))));
         }
 
         for (int count : this.maxCount != 1 ? new int[] {1, this.maxCount} : new int[] { 1 } ) {
-            for (var dye : this.dye.getMatchingItems()) {
+            for (var dye : this.dye.getMatchingItems().toList()) {
                 var t = new ArrayList<SlotDisplay>();
                 t.add(new SlotDisplay.ItemSlotDisplay(dye));
                 for (int i = 0; i < count; i++) {

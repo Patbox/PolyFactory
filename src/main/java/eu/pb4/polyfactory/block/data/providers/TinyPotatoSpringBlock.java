@@ -47,6 +47,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -82,7 +83,9 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
         var holder = BlockBoundAttachment.get(world, hit.getBlockPos());
 
         if (holder != null && holder.holder() instanceof Model x) {
-            x.interact(projectile.getYaw());
+            var delta = hit.getPos().subtract(Vec3d.ofCenter(hit.getBlockPos()));
+            var angle = Math.atan2(delta.x, -delta.z);
+            x.interact((float) angle * MathHelper.DEGREES_PER_RADIAN);
         }
     }
 
@@ -211,7 +214,7 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
         }
 
         private void updateRotation(Direction dir) {
-            float y = dir.asRotation();
+            float y = dir.getPositiveHorizontalDegrees();
 
             this.base.setYaw(y);
             this.tater.setYaw(y);

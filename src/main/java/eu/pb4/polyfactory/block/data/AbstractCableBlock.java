@@ -18,11 +18,13 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -99,8 +101,8 @@ public abstract class AbstractCableBlock extends NetworkBlock implements BlockEn
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
-        var stack = super.getPickStack(world, pos, state);
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
+        var stack = super.getPickStack(world, pos, state, includeData);
         if (world.getBlockEntity(pos) instanceof ColorProvider be && !be.isDefaultColor()) {
             ColoredItem.setColor(stack, be.getColor());
         }
@@ -281,7 +283,7 @@ public abstract class AbstractCableBlock extends NetworkBlock implements BlockEn
 
         protected void updateModel() {
             var stack = getModel(this.state, AbstractCableBlock::checkModelDirection);
-            stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(this.color, false));
+            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), IntList.of(this.color)));
             this.cable.setItem(stack);
 
             if (this.cable.getHolder() == this && this.color >= 0) {

@@ -46,7 +46,7 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
     public void onPolymerBlockSend(BlockState blockState, BlockPos.Mutable pos, PacketContext.NotNullWithPlayer player) {}
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
         return FactoryItems.STEEL_GEAR.getDefaultStack();
     }
 

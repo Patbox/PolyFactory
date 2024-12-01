@@ -231,7 +231,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             if (id == INPUT_FIRST) {
                 base = base.add(0, 0.50, 0).offset(dir, -(this.visualProgress - 0.5) * (8 / 16f)).offset(dir.rotateYClockwise(), -4 / 16f);
                 rot = Direction.UP.getRotationQuaternion()
-                        .rotateY(-dir.rotateYClockwise().asRotation() * MathHelper.RADIANS_PER_DEGREE)
+                        .rotateY(-dir.rotateYClockwise().getPositiveHorizontalDegrees() * MathHelper.RADIANS_PER_DEGREE)
                         .rotateX(MathHelper.PI * 3 / 4);
             } else {
                 base = base.add(0, 0.45, 0).offset(dir, -0.3);

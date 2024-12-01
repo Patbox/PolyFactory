@@ -5,9 +5,7 @@ import eu.pb4.polyfactory.block.property.ConnectablePart;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.Identifier;
 
@@ -15,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.function.BiConsumer;
 
 import static eu.pb4.polyfactory.ModInit.id;
-import static eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils.bridgeModel;
 
 public class MultiElementConnectedModel {
     private final EnumProperty<ConnectablePart> PART_X = FactoryProperties.CONNECTABLE_PART_X;

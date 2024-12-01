@@ -26,7 +26,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.function.BiConsumer;
 
-import static eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils.bridgeModel;
+import static eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras.bridgeModel;
 
 public class ConveyorModels {
     public static final int FRAMES = 20;

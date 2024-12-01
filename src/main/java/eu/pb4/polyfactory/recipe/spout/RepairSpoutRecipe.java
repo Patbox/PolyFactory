@@ -29,7 +29,7 @@ public record RepairSpoutRecipe() implements SpoutRecipe {
     @Override
     public ItemStack craft(SpoutInput input, RegistryWrapper.WrapperLookup lookup) {
         var stack = input.stack().copy();
-        int i = EnchantmentHelper.getRepairWithXp(input.world(), stack, (int) (input.getFluid(FactoryFluids.EXPERIENCE.defaultInstance()) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID));
+        int i = EnchantmentHelper.getRepairWithExperience(input.world(), stack, (int) (input.getFluid(FactoryFluids.EXPERIENCE.defaultInstance()) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID));
         int j = Math.min(i, stack.getDamage());
         stack.setDamage(stack.getDamage() - j);
         return stack;
@@ -43,7 +43,7 @@ public record RepairSpoutRecipe() implements SpoutRecipe {
     @Override
     public List<FluidStack<?>> fluidInput(SpoutInput input) {
         var stack = input.stack().copy();
-        int i = EnchantmentHelper.getRepairWithXp(input.world(), stack, (int) (input.getFluid(FactoryFluids.EXPERIENCE.defaultInstance()) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID));
+        int i = EnchantmentHelper.getRepairWithExperience(input.world(), stack, (int) (input.getFluid(FactoryFluids.EXPERIENCE.defaultInstance()) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID));
         int j = Math.min(i, stack.getDamage());
         return List.of(FactoryFluids.EXPERIENCE.of(j * FluidBehaviours.EXPERIENCE_ORB_TO_FLUID));
     }
@@ -56,7 +56,7 @@ public record RepairSpoutRecipe() implements SpoutRecipe {
     @Override
     public double time(SpoutInput input) {
         var stack = input.stack().copy();
-        int i = EnchantmentHelper.getRepairWithXp(input.world(), stack, (int) (input.getFluid(FactoryFluids.EXPERIENCE.defaultInstance()) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID));
+        int i = EnchantmentHelper.getRepairWithExperience(input.world(), stack, (int) (input.getFluid(FactoryFluids.EXPERIENCE.defaultInstance()) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID));
         return Math.min(i, stack.getDamage()) / 10f;
     }
 }

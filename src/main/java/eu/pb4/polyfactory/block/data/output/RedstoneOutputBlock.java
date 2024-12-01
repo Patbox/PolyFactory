@@ -14,11 +14,13 @@ import eu.pb4.polyfactory.nodes.data.DataReceiverNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -40,7 +42,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
-import static eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils.bridgeModel;
+import static eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras.bridgeModel;
 
 public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataReceiver, RedstoneConnectable {
     public static final IntProperty POWER = Properties.POWER;
@@ -115,9 +117,9 @@ public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataR
         }
 
         private ItemStack createOverlay(BlockState state) {
-            var stack = new ItemStack(Items.LEATHER_HORSE_ARMOR);
+            var stack = new ItemStack(Items.PAPER);
             stack.set(DataComponentTypes.ITEM_MODEL, state.isOf(FactoryBlocks.REDSTONE_OUTPUT) ? OUTPUT_OVERLAY : INPUT_OVERLAY);
-            stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(RedstoneWireBlock.getWireColor(state.get(POWER)), false));
+            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), IntList.of(RedstoneWireBlock.getWireColor(state.get(POWER)))));
             return stack;
         }
 

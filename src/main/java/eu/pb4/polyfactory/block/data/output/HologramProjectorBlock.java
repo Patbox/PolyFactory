@@ -136,7 +136,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
 
         var rot = switch (direction) {
             case UP, DOWN -> ctx.getHorizontalPlayerFacing().getAxis() == Direction.Axis.Z
-                    ? ctx.getHorizontalPlayerFacing().getHorizontal() : ctx.getHorizontalPlayerFacing().getOpposite().getHorizontal();
+                    ? ctx.getHorizontalPlayerFacing().getHorizontalQuarterTurns() : ctx.getHorizontalPlayerFacing().getOpposite().getHorizontalQuarterTurns();
             case NORTH, SOUTH, WEST, EAST -> ctx.getHorizontalPlayerFacing().getAxis() == ctx.getSide().getAxis()
                     ? (ctx.getVerticalPlayerLookDirection() == Direction.UP ? 2 : 0)
                     : ((ctx.getHorizontalPlayerFacing().getDirection() == Direction.AxisDirection.POSITIVE) == (direction.getAxis() == Direction.Axis.Z) ? 1 : 3);
@@ -280,7 +280,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 this.sendPacket(new ParticleS2CPacket(new DustColorTransitionParticleEffect(
                         ColorHelper.getArgb(133, 250, 255),
                         ColorHelper.getArgb(235, 254, 255),
-                        0.8f), false, pos.x, pos.y, pos.z, 0, 0, 0, 0, 0));
+                        0.8f), false, false, pos.x, pos.y, pos.z, 0, 0, 0, 0, 0));
 
                 if (this.currentDisplay != null) {
                     this.currentDisplay.startInterpolationIfDirty();
@@ -303,13 +303,13 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
             this.facing = dir;
             this.active = state.get(ACTIVE);
             float p = 0;
-            float y = rot.asRotation();
+            float y = rot.getPositiveHorizontalDegrees();
 
-            y = rot.asRotation();
+            y = rot.getPositiveHorizontalDegrees();
             var q = new Quaternionf();
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 90;
-                y = dir.asRotation();
+                y = dir.getPositiveHorizontalDegrees();
                 q.rotateY((float) (MathHelper.HALF_PI * state.get(FRONT)));
             } else if (dir == Direction.DOWN) {
                 p = 180;

@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.item;
 
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.factorytools.api.item.FireworkStarColoredItem;
+import eu.pb4.polyfactory.util.SimpleColoredItem;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.minecraft.block.entity.SignBlockEntity;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArtificialDyeItem extends Item implements SignChangingItem, FireworkStarColoredItem, ColoredItem {
+public class ArtificialDyeItem extends Item implements SignChangingItem, SimpleColoredItem, ColoredItem {
     public static final ThreadLocal<List<ItemStack>> CURRENT_DYES = ThreadLocal.withInitial(ArrayList::new);
 
     public ArtificialDyeItem(Settings settings) {

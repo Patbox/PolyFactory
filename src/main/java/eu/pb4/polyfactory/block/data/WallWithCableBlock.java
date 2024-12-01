@@ -81,8 +81,8 @@ public class WallWithCableBlock extends AbstractCableBlock implements PolymerBlo
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
-        return this.backing.getPickStack(world, pos, this.backing.getDefaultState());
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
+        return this.backing.getDefaultState().getPickStack(world, pos, includeData);
     }
 
     @Nullable

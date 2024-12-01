@@ -23,6 +23,7 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
@@ -272,8 +273,8 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
         private ItemStack createOverlay(BlockState state) {
             var model = state.isOf(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER) ? RedstoneOutputBlock.Model.OUTPUT_OVERLAY
                     : RedstoneOutputBlock.Model.INPUT_OVERLAY;
-            var stack = new ItemStack(Items.LEATHER_HORSE_ARMOR);
-            stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(RedstoneWireBlock.getWireColor(state.get(POWERED) ? 15 : 0), false));
+            var stack = new ItemStack(Items.PAPER);
+            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), IntList.of(RedstoneWireBlock.getWireColor(state.get(POWERED) ? 15 : 0))));
             stack.set(DataComponentTypes.ITEM_MODEL, model);
             return stack;
         }
@@ -293,7 +294,7 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.asRotation();
+                y = dir.getPositiveHorizontalDegrees();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             }

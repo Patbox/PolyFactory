@@ -8,29 +8,39 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.models.FactoryModels;
+import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
+import eu.pb4.polymer.resourcepack.api.AssetPaths;
+import eu.pb4.polymer.resourcepack.api.ResourcePackBuilder;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.model.*;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.property.select.CustomModelDataStringProperty;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.CustomModelDataTintSource;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.Block;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.BlockPlacementDispenserBehavior;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.FireworkExplosionComponent;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class PortableFluidTankBlockItem extends FactoryBlockItem {
     public <T extends Block & PolymerBlock> PortableFluidTankBlockItem(T block, Settings settings) {
@@ -38,24 +48,28 @@ public class PortableFluidTankBlockItem extends FactoryBlockItem {
         DispenserBlock.registerBehavior(this, new BlockPlacementDispenserBehavior());
     }
 
-    @Override
-    public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
-        var x = getMainFluid(itemStack);
-        if (x != null) {
-            return FactoryModels.ITEM_PORTABLE_FLUID_TANK.getRaw(x).getItem();
+    public static void createItemAsset(ResourcePackBuilder builder) {
+        var id = Registries.ITEM.getId(FactoryItems.PORTABLE_FLUID_TANK);
+        var list = new ArrayList<SelectItemModel.Case<String>>();
+
+        for (var fluidType : FactoryRegistries.FLUID_TYPES.getIds()) {
+            ItemModel model;
+            var modelId = FactoryModels.FLUID_PORTABLE_FLUID_TANK_ITEM.getModelId(fluidType);
+            if (FactoryRegistries.FLUID_TYPES.get(fluidType).color().isPresent()) {
+                model = new BasicItemModel(modelId, List.of(new CustomModelDataTintSource(0, -1)));
+            } else {
+                model = new BasicItemModel(modelId);
+            }
+
+            list.add(new SelectItemModel.Case<>(List.of(fluidType.toString()), model));
         }
 
-        return super.getPolymerItem(itemStack, context);
-    }
-
-    @Override
-    public Identifier getPolymerItemModel(ItemStack itemStack, PacketContext context) {
-        var x = getMainFluid(itemStack);
-        if (x != null) {
-            return FactoryModels.ITEM_PORTABLE_FLUID_TANK.getRaw(x).get(DataComponentTypes.ITEM_MODEL);
-        }
-
-        return super.getPolymerItemModel(itemStack, context);
+        builder.addData(AssetPaths.itemAsset(id), new ItemAsset(new CompositeItemModel(List.of(new BasicItemModel(id.withPrefixedPath("block/")),
+                new SelectItemModel<>(
+                        new SelectItemModel.Switch<>(new CustomModelDataStringProperty(0), list),
+                        Optional.of(EmptyItemModel.INSTANCE)
+                )
+        )), ItemAsset.Properties.DEFAULT).toJson().getBytes(StandardCharsets.UTF_8));
     }
 
     private FluidInstance<?> getMainFluid(ItemStack itemStack) {
@@ -102,8 +116,14 @@ public class PortableFluidTankBlockItem extends FactoryBlockItem {
 
             var x = (FluidInstance<Object>) getMainFluid(itemStack);
             if (x != null && x.type().color().isPresent()) {
-                base.set(DataComponentTypes.FIREWORK_EXPLOSION, new FireworkExplosionComponent(FireworkExplosionComponent.Type.BURST,
-                        IntList.of(x.type().color().get().getColor(x.data())), IntList.of(), false, false));
+                base.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(),
+                        List.of(FactoryRegistries.FLUID_TYPES.getId(x.type()).toString()), IntList.of(x.type().color().get().getColor(x.data()))));
+            } else if (x != null) {
+                base.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(),
+                        List.of(FactoryRegistries.FLUID_TYPES.getId(x.type()).toString()), IntList.of()));
+            } else {
+                base.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(),
+                        List.of(), IntList.of()));
             }
         }
         return base;

@@ -19,6 +19,7 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.FireworkExplosionComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.fluid.FluidState;
@@ -43,6 +44,8 @@ import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+
+import java.util.List;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
@@ -121,8 +124,8 @@ public class SmallLampBlock extends Block implements FactoryBlock, BlockEntityPr
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
-        var stack = super.getPickStack(world, pos, state);
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
+        var stack = super.getPickStack(world, pos, state, includeData);
         if (world.getBlockEntity(pos) instanceof ColorableBlockEntity be && !be.isDefaultColor()) {
             ColoredItem.setColor(stack, be.getColor());
         }
@@ -202,7 +205,7 @@ public class SmallLampBlock extends Block implements FactoryBlock, BlockEntityPr
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.asRotation();
+                y = dir.getPositiveHorizontalDegrees();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             } else {
@@ -217,7 +220,7 @@ public class SmallLampBlock extends Block implements FactoryBlock, BlockEntityPr
         private void updateModel() {
             var stack = new ItemStack(Items.FIREWORK_STAR);
             stack.set(DataComponentTypes.ITEM_MODEL, this.state.get(LIT) == this.inverted ? id("caged_lamp") : id("inverted_caged_lamp"));
-            stack.set(DataComponentTypes.FIREWORK_EXPLOSION, new FireworkExplosionComponent(FireworkExplosionComponent.Type.BURST, IntList.of(this.color), IntList.of(), false, false));
+            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), IntList.of(this.color)));
             this.main.setItem(stack);
             this.tick();
         }

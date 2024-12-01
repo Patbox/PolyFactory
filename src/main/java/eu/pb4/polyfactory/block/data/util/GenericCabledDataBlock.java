@@ -94,7 +94,7 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
         return this.asItem().getDefaultStack();
     }
 
@@ -205,7 +205,7 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.asRotation();
+                y = dir.getPositiveHorizontalDegrees();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             }

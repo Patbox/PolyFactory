@@ -74,8 +74,8 @@ public final class DataMemoryBlock extends DataProviderBlock implements DataRece
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
-        var x = super.getPickStack(world, pos, state);
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
+        var x = super.getPickStack(world, pos, state, includeData);
         x.set(FactoryDataComponents.READ_ONLY, state.get(READ_ONLY));
         if (world.getBlockEntity(pos) instanceof DataCache cache && cache.getCachedData() != null) {
             x.set(FactoryDataComponents.STORED_DATA, cache.getCachedData());

@@ -556,7 +556,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         private void updateAnimation(Direction dir, DirectionValue value) {
             if (dir != this.direction || value != this.value) {
                 var mat = mat();
-                mat.identity().translate(0, 0.5f, 0).rotateY((270 - dir.asRotation()) * MathHelper.RADIANS_PER_DEGREE);
+                mat.identity().translate(0, 0.5f, 0).rotateY((270 - dir.getPositiveHorizontalDegrees()) * MathHelper.RADIANS_PER_DEGREE);
                 if (value.value == -1 && !value.stack) {
                     mat.rotateY(MathHelper.PI);
                 }
@@ -611,7 +611,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
 
             if (movingItemContainer != null) {
                 movingItemContainer.setPos(calculatePos(newDelta));
-                var base = new Quaternionf().rotateY(this.direction.asRotation() * MathHelper.RADIANS_PER_DEGREE);
+                var base = new Quaternionf().rotateY(this.direction.getPositiveHorizontalDegrees() * MathHelper.RADIANS_PER_DEGREE);
                 if (this.value.stack) {
                     base.rotateX(MathHelper.HALF_PI);
                 } else if (this.value.value != 0) {

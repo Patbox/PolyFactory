@@ -216,11 +216,11 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
         private void updateStatePos(BlockState state) {
             var direction = state.get(FACING);
 
-            this.main.setYaw(direction.asRotation());
+            this.main.setYaw(direction.getPositiveHorizontalDegrees());
             this.main.setItem(state.get(SteamEngineBlock.LIT) ? LIT : FactoryItems.STEAM_ENGINE.getDefaultStack());
-            this.axle.setYaw(direction.asRotation());
-            this.rotatingA.setYaw(direction.asRotation());
-            this.rotatingB.setYaw(direction.asRotation());
+            this.axle.setYaw(direction.getPositiveHorizontalDegrees());
+            this.rotatingA.setYaw(direction.getPositiveHorizontalDegrees());
+            this.rotatingB.setYaw(direction.getPositiveHorizontalDegrees());
         }
 
         private void updateAnimation(float rotation, boolean negative) {

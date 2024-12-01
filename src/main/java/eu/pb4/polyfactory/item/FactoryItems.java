@@ -20,6 +20,7 @@ import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.wrench.WrenchItem;
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
 import net.minecraft.block.Block;
@@ -167,7 +168,6 @@ public class FactoryItems {
             builder.add(WOODEN_PLATE, (int) (context.baseSmeltTime() * 0.6));
             builder.add(COAL_DUST, (int) (context.baseSmeltTime() * 0.8));
         }));
-
 
 
         PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(ModInit.ID, "a_group"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
@@ -383,6 +383,8 @@ public class FactoryItems {
         }
 
         AttackBlockCallback.EVENT.register(WRENCH::handleBlockAttack);
+
+        PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(PortableFluidTankBlockItem::createItemAsset);
     }
 
 

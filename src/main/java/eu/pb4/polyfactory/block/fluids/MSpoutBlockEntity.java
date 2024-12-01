@@ -201,7 +201,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
                     scale = 1.25f;
                 } else {
                     base = base.add(0, 10f / 16, 0);
-                    rot = Direction.UP.getRotationQuaternion().rotateY(dir.asRotation() * MathHelper.RADIANS_PER_DEGREE);
+                    rot = Direction.UP.getRotationQuaternion().rotateY(dir.getPositiveHorizontalDegrees() * MathHelper.RADIANS_PER_DEGREE);
                 }
             } else {
                 base = base.add(0, 7.5 / 16, 0).offset(dir, -0.4);

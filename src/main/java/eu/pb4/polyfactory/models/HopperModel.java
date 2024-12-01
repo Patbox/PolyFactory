@@ -42,7 +42,7 @@ public class HopperModel extends BlockModel {
         if (facing == Direction.DOWN) {
             this.icon.setYaw(0);
         }
-        this.icon.setYaw(facing.asRotation());
+        this.icon.setYaw(facing.getPositiveHorizontalDegrees());
 
         this.tick();
     }

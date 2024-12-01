@@ -65,7 +65,7 @@ public class PolymerButtonBlock extends ButtonBlock implements FactoryBlock {
                 case FLOOR -> 0;
                 case CEILING -> 180;
             };
-            float y = blockState.get(FACING).asRotation() + 180;
+            float y = blockState.get(FACING).getPositiveHorizontalDegrees() + 180;
 
             this.base.setYaw(y);
             this.base.setPitch(p);
