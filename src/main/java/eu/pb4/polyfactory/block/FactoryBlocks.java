@@ -47,83 +47,84 @@ import java.util.Map;
 
 public class FactoryBlocks {
     private static final List<Block> BLOCKS = new ArrayList<>();
-    public static final ConveyorBlock CONVEYOR = register("conveyor", new ConveyorBlock(Block.Settings.create().hardness(3).nonOpaque()));
-    public static final ConveyorBlock STICKY_CONVEYOR = register("sticky_conveyor", new ConveyorBlock(Block.Settings.create().hardness(3).nonOpaque()));
-    public static final FunnelBlock FUNNEL = register("funnel", new FunnelBlock(Block.Settings.copy(Blocks.SPRUCE_TRAPDOOR).nonOpaque()));
-    public static final SplitterBlock SPLITTER = register("splitter", new SplitterBlock(Block.Settings.create().mapColor(MapColor.STONE_GRAY).instrument(NoteBlockInstrument.BASEDRUM).requiresTool().strength(3.3F).nonOpaque()));
-    public static final FanBlock FAN = register("fan", new FanBlock(Block.Settings.create().nonOpaque().hardness(1)));
-    public static final SelectivePassthroughBlock METAL_GRID = register("metal_grid", new SelectivePassthroughBlock(Block.Settings.copy(Blocks.IRON_BLOCK).strength(4.0F, 3.0F).nonOpaque()));
-    public static final HandCrankBlock HAND_CRANK = register("hand_crank", new HandCrankBlock(Block.Settings.create().hardness(1).nonOpaque()));
-    public static final SteamEngineBlock STEAM_ENGINE = register("steam_engine", new SteamEngineBlock(Block.Settings.copy(SPLITTER).strength(4F).nonOpaque()));
-    public static final GrinderBlock GRINDER = register("grinder", new GrinderBlock(Block.Settings.copy(SPLITTER)));
-    public static final PressBlock PRESS = register("press", new PressBlock(Block.Settings.copy(SPLITTER)));
-    public static final MixerBlock MIXER = register("mixer", new MixerBlock(Block.Settings.copy(SPLITTER)));
-    public static final MCrafterBlock CRAFTER = register("crafter", new MCrafterBlock(Block.Settings.copy(SPLITTER)));
-    public static final MinerBlock MINER = register("miner", new MinerBlock(Block.Settings.copy(SPLITTER)));
-    public static final PlacerBlock PLACER = register("placer", new PlacerBlock(Block.Settings.copy(SPLITTER)));
-    public static final PlanterBlock PLANTER = register("planter", new PlanterBlock(Block.Settings.copy(SPLITTER)));
-    public static final AxleBlock AXLE = register("axle", new AxleBlock(Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD).strength(2.5F).nonOpaque()));
-    public static final AxleWithGearBlock AXLE_WITH_GEAR = register("axle_with_gear", new AxleWithGearBlock(Block.Settings.copy(AXLE)));
-    public static final AxleWithLargeGearBlock AXLE_WITH_LARGE_GEAR = register("axle_with_large_gear", new AxleWithLargeGearBlock(Block.Settings.copy(AXLE)));
-    public static final TurntableBlock TURNTABLE = register("turntable", new TurntableBlock(Block.Settings.copy(AXLE)));
-    public static final GearboxBlock GEARBOX = register("gearbox", new GearboxBlock(Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD).strength(2.5F).nonOpaque()));
-    public static final ClutchBlock CLUTCH = register("clutch", new ClutchBlock(Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD).strength(2.5F).nonOpaque()));
-    public static final WindmillBlock WINDMILL = register("windmill", new WindmillBlock(Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD).strength(2.5F).nonOpaque()));
-    public static final ContainerBlock CONTAINER = register("wooden_container", new ContainerBlock(9 * 5, Block.Settings.copy(Blocks.CHEST).nonOpaque()));
-    public static final CableBlock CABLE = register("cable", new CableBlock(Block.Settings.copy(Blocks.GLASS).breakInstantly().nonOpaque()));
+    public static final ConveyorBlock CONVEYOR = register("conveyor", settings -> new ConveyorBlock(settings.hardness(3).nonOpaque()));
+    public static final ConveyorBlock STICKY_CONVEYOR = register("sticky_conveyor", settings -> new ConveyorBlock(settings.hardness(3).nonOpaque()));
+    public static final FunnelBlock FUNNEL = register("funnel", Block.Settings.copy(Blocks.SPRUCE_TRAPDOOR), settings -> new FunnelBlock(settings.nonOpaque()));
+    public static final SplitterBlock SPLITTER = register("splitter", settings -> new SplitterBlock(settings.mapColor(MapColor.STONE_GRAY).instrument(NoteBlockInstrument.BASEDRUM).requiresTool().strength(3.3F).nonOpaque()));
+    public static final FanBlock FAN = register("fan", settings -> new FanBlock(settings.nonOpaque().hardness(1)));
+    public static final SelectivePassthroughBlock METAL_GRID = register("metal_grid", Block.Settings.copy(Blocks.IRON_BLOCK), settings -> new SelectivePassthroughBlock(settings.strength(4.0F, 3.0F).nonOpaque()));
+    public static final HandCrankBlock HAND_CRANK = register("hand_crank", settings -> new HandCrankBlock(settings.hardness(1).nonOpaque()));
+    public static final SteamEngineBlock STEAM_ENGINE = register("steam_engine", Block.Settings.copy(SPLITTER), settings -> new SteamEngineBlock(settings.strength(4F).nonOpaque()));
+    public static final GrinderBlock GRINDER = register("grinder", Block.Settings.copy(SPLITTER), GrinderBlock::new);
+    public static final PressBlock PRESS = register("press", Block.Settings.copy(SPLITTER), PressBlock::new);
+    public static final MixerBlock MIXER = register("mixer", Block.Settings.copy(SPLITTER), MixerBlock::new);
+    public static final MCrafterBlock CRAFTER = register("crafter", Block.Settings.copy(SPLITTER), MCrafterBlock::new);
+    public static final MinerBlock MINER = register("miner", Block.Settings.copy(SPLITTER), MinerBlock::new);
+    public static final PlacerBlock PLACER = register("placer", Block.Settings.copy(SPLITTER), PlacerBlock::new);
+    public static final PlanterBlock PLANTER = register("planter", Block.Settings.copy(SPLITTER), PlanterBlock::new);
+    public static final AxleBlock AXLE = register("axle", Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD), settings -> new AxleBlock(settings.strength(2.5F).nonOpaque()));
+    public static final AxleWithGearBlock AXLE_WITH_GEAR = register("axle_with_gear", Block.Settings.copy(AXLE), AxleWithGearBlock::new);
+    public static final AxleWithLargeGearBlock AXLE_WITH_LARGE_GEAR = register("axle_with_large_gear", Block.Settings.copy(AXLE), AxleWithLargeGearBlock::new);
+    public static final TurntableBlock TURNTABLE = register("turntable", Block.Settings.copy(AXLE), TurntableBlock::new);
+    public static final GearboxBlock GEARBOX = register("gearbox", Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD), settings -> new GearboxBlock(settings.strength(2.5F).nonOpaque()));
+    public static final ClutchBlock CLUTCH = register("clutch", Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD), settings -> new ClutchBlock(settings.strength(2.5F).nonOpaque()));
+    public static final WindmillBlock WINDMILL = register("windmill", Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD), settings -> new WindmillBlock(settings.strength(2.5F).nonOpaque()));
+    public static final ContainerBlock CONTAINER = register("wooden_container", Block.Settings.copy(Blocks.CHEST), settings -> new ContainerBlock(9 * 5, settings.nonOpaque()));
+    public static final ItemPackerBlock ITEM_PACKER = register("item_packer", Block.Settings.copy(SPLITTER), ItemPackerBlock::new);
+    public static final CableBlock CABLE = register("cable", Block.Settings.copy(Blocks.GLASS), settings -> new CableBlock(settings.breakInstantly().nonOpaque()));
     public static final Map<Block, WallWithCableBlock> WALL_WITH_CABLE = WallWithCableBlock.MAP;
-    public static final CabledDataProviderBlock ITEM_COUNTER = register("item_counter", new CabledDataProviderBlock(AbstractBlock.Settings.copy(SPLITTER)));
+    public static final CabledDataProviderBlock ITEM_COUNTER = register("item_counter", Block.Settings.copy(SPLITTER), CabledDataProviderBlock::new);
 
-    public static final RedstoneInputBlock REDSTONE_INPUT = register("redstone_input", new RedstoneInputBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
-    public static final RedstoneOutputBlock REDSTONE_OUTPUT = register("redstone_output", new RedstoneOutputBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
-    public static final ItemReaderBlock ITEM_READER = register("item_reader", new ItemReaderBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
-    public static final BlockObserverBlock BLOCK_OBSERVER = register("block_observer", new BlockObserverBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
+    public static final RedstoneInputBlock REDSTONE_INPUT = register("redstone_input", Block.Settings.copy(ITEM_COUNTER), RedstoneInputBlock::new);
+    public static final RedstoneOutputBlock REDSTONE_OUTPUT = register("redstone_output", Block.Settings.copy(ITEM_COUNTER), RedstoneOutputBlock::new);
+    public static final ItemReaderBlock ITEM_READER = register("item_reader", Block.Settings.copy(ITEM_COUNTER), ItemReaderBlock::new);
+    public static final BlockObserverBlock BLOCK_OBSERVER = register("block_observer", Block.Settings.copy(ITEM_COUNTER), BlockObserverBlock::new);
     public static final ArithmeticOperatorBlock ARITHMETIC_OPERATOR = register("arithmetic_operator",
-            new ArithmeticOperatorBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
+            Block.Settings.copy(ITEM_COUNTER), ArithmeticOperatorBlock::new);
 
     public static final DataMemoryBlock DATA_MEMORY = register("data_memory",
-            new DataMemoryBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
+            Block.Settings.copy(ITEM_COUNTER), DataMemoryBlock::new);
 
-    public static final HologramProjectorBlock HOLOGRAM_PROJECTOR = register("hologram_projector", new HologramProjectorBlock(AbstractBlock.Settings.copy(SPLITTER)));
-    public static final NixieTubeBlock NIXIE_TUBE = register("nixie_tube", new NixieTubeBlock(Block.Settings.copy(Blocks.GLASS).nonOpaque()));
+    public static final HologramProjectorBlock HOLOGRAM_PROJECTOR = register("hologram_projector", Block.Settings.copy(SPLITTER), HologramProjectorBlock::new);
+    public static final NixieTubeBlock NIXIE_TUBE = register("nixie_tube", Block.Settings.copy(Blocks.GLASS), settings -> new NixieTubeBlock(settings.nonOpaque()));
 
-    public static final NixieTubeControllerBlock NIXIE_TUBE_CONTROLLER = register("nixie_tube_controller", new NixieTubeControllerBlock(AbstractBlock.Settings.copy(ITEM_COUNTER)));
-    public static final WirelessRedstoneBlock WIRELESS_REDSTONE_RECEIVER = register("wireless_redstone_receiver", new WirelessRedstoneBlock.Receiver(AbstractBlock.Settings.copy(ITEM_COUNTER)));
-    public static final WirelessRedstoneBlock WIRELESS_REDSTONE_TRANSMITTER = register("wireless_redstone_transmitter", new WirelessRedstoneBlock.Transmitter(AbstractBlock.Settings.copy(ITEM_COUNTER)));
+    public static final NixieTubeControllerBlock NIXIE_TUBE_CONTROLLER = register("nixie_tube_controller", Block.Settings.copy(ITEM_COUNTER), NixieTubeControllerBlock::new);
+    public static final WirelessRedstoneBlock WIRELESS_REDSTONE_RECEIVER = register("wireless_redstone_receiver", AbstractBlock.Settings.copy(ITEM_COUNTER), WirelessRedstoneBlock.Receiver::new);
+    public static final WirelessRedstoneBlock WIRELESS_REDSTONE_TRANSMITTER = register("wireless_redstone_transmitter", AbstractBlock.Settings.copy(ITEM_COUNTER), WirelessRedstoneBlock.Transmitter::new);
 
-    public static final RotationMeterBlock TACHOMETER = register("tachometer", new RotationMeterBlock.Speed(Block.Settings.create().hardness(2).nonOpaque()));
-    public static final RotationMeterBlock STRESSOMETER = register("stressometer", new RotationMeterBlock.Stress(Block.Settings.create().hardness(2).nonOpaque()));
-    public static final ElectricMotorBlock ELECTRIC_MOTOR = register("electric_motor", new ElectricMotorBlock(Block.Settings.create().hardness(2).nonOpaque()));
-    public static final ElectricGeneratorBlock ELECTRIC_GENERATOR = register("electric_generator", new ElectricGeneratorBlock(Block.Settings.create().hardness(2).nonOpaque()));
-    public static final WorkbenchBlock WORKBENCH = register("workbench", new WorkbenchBlock(Block.Settings.copy(Blocks.CRAFTING_TABLE).nonOpaque()));
+    public static final RotationMeterBlock TACHOMETER = register("tachometer", settings -> new RotationMeterBlock.Speed(settings.hardness(2).nonOpaque()));
+    public static final RotationMeterBlock STRESSOMETER = register("stressometer", settings -> new RotationMeterBlock.Stress(settings.hardness(2).nonOpaque()));
+    public static final ElectricMotorBlock ELECTRIC_MOTOR = register("electric_motor", settings -> new ElectricMotorBlock(settings.hardness(2).nonOpaque()));
+    public static final ElectricGeneratorBlock ELECTRIC_GENERATOR = register("electric_generator", settings -> new ElectricGeneratorBlock(settings.hardness(2).nonOpaque()));
+    public static final WorkbenchBlock WORKBENCH = register("workbench", Block.Settings.copy(Blocks.CRAFTING_TABLE), settings -> new WorkbenchBlock(settings.nonOpaque()));
 
-    public static final CreativeMotorBlock CREATIVE_MOTOR = register("creative_motor", new CreativeMotorBlock(AbstractBlock.Settings.create().strength(-1, -1).nonOpaque().dropsNothing()));
-    public static final CreativeContainerBlock CREATIVE_CONTAINER = register("creative_container", new CreativeContainerBlock(AbstractBlock.Settings.create().strength(-1, -1).nonOpaque().dropsNothing()));
+    public static final CreativeMotorBlock CREATIVE_MOTOR = register("creative_motor", settings -> new CreativeMotorBlock(settings.strength(-1, -1).nonOpaque().dropsNothing()));
+    public static final CreativeContainerBlock CREATIVE_CONTAINER = register("creative_container", settings -> new CreativeContainerBlock(settings.strength(-1, -1).nonOpaque().dropsNothing()));
     public static final InvertedRedstoneLampBlock INVERTED_REDSTONE_LAMP = register("inverted_redstone_lamp",
-            new InvertedRedstoneLampBlock(AbstractBlock.Settings.copy(Blocks.REDSTONE_LAMP).luminance((state) -> {
+            Block.Settings.copy(Blocks.REDSTONE_LAMP), settings -> new InvertedRedstoneLampBlock(settings.luminance((state) -> {
                 return (Boolean)state.get(Properties.LIT) ? 0 : 15;
             })));
-    public static final LampBlock LAMP = register("colored_lamp", new LampBlock(Block.Settings.copy(Blocks.REDSTONE_LAMP).nonOpaque(), false));
-    public static final LampBlock INVERTED_LAMP = register("inverted_colored_lamp", new LampBlock(Block.Settings.copy(INVERTED_REDSTONE_LAMP).nonOpaque(), true));
+    public static final LampBlock LAMP = register("colored_lamp", Block.Settings.copy(Blocks.REDSTONE_LAMP), settings -> new LampBlock(settings.nonOpaque(), false));
+    public static final LampBlock INVERTED_LAMP = register("inverted_colored_lamp", Block.Settings.copy(INVERTED_REDSTONE_LAMP), settings -> new LampBlock(settings.nonOpaque(), true));
 
-    public static final SmallLampBlock CAGED_LAMP = register("caged_lamp", new SmallLampBlock(Block.Settings.copy(Blocks.REDSTONE_LAMP).nonOpaque(), false));
-    public static final SmallLampBlock INVERTED_CAGED_LAMP = register("inverted_caged_lamp", new SmallLampBlock(Block.Settings.copy(INVERTED_REDSTONE_LAMP).nonOpaque(), true));
-    public static final PolymerButtonBlock STEEL_BUTTON = register("steel_button", new PolymerButtonBlock("steel", BlockSetType.IRON, 5, Block.Settings.copy(Blocks.STONE_BUTTON).nonOpaque()));
-    public static final TinyPotatoSpringBlock TINY_POTATO_SPRING = register("tiny_potato_spring", new TinyPotatoSpringBlock(AbstractBlock.Settings.create().strength(1).nonOpaque()));
-    public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", new RotationalDebugBlock(AbstractBlock.Settings.create().strength(-1, -1)));
-    public static final PipeBlock PIPE = register("pipe", new PipeBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
-    public static final FilteredPipeBlock FILTERED_PIPE = register("filtered_pipe", new FilteredPipeBlock(AbstractBlock.Settings.copy(PIPE).nonOpaque()));
-    public static final RedstoneValvePipeBlock REDSTONE_VALVE_PIPE = register("redstone_valve_pipe", new RedstoneValvePipeBlock(AbstractBlock.Settings.copy(PIPE).nonOpaque()));
+    public static final SmallLampBlock CAGED_LAMP = register("caged_lamp", Block.Settings.copy(Blocks.REDSTONE_LAMP), settings -> new SmallLampBlock(settings.nonOpaque(), false));
+    public static final SmallLampBlock INVERTED_CAGED_LAMP = register("inverted_caged_lamp", Block.Settings.copy(INVERTED_REDSTONE_LAMP), settings -> new SmallLampBlock(settings.nonOpaque(), true));
+    public static final PolymerButtonBlock STEEL_BUTTON = register("steel_button", Block.Settings.copy(Blocks.STONE_BUTTON), settings -> new PolymerButtonBlock("steel", BlockSetType.IRON, 5, settings.nonOpaque()));
+    public static final TinyPotatoSpringBlock TINY_POTATO_SPRING = register("tiny_potato_spring", settings -> new TinyPotatoSpringBlock(settings.strength(1).nonOpaque()));
+    public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", settings -> new RotationalDebugBlock(settings.strength(-1, -1)));
+    public static final PipeBlock PIPE = register("pipe", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new PipeBlock(settings.nonOpaque()));
+    public static final FilteredPipeBlock FILTERED_PIPE = register("filtered_pipe", Block.Settings.copy(PIPE), settings -> new FilteredPipeBlock(settings.nonOpaque()));
+    public static final RedstoneValvePipeBlock REDSTONE_VALVE_PIPE = register("redstone_valve_pipe", Block.Settings.copy(PIPE), settings -> new RedstoneValvePipeBlock(settings.nonOpaque()));
     public static final Map<Block, PipeInWallBlock> WALL_WITH_PIPE = PipeInWallBlock.MAP;
 
-    public static final PumpBlock PUMP = register("pump", new PumpBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
-    public static final NozzleBlock NOZZLE = register("nozzle", new NozzleBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
-    public static final DrainBlock DRAIN = register("drain", new DrainBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
-    public static final MDrainBlock MECHANICAL_DRAIN = register("mechanical_drain", new MDrainBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
-    public static final MSpoutBlock MECHANICAL_SPOUT = register("mechanical_spout", new MSpoutBlock(AbstractBlock.Settings.copy(SPLITTER).nonOpaque()));
-    public static final CreativeDrainBlock CREATIVE_DRAIN = register("creative_drain", new CreativeDrainBlock(AbstractBlock.Settings.copy(DRAIN).dropsNothing().strength(-1)));
-    public static final FluidTankBlock FLUID_TANK = register("fluid_tank", new FluidTankBlock(AbstractBlock.Settings.copy(Blocks.COPPER_BLOCK).nonOpaque()));
-    public static final PortableFluidTankBlock PORTABLE_FLUID_TANK = register("portable_fluid_tank", new PortableFluidTankBlock(AbstractBlock.Settings.create()
+    public static final PumpBlock PUMP = register("pump", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new PumpBlock(settings.nonOpaque()));
+    public static final NozzleBlock NOZZLE = register("nozzle", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new NozzleBlock(settings.nonOpaque()));
+    public static final DrainBlock DRAIN = register("drain", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new DrainBlock(settings.nonOpaque()));
+    public static final MDrainBlock MECHANICAL_DRAIN = register("mechanical_drain", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new MDrainBlock(settings.nonOpaque()));
+    public static final MSpoutBlock MECHANICAL_SPOUT = register("mechanical_spout", Block.Settings.copy(SPLITTER), settings -> new MSpoutBlock(settings.nonOpaque()));
+    public static final CreativeDrainBlock CREATIVE_DRAIN = register("creative_drain", Block.Settings.copy(DRAIN), settings -> new CreativeDrainBlock(settings.dropsNothing().strength(-1)));
+    public static final FluidTankBlock FLUID_TANK = register("fluid_tank", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new FluidTankBlock(settings.nonOpaque()));
+    public static final PortableFluidTankBlock PORTABLE_FLUID_TANK = register("portable_fluid_tank", settings -> new PortableFluidTankBlock(settings
             .mapColor(MapColor.ORANGE).strength(2.0F).nonOpaque().sounds(BlockSoundGroup.COPPER).pistonBehavior(PistonBehavior.DESTROY)));
 
     public static void register() {
@@ -131,8 +132,8 @@ public class FactoryBlocks {
         for (var block : Registries.BLOCK) {
             if (block instanceof WallBlock wallBlock) {
                 var id = Registries.BLOCK.getId(wallBlock);
-                register("wall_with_cable/" + id.getNamespace() + "/" + id.getPath(), new WallWithCableBlock(wallBlock));
-                register("wall_with_pipe/" + id.getNamespace() + "/" + id.getPath(), new PipeInWallBlock(wallBlock));
+                register("wall_with_cable/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock), settings -> new WallWithCableBlock(settings, wallBlock));
+                register("wall_with_pipe/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock), settings -> new PipeInWallBlock(settings, wallBlock));
             }
         }
 
@@ -159,8 +160,13 @@ public class FactoryBlocks {
         }
     }
 
-    public static <T extends Block> T register(String path, T item) {
+    public static <T extends Block> T register(String path, Function<AbstractBlock.Settings, T> function) {
+        return register(path, AbstractBlock.Settings.create(), function);
+    }
+    public static <T extends Block> T register(String path, AbstractBlock.Settings settings, Function<AbstractBlock.Settings, T> function) {
+        var id = Identifier.of(ModInit.ID, path);
+        var item = function.apply(settings.registryKey(RegistryKey.of(RegistryKeys.BLOCK, id)));
         BLOCKS.add(item);
-        return Registry.register(Registries.BLOCK, Identifier.of(ModInit.ID, path), item);
+        return Registry.register(Registries.BLOCK, id, item);
     }
 }

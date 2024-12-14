@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.item;
 
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
-import eu.pb4.factorytools.api.item.ModeledItem;
+import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.factorytools.api.item.MultiBlockItem;
 import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polyfactory.other.FactoryRegistries;
@@ -20,29 +20,34 @@ import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.wrench.WrenchItem;
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.registry.FuelRegistry;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
 import net.minecraft.block.Block;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.component.type.FoodComponent;
-import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.component.type.*;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.*;
+import net.minecraft.item.consume.RemoveEffectsConsumeEffect;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class FactoryItems {
     // Util
-    public static final Item MOD_ICON = register("mod_icon", new ModeledItem(new Item.Settings()));
-    public static final Item FLUID_MODEL = register("fluid_model", new FluidModelItem(new Item.Settings()));
+    public static final Item MOD_ICON = register("mod_icon", SimplePolymerItem::new);
+    public static final Item FLUID_MODEL = register("fluid_model", FluidModelItem::new);
     // Actual items
-    public static final WrenchItem WRENCH = register("wrench", new WrenchItem());
+    public static final WrenchItem WRENCH = register("wrench", settings -> new WrenchItem(settings.maxCount(1)));
     public static final Item CONVEYOR = register(FactoryBlocks.CONVEYOR);
     public static final Item STICKY_CONVEYOR = register(FactoryBlocks.STICKY_CONVEYOR);
     public static final Item FUNNEL = register(FactoryBlocks.FUNNEL);
@@ -63,30 +68,30 @@ public class FactoryItems {
     public static final Item CLUTCH = register(FactoryBlocks.CLUTCH);
     public static final Item CONTAINER = register( FactoryBlocks.CONTAINER);
     public static final Item NIXIE_TUBE = register(FactoryBlocks.NIXIE_TUBE);
-    public static final WindmillSailItem WINDMILL_SAIL = register("windmill_sail", new WindmillSailItem(new Item.Settings()));
+    public static final WindmillSailItem WINDMILL_SAIL = register("windmill_sail", WindmillSailItem::new);
     public static final Item METAL_GRID = register(FactoryBlocks.METAL_GRID);
-    public static final Item SAW_DUST = register("saw_dust", new ModeledItem(Items.STICK, new Item.Settings()));
-    public static final Item COAL_DUST = register("coal_dust", new ModeledItem(Items.COAL, new Item.Settings()));
-    public static final Item NETHERRACK_DUST = register("netherrack_dust", new ModeledItem(new Item.Settings()));
-    public static final Item ENDER_DUST = register("ender_dust", new ModeledItem(new Item.Settings()));
-    public static final Item ENDER_INFUSED_AMETHYST_SHARD = register("ender_infused_amethyst_shard", new ModeledItem(new Item.Settings()));
-    public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", new ModeledItem(new Item.Settings()));
-    public static final Item STEEL_INGOT = register("steel_ingot", new ModeledItem(new Item.Settings()));
-    public static final Item STEEL_PLATE = register("steel_plate", new ModeledItem(new Item.Settings()));
-    public static final Item COPPER_PLATE = register("copper_plate", new ModeledItem(new Item.Settings()));
-    public static final Item BRITTLE_GLASS_BOTTLE = register("brittle_glass_bottle", new ModeledItem(new Item.Settings()));
-    public static final Item BRITTLE_POTION = register("brittle_potion", new BrittlePotionItem(new Item.Settings().maxCount(1)));
-    public static final Item THROWABLE_GLASS_BOTTLE = register("throwable_glass_bottle", new ModeledItem(new Item.Settings()));
-    public static final Item LINGERING_THROWABLE_GLASS_BOTTLE = register("lingering_throwable_glass_bottle", new ModeledItem(new Item.Settings()));
-    public static final Item STEEL_GEAR = register("steel_gear", new GearItem(FactoryBlocks.AXLE_WITH_GEAR, new Item.Settings()));
-    public static final Item LARGE_STEEL_GEAR = register("large_steel_gear", new GearItem(FactoryBlocks.AXLE_WITH_LARGE_GEAR, new Item.Settings()));
-    public static final Item GENERIC_MACHINE_PART = register("generic_machine_part", new ModeledItem(new Item.Settings()));
-    public static final Item WOODEN_PLATE = register("wooden_plate", new ModeledItem(Items.STICK, new Item.Settings()));
-    public static final Item TREATED_DRIED_KELP = register("treated_dried_kelp", new ModeledItem(new Item.Settings()));
-    public static final Item INTEGRATED_CIRCUIT = register("integrated_circuit", new ModeledItem(new Item.Settings()));
-    public static final Item REDSTONE_CHIP = register("redstone_chip", new ModeledItem(new Item.Settings()));
+    public static final Item SAW_DUST = register("saw_dust", SimplePolymerItem::new);
+    public static final Item COAL_DUST = register("coal_dust", SimplePolymerItem::new);
+    public static final Item NETHERRACK_DUST = register("netherrack_dust", SimplePolymerItem::new);
+    public static final Item ENDER_DUST = register("ender_dust", SimplePolymerItem::new);
+    public static final Item ENDER_INFUSED_AMETHYST_SHARD = register("ender_infused_amethyst_shard", SimplePolymerItem::new);
+    public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", SimplePolymerItem::new);
+    public static final Item STEEL_INGOT = register("steel_ingot", SimplePolymerItem::new);
+    public static final Item STEEL_PLATE = register("steel_plate", SimplePolymerItem::new);
+    public static final Item COPPER_PLATE = register("copper_plate", SimplePolymerItem::new);
+    public static final Item BRITTLE_GLASS_BOTTLE = register("brittle_glass_bottle", SimplePolymerItem::new);
+    public static final Item BRITTLE_POTION = register("brittle_potion", settings -> new BrittlePotionItem(settings.component(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT).component(DataComponentTypes.CONSUMABLE, ConsumableComponents.drink().finishSound(SoundEvents.ITEM_OMINOUS_BOTTLE_DISPOSE).build()).maxCount(1)));
+    public static final Item THROWABLE_GLASS_BOTTLE = register("throwable_glass_bottle", SimplePolymerItem::new);
+    public static final Item LINGERING_THROWABLE_GLASS_BOTTLE = register("lingering_throwable_glass_bottle", SimplePolymerItem::new);
+    public static final Item STEEL_GEAR = register("steel_gear", (settings) -> new GearItem(FactoryBlocks.AXLE_WITH_GEAR, settings));
+    public static final Item LARGE_STEEL_GEAR = register("large_steel_gear", (settings) -> new GearItem(FactoryBlocks.AXLE_WITH_LARGE_GEAR, settings));
+    public static final Item GENERIC_MACHINE_PART = register("generic_machine_part", SimplePolymerItem::new);
+    public static final Item WOODEN_PLATE = register("wooden_plate", SimplePolymerItem::new);
+    public static final Item TREATED_DRIED_KELP = register("treated_dried_kelp", SimplePolymerItem::new);
+    public static final Item INTEGRATED_CIRCUIT = register("integrated_circuit", SimplePolymerItem::new);
+    public static final Item REDSTONE_CHIP = register("redstone_chip", SimplePolymerItem::new);
 
-    public static final Item ITEM_FILTER = register("item_filter", new FilterItem(Items.PAPER, new Item.Settings()));
+    public static final Item ITEM_FILTER = register("item_filter", FilterItem::new);
 
     public static final Item CREATIVE_MOTOR = register(FactoryBlocks.CREATIVE_MOTOR);
     public static final Item CREATIVE_CONTAINER = register(FactoryBlocks.CREATIVE_CONTAINER);
@@ -98,16 +103,16 @@ public class FactoryItems {
     public static final Item ITEM_READER = register(FactoryBlocks.ITEM_READER);
     public static final Item BLOCK_OBSERVER = register(FactoryBlocks.BLOCK_OBSERVER);
     public static final Item ARITHMETIC_OPERATOR = register(FactoryBlocks.ARITHMETIC_OPERATOR);
-    public static final Item DATA_MEMORY = register("data_memory", new DataMemoryBlockItem(FactoryBlocks.DATA_MEMORY, new Item.Settings()));
+    public static final Item DATA_MEMORY = register("data_memory", (settings) -> new DataMemoryBlockItem(FactoryBlocks.DATA_MEMORY, settings.useBlockPrefixedTranslationKey()));
     public static final Item NIXIE_TUBE_CONTROLLER = register(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
     public static final Item HOLOGRAM_PROJECTOR = register(FactoryBlocks.HOLOGRAM_PROJECTOR);
     public static final Item WIRELESS_REDSTONE_RECEIVER = register(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
     public static final Item WIRELESS_REDSTONE_TRANSMITTER = register(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER);
     public static final Item PORTABLE_REDSTONE_TRANSMITTER = register("portable_redstone_transmitter",
-            new WirelessRedstoneTransmitterItem(new Item.Settings().maxCount(1)
+            settings -> new WirelessRedstoneTransmitterItem(settings.maxCount(1)
                     .component(FactoryDataComponents.REMOTE_KEYS, new Pair<>(ItemStack.EMPTY, ItemStack.EMPTY))));
 
-    public static final CableItem CABLE = register("cable", new CableItem(FactoryBlocks.CABLE, AbstractCableBlock.DEFAULT_COLOR, new Item.Settings()));
+    public static final CableItem CABLE = register("cable", (settings) -> new CableItem(FactoryBlocks.CABLE, AbstractCableBlock.DEFAULT_COLOR, settings.useBlockPrefixedTranslationKey()));
     public static final ColoredDownsampledBlockItem LAMP = registerColored(FactoryBlocks.LAMP, -1);
     public static final ColoredDownsampledBlockItem INVERTED_LAMP = registerColored(FactoryBlocks.INVERTED_LAMP, -1);
     public static final ColoredDownsampledBlockItem CAGED_LAMP = registerColored(FactoryBlocks.CAGED_LAMP, -1);
@@ -116,26 +121,33 @@ public class FactoryItems {
     public static final Item ELECTRIC_MOTOR = register(FactoryBlocks.ELECTRIC_MOTOR);
     public static final Item ELECTRIC_GENERATOR = register(FactoryBlocks.ELECTRIC_GENERATOR);
     public static final Item WORKBENCH = register(FactoryBlocks.WORKBENCH);
-    public static final Item ARTIFICIAL_DYE = register("artificial_dye", new ArtificialDyeItem(new Item.Settings()));
-    public static final Item DYNAMITE = register("dynamite", new DynamiteItem(new Item.Settings().maxCount(16)));
-    public static final Item STICKY_DYNAMITE = register("sticky_dynamite", new DynamiteItem(new Item.Settings().maxCount(16)));
+    public static final Item ARTIFICIAL_DYE = register("artificial_dye", ArtificialDyeItem::new);
+    public static final Item DYNAMITE = register("dynamite", settings -> new DynamiteItem(settings.maxCount(16)));
+    public static final Item STICKY_DYNAMITE = register("sticky_dynamite", settings -> new DynamiteItem(settings.maxCount(16)));
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
-    public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING);
-    public static final Item EXPERIENCE_BUCKET = register("experience_bucket", new ModeledItem(new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
-    public static final Item SLIME_BUCKET = register("slime_bucket", new ModeledItem(new Item.Settings().maxCount(1).recipeRemainder(Items.BUCKET)));
-    public static final Item HONEY_BUCKET = register("honey_bucket", new HoneyBucketItem(new Item.Settings().recipeRemainder(Items.BUCKET)
-            .food(new FoodComponent.Builder().nutrition(18).saturationModifier(0.2F).build()).maxCount(1)));
+    public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING, settings -> settings.equippableUnswappable(EquipmentSlot.HEAD));
+    public static final Item EXPERIENCE_BUCKET = register("experience_bucket", settings -> new SimplePolymerItem(settings.maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final Item SLIME_BUCKET = register("slime_bucket", settings -> new SimplePolymerItem(settings.maxCount(1).recipeRemainder(Items.BUCKET)));
+    public static final Item HONEY_BUCKET = register("honey_bucket", settings -> new SimplePolymerItem(settings.recipeRemainder(Items.BUCKET)
+            .useRemainder(Items.BUCKET)
+            .food(new FoodComponent.Builder().nutrition(18).saturationModifier(0.2F).build(),
+                    ConsumableComponents.drink().consumeSeconds(8.0F).sound(SoundEvents.ITEM_HONEY_BOTTLE_DRINK)
+                            .consumeEffect(new RemoveEffectsConsumeEffect(StatusEffects.POISON))
+                            .consumeEffect(new RemoveEffectsConsumeEffect(StatusEffects.WITHER))
+                            .consumeEffect(new RemoveEffectsConsumeEffect(StatusEffects.HUNGER))
+                            .build()
+            ).maxCount(1)));
 
-    public static final Item CRISPY_HONEY = register("crispy_honey", new ModeledItem(new Item.Settings()
-            .food(new FoodComponent.Builder().nutrition(4).saturationModifier(0.6F).snack().build())));
-    public static final Item HONEYED_APPLE = register("honeyed_apple", new ModeledItem(new Item.Settings()
+    public static final Item CRISPY_HONEY = register("crispy_honey", settings -> new SimplePolymerItem(settings
+            .food(new FoodComponent.Builder().nutrition(4).saturationModifier(0.6F).build(), ConsumableComponents.food().consumeSeconds(0.8F).build())));
+    public static final Item HONEYED_APPLE = register("honeyed_apple", settings -> new SimplePolymerItem(settings
             .food(new FoodComponent.Builder().nutrition(7).saturationModifier(1.5f).build())));
-    public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", new ModeledItem(new Item.Settings()));
-    public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", new ModeledItem(new Item.Settings()));
-    public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", new ModeledItem(new Item.Settings()));
-    public static final Item TEMPLATE_BALL = register("template_ball", new ModeledItem(new Item.Settings()));
-    public static final Item SPRAY_CAN = register("spray_can", new DyeSprayItem(new Item.Settings().maxCount(1)));
-    public static final Item PIPE = register("pipe", new PipeItem(FactoryBlocks.PIPE, new Item.Settings()));
+    public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", SimplePolymerItem::new);
+    public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", SimplePolymerItem::new);
+    public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", SimplePolymerItem::new);
+    public static final Item TEMPLATE_BALL = register("template_ball", SimplePolymerItem::new);
+    public static final Item SPRAY_CAN = register("spray_can", settings -> new DyeSprayItem(settings.maxCount(1)));
+    public static final Item PIPE = register("pipe", settings -> new PipeItem(FactoryBlocks.PIPE, settings.useBlockPrefixedTranslationKey()));
     public static final Item FILTERED_PIPE = register(FactoryBlocks.FILTERED_PIPE);
     public static final Item REDSTONE_VALVE_PIPE = register(FactoryBlocks.REDSTONE_VALVE_PIPE);
     public static final Item PUMP = register(FactoryBlocks.PUMP);
@@ -144,17 +156,22 @@ public class FactoryItems {
     public static final Item MECHANICAL_DRAIN = register(FactoryBlocks.MECHANICAL_DRAIN);
     public static final Item MECHANICAL_SPOUT = register(FactoryBlocks.MECHANICAL_SPOUT);
     public static final Item CREATIVE_DRAIN = register(FactoryBlocks.CREATIVE_DRAIN);
-    public static final UniversalFluidContainerItem STEEL_BUCKET = register("steel_bucket", new UniversalFluidContainerItem(FluidConstants.BUCKET * 2, new Item.Settings().maxCount(1)));
     public static final Item FLUID_TANK = register(FactoryBlocks.FLUID_TANK);
     public static final Item PORTABLE_FLUID_TANK = register(FactoryBlocks.PORTABLE_FLUID_TANK,
             (s) -> s.maxCount(1).component(FactoryDataComponents.FLUID, FluidComponent.empty(PortableFluidTankBlockEntity.CAPACITY)));
 
-    public static final PressureFluidGun PRESSURE_FLUID_GUN = register("pressure_fluid_gun", new PressureFluidGun(
-            new Item.Settings().maxCount(1).maxDamage(800)));
+    public static final PressureFluidGun PRESSURE_FLUID_GUN = register("pressure_fluid_gun", settings -> new PressureFluidGun(
+            settings.maxCount(1).enchantable(5).repairable(COPPER_PLATE).maxDamage(800)));
+
+    public static final Item ITEM_PACKER = register(FactoryBlocks.ITEM_PACKER);
+
     public static void register() {
-        FuelRegistry.INSTANCE.add(SAW_DUST, 60);
-        FuelRegistry.INSTANCE.add(WOODEN_PLATE, 120);
-        FuelRegistry.INSTANCE.add(COAL_DUST, 160);
+        FuelRegistryEvents.BUILD.register(((builder, context) -> {
+            builder.add(SAW_DUST, (int) (context.baseSmeltTime() * 0.3));
+            builder.add(WOODEN_PLATE, (int) (context.baseSmeltTime() * 0.6));
+            builder.add(COAL_DUST, (int) (context.baseSmeltTime() * 0.8));
+        }));
+
 
         PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(ModInit.ID, "a_group"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
                 .icon(WINDMILL_SAIL::getDefaultStack)
@@ -185,6 +202,7 @@ public class FactoryItems {
                     entries.add(SPLITTER);
                     entries.add(CONTAINER);
                     entries.add(ITEM_FILTER);
+                    entries.add(ITEM_PACKER);
 
                     // Rotation other?
                     entries.add(TURNTABLE);
@@ -364,23 +382,26 @@ public class FactoryItems {
                         FactoryDebugItems.addItemGroup(context, entries);
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(STEEL_BUCKET, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     })).build()
             );
         }
 
         AttackBlockCallback.EVENT.register(WRENCH::handleBlockAttack);
+
+        PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(PortableFluidTankBlockItem::createItemAsset);
     }
 
 
-    public static <T extends Item> T register(String path, T item) {
-        Registry.register(Registries.ITEM, Identifier.of(ModInit.ID, path), item);
+    public static <T extends Item> T register(String path, Function<Item.Settings, T> function) {
+        var id = Identifier.of(ModInit.ID, path);
+        var item = function.apply(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, id)));
+        Registry.register(Registries.ITEM, id, item);
         return item;
     }
 
     public static <E extends Block & PolymerBlock> ColoredDownsampledBlockItem registerColored(E block, int color) {
         var id = Registries.BLOCK.getId(block);
-        var item = new ColoredDownsampledBlockItem(block, color, new Item.Settings());
+        var item = new ColoredDownsampledBlockItem(block, color, new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, id)).useBlockPrefixedTranslationKey());
         Registry.register(Registries.ITEM, id, item);
         return item;
     }
@@ -391,7 +412,7 @@ public class FactoryItems {
     public static <E extends Block & PolymerBlock> FactoryBlockItem register(E block, Consumer<Item.Settings> settingsConsumer) {
         var id = Registries.BLOCK.getId(block);
         FactoryBlockItem item;
-        var settings = new Item.Settings();
+        var settings = new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, id)).useBlockPrefixedTranslationKey();
         settingsConsumer.accept(settings);
 
         if (block instanceof MultiBlock multiBlock) {
@@ -404,11 +425,10 @@ public class FactoryItems {
             item = new FactoryBlockItem(block, settings);
         }
         Registry.register(Registries.ITEM, id, item);
-        item.onRegistered(id);
         return item;
     }
 
     static {
-        FactoryDebugItems.DEBUG_PIPE_FLOW.hasRecipeRemainder();
+        FactoryDebugItems.DEBUG_PIPE_FLOW.getName();
     }
 }
