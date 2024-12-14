@@ -169,12 +169,12 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
                     }
 
                     try (var t = Transaction.openOuter()) {
-                        var val = view.extract(view.getResource(), conveyor.getMaxStackCount(view.getResource().toStack()), t);
-
+                        var resource = view.getResource();
+                        var val = view.extract(view.getResource(), conveyor.getMaxStackCount(resource.toStack()), t);
                         if (val != 0) {
                             t.commit();
 
-                            if (conveyor.pushNew(view.getResource().toStack((int) val))) {
+                            if (conveyor.pushNew(resource.toStack((int) val))) {
                                 conveyor.setMovementPosition(pushDirection.getOpposite() == selfFacing ? 0.15 : 0.5);
                                 return;
                             }

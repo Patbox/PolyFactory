@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.fabricmc.fabric.api.item.v1.FabricItemStack;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
@@ -69,7 +70,7 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
                 if (!stack.isEmpty()) {
                     var value = world.getFuelRegistry().getFuelTicks(stack);
                     if (value > 0) {
-                        var remainder = stack.getRecipeRemainder();
+                        var remainder = ((FabricItemStack) (Object) stack).getRecipeRemainder();
                         stack.decrement(1);
                         self.fuelTicks = value * 10;
                         self.fuelInitial = self.fuelTicks;

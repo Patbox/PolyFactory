@@ -113,6 +113,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.PUMP)
                 .add(FactoryBlocks.MECHANICAL_DRAIN)
                 .add(FactoryBlocks.MECHANICAL_SPOUT)
+                .add(FactoryBlocks.ITEM_PACKER)
                 .add(FactoryBlocks.DRAIN)
                 .add(FactoryBlocks.FLUID_TANK)
                 .add(FactoryBlocks.NOZZLE)

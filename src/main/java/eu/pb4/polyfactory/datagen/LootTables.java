@@ -1,13 +1,11 @@
 package eu.pb4.polyfactory.datagen;
 
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.data.CableBlock;
 import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
 import eu.pb4.polyfactory.block.fluids.PipeInWallBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.loottable.CopyCachedDataLootFunction;
 import eu.pb4.polyfactory.loottable.CopyColorLootFunction;
@@ -52,6 +50,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.ELECTRIC_MOTOR);
         this.addDrop(FactoryBlocks.FUNNEL);
         this.addDrop(FactoryBlocks.AXLE);
+        this.addDrop(FactoryBlocks.ITEM_PACKER);
         this.addDrop(FactoryBlocks.GEARBOX);
         this.addDrop(FactoryBlocks.CLUTCH);
         this.addDrop(FactoryBlocks.CONTAINER);

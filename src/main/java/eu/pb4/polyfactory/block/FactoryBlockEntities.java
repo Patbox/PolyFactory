@@ -28,10 +28,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.source.HandCrankBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
-import eu.pb4.polyfactory.block.other.ColorableBlockEntity;
-import eu.pb4.polyfactory.block.other.ContainerBlockEntity;
-import eu.pb4.polyfactory.block.other.WirelessRedstoneBlockEntity;
-import eu.pb4.polyfactory.block.other.WorkbenchBlockEntity;
+import eu.pb4.polyfactory.block.other.*;
 import eu.pb4.polyfactory.mixin.util.BlockEntityTypeAccessor;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -143,6 +140,9 @@ public class FactoryBlockEntities {
              FabricBlockEntityTypeBuilder.create(PortableFluidTankBlockEntity::new, FactoryBlocks.PORTABLE_FLUID_TANK));
     public static final BlockEntityType<RedstoneValvePipeBlockEntity> REDSTONE_VALVE_PIPE = register("redstone_valve_pipe",
              FabricBlockEntityTypeBuilder.create(RedstoneValvePipeBlockEntity::new, FactoryBlocks.REDSTONE_VALVE_PIPE));
+
+    public static final BlockEntityType<ItemPackerBlockEntity> ITEM_PACKER = register("item_packer",
+            FabricBlockEntityTypeBuilder.create(ItemPackerBlockEntity::new, FactoryBlocks.ITEM_PACKER));
 
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;

@@ -1,3 +1,10 @@
+- Added Item Packer:
+  - New block that allows you to add and remove items from Shulker Boxes, bundles and any other storage api compatible item!
+  - You place/remove the storage item by adding it in front/back of the block.
+  - All other sides can add/remove items from item's inventory.
+  - Made out of
 - Increased damage done by Lava Splash to 2 hearts (from 0.5).
 - Increased damage done by Experience Splash x2 (compared to previously).
-- Recipes now use Fabric's Convention tag for Stripped Logs
+- Recipes now use Fabric's Convention tag for Stripped Logs.
+- Fix Funnels pulling items form blocks using Fabric Storage API loosing last stack if the storage becomes empty.
+- Fix Conveyors sometimes deleting items.

@@ -209,10 +209,9 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
     private boolean tryInserting(World world, BlockPos pos, Direction dir, TagKey<Block> requiredTag) {
         var x = FactoryUtil.tryInsertingMovable(this, world, this.getPos(), pos, dir, this.getCachedState().get(ConveyorBlock.DIRECTION), requiredTag);
 
-        if (x == FactoryUtil.MovableResult.SUCCESS_REGULAR) {
+        if (this.holdStack == null || this.holdStack.get().isEmpty()) {
             this.clearContainer();
             this.setDelta(0);
-            return true;
         }
         return x != FactoryUtil.MovableResult.FAILURE;
     }

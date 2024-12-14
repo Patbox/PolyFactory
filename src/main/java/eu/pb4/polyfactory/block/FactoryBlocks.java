@@ -76,6 +76,7 @@ public class FactoryBlocks {
     public static final ClutchBlock CLUTCH = register("clutch", Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD), settings -> new ClutchBlock(settings.strength(2.5F).nonOpaque()));
     public static final WindmillBlock WINDMILL = register("windmill", Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD), settings -> new WindmillBlock(settings.strength(2.5F).nonOpaque()));
     public static final ContainerBlock CONTAINER = register("wooden_container", Block.Settings.copy(Blocks.CHEST), settings -> new ContainerBlock(9 * 5, settings.nonOpaque()));
+    public static final ItemPackerBlock ITEM_PACKER = register("item_packer", Block.Settings.copy(SPLITTER), ItemPackerBlock::new);
     public static final CableBlock CABLE = register("cable", Block.Settings.copy(Blocks.GLASS), settings -> new CableBlock(settings.breakInstantly().nonOpaque()));
     public static final Map<Block, WallWithCableBlock> WALL_WITH_CABLE = WallWithCableBlock.MAP;
     public static final CabledDataProviderBlock ITEM_COUNTER = register("item_counter", Block.Settings.copy(SPLITTER), CabledDataProviderBlock::new);

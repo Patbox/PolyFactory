@@ -162,6 +162,9 @@ public class FactoryItems {
 
     public static final PressureFluidGun PRESSURE_FLUID_GUN = register("pressure_fluid_gun", settings -> new PressureFluidGun(
             settings.maxCount(1).enchantable(5).repairable(COPPER_PLATE).maxDamage(800)));
+
+    public static final Item ITEM_PACKER = register(FactoryBlocks.ITEM_PACKER);
+
     public static void register() {
         FuelRegistryEvents.BUILD.register(((builder, context) -> {
             builder.add(SAW_DUST, (int) (context.baseSmeltTime() * 0.3));
@@ -199,6 +202,7 @@ public class FactoryItems {
                     entries.add(SPLITTER);
                     entries.add(CONTAINER);
                     entries.add(ITEM_FILTER);
+                    entries.add(ITEM_PACKER);
 
                     // Rotation other?
                     entries.add(TURNTABLE);
