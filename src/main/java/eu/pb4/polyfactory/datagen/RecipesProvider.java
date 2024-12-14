@@ -455,7 +455,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .pattern("www")
                         .pattern("sss")
                         .pattern("www")
-                        .input('w', FactoryItemTags.STRIPPED_LOGS).input('s', FactoryItems.STEEL_INGOT)
+                        .input('w', ConventionalItemTags.STRIPPED_LOGS).input('s', FactoryItems.STEEL_INGOT)
                         .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                         .offerTo(exporter);
 
@@ -575,7 +575,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.HAND_CRANK)
                         .pattern("ip")
                         .pattern("l ")
-                        .input('l', FactoryItemTags.STRIPPED_LOGS).input('p', ItemTags.PLANKS).input('i', Items.IRON_INGOT)
+                        .input('l', ConventionalItemTags.STRIPPED_LOGS).input('p', ItemTags.PLANKS).input('i', Items.IRON_INGOT)
                         .criterion("get_axle", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
                         .offerTo(exporter);
 

@@ -20,19 +20,6 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
 
     @Override
     protected void configure(RegistryWrapper.WrapperLookup arg) {
-        this.getOrCreateTagBuilder(FactoryBlockTags.STRIPPED_LOGS)
-                .add(Blocks.STRIPPED_OAK_LOG)
-                .add(Blocks.STRIPPED_BIRCH_LOG)
-                .add(Blocks.STRIPPED_SPRUCE_LOG)
-                .add(Blocks.STRIPPED_JUNGLE_LOG)
-                .add(Blocks.STRIPPED_ACACIA_LOG)
-                .add(Blocks.STRIPPED_DARK_OAK_LOG)
-                .add(Blocks.STRIPPED_MANGROVE_LOG)
-                .add(Blocks.STRIPPED_CHERRY_LOG)
-                .add(Blocks.STRIPPED_CRIMSON_STEM)
-                .add(Blocks.STRIPPED_WARPED_STEM)
-        ;
-
         this.getOrCreateTagBuilder(FactoryBlockTags.SPRAY_CAN_COLORABLE)
                 .addOptionalTag(BlockTags.WOOL)
                 .addOptionalTag(BlockTags.WOOL_CARPETS)

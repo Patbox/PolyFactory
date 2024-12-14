@@ -88,7 +88,5 @@ class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
 
         this.getOrCreateTagBuilder(FactoryItemTags.DRAIN_CATALYST).add(Items.ECHO_SHARD);
         this.getOrCreateTagBuilder(FactoryItemTags.XP_CONVERSION_CATALYST).add(Items.ECHO_SHARD);
-
-        this.copy(FactoryBlockTags.STRIPPED_LOGS, FactoryItemTags.STRIPPED_LOGS);
     }
 }

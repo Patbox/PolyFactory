@@ -8,7 +8,6 @@ import net.minecraft.registry.tag.TagKey;
 public class FactoryItemTags {
     public static final TagKey<Item> ALLOWED_IN_MINER = of("allowed_in_miner");
     public static final TagKey<Item> ALLOWED_IN_PLANTER = of("allowed_in_planter");
-    public static final TagKey<Item> STRIPPED_LOGS = of("stripped_logs");
     public static final TagKey<Item> ROOT_ADVANCEMENT = of("root_advancement");
     public static final TagKey<Item> PLACER_USABLE = of("placer_usable");
     public static final TagKey<Item> DRAIN_CATALYST = of("drain_catalyst");

@@ -1,2 +1,3 @@
-- Fixed Pipes not being able to pull Honey from Bee Hives if they didn't face north.
-- Fixed Item Splitters thinking that left and right filters are equal when they aren't.
+- Increased damage done by Lava Splash to 2 hearts (from 0.5).
+- Increased damage done by Experience Splash x2 (compared to previously).
+- Recipes now use Fabric's Convention tag for Stripped Logs
