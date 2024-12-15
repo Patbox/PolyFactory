@@ -19,6 +19,8 @@ public interface FactorySoundEvents {
     RegistryEntry<SoundEvent> FLUID_SHOOT_WATER = ofEntry("fluid.shoot.water");
     RegistryEntry<SoundEvent> FLUID_SHOOT_MILK = ofEntry("fluid.shoot.milk");
     RegistryEntry<SoundEvent> FLUID_SHOOT_POTION = ofEntry("fluid.shoot.potion");
+    RegistryEntry<SoundEvent> FLUID_SHOOT_SLIME = ofEntry("fluid.shoot.slime");
+    RegistryEntry<SoundEvent> FLUID_SHOOT_HONEY = ofEntry("fluid.shoot.honey");
     RegistryEntry<SoundEvent> FLUID_SHOOT_LAVA = ofEntry("fluid.shoot.lava");
     RegistryEntry<SoundEvent> FLUID_SHOOT_EXPERIENCE = ofEntry("fluid.shoot.experience");
 

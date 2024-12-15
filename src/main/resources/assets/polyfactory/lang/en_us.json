@@ -227,6 +227,9 @@
   "entity.polyfactory.dynamite": "Dynamite",
   "entity.polyfactory.splash": "Splash of %s",
 
+  "effect.polyfactory.sticky.slime": "Sticky (Slime)",
+  "effect.polyfactory.sticky.honey": "Sticky (Honey)",
+
   "death.polyfactory.experience_bolt": "%1$s was shot by %2$s",
   "death.polyfactory.experience_bolt.item": "%1$s was shot by %2$s using %3$s",
 
@@ -245,6 +248,8 @@
   "subtitles.polyfactory.fluid.shoot.milk": "Milk shoots out",
   "subtitles.polyfactory.fluid.shoot.potion": "Potion shoots out",
   "subtitles.polyfactory.fluid.shoot.experience": "Experience shoots out",
+  "subtitles.polyfactory.fluid.shoot.honey": "Honey shoots out",
+  "subtitles.polyfactory.fluid.shoot.slime": "Slime shoots out",
 
 
   "text.polyfactory.artificial_color": "Artificially Colored",
