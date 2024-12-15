@@ -28,6 +28,12 @@ public class FactoryEntities {
             EntityType.Builder.create(MilkSplashEntity::new, SpawnGroup.MISC).dimensions(0.25f, 0.25f).maxTrackingRange(6).trackingTickInterval(2));
     public static final EntityType<ExperienceSplashEntity> EXPERIENCE_SPLASH = register("experience_splash",
             EntityType.Builder.create(ExperienceSplashEntity::new, SpawnGroup.MISC).dimensions(0.25f, 0.25f).maxTrackingRange(6).trackingTickInterval(2));
+
+    public static final EntityType<HoneySplashEntity> HONEY_SPLASH = register("honey_splash",
+            EntityType.Builder.create(HoneySplashEntity::new, SpawnGroup.MISC).dimensions(0.25f, 0.25f).maxTrackingRange(6).trackingTickInterval(2));
+
+    public static final EntityType<SlimeSplashEntity> SLIME_SPLASH = register("slime_splash",
+            EntityType.Builder.create(SlimeSplashEntity::new, SpawnGroup.MISC).dimensions(0.25f, 0.25f).maxTrackingRange(6).trackingTickInterval(2));
     public static void register() {
 
     }

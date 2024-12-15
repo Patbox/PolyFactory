@@ -213,5 +213,25 @@
       }
     ],
     "subtitle": "subtitles.polyfactory.fluid.shoot.experience"
+  },
+  "fluid.shoot.honey": {
+    "sounds": [
+      "block/honeyblock/break1",
+      "block/honeyblock/break2",
+      "block/honeyblock/break3",
+      "block/honeyblock/break4",
+      "block/honeyblock/break5"
+    ],
+    "subtitle": "subtitles.polyfactory.fluid.shoot.honey"
+  },
+  "fluid.shoot.slime": {
+    "sounds": [
+      "mob/slime/small1",
+      "mob/slime/small2",
+      "mob/slime/small3",
+      "mob/slime/small4",
+      "mob/slime/small5"
+    ],
+    "subtitle": "subtitles.polyfactory.fluid.shoot.slime"
   }
 }

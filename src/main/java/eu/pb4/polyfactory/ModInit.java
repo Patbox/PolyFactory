@@ -13,6 +13,7 @@ import eu.pb4.polyfactory.block.mechanical.AxleWithLargeGearBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.data.providers.TinyPotatoSpringBlock;
+import eu.pb4.polyfactory.effects.FactoryEffects;
 import eu.pb4.polyfactory.entity.FactoryEntities;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
@@ -71,6 +72,7 @@ public class ModInit implements ModInitializer {
 		FactoryItems.register();
 		FactoryFluids.register();
 		FactoryEntities.register();
+		FactoryEffects.register();
 		FactoryNodes.register();
 		FactoryRecipeTypes.register();
 		FactoryRecipeSerializers.register();

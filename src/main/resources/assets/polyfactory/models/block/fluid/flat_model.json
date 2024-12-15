@@ -1,6 +1,6 @@
 {
 	"textures": {
-		"texture": "polyfactory:block/fluid/xp",
+		"texture": "polyfactory:block/fluid/experience",
 		"particle": "#texture"
 	},
 	"elements": [

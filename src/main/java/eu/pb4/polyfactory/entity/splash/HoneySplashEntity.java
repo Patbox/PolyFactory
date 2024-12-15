@@ -8,10 +8,13 @@ import net.minecraft.block.CampfireBlock;
 import net.minecraft.block.FarmlandBlock;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.passive.AxolotlEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Items;
-import net.minecraft.particle.*;
+import net.minecraft.particle.ItemStackParticleEffect;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Unit;
@@ -21,15 +24,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
-import org.joml.Vector3f;
 
-public class WaterSplashEntity extends SplashEntity<Unit> {
-    private static final int WATER_COLOR = -13083194;
-    //private static final ParticleEffect PARTICLE = EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, WATER_COLOR);
-    private static final ParticleEffect PARTICLE = new ItemStackParticleEffect(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE.asItem().getDefaultStack());
-    //private static final ParticleEffect PARTICLE = new DustParticleEffect(new Vector3f(56 / 255f, 93/ 255f, 199/ 255f), 0.5f);
-    public WaterSplashEntity(EntityType<? extends ProjectileEntity> entityType, World world) {
-        super(entityType, world, FactoryFluids.WATER);
+public class HoneySplashEntity extends SplashEntity<Unit> {
+    private static final ParticleEffect PARTICLE = new ItemStackParticleEffect(ParticleTypes.ITEM, Items.HONEY_BLOCK.getDefaultStack());
+
+    public HoneySplashEntity(EntityType<? extends ProjectileEntity> entityType, World world) {
+        super(entityType, world, FactoryFluids.HONEY);
     }
 
     @Override
@@ -37,11 +37,6 @@ public class WaterSplashEntity extends SplashEntity<Unit> {
         if (!this.getWorld().isClient) {
             Direction direction = blockHitResult.getSide();
             BlockPos targetBlockPos = blockHitResult.getBlockPos();
-            var state = getWorld().getBlockState(targetBlockPos);
-            if (state.getBlock() instanceof FarmlandBlock && random.nextFloat() < 0.1) {
-                getWorld().setBlockState(targetBlockPos, state.with(FarmlandBlock.MOISTURE, FarmlandBlock.MAX_MOISTURE));
-            }
-
             BlockPos sidePos = targetBlockPos.offset(direction);
             this.extinguishFire(sidePos);
             this.extinguishFire(sidePos.offset(direction.getOpposite()));
@@ -57,23 +52,16 @@ public class WaterSplashEntity extends SplashEntity<Unit> {
         if (this.random.nextFloat() < 0.3) {
             var entity = entityHitResult.getEntity();
 
-            if (getWorld() instanceof ServerWorld world && entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
-                if (livingEntity.hurtByWater() && this.canDamageEntity(entity)) {
-                    livingEntity.damage(world, this.getDamageSources().indirectMagic(this, this.getOwner()), 1F);
-                }
-
+            if (getWorld() instanceof ServerWorld && entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
                 if (livingEntity.isOnFire() && livingEntity.isAlive() && this.canInteractEntity(entity)) {
                     livingEntity.extinguishWithSound();
                 }
-
-                livingEntity.removeStatusEffect(FactoryEffects.STICKY_SLIME);
-                livingEntity.removeStatusEffect(FactoryEffects.STICKY_HONEY);
-            }
-
-
-            if (entity instanceof AxolotlEntity axolotlEntity && this.canInteractEntity(entity)) {
-                axolotlEntity.hydrateFromPotion();
-            }
+                var effect = livingEntity.getStatusEffect(FactoryEffects.STICKY_HONEY);
+                int time = 20;
+                if (effect != null) {
+                    time += effect.getDuration();
+                }
+                livingEntity.addStatusEffect(new StatusEffectInstance(FactoryEffects.STICKY_HONEY, Math.min(time, 20 * 60), 0), this);            }
         }
         super.onEntityHit(entityHitResult);
     }
