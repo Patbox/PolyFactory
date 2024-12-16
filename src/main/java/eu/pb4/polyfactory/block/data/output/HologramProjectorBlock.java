@@ -160,7 +160,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
 
     public List<WrenchAction> getWrenchActions() {
         return List.of(
-                WrenchAction.CHANNEL,
+                WrenchAction.CHANNEL_WITH_DISABLED,
                 WrenchAction.FACING,
                 CHANGE_ROTATION,
                 SCALE,

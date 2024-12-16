@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public record WrenchAction(String id, Text name, WrenchValueGetter value, WrenchApplyAction action, WrenchApplyAction alt) {
     public static final WrenchAction FACING = ofDirection(Properties.FACING);
@@ -22,6 +23,10 @@ public record WrenchAction(String id, Text name, WrenchValueGetter value, Wrench
     public static final WrenchAction HALF = of("half", Properties.BLOCK_HALF, t -> Text.translatable("text.polyfactory.half." + t.asString()));
     public static final WrenchAction CHANNEL = ofChannel("channel", ChannelContainer.class,
         ChannelContainer::channel, ChannelContainer::setChannel
+    );
+
+    public static final WrenchAction CHANNEL_WITH_DISABLED = ofChannelWithDisabled("channel", ChannelContainer.class,
+            ChannelContainer::channel, ChannelContainer::setChannel
     );
     public static final WrenchAction FACING_HOPPER = ofDirection("rotation", Properties.HOPPER_FACING);
     public static final WrenchAction INVERTED = of("inverted", Properties.INVERTED);
@@ -90,13 +95,26 @@ public record WrenchAction(String id, Text name, WrenchValueGetter value, Wrench
     }
 
     public static <T> WrenchAction ofChannel(String id, Class<T> tClass, Function<T, Integer> get, BiConsumer<T, Integer> set) {
-        return  ofBlockEntityInt(id, tClass, 0, DataStorage.MAX_CHANNELS - 1, 1, get, set);
+        return ofBlockEntityInt(id, tClass, 0, DataStorage.MAX_CHANNELS - 1, 1, get, set);
+    }
+
+    public static <T> WrenchAction ofChannelWithDisabled(String id, Class<T> tClass, Function<T, Integer> get, BiConsumer<T, Integer> set) {
+        return ofBlockEntityInt(id, tClass, -1, DataStorage.MAX_CHANNELS - 1,
+                x -> x != -1 ? String.valueOf(x + 1) : "X", get, set);
     }
 
     public static <T> WrenchAction ofBlockEntityInt(String id, Class<T> tClass, int minInclusive, int maxInclusive, int displayOffset, Function<T, Integer> get, BiConsumer<T, Integer> set) {
         return ofBlockEntityString(id,
                 tClass,
                 x -> String.valueOf(get.apply(x) + displayOffset),
+                (x, n) -> set.accept(x,  FactoryUtil.wrap(get.apply(x) + (n ? 1 : -1), minInclusive, maxInclusive))
+        );
+    }
+
+    public static <T> WrenchAction ofBlockEntityInt(String id, Class<T> tClass, int minInclusive, int maxInclusive, IntFunction<String> display, Function<T, Integer> get, BiConsumer<T, Integer> set) {
+        return ofBlockEntityString(id,
+                tClass,
+                x -> display.apply(get.apply(x)),
                 (x, n) -> set.accept(x,  FactoryUtil.wrap(get.apply(x) + (n ? 1 : -1), minInclusive, maxInclusive))
         );
     }

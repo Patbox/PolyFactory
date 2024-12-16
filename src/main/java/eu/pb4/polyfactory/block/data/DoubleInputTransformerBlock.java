@@ -50,11 +50,11 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
 
      protected static final List<WrenchAction> WRENCH_ACTIONS = List.of(
             WrenchAction.ofDirection(FACING_INPUT_1),
-            WrenchAction.ofChannel("channel_input_1", DoubleInputTransformerBlockEntity.class,
+            WrenchAction.ofChannelWithDisabled("channel_input_1", DoubleInputTransformerBlockEntity.class,
                     DoubleInputTransformerBlockEntity::inputChannel1, DoubleInputTransformerBlockEntity::setInputChannel1),
 
             WrenchAction.ofDirection(FACING_INPUT_2),
-            WrenchAction.ofChannel("channel_input_2", DoubleInputTransformerBlockEntity.class,
+            WrenchAction.ofChannelWithDisabled("channel_input_2", DoubleInputTransformerBlockEntity.class,
                     DoubleInputTransformerBlockEntity::inputChannel2, DoubleInputTransformerBlockEntity::setInputChannel2),
 
             WrenchAction.ofDirection(FACING_OUTPUT),

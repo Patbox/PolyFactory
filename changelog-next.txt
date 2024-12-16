@@ -8,6 +8,8 @@
   - They deal no damage, instead giving player Sticky effect.
   - Sticky effect makes player movement speed slower by 20%, attack speed by 15% and block breaking by 15%.
   - When entity with this effect touches a wall while falling, it will slowly slide on it (similar effect to Honey Block).
+- Steel Gears can now be placed like regular blocks, if player has an Axle in inventory (unless creative, where it isn't needed). You can also still place it directly on Axle.
+- Nixie Tube Controller, Holographic Display and Arithmetic Operator can now disable channels, making them ignore all inputs.
 - Increased damage done by Lava Splash to 2 hearts (from 0.5).
 - Increased damage done by Experience Splash x2 (compared to previously).
 - Recipes now use Fabric's Convention tag for Stripped Logs.
