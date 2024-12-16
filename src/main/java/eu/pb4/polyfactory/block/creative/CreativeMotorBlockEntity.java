@@ -62,7 +62,7 @@ public class CreativeMotorBlockEntity extends LockableBlockEntity {
                 CreativeMotorBlockEntity.this.markDirty();
             }));
             this.setSlot(7, GuiTextures.PLUS_BUTTON.get().unbreakable().setCallback((clickType) -> {
-                CreativeMotorBlockEntity.this.speed = Math.min(CreativeMotorBlockEntity.this.speed + (clickType.shift ? 10 : 1), RotationConstants.MAX_SPEED);
+                CreativeMotorBlockEntity.this.speed = Math.min(CreativeMotorBlockEntity.this.speed + (clickType.shift ? 10 : 1), RotationConstants.MAX_SPEED * 50);
                 CreativeMotorBlockEntity.this.markDirty();
             }));
 

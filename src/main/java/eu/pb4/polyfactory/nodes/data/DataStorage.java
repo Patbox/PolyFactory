@@ -79,7 +79,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
 
     @Nullable
     public SentData getData(int channel) {
-        if (this.ctx == null || !(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
+        if (channel == -1 || this.ctx == null || !(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
             return null;
         }
 
@@ -107,6 +107,9 @@ public class DataStorage implements GraphEntity<DataStorage> {
     }
 
     public int pushDataUpdate(BlockPos pos, int channel, DataContainer data, @Nullable Direction direction) {
+        if (channel == -1) {
+            return 0;
+        }
         this.currentData.put(channel, new SentData(data, pos, direction));
         var receivers = this.receivers.get(channel);
         if (receivers == null) {
@@ -164,7 +167,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
         if (node.getBlockWorld() instanceof ServerWorld serverWorld) {
             if (node.getNode() instanceof DataProviderNode providerNode) {
                 var state = node.getBlockWorld().getBlockState(node.getBlockPos());
-                if (state.getBlock() instanceof DataProvider provider) {
+                if (state.getBlock() instanceof DataProvider provider && providerNode.channel() != -1) {
                     var data = provider.provideData(serverWorld, node.getBlockPos(), state, providerNode.channel(), providerNode);
                     if (data != null) {
                         pushDataUpdate(node.getBlockPos(), providerNode.channel(), data, providerNode instanceof DirectionNode d ? d.direction() : null);
@@ -172,7 +175,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 }
             } else if (node.getNode() instanceof DataReceiverNode receiverNode) {
                 var state = node.getBlockWorld().getBlockState(node.getBlockPos());
-                if (state.getBlock() instanceof DataReceiver receiver) {
+                if (state.getBlock() instanceof DataReceiver receiver && receiverNode.channel() != -1) {
                     var data = this.getData(receiverNode.channel());
                     if (data != null) {
                         receiver.receiveData(serverWorld, node.getBlockPos(), state, receiverNode.channel(), data.container(), receiverNode, data.pos(), data.direction);

@@ -88,7 +88,7 @@
   "item.polyfactory.steel_mesh": "Steel Mesh",
   "item.polyfactory.steel_gear": "Steel Gear",
   "item.polyfactory.copper_plate": "Copper Plate",
-  "item.polyfactory.steel_gear.tooltip": "Click [%s] on Axle to place",
+  "item.polyfactory.steel_gear.tooltip": "Requires an Axle to be placed",
   "item.polyfactory.large_steel_gear": "Large Steel Gear",
   "item.polyfactory.coal_dust": "Coal Dust",
   "item.polyfactory.saw_dust": "Saw Dust",

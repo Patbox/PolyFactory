@@ -58,7 +58,7 @@ public class NixieTubeControllerBlock extends GenericCabledDataBlock implements 
     @Override
     public List<WrenchAction> getWrenchActions() {
         return List.of(
-                WrenchAction.CHANNEL,
+                WrenchAction.CHANNEL_WITH_DISABLED,
                 this.facingAction,
                 SCROLL_SPEED,
                 SCROLL_LOOP

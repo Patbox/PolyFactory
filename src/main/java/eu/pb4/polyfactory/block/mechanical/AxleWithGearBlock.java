@@ -1,8 +1,11 @@
 package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.RotationAwareModel;
@@ -15,7 +18,11 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
@@ -23,8 +30,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
+import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
@@ -40,6 +49,41 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
+    }
+
+    @Override
+    public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
+        var otherState = ctx.getWorld().getBlockState(ctx.getBlockPos().offset(ctx.getSide().getOpposite()));
+        var axis = ctx.getSide().getAxis();
+        if (otherState.isOf(this) && !ctx.shouldCancelInteraction()) {
+            axis = otherState.get(AXIS);
+        }
+
+        return waterLog(ctx, this.getDefaultState()).with(AXIS, axis);
+    }
+
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.onPlaced(world, pos, state, placer, itemStack);
+        if (placer instanceof ServerPlayerEntity player) {
+            var axis = state.get(AXIS);
+            var mut = new BlockPos.Mutable();
+            for (var dir : Direction.values()) {
+                if (dir.getAxis() != axis) {
+                    var state2 = world.getBlockState(mut.set(pos).move(dir).move(dir.rotateClockwise(axis)));
+
+                    if (state2.getBlock() instanceof AxleWithGearBlock && state2.getBlock() != state.getBlock() && state2.get(AxleBlock.AXIS) == axis) {
+                        TriggerCriterion.trigger(player, FactoryTriggers.CONNECT_DIFFERENT_GEARS);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    protected boolean canReplace(BlockState state, ItemPlacementContext context) {
+        return false;
     }
 
     @Override
