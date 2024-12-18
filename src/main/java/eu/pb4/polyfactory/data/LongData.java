@@ -37,4 +37,9 @@ public record LongData(long value) implements DataContainer {
     public boolean forceRight() {
         return true;
     }
+
+    @Override
+    public int compareTo(DataContainer other) {
+        return Long.compare(this.asLong(), other.asLong());
+    }
 }

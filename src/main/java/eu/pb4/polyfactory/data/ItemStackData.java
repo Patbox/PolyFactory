@@ -45,4 +45,9 @@ public record ItemStackData(ItemStack stack, String name) implements DataContain
     public boolean isEmpty() {
         return this.stack.isEmpty();
     }
+
+    @Override
+    public int compareTo(DataContainer other) {
+        return this.name.compareTo(other.asString());
+    }
 }

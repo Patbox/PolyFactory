@@ -135,13 +135,10 @@ public class DataStorage implements GraphEntity<DataStorage> {
             var current = this.currentData;
             this.currentData = this.swapData;
 
-            //var count = new Object2IntOpenHashMap<BlockPos>();
-
             for (var data : current.int2ObjectEntrySet()) {
                 var rec = receivers.get(data.getIntKey());
                 if (rec != null) {
                     for (var x : rec) {
-                        //count.put(x.getLeft(), count.getInt(x.getLeft()) + 1);
                         var state = world.getBlockState(x.getLeft());
                         if (state.getBlock() instanceof DataReceiver receiver) {
                             receiver.receiveData(world, x.getLeft(), state, data.getIntKey(), data.getValue().container(), x.getRight(), data.getValue().pos, data.getValue().direction);
@@ -150,9 +147,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 }
             }
 
-            //for (var c : count.object2IntEntrySet()) {
-            //    DebugInfoSender.addGameTestMarker(world, c.getKey(), "                Count: " + c.getIntValue(), 0x88FFFF66, 60);
-            //}
 
             current.clear();
             this.swapData = current;

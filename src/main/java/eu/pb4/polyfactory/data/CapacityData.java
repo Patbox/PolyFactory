@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.NotNull;
 
 public record CapacityData(long stored, long capacity) implements DataContainer {
     public static MapCodec<CapacityData> TYPE_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(

@@ -67,6 +67,8 @@ public class UiResourceCreator {
 
     private static final char CHEST_SPACE0 = character++;
     private static final char CHEST_SPACE1 = character++;
+    private static final char ANVIL_SPACE0 = character++;
+    private static final char ANVIL_SPACE1 = character++;
 
     public static Supplier<GuiElementBuilder> custom(String path) {
         var model = PolymerResourcePackUtils.requestModel (Items.ALLIUM, id("sgui/" + path));
@@ -171,6 +173,18 @@ public class UiResourceCreator {
         return new TextBuilders(Text.literal(builder.toString()).setStyle(STYLE));
     }
 
+    public static Function<Text, Text> backgroundAnvil(String path) {
+        var builder = new StringBuilder().append(ANVIL_SPACE0);
+        var c = (character++);
+        builder.append(c);
+        builder.append(ANVIL_SPACE1);
+
+        var texture = new FontTexture(id("sgui/" + path), 13, 256, new char[][] { new char[] {c} });
+
+        FONT_TEXTURES.add(texture);
+        return new TextBuilders(Text.literal(builder.toString()).setStyle(STYLE));
+    }
+
     public static char font(Identifier path, int ascent, int height) {
         var c = (character++);
         var texture = new FontTexture(path, ascent, height, new char[][] { new char[] {c} });
@@ -201,7 +215,8 @@ public class UiResourceCreator {
     public static void setup() {
         SPACES.put(CHEST_SPACE0, -8);
         SPACES.put(CHEST_SPACE1, -168);
-
+        SPACES.put(ANVIL_SPACE0, -60);
+        SPACES.put(ANVIL_SPACE1, -119);
         if (ModInit.DYNAMIC_ASSETS) {
             PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register((b) -> UiResourceCreator.generateAssets(b::addData));
         }

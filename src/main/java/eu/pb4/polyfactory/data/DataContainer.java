@@ -7,7 +7,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.MathHelper;
 
-public interface DataContainer {
+public interface DataContainer extends Comparable<DataContainer> {
     MapCodec<DataContainer> MAP_CODEC = DataType.CODEC.dispatchMap("type", DataContainer::type, DataType::codec);
     Codec<DataContainer> CODEC = MAP_CODEC.codec();
     static DataContainer of(long count) {
@@ -47,5 +47,9 @@ public interface DataContainer {
 
     default boolean isTrue() {
         return this.asLong() != 0;
+    }
+
+    default int compareTo(DataContainer other) {
+        return Long.compare(this.asLong(), other.asLong());
     }
 }

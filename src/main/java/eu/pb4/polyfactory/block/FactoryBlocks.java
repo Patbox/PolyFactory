@@ -4,26 +4,30 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlock;
 import eu.pb4.polyfactory.block.creative.CreativeDrainBlock;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
+import eu.pb4.polyfactory.block.data.CableBlock;
 import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.data.io.ArithmeticOperatorBlock;
-import eu.pb4.polyfactory.block.data.CableBlock;
+import eu.pb4.polyfactory.block.data.io.DataComparatorBlock;
 import eu.pb4.polyfactory.block.data.io.DataMemoryBlock;
-import eu.pb4.polyfactory.block.data.output.*;
+import eu.pb4.polyfactory.block.data.output.HologramProjectorBlock;
+import eu.pb4.polyfactory.block.data.output.NixieTubeBlock;
+import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlock;
+import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.polyfactory.block.data.providers.*;
 import eu.pb4.polyfactory.block.electric.ElectricGeneratorBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.fluids.*;
-import eu.pb4.polyfactory.block.mechanical.machines.PlacerBlock;
-import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlock;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlock;
-import eu.pb4.polyfactory.block.mechanical.machines.MinerBlock;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlock;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.block.mechanical.*;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlock;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.MinerBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.PlacerBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.block.mechanical.source.HandCrankBlock;
 import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
@@ -35,6 +39,8 @@ import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.loot.LootTable;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.state.property.Properties;
@@ -44,6 +50,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class FactoryBlocks {
     private static final List<Block> BLOCKS = new ArrayList<>();
@@ -79,8 +86,12 @@ public class FactoryBlocks {
     public static final RedstoneOutputBlock REDSTONE_OUTPUT = register("redstone_output", Block.Settings.copy(ITEM_COUNTER), RedstoneOutputBlock::new);
     public static final ItemReaderBlock ITEM_READER = register("item_reader", Block.Settings.copy(ITEM_COUNTER), ItemReaderBlock::new);
     public static final BlockObserverBlock BLOCK_OBSERVER = register("block_observer", Block.Settings.copy(ITEM_COUNTER), BlockObserverBlock::new);
+    public static final TextInputBlock TEXT_INPUT = register("text_input", Block.Settings.copy(ITEM_COUNTER), TextInputBlock::new);
     public static final ArithmeticOperatorBlock ARITHMETIC_OPERATOR = register("arithmetic_operator",
             Block.Settings.copy(ITEM_COUNTER), ArithmeticOperatorBlock::new);
+
+    public static final DataComparatorBlock DATA_COMPARATOR = register("data_comparator",
+            Block.Settings.copy(ITEM_COUNTER), DataComparatorBlock::new);
 
     public static final DataMemoryBlock DATA_MEMORY = register("data_memory",
             Block.Settings.copy(ITEM_COUNTER), DataMemoryBlock::new);
@@ -147,9 +158,11 @@ public class FactoryBlocks {
 
     private static void validate(MinecraftServer server) {
         for (var block : BLOCKS) {
-            var lt = server.getReloadableRegistries().getLootTable(block.getLootTableKey());
-            if (lt == LootTable.EMPTY) {
-                ModInit.LOGGER.warn("Missing loot table? " + block.getLootTableKey().getValue());
+            if (block.getLootTableKey().isPresent()) {
+                var lt = server.getReloadableRegistries().getLootTable(block.getLootTableKey().get());
+                if (lt == LootTable.EMPTY) {
+                    ModInit.LOGGER.warn("Missing loot table? " + block.getLootTableKey().get().getValue());
+                }
             }
             if (block instanceof BlockEntityProvider provider) {
                 var be = provider.createBlockEntity(BlockPos.ORIGIN, block.getDefaultState());

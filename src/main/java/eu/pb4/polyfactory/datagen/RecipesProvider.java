@@ -423,6 +423,17 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .offerTo(exporter);
 
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.DATA_COMPARATOR, 1)
+                .pattern("csc")
+                .pattern("s-s")
+                .pattern("cwc")
+                .input('c', Items.QUARTZ)
+                .input('s', FactoryItems.STEEL_PLATE)
+                .input('-', FactoryItems.REDSTONE_CHIP)
+                .input('w', FactoryItems.CABLE)
+                .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                .offerTo(exporter);
+
         ShapelessRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.DATA_MEMORY, 1)
                 .input(FactoryItems.DATA_MEMORY)
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.DATA_MEMORY))
@@ -530,6 +541,19 @@ class RecipesProvider extends FabricRecipeProvider {
                 .input('c', Items.COPPER_INGOT)
                 .input('o', Items.OBSERVER)
                 .input('b', FactoryItems.REDSTONE_CHIP)
+                .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
+                .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.TEXT_INPUT)
+                .pattern("s-s")
+                .pattern("pbt")
+                .pattern("scs")
+                .input('s', FactoryItems.STEEL_PLATE)
+                .input('c', FactoryItems.CABLE)
+                .input('p', Items.IRON_INGOT)
+                .input('-', Items.LIGHT_WEIGHTED_PRESSURE_PLATE)
+                .input('b', FactoryItems.REDSTONE_CHIP)
+                .input('t', FactoryItems.TREATED_DRIED_KELP)
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                 .offerTo(exporter);
 

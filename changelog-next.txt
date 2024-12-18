@@ -2,7 +2,19 @@
   - New block that allows you to add and remove items from Shulker Boxes, bundles and any other storage api compatible item!
   - You place/remove the storage item by adding it in front/back of the block.
   - All other sides can add/remove items from item's inventory.
-  - Made out of Wooden Plates, Steel Plates and a Hopper.
+  - Crafted with Wooden Plates, Steel Plates and a Hopper.
+- Added Text Input:
+  - New data block that allows you to send text data in easy and flexible way.
+  - When clicked, it will open ui allowing you to input text and then accept sending it.
+  - Supports multiple input modes: string, integer, decimal and boolean
+  - Has 1 output.
+  - Crafted with Steel Plates, Cable, Iron Ingot, Treated Dried Kelp, Redstone Chip and Lightweight (Golden) Pressure Plate.
+- Added Data Comparator:
+  - New data block, that allows you to compare 2 data inputs, getting single output (same as Arithmetic Operator).
+  - Returns Boolean True or False data, depending on operation set with a wrench.
+  - Can check if data is `equal`, `not equal`, `less than`, `less or equal`, `more than` and `more or equal`.
+  - By default it tries to coerse types if they don't match, but you can enable strict mode preventing that.
+  - Crafted with Steel Plate, Cable, Nether Quartz and Redstone Chip.
 - Slime and Honey can now be shot out of Fluid Nozzle / Fluid Pressure Gun.
   - Added Slime and Honey splashes.
   - They deal no damage, instead giving player Sticky effect.
@@ -10,8 +22,13 @@
   - When entity with this effect touches a wall while falling, it will slowly slide on it (similar effect to Honey Block).
 - Steel Gears can now be placed like regular blocks, if player has an Axle in inventory (unless creative, where it isn't needed). You can also still place it directly on Axle.
 - Nixie Tube Controller, Holographic Display and Arithmetic Operator can now disable channels, making them ignore all inputs.
+- Fixed Steel Button top texture not looking correctly.
 - Increased damage done by Lava Splash to 2 hearts (from 0.5).
 - Increased damage done by Experience Splash x2 (compared to previously).
+- Steel Gears use 3d models when held in hand (2d texture otherwise).
+- Changed recipe of Arithmetic Operator and Data Memory to include Cable.
+- Boolean Data now returns 15 redstone power for true and 0 for false.
 - Recipes now use Fabric's Convention tag for Stripped Logs.
-- Fix Funnels pulling items form blocks using Fabric Storage API loosing last stack if the storage becomes empty.
-- Fix Conveyors sometimes deleting items.
+- Fixed Funnels pulling items form blocks using Fabric Storage API loosing last stack if the storage becomes empty.
+- Fixed Conveyors sometimes deleting items.
+- Fixed Boolean Data returning inverted numbers.
