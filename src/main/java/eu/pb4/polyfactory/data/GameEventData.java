@@ -8,6 +8,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.event.GameEvent;
+import org.jetbrains.annotations.NotNull;
 
 
 public record GameEventData(GameEvent event, Vec3d pos, double distance) implements DataContainer {
@@ -50,5 +51,10 @@ public record GameEventData(GameEvent event, Vec3d pos, double distance) impleme
     @Override
     public double asDouble() {
         return this.distance;
+    }
+
+    @Override
+    public int compareTo(@NotNull DataContainer o) {
+        return Double.compare(this.distance, o.asDouble());
     }
 }

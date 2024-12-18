@@ -6,10 +6,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.registry.Registries;
+import org.jetbrains.annotations.NotNull;
 
 public record BlockStateData(BlockState state) implements DataContainer {
     public static MapCodec<BlockStateData> TYPE_CODEC = BlockState.CODEC.xmap(BlockStateData::new, BlockStateData::state).fieldOf("value");
-
 
     @Override
     public DataType<BlockStateData> type() {
@@ -34,5 +34,10 @@ public record BlockStateData(BlockState state) implements DataContainer {
     @Override
     public boolean isEmpty() {
         return state.isAir();
+    }
+
+    @Override
+    public int compareTo(@NotNull DataContainer o) {
+        return asString().compareTo(o.asString());
     }
 }

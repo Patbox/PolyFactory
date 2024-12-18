@@ -21,6 +21,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerPosition;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
@@ -46,6 +47,7 @@ import org.joml.Quaternionf;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -115,8 +117,7 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
                 entity.setHeadYaw(entity.getHeadYaw() + rotate);
 
                 if (entity instanceof ServerPlayerEntity player) {
-                    //player.networkHandler.sendPacket(new PlayerPositionLookS2CPacket(0,0, 0,
-                    //        MathHelper.clamp(rotate, -30, 30), 0, Set.of(PositionFlag.values()), -1));
+                    player.networkHandler.requestTeleport(new PlayerPosition(Vec3d.ZERO, Vec3d.ZERO, rotate, 0), EnumSet.allOf(PositionFlag.class));
                 }
             }
         }

@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
 import eu.pb4.polyfactory.block.data.CableBlock;
 import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.data.io.ArithmeticOperatorBlock;
+import eu.pb4.polyfactory.block.data.io.DataComparatorBlock;
 import eu.pb4.polyfactory.block.data.io.DataMemoryBlock;
 import eu.pb4.polyfactory.block.data.output.HologramProjectorBlock;
 import eu.pb4.polyfactory.block.data.output.NixieTubeBlock;
@@ -85,8 +86,12 @@ public class FactoryBlocks {
     public static final RedstoneOutputBlock REDSTONE_OUTPUT = register("redstone_output", Block.Settings.copy(ITEM_COUNTER), RedstoneOutputBlock::new);
     public static final ItemReaderBlock ITEM_READER = register("item_reader", Block.Settings.copy(ITEM_COUNTER), ItemReaderBlock::new);
     public static final BlockObserverBlock BLOCK_OBSERVER = register("block_observer", Block.Settings.copy(ITEM_COUNTER), BlockObserverBlock::new);
+    public static final TextInputBlock TEXT_INPUT = register("text_input", Block.Settings.copy(ITEM_COUNTER), TextInputBlock::new);
     public static final ArithmeticOperatorBlock ARITHMETIC_OPERATOR = register("arithmetic_operator",
             Block.Settings.copy(ITEM_COUNTER), ArithmeticOperatorBlock::new);
+
+    public static final DataComparatorBlock DATA_COMPARATOR = register("data_comparator",
+            Block.Settings.copy(ITEM_COUNTER), DataComparatorBlock::new);
 
     public static final DataMemoryBlock DATA_MEMORY = register("data_memory",
             Block.Settings.copy(ITEM_COUNTER), DataMemoryBlock::new);

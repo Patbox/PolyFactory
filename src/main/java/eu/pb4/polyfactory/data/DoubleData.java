@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.nbt.NbtCompound;
+import org.jetbrains.annotations.NotNull;
 
 public record DoubleData(double value) implements DataContainer {
     public static MapCodec<DoubleData> TYPE_CODEC = Codec.DOUBLE.xmap(DoubleData::new, DoubleData::value).fieldOf("value");
@@ -35,5 +36,10 @@ public record DoubleData(double value) implements DataContainer {
     @Override
     public boolean forceRight() {
         return false;
+    }
+
+    @Override
+    public int compareTo(@NotNull DataContainer o) {
+        return Double.compare(this.value, o.asDouble());
     }
 }

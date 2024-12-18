@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.nbt.NbtCompound;
+import org.jetbrains.annotations.NotNull;
 
 public record BoolData(boolean value) implements DataContainer {
     public static BoolData TRUE = new BoolData(true);
@@ -26,7 +27,12 @@ public record BoolData(boolean value) implements DataContainer {
 
     @Override
     public long asLong() {
-        return value ? 0 : 1;
+        return value ? 1 : 0;
+    }
+
+    @Override
+    public int asRedstoneOutput() {
+        return value ? 15 : 0;
     }
 
     @Override

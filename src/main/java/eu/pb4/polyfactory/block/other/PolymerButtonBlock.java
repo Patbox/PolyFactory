@@ -44,7 +44,8 @@ public class PolymerButtonBlock extends ButtonBlock implements FactoryBlock {
         private final ItemDisplayElement base;
         public Model(BlockState initialBlockState) {
             this.base = ItemDisplayElementUtil.createSimple();
-            this.base.setScale(new Vector3f(1.01f));
+            this.base.setScale(new Vector3f(1.01f, 1.01f, 1.01f));
+            this.base.setTranslation(new Vector3f(0, 0.0075f, 0));
             this.updateState(initialBlockState);
 
             this.addElement(this.base);

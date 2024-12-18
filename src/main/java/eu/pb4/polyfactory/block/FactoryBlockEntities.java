@@ -100,7 +100,7 @@ public class FactoryBlockEntities {
              FabricBlockEntityTypeBuilder.create(CreativeMotorBlockEntity::new, FactoryBlocks.CREATIVE_MOTOR));
     public static final BlockEntityType<ChanneledDataBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache",
              FabricBlockEntityTypeBuilder.create(ChanneledDataBlockEntity::new, FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
-                    FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER, FactoryBlocks.BLOCK_OBSERVER, FactoryBlocks.DATA_MEMORY));
+                    FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER, FactoryBlocks.BLOCK_OBSERVER, FactoryBlocks.DATA_MEMORY, FactoryBlocks.TEXT_INPUT));
 
     public static final BlockEntityType<HologramProjectorBlockEntity> HOLOGRAM_PROJECTOR = register("hologram_projector",
              FabricBlockEntityTypeBuilder.create(HologramProjectorBlockEntity::new, FactoryBlocks.HOLOGRAM_PROJECTOR));
@@ -115,7 +115,7 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader",
              FabricBlockEntityTypeBuilder.create(ItemReaderBlockEntity::new, FactoryBlocks.ITEM_READER));
     public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer",  FabricBlockEntityTypeBuilder
-            .create(DoubleInputTransformerBlockEntity::new, FactoryBlocks.ARITHMETIC_OPERATOR));
+            .create(DoubleInputTransformerBlockEntity::new, FactoryBlocks.ARITHMETIC_OPERATOR, FactoryBlocks.DATA_COMPARATOR));
 
     public static final BlockEntityType<WorkbenchBlockEntity> WORKBENCH = register("workbench",  FabricBlockEntityTypeBuilder
             .create(WorkbenchBlockEntity::new, FactoryBlocks.WORKBENCH));

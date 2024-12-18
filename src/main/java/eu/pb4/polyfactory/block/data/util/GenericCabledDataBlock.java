@@ -42,6 +42,7 @@ import java.util.stream.Stream;
 public abstract class GenericCabledDataBlock extends AbstractCableBlock implements FactoryBlock, WrenchableBlock, BlockEntityProvider, CableConnectable {
     public static final EnumProperty<Direction> FACING = Properties.FACING;
 
+
     public final WrenchAction facingAction = WrenchAction.of("facing", WrenchValueGetter.ofProperty(Properties.FACING, FactoryUtil::asText),
             WrenchApplyAction.ofState(
             (player, world, pos, side, state, next) -> {

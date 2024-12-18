@@ -41,6 +41,7 @@
   "block.polyfactory.redstone_output": "Redstone Output",
   "block.polyfactory.item_reader": "Item Reader",
   "block.polyfactory.block_observer": "Block Observer",
+  "block.polyfactory.text_input": "Text Input",
   "block.polyfactory.wall_with_cable": "%s with Cable",
   "block.polyfactory.wall_with_cable.colored": "%s with %s Cable",
   "block.polyfactory.wall_with_cable.colored.full": "%s with %s Cable (%s)",
@@ -54,6 +55,7 @@
   "block.polyfactory.wireless_redstone_receiver": "Wireless Redstone Receiver",
   "block.polyfactory.wireless_redstone_transmitter": "Wireless Redstone Transmitter",
   "block.polyfactory.arithmetic_operator": "Arithmetic Operator",
+  "block.polyfactory.data_comparator": "Data Comparator",
   "block.polyfactory.data_memory": "Data Memory Block",
   "block.polyfactory.data_memory.tooltip.stored_data": "Stored Data",
   "block.polyfactory.data_memory.tooltip.type": "Type: %s",
@@ -153,6 +155,7 @@
   "item.polyfactory.wrench.action.action": "Action",
   "item.polyfactory.wrench.action.read_only": "Read Only",
   "item.polyfactory.wrench.action.locked": "Locked",
+  "item.polyfactory.wrench.action.strict": "Strict",
   "item.polyfactory.wrench.action.half": "Half",
   "item.polyfactory.wrench.action.radius": "Radius",
   "item.polyfactory.wrench.action.scale": "Scale",
@@ -178,12 +181,18 @@
   "item.polyfactory.wrench.action.mode.arithmetic.boolean": "Boolean",
   "item.polyfactory.wrench.action.mode.arithmetic.string": "String",
 
-
   "item.polyfactory.wrench.action.operation.arithmetic.addition": "Addition",
   "item.polyfactory.wrench.action.operation.arithmetic.subtraction": "Subtraction",
   "item.polyfactory.wrench.action.operation.arithmetic.multiplication": "Multiplication",
   "item.polyfactory.wrench.action.operation.arithmetic.division": "Division",
   "item.polyfactory.wrench.action.operation.arithmetic.modulo": "Modulo",
+
+  "item.polyfactory.wrench.action.operation.comparator.equal": "Equal",
+  "item.polyfactory.wrench.action.operation.comparator.not_equal": "Not Equal",
+  "item.polyfactory.wrench.action.operation.comparator.less_than": "Less Than",
+  "item.polyfactory.wrench.action.operation.comparator.less_or_equal": "Less or Equal",
+  "item.polyfactory.wrench.action.operation.comparator.more_than": "Less Than",
+  "item.polyfactory.wrench.action.operation.comparator.more_or_equal": "Less or Equal",
 
   "item.polyfactory.wrench.action.mode.transfer_mode.to_conveyor": "To Conveyor",
   "item.polyfactory.wrench.action.mode.transfer_mode.from_conveyor": "From Conveyor",

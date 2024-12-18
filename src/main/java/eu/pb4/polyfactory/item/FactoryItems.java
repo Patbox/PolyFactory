@@ -102,7 +102,9 @@ public class FactoryItems {
     public static final Item REDSTONE_OUTPUT = register(FactoryBlocks.REDSTONE_OUTPUT);
     public static final Item ITEM_READER = register(FactoryBlocks.ITEM_READER);
     public static final Item BLOCK_OBSERVER = register(FactoryBlocks.BLOCK_OBSERVER);
+    public static final Item TEXT_INPUT = register(FactoryBlocks.TEXT_INPUT);
     public static final Item ARITHMETIC_OPERATOR = register(FactoryBlocks.ARITHMETIC_OPERATOR);
+    public static final Item DATA_COMPARATOR = register(FactoryBlocks.DATA_COMPARATOR);
     public static final Item DATA_MEMORY = register("data_memory", (settings) -> new DataMemoryBlockItem(FactoryBlocks.DATA_MEMORY, settings.useBlockPrefixedTranslationKey()));
     public static final Item NIXIE_TUBE_CONTROLLER = register(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
     public static final Item HOLOGRAM_PROJECTOR = register(FactoryBlocks.HOLOGRAM_PROJECTOR);
@@ -201,8 +203,8 @@ public class FactoryItems {
                     entries.add(FUNNEL);
                     entries.add(SPLITTER);
                     entries.add(CONTAINER);
-                    entries.add(ITEM_FILTER);
                     entries.add(ITEM_PACKER);
+                    entries.add(ITEM_FILTER);
 
                     // Rotation other?
                     entries.add(TURNTABLE);
@@ -241,10 +243,12 @@ public class FactoryItems {
                     entries.add(ITEM_COUNTER);
                     entries.add(ITEM_READER);
                     entries.add(BLOCK_OBSERVER);
+                    entries.add(TEXT_INPUT);
                     entries.add(NIXIE_TUBE_CONTROLLER);
                     entries.add(NIXIE_TUBE);
                     entries.add(HOLOGRAM_PROJECTOR);
                     entries.add(DATA_MEMORY);
+                    entries.add(DATA_COMPARATOR);
                     entries.add(ARITHMETIC_OPERATOR);
 
                     // Redstone?

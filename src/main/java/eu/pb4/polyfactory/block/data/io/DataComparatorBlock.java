@@ -13,6 +13,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.text.Text;
 import net.minecraft.util.StringIdentifiable;
@@ -21,32 +22,34 @@ import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.function.IntPredicate;
 
-public class ArithmeticOperatorBlock extends DoubleInputTransformerBlock {
+public class DataComparatorBlock extends DoubleInputTransformerBlock {
     public static final EnumProperty<Operation> OPERATION = EnumProperty.of("operation", Operation.class);
-    public static final EnumProperty<BasicDataType> MODE = EnumProperty.of("mode", BasicDataType.class);
+    public static final BooleanProperty STRICT = BooleanProperty.of("strict");
 
     public static final List<WrenchAction> WRENCH_ACTIONS = ImmutableList.<WrenchAction>builder()
             .addAll(DoubleInputTransformerBlock.WRENCH_ACTIONS)
-            .add(WrenchAction.of("operation", OPERATION, t -> Text.translatable("item.polyfactory.wrench.action.operation.arithmetic." + t.asString())))
-            .add(WrenchAction.of("mode", MODE, BasicDataType::text))
+            .add(WrenchAction.of("operation", OPERATION, t -> t.text))
+            .add(WrenchAction.of("strict", STRICT))
             .build();
 
-    public ArithmeticOperatorBlock(Settings settings) {
+    public DataComparatorBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(OPERATION, Operation.ADDITION).with(MODE, BasicDataType.INTEGER));
+        this.setDefaultState(this.getDefaultState().with(OPERATION, Operation.EQUAL).with(STRICT, false));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(OPERATION, MODE);
+        builder.add(OPERATION);
+        builder.add(STRICT);
     }
 
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         super.onStateReplaced(state, world, pos, newState, moved);
-        if (state.isOf(newState.getBlock()) && (state.get(MODE) != newState.get(MODE) || state.get(OPERATION) != newState.get(OPERATION))
+        if (state.isOf(newState.getBlock()) && (state.get(OPERATION) != newState.get(OPERATION))
                 && world instanceof ServerWorld serverWorld && world.getBlockEntity(pos) instanceof DoubleInputTransformerBlockEntity be) {
             sendData(world, newState.get(FACING_OUTPUT), pos, this.transformData(be.lastInput1(), be.lastInput2(), serverWorld, pos, newState, be));
         }
@@ -55,28 +58,41 @@ public class ArithmeticOperatorBlock extends DoubleInputTransformerBlock {
     @Override
     protected DataContainer transformData(DataContainer input1, DataContainer input2, ServerWorld world, BlockPos selfPos, BlockState selfState, DoubleInputTransformerBlockEntity be) {
         var action = selfState.get(OPERATION);
-        var mode = selfState.get(MODE);
+        var strict = selfState.get(STRICT);
 
         if (FactoryUtil.getClosestPlayer(world, selfPos, 16) instanceof ServerPlayerEntity player) {
-            TriggerCriterion.trigger(player, FactoryTriggers.ARITHMETIC_OPERATOR);
+            TriggerCriterion.trigger(player, FactoryTriggers.DATA_COMPARATOR);
         }
 
-        return switch (action) {
-            case ADDITION -> mode.add(input1, input2);
-            case SUBTRACTION -> mode.subtract(input1, input2);
-            case MULTIPLICATION -> mode.multiply(input1, input2);
-            case DIVISION -> mode.divide(input1, input2);
-            case MODULO -> mode.modulo(input1, input2);
-        };
+        if (input1.getClass() == input2.getClass() && (action == Operation.EQUAL || action == Operation.NOT_EQUAL)) {
+            return BoolData.of(input1.equals(input2) == (action == Operation.EQUAL));
+        }
+
+        if (strict && input1.type() != input2.type()) {
+            return new InvalidData("mismatched input");
+        }
+
+        return BoolData.of(action.predicate.test(input1.compareTo(input2)));
     }
 
     public enum Operation implements StringIdentifiable {
-        ADDITION,
-        SUBTRACTION,
-        MULTIPLICATION,
-        DIVISION,
-        MODULO
+        EQUAL("equal", i -> i == 0),
+        NOT_EQUAL("not_equal", i -> i != 0),
+        LESS_THAN("less_than", i -> i < 0),
+        LESS_OR_EQUAL("less_or_equal", i -> i <= 0),
+        MORE_THAN("more_than", i -> i > 0),
+        MORE_OR_EQUAL("more_or_equal", i -> i >= 0)
         ;
+
+        private final String name;
+        private final IntPredicate predicate;
+        public final Text text;
+
+        Operation(String name, IntPredicate predicate) {
+            this.name = name;
+            this.predicate = predicate;
+            this.text = Text.translatable("item.polyfactory.wrench.action.operation.comparator." + name);
+        }
 
         @Override
         public String asString() {

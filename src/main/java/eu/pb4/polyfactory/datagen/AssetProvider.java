@@ -10,8 +10,11 @@ import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.model.ConditionItemModel;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.model.SelectItemModel;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.CustomModelDataFlagProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.UsingItemProperty;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.ViewEntityProperty;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.property.select.DisplayContextProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.ConstantTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.CustomModelDataTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.PotionTintSource;
@@ -21,6 +24,7 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.DataWriter;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -109,9 +113,20 @@ class AssetProvider implements DataProvider {
         ), new ItemAsset.Properties(false)));
 
         for (var item : List.of(FactoryItems.TINY_POTATO_SPRING, FactoryItems.PIPE, FactoryItems.MECHANICAL_DRAIN, FactoryItems.PORTABLE_FLUID_TANK,
+                FactoryItems.LARGE_STEEL_GEAR,
                 FactoryItems.PUMP, FactoryItems.STEEL_BUTTON, FactoryDebugItems.ROTATION_DEBUG)) {
             fromItem.accept(item, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("item/")), ItemAsset.Properties.DEFAULT));
         }
+
+        fromItem.accept(FactoryItems.STEEL_GEAR, id -> new ItemAsset(SelectItemModel.builder(new DisplayContextProperty())
+                .withCase(List.of(
+                        ModelTransformationMode.FIRST_PERSON_LEFT_HAND,
+                        ModelTransformationMode.FIRST_PERSON_RIGHT_HAND,
+                        ModelTransformationMode.THIRD_PERSON_LEFT_HAND,
+                        ModelTransformationMode.THIRD_PERSON_RIGHT_HAND
+                ), new BasicItemModel(id.withPrefixedPath("item/").withSuffixedPath("_world")))
+                .fallback(new BasicItemModel(id.withPrefixedPath("item/")))
+                .build(), ItemAsset.Properties.DEFAULT));
 
         consumer.accept(id("debug_item"), new ItemAsset(
                 new BasicItemModel(id("item/debug_item"), List.of(new CustomModelDataTintSource(0, 0xFFFFFF))), ItemAsset.Properties.DEFAULT)
