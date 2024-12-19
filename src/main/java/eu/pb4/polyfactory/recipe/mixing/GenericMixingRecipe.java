@@ -93,6 +93,15 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
         return new RecipeEntry<>(FactoryUtil.id("mixing/" + string), new GenericMixingRecipe("", list, Optional.of(List.of()), output, List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
     }
 
+    public static RecipeEntry<GenericMixingRecipe> of(String string, String group, List<Ingredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
+        List<CountedIngredient> list = new ArrayList<>();
+        for (Ingredient x : ingredient) {
+            CountedIngredient countedIngredient = new CountedIngredient(Optional.of(x), ItemComponentPredicate.EMPTY, 1, CountedIngredient.tryGettingLeftover(x));
+            list.add(countedIngredient);
+        }
+        return new RecipeEntry<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, list, Optional.of(List.of()), output, List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
+    }
+
     @Override
     public String getGroup() {
         return this.group;

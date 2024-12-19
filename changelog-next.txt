@@ -28,6 +28,9 @@
 - Steel Gears use 3d models when held in hand (2d texture otherwise).
 - Changed recipe of Arithmetic Operator and Data Memory to include Cable.
 - Boolean Data now returns 15 redstone power for true and 0 for false.
+- Added Grinder recipe for Wind Charges and Eyeblossom dyes.
+- Added Press recipe for Bundle and Mace.
+- Added Mixer recipe for dyed Bundle and Shulker Box.
 - Recipes now use Fabric's Convention tag for Stripped Logs.
 - Fixed Funnels pulling items form blocks using Fabric Storage API loosing last stack if the storage becomes empty.
 - Fixed Conveyors sometimes deleting items.
