@@ -25,6 +25,7 @@ public class FactoryRecipeSerializers {
     public static final LazyRecipeSerializer<ColoringMixingRecipe> MIXING_COLORING = register("mixing/coloring", ColoringMixingRecipe.CODEC);
 
     public static final LazyRecipeSerializer<GenericMixingRecipe> MIXING_GENERIC = register("mixing/generic", GenericMixingRecipe.CODEC);
+    public static final LazyRecipeSerializer<TransformMixingRecipe> MIXING_TRANSFORM = register("mixing/transform", TransformMixingRecipe.CODEC);
     public static final LazyRecipeSerializer<FireworkStarMixingRecipe> MIXING_FIREWORK = register("mixing/firework", FireworkStarMixingRecipe.CODEC);
     public static final LazyRecipeSerializer<ArtificialDyeMixingRecipe> MIXING_ARTIFICIAL_DYE = register("mixing/artificial_dye", ArtificialDyeMixingRecipe.CODEC);
     public static final LazyRecipeSerializer<BrewingMixingRecipe> MIXING_BREWING = register("mixing/brewing", BrewingMixingRecipe.CODEC);

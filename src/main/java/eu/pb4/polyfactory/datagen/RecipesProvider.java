@@ -6,21 +6,23 @@ import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
-import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.mixin.BrewingRecipeRegistryAccessor;
+import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.polyfactory.recipe.drain.PotionAddDrainRecipe;
 import eu.pb4.polyfactory.recipe.drain.PotionRemoveDrainRecipe;
 import eu.pb4.polyfactory.recipe.fluid.RemovingFluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.fluid.SimpleFluidInteractionRecipe;
-import eu.pb4.polyfactory.recipe.spout.*;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.*;
 import eu.pb4.polyfactory.recipe.press.FillSprayCanPressRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
+import eu.pb4.polyfactory.recipe.spout.PotionSpoutRecipe;
+import eu.pb4.polyfactory.recipe.spout.RepairSpoutRecipe;
+import eu.pb4.polyfactory.recipe.spout.SimpleDrainRecipe;
+import eu.pb4.polyfactory.recipe.spout.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import eu.pb4.polyfactory.other.FactorySoundEvents;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
@@ -708,6 +710,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         ),
                         GrindingRecipe.of("bone_to_bone_meal", Ingredient.ofItems(Items.BONE), 1, 5, 10, OutputStack.of(Items.BONE_MEAL, 1, 3), OutputStack.of(Items.BONE_MEAL, 0.5f, 2)),
                         GrindingRecipe.of("blaze_rod_to_powder", Ingredient.ofItems(Items.BLAZE_ROD), 2, 5, 10, OutputStack.of(Items.BLAZE_POWDER, 1, 2), OutputStack.of(Items.BLAZE_POWDER, 0.5f, 2)),
+                        GrindingRecipe.of("breeze_rod_to_charge", Ingredient.ofItems(Items.BREEZE_ROD), 2, 5, 10, OutputStack.of(Items.WIND_CHARGE, 1, 4), OutputStack.of(Items.WIND_CHARGE, 0.5f, 2)),
                         GrindingRecipe.of("glowstone_to_powder", Ingredient.ofItems(Items.GLOWSTONE), 1, 5, 10, new ItemStack(Items.GLOWSTONE_DUST, 4)),
                         GrindingRecipe.of("sugar", Ingredient.ofItems(Items.SUGAR_CANE), 1, 5, OutputStack.of(Items.SUGAR, 1f, 1), OutputStack.of(Items.SUGAR, 0.4f, 1)),
 
@@ -742,7 +745,9 @@ class RecipesProvider extends FabricRecipeProvider {
                         GrindingRecipe.of("peony_to_dye", "dye", Ingredient.ofItems(Items.PEONY), 1, 6, new ItemStack(Items.PINK_DYE, 6)),
                         GrindingRecipe.of("rose_to_dye", "dye", Ingredient.ofItems(Items.ROSE_BUSH), 1, 6, new ItemStack(Items.RED_DYE, 6)),
                         GrindingRecipe.of("pitcher_to_dye", "dye", Ingredient.ofItems(Items.PITCHER_PLANT), 1, 6, new ItemStack(Items.CYAN_DYE, 6)),
-                        GrindingRecipe.of("cactus_to_dye", "dye", Ingredient.ofItems(Items.CACTUS), 1, 6, new ItemStack(Items.GREEN_DYE, 3))
+                        GrindingRecipe.of("cactus_to_dye", "dye", Ingredient.ofItems(Items.CACTUS), 1, 6, new ItemStack(Items.GREEN_DYE, 3)),
+                        GrindingRecipe.of("closed_eyeblossom_to_dye", "dye", Ingredient.ofItems(Items.CLOSED_EYEBLOSSOM), 1, 6, new ItemStack(Items.GRAY_DYE, 3)),
+                        GrindingRecipe.of("open_eyeblossom_to_dye", "dye", Ingredient.ofItems(Items.OPEN_EYEBLOSSOM), 1, 6, new ItemStack(Items.ORANGE_DYE, 3))
                 );
 
                 offerSmelting(List.of(FactoryItems.CRUSHED_RAW_IRON), RecipeCategory.MISC, Items.IRON_INGOT, 0.5F, 180, "iron_ingot");
@@ -792,7 +797,12 @@ class RecipesProvider extends FabricRecipeProvider {
                                 5, OutputStack.of(Items.GOLDEN_APPLE)),
                         GenericPressRecipe.of("spray_can", CountedIngredient.ofItems(1, Items.BUCKET), CountedIngredient.ofItems(1, Items.COPPER_INGOT),
                                 5f, OutputStack.of(FactoryItems.SPRAY_CAN)),
-                        new RecipeEntry<>(recipeKey("press/spray_can_fill"), new FillSprayCanPressRecipe(12))
+                        new RecipeEntry<>(recipeKey("press/spray_can_fill"), new FillSprayCanPressRecipe(12)),
+                        GenericPressRecipe.of("bundle", CountedIngredient.ofItems(1, Items.LEATHER), CountedIngredient.ofItems(1, Items.STRING),
+                                3, OutputStack.of(Items.BUNDLE)),
+                        GenericPressRecipe.of("", CountedIngredient.ofItems(1, Items.HEAVY_CORE),
+                                CountedIngredient.ofItems(1, Items.BREEZE_ROD),
+                                6, OutputStack.of(Items.MACE))
                 );
 
                 for (var i = 0; i < 5; i++) {
@@ -885,6 +895,16 @@ class RecipesProvider extends FabricRecipeProvider {
                     }
 
                     {
+                        var bundle = Registries.ITEM.get(Identifier.ofVanilla(dye.getColor().asString() + "_bundle"));
+                        var shulker = Registries.ITEM.get(Identifier.ofVanilla(dye.getColor().asString() + "_shulker_box"));
+                        of(exporter, TransformMixingRecipe.of(dye.getColor().asString() + "_bundle", "bundle_coloring",
+                                        this.ingredientFromTag(ItemTags.BUNDLES), List.of(Ingredient.ofItems(dye)), 2, 2, 5, bundle.getDefaultStack()),
+                                TransformMixingRecipe.of(dye.getColor().asString() + "_shulker", "shulker_coloring",
+                                        this.ingredientFromTag(ItemTags.SHULKER_BOXES), List.of(Ingredient.ofItems(dye)), 2, 2, 5, shulker.getDefaultStack()
+                                ));
+                    }
+
+                    {
                         var nameSolid = dye.getColor().getName() + "_concrete";
                         var namePowder = nameSolid + "_powder";
 
@@ -893,7 +913,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         of(exporter, GrindingRecipe.of(nameSolid + "_to_powder", "concrete_to_powder",
                                 Ingredient.ofItems(solid), 3, 5, powder
                         ));
-                        
+
                         of(exporter, GenericMixingRecipe.ofCounted(namePowder, "concrete_powder",
                                 List.of(CountedIngredient.fromTag(4, itemWrap.getOrThrow(ItemTags.SMELTS_TO_GLASS)), CountedIngredient.ofItems(4, Items.GRAVEL), CountedIngredient.ofItems(1, dye)),
                                 4, 1, 13, new ItemStack(powder, 8)));
