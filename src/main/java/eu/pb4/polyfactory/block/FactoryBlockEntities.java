@@ -120,7 +120,7 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<WorkbenchBlockEntity> WORKBENCH = register("workbench",  FabricBlockEntityTypeBuilder
             .create(WorkbenchBlockEntity::new, FactoryBlocks.WORKBENCH));
     public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container",  FabricBlockEntityTypeBuilder
-            .create(ColorableBlockEntity::new, FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP));
+            .create(ColorableBlockEntity::new, FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP, FactoryBlocks.FIXTURE_LAMP, FactoryBlocks.INVERTED_FIXTURE_LAMP));
 
     public static final BlockEntityType<PipeBlockEntity> PIPE = register("pipe",  FabricBlockEntityTypeBuilder.create(PipeBlockEntity::new, Util.make(new ArrayList<Block>(), (a) -> {
         a.add(FactoryBlocks.PIPE);

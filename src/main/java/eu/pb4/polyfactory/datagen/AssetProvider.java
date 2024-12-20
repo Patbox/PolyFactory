@@ -99,6 +99,10 @@ class AssetProvider implements DataProvider {
                 List.of(new ConstantTintSource(-1), new CustomModelDataTintSource(0, 0xFFFFFF))), ItemAsset.Properties.DEFAULT));
         fromItem.accept(FactoryItems.INVERTED_CAGED_LAMP, id -> new ItemAsset(new BasicItemModel(id("block/caged_lamp_on"),
                 List.of(new ConstantTintSource(-1), new CustomModelDataTintSource(0, 0xFFFFFF))), ItemAsset.Properties.DEFAULT));
+        fromItem.accept(FactoryItems.FIXTURE_LAMP, id -> new ItemAsset(new BasicItemModel(id("block/fixture_lamp_off"),
+                List.of(new ConstantTintSource(-1), new CustomModelDataTintSource(0, 0xFFFFFF))), ItemAsset.Properties.DEFAULT));
+        fromItem.accept(FactoryItems.INVERTED_FIXTURE_LAMP, id -> new ItemAsset(new BasicItemModel(id("block/fixture_lamp_on"),
+                List.of(new ConstantTintSource(-1), new CustomModelDataTintSource(0, 0xFFFFFF))), ItemAsset.Properties.DEFAULT));
 
         fromItem.accept(FactoryItems.FAN, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("block/").withSuffixedPath("_base")), ItemAsset.Properties.DEFAULT));
         fromItem.accept(FactoryItems.FUNNEL, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("block/").withSuffixedPath("_out")), ItemAsset.Properties.DEFAULT));

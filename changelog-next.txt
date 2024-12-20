@@ -15,6 +15,10 @@
   - Can check if data is `equal`, `not equal`, `less than`, `less or equal`, `more than` and `more or equal`.
   - By default it tries to coerse types if they don't match, but you can enable strict mode preventing that.
   - Crafted with Steel Plate, Cable, Nether Quartz and Redstone Chip.
+- Added Fixture Lamp:
+  - New variant of Colored Lamp block.
+  - Has small wall-adjusted hitbox.
+  - Crafted with a Colored Lamp and any wooden Pressure Plate.
 - Slime and Honey can now be shot out of Fluid Nozzle / Fluid Pressure Gun.
   - Added Slime and Honey splashes.
   - They deal no damage, instead giving player Sticky effect.

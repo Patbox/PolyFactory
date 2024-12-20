@@ -78,6 +78,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modImplementation 'eu.pb4:polymer-core:0.11.2+1.21.4'
+	modImplementation 'eu.pb4:polymer-blocks:0.11.2+1.21.4'
 	modImplementation 'eu.pb4:polymer-resource-pack:0.11.2+1.21.4'
 	modImplementation 'eu.pb4:polymer-resource-pack-extras:0.11.2+1.21.4'
 	modImplementation 'eu.pb4:polymer-autohost:0.11.2+1.21.4'

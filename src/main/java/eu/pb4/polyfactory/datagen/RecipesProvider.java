@@ -667,6 +667,8 @@ class RecipesProvider extends FabricRecipeProvider {
                         ColoringCraftingRecipe.of(itemWrap, "inverted_color", FactoryItems.INVERTED_LAMP),
                         ColoringCraftingRecipe.of(itemWrap, "caged_lamp_color", FactoryItems.CAGED_LAMP),
                         ColoringCraftingRecipe.of(itemWrap, "inverted_caged_color", FactoryItems.INVERTED_CAGED_LAMP),
+                        ColoringCraftingRecipe.of(itemWrap, "fixture_lamp_color", FactoryItems.FIXTURE_LAMP),
+                        ColoringCraftingRecipe.of(itemWrap, "inverted_fixture_color", FactoryItems.INVERTED_FIXTURE_LAMP),
                         ColoringCraftingRecipe.of(itemWrap, "portable_redstone_transmitter_color", FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, 1)
                 );
                 of(exporter,
@@ -675,6 +677,8 @@ class RecipesProvider extends FabricRecipeProvider {
                         ColoringMixingRecipe.of("inverted_lamp_color", FactoryItems.INVERTED_LAMP, 2, 6, 10),
                         ColoringMixingRecipe.of("caged_lamp_color", FactoryItems.CAGED_LAMP, 2, 6, 10),
                         ColoringMixingRecipe.of("inverted_caged_lamp_color", FactoryItems.INVERTED_CAGED_LAMP, 2, 6, 10),
+                        ColoringMixingRecipe.of("fixture_lamp_color", FactoryItems.FIXTURE_LAMP, 2, 6, 10),
+                        ColoringMixingRecipe.of("inverted_fixture_lamp_color", FactoryItems.INVERTED_FIXTURE_LAMP, 2, 6, 10),
                         ColoringMixingRecipe.of("portable_redstone_transmitter_color", FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, 1, 2, 6, 10)
                 );
 
@@ -828,7 +832,17 @@ class RecipesProvider extends FabricRecipeProvider {
                                 new ShapelessNbtCopyRecipe("", CraftingRecipeCategory.REDSTONE,
                                         FactoryItems.CAGED_LAMP.getDefaultStack(),
                                         Ingredient.ofItems(FactoryItems.LAMP),
-                                        List.of(Ingredient.ofItems(FactoryItems.METAL_GRID))))
+                                        List.of(Ingredient.ofItems(FactoryItems.METAL_GRID)))),
+                        new RecipeEntry<>(recipeKey("crafting/inverted_fixture_lamp"),
+                                new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
+                                        FactoryItems.INVERTED_FIXTURE_LAMP.getDefaultStack(),
+                                        Ingredient.ofItems(FactoryItems.FIXTURE_LAMP),
+                                        List.of(Ingredient.ofItems(Items.REDSTONE_TORCH)))),
+                        new RecipeEntry<>(recipeKey("crafting/fixture_lamp"),
+                                new ShapelessNbtCopyRecipe("", CraftingRecipeCategory.REDSTONE,
+                                        FactoryItems.FIXTURE_LAMP.getDefaultStack().copyWithCount(3),
+                                        Ingredient.ofItems(FactoryItems.LAMP),
+                                        List.of(ingredientFromTag(ItemTags.WOODEN_PRESSURE_PLATES))))
                 );
 
 
