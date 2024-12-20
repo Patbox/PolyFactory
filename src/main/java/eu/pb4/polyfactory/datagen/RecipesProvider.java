@@ -664,22 +664,26 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(Items.DRAGON_EGG))
                 .offerTo(exporter);
 
-        of(exporter,
-                ColoringCraftingRecipe.of("cable_color", FactoryItems.CABLE),
-                ColoringCraftingRecipe.of("lamp_color", FactoryItems.LAMP),
-                ColoringCraftingRecipe.of("inverted_color", FactoryItems.INVERTED_LAMP),
-                ColoringCraftingRecipe.of("caged_lamp_color", FactoryItems.CAGED_LAMP),
-                ColoringCraftingRecipe.of("inverted_caged_color", FactoryItems.INVERTED_CAGED_LAMP),
-                ColoringCraftingRecipe.of("portable_redstone_transmitter_color", FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, 1)
-        );
-        of(exporter,
-                ColoringMixingRecipe.of("cable_color", FactoryItems.CABLE, 2, 6, 10),
-                ColoringMixingRecipe.of("lamp_color", FactoryItems.LAMP, 2, 6, 10),
-                ColoringMixingRecipe.of("inverted_lamp_color", FactoryItems.INVERTED_LAMP, 2, 6, 10),
-                ColoringMixingRecipe.of("caged_lamp_color", FactoryItems.CAGED_LAMP, 2, 6, 10),
-                ColoringMixingRecipe.of("inverted_caged_lamp_color", FactoryItems.INVERTED_CAGED_LAMP, 2, 6, 10),
-                ColoringMixingRecipe.of("portable_redstone_transmitter_color", FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, 1,2, 6, 10)
-        );
+                of(exporter,
+                        ColoringCraftingRecipe.of(itemWrap, "cable_color", FactoryItems.CABLE),
+                        ColoringCraftingRecipe.of(itemWrap, "lamp_color", FactoryItems.LAMP),
+                        ColoringCraftingRecipe.of(itemWrap, "inverted_color", FactoryItems.INVERTED_LAMP),
+                        ColoringCraftingRecipe.of(itemWrap, "caged_lamp_color", FactoryItems.CAGED_LAMP),
+                        ColoringCraftingRecipe.of(itemWrap, "inverted_caged_color", FactoryItems.INVERTED_CAGED_LAMP),
+                        ColoringCraftingRecipe.of(itemWrap, "fixture_lamp_color", FactoryItems.FIXTURE_LAMP),
+                        ColoringCraftingRecipe.of(itemWrap, "inverted_fixture_color", FactoryItems.INVERTED_FIXTURE_LAMP),
+                        ColoringCraftingRecipe.of(itemWrap, "portable_redstone_transmitter_color", FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, 1)
+                );
+                of(exporter,
+                        ColoringMixingRecipe.of("cable_color", FactoryItems.CABLE, 2, 6, 10),
+                        ColoringMixingRecipe.of("lamp_color", FactoryItems.LAMP, 2, 6, 10),
+                        ColoringMixingRecipe.of("inverted_lamp_color", FactoryItems.INVERTED_LAMP, 2, 6, 10),
+                        ColoringMixingRecipe.of("caged_lamp_color", FactoryItems.CAGED_LAMP, 2, 6, 10),
+                        ColoringMixingRecipe.of("inverted_caged_lamp_color", FactoryItems.INVERTED_CAGED_LAMP, 2, 6, 10),
+                        ColoringMixingRecipe.of("fixture_lamp_color", FactoryItems.FIXTURE_LAMP, 2, 6, 10),
+                        ColoringMixingRecipe.of("inverted_fixture_lamp_color", FactoryItems.INVERTED_FIXTURE_LAMP, 2, 6, 10),
+                        ColoringMixingRecipe.of("portable_redstone_transmitter_color", FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, 1, 2, 6, 10)
+                );
 
         of(exporter,
                 GrindingRecipe.of("coal_dust", Ingredient.ofItems(Items.COAL), 1, 5, 8, FactoryItems.COAL_DUST),
@@ -800,30 +804,35 @@ class RecipesProvider extends FabricRecipeProvider {
                 new RecipeEntry<>(id("press/spray_can_fill"), new FillSprayCanPressRecipe(12))
         );
 
-        of(exporter,
-                new RecipeEntry<>(id("crafting/spray_can_fill"), new FillSprayCanCraftingRecipe(CraftingRecipeCategory.MISC)),
-                new RecipeEntry<>(id("crafting/inverted_colored_lamp"),
-                        new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
-                                FactoryItems.INVERTED_LAMP.getDefaultStack(),
-                                Ingredient.ofItems(FactoryItems.LAMP),
-                                DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(Items.REDSTONE_TORCH)))),
-                new RecipeEntry<>(id("crafting/inverted_caged_lamp"),
-                        new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
-                                FactoryItems.INVERTED_CAGED_LAMP.getDefaultStack(),
-                                Ingredient.ofItems(FactoryItems.CAGED_LAMP),
-                                DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(Items.REDSTONE_TORCH)))),
-                new RecipeEntry<>(id("crafting/caged_lamp"),
-                        new ShapelessNbtCopyRecipe("", CraftingRecipeCategory.REDSTONE,
-                                FactoryItems.CAGED_LAMP.getDefaultStack(),
-                                Ingredient.ofItems(FactoryItems.LAMP),
-                                DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(FactoryItems.METAL_GRID))))
-        );
-        for (var i = 0; i < 5; i++) {
-            of(exporter, GenericPressRecipe.of("throwable_glass_bottle_" + i, "throwable_glass_bottle", CountedIngredient.ofItems(5 - i, Items.GLASS_BOTTLE),
-                    CountedIngredient.ofItems(1, Items.GUNPOWDER), 7 - i, new OutputStack(new ItemStack(FactoryItems.THROWABLE_GLASS_BOTTLE, 5 - i), 1, 1)));
-            of(exporter, GenericPressRecipe.of("lingering_throwable_glass_bottle_" + i, "lingering_throwable_glass_bottle", CountedIngredient.ofItems(5 - i, FactoryItems.THROWABLE_GLASS_BOTTLE),
-                    CountedIngredient.ofItemsRemainder(1, Items.DRAGON_BREATH, Items.GLASS_BOTTLE), 7 - i, new OutputStack(new ItemStack(FactoryItems.LINGERING_THROWABLE_GLASS_BOTTLE, 5 - i), 1, 1)));
-        }
+                of(exporter,
+                        new RecipeEntry<>(recipeKey("crafting/spray_can_fill"), new FillSprayCanCraftingRecipe(CraftingRecipeCategory.MISC)),
+                        new RecipeEntry<>(recipeKey("crafting/inverted_colored_lamp"),
+                                new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
+                                        FactoryItems.INVERTED_LAMP.getDefaultStack(),
+                                        Ingredient.ofItems(FactoryItems.LAMP),
+                                        List.of(Ingredient.ofItems(Items.REDSTONE_TORCH)))),
+                        new RecipeEntry<>(recipeKey("crafting/inverted_caged_lamp"),
+                                new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
+                                        FactoryItems.INVERTED_CAGED_LAMP.getDefaultStack(),
+                                        Ingredient.ofItems(FactoryItems.CAGED_LAMP),
+                                        List.of(Ingredient.ofItems(Items.REDSTONE_TORCH)))),
+                        new RecipeEntry<>(recipeKey("crafting/caged_lamp"),
+                                new ShapelessNbtCopyRecipe("", CraftingRecipeCategory.REDSTONE,
+                                        FactoryItems.CAGED_LAMP.getDefaultStack(),
+                                        Ingredient.ofItems(FactoryItems.LAMP),
+                                        List.of(Ingredient.ofItems(FactoryItems.METAL_GRID)))),
+                        new RecipeEntry<>(recipeKey("crafting/inverted_fixture_lamp"),
+                                new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
+                                        FactoryItems.INVERTED_FIXTURE_LAMP.getDefaultStack(),
+                                        Ingredient.ofItems(FactoryItems.FIXTURE_LAMP),
+                                        List.of(Ingredient.ofItems(Items.REDSTONE_TORCH)))),
+                        new RecipeEntry<>(recipeKey("crafting/fixture_lamp"),
+                                new ShapelessNbtCopyRecipe("", CraftingRecipeCategory.REDSTONE,
+                                        FactoryItems.FIXTURE_LAMP.getDefaultStack().copyWithCount(3),
+                                        Ingredient.ofItems(FactoryItems.LAMP),
+                                        List.of(ingredientFromTag(ItemTags.WOODEN_PRESSURE_PLATES))))
+                );
+
 
         {
             var x = new CompShapedRecipeJsonBuilder(RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)

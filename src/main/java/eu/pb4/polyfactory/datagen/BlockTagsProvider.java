@@ -147,6 +147,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER)
                 .add(FactoryBlocks.CAGED_LAMP)
                 .add(FactoryBlocks.INVERTED_CAGED_LAMP)
+
         ;
 
         this.getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)

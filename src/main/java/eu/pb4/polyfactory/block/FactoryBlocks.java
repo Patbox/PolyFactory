@@ -52,6 +52,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static eu.pb4.polyfactory.ModInit.id;
+
 public class FactoryBlocks {
     private static final List<Block> BLOCKS = new ArrayList<>();
     public static final ConveyorBlock CONVEYOR = register("conveyor", settings -> new ConveyorBlock(settings.hardness(3).nonOpaque()));
@@ -118,8 +120,10 @@ public class FactoryBlocks {
     public static final LampBlock LAMP = register("colored_lamp", Block.Settings.copy(Blocks.REDSTONE_LAMP), settings -> new LampBlock(settings.nonOpaque(), false));
     public static final LampBlock INVERTED_LAMP = register("inverted_colored_lamp", Block.Settings.copy(INVERTED_REDSTONE_LAMP), settings -> new LampBlock(settings.nonOpaque(), true));
 
-    public static final SmallLampBlock CAGED_LAMP = register("caged_lamp", Block.Settings.copy(Blocks.REDSTONE_LAMP), settings -> new SmallLampBlock(settings.nonOpaque(), false));
-    public static final SmallLampBlock INVERTED_CAGED_LAMP = register("inverted_caged_lamp", Block.Settings.copy(INVERTED_REDSTONE_LAMP), settings -> new SmallLampBlock(settings.nonOpaque(), true));
+    public static final SidedLampBlock CAGED_LAMP = register("caged_lamp", Block.Settings.copy(Blocks.REDSTONE_LAMP), settings -> new SidedLampBlock.Full(settings.nonOpaque(), id("caged_lamp"), false));
+    public static final SidedLampBlock INVERTED_CAGED_LAMP = register("inverted_caged_lamp", Block.Settings.copy(INVERTED_REDSTONE_LAMP), settings -> new SidedLampBlock.Full(settings.nonOpaque(), id("caged_lamp"), true));
+    public static final SidedLampBlock FIXTURE_LAMP = register("fixture_lamp", Block.Settings.copy(Blocks.REDSTONE_LAMP), settings -> new SidedLampBlock.Flat(settings.nonOpaque(), id("fixture_lamp"), false));
+    public static final SidedLampBlock INVERTED_FIXTURE_LAMP = register("inverted_fixture_lamp", Block.Settings.copy(INVERTED_REDSTONE_LAMP), settings -> new SidedLampBlock.Flat(settings.nonOpaque(), id("fixture_lamp"), true));
     public static final PolymerButtonBlock STEEL_BUTTON = register("steel_button", Block.Settings.copy(Blocks.STONE_BUTTON), settings -> new PolymerButtonBlock("steel", BlockSetType.IRON, 5, settings.nonOpaque()));
     public static final TinyPotatoSpringBlock TINY_POTATO_SPRING = register("tiny_potato_spring", settings -> new TinyPotatoSpringBlock(settings.strength(1).nonOpaque()));
     public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", settings -> new RotationalDebugBlock(settings.strength(-1, -1)));

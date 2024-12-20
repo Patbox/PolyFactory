@@ -9,7 +9,7 @@ import eu.pb4.polyfactory.block.data.output.NixieTubeBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
 import eu.pb4.polyfactory.block.other.LampBlock;
-import eu.pb4.polyfactory.block.other.SmallLampBlock;
+import eu.pb4.polyfactory.block.other.SidedLampBlock;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
@@ -33,9 +33,7 @@ import net.minecraft.item.Items;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -47,6 +45,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerItem, ColoredItem {
     public static final int MAX_USES = 128;
@@ -83,7 +82,7 @@ public class DyeSprayItem extends Item implements RegistryCallbackItem, PolymerI
             success = cableBlock.setColor(state, context.getWorld(), context.getBlockPos(), color);
         } else if (state.getBlock() instanceof LampBlock lampBlock) {
             success = lampBlock.setColor(context.getWorld(), context.getBlockPos(), color);
-        } else if (state.getBlock() instanceof SmallLampBlock lampBlock) {
+        } else if (state.getBlock() instanceof SidedLampBlock lampBlock) {
             success = lampBlock.setColor(context.getWorld(), context.getBlockPos(), color);
         } else if (state.getBlock() instanceof WindmillBlock && context.getWorld().getBlockEntity(context.getBlockPos()) instanceof WindmillBlockEntity be) {
             var stacks = be.getSails();

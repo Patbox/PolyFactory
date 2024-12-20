@@ -136,6 +136,12 @@
   "block.polyfactory.inverted_caged_lamp": "Inverted Caged Lamp",
   "block.polyfactory.inverted_caged_lamp.colored": "Inverted %s Caged Lamp",
   "block.polyfactory.inverted_caged_lamp.colored.full": "Inverted %s Caged Lamp (%s)",
+  "block.polyfactory.fixture_lamp": "Fixture Lamp",
+  "block.polyfactory.fixture_lamp.colored": "%s Fixture Lamp",
+  "block.polyfactory.fixture_lamp.colored.full": "%s Fixture Lamp (%s)",
+  "block.polyfactory.inverted_fixture_lamp": "Inverted Fixture Lamp",
+  "block.polyfactory.inverted_fixture_lamp.colored": "Inverted %s Fixture Lamp",
+  "block.polyfactory.inverted_fixture_lamp.colored.full": "Inverted %s Fixture Lamp (%s)",
   "block.polyfactory.steel_button": "Steel Button",
 
 
