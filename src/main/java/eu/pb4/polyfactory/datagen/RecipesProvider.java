@@ -137,6 +137,18 @@ class RecipesProvider extends FabricRecipeProvider {
                         .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.TREATED_DRIED_KELP))
                         .offerTo(exporter);
 
+                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.GATED_CABLE, 1)
+                        .pattern("ris")
+                        .pattern("cxc")
+                        .pattern("sir")
+                        .input('i', FactoryItems.STEEL_PLATE)
+                        .input('s', Items.SMOOTH_STONE_SLAB)
+                        .input('x', Items.COPPER_INGOT)
+                        .input('r', Items.REDSTONE)
+                        .input('c', FactoryItems.CABLE)
+                        .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.CABLE))
+                        .offerTo(exporter);
+
                 ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.PRESS, 1)
                         .pattern(" g ")
                         .pattern("sis")
@@ -721,13 +733,13 @@ class RecipesProvider extends FabricRecipeProvider {
                         // Crushed raw metals
 
                         GrindingRecipe.of("crushed_raw_iron", Ingredient.ofItems(Items.RAW_IRON), 8, 12, 38,
-                                OutputStack.of(FactoryItems.CRUSHED_RAW_IRON, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_IRON, 0.33f, 1)
+                                OutputStack.of(FactoryItems.CRUSHED_RAW_IRON, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_IRON, 0.4f, 1)
                         ),
                         GrindingRecipe.of("crushed_raw_gold", Ingredient.ofItems(Items.RAW_GOLD), 6, 12, 38,
-                                OutputStack.of(FactoryItems.CRUSHED_RAW_GOLD, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_GOLD, 0.33f, 1)
+                                OutputStack.of(FactoryItems.CRUSHED_RAW_GOLD, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_GOLD, 0.4f, 1)
                         ),
                         GrindingRecipe.of("crushed_raw_copper", Ingredient.ofItems(Items.RAW_COPPER), 6, 12, 38,
-                                OutputStack.of(FactoryItems.CRUSHED_RAW_COPPER, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_COPPER, 0.33f, 1)
+                                OutputStack.of(FactoryItems.CRUSHED_RAW_COPPER, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_COPPER, 0.4f, 1)
                         ),
 
                         // Flower to Dye
@@ -842,7 +854,7 @@ class RecipesProvider extends FabricRecipeProvider {
                                 new ShapelessNbtCopyRecipe("", CraftingRecipeCategory.REDSTONE,
                                         FactoryItems.FIXTURE_LAMP.getDefaultStack().copyWithCount(3),
                                         Ingredient.ofItems(FactoryItems.LAMP),
-                                        List.of(ingredientFromTag(ItemTags.WOODEN_PRESSURE_PLATES))))
+                                        List.of(Ingredient.ofItems(FactoryItems.WOODEN_PLATE))))
                 );
 
 

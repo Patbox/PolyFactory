@@ -221,7 +221,7 @@ public abstract class SidedLampBlock extends Block implements FactoryBlock, Bloc
         private Model(BlockPos pos, BlockState state) {
             this.main = ItemDisplayElementUtil.createSimple();
             this.main.setScale(new Vector3f(2));
-            this.main.setViewRange(0.5f);
+            this.main.setViewRange(0.8f);
             this.main.setRightRotation(new Quaternionf().rotateX(MathHelper.HALF_PI));
             this.state = state;
             updateStatePos(state);

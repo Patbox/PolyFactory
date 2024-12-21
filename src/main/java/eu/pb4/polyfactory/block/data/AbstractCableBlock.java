@@ -53,7 +53,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.BiPredicate;
 
-public abstract class AbstractCableBlock extends NetworkBlock implements BlockEntityProvider, CableConnectable, NetworkComponent.Data, NetworkComponent.Energy {
+public abstract class AbstractCableBlock extends CableNetworkBlock implements BlockEntityProvider, CableConnectable {
     public static final int DEFAULT_COLOR = 0xbbbbbb;
     public static final BooleanProperty HAS_CABLE = BooleanProperty.of("has_cable");
 
@@ -165,17 +165,6 @@ public abstract class AbstractCableBlock extends NetworkBlock implements BlockEn
         }
 
         super.onPlaced(world, pos, state, placer, itemStack);
-    }
-
-    @Override
-    protected void updateNetworkAt(WorldView world, BlockPos pos) {
-        NetworkComponent.Data.updateDataAt(world, pos);
-        NetworkComponent.Energy.updateEnergyAt(world, pos);
-    }
-
-    @Override
-    protected boolean isSameNetworkType(Block block) {
-        return block instanceof NetworkComponent.Data || block instanceof NetworkComponent.Energy;
     }
 
     @Override
