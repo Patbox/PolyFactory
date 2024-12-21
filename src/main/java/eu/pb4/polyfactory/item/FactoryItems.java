@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.item;
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.polyfactory.block.data.GatedCableBlock;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.factorytools.api.item.MultiBlockItem;
 import eu.pb4.factorytools.api.block.MultiBlock;
@@ -331,32 +332,32 @@ public class FactoryItems {
                 .displayName(Text.translatable("itemgroup." + ModInit.ID + ".variants"))
                 .entries(((context, entries) -> {
 
-                    for (var dye : DyeColor.values()) {
+                    for (var dye : FactoryUtil.COLORS_CREATIVE) {
                         var stack = WINDMILL_SAIL.getDefaultStack();
                         stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(DyeColorExtra.getColor(dye), true));
                         entries.add(stack);
                     }
 
-                    for (var dye : DyeColor.values()) {
+                    for (var dye : FactoryUtil.COLORS_CREATIVE) {
                         entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(dye)));
                     }
 
-                    for (var dye : DyeColor.values()) {
+                    for (var dye : FactoryUtil.COLORS_CREATIVE) {
                         entries.add(ColoredItem.stack(LAMP, 1, DyeColorExtra.getColor(dye)));
                     }
-                    for (var dye : DyeColor.values()) {
+                    for (var dye : FactoryUtil.COLORS_CREATIVE) {
                         entries.add(ColoredItem.stack(INVERTED_LAMP, 1, DyeColorExtra.getColor(dye)));
                     }
-                    for (var dye : DyeColor.values()) {
+                    for (var dye : FactoryUtil.COLORS_CREATIVE) {
                         entries.add(ColoredItem.stack(CAGED_LAMP, 1, DyeColorExtra.getColor(dye)));
                     }
-                    for (var dye : DyeColor.values()) {
+                    for (var dye : FactoryUtil.COLORS_CREATIVE) {
                         entries.add(ColoredItem.stack(INVERTED_CAGED_LAMP, 1, DyeColorExtra.getColor(dye)));
                     }
-                    for (var dye : DyeColor.values()) {
+                    for (var dye : FactoryUtil.COLORS_CREATIVE) {
                         entries.add(ColoredItem.stack(FIXTURE_LAMP, 1, DyeColorExtra.getColor(dye)));
                     }
-                    for (var dye : DyeColor.values()) {
+                    for (var dye : FactoryUtil.COLORS_CREATIVE) {
                         entries.add(ColoredItem.stack(INVERTED_FIXTURE_LAMP, 1, DyeColorExtra.getColor(dye)));
                     }
 
@@ -382,7 +383,7 @@ public class FactoryItems {
                         entries.add(stack);
                     }
 
-                    for (var dye : DyeColor.values()) {
+                    for (var dye : FactoryUtil.COLORS_CREATIVE) {
                         var x = ColoredItem.stack(SPRAY_CAN, 1, DyeColorExtra.getColor(dye));
                         x.set(FactoryDataComponents.USES_LEFT, 128);
                         entries.add(x);

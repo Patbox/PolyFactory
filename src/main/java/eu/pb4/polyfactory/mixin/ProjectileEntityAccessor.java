@@ -13,4 +13,10 @@ public interface ProjectileEntityAccessor {
 
     @Accessor
     void setOwnerUuid(UUID ownerUuid);
+
+    @Accessor
+    boolean isLeftOwner();
+
+    @Accessor
+    void setLeftOwner(boolean leftOwner);
 }

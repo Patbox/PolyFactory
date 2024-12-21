@@ -1,11 +1,15 @@
 package eu.pb4.polyfactory.block.other;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.PredicateLimitedSlot;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
+import eu.pb4.polyfactory.util.storage.WrappingStorage;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
@@ -172,7 +176,15 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
             return this.cachedItemStorage;
         }
 
-        return ItemStorage.ITEM.find(this.itemStack, ContainerItemContext.ofSingleSlot(this.inventoryStorage.getSlot(0)));
+        var storage = ItemStorage.ITEM.find(this.itemStack, ContainerItemContext.ofSingleSlot(this.inventoryStorage.getSlot(0)));
+
+        return WrappingStorage.withModifyCallback(storage, this::runAdvancement);
+    }
+
+    private void runAdvancement() {
+        if (this.world != null && FactoryUtil.getClosestPlayer(this.world, this.pos, 16) instanceof ServerPlayerEntity player) {
+            TriggerCriterion.trigger(player, FactoryTriggers.ITEM_PACKER_ACCESSES);
+        }
     }
 
     @Override

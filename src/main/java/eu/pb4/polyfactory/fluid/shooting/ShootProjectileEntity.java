@@ -67,6 +67,10 @@ public record ShootProjectileEntity<T>(EntityCreator<T> entityCreator,
             var entity = entityCreator.createEntity(world, fluidInstance, amount);
             if (entity instanceof ProjectileEntity projectile) {
                 ((ProjectileEntityAccessor) projectile).setOwnerUuid(context.uuid());
+
+                if (!context.isEntity()) {
+                    ((ProjectileEntityAccessor) projectile).setLeftOwner(true);
+                }
             }
             entity.setPosition(pos);
             vec.set(rotation.x, rotation.y, rotation.z);

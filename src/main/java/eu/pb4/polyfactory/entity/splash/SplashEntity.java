@@ -52,6 +52,8 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
         this.data = fluidInstance.defaultData();
     }
 
+
+
     @Override
     public void setFluidData(T data) {
         this.data = data;
