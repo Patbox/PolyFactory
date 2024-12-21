@@ -123,7 +123,7 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
         private Model(BlockPos pos, BlockState state, boolean inverted) {
             this.main = ItemDisplayElementUtil.createSimple();
             this.main.setScale(new Vector3f(2 + (pos.getManhattanDistance(BlockPos.ORIGIN) % 2) * 0.001f));
-            this.main.setViewRange(0.5f);
+            this.main.setViewRange(0.8f);
             this.state = state;
             this.inverted = inverted;
             this.addElement(this.main);

@@ -48,6 +48,7 @@
   "block.polyfactory.cable": "Cable",
   "block.polyfactory.cable.colored": "%s Cable",
   "block.polyfactory.cable.colored.full": "%s Cable (%s)",
+  "block.polyfactory.gated_cable": "Gated Cable",
   "block.polyfactory.creative_motor": "Creative Motor",
   "block.polyfactory.creative_container": "Creative Container",
   "block.polyfactory.inverted_redstone_lamp": "Inverted Redstone Lamp",

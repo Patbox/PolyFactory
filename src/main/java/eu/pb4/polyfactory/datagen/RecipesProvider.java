@@ -137,17 +137,29 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.TREATED_DRIED_KELP))
                 .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.PRESS, 1)
-                .pattern(" g ")
-                .pattern("sis")
-                .pattern("wcw")
-                .input('i', Items.ANVIL)
-                .input('c', Items.SMOOTH_STONE)
-                .input('s', FactoryItems.STEEL_INGOT)
-                .input('w', ItemTags.PLANKS)
-                .input('g', FactoryItems.GENERIC_MACHINE_PART)
-                .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
-                .offerTo(exporter);
+                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.GATED_CABLE, 1)
+                        .pattern("ris")
+                        .pattern("cxc")
+                        .pattern("sir")
+                        .input('i', FactoryItems.STEEL_PLATE)
+                        .input('s', Items.SMOOTH_STONE_SLAB)
+                        .input('x', Items.COPPER_INGOT)
+                        .input('r', Items.REDSTONE)
+                        .input('c', FactoryItems.CABLE)
+                        .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.CABLE))
+                        .offerTo(exporter);
+
+                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.PRESS, 1)
+                        .pattern(" g ")
+                        .pattern("sis")
+                        .pattern("wcw")
+                        .input('i', Items.ANVIL)
+                        .input('c', Items.SMOOTH_STONE)
+                        .input('s', FactoryItems.STEEL_INGOT)
+                        .input('w', ItemTags.PLANKS)
+                        .input('g', FactoryItems.GENERIC_MACHINE_PART)
+                        .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                        .offerTo(exporter);
 
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.MINER, 1)
                 .pattern(" i ")
@@ -722,15 +734,15 @@ class RecipesProvider extends FabricRecipeProvider {
 
                 // Crushed raw metals
 
-                GrindingRecipe.of("crushed_raw_iron", Ingredient.ofItems(Items.RAW_IRON), 8, 12, 38,
-                        OutputStack.of(FactoryItems.CRUSHED_RAW_IRON, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_IRON, 0.33f, 1)
-                ),
-                GrindingRecipe.of("crushed_raw_gold", Ingredient.ofItems(Items.RAW_GOLD), 6, 12, 38,
-                        OutputStack.of(FactoryItems.CRUSHED_RAW_GOLD, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_GOLD, 0.33f, 1)
-                ),
-                GrindingRecipe.of("crushed_raw_copper", Ingredient.ofItems(Items.RAW_COPPER), 6, 12, 38,
-                        OutputStack.of(FactoryItems.CRUSHED_RAW_COPPER, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_COPPER, 0.33f, 1)
-                ),
+                        GrindingRecipe.of("crushed_raw_iron", Ingredient.ofItems(Items.RAW_IRON), 8, 12, 38,
+                                OutputStack.of(FactoryItems.CRUSHED_RAW_IRON, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_IRON, 0.4f, 1)
+                        ),
+                        GrindingRecipe.of("crushed_raw_gold", Ingredient.ofItems(Items.RAW_GOLD), 6, 12, 38,
+                                OutputStack.of(FactoryItems.CRUSHED_RAW_GOLD, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_GOLD, 0.4f, 1)
+                        ),
+                        GrindingRecipe.of("crushed_raw_copper", Ingredient.ofItems(Items.RAW_COPPER), 6, 12, 38,
+                                OutputStack.of(FactoryItems.CRUSHED_RAW_COPPER, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_COPPER, 0.4f, 1)
+                        ),
 
                 // Flower to Dye
                 GrindingRecipe.of("dandelion_to_dye", "dye", Ingredient.ofItems(Items.DANDELION), 1, 6, new ItemStack(Items.YELLOW_DYE, 3)),
@@ -830,7 +842,7 @@ class RecipesProvider extends FabricRecipeProvider {
                                 new ShapelessNbtCopyRecipe("", CraftingRecipeCategory.REDSTONE,
                                         FactoryItems.FIXTURE_LAMP.getDefaultStack().copyWithCount(3),
                                         Ingredient.ofItems(FactoryItems.LAMP),
-                                        List.of(ingredientFromTag(ItemTags.WOODEN_PRESSURE_PLATES))))
+                                        List.of(Ingredient.ofItems(FactoryItems.WOODEN_PLATE))))
                 );
 
 

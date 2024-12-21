@@ -125,23 +125,23 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
 
     @Override
     public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
-        // This if statement is a mess...
-        if (node instanceof DirectionNode directionNode && world.getBlockEntity(selfPos) instanceof DoubleInputTransformerBlockEntity be && (
-                (channel == be.inputChannel1() && selfState.get(FACING_INPUT_1) == directionNode.direction())
-                || (channel == be.inputChannel2() && selfState.get(FACING_INPUT_2) == directionNode.direction())
-            ) && !(selfPos.equals(sourcePos) && sourceDir == selfState.get(FACING_OUTPUT)
-                && (directionNode.direction() != sourceDir
-                && FactoryNodes.DATA.getGraphWorld(world).getNodesAt(selfPos).filter(x -> x.getNode() == node).findFirst().map(NodeHolder::getGraphId)
-                        .orElse(-1l).longValue() != FactoryNodes.DATA.getGraphWorld(world).getNodesAt(selfPos).filter(x -> x.getNode() instanceof DataProviderNode)
-                .findFirst().map(NodeHolder::getGraphId).orElse(-2l).longValue()
-        ))) {
-            var input1 = channel == be.inputChannel1() && selfState.get(FACING_INPUT_1) == directionNode.direction()
-                    ? be.setLastInput1(data) : be.lastInput1();
-            var input2 = channel == be.inputChannel2() && selfState.get(FACING_INPUT_2) == directionNode.direction()
-                    ? be.setLastInput2(data) : be.lastInput2();
+        if (node instanceof ChannelReceiverDirectionNode direction && world.getBlockEntity(selfPos) instanceof DoubleInputTransformerBlockEntity be) {
+            DataContainer input1 = be.lastInput1();
+            DataContainer input2 = be.lastInput2();
+            boolean matchingData = false;
+            if (direction.direction() == selfState.get(FACING_INPUT_1) && channel == be.inputChannel1()) {
+                input1 = be.setLastInput1(data);
+                matchingData = true;
+            }
+            if (direction.direction() == selfState.get(FACING_INPUT_2) && channel == be.inputChannel2()) {
+                input2 = be.setLastInput2(data);
+                matchingData = true;
+            }
 
-            sendData(world, selfState.get(FACING_OUTPUT), selfPos, this.transformData(input1, input2, world, selfPos, selfState, be));
-            return true;
+            if (matchingData) {
+                sendData(world, selfState.get(FACING_OUTPUT), selfPos, this.transformData(input1, input2, world, selfPos, selfState, be));
+                return true;
+            }
         }
 
         return false;

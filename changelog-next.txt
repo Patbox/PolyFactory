@@ -13,12 +13,18 @@
   - New data block, that allows you to compare 2 data inputs, getting single output (same as Arithmetic Operator).
   - Returns Boolean True or False data, depending on operation set with a wrench.
   - Can check if data is `equal`, `not equal`, `less than`, `less or equal`, `more than` and `more or equal`.
-  - By default it tries to coerse types if they don't match, but you can enable strict mode preventing that.
+  - By default it tries to convert types if they don't match, but you can enable strict mode preventing that.
+  - This block also emits weak redstone signal in direction of output with power level 15 when returning true and 0 for false.
   - Crafted with Steel Plate, Cable, Nether Quartz and Redstone Chip.
 - Added Fixture Lamp:
   - New variant of Colored Lamp block.
   - Has small wall-adjusted hitbox.
-  - Crafted with a Colored Lamp and any wooden Pressure Plate.
+  - Crafted with a Colored Lamp and any Wooden Plate.
+- Added Gated Cable:
+  - When powered by redstone, it prevents any data to pass through it.
+  - It doesn't add any delay when sending data.
+  - Can be inverted with a wrench, only allowing data to pass when powered.
+  - Crafted with Steel Plate, Cable, Smooth Stone Slab, Redstone and Copper Ingot
 - Slime and Honey can now be shot out of Fluid Nozzle / Fluid Pressure Gun.
   - Added Slime and Honey splashes.
   - They deal no damage, instead giving player Sticky effect.
@@ -29,9 +35,11 @@
 - Fixed Steel Button top texture not looking correctly.
 - Increased damage done by Lava Splash to 2 hearts (from 0.5).
 - Increased damage done by Experience Splash x2 (compared to previously).
+- Increased change of Crushed Raw Ore doubling from 33% to 40%
 - Steel Gears use 3d models when held in hand (2d texture otherwise).
 - Changed recipe of Arithmetic Operator and Data Memory to include Cable.
 - Boolean Data now returns 15 redstone power for true and 0 for false.
+- Increased view range of Colored and Caged Lamps.
 - Added Grinder recipe for Wind Charges and Eyeblossom dyes.
 - Added Press recipe for Bundle and Mace.
 - Added Mixer recipe for dyed Bundle and Shulker Box.

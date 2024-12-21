@@ -18,7 +18,10 @@ import net.minecraft.state.property.EnumProperty;
 import net.minecraft.text.Text;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 import java.util.List;
 import java.util.Locale;
@@ -47,12 +50,36 @@ public class DataComparatorBlock extends DoubleInputTransformerBlock {
     }
 
     @Override
+    protected int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        if (state.get(FACING_OUTPUT) == direction.getOpposite() && world.getBlockEntity(pos) instanceof DoubleInputTransformerBlockEntity be) {
+            return be.lastOutput().isTrue() ? 15 : 0;
+        }
+        return 0;
+    }
+
+    @Override
+    protected boolean emitsRedstonePower(BlockState state) {
+        return true;
+    }
+
+    @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         super.onStateReplaced(state, world, pos, newState, moved);
         if (state.isOf(newState.getBlock()) && (state.get(OPERATION) != newState.get(OPERATION))
                 && world instanceof ServerWorld serverWorld && world.getBlockEntity(pos) instanceof DoubleInputTransformerBlockEntity be) {
             sendData(world, newState.get(FACING_OUTPUT), pos, this.transformData(be.lastInput1(), be.lastInput2(), serverWorld, pos, newState, be));
+        } else {
+            world.updateNeighborsAlways(pos, this);
         }
+    }
+
+    @Override
+    public int sendData(WorldAccess world, Direction direction, BlockPos selfPos, DataContainer data) {
+        var i = super.sendData(world, direction, selfPos, data);
+        if (world instanceof World w) {
+            w.updateNeighborsAlways(selfPos, this);
+        }
+        return i;
     }
 
     @Override
@@ -96,7 +123,7 @@ public class DataComparatorBlock extends DoubleInputTransformerBlock {
 
         @Override
         public String asString() {
-            return this.name().toLowerCase(Locale.ROOT);
+            return name;
         }
     }
 
