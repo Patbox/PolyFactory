@@ -43,7 +43,10 @@
 - Added Grinder recipe for Wind Charges and Eyeblossom dyes.
 - Added Press recipe for Bundle and Mace.
 - Added Mixer recipe for dyed Bundle and Shulker Box.
+- Added advancements related to new content.
+- Changed order of colored items in creative item groups (Variants tab) to match other vanilla items.
 - Recipes now use Fabric's Convention tag for Stripped Logs.
 - Fixed Funnels pulling items form blocks using Fabric Storage API loosing last stack if the storage becomes empty.
 - Fixed Conveyors sometimes deleting items.
+- Fixed Splashes shoot through Fluid Nozzle not interacting with owner straight away.
 - Fixed Boolean Data returning inverted numbers.

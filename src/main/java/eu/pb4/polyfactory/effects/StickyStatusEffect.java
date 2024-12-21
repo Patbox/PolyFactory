@@ -1,5 +1,7 @@
 package eu.pb4.polyfactory.effects;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.other.PolymerStatusEffect;
 import net.minecraft.entity.Entity;
@@ -70,6 +72,7 @@ public class StickyStatusEffect extends StatusEffect implements PolymerStatusEff
                 } else {
                     FactoryUtil.sendVelocityDelta(player, new Vec3d(0, y - vec3d.y + entity.getFinalGravity(), 0));
                 }
+                TriggerCriterion.trigger(player, FactoryTriggers.STICKY_WALL_SLIDING);
             }
 
             if (entity.getWorld().random.nextInt(5) == 0) {

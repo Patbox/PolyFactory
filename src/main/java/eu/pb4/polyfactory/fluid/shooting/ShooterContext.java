@@ -22,4 +22,8 @@ public interface ShooterContext {
     default float extraSpread() {
         return 0;
     }
+
+    default boolean isEntity() {
+        return false;
+    }
 }

@@ -418,6 +418,21 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.ARITHMETIC_OPERATOR))
                 .build(exporter, "polyfactory:main/base/arithmetic_operator");
 
+        var dataComparator = Advancement.Builder.create()
+                .parent(aritheticOperator)
+                .display(
+                        FactoryItems.DATA_COMPARATOR,
+                        Text.translatable("advancements.polyfactory.data_comparator.title"),
+                        Text.translatable("advancements.polyfactory.data_comparator.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.DATA_COMPARATOR))
+                .build(exporter, "polyfactory:main/base/data_comparator");
+
         var dataMemory = Advancement.Builder.create()
                 .parent(aritheticOperator)
                 .display(
@@ -611,6 +626,21 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 )
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.CONTAINER_ADD_ITEM))
                 .build(exporter, "polyfactory:main/base/container");
+
+        var itemPacker = Advancement.Builder.create()
+                .parent(container)
+                .display(
+                        FactoryItems.ITEM_PACKER,
+                        Text.translatable("advancements.polyfactory.item_packer.title"),
+                        Text.translatable("advancements.polyfactory.item_packer.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.ITEM_PACKER_ACCESSES))
+                .build(exporter, "polyfactory:main/base/item_packer");
 
         var fan = Advancement.Builder.create()
                 .parent(press)
@@ -828,7 +858,20 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .criterion("use", FluidShootsCriterion.ofNozzle())
                 .build(exporter, "polyfactory:main/base/nozzle");
 
-
+        var stickyEffect = Advancement.Builder.create()
+                .parent(nozzle)
+                .display(
+                        FactoryItems.HONEY_BUCKET,
+                        Text.translatable("advancements.polyfactory.sticky_effect.title"),
+                        Text.translatable("advancements.polyfactory.sticky_effect.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.STICKY_WALL_SLIDING))
+                .build(exporter, "polyfactory:main/base/sticky_effect");
 
         var pressureFluidGun = Advancement.Builder.create()
                 .parent(nozzle)

@@ -5,8 +5,8 @@ import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
-import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
+import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.sgui.api.GuiHelpers;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -17,7 +17,6 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.block.enums.WallShape;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
@@ -41,7 +40,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -57,7 +55,22 @@ public class FactoryUtil {
     public static final Vec3d HALF_BELOW = new Vec3d(0, -0.5, 0);
     public static final List<Direction> HORIZONTAL_DIRECTIONS = List.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
     public static final List<EquipmentSlot> ARMOR_EQUIPMENT = Arrays.stream(EquipmentSlot.values()).filter(x -> x.getType() == EquipmentSlot.Type.HUMANOID_ARMOR).toList();
-
+    public static final List<DyeColor> COLORS_CREATIVE = List.of(DyeColor.WHITE,
+            DyeColor.LIGHT_GRAY,
+            DyeColor.GRAY,
+            DyeColor.BLACK,
+            DyeColor.BROWN,
+            DyeColor.RED,
+            DyeColor.ORANGE,
+            DyeColor.YELLOW,
+            DyeColor.LIME,
+            DyeColor.GREEN,
+            DyeColor.CYAN,
+            DyeColor.LIGHT_BLUE,
+            DyeColor.BLUE,
+            DyeColor.PURPLE,
+            DyeColor.MAGENTA,
+            DyeColor.PINK);
     private static final List<Runnable> RUN_NEXT_TICK = new ArrayList<>();
     private static final Item[] COLORED_MODEL_ITEMS = new Item[]{
             Items.LEATHER_HELMET,
@@ -411,10 +424,10 @@ public class FactoryUtil {
     }
 
     public static void sendSlotUpdate(Entity entity, Hand hand) {
-        if (entity instanceof ServerPlayerEntity player ) {
+        if (entity instanceof ServerPlayerEntity player) {
             GuiHelpers.sendSlotUpdate(player, player.playerScreenHandler.syncId, hand == Hand.MAIN_HAND
-                    ? PlayerScreenHandler.HOTBAR_START + player.getInventory().selectedSlot
-                    : PlayerScreenHandler.OFFHAND_ID,
+                            ? PlayerScreenHandler.HOTBAR_START + player.getInventory().selectedSlot
+                            : PlayerScreenHandler.OFFHAND_ID,
                     player.getStackInHand(hand), player.playerScreenHandler.nextRevision());
         }
     }
@@ -454,7 +467,7 @@ public class FactoryUtil {
             default -> state;
         };
     }
-    
+
 
     public enum MovableResult {
         SUCCESS_MOVABLE,

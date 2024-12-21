@@ -35,5 +35,7 @@ public interface FactoryTriggers {
     Identifier TATER_1024 = id("tater_1024");
     Identifier ARITHMETIC_OPERATOR = id("arithmetic_operator");
     Identifier DATA_COMPARATOR = id("data_comparator");
-    Identifier DATA_MEMORY= id("data_memory");
+    Identifier DATA_MEMORY = id("data_memory");
+    Identifier ITEM_PACKER_ACCESSES = id("item_packer_accesses");
+    Identifier STICKY_WALL_SLIDING = id("sticky_wall_sliding");
 }

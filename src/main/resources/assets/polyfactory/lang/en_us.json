@@ -198,8 +198,8 @@
   "item.polyfactory.wrench.action.operation.comparator.not_equal": "Not Equal",
   "item.polyfactory.wrench.action.operation.comparator.less_than": "Less Than",
   "item.polyfactory.wrench.action.operation.comparator.less_or_equal": "Less or Equal",
-  "item.polyfactory.wrench.action.operation.comparator.more_than": "Less Than",
-  "item.polyfactory.wrench.action.operation.comparator.more_or_equal": "Less or Equal",
+  "item.polyfactory.wrench.action.operation.comparator.more_than": "More Than",
+  "item.polyfactory.wrench.action.operation.comparator.more_or_equal": "More or Equal",
 
   "item.polyfactory.wrench.action.mode.transfer_mode.to_conveyor": "To Conveyor",
   "item.polyfactory.wrench.action.mode.transfer_mode.from_conveyor": "From Conveyor",
@@ -228,6 +228,8 @@
   "data_type.polyfactory.game_event": "Game Event",
   "data_type.polyfactory.block_state": "Block",
   "data_type.polyfactory.item_stack": "Item",
+  "data_type.polyfactory.capacity": "Capacity",
+  "data_type.polyfactory.invalid": "Error",
 
   "fluid_type.minecraft.water": "Water",
   "fluid_type.minecraft.lava": "Lava",
@@ -324,6 +326,9 @@
   "advancements.polyfactory.container.title": "Alternative Storage",
   "advancements.polyfactory.container.description": "Put item into Wooden Container",
 
+  "advancements.polyfactory.item_packer.title": "Pack it up",
+  "advancements.polyfactory.item_packer.description": "Use Item Packer to put or take items from Bundle or Shulker Box",
+
   "advancements.polyfactory.workbench.title": "Better than Crafting Table",
   "advancements.polyfactory.workbench.description": "Create a Workbench",
 
@@ -379,6 +384,9 @@
   "advancements.polyfactory.arithmetic_operator.title": "It just adds up!",
   "advancements.polyfactory.arithmetic_operator.description": "Use Arithmetic Operator to apply any operation on data!",
 
+  "advancements.polyfactory.data_comparator.title": "More or less",
+  "advancements.polyfactory.data_comparator.description": "Use Data Comparator to compare data!",
+
   "advancements.polyfactory.data_memory.title": "The storage device can now be safely removed from your computer.",
   "advancements.polyfactory.data_memory.description": "Store some data in Data Memory Block and then take it with you!",
 
@@ -414,6 +422,9 @@
 
   "advancements.polyfactory.nozzle_lava.title": "Flamethrower!",
   "advancements.polyfactory.nozzle_lava.description": "Shoot out lava from Nozzle or Pressure Fluid Gun",
+
+  "advancements.polyfactory.sticky_effect.title": "Even more Sticky Situation",
+  "advancements.polyfactory.sticky_effect.description": "Slide on a wall by using Sticky (Honey or Slime) effect.",
 
   "advancements.polyfactory.pressure_fluid_gun_healing.title": "Meet the Medic",
   "advancements.polyfactory.pressure_fluid_gun_healing.description": "It's time to heal with Pressure Fluid Gun!",

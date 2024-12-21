@@ -38,4 +38,9 @@ public record EntityShooterContext(LivingEntity entity) implements ShooterContex
     public SoundCategory soundCategory() {
         return entity.getSoundCategory();
     }
+
+    @Override
+    public boolean isEntity() {
+        return true;
+    }
 }
