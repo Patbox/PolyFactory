@@ -16,6 +16,8 @@ import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
+import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -31,10 +33,13 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.ActionResult;
@@ -43,13 +48,14 @@ import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.Collection;
-import java.util.List;
 
 public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityProvider, BarrierBasedWaterloggable, ItemUseLimiter.All {
 
@@ -60,13 +66,14 @@ public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityPr
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(WATERLOGGED);
+        builder.add(FACING);
         super.appendProperties(builder);
     }
 
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterLog(ctx, this.getDefaultState());
+        return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite()));
     }
 
     @Override
@@ -96,11 +103,6 @@ public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityPr
     }
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        super.onPlaced(world, pos, state, placer, itemStack);
-    }
-
-    @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!player.isSneaking() && world.getBlockEntity(pos) instanceof WorkbenchBlockEntity be) {
             be.openGui((ServerPlayerEntity) player);
@@ -116,8 +118,6 @@ public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityPr
         super.onStateReplaced(state, world, pos, newState, moved);
     }
 
-
-
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
@@ -131,11 +131,49 @@ public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityPr
 
     public static class Model extends BlockModel {
         private final ItemDisplayElement base;
+        private final ItemDisplayElement[] items = new ItemDisplayElement[9];
 
         private Model(BlockState state) {
             this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
+            for (int i = 0; i < 9; i++) {
+                var element = ItemDisplayElementUtil.createSimple();
+                element.setViewRange(0.4f);
+                element.setScale(new Vector3f(4 / 16f));
+                element.setLeftRotation(new Quaternionf().rotateX(-MathHelper.HALF_PI));
+                element.setTranslation(new Vector3f((i % 3 - 1) * 3 / 16f, (8 + 2 / 16f) / 16f , (i / 3 - 1) * 3 / 16f));
+                this.items[i] = element;
+            }
+
+            this.updateState(state);
+            for (var el : this.items) {
+                this.addElement(el);
+            }
             this.addElement(this.base);
+        }
+
+
+        public void setStack(int i, ItemStack stack) {
+            this.items[i].setItem(stack.copy());
+            if (this.getTick() != 0) {
+                this.items[i].tick();
+            }
+        }
+        @Override
+        public void notifyUpdate(HolderAttachment.UpdateType updateType) {
+            super.notifyUpdate(updateType);
+            if (updateType == BlockAwareAttachment.BLOCK_STATE_UPDATE) {
+                this.updateState(this.blockState());
+                this.tick();
+            }
+        }
+
+        private void updateState(BlockState blockState) {
+            var yaw = blockState.get(FACING).getPositiveHorizontalDegrees();
+            for (var el : this.items) {
+                el.setYaw(yaw);
+            }
+            this.base.setYaw(yaw);
         }
     }
 }

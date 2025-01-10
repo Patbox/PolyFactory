@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlock;
 import eu.pb4.polyfactory.ui.WorkbenchScreenHandler;
 import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -43,6 +44,8 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
     @Nullable
     private RecipeEntry<CraftingRecipe> currentRecipe;
 
+    private WorkbenchBlock.Model model;
+
     public WorkbenchBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.WORKBENCH, pos, state);
     }
@@ -60,6 +63,11 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
             updateResult();
         }
         super.readNbt(nbt, lookup);
+        if (this.model != null) {
+            for (int i = 0; i < 9; i++) {
+                this.markStackDirty(i);
+            }
+        }
     }
 
     @Override
@@ -168,6 +176,27 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
         result.setStack(0, itemStack);
     }
 
+    public void markStackDirty(int index) {
+        if (this.model != null) {
+            this.model.setStack(index, this.getStack(index));
+        }
+    }
+
+    @Override
+    public void setStack(int slot, ItemStack stack) {
+        MinimalSidedInventory.super.setStack(slot, stack);
+        this.markStackDirty(slot);
+    }
+
+    @Override
+    public ItemStack removeStack(int slot, int amount) {
+        var out = MinimalSidedInventory.super.removeStack(slot, amount);
+        if (!out.isEmpty()) {
+            this.markStackDirty(slot);
+        }
+        return out;
+    }
+
     @Override
     public void markDirty() {
         super.markDirty();
@@ -201,6 +230,10 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
     @Override
     public void onListenerUpdate(WorldChunk chunk) {
         updateResult();
+        this.model = BlockAwareAttachment.get(chunk, this.pos).holder() instanceof WorkbenchBlock.Model m ? m : null;
+        for (int i = 0; i < 9; i++) {
+            this.markStackDirty(i);
+        }
     }
 
     @Nullable
