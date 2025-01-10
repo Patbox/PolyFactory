@@ -77,16 +77,16 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation 'eu.pb4:polymer-core:0.11.2+1.21.4'
-	modImplementation 'eu.pb4:polymer-blocks:0.11.2+1.21.4'
-	modImplementation 'eu.pb4:polymer-resource-pack:0.11.2+1.21.4'
-	modImplementation 'eu.pb4:polymer-resource-pack-extras:0.11.2+1.21.4'
-	modImplementation 'eu.pb4:polymer-autohost:0.11.2+1.21.4'
-	modImplementation 'eu.pb4:polymer-virtual-entity:0.11.2+1.21.4'
+	modImplementation 'eu.pb4:polymer-core:0.11.3+1.21.4'
+	modImplementation 'eu.pb4:polymer-blocks:0.11.3+1.21.4'
+	modImplementation 'eu.pb4:polymer-resource-pack:0.11.3+1.21.4'
+	modImplementation 'eu.pb4:polymer-resource-pack-extras:0.11.3+1.21.4'
+	modImplementation 'eu.pb4:polymer-autohost:0.11.3+1.21.4'
+	modImplementation 'eu.pb4:polymer-virtual-entity:0.11.3+1.21.4'
 	modImplementation include('eu.pb4:map-canvas-api:0.5.0+1.21.3')
 	modImplementation include('eu.pb4:common-protection-api:1.0.0')
 	modImplementation include('eu.pb4:sidebar-api:0.5.1+1.21.1')
-	modImplementation include('eu.pb4:sgui:1.8.1+1.21.4')
+	modImplementation include('eu.pb4:sgui:1.8.2+1.21.4')
 	modImplementation include('eu.pb4:factorytools:0.5.0+1.21.4')
 	modImplementation include('com.kneelawk.graphlib:graphlib-core-fabric:2.0.3+1.21')
 
