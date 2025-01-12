@@ -23,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class TallItemMachineBlockEntity extends LockableBlockEntity implements MachineInfoProvider, InventorySimpleContainerProvider, SidedInventory {
     protected Text state;
-
     public TallItemMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }

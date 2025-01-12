@@ -1,2 +1,3 @@
+- Mechanical Planters can now hold 9 stacks of items (previously could only hold 1).
 - Workbench now shows items stored in it.
 - Splash particles are no longer saved.
