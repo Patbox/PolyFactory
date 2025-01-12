@@ -15,6 +15,7 @@ import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -157,19 +158,50 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
             this.updateAnimation(0, state.get(FACING));
             this.addElement(this.mainElement);
             if (false) {
-                this.blocks = new BlockCollection(4, 4, 4);
+                this.blocks = new BlockCollection(9, 9, 9);
+                this.blocks.setCenter(4, 0, 4);
 
-                this.blocks.setBlockState(0, 0, 0, Blocks.STONE.getDefaultState(), null);
-                this.blocks.setBlockState(0, 1, 0, Blocks.STONE.getDefaultState(), null);
-                this.blocks.setBlockState(0, 2, 0, Blocks.STONE.getDefaultState(), null);
-                this.blocks.setBlockState(0, 2, 1, Blocks.STONE.getDefaultState(), null);
-                this.blocks.setBlockState(1, 2, 1, Blocks.STONE.getDefaultState(), null);
-                this.blocks.setBlockState(1, 2, 2, Blocks.STONE.getDefaultState(), null);
-                this.blocks.setBlockState(2, 2, 2, Blocks.STONE.getDefaultState(), null);
-                this.blocks.setBlockState(2, 3, 2, FactoryBlocks.AXLE.getDefaultState(), null);
+                for (int y = 0; y < 4; y++) {
+                    this.blocks.setBlockState(4, y, 4, Blocks.STONE.getDefaultState(), null);
+                }
+
+                for (int x = 0; x <= 8; x++) {
+                    this.blocks.setBlockState(x, 3, 4, Blocks.TNT.getDefaultState(), null);
+                    this.blocks.setBlockState(4, 3, x, Blocks.TNT.getDefaultState(), null);
+                }
+
+                for (int x = 2; x <= 6; x++) {
+                    for (int z = 2; z <= 6; z++) {
+                        this.blocks.setBlockState(x, 3, z, Blocks.GLASS.getDefaultState(), null);
+                    }
+                    this.blocks.setBlockState(2, 4, x, Blocks.GLASS.getDefaultState(), null);
+                    this.blocks.setBlockState(6, 4, x, Blocks.GLASS.getDefaultState(), null);
+                    this.blocks.setBlockState(x, 4, 2, Blocks.GLASS.getDefaultState(), null);
+                    this.blocks.setBlockState(x, 4, 6, Blocks.GLASS.getDefaultState(), null);
+                }
+                this.blocks.setBlockState(4, 5, 4, Blocks.TORCH.getDefaultState(), null);
+
                 this.blocks.setOffset(Vec3d.of(state.get(FACING).getOpposite().getVector()));
 
                 this.addElement(this.blocks);
+            }
+        }
+
+
+        @Override
+        public void setAttachment(@Nullable HolderAttachment attachment) {
+            if (this.blocks != null) {
+                this.blocks.setWorld(attachment != null ? attachment.getWorld() : null);
+            }
+
+            super.setAttachment(attachment);
+        }
+
+        @Override
+        public void destroy() {
+            super.destroy();
+            if (this.blocks != null) {
+                this.blocks.setWorld(null);
             }
         }
 

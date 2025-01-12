@@ -14,6 +14,8 @@
     "SimpleBlockGraphAccessor",
     "StatusEffectInstanceAccessor",
     "block.BlockMixin",
+    "block.EntityViewMixin",
+    "block.ServerWorldMixin",
     "block.StateManagerMixin",
     "block.WallBlockMixin",
     "block.WorldChunkMixin",
