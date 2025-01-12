@@ -26,13 +26,13 @@ import java.util.function.Supplier;
 
 @Mixin(Schema1460.class)
 public abstract class Schema1460Mixin extends Schema {
+    @Shadow protected static void registerInventory(Schema schema, Map<String, Supplier<TypeTemplate>> map, String name) {};
+
     public Schema1460Mixin(int versionKey, Schema parent) {
         super(versionKey, parent);
     }
 
-    @Shadow
-    protected static void method_5273(Schema schema, Map<String, Supplier<TypeTemplate>> map, String name) {
-    }
+
 
     @Inject(method = "registerBlockEntities", at = @At("RETURN"))
     private void registerPolyFactoryBlockEntities(Schema schema, CallbackInfoReturnable<Map<String, Supplier<TypeTemplate>>> cir) {
@@ -42,12 +42,14 @@ public abstract class Schema1460Mixin extends Schema {
         //    return DSL.optionalFields("HeldStack", TypeReferences.ITEM_STACK.in(schema));
         //});
 
-        method_5273(schema, map, mod("steam_engine"));
-        method_5273(schema, map, mod("grinder"));
-        method_5273(schema, map, mod("press"));
-        method_5273(schema, map, mod("mixer"));
-        method_5273(schema, map, mod("crafter"));
-        method_5273(schema, map, mod("workbench"));
+        registerInventory(schema, map, mod("steam_engine"));
+        registerInventory(schema, map, mod("grinder"));
+        registerInventory(schema, map, mod("press"));
+        registerInventory(schema, map, mod("mixer"));
+        registerInventory(schema, map, mod("crafter"));
+        registerInventory(schema, map, mod("workbench"));
+        registerInventory(schema, map, mod("mechanical_drain"));
+        registerInventory(schema, map, mod("mechanical_spout"));
 
         container(schema, map, "container");
         container(schema, map, "creative_container");
@@ -59,7 +61,6 @@ public abstract class Schema1460Mixin extends Schema {
 
         stackOwner(schema, map, "miner", "tool");
         stackOwner(schema, map, "placer", "stack");
-        stackOwner(schema, map, "planter", "stack");
 
         dataCache(schema, map, "nixie_tube_controller");
         dataCache(schema, map, "provider_data_cache");
@@ -72,6 +73,9 @@ public abstract class Schema1460Mixin extends Schema {
                     ;
         });
 
+        schema.register(map, mod("planter"), (name) -> {
+            return DSL.optionalFields("stack", TypeReferences.ITEM_STACK.in(schema), "Items", DSL.list(TypeReferences.ITEM_STACK.in(schema)));
+        });
 
         schema.register(map, mod("splitter"), (name) -> {
             return DSL.optionalFields("FilterStackLeft", TypeReferences.ITEM_STACK.in(schema),
@@ -79,8 +83,7 @@ public abstract class Schema1460Mixin extends Schema {
                     ;
         });
         schema.register(map, mod("windmill"), (name) -> {
-            return DSL.optionalFields("Sails", DSL.list(TypeReferences.ITEM_STACK.in(schema)))
-                    ;
+            return DSL.optionalFields("Sails", DSL.list(TypeReferences.ITEM_STACK.in(schema)));
         });
         schema.register(map, mod("wireless_redstone"), (name) -> {
             return DSL.optionalFields("key1", TypeReferences.ITEM_STACK.in(schema),
@@ -96,8 +99,10 @@ public abstract class Schema1460Mixin extends Schema {
         schema.registerSimple(map, mod("hand_crank"));
         schema.registerSimple(map, mod("pump"));
         schema.registerSimple(map, mod("pipe"));
+        schema.registerSimple(map, mod("nozzle"));
         schema.registerSimple(map, mod("drain"));
         schema.registerSimple(map, mod("filtered_pipe"));
+        schema.registerSimple(map, mod("redstone_valve_pipe"));
         schema.registerSimple(map, mod("fluid_tank"));
         schema.registerSimple(map, mod("portable_fluid_tank"));
     }

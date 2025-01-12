@@ -14,20 +14,24 @@ import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.TagLimitedSlot;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
 import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -37,8 +41,11 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
-public class PlanterBlockEntity extends LockableBlockEntity implements SingleStackInventory, SidedInventory, BlockEntityExtraListener, OwnedBlockEntity {
-    private ItemStack stack = ItemStack.EMPTY;
+import java.util.stream.IntStream;
+
+public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, BlockEntityExtraListener, OwnedBlockEntity {
+    private static final int[] SLOTS = IntStream.range(0, 9).toArray();
+    private final DefaultedList<ItemStack> items = DefaultedList.ofSize(9, ItemStack.EMPTY);
     protected GameProfile owner = null;
     protected double process = 0;
     private float stress = 0;
@@ -51,7 +58,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("stack", this.stack.toNbtAllowEmpty(lookup));
+        Inventories.writeNbt(nbt, this.items, lookup);
         nbt.putDouble("progress", this.process);
         if (this.owner != null) {
             nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
@@ -62,7 +69,12 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.stack = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("stack"));
+        if (nbt.contains("stack", NbtElement.COMPOUND_TYPE) && !nbt.contains("Items", NbtElement.LIST_TYPE)) {
+            this.setStack(0, ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("stack")));
+        } else {
+            Inventories.readNbt(nbt, this.items, lookup);
+        }
+
         this.process = nbt.getDouble("progress");
         if (nbt.contains("owner")) {
             this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompound("owner"));
@@ -88,19 +100,18 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
     }
 
     @Override
-    public ItemStack getStack() {
-        return this.stack;
-    }
-
-    @Override
-    public void setStack(ItemStack stack) {
-        this.stack = stack;
-        this.markDirty();
+    public int[] getAvailableSlots(Direction side) {
+        return SLOTS;
     }
 
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
         return stack.isIn(FactoryItemTags.ALLOWED_IN_PLANTER);
+    }
+
+    @Override
+    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+        return true;
     }
 
     @Override
@@ -111,11 +122,25 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
     public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
         var self = (PlanterBlockEntity) t;
 
-        if (self.stack.isEmpty() || !(self.stack.getItem() instanceof BlockItem blockItem)) {
+        if (self.isEmpty()) {
             self.stress = 0;
             self.process = 0;
             return;
         }
+        ItemStack stack = ItemStack.EMPTY;
+        for (var x : self.items) {
+            if (!x.isEmpty()) {
+                stack = x;
+                break;
+            }
+        }
+
+        if (!(stack.getItem() instanceof BlockItem blockItem)) {
+            self.stress = 0;
+            self.process = 0;
+            return;
+        }
+
         var placableState = blockItem.getBlock().getDefaultState();
 
         var speed = Math.abs(RotationUser.getRotation((ServerWorld) world, pos).speed()) * MathHelper.RADIANS_PER_DEGREE * 2.5f;
@@ -159,7 +184,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
             self.process = 0;
             self.stress = 0;
             world.setBlockState(place, placableState);
-            self.stack.decrement(1);
+            stack.decrement(1);
             world.playSound(null, pos, placableState.getSoundGroup().getPlaceSound(), SoundCategory.BLOCKS, 0.5f, 1.0f);
             world.emitGameEvent(GameEvent.BLOCK_PLACE, place, GameEvent.Emitter.of(placableState));
             if (self.owner != null && world.getPlayerByUuid(self.owner.getId()) instanceof ServerPlayerEntity serverPlayer) {
@@ -192,11 +217,18 @@ public class PlanterBlockEntity extends LockableBlockEntity implements SingleSta
         this.markDirty();
     }
 
+    @Override
+    public DefaultedList<ItemStack> getStacks() {
+        return this.items;
+    }
+
     private class Gui extends SimpleGui {
         public Gui(ServerPlayerEntity player) {
-            super(ScreenHandlerType.HOPPER, player, false);
-            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(PlanterBlockEntity.this.getCachedState().getBlock().getName()));
-            this.setSlotRedirect(2, new TagLimitedSlot(PlanterBlockEntity.this, 0, FactoryItemTags.ALLOWED_IN_PLANTER));
+            super(ScreenHandlerType.GENERIC_3X3, player, false);
+            this.setTitle(PlanterBlockEntity.this.getCachedState().getBlock().getName());
+            for (int i = 0; i < 9; i++) {
+                this.setSlotRedirect(i, new TagLimitedSlot(PlanterBlockEntity.this, i, FactoryItemTags.ALLOWED_IN_PLANTER));
+            }
             this.open();
         }
 
