@@ -71,8 +71,9 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
         if (!(t instanceof NozzleBlockEntity nozzle)) {
             return;
         }
+        var goodDir = nozzle.getCachedState().get(NozzleBlock.FACING);
 
-        if (!nozzle.world().getChunkManager().chunkLoadingManager.getTicketManager().shouldTickEntities(ChunkPos.toLong(pos))) {
+        if (!nozzle.world().getChunkManager().chunkLoadingManager.getTicketManager().shouldTickEntities(ChunkPos.toLong(pos.offset(goodDir)))) {
             return;
         }
 
@@ -85,7 +86,6 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
             return;
         }
         var num = new MutableDouble();
-        var goodDir = nozzle.getCachedState().get(NozzleBlock.FACING);
         NetworkComponent.Pipe.getLogic((ServerWorld) world, pos).runPushFlows(pos, () -> true, (dir, strength) -> {
             if (dir == goodDir) {
                 num.add(strength);
