@@ -1,7 +1,6 @@
 package eu.pb4.polyfactory.block.collection;
 
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.elements.AbstractElement;
@@ -98,53 +97,62 @@ public class BlockCollection extends AbstractElement implements CollisionView {
         for (var x = 0; x < this.sizeX; x++) {
             for (var y = 0; y < this.sizeY; y++) {
                 for (var z = 0; z < this.sizeZ; z++) {
-                    var i = index(x, y, z);
-                    var id = this.blockId[i];
-                    if (id != -1) {
-                        packetConsumer.accept(new EntitySpawnS2CPacket(id, UUID.randomUUID(),
-                                pos.x, pos.y, pos.z, 0f, 0f,
-                                EntityType.BLOCK_DISPLAY, 0, Vec3d.ZERO, 0d
-                                ));
-
-                        packetConsumer.accept(new EntityTrackerUpdateS2CPacket(id, List.of(
-                                DataTracker.SerializedEntry.of(DisplayTrackedData.INTERPOLATION_DURATION, 1),
-                                DataTracker.SerializedEntry.of(DisplayTrackedData.Block.BLOCK_STATE, this.states[i]),
-                                DataTracker.SerializedEntry.of(DisplayTrackedData.TRANSLATION, new Vector3f(x - 0.5f - this.centerX, y - 0.5f - this.centerY, z - 0.5f - this.centerZ)
-                                        .rotate(quaternion)),
-                                DataTracker.SerializedEntry.of(DisplayTrackedData.LEFT_ROTATION, quaternion),
-                                DataTracker.SerializedEntry.of(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
-
-                        )));
-                    }
-                    id = this.collisionBlockId[i];
-                    if (id != -1) {
-                        vec.set(x - this.centerX, y - this.centerY, z - this.centerZ).rotate(quaternion);
-                        packetConsumer.accept(new EntitySpawnS2CPacket(id, UUID.randomUUID(),
-                                pos.x + vec.x, pos.y + vec.y - 0.5, pos.z + vec.z , 0f, 0f,
-                                EntityType.SHULKER, 0, Vec3d.ZERO, 0d
-                        ));
-
-                        packetConsumer.accept(new EntityTrackerUpdateS2CPacket(id, List.of(
-                                DataTracker.SerializedEntry.of(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
-                        )));
-
-                        packetConsumer.accept(new EntitySpawnS2CPacket(this.collisionBlockId2[i], UUID.randomUUID(),
-                                pos.x + vec.x, pos.y + vec.y - 0.5, pos.z + vec.z, 0f, 0f,
-                                EntityType.BLOCK_DISPLAY, 0, Vec3d.ZERO, 0d
-                        ));
-
-                        packetConsumer.accept(new EntityTrackerUpdateS2CPacket(this.collisionBlockId2[i], List.of(
-                                DataTracker.SerializedEntry.of(DisplayTrackedData.INTERPOLATION_DURATION, 1),
-                                DataTracker.SerializedEntry.of(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
-                        )));
-
-                        packetConsumer.accept(VirtualEntityUtils.createRidePacket(this.collisionBlockId2[i], IntList.of(id)));
-                    }
+                    sendInitialBlockVisual(packetConsumer, x, y, z, pos, vec, quaternion);
+                    sendInitialBlockCollision(packetConsumer, x, y, z, pos, vec, quaternion);
                 }
             }
         }
 
         packetConsumer.accept(VirtualEntityUtils.createRidePacket(this.main.getEntityId(), this.blockIdList));
+    }
+
+
+    public void sendInitialBlockVisual(Consumer<Packet<ClientPlayPacketListener>> packetConsumer, int x, int y, int z, Vec3d pos, Vector3f vec, Quaternionf quaternion) {
+        var i = index(x, y, z);
+        var id = this.blockId[i];
+        if (id != -1) {
+            packetConsumer.accept(new EntitySpawnS2CPacket(id, UUID.randomUUID(),
+                    pos.x, pos.y, pos.z, 0f, 0f,
+                    EntityType.BLOCK_DISPLAY, 0, Vec3d.ZERO, 0d
+            ));
+
+            packetConsumer.accept(new EntityTrackerUpdateS2CPacket(id, List.of(
+                    DataTracker.SerializedEntry.of(DisplayTrackedData.INTERPOLATION_DURATION, 1),
+                    DataTracker.SerializedEntry.of(DisplayTrackedData.Block.BLOCK_STATE, this.states[i]),
+                    DataTracker.SerializedEntry.of(DisplayTrackedData.TRANSLATION, new Vector3f(x - 0.5f - this.centerX, y - 0.5f - this.centerY, z - 0.5f - this.centerZ)
+                            .rotate(quaternion)),
+                    DataTracker.SerializedEntry.of(DisplayTrackedData.LEFT_ROTATION, quaternion),
+                    DataTracker.SerializedEntry.of(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
+
+            )));
+        }
+    }
+    public void sendInitialBlockCollision(Consumer<Packet<ClientPlayPacketListener>> packetConsumer, int x, int y, int z, Vec3d pos, Vector3f vec, Quaternionf quaternion) {
+        var i = index(x, y, z);
+        var id = this.collisionBlockId[i];
+        if (id != -1) {
+            vec.set(x - this.centerX, y - this.centerY, z - this.centerZ).rotate(quaternion);
+            packetConsumer.accept(new EntitySpawnS2CPacket(id, UUID.randomUUID(),
+                    pos.x + vec.x, pos.y + vec.y - 0.5, pos.z + vec.z , 0f, 0f,
+                    EntityType.SHULKER, 0, Vec3d.ZERO, 0d
+            ));
+
+            packetConsumer.accept(new EntityTrackerUpdateS2CPacket(id, List.of(
+                    DataTracker.SerializedEntry.of(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
+            )));
+
+            packetConsumer.accept(new EntitySpawnS2CPacket(this.collisionBlockId2[i], UUID.randomUUID(),
+                    pos.x + vec.x, pos.y + vec.y - 0.5, pos.z + vec.z, 0f, 0f,
+                    EntityType.BLOCK_DISPLAY, 0, Vec3d.ZERO, 0d
+            ));
+
+            packetConsumer.accept(new EntityTrackerUpdateS2CPacket(this.collisionBlockId2[i], List.of(
+                    DataTracker.SerializedEntry.of(DisplayTrackedData.INTERPOLATION_DURATION, 1),
+                    DataTracker.SerializedEntry.of(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
+            )));
+
+            packetConsumer.accept(VirtualEntityUtils.createRidePacket(this.collisionBlockId2[i], IntList.of(id)));
+        }
     }
 
     public void setQuaternion(Quaternionf quaternion) {
@@ -154,6 +162,10 @@ public class BlockCollection extends AbstractElement implements CollisionView {
 
     public void setBlockState(int x, int y, int z, BlockState state, @Nullable BlockEntity blockEntity) {
         var i = index(x, y, z);
+        if (this.states[i] == state) {
+            this.blockEntities[i] = blockEntity;
+            return;
+        }
         this.states[i] = state;
         this.blockEntities[i] = blockEntity;
         if (this.blockId[i] == -1 && !state.isAir()) {
@@ -161,6 +173,14 @@ public class BlockCollection extends AbstractElement implements CollisionView {
             this.blockId[i] = e;
             this.blockIdList.add(e);
             this.allIdList.add(e);
+
+            var pos = this.main.getCurrentPos();
+            var vec = new Vector3f();
+            var quaternion = new Quaternionf(this.quaternion);
+            if (this.getHolder() != null) {
+                this.sendInitialBlockVisual(this.getHolder()::sendPacket, x, y, z, pos, vec, quaternion);
+            }
+
             if (!state.getCollisionShape(this, new BlockPos(x, y, z)).isEmpty()) {
                 var e2 = VirtualEntityUtils.requestEntityId();
                 var e3 = VirtualEntityUtils.requestEntityId();
@@ -168,6 +188,53 @@ public class BlockCollection extends AbstractElement implements CollisionView {
                 this.collisionBlockId2[i] = e3;
                 this.allIdList.add(e2);
                 this.allIdList.add(e3);
+                if (this.getHolder() != null) {
+                    this.sendInitialBlockCollision(this.getHolder()::sendPacket, x, y, z, pos, vec, quaternion);
+                }
+            }
+        } else if (state.isAir()) {
+            this.blockIdList.removeInt(this.blockId[i]);
+            this.allIdList.removeInt(this.blockId[i]);
+            if (this.collisionBlockId[i] != -1) {
+                this.allIdList.removeInt(this.collisionBlockId[i]);
+                this.allIdList.removeInt(this.collisionBlockId2[i]);
+                if (this.getHolder() != null) {
+                    this.getHolder().sendPacket(new EntitiesDestroyS2CPacket(IntList.of(
+                            this.blockId[i], this.collisionBlockId[i], this.collisionBlockId2[i])));
+                }
+            } else if (this.getHolder() != null) {
+                this.getHolder().sendPacket(new EntitiesDestroyS2CPacket(IntList.of(this.blockId[i])));
+            }
+            this.blockId[i] = this.collisionBlockId[i] = this.collisionBlockId2[i] = -1;
+        } else {
+            var noCollision = state.getCollisionShape(this, new BlockPos(x, y, z)).isEmpty();
+            if (this.getHolder() != null) {
+                this.getHolder().sendPacket(new EntityTrackerUpdateS2CPacket(this.blockId[i], List.of(
+                        DataTracker.SerializedEntry.of(DisplayTrackedData.Block.BLOCK_STATE, this.states[i])
+
+                )));
+            }
+
+            if (this.collisionBlockId[i] != -1 && noCollision) {
+                this.allIdList.removeInt(this.collisionBlockId[i]);
+                this.allIdList.removeInt(this.collisionBlockId2[i]);
+                if (this.getHolder() != null) {
+                    this.getHolder().sendPacket(new EntitiesDestroyS2CPacket(IntList.of(this.collisionBlockId[i], this.collisionBlockId2[i])));
+                }
+                this.collisionBlockId[i] = this.collisionBlockId2[i] = 0;
+            } else if (this.collisionBlockId[i] == -1 && !noCollision) {
+                var e2 = VirtualEntityUtils.requestEntityId();
+                var e3 = VirtualEntityUtils.requestEntityId();
+                this.collisionBlockId[i] = e2;
+                this.collisionBlockId2[i] = e3;
+                this.allIdList.add(e2);
+                this.allIdList.add(e3);
+                if (this.getHolder() != null) {
+                    var pos = this.main.getCurrentPos();
+                    var vec = new Vector3f();
+                    var quaternion = new Quaternionf(this.quaternion);
+                    this.sendInitialBlockCollision(this.getHolder()::sendPacket, x, y, z, pos, vec, quaternion);
+                }
             }
         }
     }
@@ -199,7 +266,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
 
     @Override
     public int getHeight() {
-        return 0;
+        return this.sizeY;
     }
     @Override
     public int getBottomY() {
