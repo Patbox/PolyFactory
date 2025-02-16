@@ -6,6 +6,7 @@ import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.vehicle.ChestMinecartEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -25,6 +26,8 @@ public class FactoryEntities {
     public static final EntityType<HoneySplashEntity> HONEY_SPLASH = register("honey_splash", createSplash(HoneySplashEntity::new));
 
     public static final EntityType<SlimeSplashEntity> SLIME_SPLASH = register("slime_splash", createSplash(SlimeSplashEntity::new));
+
+    public static final EntityType<MinecartWithBlocksEntity> MINECART_WITH_BLOCKS = register("minecart_with_blocks", EntityType.Builder.create(MinecartWithBlocksEntity::new, SpawnGroup.MISC).dropsNothing().dimensions(0.98F, 0.7F).passengerAttachments(0.1875F).maxTrackingRange(8));
     public static void register() {
 
     }
