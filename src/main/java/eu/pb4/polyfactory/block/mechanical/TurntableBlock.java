@@ -9,6 +9,7 @@ import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.collection.BlockCollection;
+import eu.pb4.polyfactory.block.collection.BlockCollectionData;
 import eu.pb4.polyfactory.block.mechanical.source.HandCrankBlockEntity;
 import eu.pb4.polyfactory.item.FactoryEnchantmentEffectComponents;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
@@ -167,30 +168,9 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
             this.mainElement = LodItemDisplayElement.createSimple(ItemDisplayElementUtil.getModel(state.getBlock().asItem()), this.getUpdateRate(), 0.3f, 0.6f);
             this.updateAnimation(0, state.get(FACING));
             this.addElement(this.mainElement);
-            if (false) {
-                this.blocks = new BlockCollection(9, 9, 9);
+            if (true) {
+                this.blocks = new BlockCollection(BlockCollectionData.createDebug());
                 this.blocks.setCenter(4, 0, 4);
-
-                for (int y = 0; y < 4; y++) {
-                    this.blocks.setBlockState(4, y, 4, Blocks.STONE.getDefaultState(), null);
-                }
-
-                for (int x = 0; x <= 8; x++) {
-                    this.blocks.setBlockState(x, 3, 4, Blocks.TNT.getDefaultState(), null);
-                    this.blocks.setBlockState(4, 3, x, Blocks.TNT.getDefaultState(), null);
-                }
-
-                for (int x = 2; x <= 6; x++) {
-                    for (int z = 2; z <= 6; z++) {
-                        this.blocks.setBlockState(x, 3, z, Blocks.GLASS.getDefaultState(), null);
-                    }
-                    this.blocks.setBlockState(2, 4, x, Blocks.GLASS.getDefaultState(), null);
-                    this.blocks.setBlockState(6, 4, x, Blocks.GLASS.getDefaultState(), null);
-                    this.blocks.setBlockState(x, 4, 2, Blocks.GLASS.getDefaultState(), null);
-                    this.blocks.setBlockState(x, 4, 6, Blocks.GLASS.getDefaultState(), null);
-                }
-                this.blocks.setBlockState(4, 5, 4, Blocks.TORCH.getDefaultState(), null);
-
                 this.blocks.setOffset(Vec3d.of(state.get(FACING).getOpposite().getVector()));
 
                 this.addElement(this.blocks);
