@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.data.providers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.RedstoneConnectable;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.LongData;
@@ -71,9 +72,8 @@ public class RedstoneInputBlock extends CabledDataProviderBlock implements Redst
         }
     }
 
-    @Override
-    public int sendData(WorldView world, BlockPos selfPos, DataContainer data) {
-        var i = super.sendData(world, selfPos, data);
+    public static int sendData(WorldView world, BlockPos selfPos, DataContainer data) {
+        var i = DataProvider.sendData(world, selfPos, data);
         if (i > 0 && FactoryUtil.getClosestPlayer((World) world, selfPos, 32) instanceof ServerPlayerEntity player) {
             TriggerCriterion.trigger(player, FactoryTriggers.REDSTONE_IN);
         }

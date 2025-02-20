@@ -121,14 +121,6 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
         return null;
     }
 
-    public int sendData(WorldAccess world, BlockPos selfPos, DataContainer data) {
-        if (world instanceof ServerWorld serverWorld && world.getBlockEntity(selfPos) instanceof ChanneledDataCache be) {
-            be.setCachedData(data);
-            return NetworkComponent.Data.getLogic(serverWorld, selfPos).pushDataUpdate(selfPos, be.channel(), data, null);
-        }
-        return 0;
-    }
-
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
@@ -155,7 +147,7 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
 
         @Override
         protected <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
-            sendData(world, pos, new LongData((long) (RotationUser.getRotation(world, pos).speed() / 360 * 60 * 20)));
+            DataProvider.sendData(world, pos, new LongData((long) (RotationUser.getRotation(world, pos).speed() / 360 * 60 * 20)));
         }
     }
 
@@ -178,7 +170,7 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
         @Override
         protected <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
             var rot = RotationUser.getRotation(world, pos);
-            sendData(world, pos, new LongData(switch (state.get(TYPE)) {
+            DataProvider.sendData(world, pos, new LongData(switch (state.get(TYPE)) {
                 case LEFT -> (long) (rot.stressCapacity() - rot.stressUsage());
                 case CAPACITY -> (long) rot.stressCapacity();
                 case USED -> (long) rot.stressUsage();

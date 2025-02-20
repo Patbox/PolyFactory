@@ -9,6 +9,7 @@ import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.data.CableConnectable;
+import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.data.StringData;
@@ -163,7 +164,7 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
 
     @Override
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        NetworkComponent.Data.getLogic(world, pos).pushDataUpdate(pos, 0, new StringData(PotatoWisdom.get(random)), Direction.DOWN);
+        DataProvider.sendData(world, pos, 0, Direction.DOWN, new StringData(PotatoWisdom.get(random)));
     }
 
     @Override

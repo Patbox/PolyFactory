@@ -10,10 +10,7 @@ import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.data.io.ArithmeticOperatorBlock;
 import eu.pb4.polyfactory.block.data.io.DataComparatorBlock;
 import eu.pb4.polyfactory.block.data.io.DataMemoryBlock;
-import eu.pb4.polyfactory.block.data.output.HologramProjectorBlock;
-import eu.pb4.polyfactory.block.data.output.NixieTubeBlock;
-import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlock;
-import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
+import eu.pb4.polyfactory.block.data.output.*;
 import eu.pb4.polyfactory.block.data.providers.*;
 import eu.pb4.polyfactory.block.electric.ElectricGeneratorBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
@@ -88,6 +85,8 @@ public class FactoryBlocks {
 
     public static final RedstoneInputBlock REDSTONE_INPUT = register("redstone_input", Block.Settings.copy(ITEM_COUNTER), RedstoneInputBlock::new);
     public static final RedstoneOutputBlock REDSTONE_OUTPUT = register("redstone_output", Block.Settings.copy(ITEM_COUNTER), RedstoneOutputBlock::new);
+    public static final SpeakerBlock SPEAKER = register("speaker",Block.Settings.copy(ITEM_COUNTER), SpeakerBlock::new);
+    public static final RecordPlayerBlock RECORD_PLAYER = register("record_player",Block.Settings.copy(ITEM_COUNTER), RecordPlayerBlock::new);
     public static final ItemReaderBlock ITEM_READER = register("item_reader", Block.Settings.copy(ITEM_COUNTER), ItemReaderBlock::new);
     public static final BlockObserverBlock BLOCK_OBSERVER = register("block_observer", Block.Settings.copy(ITEM_COUNTER), BlockObserverBlock::new);
     public static final TextInputBlock TEXT_INPUT = register("text_input", Block.Settings.copy(ITEM_COUNTER), TextInputBlock::new);

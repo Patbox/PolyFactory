@@ -39,6 +39,8 @@
   "block.polyfactory.item_counter": "Storage Counter",
   "block.polyfactory.redstone_input": "Redstone Input",
   "block.polyfactory.redstone_output": "Redstone Output",
+  "block.polyfactory.speaker": "Speaker",
+  "block.polyfactory.record_player": "Record Player",
   "block.polyfactory.item_reader": "Item Reader",
   "block.polyfactory.block_observer": "Block Observer",
   "block.polyfactory.text_input": "Text Input",

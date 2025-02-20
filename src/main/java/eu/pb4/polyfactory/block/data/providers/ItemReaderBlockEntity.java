@@ -5,6 +5,7 @@ import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
 import eu.pb4.polyfactory.data.DataContainer;
@@ -118,7 +119,7 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
         this.page = this.page % this.lines.length;
         this.lastData = new ItemStackData(this.stack.copy(), this.lines[this.page]);
         if (this.world != null) {
-            if (FactoryBlocks.ITEM_READER.sendData(this.world, this.pos, this.lastData) > 0) {
+            if (DataProvider.sendData(this.world, this.pos, this.lastData) > 0) {
                 if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
                     TriggerCriterion.trigger(player, FactoryTriggers.ITEM_READER);
                 }

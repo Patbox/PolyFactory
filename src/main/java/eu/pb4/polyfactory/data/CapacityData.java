@@ -37,7 +37,7 @@ public record CapacityData(long stored, long capacity) implements DataContainer 
 
     @Override
     public int asRedstoneOutput() {
-        return (int) MathHelper.clamp((15 * this.capacity / this.stored), 0, 15);
+        return (int) MathHelper.clamp((15 * this.stored / this.capacity), 0, 15);
     }
 
     @Override
@@ -48,5 +48,15 @@ public record CapacityData(long stored, long capacity) implements DataContainer 
     @Override
     public boolean forceRight() {
         return true;
+    }
+
+    @Override
+    public DataContainer extract(String field) {
+        return switch (field) {
+            case "stored" -> new LongData(this.stored);
+            case "capacity" -> new LongData(this.capacity);
+            case "percent" -> new DoubleData((double) this.stored / this.capacity);
+            default -> DataContainer.empty();
+        };
     }
 }

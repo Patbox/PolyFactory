@@ -34,12 +34,4 @@ public class CabledDataProviderBlock extends GenericCabledDataBlock implements D
         }
         return null;
     }
-
-    public int sendData(WorldView world, BlockPos selfPos, DataContainer data) {
-        if (world instanceof ServerWorld serverWorld && world.getBlockEntity(selfPos) instanceof ChanneledDataCache be) {
-            be.setCachedData(data);
-            return Data.getLogic(serverWorld, selfPos).pushDataUpdate(selfPos, be.channel(), data, null);
-        }
-        return 0;
-    }
 }

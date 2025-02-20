@@ -47,6 +47,17 @@ public record ItemStackData(ItemStack stack, String name) implements DataContain
     }
 
     @Override
+    public DataContainer extract(String field) {
+        return switch (field) {
+            case "type" -> new StringData(Registries.ITEM.getId(this.stack.getItem()).toString());
+            case "name" -> new StringData(asString());
+            case "count" -> new LongData(asLong());
+            default -> DataContainer.empty();
+        };
+    }
+
+
+    @Override
     public int compareTo(DataContainer other) {
         return this.name.compareTo(other.asString());
     }

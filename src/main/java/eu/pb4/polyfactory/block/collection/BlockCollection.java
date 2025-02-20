@@ -119,7 +119,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
             ));
 
             packetConsumer.accept(new EntityTrackerUpdateS2CPacket(id, List.of(
-                    DataTracker.SerializedEntry.of(DisplayTrackedData.INTERPOLATION_DURATION, 2),
+                    DataTracker.SerializedEntry.of(DisplayTrackedData.INTERPOLATION_DURATION, 1),
                     DataTracker.SerializedEntry.of(DisplayTrackedData.Block.BLOCK_STATE, this.data.states()[i]),
                     DataTracker.SerializedEntry.of(DisplayTrackedData.TRANSLATION, new Vector3f(x - 0.5f - this.centerX, y - 0.5f - this.centerY, z - 0.5f - this.centerZ)
                             .rotate(quaternion)),
@@ -140,7 +140,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
             ));
 
             packetConsumer.accept(new EntityTrackerUpdateS2CPacket(id, List.of(
-                    DataTracker.SerializedEntry.of(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
+                    //DataTracker.SerializedEntry.of(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
             )));
 
             packetConsumer.accept(new EntitySpawnS2CPacket(this.collisionBlockId2[i], UUID.randomUUID(),
@@ -149,7 +149,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
             ));
 
             packetConsumer.accept(new EntityTrackerUpdateS2CPacket(this.collisionBlockId2[i], List.of(
-                    DataTracker.SerializedEntry.of(DisplayTrackedData.INTERPOLATION_DURATION, 1),
+                    //DataTracker.SerializedEntry.of(DisplayTrackedData.INTERPOLATION_DURATION, 1),
                     DataTracker.SerializedEntry.of(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
             )));
 
@@ -227,7 +227,6 @@ public class BlockCollection extends AbstractElement implements CollisionView {
             if (this.getHolder() != null) {
                 this.getHolder().sendPacket(new EntityTrackerUpdateS2CPacket(this.blockId[i], List.of(
                         DataTracker.SerializedEntry.of(DisplayTrackedData.Block.BLOCK_STATE, this.data.states()[i])
-
                 )));
             }
 
@@ -353,11 +352,11 @@ public class BlockCollection extends AbstractElement implements CollisionView {
                             for (var entity : ents) {
                                 if (entity.getBoundingBox().intersects(
                                         previous.x + vec2.x - 0.5 - 0.05, previous.y + vec2.y - 0.5 - 0.05, previous.z + vec2.z - 0.5 - 0.05,
-                                        previous.x + vec2.x + 0.5 + 0.05, previous.y + vec2.y + 0.51 + 0.05, previous.z + vec2.z + 0.5 + 0.05
+                                        previous.x + vec2.x + 0.5 + 0.05, previous.y + vec2.y + 0.5 + 0.25, previous.z + vec2.z + 0.5 + 0.05
                                 )) {
                                     var evec = idMap.computeIfAbsent(entity, (a) -> new Vector3f());
                                     vec.sub(vec2);
-                                    evec.y = (float) Math.max(evec.y, vec.y + entity.getFinalGravity());
+                                    evec.y = Math.max(evec.y, vec.y);
 
                                     vec.set( entity.getX() - previous.getX(), entity.getY() - previous.getY(), entity.getZ() - previous.getZ());
                                     vec.rotate(quaternionOldInverted);
@@ -367,8 +366,6 @@ public class BlockCollection extends AbstractElement implements CollisionView {
                                     evec.z = (float) (vec.z - entity.getZ() + previous.getZ());
                                 }
                             }
-
-
                         }
                     }
                 }
@@ -380,6 +377,9 @@ public class BlockCollection extends AbstractElement implements CollisionView {
                     entity.move(MovementType.SHULKER, move);
                     if (entity instanceof ServerPlayerEntity player) {
                         FactoryUtil.sendVelocityDelta(player, move);
+                        //.networkHandler.sendPacket(new PlayerPositionLookS2CPacket(0, new PlayerPosition(move, move, 0, 0),
+                        //        EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.DELTA_X, PositionFlag.DELTA_Y, PositionFlag.DELTA_Z, PositionFlag.Y_ROT, PositionFlag.X_R
+                        //                )));
                         newPreviousShift.put(player.getId(), move);
                     }
                 }

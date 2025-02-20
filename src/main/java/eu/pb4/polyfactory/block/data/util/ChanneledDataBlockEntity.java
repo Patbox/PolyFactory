@@ -24,7 +24,7 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
     private int color = -2;
     @Nullable
     private AbstractCableBlock.BaseCableModel model;
-    protected DataContainer lastData = StringData.EMPTY;
+    protected DataContainer lastData = DataContainer.empty();
     private int channel;
     @Nullable
     public DataContainer getCachedData() {

@@ -1,0 +1,8 @@
+{
+	"parent": "polyfactory:block/nixie_tube_controller",
+	"textures": {
+		"particle": "polyfactory:block/cable/speaker_front",
+		"side": "polyfactory:block/cable/speaker_side",
+		"front": "polyfactory:block/cable/speaker_front"
+	}
+}

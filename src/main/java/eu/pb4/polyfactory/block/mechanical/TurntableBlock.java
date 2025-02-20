@@ -158,7 +158,7 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
             this.mainElement = LodItemDisplayElement.createSimple(ItemDisplayElementUtil.getModel(state.getBlock().asItem()), this.getUpdateRate(), 0.3f, 0.6f);
             this.updateAnimation(0, state.get(FACING));
             this.addElement(this.mainElement);
-            if (true) {
+            if (false) {
                 this.blocks = new BlockCollection(BlockCollectionData.createDebug());
                 this.blocks.setCenter(4, 0, 4);
                 this.blocks.setOffset(Vec3d.of(state.get(FACING).getOpposite().getVector()));
