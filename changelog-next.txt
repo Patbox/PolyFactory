@@ -1,3 +1,13 @@
+- Added Speaker Block:
+  - This block can produce sound, by either being connected with Record Player or receiving correct data.
+  - Crafted with Steel Plates, Copper Ingots, Redstone and Jukebox.
+- Added Record Player
+  - A data provider, that can be used to play Music Discs.
+  - Doesn't produce sound on it own, needs to be connected to speakers through cables (while pointing at correct channel).
+  - Crafted with Steel Plates, Copper Ingots, Redstone and Jukebox.
 - Mechanical Planters can now hold 9 stacks of items (previously could only hold 1).
 - Workbench now shows items stored in it.
 - Splash particles are no longer saved.
+- Updated Mechanical Press model.
+- You now need to hold Wrench as cursor item to toggle Data Memory Block item's Read Only state:
+  - This fixes the Data Memory Block's item being unmovable in inventory.

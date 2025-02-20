@@ -33,9 +33,9 @@ public enum BasicDataType implements StringIdentifiable {
     STRING("string", StringData::ofLimited,
             (a, b) -> StringData.ofLimited(a.asString() + b.asString()),
             (a, b) -> StringData.ofLimited(a.asString().replace(b.asString(), "")),
-            (a, b) -> StringData.EMPTY,
-            (a, b) -> StringData.EMPTY,
-            (a, b) -> StringData.EMPTY
+            (a, b) -> DataContainer.empty(),
+            (a, b) -> DataContainer.empty(),
+            (a, b) -> DataContainer.empty()
     );
 
     private final String name;
@@ -47,7 +47,7 @@ public enum BasicDataType implements StringIdentifiable {
     private final BiFunction<DataContainer, DataContainer, DataContainer> divide;
     private final BiFunction<DataContainer, DataContainer, DataContainer> modulo;
 
-    BasicDataType(String name,  Function<String, @Nullable DataContainer> parser,
+    BasicDataType(String name, Function<String, @Nullable DataContainer> parser,
                   BiFunction<DataContainer, DataContainer, DataContainer> add,
                   BiFunction<DataContainer, DataContainer, DataContainer> subtract,
                   BiFunction<DataContainer, DataContainer, DataContainer> multiply,

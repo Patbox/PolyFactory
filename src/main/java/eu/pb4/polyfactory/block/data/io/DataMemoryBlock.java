@@ -5,6 +5,7 @@ import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.block.data.providers.DataProviderBlock;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
@@ -87,7 +88,7 @@ public final class DataMemoryBlock extends DataProviderBlock implements DataRece
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         if (stack.contains(FactoryDataComponents.STORED_DATA)) {
 
-            var decoded = stack.getOrDefault(FactoryDataComponents.STORED_DATA, StringData.EMPTY);
+            var decoded = stack.getOrDefault(FactoryDataComponents.STORED_DATA, DataContainer.empty());
             tooltip.add(
                     Texts.bracketed(
                             Text.translatable("block.polyfactory.data_memory.tooltip.stored_data").formatted(Formatting.YELLOW)
@@ -132,7 +133,7 @@ public final class DataMemoryBlock extends DataProviderBlock implements DataRece
                 } else {
                     world.setBlockState(pos, state.with(POWERED, true), 2);
                     if (world.getBlockEntity(pos) instanceof ChanneledDataCache be) {
-                        sendData(world, pos, be.getCachedData());
+                        DataProvider.sendData(world, pos, be.getCachedData());
                     }
                 }
             }

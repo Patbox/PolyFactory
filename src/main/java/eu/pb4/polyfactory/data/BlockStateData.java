@@ -37,6 +37,15 @@ public record BlockStateData(BlockState state) implements DataContainer {
     }
 
     @Override
+    public DataContainer extract(String field) {
+        return switch (field) {
+            case "type" -> new StringData(Registries.BLOCK.getId(this.state.getBlock()));
+            default -> DataContainer.empty();
+        };
+    }
+
+
+    @Override
     public int compareTo(@NotNull DataContainer o) {
         return asString().compareTo(o.asString());
     }

@@ -25,14 +25,6 @@ public record GameEventData(GameEvent event, Vec3d pos, double distance) impleme
             ).apply(instance, GameEventData::new)
     );
 
-    public static DataContainer fromNbt(NbtCompound compound) {
-        return new GameEventData(
-                Registries.GAME_EVENT.get(Identifier.tryParse(compound.getString("event"))),
-                new Vec3d(compound.getDouble("pos_x"), compound.getDouble("pos_y"), compound.getDouble("pos_z")),
-                compound.getDouble("distance")
-        );
-    }
-
     @Override
     public DataType<GameEventData> type() {
         return DataType.GAME_EVENT;
@@ -51,6 +43,16 @@ public record GameEventData(GameEvent event, Vec3d pos, double distance) impleme
     @Override
     public double asDouble() {
         return this.distance;
+    }
+
+    @Override
+    public DataContainer extract(String field) {
+        return switch (field) {
+            case "event" -> new StringData(asString());
+            case "position" -> new StringData(pos.toString());
+            case "distance" -> new DoubleData(this.distance);
+            default -> DataContainer.empty();
+        };
     }
 
     @Override

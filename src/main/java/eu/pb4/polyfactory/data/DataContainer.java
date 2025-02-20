@@ -16,6 +16,9 @@ public interface DataContainer extends Comparable<DataContainer> {
     static DataContainer of(boolean count) {
         return count ? BoolData.TRUE : BoolData.FALSE;
     }
+    static DataContainer empty() {
+        return EmptyData.INSTANCE;
+    }
 
     DataType<? extends DataContainer> type();
 
@@ -35,6 +38,10 @@ public interface DataContainer extends Comparable<DataContainer> {
 
     default boolean forceRight() {
         return false;
+    }
+
+    default DataContainer extract(String field) {
+        return empty();
     }
 
     static DataContainer fromNbt(NbtElement compound, RegistryWrapper.WrapperLookup lookup) {

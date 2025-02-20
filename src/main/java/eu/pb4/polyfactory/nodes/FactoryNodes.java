@@ -73,6 +73,8 @@ public class FactoryNodes {
         universe.addNodeType(ChannelReceiverDirectionNode.TYPE);
         universe.addNodeType(ChannelReceiverSelectiveSideNode.TYPE);
         universe.addNodeType(ChannelProviderSelectiveSideNode.TYPE);
+        universe.addNodeType(SpeakerNode.TYPE);
+        universe.addCacheCategory(SpeakerNode.CACHE);
 
         universe.addGraphEntityType(DataStorage.TYPE);
 

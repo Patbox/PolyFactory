@@ -34,12 +34,4 @@ public class DataProviderBlock extends GenericDirectionalDataBlock implements Da
         }
         return null;
     }
-
-    public int sendData(WorldAccess world, BlockPos selfPos, DataContainer data) {
-        if (data != null && world instanceof ServerWorld serverWorld && world.getBlockEntity(selfPos) instanceof ChanneledDataCache be) {
-            be.setCachedData(data);
-            return NetworkComponent.Data.getLogic(serverWorld, selfPos).pushDataUpdate(selfPos, be.channel(), data, null);
-        }
-        return 0;
-    }
 }

@@ -70,13 +70,10 @@ public abstract class AbstractCableBlock extends CableNetworkBlock implements Bl
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        var hand = Hand.MAIN_HAND;
-        if (player.getStackInHand(hand).isIn(ConventionalItemTags.DYES)
-                && setColor(state, world, pos, FactoryItems.CABLE.downSampleColor(DyeColorExtra.getColor(player.getStackInHand(hand))))
-        ) {
+    protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (stack.isIn(ConventionalItemTags.DYES) && setColor(state, world, pos, FactoryItems.CABLE.downSampleColor(DyeColorExtra.getColor(stack)))) {
             if (!player.isCreative()) {
-                player.getStackInHand(hand).decrement(1);
+                stack.decrement(1);
             }
             world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS);
 
@@ -89,7 +86,7 @@ public abstract class AbstractCableBlock extends CableNetworkBlock implements Bl
             return ActionResult.SUCCESS;
         }
 
-        return super.onUse(state, world, pos, player, hit);
+        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
     }
 
     @Override

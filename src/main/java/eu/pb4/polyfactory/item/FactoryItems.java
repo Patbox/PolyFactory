@@ -2,7 +2,6 @@ package eu.pb4.polyfactory.item;
 
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
-import eu.pb4.polyfactory.block.data.GatedCableBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.factorytools.api.item.MultiBlockItem;
@@ -102,6 +101,8 @@ public class FactoryItems {
     public static final Item ITEM_COUNTER = register(FactoryBlocks.ITEM_COUNTER);
     public static final Item REDSTONE_INPUT = register(FactoryBlocks.REDSTONE_INPUT);
     public static final Item REDSTONE_OUTPUT = register(FactoryBlocks.REDSTONE_OUTPUT);
+    public static final Item SPEAKER = register(FactoryBlocks.SPEAKER);
+    public static final Item RECORD_PLAYER = register(FactoryBlocks.RECORD_PLAYER);
     public static final Item ITEM_READER = register(FactoryBlocks.ITEM_READER);
     public static final Item BLOCK_OBSERVER = register(FactoryBlocks.BLOCK_OBSERVER);
     public static final Item TEXT_INPUT = register(FactoryBlocks.TEXT_INPUT);
@@ -250,9 +251,11 @@ public class FactoryItems {
                     entries.add(ITEM_READER);
                     entries.add(BLOCK_OBSERVER);
                     entries.add(TEXT_INPUT);
+                    entries.add(RECORD_PLAYER);
                     entries.add(NIXIE_TUBE_CONTROLLER);
                     entries.add(NIXIE_TUBE);
                     entries.add(HOLOGRAM_PROJECTOR);
+                    entries.add(SPEAKER);
                     entries.add(DATA_MEMORY);
                     entries.add(DATA_COMPARATOR);
                     entries.add(ARITHMETIC_OPERATOR);

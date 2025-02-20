@@ -34,22 +34,6 @@ public record ChannelProviderSelectiveSideNode(EnumSet<Direction> directions, in
             Codec.INT.fieldOf("channel").forGetter(ChannelProviderSelectiveSideNode::channel)
     ).apply(instance, ChannelProviderSelectiveSideNode::new)));
 
-    private static BlockNode fromNbt(NbtElement element) {
-        if (element instanceof NbtCompound compound) {
-            var out = new ArrayList<Direction>();
-            var list = compound.getList("dir", NbtElement.STRING_TYPE);
-
-            for (var entry : list) {
-                if (entry instanceof NbtString string) {
-                    out.add(Direction.byName(string.asString()));
-                }
-            }
-
-            return new ChannelProviderSelectiveSideNode(out.isEmpty() ? EnumSet.noneOf(Direction.class) : EnumSet.copyOf(out), compound.getInt("channel"));
-        }
-        return new ChannelProviderSelectiveSideNode(EnumSet.noneOf(Direction.class),  0);
-    }
-
     @Override
     public @NotNull BlockNodeType getType() {
         return TYPE;

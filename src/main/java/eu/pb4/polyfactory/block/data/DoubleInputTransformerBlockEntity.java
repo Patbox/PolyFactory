@@ -12,9 +12,9 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 
 public class DoubleInputTransformerBlockEntity extends LockableBlockEntity {
-    protected DataContainer lastInput1 = StringData.EMPTY;
-    protected DataContainer lastInput2 = StringData.EMPTY;
-    protected DataContainer lastOutput = StringData.EMPTY;
+    protected DataContainer lastInput1 = DataContainer.empty();
+    protected DataContainer lastInput2 = DataContainer.empty();
+    protected DataContainer lastOutput = DataContainer.empty();
     private int channelInput1;
     private int channelInput2;
     private int channelOutput;

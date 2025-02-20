@@ -58,6 +58,7 @@ public abstract class Schema1460Mixin extends Schema {
         stack(schema, map, "conveyor", "HeldStack");
         stack(schema, map, "item_reader", "stack");
         stack(schema, map, "item_packer", "item");
+        stack(schema, map, "record_player", "stack");
 
         stackOwner(schema, map, "miner", "tool");
         stackOwner(schema, map, "placer", "stack");

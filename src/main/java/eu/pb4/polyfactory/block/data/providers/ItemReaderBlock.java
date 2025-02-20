@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.data.providers;
 
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -73,7 +74,7 @@ public class ItemReaderBlock extends CabledDataProviderBlock {
                 world.setBlockState(pos, state.with(POWERED, !powered), Block.NOTIFY_LISTENERS);
 
                 if (!powered && world.getBlockEntity(pos) instanceof ItemReaderBlockEntity be) {
-                    sendData(world, pos, be.nextPage());
+                    DataProvider.sendData(world, pos, be.nextPage());
                 }
             }
 
@@ -82,14 +83,13 @@ public class ItemReaderBlock extends CabledDataProviderBlock {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        var x = super.onUse(state, world, pos, player, hit);
 
-        if (x == ActionResult.PASS  && !player.isSneaking() && state.get(FACING).getOpposite() != hit.getSide() && player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof ItemReaderBlockEntity be) {
+        if (!player.isSneaking() && state.get(FACING).getOpposite() != hit.getSide() && player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof ItemReaderBlockEntity be) {
             be.openGui(serverPlayer);
             return ActionResult.SUCCESS;
         }
 
-        return x;
+        return super.onUse(state, world, pos, player, hit);
     }
 
     @Override

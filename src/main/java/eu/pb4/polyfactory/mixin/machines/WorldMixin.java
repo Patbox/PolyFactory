@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.mixin.machines;
 
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.providers.DataProviderBlock;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.data.CapacityData;
@@ -64,7 +65,7 @@ public abstract class WorldMixin implements WorldAccess {
             if (this.isChunkLoaded(ChunkSectionPos.getSectionCoord(selfPos.getX()), ChunkSectionPos.getSectionCoord(selfPos.getZ()))) {
                 var state = this.getBlockState(selfPos);
                 if (state.isOf(FactoryBlocks.ITEM_COUNTER) && state.get(DataProviderBlock.FACING) == dir.getOpposite()) {
-                    FactoryBlocks.ITEM_COUNTER.sendData(world, selfPos, data);
+                    DataProvider.sendData(world, selfPos, data);
                 }
             }
         }

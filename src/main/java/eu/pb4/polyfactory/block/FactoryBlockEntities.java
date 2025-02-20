@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.block.data.CableBlockEntity;
 import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlockEntity;
 import eu.pb4.polyfactory.block.data.output.HologramProjectorBlockEntity;
 import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlockEntity;
+import eu.pb4.polyfactory.block.data.providers.RecordPlayerBlockEntity;
 import eu.pb4.polyfactory.block.data.providers.ItemReaderBlockEntity;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlockEntity;
@@ -101,8 +102,9 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<CreativeMotorBlockEntity> CREATIVE_MOTOR = register("creative_motor",
             BlockEntityType.Builder.create(CreativeMotorBlockEntity::new, FactoryBlocks.CREATIVE_MOTOR));
     public static final BlockEntityType<ChanneledDataBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache",
-            BlockEntityType.Builder.create(ChanneledDataBlockEntity::new, FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
-                    FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER, FactoryBlocks.BLOCK_OBSERVER, FactoryBlocks.DATA_MEMORY));
+             FabricBlockEntityTypeBuilder.create(ChanneledDataBlockEntity::new, FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
+                    FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER, FactoryBlocks.BLOCK_OBSERVER, FactoryBlocks.DATA_MEMORY, FactoryBlocks.TEXT_INPUT,
+                     FactoryBlocks.SPEAKER));
 
     public static final BlockEntityType<HologramProjectorBlockEntity> HOLOGRAM_PROJECTOR = register("hologram_projector",
             BlockEntityType.Builder.create(HologramProjectorBlockEntity::new, FactoryBlocks.HOLOGRAM_PROJECTOR));
@@ -115,9 +117,11 @@ public class FactoryBlockEntities {
                 a.addAll(FactoryBlocks.WALL_WITH_CABLE.values());
             }).toArray(Block[]::new)));
     public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader",
-            BlockEntityType.Builder.create(ItemReaderBlockEntity::new, FactoryBlocks.ITEM_READER));
-    public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer", BlockEntityType.Builder
-            .create(DoubleInputTransformerBlockEntity::new, FactoryBlocks.ARITHMETIC_OPERATOR));
+             FabricBlockEntityTypeBuilder.create(ItemReaderBlockEntity::new, FactoryBlocks.ITEM_READER));
+    public static final BlockEntityType<RecordPlayerBlockEntity> RECORD_PLAYER = register("record_player",
+            FabricBlockEntityTypeBuilder.create(RecordPlayerBlockEntity::new, FactoryBlocks.RECORD_PLAYER));
+    public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer",  FabricBlockEntityTypeBuilder
+            .create(DoubleInputTransformerBlockEntity::new, FactoryBlocks.ARITHMETIC_OPERATOR, FactoryBlocks.DATA_COMPARATOR));
 
     public static final BlockEntityType<WorkbenchBlockEntity> WORKBENCH = register("workbench", BlockEntityType.Builder
             .create(WorkbenchBlockEntity::new, FactoryBlocks.WORKBENCH));

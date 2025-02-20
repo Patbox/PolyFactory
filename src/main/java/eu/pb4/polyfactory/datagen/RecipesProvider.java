@@ -418,6 +418,29 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                 .offerTo(exporter);
 
+                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.SPEAKER)
+                        .pattern("c-c")
+                        .pattern("sbs")
+                        .pattern("scs")
+                        .input('s', FactoryItems.STEEL_PLATE)
+                        .input('c', Items.COPPER_INGOT)
+                        .input('-', Items.NOTE_BLOCK)
+                        .input('b', FactoryItems.REDSTONE_CHIP)
+                        .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
+                        .offerTo(exporter);
+
+                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.RECORD_PLAYER)
+                        .pattern("c-c")
+                        .pattern("sbs")
+                        .pattern("scs")
+                        .input('s', FactoryItems.STEEL_PLATE)
+                        .input('c', Items.COPPER_INGOT)
+                        .input('-', Items.JUKEBOX)
+                        .input('b', FactoryItems.REDSTONE_CHIP)
+                        .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
+                        .offerTo(exporter);
+
+
 
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.ARITHMETIC_OPERATOR, 1)
                 .pattern("csc")

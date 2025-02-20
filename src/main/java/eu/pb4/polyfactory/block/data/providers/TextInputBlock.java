@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.data.providers;
 
+import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.data.BasicDataType;
 import eu.pb4.polyfactory.data.StringData;
@@ -45,9 +46,7 @@ public class TextInputBlock extends CabledDataProviderBlock {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        var x = super.onUse(state, world, pos, player, hit);
-
-        if (x == ActionResult.PASS && !player.isSneaking() && state.get(FACING).getOpposite() != hit.getSide()
+        if (!player.isSneaking() && state.get(FACING).getOpposite() != hit.getSide()
                 && player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof ChanneledDataBlockEntity be) {
             if (be.checkUnlocked(player)) {
                 new Gui(serverPlayer, be);
@@ -55,7 +54,7 @@ public class TextInputBlock extends CabledDataProviderBlock {
             return ActionResult.SUCCESS_SERVER;
         }
 
-        return x;
+        return super.onUse(state, world, pos, player, hit);
     }
     private class Gui extends AnvilInputGui {
         private final ChanneledDataBlockEntity blockEntity;
@@ -86,7 +85,7 @@ public class TextInputBlock extends CabledDataProviderBlock {
             if (data != null) {
                 this.setSlot(1, GuiTextures.BUTTON_DONE.get().setName(ScreenTexts.DONE).setCallback(x -> {
                     player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.5f, 1);
-                    sendData(blockEntity.getWorld(), blockEntity.getPos(), data);
+                    DataProvider.sendData(blockEntity.getWorld(), blockEntity.getPos(), data);
                     this.close();
                 }));
             } else {

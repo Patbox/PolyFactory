@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.data.providers;
 
+import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.data.BlockStateData;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -22,14 +23,14 @@ public class BlockObserverBlock extends CabledDataProviderBlock {
         super.onPlaced(world, pos, state, placer, itemStack);
         var forwardState = world.getBlockState(pos.offset(state.get(FACING)));
 
-        this.sendData(world, pos, new BlockStateData(forwardState));
+        DataProvider.sendData(world, pos, new BlockStateData(forwardState));
     }
 
 
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         if (direction == state.get(FACING)) {
-            this.sendData(world, pos, new BlockStateData(neighborState));
+            DataProvider.sendData(world, pos, new BlockStateData(neighborState));
         }
 
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
