@@ -28,7 +28,7 @@ public class DataExtractorBlock extends InputTransformerBlock {
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (player instanceof ServerPlayerEntity serverPlayer && !player.shouldCancelInteraction() && world.getBlockEntity(pos) instanceof DataExtractorBlockEntity be) {
             be.openGui(serverPlayer);
-            return ActionResult.SUCCESS_SERVER;
+            return ActionResult.SUCCESS;
         }
 
         return super.onUse(state, world, pos, player, hit);

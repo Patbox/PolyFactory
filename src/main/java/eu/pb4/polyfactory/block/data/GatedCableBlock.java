@@ -16,6 +16,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -25,8 +26,8 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -59,9 +60,9 @@ public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, 
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         this.updatePowered(world, pos, state);
-        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
     }
 
     @Nullable
@@ -88,7 +89,7 @@ public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, 
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity context) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
@@ -103,7 +104,7 @@ public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, 
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
+    public BlockState getPolymerBlockState(BlockState state) {
         return Blocks.BARRIER.getDefaultState();
     }
 
@@ -118,9 +119,10 @@ public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, 
     }
 
     @Override
-    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         return dir.getAxis() == state.get(AXIS);
     }
+
 
     public static final class Model extends RotationAwareModel {
         private final ItemDisplayElement main;

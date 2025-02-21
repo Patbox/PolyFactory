@@ -1,21 +1,11 @@
 package eu.pb4.polyfactory.block.other;
 
-import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.block.ItemUseLimiter;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
-import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlockEntity;
-import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
-import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
-import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
@@ -24,32 +14,24 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
@@ -58,6 +40,7 @@ import org.joml.Vector3f;
 
 
 public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityProvider, BarrierBasedWaterloggable, ItemUseLimiter.All {
+    public static final DirectionProperty FACING = Properties.FACING;
 
     public WorkbenchBlock(Settings settings) {
         super(settings);
@@ -141,7 +124,7 @@ public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityPr
                 element.setViewRange(0.4f);
                 element.setScale(new Vector3f(4 / 16f));
                 element.setLeftRotation(new Quaternionf().rotateX(-MathHelper.HALF_PI));
-                element.setTranslation(new Vector3f((i % 3 - 1) * 3 / 16f, (8 + 2 / 16f) / 16f , (i / 3 - 1) * 3 / 16f));
+                element.setTranslation(new Vector3f((i % 3 - 1) * 3 / 16f, (8 + 2 / 16f) / 16f, (i / 3 - 1) * 3 / 16f));
                 this.items[i] = element;
             }
 
@@ -159,6 +142,7 @@ public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityPr
                 this.items[i].tick();
             }
         }
+
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             super.notifyUpdate(updateType);
@@ -169,7 +153,7 @@ public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityPr
         }
 
         private void updateState(BlockState blockState) {
-            var yaw = blockState.get(FACING).getPositiveHorizontalDegrees();
+            var yaw = blockState.get(FACING).asRotation();
             for (var el : this.items) {
                 el.setYaw(yaw);
             }

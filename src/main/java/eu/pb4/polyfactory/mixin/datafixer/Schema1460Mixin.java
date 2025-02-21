@@ -26,7 +26,9 @@ import java.util.function.Supplier;
 
 @Mixin(Schema1460.class)
 public abstract class Schema1460Mixin extends Schema {
-    @Shadow protected static void registerInventory(Schema schema, Map<String, Supplier<TypeTemplate>> map, String name) {};
+    @Shadow
+    protected static void method_5273(Schema schema, Map<String, Supplier<TypeTemplate>> map, String name) {
+    }
 
     public Schema1460Mixin(int versionKey, Schema parent) {
         super(versionKey, parent);
@@ -42,14 +44,14 @@ public abstract class Schema1460Mixin extends Schema {
         //    return DSL.optionalFields("HeldStack", TypeReferences.ITEM_STACK.in(schema));
         //});
 
-        registerInventory(schema, map, mod("steam_engine"));
-        registerInventory(schema, map, mod("grinder"));
-        registerInventory(schema, map, mod("press"));
-        registerInventory(schema, map, mod("mixer"));
-        registerInventory(schema, map, mod("crafter"));
-        registerInventory(schema, map, mod("workbench"));
-        registerInventory(schema, map, mod("mechanical_drain"));
-        registerInventory(schema, map, mod("mechanical_spout"));
+        method_5273(schema, map, mod("steam_engine"));
+        method_5273(schema, map, mod("grinder"));
+        method_5273(schema, map, mod("press"));
+        method_5273(schema, map, mod("mixer"));
+        method_5273(schema, map, mod("crafter"));
+        method_5273(schema, map, mod("workbench"));
+        method_5273(schema, map, mod("mechanical_drain"));
+        method_5273(schema, map, mod("mechanical_spout"));
 
         container(schema, map, "container");
         container(schema, map, "creative_container");

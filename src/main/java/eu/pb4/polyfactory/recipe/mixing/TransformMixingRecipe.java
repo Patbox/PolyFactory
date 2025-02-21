@@ -31,7 +31,7 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
                                     double optimalSpeed, float minimumTemperature, float maxTemperature) implements MixingRecipe {
     public static final MapCodec<TransformMixingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.STRING.optionalFieldOf("group", "").forGetter(TransformMixingRecipe::group),
-                    Ingredient.CODEC.fieldOf("base").forGetter(TransformMixingRecipe::base),
+                    Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("base").forGetter(TransformMixingRecipe::base),
                     CountedIngredient.LIST_CODEC.fieldOf("input").forGetter(TransformMixingRecipe::input),
                     FluidInputStack.CODEC.listOf().optionalFieldOf("fluid_input").forGetter(TransformMixingRecipe::fluidInputs),
                     ItemStack.UNCOUNTED_CODEC.fieldOf("output").forGetter(TransformMixingRecipe::output),
@@ -87,7 +87,7 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
     public static RecipeEntry<TransformMixingRecipe> of(String string, Ingredient base, List<Ingredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
         List<CountedIngredient> list = new ArrayList<>();
         for (Ingredient x : ingredient) {
-            CountedIngredient countedIngredient = new CountedIngredient(Optional.of(x), ItemComponentPredicate.EMPTY, 1, CountedIngredient.tryGettingLeftover(x));
+            CountedIngredient countedIngredient = new CountedIngredient(x, ItemComponentPredicate.EMPTY, 1, CountedIngredient.tryGettingLeftover(x));
             list.add(countedIngredient);
         }
         return new RecipeEntry<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe("", base, list, Optional.of(List.of()), output, List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
@@ -96,7 +96,7 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
     public static RecipeEntry<TransformMixingRecipe> of(String string, String group, Ingredient base, List<Ingredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
         List<CountedIngredient> list = new ArrayList<>();
         for (Ingredient x : ingredient) {
-            CountedIngredient countedIngredient = new CountedIngredient(Optional.of(x), ItemComponentPredicate.EMPTY, 1, CountedIngredient.tryGettingLeftover(x));
+            CountedIngredient countedIngredient = new CountedIngredient(x, ItemComponentPredicate.EMPTY, 1, CountedIngredient.tryGettingLeftover(x));
             list.add(countedIngredient);
         }
         return new RecipeEntry<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe(group, base, list, Optional.of(List.of()), output, List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
@@ -235,6 +235,17 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
 
         return this.output.copy();
     }
+
+    @Override
+    public boolean fits(int width, int height) {
+        return true;
+    }
+
+    @Override
+    public ItemStack getResult(RegistryWrapper.WrapperLookup registriesLookup) {
+        return this.output.copy();
+    }
+
     @Override
     public RecipeSerializer<TransformMixingRecipe> getSerializer() {
         return FactoryRecipeSerializers.MIXING_TRANSFORM;

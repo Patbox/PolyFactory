@@ -147,8 +147,8 @@ public class FactoryBlocks {
         for (var block : Registries.BLOCK) {
             if (block instanceof WallBlock wallBlock) {
                 var id = Registries.BLOCK.getId(wallBlock);
-                register("wall_with_cable/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock), settings -> new WallWithCableBlock(settings, wallBlock));
-                register("wall_with_pipe/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock), settings -> new PipeInWallBlock(settings, wallBlock));
+                register("wall_with_cable/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock), settings -> new WallWithCableBlock(wallBlock));
+                register("wall_with_pipe/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock), settings -> new PipeInWallBlock(wallBlock));
             }
         }
 
@@ -162,12 +162,12 @@ public class FactoryBlocks {
 
     private static void validate(MinecraftServer server) {
         for (var block : BLOCKS) {
-            if (block.getLootTableKey().isPresent()) {
-                var lt = server.getReloadableRegistries().getLootTable(block.getLootTableKey().get());
+            //if (block.getLootTableKey() != ) {
+                var lt = server.getReloadableRegistries().getLootTable(block.getLootTableKey());
                 if (lt == LootTable.EMPTY) {
-                    ModInit.LOGGER.warn("Missing loot table? " + block.getLootTableKey().get().getValue());
+                    ModInit.LOGGER.warn("Missing loot table? " + block.getLootTableKey().getValue());
                 }
-            }
+            //}
             if (block instanceof BlockEntityProvider provider) {
                 var be = provider.createBlockEntity(BlockPos.ORIGIN, block.getDefaultState());
                 if (be != null) {
@@ -182,7 +182,7 @@ public class FactoryBlocks {
     }
     public static <T extends Block> T register(String path, AbstractBlock.Settings settings, Function<AbstractBlock.Settings, T> function) {
         var id = Identifier.of(ModInit.ID, path);
-        var item = function.apply(settings.registryKey(RegistryKey.of(RegistryKeys.BLOCK, id)));
+        var item = function.apply(settings);
         BLOCKS.add(item);
         return Registry.register(Registries.BLOCK, id, item);
     }

@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.ui.PredicateLimitedSlot;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
 import eu.pb4.polyfactory.util.storage.WrappingStorage;
+import eu.pb4.polyfactory.util.storage.fabricbkp.PFItemStorage;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
@@ -65,7 +66,7 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.writeNbt(nbt, lookup);
-        nbt.put("item", this.itemStack.toNbtAllowEmpty(lookup));
+        nbt.put("item", this.itemStack.encodeAllowEmpty(lookup));
     }
 
     @Override
@@ -155,7 +156,7 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
         if (dir != null && this.getCachedState().get(ItemPackerBlock.FACING).getAxis() == dir.getAxis()) {
-            return ItemStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack)) != null;
+            return PFItemStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack)) != null;
         }
 
         return false;
@@ -176,7 +177,7 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
             return this.cachedItemStorage;
         }
 
-        var storage = ItemStorage.ITEM.find(this.itemStack, ContainerItemContext.ofSingleSlot(this.inventoryStorage.getSlot(0)));
+        var storage = PFItemStorage.ITEM.find(this.itemStack, ContainerItemContext.ofSingleSlot(this.inventoryStorage.getSlot(0)));
 
         return WrappingStorage.withModifyCallback(storage, this::runAdvancement);
     }
@@ -196,7 +197,7 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.HOPPER, player, false);
             this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(ItemPackerBlockEntity.this.getCachedState().getBlock().getName()));
-            this.setSlotRedirect(2, new PredicateLimitedSlot(ItemPackerBlockEntity.this, 0, stack -> ItemStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack)) != null));
+            this.setSlotRedirect(2, new PredicateLimitedSlot(ItemPackerBlockEntity.this, 0, stack -> PFItemStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack)) != null));
             this.open();
         }
 

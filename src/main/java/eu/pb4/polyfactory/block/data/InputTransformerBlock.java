@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.data;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.base.AxisAndFacingBlock;
@@ -24,8 +25,10 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -41,8 +44,8 @@ import java.util.List;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public abstract class InputTransformerBlock extends DataNetworkBlock implements BlockEntityProvider, FactoryBlock, CableConnectable, DataProvider, DataReceiver, WrenchableBlock {
-    public static final EnumProperty<Direction> FACING_INPUT = EnumProperty.of("facing_input", Direction.class);
-    public static final EnumProperty<Direction> FACING_OUTPUT = EnumProperty.of("facing_output", Direction.class);
+    public static final DirectionProperty FACING_INPUT = DirectionProperty.of("facing_input");
+    public static final DirectionProperty FACING_OUTPUT = DirectionProperty.of("facing_output");
 
      protected static final List<WrenchAction> WRENCH_ACTIONS = List.of(
             WrenchAction.ofDirection(FACING_INPUT),
@@ -73,12 +76,12 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
+    public BlockState getPolymerBlockState(BlockState state) {
         return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity context) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
@@ -89,7 +92,7 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
     }
 
     @Override
-    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         return state.get(FACING_INPUT) == dir
                 || state.get(FACING_OUTPUT) == dir;
     }
@@ -156,8 +159,8 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
     }
 
     public static class Model extends BlockModel {
-        public static final ItemStack INPUT = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_input"));
-        public static final ItemStack OUTPUT = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_output"));
+        public static final ItemStack INPUT = BaseItemProvider.requestModel(id("block/data_cube_connector_input"));
+        public static final ItemStack OUTPUT = BaseItemProvider.requestModel(id("block/data_cube_connector_output"));
         private final ItemDisplayElement base;
         private final ItemDisplayElement input;
         private final ItemDisplayElement output;
@@ -183,7 +186,7 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.getPositiveHorizontalDegrees();
+                y = dir.asRotation();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             }

@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
 public abstract class CableNetworkBlock extends NetworkBlock implements NetworkComponent.Data, NetworkComponent.Energy{
@@ -12,7 +13,7 @@ public abstract class CableNetworkBlock extends NetworkBlock implements NetworkC
     }
 
     @Override
-    protected void updateNetworkAt(WorldView world, BlockPos pos) {
+    protected void updateNetworkAt(WorldAccess world, BlockPos pos) {
         NetworkComponent.Data.updateDataAt(world, pos);
         NetworkComponent.Energy.updateEnergyAt(world, pos);
     }

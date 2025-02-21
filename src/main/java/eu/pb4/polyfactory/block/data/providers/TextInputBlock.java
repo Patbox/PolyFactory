@@ -51,7 +51,7 @@ public class TextInputBlock extends CabledDataProviderBlock {
             if (be.checkUnlocked(player)) {
                 new Gui(serverPlayer, be);
             }
-            return ActionResult.SUCCESS_SERVER;
+            return ActionResult.SUCCESS;
         }
 
         return super.onUse(state, world, pos, player, hit);

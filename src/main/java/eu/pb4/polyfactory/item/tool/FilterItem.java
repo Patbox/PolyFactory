@@ -13,6 +13,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -24,8 +25,8 @@ import net.minecraft.world.World;
 
 
 public class FilterItem extends ModeledItem {
-    public FilterItem(Item item, Settings settings) {
-        super(item, settings);
+    public FilterItem(Settings settings) {
+        super(Items.PAPER, settings);
     }
 
     @Override

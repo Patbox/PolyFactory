@@ -14,7 +14,7 @@ import net.minecraft.util.Formatting;
 import static eu.pb4.polyfactory.item.FactoryItems.register;
 
 public class FactoryDebugItems {
-    public static final Item DEBUG_PIPE_FLOW = register("debug/pipe_flow", BaseDebugItem.onBlockInteract("Pipe Flow", 0xff8800, (ctx) -> {
+    public static final Item DEBUG_PIPE_FLOW = register("debug/pipe_flow", (s) -> BaseDebugItem.onBlockInteract("Pipe Flow", 0xff8800, (ctx) -> {
         var player = ctx.getPlayer();
         var world = ctx.getWorld();
         var pos = ctx.getBlockPos();
@@ -29,7 +29,7 @@ public class FactoryDebugItems {
         });
     }));
 
-    public static final Item DEBUG_NODE_INFO = register("debug/node_info", BaseDebugItem.onBlockInteract("Node Info", 0x0088ff, (ctx) -> {
+    public static final Item DEBUG_NODE_INFO = register("debug/node_info", (s) -> BaseDebugItem.onBlockInteract("Node Info", 0x0088ff, (ctx) -> {
         var player = ctx.getPlayer();
         var world = ctx.getWorld();
         var pos = ctx.getBlockPos();

@@ -28,7 +28,7 @@ public record SoundEventData(RegistryEntry<SoundEvent> soundEvent, float volume,
 
     @Override
     public String asString() {
-        return soundEvent.value().id().toString();
+        return soundEvent.value().getId().toString();
     }
 
     @Override

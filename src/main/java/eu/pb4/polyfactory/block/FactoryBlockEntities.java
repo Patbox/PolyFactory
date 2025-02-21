@@ -105,7 +105,7 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<CreativeMotorBlockEntity> CREATIVE_MOTOR = register("creative_motor",
             BlockEntityType.Builder.create(CreativeMotorBlockEntity::new, FactoryBlocks.CREATIVE_MOTOR));
     public static final BlockEntityType<ChanneledDataBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache",
-             FabricBlockEntityTypeBuilder.create(ChanneledDataBlockEntity::new, FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
+            BlockEntityType.Builder.create(ChanneledDataBlockEntity::new, FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
                     FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER, FactoryBlocks.BLOCK_OBSERVER, FactoryBlocks.DATA_MEMORY, FactoryBlocks.TEXT_INPUT,
                      FactoryBlocks.SPEAKER));
 
@@ -120,20 +120,20 @@ public class FactoryBlockEntities {
                 a.addAll(FactoryBlocks.WALL_WITH_CABLE.values());
             }).toArray(Block[]::new)));
     public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader",
-             FabricBlockEntityTypeBuilder.create(ItemReaderBlockEntity::new, FactoryBlocks.ITEM_READER));
+            BlockEntityType.Builder.create(ItemReaderBlockEntity::new, FactoryBlocks.ITEM_READER));
     public static final BlockEntityType<RecordPlayerBlockEntity> RECORD_PLAYER = register("record_player",
-            FabricBlockEntityTypeBuilder.create(RecordPlayerBlockEntity::new, FactoryBlocks.RECORD_PLAYER));
-    public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer",  FabricBlockEntityTypeBuilder
-            .create(DoubleInputTransformerBlockEntity::new, FactoryBlocks.ARITHMETIC_OPERATOR, FactoryBlocks.DATA_COMPARATOR));
-    public static final BlockEntityType<InputTransformerBlockEntity> INPUT_TRANSFORMER = register("input_transformer",  FabricBlockEntityTypeBuilder
-            .create(InputTransformerBlockEntity::new));
+            BlockEntityType.Builder.create(RecordPlayerBlockEntity::new, FactoryBlocks.RECORD_PLAYER));
+    public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer",
+            BlockEntityType.Builder.create(DoubleInputTransformerBlockEntity::new, FactoryBlocks.ARITHMETIC_OPERATOR, FactoryBlocks.DATA_COMPARATOR));
+    public static final BlockEntityType<InputTransformerBlockEntity> INPUT_TRANSFORMER = register("input_transformer",
+            BlockEntityType.Builder.create(InputTransformerBlockEntity::new));
 
-    public static final BlockEntityType<DataExtractorBlockEntity> DATA_EXTRACTOR = register("data_extractor", FabricBlockEntityTypeBuilder
+    public static final BlockEntityType<DataExtractorBlockEntity> DATA_EXTRACTOR = register("data_extractor", BlockEntityType.Builder
             .create(DataExtractorBlockEntity::new, FactoryBlocks.DATA_EXTRACTOR));
 
     public static final BlockEntityType<WorkbenchBlockEntity> WORKBENCH = register("workbench", BlockEntityType.Builder
             .create(WorkbenchBlockEntity::new, FactoryBlocks.WORKBENCH));
-    public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container",  FabricBlockEntityTypeBuilder
+    public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container",  BlockEntityType.Builder
             .create(ColorableBlockEntity::new, FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP, FactoryBlocks.FIXTURE_LAMP, FactoryBlocks.INVERTED_FIXTURE_LAMP));
 
     public static final BlockEntityType<PipeBlockEntity> PIPE = register("pipe", BlockEntityType.Builder.create(PipeBlockEntity::new, Util.make(new ArrayList<Block>(), (a) -> {
@@ -156,7 +156,7 @@ public class FactoryBlockEntities {
             BlockEntityType.Builder.create(RedstoneValvePipeBlockEntity::new, FactoryBlocks.REDSTONE_VALVE_PIPE));
 
     public static final BlockEntityType<ItemPackerBlockEntity> ITEM_PACKER = register("item_packer",
-            FabricBlockEntityTypeBuilder.create(ItemPackerBlockEntity::new, FactoryBlocks.ITEM_PACKER));
+            BlockEntityType.Builder.create(ItemPackerBlockEntity::new, FactoryBlocks.ITEM_PACKER));
 
     public static void register() {
         var x = (BlockEntityTypeAccessor) BlockEntityType.HOPPER;

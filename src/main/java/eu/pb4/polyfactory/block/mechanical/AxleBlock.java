@@ -220,7 +220,7 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, W
         }
 
         static {
-            ITEM_MODEL.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(AutoModeledPolymerItem.MODELS.get(FactoryItems.AXLE).value()));
+            ITEM_MODEL.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(ITEM_MODEL.getItem(), FactoryUtil.id("block/axle")).value()));
             ITEM_MODEL_SHORT.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(PolymerResourcePackUtils.requestModel(ITEM_MODEL_SHORT.getItem(), FactoryUtil.id("block/axle_short")).value()));
         }
     }

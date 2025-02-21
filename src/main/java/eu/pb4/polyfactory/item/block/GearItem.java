@@ -59,7 +59,7 @@ public class GearItem extends FactoryBlockItem {
 
 
             ctx = ItemPlacementContext.offset(ctx, otherPos
-                    .add(MathHelper.sign(offset.x), MathHelper.sign(offset.y), MathHelper.sign(offset.z)), zeroAxis.getPositiveDirection());
+                    .add(MathHelper.sign(offset.x), MathHelper.sign(offset.y), MathHelper.sign(offset.z)), Direction.from(zeroAxis, Direction.AxisDirection.POSITIVE));
             return ctx.canReplaceExisting() ? ctx : null;
         } else if (otherState.isOf(this.getBlock()) && this.getBlock() instanceof AxleWithLargeGearBlock) {
             var zeroAxis = otherState.get(AxleWithGearBlock.AXIS);

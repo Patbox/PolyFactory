@@ -19,7 +19,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.player.PlayerPosition;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.listener.ClientPlayPacketListener;
@@ -344,9 +343,9 @@ public class BlockCollection extends AbstractElement implements CollisionView {
                         if (id != -1) {
                             vec.set(x - this.centerX, y - this.centerY, z - this.centerZ);
                             vec.rotate(this.newQuaternion);
-                            b.add(new EntityPositionSyncS2CPacket(id,
-                                    new PlayerPosition(new Vec3d(pos.x + vec.x, pos.y + vec.y - 0.5, pos.z + vec.z), Vec3d.ZERO, 0, 0), false
-                            ));
+                            //b.add(new EntityPositionSyncS2CPacket(id,
+                            //        new PlayerPosition(new Vec3d(pos.x + vec.x, pos.y + vec.y - 0.5, pos.z + vec.z), Vec3d.ZERO, 0, 0), false
+                            //));
                             vec2.set(x - this.centerX, y - this.centerY, z - this.centerZ);
                             vec2.rotate(this.quaternion);
 

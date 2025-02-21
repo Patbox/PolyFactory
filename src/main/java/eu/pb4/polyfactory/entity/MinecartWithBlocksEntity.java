@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 import org.joml.Quaternionf;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-public class MinecartWithBlocksEntity extends AbstractMinecartEntity implements PolymerEntity {
+public abstract class MinecartWithBlocksEntity extends AbstractMinecartEntity implements PolymerEntity {
     private final ElementHolder holder;
     private final BlockCollection blocks;
 
@@ -41,9 +41,9 @@ public class MinecartWithBlocksEntity extends AbstractMinecartEntity implements 
         this.blocks.setWorld(null);
     }
 
-    @Override
+    //@Override
     public void onRemove(RemovalReason reason) {
-        super.onRemove(reason);
+        //super.onRemove(reason);
         this.blocks.setWorld(null);
 
     }
@@ -61,12 +61,12 @@ public class MinecartWithBlocksEntity extends AbstractMinecartEntity implements 
         return ItemStack.EMPTY;
     }
 
-    @Override
+    //@Override
     protected Item asItem() {
         return Items.AIR;
     }
 
-    @Override
+    //@Override
     public EntityType<?> getPolymerEntityType(PacketContext packetContext) {
         return EntityType.FURNACE_MINECART;
     }

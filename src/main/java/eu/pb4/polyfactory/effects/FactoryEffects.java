@@ -25,11 +25,11 @@ import net.minecraft.util.Identifier;
 public class FactoryEffects {
     public static final RegistryEntry<StatusEffect> STICKY_SLIME = register("sticky/slime",
             new StickyStatusEffect("slime", StatusEffectCategory.HARMFUL,0x73c262,
-                    new BlockStateParticleEffect(ParticleTypes.BLOCK_CRUMBLE, Blocks.SLIME_BLOCK.getDefaultState())));
+                    new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.SLIME_BLOCK.getDefaultState())));
 
     public static final RegistryEntry<StatusEffect> STICKY_HONEY = register("sticky/honey",
             new StickyStatusEffect("honey", StatusEffectCategory.HARMFUL,0xfaab1c,
-                    new BlockStateParticleEffect(ParticleTypes.BLOCK_CRUMBLE, Blocks.HONEY_BLOCK.getDefaultState())));
+                    new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.HONEY_BLOCK.getDefaultState())));
     public static void register() {
 
     }

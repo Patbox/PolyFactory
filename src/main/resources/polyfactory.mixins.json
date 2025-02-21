@@ -21,6 +21,8 @@
     "datafixer.ItemStackComponentizationFixMixin",
     "datafixer.Schema1460Mixin",
     "datafixer.Schema3818_3Mixin",
+    "fabricbkp.BundleContentsComponentAccessor",
+    "fabricbkp.ContainerComponentAccessor",
     "fluid.AbstractCauldronBlockMixin",
     "machines.FallingBlockEntityMixin",
     "machines.HopperBlockEntityMixin",

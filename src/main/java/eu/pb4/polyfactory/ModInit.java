@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.advancement.PolyFactoryAdvancementCriteria;
 import eu.pb4.polyfactory.advancement.FactoryItemPredicates;
 import eu.pb4.polyfactory.block.FactoryPoi;
 import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlock;
+import eu.pb4.polyfactory.block.data.InputTransformerBlock;
 import eu.pb4.polyfactory.block.data.io.DataMemoryBlock;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.polyfactory.block.fluids.PumpBlock;
@@ -112,5 +113,6 @@ public class ModInit implements ModInitializer {
 		DoubleInputTransformerBlock.Model.INPUT_A.getItem();
 		DataMemoryBlock.Model.POWERED_MODEL.getItem();
 		PumpBlock.Model.BLOCK_MODEL.getItem();
+		InputTransformerBlock.Model.INPUT.getItem();
 	}
 }

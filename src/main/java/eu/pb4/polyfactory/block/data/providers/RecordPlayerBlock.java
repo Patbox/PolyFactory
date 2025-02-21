@@ -10,21 +10,18 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerPosition;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.s2c.play.EntityPositionSyncS2CPacket;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -62,21 +59,21 @@ public class RecordPlayerBlock extends CabledDataProviderBlock {
     }
 
     @Override
-    protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (state.get(FACING).getOpposite() != hit.getSide() && world.getBlockEntity(pos) instanceof RecordPlayerBlockEntity be) {
+    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (hand == Hand.MAIN_HAND && state.get(FACING).getOpposite() != hit.getSide() && world.getBlockEntity(pos) instanceof RecordPlayerBlockEntity be) {
             if (be.getStack().isEmpty() && stack.contains(DataComponentTypes.JUKEBOX_PLAYABLE)) {
                 be.setStack(stack.copyWithCount(1));
                 stack.decrementUnlessCreative(1, player);
-                return ActionResult.SUCCESS_SERVER;
+                return ItemActionResult.SUCCESS;
             } else if (!be.getStack().isEmpty()) {
                 var newStack = be.getStack().copy();
                 be.setStack(ItemStack.EMPTY);
                 if (stack.isEmpty()) {
                     player.setStackInHand(hand, newStack);
                 } else {
-                    player.giveOrDropStack(newStack);
+                    player.getInventory().offerOrDrop(newStack);
                 }
-                return ActionResult.SUCCESS_SERVER;
+                return ItemActionResult.SUCCESS;
             }
         }
 
@@ -94,9 +91,9 @@ public class RecordPlayerBlock extends CabledDataProviderBlock {
             if (player.getMainHandStack().isEmpty()) {
                 player.setStackInHand(Hand.MAIN_HAND, stack);
             } else {
-                player.giveOrDropStack(stack);
+                player.getInventory().offerOrDrop(stack);
             }
-            return ActionResult.SUCCESS_SERVER;
+            return ActionResult.SUCCESS;
         }
 
         return super.onUse(state, world, pos, player, hit);
@@ -162,8 +159,8 @@ public class RecordPlayerBlock extends CabledDataProviderBlock {
                     //closest = player.add(x / weight, y / weight, z / weight);
                 }
 
-                handler.sendPacket(new EntityPositionSyncS2CPacket(this.soundSource.getEntityId(),
-                        new PlayerPosition(closest.add(0, Math.signum(closest.y - player.y) * (16 * 4 * (1 - volume) + 1), 0), Vec3d.ZERO, 0, 0), false));
+                handler.sendPacket(VirtualEntityUtils.createSimpleMovePacket(this.soundSource.getEntityId(),
+                        closest.add(0, Math.signum(closest.y - player.y) * (16 * 4 * (1 - volume) + 1), 0), (byte) 0, (byte) 0));
             }
         }
     }

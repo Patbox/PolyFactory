@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
+import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.mixin.BrewingRecipeRegistryAccessor;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
@@ -137,7 +138,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.TREATED_DRIED_KELP))
                 .offerTo(exporter);
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.GATED_CABLE, 1)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.GATED_CABLE, 1)
                         .pattern("ris")
                         .pattern("cxc")
                         .pattern("sir")
@@ -149,7 +150,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.CABLE))
                         .offerTo(exporter);
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.PRESS, 1)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.PRESS, 1)
                         .pattern(" g ")
                         .pattern("sis")
                         .pattern("wcw")
@@ -359,7 +360,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.FUNNEL))
                 .offerTo(exporter);
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.ITEM_PACKER, 1)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.ITEM_PACKER, 1)
                         .pattern("wsw")
                         .pattern("shs")
                         .pattern("wsw")
@@ -368,13 +369,6 @@ class RecipesProvider extends FabricRecipeProvider {
                         .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.WOODEN_PLATE))
                         .offerTo(exporter);
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.CONTAINER, 1)
-                        .pattern("www")
-                        .pattern("wsw")
-                        .pattern("www")
-                        .input('w', FactoryItems.WOODEN_PLATE).input('s', FactoryItems.STEEL_INGOT)
-                        .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
-                        .offerTo(exporter);
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.CONTAINER, 1)
                 .pattern("www")
                 .pattern("wsw")
@@ -418,7 +412,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                 .offerTo(exporter);
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.SPEAKER)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.SPEAKER)
                         .pattern("c-c")
                         .pattern("sbs")
                         .pattern("scs")
@@ -429,7 +423,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                         .offerTo(exporter);
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.RECORD_PLAYER)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.RECORD_PLAYER)
                         .pattern("c-c")
                         .pattern("sbs")
                         .pattern("scs")
@@ -460,7 +454,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .offerTo(exporter);
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.DATA_EXTRACTOR, 1)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.DATA_EXTRACTOR, 1)
                         .pattern("csc")
                         .pattern("s-s")
                         .pattern("cwc")
@@ -468,18 +462,6 @@ class RecipesProvider extends FabricRecipeProvider {
                         .input('s', FactoryItems.STEEL_PLATE)
                         .input('-', FactoryItems.REDSTONE_CHIP)
                         .input('w', FactoryItems.CABLE)
-                        .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
-                        .offerTo(exporter);
-
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.DATA_MEMORY, 1)
-                        .pattern("cpc")
-                        .pattern("s-s")
-                        .pattern("cwc")
-                        .input('c', Items.GOLD_INGOT).input('s', FactoryItems.STEEL_PLATE)
-                        .input('p', FactoryItems.COPPER_PLATE)
-                        .input('-', FactoryItems.REDSTONE_CHIP)
-                        .input('w', FactoryItems.CABLE)
-
                         .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                         .offerTo(exporter);
 
@@ -712,14 +694,14 @@ class RecipesProvider extends FabricRecipeProvider {
                 .offerTo(exporter);
 
                 of(exporter,
-                        ColoringCraftingRecipe.of(itemWrap, "cable_color", FactoryItems.CABLE),
-                        ColoringCraftingRecipe.of(itemWrap, "lamp_color", FactoryItems.LAMP),
-                        ColoringCraftingRecipe.of(itemWrap, "inverted_color", FactoryItems.INVERTED_LAMP),
-                        ColoringCraftingRecipe.of(itemWrap, "caged_lamp_color", FactoryItems.CAGED_LAMP),
-                        ColoringCraftingRecipe.of(itemWrap, "inverted_caged_color", FactoryItems.INVERTED_CAGED_LAMP),
-                        ColoringCraftingRecipe.of(itemWrap, "fixture_lamp_color", FactoryItems.FIXTURE_LAMP),
-                        ColoringCraftingRecipe.of(itemWrap, "inverted_fixture_color", FactoryItems.INVERTED_FIXTURE_LAMP),
-                        ColoringCraftingRecipe.of(itemWrap, "portable_redstone_transmitter_color", FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, 1)
+                        ColoringCraftingRecipe.of("cable_color", FactoryItems.CABLE),
+                        ColoringCraftingRecipe.of("lamp_color", FactoryItems.LAMP),
+                        ColoringCraftingRecipe.of("inverted_color", FactoryItems.INVERTED_LAMP),
+                        ColoringCraftingRecipe.of("caged_lamp_color", FactoryItems.CAGED_LAMP),
+                        ColoringCraftingRecipe.of("inverted_caged_color", FactoryItems.INVERTED_CAGED_LAMP),
+                        ColoringCraftingRecipe.of("fixture_lamp_color", FactoryItems.FIXTURE_LAMP),
+                        ColoringCraftingRecipe.of("inverted_fixture_color", FactoryItems.INVERTED_FIXTURE_LAMP),
+                        ColoringCraftingRecipe.of("portable_redstone_transmitter_color", FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, 1)
                 );
                 of(exporter,
                         ColoringMixingRecipe.of("cable_color", FactoryItems.CABLE, 2, 6, 10),
@@ -857,27 +839,27 @@ class RecipesProvider extends FabricRecipeProvider {
                                 new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
                                         FactoryItems.INVERTED_LAMP.getDefaultStack(),
                                         Ingredient.ofItems(FactoryItems.LAMP),
-                                        List.of(Ingredient.ofItems(Items.REDSTONE_TORCH)))),
+                                        DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(Items.REDSTONE_TORCH)))),
                         new RecipeEntry<>(recipeKey("crafting/inverted_caged_lamp"),
                                 new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
                                         FactoryItems.INVERTED_CAGED_LAMP.getDefaultStack(),
                                         Ingredient.ofItems(FactoryItems.CAGED_LAMP),
-                                        List.of(Ingredient.ofItems(Items.REDSTONE_TORCH)))),
+                                        DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(Items.REDSTONE_TORCH)))),
                         new RecipeEntry<>(recipeKey("crafting/caged_lamp"),
                                 new ShapelessNbtCopyRecipe("", CraftingRecipeCategory.REDSTONE,
                                         FactoryItems.CAGED_LAMP.getDefaultStack(),
                                         Ingredient.ofItems(FactoryItems.LAMP),
-                                        List.of(Ingredient.ofItems(FactoryItems.METAL_GRID)))),
+                                        DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(FactoryItems.METAL_GRID)))),
                         new RecipeEntry<>(recipeKey("crafting/inverted_fixture_lamp"),
                                 new ShapelessNbtCopyRecipe("lamp_invertion", CraftingRecipeCategory.REDSTONE,
                                         FactoryItems.INVERTED_FIXTURE_LAMP.getDefaultStack(),
                                         Ingredient.ofItems(FactoryItems.FIXTURE_LAMP),
-                                        List.of(Ingredient.ofItems(Items.REDSTONE_TORCH)))),
+                                        DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(Items.REDSTONE_TORCH)))),
                         new RecipeEntry<>(recipeKey("crafting/fixture_lamp"),
                                 new ShapelessNbtCopyRecipe("", CraftingRecipeCategory.REDSTONE,
                                         FactoryItems.FIXTURE_LAMP.getDefaultStack().copyWithCount(3),
                                         Ingredient.ofItems(FactoryItems.LAMP),
-                                        List.of(Ingredient.ofItems(FactoryItems.WOODEN_PLATE))))
+                                        DefaultedList.copyOf(Ingredient.EMPTY, Ingredient.ofItems(FactoryItems.WOODEN_PLATE))))
                 );
 
 

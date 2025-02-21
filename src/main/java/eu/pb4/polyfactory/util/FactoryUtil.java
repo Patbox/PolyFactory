@@ -40,6 +40,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -154,6 +155,9 @@ public class FactoryUtil {
     }
 
     public static Identifier id(String path) {
+        return Identifier.of(ModInit.ID, path);
+    }
+    public static Identifier recipeKey(String path) {
         return Identifier.of(ModInit.ID, path);
     }
 

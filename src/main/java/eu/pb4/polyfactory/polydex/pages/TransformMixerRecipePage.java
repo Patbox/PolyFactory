@@ -27,7 +27,7 @@ public class TransformMixerRecipePage extends MixerRecipePage<TransformMixingRec
     @Override
     protected List<CountedIngredient> getItemInput() {
         var list = new ArrayList<CountedIngredient>(this.recipe.input().size() + 1);
-        list.add(new CountedIngredient(Optional.of(this.recipe.base()), ItemComponentPredicate.EMPTY, 1, ItemStack.EMPTY));
+        list.add(new CountedIngredient(this.recipe.base(), ItemComponentPredicate.EMPTY, 1, ItemStack.EMPTY));
         list.addAll(this.recipe.input());
         return list;
     }

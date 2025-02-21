@@ -26,17 +26,18 @@ public class StickyStatusEffect extends StatusEffect implements PolymerStatusEff
     public StickyStatusEffect(String type, StatusEffectCategory category, int color, ParticleEffect particleEffect) {
         super(category, color, particleEffect);
         var attributeId = id("sticky/" + type);
-        this.addAttributeModifier(EntityAttributes.MOVEMENT_SPEED, attributeId, -0.2, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-        this.addAttributeModifier(EntityAttributes.ATTACK_SPEED, attributeId, -0.15, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-        this.addAttributeModifier(EntityAttributes.BLOCK_BREAK_SPEED, attributeId, -0.15, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        this.addAttributeModifier(EntityAttributes.GENERIC_MOVEMENT_SPEED, attributeId, -0.2, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        this.addAttributeModifier(EntityAttributes.GENERIC_ATTACK_SPEED, attributeId, -0.15, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        this.addAttributeModifier(EntityAttributes.PLAYER_BLOCK_BREAK_SPEED, attributeId, -0.15, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
     }
 
 
     @Override
-    public boolean applyUpdateEffect(ServerWorld world, LivingEntity entity, int amplifier) {
+    public boolean applyUpdateEffect(LivingEntity entity, int amplifier) {
         if (entity.isWet()) {
             return false;
         }
+        var world = entity.getWorld();
 
         var box = entity.getBoundingBox().expand(0.01, -0.1, 0.01);
         boolean active = false;
@@ -52,7 +53,7 @@ public class StickyStatusEffect extends StatusEffect implements PolymerStatusEff
         //    player.sendMessage(Text.literal("Active: " + active + " | " + (entity.getMovement().getY() < 0 ? "-" : "+") + ((int) y) + "." + ((int) ((y - ((int) y)) * 100))), true);
         //}
 
-        return super.applyUpdateEffect(world, entity, amplifier);
+        return super.applyUpdateEffect(entity, amplifier);
     }
 
     @Override

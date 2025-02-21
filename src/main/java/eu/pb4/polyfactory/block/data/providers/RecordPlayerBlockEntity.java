@@ -101,7 +101,7 @@ public class RecordPlayerBlockEntity extends ChanneledDataBlockEntity implements
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.writeNbt(nbt, lookup);
-        nbt.put("stack", this.stack.toNbtAllowEmpty(lookup));
+        nbt.put("stack", this.stack.encodeAllowEmpty(lookup));
         if (this.song != null) {
             nbt.putLong("ticks_since_song_started", this.ticksSinceSongStarted);
         }
