@@ -1,0 +1,36 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"1": "polyfactory:block/cable/data_io/connector_input",
+		"2": "polyfactory:block/cable/data_io/connector_cable",
+		"3": "polyfactory:block/empty",
+		"particle": "polyfactory:block/cable/data_io/outside"
+	},
+	"elements": [
+		{
+			"name": "overlay",
+			"from": [0, 0, -0.01],
+			"to": [16, 16, 0.09],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#1"},
+				"east": {"uv": [0, 0, 0.1, 16], "texture": "#3"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#1"},
+				"west": {"uv": [15, 0, 15.1, 16], "texture": "#3"},
+				"up": {"uv": [0, 0, 16, 1], "texture": "#3"},
+				"down": {"uv": [0, 15, 16, 15.1], "texture": "#3"}
+			}
+		},
+		{
+			"from": [6, 6, 0],
+			"to": [10, 10, 2],
+			"faces": {
+				"north": {"uv": [0, 0, 4, 4], "texture": "#2"},
+				"east": {"uv": [4, 5, 0, 7], "rotation": 90, "texture": "#2"},
+				"south": {"uv": [0, 0, 4, 4], "texture": "#2"},
+				"west": {"uv": [0, 5, 4, 7], "rotation": 90, "texture": "#2"},
+				"up": {"uv": [0, 5, 4, 7], "texture": "#2"},
+				"down": {"uv": [4, 5, 0, 7], "texture": "#2"}
+			}
+		}
+	]
+}

@@ -7,9 +7,14 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface DataContainer extends Comparable<DataContainer> {
     MapCodec<DataContainer> MAP_CODEC = DataType.CODEC.dispatchMap("type", DataContainer::type, DataType::codec);
     Codec<DataContainer> CODEC = MAP_CODEC.codec();
+
+    List<String> GENERIC_EXTRACTS = List.of("decimal", "integer", "string", "boolean", "redstone");
     static DataContainer of(long count) {
         return new LongData(count);
     }
@@ -41,7 +46,15 @@ public interface DataContainer extends Comparable<DataContainer> {
     }
 
     default DataContainer extract(String field) {
-        return empty();
+        return switch (field) {
+            case "decimal" -> new DoubleData(asDouble());
+            case "integer" -> new LongData(asLong());
+            case "redstone" -> new LongData(asRedstoneOutput());
+            case "string" -> new StringData(asString());
+            case "boolean" -> BoolData.of(this.isTrue());
+            case "" -> this;
+            default -> empty();
+        };
     }
 
     static DataContainer fromNbt(NbtElement compound, RegistryWrapper.WrapperLookup lookup) {

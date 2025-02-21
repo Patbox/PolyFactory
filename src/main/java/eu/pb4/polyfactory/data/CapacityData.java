@@ -49,14 +49,13 @@ public record CapacityData(long stored, long capacity) implements DataContainer 
     public boolean forceRight() {
         return true;
     }
-
     @Override
     public DataContainer extract(String field) {
         return switch (field) {
-            case "stored" -> new LongData(this.stored);
-            case "capacity" -> new LongData(this.capacity);
+            case "stored", "value" -> new LongData(this.stored);
+            case "capacity", "max" -> new LongData(this.capacity);
             case "percent" -> new DoubleData((double) this.stored / this.capacity);
-            default -> DataContainer.empty();
+            default -> DataContainer.super.extract(field);
         };
     }
 }

@@ -52,7 +52,8 @@ public record ItemStackData(ItemStack stack, String name) implements DataContain
             case "type" -> new StringData(Registries.ITEM.getId(this.stack.getItem()).toString());
             case "name" -> new StringData(asString());
             case "count" -> new LongData(asLong());
-            default -> DataContainer.empty();
+            case "damage" -> new LongData(this.stack.getDamage());
+            default -> DataContainer.super.extract(field);
         };
     }
 

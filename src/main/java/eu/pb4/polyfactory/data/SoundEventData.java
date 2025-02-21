@@ -47,7 +47,7 @@ public record SoundEventData(RegistryEntry<SoundEvent> soundEvent, float volume,
             case "sound" -> new StringData(asString());
             case "pitch" -> new DoubleData(this.pitch);
             case "volume" -> new DoubleData(this.volume);
-            default -> DataContainer.empty();
+            default -> DataContainer.super.extract(field);
         };
     }
 

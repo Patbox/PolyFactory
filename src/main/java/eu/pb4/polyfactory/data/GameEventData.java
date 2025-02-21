@@ -51,7 +51,7 @@ public record GameEventData(GameEvent event, Vec3d pos, double distance) impleme
             case "event" -> new StringData(asString());
             case "position" -> new StringData(pos.toString());
             case "distance" -> new DoubleData(this.distance);
-            default -> DataContainer.empty();
+            default -> DataContainer.super.extract(field);
         };
     }
 

@@ -25,6 +25,7 @@ public class GuiTextures {
     public static final Function<Text, Text> CENTER_SLOT_GENERIC = background("center_slot");
     public static final Function<Text, Text> FILL3 = background("fill3");
     public static final Function<Text, Text> TEXT_INPUT = backgroundAnvil("text_input");
+    public static final Function<Text, Text> DATA_EXTRACTOR = backgroundAnvil("data_extractor");
     public static final Supplier<GuiElementBuilder> EMPTY_BUILDER = icon16("empty");
     public static final GuiElement EMPTY = EMPTY_BUILDER.get().hideTooltip().build();
     public static final Supplier<GuiElementBuilder> POLYDEX_BUTTON = icon32("polydex");

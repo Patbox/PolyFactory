@@ -7,6 +7,9 @@ import eu.pb4.polyfactory.block.creative.CreativeDrainBlockEntity;
 import eu.pb4.polyfactory.block.creative.CreativeMotorBlockEntity;
 import eu.pb4.polyfactory.block.data.CableBlockEntity;
 import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlockEntity;
+import eu.pb4.polyfactory.block.data.InputTransformerBlockEntity;
+import eu.pb4.polyfactory.block.data.io.DataExtractorBlock;
+import eu.pb4.polyfactory.block.data.io.DataExtractorBlockEntity;
 import eu.pb4.polyfactory.block.data.output.HologramProjectorBlockEntity;
 import eu.pb4.polyfactory.block.data.output.NixieTubeBlockEntity;
 import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlockEntity;
@@ -120,6 +123,11 @@ public class FactoryBlockEntities {
             FabricBlockEntityTypeBuilder.create(RecordPlayerBlockEntity::new, FactoryBlocks.RECORD_PLAYER));
     public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer",  FabricBlockEntityTypeBuilder
             .create(DoubleInputTransformerBlockEntity::new, FactoryBlocks.ARITHMETIC_OPERATOR, FactoryBlocks.DATA_COMPARATOR));
+    public static final BlockEntityType<InputTransformerBlockEntity> INPUT_TRANSFORMER = register("input_transformer",  FabricBlockEntityTypeBuilder
+            .create(InputTransformerBlockEntity::new));
+
+    public static final BlockEntityType<DataExtractorBlockEntity> DATA_EXTRACTOR = register("data_extractor", FabricBlockEntityTypeBuilder
+            .create(DataExtractorBlockEntity::new, FactoryBlocks.DATA_EXTRACTOR));
 
     public static final BlockEntityType<WorkbenchBlockEntity> WORKBENCH = register("workbench",  FabricBlockEntityTypeBuilder
             .create(WorkbenchBlockEntity::new, FactoryBlocks.WORKBENCH));

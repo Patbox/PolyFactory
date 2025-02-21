@@ -13,8 +13,8 @@ public enum BasicDataType implements StringIdentifiable {
             (a, b) -> new LongData(a.asLong() + b.asLong()),
             (a, b) -> new LongData(a.asLong() - b.asLong()),
             (a, b) -> new LongData(a.asLong() * b.asLong()),
-            (a, b) -> new LongData(a.asLong() / b.asLong()),
-            (a, b) -> new LongData(a.asLong() % b.asLong())
+            (a, b) -> b.asLong() == 0 ? LongData.ZERO : new LongData(a.asLong() / b.asLong()),
+            (a, b) -> b.asLong() == 0 ? LongData.ZERO : new LongData(a.asLong() % b.asLong())
     ),
     DECIMAL("decimal", x -> new DoubleData(Double.parseDouble(x)),
             (a, b) -> new DoubleData(a.asDouble() + b.asDouble()),
