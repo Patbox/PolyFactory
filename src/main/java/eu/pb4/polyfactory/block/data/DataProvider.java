@@ -15,21 +15,21 @@ public interface DataProvider {
     @Nullable
     DataContainer provideData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataProviderNode node);
 
-    static int sendData(WorldView world, BlockPos selfPos, DataContainer data) {
-        if (world.getBlockEntity(selfPos) instanceof ChanneledDataCache be) {
+    static int sendData(@Nullable WorldView world, BlockPos selfPos, DataContainer data) {
+        if (world != null && world.getBlockEntity(selfPos) instanceof ChanneledDataCache be) {
             be.setCachedData(data);
             return sendData(world, selfPos, be.channel(), data);
         }
         return 0;
     }
 
-    static int sendData(WorldView world, BlockPos selfPos, int channel, DataContainer data) {
+    static int sendData(@Nullable WorldView world, BlockPos selfPos, int channel, DataContainer data) {
         return sendData(world, selfPos, channel, null, data);
     }
 
-    static int sendData(WorldView world, BlockPos selfPos, int channel, @Nullable Direction direction, DataContainer data) {
+    static int sendData(@Nullable WorldView world, BlockPos selfPos, int channel, @Nullable Direction direction, DataContainer data) {
         if (world instanceof ServerWorld serverWorld) {
-            return NetworkComponent.Data.getLogic(serverWorld, selfPos).pushDataUpdate(selfPos, channel, data, direction);
+            return NetworkComponent.Data.getLogic(serverWorld, selfPos, x -> x.getNode() instanceof DataProviderNode).pushDataUpdate(selfPos, channel, data, direction);
         }
         return 0;
     }

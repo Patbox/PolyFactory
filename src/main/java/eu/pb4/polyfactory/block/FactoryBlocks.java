@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.block.data.GatedCableBlock;
 import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.data.io.ArithmeticOperatorBlock;
 import eu.pb4.polyfactory.block.data.io.DataComparatorBlock;
+import eu.pb4.polyfactory.block.data.io.DataExtractorBlock;
 import eu.pb4.polyfactory.block.data.io.DataMemoryBlock;
 import eu.pb4.polyfactory.block.data.output.*;
 import eu.pb4.polyfactory.block.data.providers.*;
@@ -93,11 +94,9 @@ public class FactoryBlocks {
     public static final ArithmeticOperatorBlock ARITHMETIC_OPERATOR = register("arithmetic_operator",
             Block.Settings.copy(ITEM_COUNTER), ArithmeticOperatorBlock::new);
 
-    public static final DataComparatorBlock DATA_COMPARATOR = register("data_comparator",
-            Block.Settings.copy(ITEM_COUNTER), DataComparatorBlock::new);
-
-    public static final DataMemoryBlock DATA_MEMORY = register("data_memory",
-            Block.Settings.copy(ITEM_COUNTER), DataMemoryBlock::new);
+    public static final DataComparatorBlock DATA_COMPARATOR = register("data_comparator", Block.Settings.copy(ITEM_COUNTER), DataComparatorBlock::new);
+    public static final DataExtractorBlock DATA_EXTRACTOR = register("data_extractor", Block.Settings.copy(ITEM_COUNTER), DataExtractorBlock::new);
+    public static final DataMemoryBlock DATA_MEMORY = register("data_memory", Block.Settings.copy(ITEM_COUNTER), DataMemoryBlock::new);
 
     public static final HologramProjectorBlock HOLOGRAM_PROJECTOR = register("hologram_projector", Block.Settings.copy(SPLITTER), HologramProjectorBlock::new);
     public static final NixieTubeBlock NIXIE_TUBE = register("nixie_tube", Block.Settings.copy(Blocks.GLASS), settings -> new NixieTubeBlock(settings.nonOpaque()));

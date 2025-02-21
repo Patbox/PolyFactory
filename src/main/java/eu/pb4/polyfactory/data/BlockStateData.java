@@ -6,11 +6,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.registry.Registries;
+import net.minecraft.state.property.Property;
 import org.jetbrains.annotations.NotNull;
 
 public record BlockStateData(BlockState state) implements DataContainer {
     public static MapCodec<BlockStateData> TYPE_CODEC = BlockState.CODEC.xmap(BlockStateData::new, BlockStateData::state).fieldOf("value");
-
     @Override
     public DataType<BlockStateData> type() {
         return DataType.BLOCK_STATE;
@@ -38,10 +38,23 @@ public record BlockStateData(BlockState state) implements DataContainer {
 
     @Override
     public DataContainer extract(String field) {
-        return switch (field) {
-            case "type" -> new StringData(Registries.BLOCK.getId(this.state.getBlock()));
-            default -> DataContainer.empty();
-        };
+        if (field.equals("type")) {
+            return new StringData(Registries.BLOCK.getId(this.state.getBlock()));
+        }
+        if (field.startsWith("property:")) {
+            var property = this.state.getBlock().getStateManager().getProperty(field.substring("property:".length()));
+            var value = this.state.get(property);
+            if (value instanceof Boolean bool) {
+                return BoolData.of(bool);
+            } else if (value instanceof Integer integer) {
+                return new LongData(integer);
+            }
+
+            //noinspection unchecked
+            return new StringData(((Property) property).name(value));
+        }
+
+        return DataContainer.super.extract(field);
     }
 
 

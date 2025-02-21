@@ -1,10 +1,14 @@
 - Added Speaker Block:
   - This block can produce sound, by either being connected with Record Player or receiving correct data.
-  - Crafted with Steel Plates, Copper Ingots, Redstone and Jukebox.
-- Added Record Player
+  - Crafted with Steel Plates, Copper Ingots, Redstone Chip and Jukebox.
+- Added Record Player:
   - A data provider, that can be used to play Music Discs.
   - Doesn't produce sound on it own, needs to be connected to speakers through cables (while pointing at correct channel).
-  - Crafted with Steel Plates, Copper Ingots, Redstone and Jukebox.
+  - Crafted with Steel Plates, Copper Ingots, Redstone Chip and Jukebox.
+- Added Data Extractor:
+  - Allows to extract data from more complex data types (items, capacity, etc.).
+  - Has one input and one output.
+  - Crafted with Steel Plates, Lapis Lazuli, Redstone Chip and Cable
 - Mechanical Planters can now hold 9 stacks of items (previously could only hold 1).
 - Workbench now shows items stored in it.
 - Splash particles are no longer saved.

@@ -108,6 +108,7 @@ public class FactoryItems {
     public static final Item TEXT_INPUT = register(FactoryBlocks.TEXT_INPUT);
     public static final Item ARITHMETIC_OPERATOR = register(FactoryBlocks.ARITHMETIC_OPERATOR);
     public static final Item DATA_COMPARATOR = register(FactoryBlocks.DATA_COMPARATOR);
+    public static final Item DATA_EXTRACTOR = register(FactoryBlocks.DATA_EXTRACTOR);
     public static final Item DATA_MEMORY = register("data_memory", (settings) -> new DataMemoryBlockItem(FactoryBlocks.DATA_MEMORY, settings.useBlockPrefixedTranslationKey()));
     public static final Item NIXIE_TUBE_CONTROLLER = register(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
     public static final Item HOLOGRAM_PROJECTOR = register(FactoryBlocks.HOLOGRAM_PROJECTOR);
@@ -257,6 +258,7 @@ public class FactoryItems {
                     entries.add(HOLOGRAM_PROJECTOR);
                     entries.add(SPEAKER);
                     entries.add(DATA_MEMORY);
+                    entries.add(DATA_EXTRACTOR);
                     entries.add(DATA_COMPARATOR);
                     entries.add(ARITHMETIC_OPERATOR);
 

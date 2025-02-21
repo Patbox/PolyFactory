@@ -71,6 +71,8 @@ public class RecordPlayerBlockEntity extends ChanneledDataBlockEntity implements
         this.stopPlaying();
         if (song != null) {
             this.startPlaying(song.song().getEntry(this.world.getRegistryManager()).get());
+        } else {
+            DataProvider.sendData(this.world, pos, CapacityData.ZERO);
         }
         this.markDirty();
     }
@@ -166,6 +168,8 @@ public class RecordPlayerBlockEntity extends ChanneledDataBlockEntity implements
     public void startPlaying(RegistryEntry<JukeboxSong> song) {
         this.song = song;
         this.ticksSinceSongStarted = 0L;
+        assert this.world != null;
+        DataProvider.sendData(this.world, pos, new CapacityData(0, this.song.value().getLengthInTicks()));
         if (this.model != null) {
             this.model.startPlaying(song.value().soundEvent(), this.speakers, this.volume);
         }
