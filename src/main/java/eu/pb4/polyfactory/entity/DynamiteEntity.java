@@ -12,6 +12,7 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -62,7 +63,6 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
     protected void onBlockHit(BlockHitResult blockHitResult) {
         if (this.itemStack.isOf(FactoryItems.STICKY_DYNAMITE)) {
             this.stickToBlock = blockHitResult.getBlockPos();
-            this.move(MovementType.SELF, this.getVelocity());
             this.setVelocity(Vec3d.ZERO);
             return;
         }
@@ -76,34 +76,31 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
             return;
         }
         super.tick();
-
-        if (this.stickToBlock == null) {
-            HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit);
-            if (hitResult.getType() != HitResult.Type.MISS) {
-                this.hitOrDeflect(hitResult);
-            }
-        }
-        //this.checkBlockCollision();
         this.updateRotation();
 
-        boolean move = true;
         if (this.stickToBlock != null) {
-            move = false;
-
             var state = this.getWorld().getBlockState(this.stickToBlock);
             if (state.getCollisionShape(this.getWorld(), this.stickToBlock).isEmpty()) {
                 this.stickToBlock = null;
             }
         }
+        if (this.age == 6 && this.getOwner() instanceof ServerPlayerEntity player) {
+            player.networkHandler.sendPacket(new EntityTrackerUpdateS2CPacket(this.getId(),
+                    List.of(DataTracker.SerializedEntry.of(DisplayTrackedData.Item.ITEM, this.itemStack))));
+        }
 
-        if (move) {
-            this.move(MovementType.SELF, this.getVelocity());
-
+        if (this.stickToBlock == null) {
             if (!this.hasNoGravity()) {
-                this.setVelocity(this.getVelocity().add(0.0, -0.04, 0.0));
+                this.applyGravity();
             }
 
             this.setVelocity(this.getVelocity().multiply(0.98));
+
+            HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit);
+            this.setPosition(hitResult.getPos().subtract(this.getVelocity().normalize().multiply(0.1f)));
+            if (hitResult.getType() != HitResult.Type.MISS) {
+                this.hitOrDeflect(hitResult);
+            }
 
             if (this.isOnGround()) {
                 this.setVelocity(this.getVelocity().multiply(0.8, -0.8, 0.8));
@@ -137,6 +134,11 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
     }
 
     @Override
+    protected double getGravity() {
+        return 0.04f;
+    }
+
+    @Override
     public EntityType<?> getPolymerEntityType(PacketContext context) {
         return EntityType.ITEM_DISPLAY;
     }
@@ -144,10 +146,10 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
     @Override
     public void modifyRawTrackedData(List<DataTracker.SerializedEntry<?>> data, ServerPlayerEntity player, boolean initial) {
         if (initial) {
-            data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.TELEPORTATION_DURATION, 2));
+            data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.TELEPORTATION_DURATION, 3));
             data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.SCALE, new Vector3f(0.6f)));
             data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.BILLBOARD, (byte) DisplayEntity.BillboardMode.CENTER.ordinal()));
-            data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.Item.ITEM, this.itemStack));
+            data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.Item.ITEM, this.age < 4 && this.isOwner(player) ? ItemStack.EMPTY : this.itemStack));
             data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.Item.ITEM_DISPLAY, ModelTransformationMode.FIXED.getIndex()));
         }
     }

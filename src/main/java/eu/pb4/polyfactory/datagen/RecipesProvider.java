@@ -741,6 +741,9 @@ class RecipesProvider extends FabricRecipeProvider {
                                 OutputStack.of(FactoryItems.SAW_DUST, 0.8f, 6), OutputStack.of(Items.STICK, 0.4f, 8)),
                         GrindingRecipe.of("stone_to_cobblestone", Ingredient.ofItems(Items.STONE), 2, 5, 15, Items.COBBLESTONE),
                         GrindingRecipe.of("cobblestone_to_gravel", Ingredient.ofItems(Items.COBBLESTONE), 4, 6, 15, Items.GRAVEL),
+                        GrindingRecipe.of("diorite_to_gravel", Ingredient.ofItems(Items.DIORITE), 4, 6, 15, OutputStack.of(Items.GRAVEL), OutputStack.of(Items.QUARTZ, 0.05f, 1)),
+                        GrindingRecipe.of("andesite_to_gravel", Ingredient.ofItems(Items.ANDESITE), 4, 6, 15, OutputStack.of(Items.GRAVEL), OutputStack.of(Items.QUARTZ, 0.05f, 1)),
+                        GrindingRecipe.of("granite_to_gravel", Ingredient.ofItems(Items.GRANITE), 4, 6, 15, OutputStack.of(Items.GRAVEL), OutputStack.of(Items.QUARTZ, 0.1f, 1)),
                         GrindingRecipe.of("gravel_to_sand", Ingredient.ofItems(Items.GRAVEL), 4, 3, 15, Items.SAND),
 
                         GrindingRecipe.of("iron_ingot_to_nuggets", Ingredient.ofItems(Items.IRON_INGOT), 2, 5, 10, new ItemStack(Items.IRON_NUGGET, 9)),

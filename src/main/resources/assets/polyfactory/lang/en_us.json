@@ -238,6 +238,7 @@
   "data_type.polyfactory.capacity": "Capacity",
   "data_type.polyfactory.invalid": "Error",
   "data_type.polyfactory.empty": "Empty",
+  "data_type.polyfactory.map": "Entry Map",
 
   "data_type_field.polyfactory.any.integer.desc": "Value as integer",
   "data_type_field.polyfactory.any.decimal.desc": "Value as decimal",
@@ -249,7 +250,7 @@
   "data_type_field.polyfactory.sound_event.volume.desc": "Sound Volume",
   "data_type_field.polyfactory.sound_event.pitch.desc": "Sound Pitch",
   "data_type_field.polyfactory.block_state.type.desc": "Block Id",
-  "data_type_field.polyfactory.block_state.property:*.desc": "Value of the block state property (replace * with name).",
+  "data_type_field.polyfactory.block_state.property:*.desc": "Value of the block state property (replace * with name)",
   "data_type_field.polyfactory.item_stack.type.desc": "Item Id",
   "data_type_field.polyfactory.item_stack.count.desc": "Item Count",
   "data_type_field.polyfactory.item_stack.name.desc": "Item Name",
@@ -260,6 +261,9 @@
   "data_type_field.polyfactory.capacity.stored.desc": "Stored amount",
   "data_type_field.polyfactory.capacity.capacity.desc": "Storage capacity",
   "data_type_field.polyfactory.capacity.percent.desc": "Percent of filled storage",
+  "data_type_field.polyfactory.map.size.desc": "Count of entries",
+  "data_type_field.polyfactory.map.key:*.desc": "Value by key (replace * with key)",
+  "data_type_field.polyfactory.map.exists:*.desc": "If key exists (replace * with key)",
 
   "fluid_type.minecraft.water": "Water",
   "fluid_type.minecraft.lava": "Lava",
