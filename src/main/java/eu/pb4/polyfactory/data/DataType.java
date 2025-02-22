@@ -34,6 +34,7 @@ public record DataType<T extends DataContainer>(String id, MapCodec<T> codec, Li
     public static final DataType<ItemStackData> ITEM_STACK = new DataType<>("item_stack", ItemStackData.TYPE_CODEC, "type", "count", "name", "damage");
     public static final DataType<CapacityData> CAPACITY = new DataType<>("capacity", CapacityData.TYPE_CODEC, "stored", "capacity", "percent");
     public static final DataType<InvalidData> INVALID = new DataType<>("invalid", InvalidData.TYPE_CODEC);
+    public static final DataType<MapData> MAP = new DataType<>("map", MapData.TYPE_CODEC, "size", "key:*", "exists:*");
     public static final DataType<EmptyData> EMPTY = new DataType<>("empty", EmptyData.TYPE_CODEC);
 
     @SuppressWarnings({"rawtypes", "unchecked"})

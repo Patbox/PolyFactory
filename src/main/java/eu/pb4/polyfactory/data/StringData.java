@@ -50,6 +50,12 @@ public record StringData(String value) implements DataContainer {
     }
 
     @Override
+    public DataContainer extract(String field) {
+        if (field.equals("length")) return new LongData(value.length());
+        return DataContainer.super.extract(field);
+    }
+
+    @Override
     public int compareTo(@NotNull DataContainer o) {
         return this.value.compareTo(o.asString());
     }
