@@ -20,6 +20,14 @@ import eu.pb4.polyfactory.block.data.providers.ItemReaderBlockEntity;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlockEntity;
 import eu.pb4.polyfactory.block.fluids.*;
+import eu.pb4.polyfactory.block.mechanical.EjectorBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.FanBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.machines.MinerBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.machines.PlacerBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.*;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlockEntity;
@@ -61,8 +69,9 @@ public class FactoryBlockEntities {
             BlockEntityType.Builder.create(SplitterBlockEntity::new, FactoryBlocks.SPLITTER));
 
     public static final BlockEntityType<FanBlockEntity> FAN = register("fan",
-            BlockEntityType.Builder.create(FanBlockEntity::new, FactoryBlocks.FAN));
-
+             FabricBlockEntityTypeBuilder.create(FanBlockEntity::new, FactoryBlocks.FAN));
+    public static final BlockEntityType<EjectorBlockEntity> EJECTOR = register("ejector",
+            FabricBlockEntityTypeBuilder.create(EjectorBlockEntity::new, FactoryBlocks.EJECTOR));
     public static final BlockEntityType<HandCrankBlockEntity> HAND_CRANK = register("hand_crank",
             BlockEntityType.Builder.create(HandCrankBlockEntity::new, FactoryBlocks.HAND_CRANK));
 

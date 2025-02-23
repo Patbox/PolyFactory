@@ -60,6 +60,7 @@ public class FactoryBlocks {
     public static final FunnelBlock FUNNEL = register("funnel", Block.Settings.copy(Blocks.SPRUCE_TRAPDOOR), settings -> new FunnelBlock(settings.nonOpaque()));
     public static final SplitterBlock SPLITTER = register("splitter", settings -> new SplitterBlock(settings.mapColor(MapColor.STONE_GRAY).instrument(NoteBlockInstrument.BASEDRUM).requiresTool().strength(3.3F).nonOpaque()));
     public static final FanBlock FAN = register("fan", settings -> new FanBlock(settings.nonOpaque().hardness(1)));
+    public static final EjectorBlock EJECTOR = register("ejector", settings -> new EjectorBlock(settings.nonOpaque().hardness(1)));
     public static final SelectivePassthroughBlock METAL_GRID = register("metal_grid", Block.Settings.copy(Blocks.IRON_BLOCK), settings -> new SelectivePassthroughBlock(settings.strength(4.0F, 3.0F).nonOpaque()));
     public static final HandCrankBlock HAND_CRANK = register("hand_crank", settings -> new HandCrankBlock(settings.hardness(1).nonOpaque()));
     public static final SteamEngineBlock STEAM_ENGINE = register("steam_engine", Block.Settings.copy(SPLITTER), settings -> new SteamEngineBlock(settings.strength(4F).nonOpaque()));

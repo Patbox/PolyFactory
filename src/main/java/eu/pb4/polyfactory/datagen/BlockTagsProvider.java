@@ -91,6 +91,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                         FactoryBlocks.MINER,
                         FactoryBlocks.SPLITTER)
                 .add(FactoryBlocks.MIXER)
+                .add(FactoryBlocks.EJECTOR)
                 .add(FactoryBlocks.PLANTER)
                 .add(FactoryBlocks.PLACER)
                 .add(FactoryBlocks.STEAM_ENGINE)

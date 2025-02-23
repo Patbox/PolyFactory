@@ -1,0 +1,238 @@
+package eu.pb4.polyfactory.block.mechanical;
+
+import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.models.RotationAwareModel;
+import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
+import eu.pb4.polyfactory.nodes.mechanical.RotationData;
+import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.LastFanEffectedTickConsumer;
+import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
+import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.Properties;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import net.minecraft.world.block.WireOrientation;
+import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+
+import static eu.pb4.polyfactory.util.FactoryUtil.id;
+
+public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider, WrenchableBlock {
+    public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
+    public static final BooleanProperty ENABLED = Properties.ENABLED;
+    private static final List<WrenchAction> WRENCH_ACTIONS = List.of(
+            WrenchAction.FACING_HORIZONTAL,
+            WrenchAction.ofBlockEntityString("angle", EjectorBlockEntity.class,
+                    x -> String.format(Locale.ROOT, "%.1f", x.angle()),
+                    (x, n) -> x.setAngle(FactoryUtil.wrap(x.angle() + (n ? 5f : -5f), 10, 75))),
+            WrenchAction.ofBlockEntityString("strength", EjectorBlockEntity.class,
+                    x -> String.format(Locale.ROOT, "%.1f", x.strength()),
+                    (x, n) -> x.setStrength(FactoryUtil.wrap(x.strength() + (n ? 0.5f : -0.5f), 1, 3)))
+            );
+
+
+    public EjectorBlock(Settings settings) {
+        super(settings);
+        setDefaultState(getDefaultState().with(ENABLED, true));
+    }
+
+    @Nullable
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing());
+    }
+
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (!oldState.isOf(state.getBlock())) {
+            this.updateEnabled(world, pos, state);
+        }
+        super.onBlockAdded(state,world,pos, oldState, notify);
+    }
+
+    @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
+        this.updateEnabled(world, pos, state);
+        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
+    }
+
+    private void updateEnabled(World world, BlockPos pos, BlockState state) {
+        boolean powered = world.isReceivingRedstonePower(pos);
+        if (powered == state.get(ENABLED)) {
+            world.setBlockState(pos, state.with(ENABLED, !powered), 4);
+        }
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING, ENABLED);
+    }
+
+    @Override
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        return List.of(new FunctionalAxisNode(state.get(FACING).rotateYClockwise().getAxis()));
+    }
+
+    @Override
+    public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
+        if (!(world.getBlockEntity(pos) instanceof EjectorBlockEntity be) || be.progress() < 1 || !state.get(ENABLED)) {
+            return;
+        }
+
+        be.setProgress(0);
+
+        var rot = state.get(FACING).rotateYClockwise();
+        var vec = new Vec3d(state.get(FACING).getUnitVector()
+                .rotateAxis(be.angle() * MathHelper.RADIANS_PER_DEGREE, rot.getOffsetX(), rot.getOffsetY(), rot.getOffsetZ())
+                .mul(1 / 0.98f, 1 / 0.98f, 1 / 0.98f)
+                .mul(be.strength()))
+                .add(0, entity.getFinalGravity(), 0);
+        entity.addVelocity(vec);
+        if (entity instanceof ServerPlayerEntity player) {
+            FactoryUtil.sendVelocityDelta(player, vec);
+        } else if (entity instanceof LastFanEffectedTickConsumer c) {
+            c.polyfactory$setLastFanTick();
+        }
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new EjectorBlockEntity(pos, state);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return world instanceof ServerWorld && type == FactoryBlockEntities.EJECTOR ? EjectorBlockEntity::tick : null;
+    }
+
+    @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.transform(state, rotation::rotate, FACING);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.transform(state, mirror::apply, FACING);
+    }
+
+    @Override
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
+        return Blocks.BARRIER.getDefaultState();
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
+        return Blocks.IRON_BLOCK.getDefaultState();
+    }
+
+    @Override
+    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return new Model(initialBlockState);
+    }
+
+    @Override
+    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return true;
+    }
+
+    @Override
+    public List<WrenchAction> getWrenchActions() {
+        return WRENCH_ACTIONS;
+    }
+
+    @Override
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+        if (world.getBlockEntity(pos) instanceof EjectorBlockEntity be) {
+            be.updateRotationalData(modifier, state, world, pos);
+        }
+    }
+    public static final class Model extends RotationAwareModel {
+        public static final ItemStack BASE_MODEL = ItemDisplayElementUtil.getModel(id("block/ejector_base"));
+        public static final ItemStack PLATE_MODEL = ItemDisplayElementUtil.getModel(id("block/ejector_plate"));
+        public static final ItemStack LINK_MODEL = ItemDisplayElementUtil.getModel(id("block/ejector_link"));
+
+        private final ItemDisplayElement base;
+        private final ItemDisplayElement plate;
+        private final ItemDisplayElement link;
+        private float progress = -1;
+
+
+        private Model(BlockState state) {
+            this.base = ItemDisplayElementUtil.createSimple(BASE_MODEL);
+            this.plate = ItemDisplayElementUtil.createSimple(PLATE_MODEL);
+            this.plate.setInterpolationDuration(3);
+            this.link = ItemDisplayElementUtil.createSimple(LINK_MODEL);
+            this.link.setInterpolationDuration(3);
+            this.updateStatePos(state);
+            this.updateProgress(0);
+            this.addElement(this.base);
+            this.addElement(this.plate);
+            this.addElement(this.link);
+
+        }
+
+        private void updateStatePos(BlockState state) {
+            var dir = state.get(FACING);
+            float y = dir.getPositiveHorizontalDegrees();
+            this.base.setYaw(y);
+            this.plate.setYaw(y);
+            this.link.setYaw(y);
+        }
+
+        public void updateProgress(float progress) {
+            if (this.progress == progress) {
+                return;
+            }
+            this.progress = progress;
+            this.plate.setTransformation(mat().translate(0, 5 / 16f, 7 / 16f).rotateX(progress));
+            this.link.setTransformation(mat().translate(0, 5 / 16f, 7 / 16f).rotateX(progress).translate(0, 0, -10 / 16f).rotateX(-progress / 2));
+        }
+
+        @Override
+        protected void onTick() {
+            if (this.plate.isDirty()) {
+                this.plate.startInterpolation();
+                this.link.startInterpolation();
+            }
+        }
+
+        @Override
+        public void notifyUpdate(HolderAttachment.UpdateType updateType) {
+            if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
+                updateStatePos(this.blockState());
+            }
+        }
+    }
+}
