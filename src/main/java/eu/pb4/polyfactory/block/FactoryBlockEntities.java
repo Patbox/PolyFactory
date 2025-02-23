@@ -11,6 +11,8 @@ import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlockEntity;
 import eu.pb4.polyfactory.block.data.InputTransformerBlockEntity;
 import eu.pb4.polyfactory.block.data.io.DataExtractorBlock;
 import eu.pb4.polyfactory.block.data.io.DataExtractorBlockEntity;
+import eu.pb4.polyfactory.block.data.io.DataMemoryBlock;
+import eu.pb4.polyfactory.block.data.io.DataMemoryBlockEntity;
 import eu.pb4.polyfactory.block.data.output.HologramProjectorBlockEntity;
 import eu.pb4.polyfactory.block.data.output.NixieTubeControllerBlockEntity;
 import eu.pb4.polyfactory.block.data.providers.RecordPlayerBlockEntity;
@@ -103,11 +105,14 @@ public class FactoryBlockEntities {
             BlockEntityType.Builder.create(CreativeContainerBlockEntity::new, FactoryBlocks.CREATIVE_CONTAINER));
 
     public static final BlockEntityType<CreativeMotorBlockEntity> CREATIVE_MOTOR = register("creative_motor",
-            BlockEntityType.Builder.create(CreativeMotorBlockEntity::new, FactoryBlocks.CREATIVE_MOTOR));
-    public static final BlockEntityType<ChanneledDataBlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache",
-            BlockEntityType.Builder.create(ChanneledDataBlockEntity::new, FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
+             FabricBlockEntityTypeBuilder.create(CreativeMotorBlockEntity::new, FactoryBlocks.CREATIVE_MOTOR));
+    public static final BlockEntityType<BlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache",
+             FabricBlockEntityTypeBuilder.create(ChanneledDataBlockEntity::migrating, FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
                     FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER, FactoryBlocks.BLOCK_OBSERVER, FactoryBlocks.DATA_MEMORY, FactoryBlocks.TEXT_INPUT,
                      FactoryBlocks.SPEAKER));
+
+    public static final BlockEntityType<DataMemoryBlockEntity> DATA_MEMORY = register("data_memory",
+            FabricBlockEntityTypeBuilder.create(DataMemoryBlockEntity::new, FactoryBlocks.DATA_MEMORY));
 
     public static final BlockEntityType<HologramProjectorBlockEntity> HOLOGRAM_PROJECTOR = register("hologram_projector",
             BlockEntityType.Builder.create(HologramProjectorBlockEntity::new, FactoryBlocks.HOLOGRAM_PROJECTOR));

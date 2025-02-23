@@ -8,12 +8,20 @@ import eu.pb4.polyfactory.data.SoundEventData;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverSelectiveSideNode;
 import eu.pb4.polyfactory.nodes.data.DataReceiverNode;
 import eu.pb4.polyfactory.nodes.data.SpeakerNode;
+import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
+import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.NoteBlockInstrument;
+import net.minecraft.network.packet.s2c.play.PlaySoundFromEntityS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -43,10 +51,12 @@ public class SpeakerBlock extends GenericCabledDataBlock implements DataReceiver
         var soundEvent = Registries.SOUND_EVENT.getEntry(SoundEvents.INTENTIONALLY_EMPTY);
         var volume = 1f;
         var pitch = 1f;
+        var seed = 0L;
         if (data instanceof SoundEventData soundEventData) {
             soundEvent = soundEventData.soundEvent();
             volume = soundEventData.volume();
             pitch = soundEventData.pitch();
+            seed = soundEventData.seed();
         } else {
             var notFound = true;
             var parts = data.asString().split(" ", 4);
@@ -72,15 +82,44 @@ public class SpeakerBlock extends GenericCabledDataBlock implements DataReceiver
             }
 
             if (notFound) {
-                //soundEvent = Registries.SOUND_EVENT.getEntry(SoundEvents.ENTITY_ITEM_PICKUP);
-                //pitch = (float) Math.abs((data.asDouble() / 10) % 1.5 + 0.5);
                 return false;
             }
         }
 
+        var x = BlockAwareAttachment.get(world, selfPos);
+        if (x != null && x.holder() instanceof Model model) {
+            model.playSound(soundEvent, Math.min(volume, 1.5f), pitch, seed);
+        }
+
         var facing = Vec3d.ofCenter(selfPos).offset(selfState.get(FACING), 0.6);
-        world.playSound(null, facing.x, facing.y, facing.z, soundEvent, SoundCategory.RECORDS, Math.min(volume, 1.5f), pitch);
         world.spawnParticles(ParticleTypes.NOTE, facing.x, facing.y, facing.z, 0, pitch / 24, 0, 0, 1);
         return true;
+    }
+
+    @Override
+    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+        return new Model(initialBlockState);
+    }
+
+    public static class Model extends GenericCabledDataBlock.Model {
+        private final ItemDisplayElement soundSource = new ItemDisplayElement();
+        protected Model(BlockState state) {
+            super(state);
+            this.soundSource.setInvisible(true);
+            this.updateStatePos(state);
+            this.addElement(this.soundSource);
+        }
+
+        @Override
+        protected void updateStatePos(BlockState state) {
+            super.updateStatePos(state);
+            if (this.soundSource != null) {
+                this.soundSource.setOffset(state.get(FACING).getDoubleVector().multiply(0.5));
+            }
+        }
+
+        public void playSound(RegistryEntry<SoundEvent> sound, float volume, float pitch, long seed) {
+            this.sendPacket(VirtualEntityUtils.createPlaySoundFromEntityPacket(this.soundSource.getEntityId(), sound, SoundCategory.RECORDS, volume, pitch, seed));
+        }
     }
 }

@@ -1,6 +1,0 @@
-{
-	"parent": "polyfactory:block/data_memory",
-	"textures": {
-		"1": "polyfactory:block/cable/data_io/data_memory_powered"
-	}
-}

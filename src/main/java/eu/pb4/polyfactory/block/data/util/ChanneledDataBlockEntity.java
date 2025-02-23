@@ -3,7 +3,9 @@ package eu.pb4.polyfactory.block.data.util;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
+import eu.pb4.polyfactory.block.data.io.DataMemoryBlockEntity;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.StringData;
@@ -12,6 +14,7 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.nbt.NbtCompound;
@@ -107,6 +110,13 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
 
     public ChanneledDataBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.PROVIDER_DATA_CACHE, pos, state);
+    }
+
+    public static BlockEntity migrating(BlockPos pos, BlockState state) {
+        if (state.isOf(FactoryBlocks.DATA_MEMORY)) {
+            return new DataMemoryBlockEntity(pos, state);
+        }
+        return new ChanneledDataBlockEntity(pos, state);
     }
 
     protected ChanneledDataBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {

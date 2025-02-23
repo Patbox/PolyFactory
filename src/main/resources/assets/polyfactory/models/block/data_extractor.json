@@ -1,5 +1,4 @@
 {
-	"credit": "Made with Blockbench",
 	"parent": "polyfactory:block/arithmetic_operator",
 	"textures": {
 		"0": "polyfactory:block/cable/data_io/extractor_outside",

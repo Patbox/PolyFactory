@@ -12,12 +12,13 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.NotNull;
 
-public record SoundEventData(RegistryEntry<SoundEvent> soundEvent, float volume, float pitch) implements DataContainer {
+public record SoundEventData(RegistryEntry<SoundEvent> soundEvent, float volume, float pitch, long seed) implements DataContainer {
 
     public static MapCodec<SoundEventData> TYPE_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     Registries.SOUND_EVENT.getEntryCodec().fieldOf("event").forGetter(SoundEventData::soundEvent),
                     Codec.FLOAT.optionalFieldOf("volume", 1f).forGetter(SoundEventData::volume),
-                    Codec.FLOAT.optionalFieldOf("pitch", 1f).forGetter(SoundEventData::pitch)
+                    Codec.FLOAT.optionalFieldOf("pitch", 1f).forGetter(SoundEventData::pitch),
+                    Codec.LONG.optionalFieldOf("seed", 0L).forGetter(SoundEventData::seed)
             ).apply(instance, SoundEventData::new)
     );
 

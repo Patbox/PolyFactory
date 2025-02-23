@@ -1,0 +1,22 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "polyfactory:block/cable/data_io/data_memory_cover",
+		"particle": "polyfactory:block/cable/data_io/data_memory_cover"
+	},
+	"elements": [
+		{
+			"name": "overlay",
+			"from": [0, 0, -0.01],
+			"to": [16, 16, 0.09],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#0"},
+				"east": {"uv": [0, 0, 0.1, 16], "texture": "#0"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#0"},
+				"west": {"uv": [15, 0, 15.1, 16], "texture": "#0"},
+				"up": {"uv": [0, 0, 16, 1], "texture": "#0"},
+				"down": {"uv": [0, 15, 16, 15.1], "texture": "#0"}
+			}
+		}
+	]
+}

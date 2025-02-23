@@ -382,8 +382,8 @@ public class FactoryUtil {
         return world.getClosestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, distance, false);
     }
 
-    public static Text asText(Direction dir) {
-        return Text.translatable("text.polyfactory.direction." + dir);
+    public static Text asText(@Nullable Direction dir) {
+        return Text.translatable("text.polyfactory.direction." + (dir != null ? dir.asString() : "none"));
     }
 
     public static void setSafeVelocity(Entity entity, Vec3d vec) {
