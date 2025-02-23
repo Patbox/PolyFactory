@@ -1,0 +1,39 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "polyfactory:block/ejector/side_rotation",
+		"1": "polyfactory:block/steel_plate_base",
+		"2": "polyfactory:block/ejector/side_back",
+		"4": "polyfactory:block/ejector/inner_base",
+		"5": "polyfactory:block/ejector/inner_attach",
+		"6": "polyfactory:block/ejector/side",
+		"particle": "polyfactory:block/ejector/side_rotation"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 12, 16],
+			"faces": {
+				"north": {"uv": [0, 4, 16, 16], "texture": "#6"},
+				"east": {"uv": [0, 4, 16, 16], "texture": "#0"},
+				"south": {"uv": [0, 4, 16, 16], "texture": "#2"},
+				"west": {"uv": [0, 4, 16, 16], "texture": "#0"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#4"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#1"}
+			}
+		},
+		{
+			"from": [1, 12, 1],
+			"to": [15, 14, 4],
+			"rotation": {"angle": 0, "axis": "y", "origin": [1, 12, 1]},
+			"faces": {
+				"north": {"uv": [0, 3, 14, 5], "texture": "#5"},
+				"east": {"uv": [0, 5, 3, 7], "texture": "#5"},
+				"south": {"uv": [0, 3, 14, 5], "texture": "#5"},
+				"west": {"uv": [3, 5, 6, 7], "texture": "#5"},
+				"up": {"uv": [0, 0, 14, 3], "texture": "#5"},
+				"down": {"uv": [0, 0, 14, 3], "texture": "#5"}
+			}
+		}
+	]
+}

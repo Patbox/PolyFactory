@@ -1,0 +1,22 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "polyfactory:block/ejector/inner_attach",
+		"particle": "polyfactory:block/ejector/inner_attach"
+	},
+	"elements": [
+		{
+			"from": [6, -3, 7],
+			"to": [10, 9, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 1, 1]},
+			"faces": {
+				"north": {"uv": [4, 12, 16, 16], "rotation": 90, "texture": "#0"},
+				"east": {"uv": [4, 10, 16, 12], "rotation": 90, "texture": "#0"},
+				"south": {"uv": [4, 12, 16, 16], "rotation": 90, "texture": "#0"},
+				"west": {"uv": [4, 10, 16, 12], "rotation": 90, "texture": "#0"},
+				"up": {"uv": [2, 12, 4, 16], "rotation": 90, "texture": "#0"},
+				"down": {"uv": [0, 12, 2, 16], "rotation": 90, "texture": "#0"}
+			}
+		}
+	]
+}

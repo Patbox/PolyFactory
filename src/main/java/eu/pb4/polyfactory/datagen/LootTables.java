@@ -39,6 +39,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.MINER);
         this.addDrop(FactoryBlocks.PLANTER);
         this.addDrop(FactoryBlocks.FAN);
+        this.addDrop(FactoryBlocks.EJECTOR);
         this.addDrop(FactoryBlocks.GRINDER);
         this.addDrop(FactoryBlocks.PLACER);
         this.addDrop(FactoryBlocks.STEEL_BUTTON);

@@ -54,6 +54,7 @@ public class FactoryItems {
     public static final Item FUNNEL = register(FactoryBlocks.FUNNEL);
     public static final Item SPLITTER = register(FactoryBlocks.SPLITTER);
     public static final Item FAN = register(FactoryBlocks.FAN);
+    public static final Item EJECTOR = register(FactoryBlocks.EJECTOR);
     public static final Item HAND_CRANK = register(FactoryBlocks.HAND_CRANK);
     public static final Item STEAM_ENGINE = register(FactoryBlocks.STEAM_ENGINE);
     public static final Item GRINDER = register(FactoryBlocks.GRINDER);
@@ -214,6 +215,7 @@ public class FactoryItems {
                     entries.add(ITEM_FILTER);
 
                     // Rotation other?
+                    entries.add(EJECTOR);
                     entries.add(TURNTABLE);
 
                     // Crafting/Machines
