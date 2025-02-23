@@ -39,6 +39,9 @@ public record WrenchAction(String id, Text name, WrenchValueGetter value, Wrench
         return new WrenchAction(id, name, value, action, alt);
     }
 
+    public static WrenchAction of(Property<?> property) {
+        return of(property.getName(), property);
+    }
     public static WrenchAction of(String id, Property<?> property) {
         return new WrenchAction(id, Text.translatable("item.polyfactory.wrench.action." + id),
                 WrenchValueGetter.ofProperty(property), WrenchApplyAction.ofProperty(property));

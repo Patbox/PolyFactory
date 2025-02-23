@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
+import eu.pb4.polyfactory.block.other.StatePropertiesCodecPatcher;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchApplyAction;
@@ -30,7 +31,6 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -39,7 +39,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.List;
 import java.util.stream.Stream;
 
-public abstract class GenericCabledDataBlock extends AbstractCableBlock implements FactoryBlock, WrenchableBlock, BlockEntityProvider, CableConnectable {
+public abstract class GenericCabledDataBlock extends AbstractCableBlock implements FactoryBlock, WrenchableBlock, BlockEntityProvider, CableConnectable, StatePropertiesCodecPatcher {
     public static final EnumProperty<Direction> FACING = Properties.FACING;
 
 
@@ -65,33 +65,14 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
         super(settings);
     }
 
-    public static MapCodec<BlockState> modifyPropertiesCodec(MapCodec<BlockState> codec) {
-        return new MapCodec<BlockState>() {
-            @Override
-            public <T> RecordBuilder<T> encode(BlockState input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
-                return codec.encode(input, ops, prefix);
+    public MapCodec<BlockState> modifyPropertiesCodec(MapCodec<BlockState> codec) {
+        return StatePropertiesCodecPatcher.modifier(codec, (state, ops, input) -> {
+            var facing = state.get(FACING);
+            if (input.get(facing.getOpposite().asString()) == null) {
+                return state.with(FACING_PROPERTIES.get(facing.getOpposite()), true);
             }
-
-            @Override
-            public <T> DataResult<BlockState> decode(DynamicOps<T> ops, MapLike<T> input) {
-                var result = codec.decode(ops, input);
-                if (result.result().isPresent()) {
-                    var state = result.result().get();
-
-                    var facing = state.get(FACING);
-                    if (input.get(facing.getOpposite().asString()) == null) {
-                        return DataResult.success(state.with(FACING_PROPERTIES.get(facing.getOpposite()), true));
-                    }
-                }
-
-                return result;
-            }
-
-            @Override
-            public <T> Stream<T> keys(DynamicOps<T> ops) {
-                return codec.keys(ops);
-            }
-        };
+            return state;
+        });
     }
 
     @Override

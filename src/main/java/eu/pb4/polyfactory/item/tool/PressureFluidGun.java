@@ -51,7 +51,7 @@ public class PressureFluidGun extends Item implements PolymerItem {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
-        if (!selected && entity instanceof LivingEntity livingEntity) {
+        if (entity instanceof LivingEntity livingEntity && livingEntity.getActiveItem() != stack) {
             onStoppedUsing(stack, world, livingEntity, 0);
         }
     }

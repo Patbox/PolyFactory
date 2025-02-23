@@ -216,6 +216,7 @@
   "text.polyfactory.direction.south": "South",
   "text.polyfactory.direction.east": "East",
   "text.polyfactory.direction.west": "West",
+  "text.polyfactory.direction.none": "None",
 
   "text.polyfactory.half.bottom": "Bottom",
   "text.polyfactory.half.top": "Top",
