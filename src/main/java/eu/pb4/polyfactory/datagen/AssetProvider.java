@@ -147,6 +147,8 @@ class AssetProvider implements DataProvider {
                 new BasicItemModel(id("block/redstone_input_overlay"), List.of(new CustomModelDataTintSource(0, 0xFF0000))), ItemAsset.Properties.DEFAULT));
         consumer.accept(id("-/block/redstone_output_overlay"), new ItemAsset(
                 new BasicItemModel(id("block/redstone_output_overlay"), List.of(new CustomModelDataTintSource(0, 0xFF0000))), ItemAsset.Properties.DEFAULT));
+
+        consumer.accept(id("placeholder"), new ItemAsset(new BasicItemModel(id("item/placeholder")), ItemAsset.Properties.DEFAULT));
     }
 
     @Override

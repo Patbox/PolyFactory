@@ -1,5 +1,7 @@
 - Added Speaker Block:
   - This block can produce sound, by either being connected with Record Player or receiving correct data.
+  - Supported string data uses format: `INSTRUMENT PITCH VOLUME`, where instrument is Noteblock instrument, pitch is decimal number from 0 to 2 and volume is a number between 0 and 1.
+  - It can also play direct sound data, but there is nothing generating that yet.
   - Crafted with Steel Plates, Copper Ingots, Redstone Chip and Jukebox.
 - Added Record Player:
   - A data provider, that can be used to play Music Discs.
@@ -9,7 +11,12 @@
   - Allows to extract data from more complex data types (items, capacity, etc.).
   - Has one input and one output.
   - Configured by just clicking on it and providing field name to extract.
-  - Crafted with Steel Plates, Lapis Lazuli, Redstone Chip and Cable
+  - Crafted with Steel Plates, Lapis Lazuli, Redstone Chip and Cable.
+- Added Mechanical Ejector:
+  - Pretty much just a configurable launchpad powered by rotation!
+  - You can change its strength (from 1 to 3) and angle (from 10 to 75).
+  - It needs to recharge after use, with time depending on strength.
+  - Crafted with Steel Places, Wooden Plates, Steel Gear and an Axle.
 - Data Memory now has separate input and output, with their own channels.
 - Mechanical Planters can now hold 9 stacks of items (previously could only hold 1).
 - New griding recipes:
@@ -23,3 +30,4 @@
 - You now need to hold Wrench as cursor item to toggle Data Memory Block item's Read Only state:
   - This fixes the Data Memory Block's item being unmovable in inventory.
 - Fixed Pressure Fluid Gun not working correctly in offhand.
+- Fixed Wireless Redstone sounds not working.

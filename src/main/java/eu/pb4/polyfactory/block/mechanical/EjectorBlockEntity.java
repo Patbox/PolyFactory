@@ -25,6 +25,8 @@ public class EjectorBlockEntity extends BlockEntity implements BlockEntityExtraL
 
     private float strength = 2;
 
+    private long ignoredTick = -1;
+
     public EjectorBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.EJECTOR, pos, state);
     }
@@ -92,8 +94,16 @@ public class EjectorBlockEntity extends BlockEntity implements BlockEntityExtraL
         this.progress = Math.min(progress, 1);
         this.markDirty();
         if (this.model != null) {
-            this.model.updateProgress((1 - this.progress) * (90 - this.angle * 0.75f) * MathHelper.RADIANS_PER_DEGREE);
+            this.model.updateProgress((1 - this.progress) * (60 - this.angle * 0.4f) * MathHelper.RADIANS_PER_DEGREE);
             this.model.tick();
         }
+    }
+
+    public void setIgnoredTick(long ignoredTick) {
+        this.ignoredTick = ignoredTick;
+    }
+
+    public long ignoredTick() {
+        return ignoredTick;
     }
 }

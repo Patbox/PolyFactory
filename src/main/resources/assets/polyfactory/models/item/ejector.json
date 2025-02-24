@@ -2,7 +2,7 @@
 	"credit": "Made with Blockbench",
 	"textures": {
 		"0": "polyfactory:block/ejector/side_rotation",
-		"1": "polyfactory:block/steel_plate_base",
+		"1": "polyfactory:block/ejector/bottom",
 		"2": "polyfactory:block/ejector/side_back",
 		"4": "polyfactory:block/ejector/inner_base",
 		"5": "polyfactory:block/ejector/inner_attach",
