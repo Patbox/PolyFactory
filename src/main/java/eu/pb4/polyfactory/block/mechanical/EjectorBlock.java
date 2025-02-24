@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
+import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.LastFanEffectedTickConsumer;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -27,6 +28,7 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
@@ -105,10 +107,14 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
 
     @Override
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
-        if (!(world.getBlockEntity(pos) instanceof EjectorBlockEntity be) || be.progress() < 1 || !state.get(ENABLED)) {
+        if (!(world.getBlockEntity(pos) instanceof EjectorBlockEntity be) || (be.progress() < 1 && be.ignoredTick() + 15 < world.getTime()) || !state.get(ENABLED)) {
             return;
         }
 
+        if (be.progress() >= 1) {
+            world.playSound(null, pos, FactorySoundEvents.BLOCK_EJECTOR_LAUNCH, SoundCategory.BLOCKS);
+            be.setIgnoredTick(world.getTime());
+        }
         be.setProgress(0);
 
         var rot = state.get(FACING).rotateYClockwise();

@@ -6,7 +6,7 @@
   "block.polyfactory.sticky_conveyor": "Sticky Item Conveyor",
   "block.polyfactory.funnel": "Funnel",
   "block.polyfactory.fan": "Fan",
-  "block.polyfactory.ejector": "Ejector",
+  "block.polyfactory.ejector": "Mechanical Ejector",
   "block.polyfactory.metal_grid": "Metal Grid",
   "block.polyfactory.splitter": "Item Splitter",
   "block.polyfactory.item_packer": "Item Packer",
@@ -298,6 +298,7 @@
 
   "stat.polyfactory.taters_clicked": "Potatoes Clicked",
   "subtitles.polyfactory.block.press.craft": "Mechanical Press presses",
+  "subtitles.polyfactory.block.ejector.launch": "Mechanical Ejector launches",
   "subtitles.polyfactory.entity.dynamite.throw": "Dynamite flies",
   "subtitles.polyfactory.fluid.shoot.water": "Water shoots out",
   "subtitles.polyfactory.fluid.shoot.lava": "Flames shoot out",

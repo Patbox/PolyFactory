@@ -23,7 +23,10 @@
   },
   "block.press.craft": {
     "sounds": [
-      "random/anvil_land"
+      {
+        "name": "random/anvil_land",
+        "attenuation_distance": 8
+      }
     ],
     "subtitle": "subtitles.polyfactory.block.press.craft"
   },
@@ -31,7 +34,7 @@
     "sounds": [
       {
         "attenuation_distance": 6,
-        "name": "block/copper_bulb/turn",
+        "name": "block/copper_bulb/toggle",
         "pitch": 0.75
       }
     ]
@@ -40,9 +43,19 @@
     "sounds": [
       {
         "attenuation_distance": 6,
-        "name": "block/copper_bulb/turn"
+        "name": "block/copper_bulb/toggle"
       }
     ]
+  },
+  "block.ejector.launch": {
+    "sounds": [
+      {
+        "attenuation_distance": 12,
+        "name": "tile/piston/out",
+        "pitch": 1.2
+      }
+    ],
+    "subtitle": "subtitles.polyfactory.block.ejector.launch"
   },
   "item.bucket.empty_slime": {
     "sounds": [
@@ -191,7 +204,8 @@
         "name": "liquid/swim4",
         "pitch": 1.75,
         "volume": 0.8
-      }    ],
+      }
+    ],
     "subtitle": "subtitles.polyfactory.fluid.shoot.potion"
   },
   "fluid.shoot.lava": {

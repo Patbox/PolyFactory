@@ -10,6 +10,7 @@ public interface FactorySoundEvents {
     SoundEvent BLOCK_PRESS_CRAFT = of("block.press.craft");
     SoundEvent BLOCK_REMOTE_REDSTONE_ON = of("block.remote_redstone.on");
     SoundEvent BLOCK_REMOTE_REDSTONE_OFF = of("block.remote_redstone.off");
+    SoundEvent BLOCK_EJECTOR_LAUNCH = of("block.ejector.launch");
     SoundEvent ITEM_WRENCH_USE = of("item.wrench.use");
     SoundEvent ITEM_WRENCH_SWITCH = of("item.wrench.switch");
     SoundEvent ITEM_BUCKET_EMPTY_SLIME = of("item.bucket.empty_slime");

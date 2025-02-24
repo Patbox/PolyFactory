@@ -193,23 +193,34 @@ class RecipesProvider extends FabricRecipeProvider {
                 .offerTo(exporter);
 
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.FAN, 1)
-                .pattern("iii")
-                .pattern("wsw")
-                .pattern("waw")
-                .input('i', Items.IRON_BARS).input('s', Items.IRON_INGOT)
-                .input('w', FactoryItems.STEEL_PLATE).input('a', FactoryItems.AXLE)
-                .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
-                .offerTo(exporter);
+                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.EJECTOR, 1)
+                        .pattern("iii")
+                        .pattern("wsw")
+                        .pattern("waw")
+                        .input('i', FactoryItems.WOODEN_PLATE)
+                        .input('g', FactoryItems.STEEL_GEAR)
+                        .input('w', FactoryItems.STEEL_PLATE).input('a', FactoryItems.AXLE)
+                        .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                        .offerTo(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.CRAFTER, 1)
-                .pattern("iai")
-                .pattern("wsw")
-                .pattern("www")
-                .input('i', FactoryItems.STEEL_GEAR).input('s', Items.CRAFTING_TABLE)
-                .input('w', FactoryItems.STEEL_PLATE).input('a', FactoryItems.AXLE)
-                .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
-                .offerTo(exporter);
+                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.FAN, 1)
+                        .pattern("iii")
+                        .pattern("wsw")
+                        .pattern("waw")
+                        .input('i', Items.IRON_BARS).input('s', Items.IRON_INGOT)
+                        .input('w', FactoryItems.STEEL_PLATE).input('a', FactoryItems.AXLE)
+                        .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                        .offerTo(exporter);
+
+
+                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.CRAFTER, 1)
+                        .pattern("iai")
+                        .pattern("wsw")
+                        .pattern("www")
+                        .input('i', FactoryItems.STEEL_GEAR).input('s', Items.CRAFTING_TABLE)
+                        .input('w', FactoryItems.STEEL_PLATE).input('a', FactoryItems.AXLE)
+                        .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                        .offerTo(exporter);
 
 
         ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.TURNTABLE, 1)
