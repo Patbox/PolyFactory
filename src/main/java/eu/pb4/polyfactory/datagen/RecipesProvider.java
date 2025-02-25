@@ -194,7 +194,7 @@ class RecipesProvider extends FabricRecipeProvider {
 
                 ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.EJECTOR, 1)
                         .pattern("iii")
-                        .pattern("wsw")
+                        .pattern("wgw")
                         .pattern("waw")
                         .input('i', FactoryItems.WOODEN_PLATE)
                         .input('g', FactoryItems.STEEL_GEAR)

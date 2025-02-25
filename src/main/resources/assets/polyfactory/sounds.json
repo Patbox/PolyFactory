@@ -50,7 +50,7 @@
   "block.ejector.launch": {
     "sounds": [
       {
-        "attenuation_distance": 12,
+        "attenuation_distance": 16,
         "name": "tile/piston/out",
         "pitch": 1.2
       }

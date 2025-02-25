@@ -32,16 +32,16 @@ public class EjectorBlockEntity extends BlockEntity implements BlockEntityExtraL
     }
 
     public static <T extends BlockEntity> void tick(World worldx, BlockPos pos, BlockState state, T t) {
-        if (!(worldx instanceof ServerWorld world) || !(t instanceof EjectorBlockEntity be)) {
+        if (!(worldx instanceof ServerWorld world) || !(t instanceof EjectorBlockEntity be) || be.ignoredTick + 10 > world.getTime()) {
             return;
         }
         var speed = RotationUser.getRotation(world, pos).speed();
-        be.setProgress((float) (be.progress + speed / (be.strength * 400)));
+        be.setProgress((float) (be.progress + speed / (be.strength * be.strength * 80)));
     }
 
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
         if (this.progress < 1) {
-            modifier.stress(this.strength * 1.5);
+            modifier.stress(this.strength * 1.2);
         }
     }
 

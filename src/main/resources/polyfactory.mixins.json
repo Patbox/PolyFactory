@@ -25,6 +25,7 @@
     "machines.FallingBlockEntityMixin",
     "machines.HopperBlockEntityMixin",
     "machines.HopperBlockMixin",
+    "machines.TntEntityMixin",
     "machines.WorldMixin",
     "player.ItemUsageContextAccessor",
     "player.LivingEntityMixin",
