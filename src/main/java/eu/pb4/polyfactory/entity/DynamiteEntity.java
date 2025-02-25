@@ -96,7 +96,8 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
             this.setVelocity(this.getVelocity().multiply(0.98));
 
             HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit);
-            this.setPosition(hitResult.getPos().subtract(this.getVelocity().normalize().multiply(0.1f)));
+            this.setPosition(hitResult.getPos().subtract(this.getVelocity().normalize().multiply(0.05f)));
+            this.tickBlockCollision();
             if (hitResult.getType() != HitResult.Type.MISS) {
                 this.hitOrDeflect(hitResult);
             }

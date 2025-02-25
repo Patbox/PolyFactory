@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlockEntity;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.RotationAwareModel;
@@ -56,11 +57,11 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
     private static final List<WrenchAction> WRENCH_ACTIONS = List.of(
             WrenchAction.FACING_HORIZONTAL,
             WrenchAction.ofBlockEntityString("angle", EjectorBlockEntity.class,
-                    x -> String.format(Locale.ROOT, "%.1f", x.angle()),
+                    x -> String.format(Locale.ROOT, "%.0f", x.angle()),
                     (x, n) -> x.setAngle(FactoryUtil.wrap(x.angle() + (n ? 5f : -5f), 10, 75))),
             WrenchAction.ofBlockEntityString("strength", EjectorBlockEntity.class,
-                    x -> String.format(Locale.ROOT, "%.1f", x.strength()),
-                    (x, n) -> x.setStrength(FactoryUtil.wrap(x.strength() + (n ? 0.5f : -0.5f), 1, 3)))
+                    x -> String.format(Locale.ROOT, "%.2f", x.strength()),
+                    (x, n) -> x.setStrength(FactoryUtil.wrap(x.strength() + (n ? 0.25f : -0.25f), 1, 3.5f)))
             );
 
 
@@ -107,7 +108,7 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
 
     @Override
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
-        if (!(world.getBlockEntity(pos) instanceof EjectorBlockEntity be) || (be.progress() < 1 && be.ignoredTick() + 15 < world.getTime()) || !state.get(ENABLED)) {
+        if (!(world.getBlockEntity(pos) instanceof EjectorBlockEntity be) || (be.progress() < 1 && be.ignoredTick() + 4 < world.getTime()) || !state.get(ENABLED)) {
             return;
         }
 
@@ -122,7 +123,8 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
                 .rotateAxis(be.angle() * MathHelper.RADIANS_PER_DEGREE, rot.getOffsetX(), rot.getOffsetY(), rot.getOffsetZ())
                 .mul(1 / 0.98f, 1 / 0.98f, 1 / 0.98f)
                 .mul(be.strength()))
-                .add(0, entity.getFinalGravity(), 0);
+                .multiply(entity.getFinalGravity() / 0.08)
+                .add(0, 0, 0);
         entity.addVelocity(vec);
         if (entity instanceof ServerPlayerEntity player) {
             FactoryUtil.sendVelocityDelta(player, vec);
@@ -184,6 +186,17 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
             be.updateRotationalData(modifier, state, world, pos);
         }
     }
+
+    @Override
+    public boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        return world.getBlockEntity(pos) instanceof EjectorBlockEntity be ? (int) (be.progress() * 15) : 0;
+    }
+
     public static final class Model extends RotationAwareModel {
         public static final ItemStack BASE_MODEL = ItemDisplayElementUtil.getModel(id("block/ejector_base"));
         public static final ItemStack PLATE_MODEL = ItemDisplayElementUtil.getModel(id("block/ejector_plate"));

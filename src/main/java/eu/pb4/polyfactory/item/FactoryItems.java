@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.item;
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.factorytools.api.item.ModeledItem;
+import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.factorytools.api.item.MultiBlockItem;
 import eu.pb4.factorytools.api.block.MultiBlock;
@@ -436,6 +437,8 @@ public class FactoryItems {
             item = new CabledBlockItem((AbstractCableBlock & PolymerBlock) cableBlock, settings);
         } else if (block instanceof PortableFluidTankBlock) {
             item = new PortableFluidTankBlockItem(block, settings);
+        } else if (block instanceof AxleBlock axleBlock) {
+            item = new AxleItem(axleBlock, settings);
         } else {
             item = new FactoryBlockItem(block, settings);
         }
