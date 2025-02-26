@@ -73,6 +73,7 @@ public class FactoryItems {
     public static final Item NIXIE_TUBE = register(FactoryBlocks.NIXIE_TUBE);
     public static final WindmillSailItem WINDMILL_SAIL = register("windmill_sail", WindmillSailItem::new);
     public static final Item METAL_GRID = register(FactoryBlocks.METAL_GRID);
+    public static final Item STRING_MESH = register("string_mesh", SimplePolymerItem::new);
     public static final Item SAW_DUST = register("saw_dust", SimplePolymerItem::new);
     public static final Item COAL_DUST = register("coal_dust", SimplePolymerItem::new);
     public static final Item NETHERRACK_DUST = register("netherrack_dust", SimplePolymerItem::new);
@@ -94,7 +95,7 @@ public class FactoryItems {
     public static final Item INTEGRATED_CIRCUIT = register("integrated_circuit", SimplePolymerItem::new);
     public static final Item REDSTONE_CHIP = register("redstone_chip", SimplePolymerItem::new);
 
-    public static final Item ITEM_FILTER = register("item_filter", FilterItem::new);
+    public static final Item ITEM_FILTER = register("item_filter", ImprovedFilterItem::new);
 
     public static final Item CREATIVE_MOTOR = register(FactoryBlocks.CREATIVE_MOTOR);
     public static final Item CREATIVE_CONTAINER = register(FactoryBlocks.CREATIVE_CONTAINER);
@@ -312,6 +313,7 @@ public class FactoryItems {
                     entries.add(COPPER_PLATE);
                     entries.add(WOODEN_PLATE);
                     entries.add(TREATED_DRIED_KELP);
+                    entries.add(STRING_MESH);
                     entries.add(ENDER_INFUSED_AMETHYST_SHARD);
                     entries.add(GENERIC_MACHINE_PART);
                     entries.add(REDSTONE_CHIP);

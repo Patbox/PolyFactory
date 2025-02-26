@@ -36,7 +36,7 @@ public class EjectorBlockEntity extends BlockEntity implements BlockEntityExtraL
             return;
         }
         var speed = RotationUser.getRotation(world, pos).speed();
-        be.setProgress((float) (be.progress + speed / (be.strength * be.strength * 80)));
+        be.setProgress((float) (be.progress + speed / (be.strength * be.strength * 60)));
     }
 
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {

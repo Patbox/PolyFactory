@@ -24,6 +24,7 @@ public class GuiTextures {
     public static final Function<Text, Text> STEAM_ENGINE = background("steam_engine");
     public static final Function<Text, Text> CENTER_SLOT_GENERIC = background("center_slot");
     public static final Function<Text, Text> FILL3 = background("fill3");
+    public static final Function<Text, Text> ITEM_FILTER = background("item_filter");
     public static final Function<Text, Text> TEXT_INPUT = backgroundAnvil("text_input");
     public static final Function<Text, Text> DATA_EXTRACTOR = backgroundAnvil("data_extractor");
     public static final Supplier<GuiElementBuilder> EMPTY_BUILDER = icon16("empty");
@@ -37,6 +38,8 @@ public class GuiTextures {
     public static final Supplier<GuiElementBuilder> BUTTON_CLOSE = icon32("button/close");
     public static final Supplier<GuiElementBuilder> BUTTON_DONE = icon32("button/done");
     public static final Supplier<GuiElementBuilder> BUTTON_DONE_BLOCKED = icon32("button/done_blocked");
+    public static final Supplier<GuiElementBuilder> BUTTON_ITEM_FILTER_TYPE_ONLY = icon32("button/item_filter/type_only");
+    public static final Supplier<GuiElementBuilder> BUTTON_ITEM_FILTER_STRICT = icon32("button/item_filter/strict");
     public static final Supplier<GuiElementBuilder> LOCKED_SLOT = icon32("locked_slot");
     public static final Progress FLAME = Progress.createVertical("flame", 1, 14, true);
     public static final Progress ICE = Progress.createVertical("ice", 1, 14, true);

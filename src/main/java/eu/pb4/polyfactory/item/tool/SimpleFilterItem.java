@@ -3,6 +3,8 @@ package eu.pb4.polyfactory.item.tool;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.util.filter.ExactItemFilter;
+import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.GuiHelpers;
@@ -21,19 +23,28 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
+import java.util.List;
 
-public class FilterItem extends SimplePolymerItem {
-    public FilterItem(Settings settings) {
+
+public class SimpleFilterItem extends AbstractFilterItem {
+    public SimpleFilterItem(Settings settings) {
         super(settings);
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity user, Hand hand) {
-        var stack = user.getStackInHand(hand);
-        if (user instanceof ServerPlayerEntity player) {
-            new Gui(player, stack);
-        }
-        return ActionResult.SUCCESS_SERVER;
+    public void openConfiguration(ServerPlayerEntity player, ItemStack stack) {
+        new Gui(player, stack);
+    }
+
+    @Override
+    public boolean isFilterSet(ItemStack stack) {
+        return !getStack(stack).isEmpty();
+    }
+
+    @Override
+    public FilterData createFilterData(ItemStack stack) {
+        var filter = getStack(stack).copy();
+        return new FilterData(new ExactItemFilter(filter), List.of(filter), false);
     }
 
     @Override
@@ -43,7 +54,7 @@ public class FilterItem extends SimplePolymerItem {
     }
 
     public static ItemStack getStack(ItemStack stack) {
-        return stack.getOrDefault(FactoryDataComponents.ITEM_FILTER, ItemStack.EMPTY);
+        return stack.getOrDefault(FactoryDataComponents.ITEM_FILTER, List.of(ItemStack.EMPTY)).getFirst();
     }
 
     public static void setStack(ItemStack filter, ItemStack target) {
@@ -57,7 +68,7 @@ public class FilterItem extends SimplePolymerItem {
         if (target.isEmpty()) {
             filter.remove(FactoryDataComponents.ITEM_FILTER);
         } else {
-            filter.set(FactoryDataComponents.ITEM_FILTER, target.copyWithCount(1));
+            filter.set(FactoryDataComponents.ITEM_FILTER, List.of(target.copyWithCount(1)));
         }
     }
 
@@ -77,7 +88,7 @@ public class FilterItem extends SimplePolymerItem {
         public Gui(ServerPlayerEntity player, ItemStack stack) {
             super(ScreenHandlerType.HOPPER, player, false);
             this.stack = stack;
-            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(Text.translatable("item.polyfactory.item_filter")));
+            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(Text.translatable(stack.getItem().getTranslationKey())));
             this.setSlot(2, new GuiElementInterface() {
                 @Override
                 public ItemStack getItemStack() {

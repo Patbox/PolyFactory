@@ -386,9 +386,23 @@ class RecipesProvider extends FabricRecipeProvider {
                         .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                         .offerTo(exporter);
 
-                ShapelessRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.ITEM_FILTER)
-                        .input(FactoryItems.WOODEN_PLATE).input(Items.COBWEB)
+                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.ITEM_FILTER)
+                        .pattern(" p ")
+                        .pattern("imi")
+                        .pattern(" p ")
+                        .input('p', FactoryItems.WOODEN_PLATE)
+                        .input('m', FactoryItems.STRING_MESH)
+                        .input('i', Items.IRON_INGOT)
                         .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.WOODEN_PLATE))
+                        .offerTo(exporter);
+
+
+                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, FactoryItems.STRING_MESH)
+                        .pattern(" s ")
+                        .pattern("sss")
+                        .pattern(" s ")
+                        .input('s', Items.STRING)
+                        .criterion("get_item", InventoryChangedCriterion.Conditions.items(Items.STRING))
                         .offerTo(exporter);
 
                 ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.ITEM_COUNTER)
@@ -824,9 +838,12 @@ class RecipesProvider extends FabricRecipeProvider {
 
                 for (var entry : HoneycombItem.UNWAXED_TO_WAXED_BLOCKS.get().entrySet()) {
                     //noinspection deprecation
-                    of(exporter,
-                            GenericPressRecipe.of(getShortString(entry.getKey().getRegistryEntry()) + "_to_" + getShortString(entry.getValue().getRegistryEntry()),
-                                    Ingredient.ofItems(entry.getKey()), 1, 2f, new ItemStack(entry.getValue(), 1)));
+                    var name = getShortString(entry.getKey().getRegistryEntry()) + "_to_" + getShortString(entry.getValue().getRegistryEntry());
+                    for (int i = 1; i <= 4; i++) {
+                        of(exporter,
+                                GenericPressRecipe.of(name + "_" + i, "press/copper_waxing",
+                                        CountedIngredient.ofItems(i, entry.getKey()), CountedIngredient.ofItems(1, Items.HONEYCOMB), 2f, new OutputStack(new ItemStack(entry.getValue(), i), 1, 1)));
+                    }
                 }
 
                 of(exporter,

@@ -6,10 +6,10 @@ import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
-import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.tool.FilterItem;
+import eu.pb4.polyfactory.item.tool.AbstractFilterItem;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.models.FilterIcon;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
@@ -246,7 +246,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
             return ActionResult.FAIL;
         }
 
-        if (stack.isOf(FactoryItems.ITEM_FILTER) && !FilterItem.getStack(stack).isEmpty()) {
+        if (stack.getItem() instanceof AbstractFilterItem item && item.isFilterSet(stack)) {
             if (!be.getFilter().isEmpty()) {
                 player.getInventory().offerOrDrop(be.getFilter());
             }
@@ -301,7 +301,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
     public static final class Model extends BlockModel {
         private static final ItemStack MODEL_IN = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/funnel_in"));
         private static final ItemStack MODEL_OUT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/funnel_out"));
-        final ItemDisplayElement filterElement;
+        final FilterIcon filterElement = new FilterIcon(this);
         private final ItemDisplayElement mainElement;
 
         private Model(ServerWorld world, BlockPos pos, BlockState state) {
@@ -310,16 +310,9 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
             this.mainElement.setInvisible(true);
             this.mainElement.setViewRange(0.8f);
-            this.filterElement = new LodItemDisplayElement();
-            this.filterElement.setDisplaySize(1, 1);
-            this.filterElement.setModelTransformation(ModelTransformationMode.GUI);
-            this.filterElement.setViewRange(0.1f);
-            this.filterElement.setInvisible(true);
-            this.filterElement.setViewRange(0.3f);
 
             this.updateFacing(state);
             this.addElement(this.mainElement);
-            this.addElement(this.filterElement);
         }
 
         private void updateFacing(BlockState facing) {
