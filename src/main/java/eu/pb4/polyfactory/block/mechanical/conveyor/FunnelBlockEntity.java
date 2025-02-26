@@ -47,7 +47,7 @@ public class FunnelBlockEntity extends BlockEntity implements BlockEntityExtraLi
 
     private void updateHologram() {
         if (this.model != null) {
-            model.filterElement.setItem(this.filter.icon());
+            model.filterElement.setFilter(this.filter);
             model.tick();
         }
     }

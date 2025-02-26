@@ -124,7 +124,8 @@ public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityPr
                 element.setViewRange(0.4f);
                 element.setScale(new Vector3f(4 / 16f));
                 element.setLeftRotation(new Quaternionf().rotateX(-MathHelper.HALF_PI));
-                element.setTranslation(new Vector3f((i % 3 - 1) * 3 / 16f, (8 + 2 / 16f) / 16f, (i / 3 - 1) * 3 / 16f));
+                //noinspection IntegerDivisionInFloatingPointContext
+                element.setTranslation(new Vector3f((i % 3 - 1) * 3 / 16f, (8 + 2 / 16f) / 16f + 0.001f * i, (((int) i / 3) - 1) * 3 / 16f));
                 this.items[i] = element;
             }
 

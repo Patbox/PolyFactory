@@ -37,7 +37,7 @@ public class SplitterBlockEntity extends BlockEntity implements BlockEntityExtra
 
     private void updateHologram() {
         if (this.model != null) {
-            model.updateFilters(filterLeft.icon(), filterRight.icon());
+            model.updateFilters(filterLeft, filterRight);
             model.tick();
         }
     }

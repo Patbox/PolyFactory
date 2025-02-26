@@ -97,18 +97,19 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
             this.model.destroy();
             this.model = null;
         } else if (this.model != null) {
-            this.model.setItem(this.filter.icon());
+            this.model.setFilter(this.filter);
             this.model.tick();
         }
         this.markDirty();
     }
 
+    @Unique
     private void createModel() {
         if (!(this.world instanceof ServerWorld serverWorld)) {
             return;
         }
         var model = new HopperModel(this.getCachedState());
-        model.setItem(this.filter.icon());
+        model.setFilter(this.filter);
         ChunkAttachment.of(model, serverWorld, this.pos);
         this.model = model;
     }

@@ -5,11 +5,13 @@ import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.tool.FilterItem;
+import eu.pb4.polyfactory.item.tool.AbstractFilterItem;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.factorytools.api.util.WorldPointer;
+import eu.pb4.polyfactory.models.FilterIcon;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -179,8 +181,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
         var be = world.getBlockEntity(pos);
         var hand = Hand.MAIN_HAND;
         var stack = player.getStackInHand(hand);
-
-        if (((stack.isOf(FactoryItems.ITEM_FILTER) && !FilterItem.getStack(stack).isEmpty()) || stack.isEmpty()) && hand == Hand.MAIN_HAND && be instanceof SplitterBlockEntity splitterBlockEntity) {
+        if ((stack.getItem() instanceof AbstractFilterItem item && item.isFilterSet(stack) || stack.isEmpty()) && be instanceof SplitterBlockEntity splitterBlockEntity) {
             var dir = state.get(FACING);
             if (hit.getSide().getAxis() != Direction.Axis.Y && hit.getSide().getAxis() != dir.getAxis()) {
                 if (hit.getSide() == dir.rotateYCounterclockwise()) {
@@ -236,7 +237,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
 
     @Override
     public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(world, pos, initialBlockState);
+        return new Model(initialBlockState);
     }
 
     @Override
@@ -245,15 +246,12 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
     }
 
     public static final class Model extends BlockModel {
-        static {
-        }
-
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement mainElement;
-        private final ItemDisplayElement leftLockElement;
-        private final ItemDisplayElement rightLockElement;
+        private final FilterIcon leftLockElement = new FilterIcon(this);
+        private final FilterIcon rightLockElement = new FilterIcon(this);
 
-        private Model(ServerWorld world, BlockPos pos, BlockState state) {
+        private Model(BlockState state) {
             this.mainElement = new ItemDisplayElement();
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
@@ -261,25 +259,8 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
             this.mainElement.setInvisible(true);
             this.mainElement.setViewRange(0.8f);
 
-            this.leftLockElement = new ItemDisplayElement();
-            this.leftLockElement.setDisplaySize(1, 1);
-            this.leftLockElement.setModelTransformation(ModelTransformationMode.GUI);
-            this.leftLockElement.setInvisible(true);
-            this.leftLockElement.setViewRange(0.3f);
-
-            this.rightLockElement = new ItemDisplayElement();
-            this.rightLockElement.setDisplaySize(1, 1);
-            this.rightLockElement.setModelTransformation(ModelTransformationMode.GUI);
-            this.rightLockElement.setInvisible(true);
-            this.rightLockElement.setViewRange(0.3f);
-
-
             this.updateFacing(state);
             this.addElement(this.mainElement);
-            this.addElement(this.leftLockElement);
-            this.addElement(this.rightLockElement);
-
-
         }
 
         private void updateFacing(BlockState facing) {
@@ -310,9 +291,9 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
             this.tick();
         }
 
-        public void updateFilters(ItemStack filterStackLeft, ItemStack filterStackRight) {
-            this.leftLockElement.setItem(filterStackLeft);
-            this.rightLockElement.setItem(filterStackRight);
+        public void updateFilters(FilterData filterStackLeft, FilterData filterStackRight) {
+            this.leftLockElement.setFilter(filterStackLeft);
+            this.rightLockElement.setFilter(filterStackRight);
         }
 
         @Override

@@ -4,7 +4,7 @@ import net.minecraft.item.ItemStack;
 
 import java.util.Objects;
 
-public record SimpleItemFilter(ItemStack item) implements ItemFilter {
+public record ExactItemFilter(ItemStack item) implements ItemFilter {
     @Override
     public boolean test(ItemStack stack) {
         return !stack.isEmpty() && ItemStack.areItemsAndComponentsEqual(item, stack);
@@ -14,8 +14,8 @@ public record SimpleItemFilter(ItemStack item) implements ItemFilter {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SimpleItemFilter that = (SimpleItemFilter) o;
-        return that.item.isEmpty() == this.item.isEmpty() && ItemStack.areItemsAndComponentsEqual(that.item, that.item);
+        ExactItemFilter that = (ExactItemFilter) o;
+        return ItemStack.areItemsAndComponentsEqual(that.item, this.item);
     }
 
     @Override

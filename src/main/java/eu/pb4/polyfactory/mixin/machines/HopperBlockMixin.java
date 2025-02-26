@@ -1,11 +1,9 @@
 package eu.pb4.polyfactory.mixin.machines;
 
 import eu.pb4.polyfactory.block.other.FilteredBlockEntity;
-import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.tool.FilterItem;
+import eu.pb4.polyfactory.item.tool.AbstractFilterItem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
@@ -32,7 +30,7 @@ public class HopperBlockMixin {
         }
 
         var stack = player.getStackInHand(Hand.MAIN_HAND);
-        if (stack.isOf(FactoryItems.ITEM_FILTER) && !FilterItem.getStack(stack).isEmpty()) {
+        if (stack.getItem() instanceof AbstractFilterItem item && item.isFilterSet(stack)) {
             if (!be.polyfactory$getFilter().isEmpty()) {
                 player.getInventory().offerOrDrop(be.polyfactory$getFilter());
             }

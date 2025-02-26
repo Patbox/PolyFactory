@@ -33,6 +33,8 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
     private ItemStack itemStack = FactoryItems.DYNAMITE.getDefaultStack();
     private BlockPos stickToBlock;
 
+    private Vec3d particlePos = null;
+
     public DynamiteEntity(EntityType<? extends ProjectileEntity> type, World world) {
         super(type, world);
     }
@@ -124,8 +126,13 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
                 this.explode();
             }
         } else {
+            if (this.particlePos == null) {
+                this.particlePos = new Vec3d(this.getX(), this.getY() + getHeight(), this.getZ());
+            }
+            this.particlePos = this.particlePos.lerp(this.getPos().add(0, getHeight(), 0),  1 / 5f);
+
             this.updateWaterState();
-            world.spawnParticles(ParticleTypes.SMOKE, this.getX(), this.getY() + getHeight(), this.getZ(), 0,0.0, 0.0, 0.0, 0);
+            world.spawnParticles(ParticleTypes.SMOKE, this.particlePos.x, this.particlePos.y, this.particlePos.z, 0, 0.0, 0.0, 0.0, 0);
         }
     }
 
