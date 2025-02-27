@@ -23,6 +23,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -129,7 +130,7 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions() {
+    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(WrenchAction.AXIS, WrenchAction.INVERTED);
     }
 

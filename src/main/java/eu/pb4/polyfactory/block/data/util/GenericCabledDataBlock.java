@@ -23,6 +23,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
@@ -37,7 +38,6 @@ import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public abstract class GenericCabledDataBlock extends AbstractCableBlock implements FactoryBlock, WrenchableBlock, BlockEntityProvider, CableConnectable, StatePropertiesCodecPatcher {
     public static final EnumProperty<Direction> FACING = Properties.FACING;
@@ -133,7 +133,7 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions() {
+    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(
                 WrenchAction.CHANNEL,
                 this.facingAction

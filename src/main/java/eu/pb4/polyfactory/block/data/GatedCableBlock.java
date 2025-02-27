@@ -16,6 +16,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -113,7 +114,7 @@ public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, 
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions() {
+    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(WrenchAction.AXIS, WrenchAction.INVERTED);
     }
 

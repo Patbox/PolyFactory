@@ -17,6 +17,7 @@ import net.minecraft.state.property.EnumProperty;
 import net.minecraft.text.Text;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -85,7 +86,7 @@ public class ArithmeticOperatorBlock extends DoubleInputTransformerBlock {
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions() {
+    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return WRENCH_ACTIONS;
     }
 }

@@ -24,7 +24,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.function.IntPredicate;
 
 public class DataComparatorBlock extends DoubleInputTransformerBlock {
@@ -128,7 +127,7 @@ public class DataComparatorBlock extends DoubleInputTransformerBlock {
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions() {
+    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return WRENCH_ACTIONS;
     }
 }

@@ -3,7 +3,6 @@ package eu.pb4.polyfactory.block.data.providers;
 import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.data.BasicDataType;
-import eu.pb4.polyfactory.data.StringData;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
@@ -24,6 +23,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -117,7 +117,7 @@ public class TextInputBlock extends CabledDataProviderBlock {
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions() {
+    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(
                 WrenchAction.CHANNEL,
                 this.facingAction,

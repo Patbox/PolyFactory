@@ -21,7 +21,7 @@ public class HopperModel extends BlockModel {
         this.model = ItemDisplayElementUtil.createSimple(GenericParts.FILTER_MESH);
         this.model.setScale(new Vector3f(2));
         this.model.setTranslation(new Vector3f(0, 15 / 16f, 0));
-        this.icon.setTransformation(mat().translate(0, 0.5f, 0.37f).rotateX(MathHelper.HALF_PI * 0.3f).scale(0.3f, 0.3f, 0.005f));
+        this.icon.setTransformation(mat().translate(0, 0.5f, 0.37f).rotateX(MathHelper.HALF_PI * 0.3f).scale(0.25f, 0.25f, 0.005f));
         this.addElement(this.model);
         this.updateRotation(cachedState);
     }

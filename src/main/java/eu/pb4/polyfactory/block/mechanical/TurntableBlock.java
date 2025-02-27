@@ -5,7 +5,6 @@ import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
-import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.collection.BlockCollection;
 import eu.pb4.polyfactory.block.collection.BlockCollectionData;
 import eu.pb4.polyfactory.item.FactoryEnchantmentEffectComponents;
@@ -27,7 +26,6 @@ import net.minecraft.entity.player.PlayerPosition;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -38,7 +36,6 @@ import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
@@ -51,7 +48,6 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlock,  BarrierBasedWaterloggable, WrenchableBlock {
     public static final EnumProperty<Direction> FACING = Properties.FACING;
@@ -146,7 +142,7 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions() {
+    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(WrenchAction.FACING);
     }
 

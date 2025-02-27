@@ -41,6 +41,7 @@ public class GuiTextures {
     public static final Supplier<GuiElementBuilder> BUTTON_ITEM_FILTER_TYPE_ONLY = icon32("button/item_filter/type_only");
     public static final Supplier<GuiElementBuilder> BUTTON_ITEM_FILTER_STRICT = icon32("button/item_filter/strict");
     public static final Supplier<GuiElementBuilder> LOCKED_SLOT = icon32("locked_slot");
+    public static final ItemStack ITEM_FILTER_BLOCKED = icon16("item_filter_blocked").get().asStack();
     public static final Progress FLAME = Progress.createVertical("flame", 1, 14, true);
     public static final Progress ICE = Progress.createVertical("ice", 1, 14, true);
     public static final Progress FLAME_OFFSET_RIGHT = Progress.createVertical32Right("flame_offset_right", 9, 22, true);

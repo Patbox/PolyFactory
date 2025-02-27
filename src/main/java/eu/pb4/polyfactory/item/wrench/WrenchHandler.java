@@ -51,13 +51,17 @@ public class WrenchHandler {
         if (player.getMainHandStack().isOf(FactoryItems.WRENCH) && player.raycast(7, 0, false) instanceof BlockHitResult blockHitResult) {
             var state = player.getWorld().getBlockState(blockHitResult.getBlockPos());
             if (state == this.state && blockHitResult.getBlockPos().equals(this.pos)) {
+                if (this.state.getBlock() instanceof WrenchableBlock wrenchableBlock) {
+                    wrenchableBlock.wrenchTick(player, blockHitResult, this.state);
+                }
                 return;
             }
 
             this.state = state;
             this.pos = blockHitResult.getBlockPos();
             if (this.state.getBlock() instanceof WrenchableBlock wrenchableBlock) {
-                this.actions = wrenchableBlock.getWrenchActions();
+                wrenchableBlock.wrenchTick(player, blockHitResult, this.state);
+                this.actions = wrenchableBlock.getWrenchActions(player, blockHitResult.getBlockPos(), blockHitResult.getSide(), this.state);
                 var selected = this.currentAction.get(this.state.getBlock());
                 this.sidebar.setTitle(Text.translatable("item.polyfactory.wrench.title",
                         Text.empty()/*.append(this.state.getBlock().getName())
@@ -99,7 +103,7 @@ public class WrenchHandler {
         if (!(state.getBlock() instanceof WrenchableBlock wrenchableBlock)) {
             return ActionResult.PASS;
         }
-        var actions = wrenchableBlock.getWrenchActions();
+        var actions = wrenchableBlock.getWrenchActions(player, pos, side, this.state);
 
         if (actions.isEmpty()) {
             return ActionResult.PASS;
@@ -130,7 +134,7 @@ public class WrenchHandler {
             return;
         }
 
-        var actions = wrenchableBlock.getWrenchActions();
+        var actions = wrenchableBlock.getWrenchActions(player, pos, side, this.state);
         if (actions.isEmpty()) {
             return;
         }
@@ -138,11 +142,11 @@ public class WrenchHandler {
         var current = this.currentAction.get(state.getBlock());
 
         if (current == null) {
-            current = actions.get(0).id();
+            current = actions.getFirst().id();
         }
         boolean foundCurrent = false;
-        String nextAction = actions.get(0).id();
-        String previousAction = actions.get(actions.size() - 1).id();
+        String nextAction = actions.getFirst().id();
+        String previousAction = actions.getLast().id();
         for (var action : actions) {
             if (foundCurrent) {
                 nextAction = action.id();

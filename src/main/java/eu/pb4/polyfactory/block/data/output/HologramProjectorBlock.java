@@ -55,7 +55,6 @@ import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
@@ -163,7 +162,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
         return 0;
     }
 
-    public List<WrenchAction> getWrenchActions() {
+    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(
                 WrenchAction.CHANNEL_WITH_DISABLED,
                 WrenchAction.FACING,
