@@ -138,6 +138,9 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<WorkbenchBlockEntity> WORKBENCH = register("workbench",  FabricBlockEntityTypeBuilder
             .create(WorkbenchBlockEntity::new, FactoryBlocks.WORKBENCH));
+
+    public static final BlockEntityType<BlueprintWorkbenchBlockEntity> BLUEPRINT_WORKBENCH = register("blueprint_workbench",  FabricBlockEntityTypeBuilder
+            .create(BlueprintWorkbenchBlockEntity::new, FactoryBlocks.BLUEPRINT_WORKBENCH));
     public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container",  FabricBlockEntityTypeBuilder
             .create(ColorableBlockEntity::new, FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP, FactoryBlocks.FIXTURE_LAMP, FactoryBlocks.INVERTED_FIXTURE_LAMP));
 

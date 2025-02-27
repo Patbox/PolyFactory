@@ -111,7 +111,7 @@ public class FactoryBlocks {
     public static final ElectricMotorBlock ELECTRIC_MOTOR = register("electric_motor", settings -> new ElectricMotorBlock(settings.hardness(2).nonOpaque()));
     public static final ElectricGeneratorBlock ELECTRIC_GENERATOR = register("electric_generator", settings -> new ElectricGeneratorBlock(settings.hardness(2).nonOpaque()));
     public static final WorkbenchBlock WORKBENCH = register("workbench", Block.Settings.copy(Blocks.CRAFTING_TABLE), settings -> new WorkbenchBlock(settings.nonOpaque()));
-
+    public static final BlueprintWorkbenchBlock BLUEPRINT_WORKBENCH = register("blueprint_workbench", Block.Settings.copy(WORKBENCH), BlueprintWorkbenchBlock::new);
     public static final CreativeMotorBlock CREATIVE_MOTOR = register("creative_motor", settings -> new CreativeMotorBlock(settings.strength(-1, -1).nonOpaque().dropsNothing()));
     public static final CreativeContainerBlock CREATIVE_CONTAINER = register("creative_container", settings -> new CreativeContainerBlock(settings.strength(-1, -1).nonOpaque().dropsNothing()));
     public static final InvertedRedstoneLampBlock INVERTED_REDSTONE_LAMP = register("inverted_redstone_lamp",

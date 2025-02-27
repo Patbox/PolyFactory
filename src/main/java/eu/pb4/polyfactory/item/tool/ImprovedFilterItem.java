@@ -159,7 +159,7 @@ public class ImprovedFilterItem extends AbstractFilterItem {
 
         @Override
         public boolean onAnyClick(int index, ClickType type, SlotActionType action) {
-            if (index == -999) {
+            if (index == -999 || index == -1) {
                 return true;
             }
 

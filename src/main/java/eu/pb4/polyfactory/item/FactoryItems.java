@@ -133,6 +133,7 @@ public class FactoryItems {
     public static final Item ELECTRIC_MOTOR = register(FactoryBlocks.ELECTRIC_MOTOR);
     public static final Item ELECTRIC_GENERATOR = register(FactoryBlocks.ELECTRIC_GENERATOR);
     public static final Item WORKBENCH = register(FactoryBlocks.WORKBENCH);
+    public static final Item BLUEPRINT_WORKBENCH = register(FactoryBlocks.BLUEPRINT_WORKBENCH);
     public static final Item ARTIFICIAL_DYE = register("artificial_dye", ArtificialDyeItem::new);
     public static final Item DYNAMITE = register("dynamite", settings -> new DynamiteItem(settings.maxCount(16)));
     public static final Item STICKY_DYNAMITE = register("sticky_dynamite", settings -> new DynamiteItem(settings.maxCount(16)));
@@ -222,6 +223,7 @@ public class FactoryItems {
 
                     // Crafting/Machines
                     entries.add(WORKBENCH);
+                    entries.add(BLUEPRINT_WORKBENCH);
                     entries.add(GRINDER);
                     entries.add(PRESS);
                     entries.add(MIXER);

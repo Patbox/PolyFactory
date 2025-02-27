@@ -61,7 +61,7 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
         super.readNbt(nbt, lookup);
         if (this.model != null) {
             for (int i = 0; i < 9; i++) {
-                this.markStackDirty(i);
+                this.markSlotDirty(i);
             }
         }
     }
@@ -172,25 +172,11 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
         result.setStack(0, itemStack);
     }
 
-    public void markStackDirty(int index) {
+    @Override
+    public void markSlotDirty(int index) {
         if (this.model != null) {
             this.model.setStack(index, this.getStack(index));
         }
-    }
-
-    @Override
-    public void setStack(int slot, ItemStack stack) {
-        MinimalSidedInventory.super.setStack(slot, stack);
-        this.markStackDirty(slot);
-    }
-
-    @Override
-    public ItemStack removeStack(int slot, int amount) {
-        var out = MinimalSidedInventory.super.removeStack(slot, amount);
-        if (!out.isEmpty()) {
-            this.markStackDirty(slot);
-        }
-        return out;
     }
 
     @Override
@@ -228,7 +214,7 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
         updateResult();
         this.model = BlockAwareAttachment.get(chunk, this.pos).holder() instanceof WorkbenchBlock.Model m ? m : null;
         for (int i = 0; i < 9; i++) {
-            this.markStackDirty(i);
+            this.markSlotDirty(i);
         }
     }
 

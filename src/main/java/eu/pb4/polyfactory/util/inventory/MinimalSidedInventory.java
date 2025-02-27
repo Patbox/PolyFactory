@@ -44,6 +44,7 @@ public interface MinimalSidedInventory extends SidedInventory {
         ItemStack itemStack = Inventories.splitStack(this.getStacks(), slot, amount);
         if (!itemStack.isEmpty()) {
             this.markDirty();
+            this.markSlotDirty(slot);
         }
 
         return itemStack;
@@ -51,16 +52,18 @@ public interface MinimalSidedInventory extends SidedInventory {
 
     @Override
     default ItemStack removeStack(int slot) {
+        var x = Inventories.removeStack(this.getStacks(), slot);
         this.markDirty();
-        return Inventories.removeStack(this.getStacks(), slot);
+        this.markSlotDirty(slot);
+        return x;
     }
 
     @Override
     default void setStack(int slot, ItemStack stack) {
         this.getStacks().set(slot, stack);
         this.markDirty();
+        this.markSlotDirty(slot);
     }
-
 
     @Override
     default boolean canPlayerUse(PlayerEntity player) {
@@ -70,6 +73,11 @@ public interface MinimalSidedInventory extends SidedInventory {
     @Override
     default void clear() {
         this.getStacks().clear();
+        for (int i = 0; i < this.size(); i++) {
+            this.markSlotDirty(i);
+        }
         this.markDirty();
     }
+
+    default void markSlotDirty(int slot) {};
 }
