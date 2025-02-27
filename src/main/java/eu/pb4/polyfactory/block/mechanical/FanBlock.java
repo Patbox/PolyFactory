@@ -146,7 +146,7 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions() {
+    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(REVERSE_ACTION, WrenchAction.FACING);
     }
 

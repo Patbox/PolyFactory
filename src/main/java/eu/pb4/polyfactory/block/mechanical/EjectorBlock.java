@@ -4,7 +4,6 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlockEntity;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.models.RotationAwareModel;
@@ -25,8 +24,13 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.Flutterer;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
+import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -36,6 +40,7 @@ import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -118,13 +123,25 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
         }
         be.setProgress(0);
 
+
         var rot = state.get(FACING).rotateYClockwise();
+
+        var verticalDrag = 0.98f;
+        var horizontalDrag = 0.98f;
+
+        if (entity instanceof LivingEntity livingEntity) {
+            horizontalDrag = livingEntity.hasNoDrag() ? 1 : 0.91F;
+        }
+        if (entity instanceof Flutterer flutterer) {
+            verticalDrag = horizontalDrag;
+        }
+
         var vec = new Vec3d(state.get(FACING).getUnitVector()
+                .mul(1 / verticalDrag, 1 / horizontalDrag, 1 / verticalDrag)
+                .mul(be.strength())
+                .mul((float) (entity.getFinalGravity() / 0.08))
                 .rotateAxis(be.angle() * MathHelper.RADIANS_PER_DEGREE, rot.getOffsetX(), rot.getOffsetY(), rot.getOffsetZ())
-                .mul(1 / 0.98f, 1 / 0.98f, 1 / 0.98f)
-                .mul(be.strength()))
-                .multiply(entity.getFinalGravity() / 0.08)
-                .add(0, 0, 0);
+        );
         entity.addVelocity(vec);
         if (entity instanceof ServerPlayerEntity player) {
             FactoryUtil.sendVelocityDelta(player, vec);
@@ -176,7 +193,7 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions() {
+    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return WRENCH_ACTIONS;
     }
 
@@ -195,6 +212,39 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
     @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         return world.getBlockEntity(pos) instanceof EjectorBlockEntity be ? (int) (be.progress() * 15) : 0;
+    }
+
+    @Override
+    public void wrenchTick(ServerPlayerEntity player, BlockHitResult hit, BlockState state) {
+        if (true) {
+            return;
+        }
+
+        var world = player.getServerWorld();
+        if (!(world.getBlockEntity(hit.getBlockPos()) instanceof EjectorBlockEntity be)) {
+            return;
+        }
+        var out = Vec3d.ofCenter(hit.getBlockPos(), 1);
+
+        var rot = state.get(FACING).rotateYClockwise();
+        var vec = new Vec3d(state.get(FACING).getUnitVector()
+                .mul(1 / 0.98f, 1 / 0.98f, 1 / 0.98f)
+                .mul(be.strength())
+                .mul(0.5f)
+                .rotateAxis(be.angle() * MathHelper.RADIANS_PER_DEGREE, rot.getOffsetX(), rot.getOffsetY(), rot.getOffsetZ())
+        );
+
+        int endTime = (player.age / 4) % 10;
+
+        var particle = new DustParticleEffect(0xFF0000, 1);
+
+        for (int i = 0; i < 40; i++) {
+            player.networkHandler.sendPacket(new ParticleS2CPacket(particle, true, true,
+                    out.x, out.y, out.z, 0, 0, 0, 0, 0));
+            vec = vec.add(0, -0.08, 0);
+            out = out.add(vec);
+            vec = vec.multiply(0.98);
+        }
     }
 
     public static final class Model extends RotationAwareModel {

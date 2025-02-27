@@ -203,7 +203,7 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions() {
+    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return ACTIONS;
     }
 

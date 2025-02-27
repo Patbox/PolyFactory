@@ -38,6 +38,8 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -252,7 +254,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
             be.setFilter(stack.copyWithCount(1));
             stack.decrement(1);
             return ActionResult.SUCCESS;
-        } else if (stack.isEmpty()) {
+        } else if (stack.isEmpty() && !be.getFilter().isEmpty()) {
             player.setStackInHand(Hand.MAIN_HAND, be.getFilter());
             be.setFilter(ItemStack.EMPTY);
             return ActionResult.SUCCESS;
@@ -293,7 +295,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions() {
+    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(WrenchAction.FACING, MODE_ACTION);
     }
 
@@ -330,9 +332,9 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
                 mat.rotateX(-22.5f * MathHelper.RADIANS_PER_DEGREE);
                 mat.translate(0, 0.50f, 0.008f);
             } else {
-                mat.translate(0, 0.555f, 0.025f);
+                mat.translate(0, 8.5f / 16f, 0.025f);
             }
-            mat.scale(0.4f, 0.4f, 0.005f);
+            mat.scale(0.3f, 0.3f, 0.005f);
             this.filterElement.setTransformation(mat);
             this.tick();
         }

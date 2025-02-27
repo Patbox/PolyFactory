@@ -30,6 +30,8 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -184,7 +186,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
         if ((stack.getItem() instanceof AbstractFilterItem item && item.isFilterSet(stack) || stack.isEmpty()) && be instanceof SplitterBlockEntity splitterBlockEntity) {
             var dir = state.get(FACING);
             if (hit.getSide().getAxis() != Direction.Axis.Y && hit.getSide().getAxis() != dir.getAxis()) {
-                if (hit.getSide() == dir.rotateYCounterclockwise()) {
+                if (hit.getSide() == dir.rotateYCounterclockwise() && (!splitterBlockEntity.getFilterLeft().isEmpty() || !stack.isEmpty())) {
                     if (stack.isEmpty()) {
                         player.setStackInHand(hand, splitterBlockEntity.getFilterLeft());
                         splitterBlockEntity.setFilterLeft(ItemStack.EMPTY);
@@ -195,7 +197,8 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
                         splitterBlockEntity.setFilterLeft(stack.copyWithCount(1));
                         stack.decrement(1);
                     }
-                } else {
+                    return ActionResult.SUCCESS_SERVER;
+                } else if (!splitterBlockEntity.getFilterRight().isEmpty() || !stack.isEmpty()) {
                     if (stack.isEmpty()) {
                         player.setStackInHand(hand, splitterBlockEntity.getFilterRight());
                         splitterBlockEntity.setFilterRight(ItemStack.EMPTY);
@@ -206,12 +209,12 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
                         splitterBlockEntity.setFilterRight(stack.copyWithCount(1));
                         stack.decrement(1);
                     }
+                    return ActionResult.SUCCESS;
                 }
             }
-            return ActionResult.SUCCESS;
         }
 
-        return ActionResult.FAIL;
+        return ActionResult.PASS;
     }
 
     @Override
@@ -241,7 +244,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions() {
+    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(WrenchAction.FACING_HORIZONTAL);
     }
 
@@ -274,17 +277,17 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
             mat.popMatrix();
 
             mat.pushMatrix();
-            mat.translate(-0.51f, 0.4f, 0);
+            mat.translate(-0.51f, 5.5f / 16f, 0);
             mat.rotateY(MathHelper.HALF_PI);
-            mat.scale(0.3f, 0.3f, 0.02f);
+            mat.scale(0.3f, 0.3f, 0.005f);
             this.leftLockElement.setTransformation(mat);
             mat.popMatrix();
 
 
             mat.pushMatrix();
-            mat.translate(0.51f, 0.4f, 0);
+            mat.translate(0.51f, 5.5f / 16f, 0);
             mat.rotateY(-MathHelper.HALF_PI);
-            mat.scale(0.3f, 0.3f, 0.02f);
+            mat.scale(0.3f, 0.3f, 0.005f);
             this.rightLockElement.setTransformation(mat);
             mat.popMatrix();
 
