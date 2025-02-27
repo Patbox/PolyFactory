@@ -114,18 +114,14 @@ public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityPr
 
     public static class Model extends BlockModel {
         private final ItemDisplayElement base;
-        private final ItemDisplayElement[] items = new ItemDisplayElement[9];
+        protected final ItemDisplayElement[] items = new ItemDisplayElement[9];
 
-        private Model(BlockState state) {
+        public Model(BlockState state) {
             this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
             for (int i = 0; i < 9; i++) {
                 var element = ItemDisplayElementUtil.createSimple();
-                element.setViewRange(0.4f);
-                element.setScale(new Vector3f(4 / 16f));
-                element.setLeftRotation(new Quaternionf().rotateX(-MathHelper.HALF_PI));
-                //noinspection IntegerDivisionInFloatingPointContext
-                element.setTranslation(new Vector3f((i % 3 - 1) * 3 / 16f, (8 + 2 / 16f) / 16f + 0.001f * i, (((int) i / 3) - 1) * 3 / 16f));
+                this.setupElement(element, i);
                 this.items[i] = element;
             }
 
@@ -136,10 +132,18 @@ public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityPr
             this.addElement(this.base);
         }
 
+        protected void setupElement(ItemDisplayElement element, int i) {
+            element.setViewRange(0.4f);
+            element.setScale(new Vector3f(4 / 16f));
+            element.setLeftRotation(new Quaternionf().rotateX(-MathHelper.HALF_PI));
+            //noinspection IntegerDivisionInFloatingPointContext
+            element.setTranslation(new Vector3f((i % 3 - 1) * 3 / 16f, (8 + 2 / 16f) / 16f + 0.001f * i, (((int) i / 3) - 1) * 3 / 16f));
+        }
+
 
         public void setStack(int i, ItemStack stack) {
             this.items[i].setItem(stack.copy());
-            if (this.getTick() != 0) {
+            if (!this.getWatchingPlayers().isEmpty()) {
                 this.items[i].tick();
             }
         }

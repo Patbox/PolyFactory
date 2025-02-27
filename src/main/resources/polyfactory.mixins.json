@@ -8,6 +8,7 @@
     "EnchantmentHelperAccessor",
     "ExperienceOrbEntityAccessor",
     "FallingBlockAccessor",
+    "ItemEntityAccessor",
     "ProjectileEntityAccessor",
     "ShapedRecipeAccessor",
     "SimpleBlockGraphAccessor",

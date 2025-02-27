@@ -24,6 +24,7 @@ public class GuiTextures {
     public static final Function<Text, Text> STEAM_ENGINE = background("steam_engine");
     public static final Function<Text, Text> CENTER_SLOT_GENERIC = background("center_slot");
     public static final Function<Text, Text> FILL3 = background("fill3");
+    public static final Function<Text, Text> BLUEPRINT_WORKBENCH = background("blueprint_workbench");
     public static final Function<Text, Text> ITEM_FILTER = background("item_filter");
     public static final Function<Text, Text> TEXT_INPUT = backgroundAnvil("text_input");
     public static final Function<Text, Text> DATA_EXTRACTOR = backgroundAnvil("data_extractor");

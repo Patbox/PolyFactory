@@ -52,7 +52,7 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<Crafting
                     @Override
                     public void markDirty() {
                         super.markDirty();
-                        input.markStackDirty(index);
+                        input.markSlotDirty(index);
                     }
                 });
             }

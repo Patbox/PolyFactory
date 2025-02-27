@@ -164,6 +164,8 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.GEARBOX)
                 .add(FactoryBlocks.CONTAINER)
                 .add(FactoryBlocks.FUNNEL)
+                .add(FactoryBlocks.WORKBENCH)
+                .add(FactoryBlocks.BLUEPRINT_WORKBENCH)
         ;
 
         this.getOrCreateTagBuilder(BlockTags.WALLS)

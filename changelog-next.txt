@@ -17,18 +17,23 @@
   - You can change its strength (from 1 to 3) and angle (from 10 to 75).
   - It needs to recharge after use, with time depending on strength.
   - Crafted with Steel Places, Wooden Plates, Steel Gear and an Axle.
-- Data Memory improvements:
+- Added Blueprint Workbench:
+  - A new workbench variant, that acts as a "static recipe template".
+  - When in world (hovering) item is clicked, it will be crafted from items in player's inventory.
+  - Crafting pattern is defined by items in the workbench and supports usage of Item Filters for multi-item selection.
+  - Crafted with a Workbench, a Paper and Blue Dye.
+- Data Memory Block improvements:
   - It now has separate input and output, with their own channels, instead of single input for reading and writing to it.
   - You now need to hold Wrench as cursor item to toggle Data Memory Block item's Read Only state:
     - This fixes the Data Memory Block's item being unmovable in inventory.
-- Workbench improvements:
-  - Updated model and texture.
-  - It now shows items stored in it.
 - Item Filter improvements:
   - Item Filters can now match up to 9 different items.
   - You can change their strictness (full match or type only) and whatever they work as a whitelist or blacklist.
   - Updated texture.
   - It's now crafted with Wooden Plates, Iron Ingots and String Mesh.
+- Workbench improvements:
+  - Updated model and texture.
+  - It now shows items stored in it.
 - Mechanical Planters can now hold 9 stacks of items (previously could only hold 1).
 - New griding recipes:
   - Andesite and Diorite into Gravel and 5% chance for Quartz

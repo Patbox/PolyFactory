@@ -1,14 +1,14 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"1": "polyfactory:block/workbench_side",
-		"2": "polyfactory:block/workbench_bottom",
-		"3": "polyfactory:block/workbench_top",
-		"4": "polyfactory:block/workbench_front",
-		"6": "polyfactory:block/workbench_inner",
-		"7": "polyfactory:block/workbench_inner_side",
-		"8": "polyfactory:block/workbench_shelf",
-		"particle": "polyfactory:block/workbench_front"
+		"1": "polyfactory:block/workbench/side",
+		"2": "polyfactory:block/workbench/bottom",
+		"3": "polyfactory:block/workbench/top",
+		"4": "polyfactory:block/workbench/front",
+		"6": "polyfactory:block/workbench/inner",
+		"7": "polyfactory:block/workbench/inner_side",
+		"8": "polyfactory:block/workbench/shelf",
+		"particle": "polyfactory:block/workbench/front"
 	},
 	"elements": [
 		{

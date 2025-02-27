@@ -1,0 +1,9 @@
+{
+	"parent": "polyfactory:block/workbench",
+	"textures": {
+		"1": "polyfactory:block/workbench/blueprint/side",
+		"3": "polyfactory:block/workbench/blueprint/top",
+		"4": "polyfactory:block/workbench/blueprint/front",
+		"particle": "polyfactory:block/workbench/blueprint/front"
+	}
+}

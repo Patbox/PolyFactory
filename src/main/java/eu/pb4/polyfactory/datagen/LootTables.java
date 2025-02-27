@@ -100,6 +100,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.TINY_POTATO_SPRING);
         this.addDrop(FactoryBlocks.CRAFTER);
         this.addDrop(FactoryBlocks.WORKBENCH);
+        this.addDrop(FactoryBlocks.BLUEPRINT_WORKBENCH);
         this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE);
         this.addDrop(FactoryBlocks.TURNTABLE);
 
