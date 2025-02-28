@@ -25,7 +25,7 @@ public class Schema3818_3Mixin {
     private static void addCustomComponents(Schema schema, CallbackInfoReturnable<SequencedMap<String, Supplier<TypeTemplate>>> cir) {
         var map = cir.getReturnValue();
 
-        map.put("polyfactory:item_filter", () -> TypeReferences.ITEM_STACK.in(schema));
+        map.put("polyfactory:item_filter", () -> DSL.or(TypeReferences.ITEM_STACK.in(schema), DSL.list(TypeReferences.ITEM_STACK.in(schema))));
         map.put("polyfactory:stored_data", () -> FactoryTypeReferences.DATA_CONTAINER.in(schema));
         map.put("polyfactory:remote_keys", () -> DSL.compoundList(TypeReferences.ITEM_STACK.in(schema)));
     }

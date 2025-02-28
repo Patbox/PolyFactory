@@ -1,11 +1,14 @@
 package eu.pb4.polyfactory.mixin.machines;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.other.FilteredBlockEntity;
 import eu.pb4.polyfactory.item.tool.AbstractFilterItem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
@@ -36,6 +39,9 @@ public class HopperBlockMixin {
             }
             be.polyfactory$setFilter(stack.copyWithCount(1));
             stack.decrement(1);
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                TriggerCriterion.trigger(serverPlayer, FactoryTriggers.ITEM_FILTER_USE);
+            }
             cir.setReturnValue(ActionResult.SUCCESS_SERVER);
         } else if (stack.isEmpty() && !be.polyfactory$getFilter().isEmpty() && player.isSneaking()) {
             player.setStackInHand(Hand.MAIN_HAND, be.polyfactory$getFilter());

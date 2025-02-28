@@ -1,9 +1,11 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.AbstractFilterItem;
@@ -199,6 +201,9 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
                         }
                         splitterBlockEntity.setFilterLeft(stack.copyWithCount(1));
                         stack.decrement(1);
+                        if (player instanceof ServerPlayerEntity serverPlayer) {
+                            TriggerCriterion.trigger(serverPlayer, FactoryTriggers.ITEM_FILTER_USE);
+                        }
                     }
                     return ActionResult.SUCCESS_SERVER;
                 } else if (!splitterBlockEntity.getFilterRight().isEmpty() || !stack.isEmpty()) {
@@ -211,6 +216,9 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
                         }
                         splitterBlockEntity.setFilterRight(stack.copyWithCount(1));
                         stack.decrement(1);
+                        if (player instanceof ServerPlayerEntity serverPlayer) {
+                            TriggerCriterion.trigger(serverPlayer, FactoryTriggers.ITEM_FILTER_USE);
+                        }
                     }
                     return ActionResult.SUCCESS_SERVER;
                 }

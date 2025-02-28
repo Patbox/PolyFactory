@@ -380,14 +380,23 @@
   "advancements.polyfactory.item_packer.title": "Pack it up",
   "advancements.polyfactory.item_packer.description": "Use Item Packer to put or take items from Bundle or Shulker Box",
 
+  "advancements.polyfactory.item_filter.title": "Nice and clean",
+  "advancements.polyfactory.item_filter.description": "Use Item Filter to filter out passing items.",
+
   "advancements.polyfactory.workbench.title": "Better than Crafting Table",
   "advancements.polyfactory.workbench.description": "Create a Workbench",
+
+  "advancements.polyfactory.blueprint_workbench.title": "Following the blueprints",
+  "advancements.polyfactory.blueprint_workbench.description": "Use Blueprint Workbench to quickly craft items.",
 
   "advancements.polyfactory.fan.title": "Moving with the wind",
   "advancements.polyfactory.fan.description": "Get pushed by a Fan!",
 
   "advancements.polyfactory.fan_sky.title": "Like a Feather",
   "advancements.polyfactory.fan_sky.description": "Jump into upward-facing, fast-moving Fan",
+
+  "advancements.polyfactory.ejector.title": "Ready. Set. Launch!",
+  "advancements.polyfactory.ejector.description": "Step onto a Mechanical Ejector and get launched!",
 
   "advancements.polyfactory.miner.title": "Remote Mining",
   "advancements.polyfactory.miner.description": "Use Mechanical Miner to break a block remotely",
@@ -412,6 +421,9 @@
 
   "advancements.polyfactory.cable.title": "Connected!",
   "advancements.polyfactory.cable.description": "Connect Data Provider to an Receiver with Cable",
+
+  "advancements.polyfactory.record_player.title": "State-of-The-Art Sound System",
+  "advancements.polyfactory.record_player.description": "Connect Record Player and Speakers, then play a disk with them.",
 
   "advancements.polyfactory.redstone.title": "Redstone in, Redstone out",
   "advancements.polyfactory.redstone.description": "Connect Redstone Input and Redstone Output together and send a signal",

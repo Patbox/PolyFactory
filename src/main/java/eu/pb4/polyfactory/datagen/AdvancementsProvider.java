@@ -361,6 +361,21 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.CABLE_CONNECT))
                 .build(exporter, "polyfactory:main/base/cable");
 
+        var recordPlayer = Advancement.Builder.create()
+                .parent(cable)
+                .display(
+                        FactoryItems.RECORD_PLAYER,
+                        Text.translatable("advancements.polyfactory.record_player.title"),
+                        Text.translatable("advancements.polyfactory.record_player.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("a", TriggerCriterion.of(FactoryTriggers.CONNECT_RECORD_PLAYER_AND_SPEAKERS))
+                .build(exporter, "polyfactory:main/base/record_player");
+
         var redstone = Advancement.Builder.create()
                 .parent(cable)
                 .display(
@@ -620,6 +635,21 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .criterion("craft", RecipeCraftedCriterion.Conditions.create(recipeKey("workbench")))
                 .build(exporter, "polyfactory:main/base/workbench");
 
+        var blueprintWorkbench = Advancement.Builder.create()
+                .parent(workbench)
+                .display(
+                        FactoryItems.BLUEPRINT_WORKBENCH,
+                        Text.translatable("advancements.polyfactory.blueprint_workbench.title"),
+                        Text.translatable("advancements.polyfactory.blueprint_workbench.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("craft", TriggerCriterion.of(FactoryTriggers.CRAFT_WITH_BLUEPRINT_WORKBENCH))
+                .build(exporter, "polyfactory:main/base/blueprint_workbench");
+
         var container = Advancement.Builder.create()
                 .parent(workbench)
                 .display(
@@ -634,6 +664,22 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 )
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.CONTAINER_ADD_ITEM))
                 .build(exporter, "polyfactory:main/base/container");
+
+
+        var itemFilter = Advancement.Builder.create()
+                .parent(press)
+                .display(
+                        FactoryItems.ITEM_FILTER,
+                        Text.translatable("advancements.polyfactory.item_filter.title"),
+                        Text.translatable("advancements.polyfactory.item_filter.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.ITEM_FILTER_USE))
+                .build(exporter, "polyfactory:main/base/item_filter");
 
         var itemPacker = Advancement.Builder.create()
                 .parent(container)
@@ -679,6 +725,21 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 )
                 .criterion("use", TriggerCriterion.of(FactoryTriggers.MOVED_BY_FAN_A_LOT))
                 .build(exporter, "polyfactory:main/base/fan_sky");
+
+        var ejector = Advancement.Builder.create()
+                .parent(press)
+                .display(
+                        FactoryItems.EJECTOR,
+                        Text.translatable("advancements.polyfactory.ejector.title"),
+                        Text.translatable("advancements.polyfactory.ejector.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.LAUNCHED_BY_EJECTOR))
+                .build(exporter, "polyfactory:main/base/ejector");
 
         var miner = Advancement.Builder.create()
                 .parent(press)

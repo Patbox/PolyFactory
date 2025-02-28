@@ -57,14 +57,14 @@ public class BlueprintWorkbenchBlock extends WorkbenchBlock {
 
     public static class Model extends WorkbenchBlock.Model {
         private final SimpleEntityElement result;
+        private final InteractionElement clickable;
 
         private Model(BlockState state) {
             super(state);
 
             this.result = new SimpleEntityElement(EntityType.ITEM);
             this.result.setOffset(new Vec3d(0, 0.5, 0));
-            this.addElement(this.result);
-            var clickable = new InteractionElement(new VirtualElement.InteractionHandler() {
+            this.clickable = new InteractionElement(new VirtualElement.InteractionHandler() {
                 @Override
                 public void interact(ServerPlayerEntity player, Hand hand) {
                     BlueprintWorkbenchBlock.clickForCrafting(player, blockPos());
@@ -72,7 +72,6 @@ public class BlueprintWorkbenchBlock extends WorkbenchBlock {
             });
             clickable.setSize(0.4f, 0.55f);
             clickable.setOffset(new Vec3d(0, 0.5, 0));
-            this.addElement(clickable);
         }
 
         @Override
@@ -84,8 +83,12 @@ public class BlueprintWorkbenchBlock extends WorkbenchBlock {
 
         public void setResult(ItemStack stack) {
             this.removeElement(this.result);
-            this.result.getDataTracker().set(ItemEntityAccessor.getSTACK(), stack.copy());
-            this.addElement(this.result);
+            this.removeElement(this.clickable);
+            if (!stack.isEmpty()) {
+                this.result.getDataTracker().set(ItemEntityAccessor.getSTACK(), stack.copy());
+                this.addElement(this.result);
+                this.addElement(this.clickable);
+            }
         }
     }
 }

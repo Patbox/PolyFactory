@@ -48,6 +48,7 @@ public abstract class Schema1460Mixin extends Schema {
         registerInventory(schema, map, mod("mixer"));
         registerInventory(schema, map, mod("crafter"));
         registerInventory(schema, map, mod("workbench"));
+        registerInventory(schema, map, mod("blueprint_workbench"));
         registerInventory(schema, map, mod("mechanical_drain"));
         registerInventory(schema, map, mod("mechanical_spout"));
 
@@ -66,10 +67,23 @@ public abstract class Schema1460Mixin extends Schema {
         dataCache(schema, map, "nixie_tube_controller");
         dataCache(schema, map, "provider_data_cache");
         dataCache(schema, map, "hologram_projector");
+        dataCache(schema, map, "data_memory");
 
         schema.register(map, mod("double_input_transformer"), (name) -> {
             return DSL.optionalFields("input_data_1", FactoryTypeReferences.DATA_CONTAINER.in(schema),
                     "input_data_2", FactoryTypeReferences.DATA_CONTAINER.in(schema),
+                    "output_data", FactoryTypeReferences.DATA_CONTAINER.in(schema))
+                    ;
+        });
+
+        schema.register(map, mod("input_transformer"), (name) -> {
+            return DSL.optionalFields("input_data", FactoryTypeReferences.DATA_CONTAINER.in(schema),
+                    "output_data", FactoryTypeReferences.DATA_CONTAINER.in(schema))
+                    ;
+        });
+
+        schema.register(map, mod("data_extractor"), (name) -> {
+            return DSL.optionalFields("input_data", FactoryTypeReferences.DATA_CONTAINER.in(schema),
                     "output_data", FactoryTypeReferences.DATA_CONTAINER.in(schema))
                     ;
         });
