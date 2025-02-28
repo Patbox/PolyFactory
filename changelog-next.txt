@@ -43,7 +43,8 @@
 - Improved physics of Dynamite and Sticky Dynamite
 - Splash particles are no longer saved.
 - Updated Mechanical Press model and texture.
+- Updated Windmill Sail and Cable item textures.
 - Fan can now be only broken with correct tool.
-
+- New advancements for added content.
 - Fixed Pressure Fluid Gun not working correctly in offhand.
 - Fixed Wireless Redstone sounds not working.

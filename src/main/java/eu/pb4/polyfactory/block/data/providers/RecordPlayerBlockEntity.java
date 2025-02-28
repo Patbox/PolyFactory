@@ -1,6 +1,8 @@
 package eu.pb4.polyfactory.block.data.providers;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
@@ -9,6 +11,7 @@ import eu.pb4.polyfactory.data.CapacityData;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.data.SpeakerNode;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
@@ -152,6 +155,11 @@ public class RecordPlayerBlockEntity extends ChanneledDataBlockEntity implements
                 }
                 if (this.model != null) {
                     this.model.updatePosition(this.speakers, this.volume);
+                }
+                if (!this.speakers.isEmpty()) {
+                    if (this.ticksSinceSongStarted == 5 && FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
+                        TriggerCriterion.trigger(player, FactoryTriggers.CONNECT_RECORD_PLAYER_AND_SPEAKERS);
+                    }
                 }
                 ++this.ticksSinceSongStarted;
             }

@@ -1,7 +1,9 @@
 package eu.pb4.polyfactory.block.other;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.PredicateLimitedSlot;
@@ -137,7 +139,7 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
         }
 
         player.playSoundToPlayer(SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.5f, 1);
-
+        TriggerCriterion.trigger(player, FactoryTriggers.CRAFT_WITH_BLUEPRINT_WORKBENCH);
         player.swingHand(Hand.MAIN_HAND, true);
     }
 

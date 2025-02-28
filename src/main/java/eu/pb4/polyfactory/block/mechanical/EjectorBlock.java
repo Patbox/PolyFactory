@@ -1,8 +1,10 @@
 package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
 import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
@@ -63,10 +65,10 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
             WrenchAction.FACING_HORIZONTAL,
             WrenchAction.ofBlockEntityString("angle", EjectorBlockEntity.class,
                     x -> String.format(Locale.ROOT, "%.0f", x.angle()),
-                    (x, n) -> x.setAngle(FactoryUtil.wrap(x.angle() + (n ? 5f : -5f), 10, 75))),
+                    (x, n) -> x.setAngle(FactoryUtil.wrap(x.angle() + (n ? 5f : -5f), 10, 65))),
             WrenchAction.ofBlockEntityString("strength", EjectorBlockEntity.class,
                     x -> String.format(Locale.ROOT, "%.2f", x.strength()),
-                    (x, n) -> x.setStrength(FactoryUtil.wrap(x.strength() + (n ? 0.25f : -0.25f), 1, 3.5f)))
+                    (x, n) -> x.setStrength(FactoryUtil.wrap(x.strength() + (n ? 0.25f : -0.25f), 1, 2.5f)))
             );
 
 
@@ -111,6 +113,13 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
         return List.of(new FunctionalAxisNode(state.get(FACING).rotateYClockwise().getAxis()));
     }
 
+    public void onLandedUpon(World world, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
+        if (!(world.getBlockEntity(pos) instanceof EjectorBlockEntity be) || (be.progress() < 1 && be.ignoredTick() + 4 < world.getTime()) || !state.get(ENABLED)) {
+            return;
+        }
+        super.onLandedUpon(world, state, pos, entity, fallDistance);
+    }
+
     @Override
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
         if (!(world.getBlockEntity(pos) instanceof EjectorBlockEntity be) || (be.progress() < 1 && be.ignoredTick() + 4 < world.getTime()) || !state.get(ENABLED)) {
@@ -132,7 +141,7 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
         if (entity instanceof LivingEntity livingEntity) {
             horizontalDrag = livingEntity.hasNoDrag() ? 1 : 0.91F;
         }
-        if (entity instanceof Flutterer flutterer) {
+        if (entity instanceof Flutterer ) {
             verticalDrag = horizontalDrag;
         }
 
@@ -145,6 +154,7 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
         entity.addVelocity(vec);
         if (entity instanceof ServerPlayerEntity player) {
             FactoryUtil.sendVelocityDelta(player, vec);
+            TriggerCriterion.trigger(player, FactoryTriggers.LAUNCHED_BY_EJECTOR);
         } else if (entity instanceof LastFanEffectedTickConsumer c) {
             c.polyfactory$setLastFanTick();
         }

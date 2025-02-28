@@ -29,7 +29,6 @@ public interface FactoryTriggers {
     Identifier DRAIN_USE = id("drain_use");
     Identifier FLUID_TANK_CONNECT = id("fluid_tank_connect");
     Identifier SPOUT_CRAFT = id("spout_craft");
-
     Identifier TATER_16 = id("tater_16");
     Identifier TATER_128 = id("tater_128");
     Identifier TATER_1024 = id("tater_1024");
@@ -38,4 +37,8 @@ public interface FactoryTriggers {
     Identifier DATA_MEMORY = id("data_memory");
     Identifier ITEM_PACKER_ACCESSES = id("item_packer_accesses");
     Identifier STICKY_WALL_SLIDING = id("sticky_wall_sliding");
+    Identifier LAUNCHED_BY_EJECTOR = id("launched_by_ejector");
+    Identifier CRAFT_WITH_BLUEPRINT_WORKBENCH = id("craft_with_blueprint_workbench");
+    Identifier ITEM_FILTER_USE = id("item_filter_use");
+    Identifier CONNECT_RECORD_PLAYER_AND_SPEAKERS = id("connect_record_player_and_speakers");
 }

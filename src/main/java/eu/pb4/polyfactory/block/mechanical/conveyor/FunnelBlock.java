@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
@@ -7,6 +8,7 @@ import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.factorytools.api.util.WorldPointer;
@@ -252,6 +254,9 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
                 player.getInventory().offerOrDrop(be.getFilter());
             }
             be.setFilter(stack.copyWithCount(1));
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                TriggerCriterion.trigger(serverPlayer, FactoryTriggers.ITEM_FILTER_USE);
+            }
             stack.decrement(1);
             return ActionResult.SUCCESS;
         } else if (stack.isEmpty() && !be.getFilter().isEmpty()) {
