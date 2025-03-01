@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
+import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polyfactory.util.inventory.FilteredRedirectedItemStorage;
@@ -17,7 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
-public class FunnelBlockEntity extends BlockEntity implements BlockEntityExtraListener {
+public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntityExtraListener {
     @SuppressWarnings("UnstableApiUsage")
     private final Storage<ItemVariant> storage = new FilteredRedirectedItemStorage<>(ItemStorage.SIDED,
             this::getWorld, this::getPos, () -> this.getCachedState().get(FunnelBlock.FACING), (t) -> this.matches(t.toStack()));

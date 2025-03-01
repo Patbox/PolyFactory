@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
+import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -14,7 +15,7 @@ import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.Objects;
 
-public class SplitterBlockEntity extends BlockEntity implements BlockEntityExtraListener {
+public class SplitterBlockEntity extends LockableBlockEntity implements BlockEntityExtraListener {
     private FilterData filterLeft = FilterData.EMPTY_FALSE;
     private FilterData filterRight = FilterData.EMPTY_FALSE;
     private ItemStack filterStackLeft = ItemStack.EMPTY;

@@ -367,6 +367,17 @@ class RecipesProvider extends FabricRecipeProvider {
                         .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                         .offerTo(exporter);
 
+                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.SLOT_AWARE_FUNNEL, 1)
+                        .pattern("gcg")
+                        .pattern("sfs")
+                        .pattern("gsg")
+                        .input('c', FactoryItems.REDSTONE_CHIP)
+                        .input('s', FactoryItems.STEEL_PLATE)
+                        .input('f', FactoryItems.FUNNEL)
+                        .input('g', Items.GOLD_INGOT)
+                        .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                        .offerTo(exporter);
+
                 ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.SPLITTER, 1)
                         .pattern("sss")
                         .pattern("fxf")

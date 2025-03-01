@@ -189,6 +189,10 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
         var hand = Hand.MAIN_HAND;
         var stack = player.getStackInHand(hand);
         if ((stack.getItem() instanceof AbstractFilterItem item && item.isFilterSet(stack) || stack.isEmpty()) && be instanceof SplitterBlockEntity splitterBlockEntity) {
+            if (!splitterBlockEntity.checkUnlocked(player)) {
+                return ActionResult.FAIL;
+            }
+
             var dir = state.get(FACING);
             if (hit.getSide().getAxis() != Direction.Axis.Y && hit.getSide().getAxis() != dir.getAxis()) {
                 if (hit.getSide() == dir.rotateYCounterclockwise() && (!splitterBlockEntity.getFilterLeft().isEmpty() || !stack.isEmpty())) {

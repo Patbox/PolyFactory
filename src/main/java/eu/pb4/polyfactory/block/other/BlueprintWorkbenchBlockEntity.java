@@ -5,6 +5,7 @@ import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.PredicateLimitedSlot;
 import eu.pb4.polyfactory.util.filter.FilterData;
@@ -202,6 +203,7 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
                 this.setSlotRedirect((i / 3) * 9 + 2 + i % 3, new Slot(be, i, 0, 0));
             }
             this.setSlot(9 + 6, () -> be.outputPreview.copy());
+            this.setSlot(9, PolydexCompat.getButton(RecipeType.CRAFTING));
             this.open();
         }
 

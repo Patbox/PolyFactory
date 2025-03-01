@@ -53,6 +53,7 @@ public class FactoryItems {
     public static final Item CONVEYOR = register(FactoryBlocks.CONVEYOR);
     public static final Item STICKY_CONVEYOR = register(FactoryBlocks.STICKY_CONVEYOR);
     public static final Item FUNNEL = register(FactoryBlocks.FUNNEL);
+    public static final Item SLOT_AWARE_FUNNEL = register(FactoryBlocks.SLOT_AWARE_FUNNEL);
     public static final Item SPLITTER = register(FactoryBlocks.SPLITTER);
     public static final Item FAN = register(FactoryBlocks.FAN);
     public static final Item EJECTOR = register(FactoryBlocks.EJECTOR);
@@ -212,6 +213,7 @@ public class FactoryItems {
                     entries.add(FAN);
                     entries.add(METAL_GRID);
                     entries.add(FUNNEL);
+                    entries.add(SLOT_AWARE_FUNNEL);
                     entries.add(SPLITTER);
                     entries.add(CONTAINER);
                     entries.add(ITEM_PACKER);

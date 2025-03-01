@@ -24,6 +24,7 @@ import eu.pb4.polyfactory.block.mechanical.EjectorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.FanBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.conveyor.SlotAwareFunnelBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.MinerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.PlacerBlockEntity;
@@ -55,6 +56,9 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<FunnelBlockEntity> FUNNEL = register("funnel",
              FabricBlockEntityTypeBuilder.create(FunnelBlockEntity::new, FactoryBlocks.FUNNEL));
+
+    public static final BlockEntityType<SlotAwareFunnelBlockEntity> SLOT_AWARE_FUNNEL = register("slot_aware_funnel",
+            FabricBlockEntityTypeBuilder.create(SlotAwareFunnelBlockEntity::new, FactoryBlocks.SLOT_AWARE_FUNNEL));
 
     public static final BlockEntityType<SplitterBlockEntity> SPLITTER = register("splitter",
              FabricBlockEntityTypeBuilder.create(SplitterBlockEntity::new, FactoryBlocks.SPLITTER));
@@ -109,7 +113,7 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<BlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache",
              FabricBlockEntityTypeBuilder.create(ChanneledDataBlockEntity::migrating, FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
                     FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER, FactoryBlocks.BLOCK_OBSERVER, FactoryBlocks.DATA_MEMORY, FactoryBlocks.TEXT_INPUT,
-                     FactoryBlocks.SPEAKER));
+                     FactoryBlocks.SPEAKER, FactoryBlocks.TPS_PROVIDER));
 
     public static final BlockEntityType<DataMemoryBlockEntity> DATA_MEMORY = register("data_memory",
             FabricBlockEntityTypeBuilder.create(DataMemoryBlockEntity::new, FactoryBlocks.DATA_MEMORY));

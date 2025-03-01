@@ -52,7 +52,7 @@ public class FilterIcon {
         var count = items / 2f - 0.5f;
         var mat = BlockModel.mat();
         mat.set(this.transform);
-        if (items > 2) {
+        if (items > 3) {
             mat.scale(3f / items);
         }
         mat.translate(count, 0, 0);

@@ -18,10 +18,15 @@
   - It needs to recharge after use, with time depending on strength.
   - Crafted with Steel Places, Wooden Plates, Steel Gear and an Axle.
 - Added Blueprint Workbench:
-  - A new workbench variant, that acts as a "static recipe template".
+  - A new Workbench variant, that acts as a "static recipe template".
   - When in world (hovering) item is clicked, it will be crafted from items in player's inventory.
   - Crafting pattern is defined by items in the workbench and supports usage of Item Filters for multi-item selection.
   - Crafted with a Workbench, a Paper and Blue Dye.
+- Added Slot-Aware Funnel:
+  - A new Funnel variant, that allows you to set which slots items should go into.
+  - Supports up to 9 different slots, each with own filter (which is set as either Item Filter or just item directly).
+  - Each slot can target any slot from 0 to 99.
+  - Crafted with Gold Ingots, Steel Plates, Redstone Chip and a Funnel.
 - Data Memory Block improvements:
   - It now has separate input and output, with their own channels, instead of single input for reading and writing to it.
   - You now need to hold Wrench as cursor item to toggle Data Memory Block item's Read Only state:
@@ -40,11 +45,15 @@
   - Granite into Gravel and 10% chance for Quartz
 - Added String Mesh - Crafted from 5 strings, currently only a crafting ingredient.
 - Fixed and improved Copper waxing recipes in Press.
-- Improved physics of Dynamite and Sticky Dynamite
+- Improved physics of Dynamite and Sticky Dynamite.
+- Drains with Echo Shard will now attract Experience Orbs.
 - Splash particles are no longer saved.
 - Updated Mechanical Press model and texture.
 - Updated Windmill Sail and Cable item textures.
+- Split up texture of Funnel block and updated it's model's UV mappings.
 - Fan can now be only broken with correct tool.
 - New advancements for added content.
 - Fixed Pressure Fluid Gun not working correctly in offhand.
 - Fixed Wireless Redstone sounds not working.
+- Fixed Vanilla Crafters not having items put into them correctly (acted like regular inventory).
+- Fixed upside-down Holograms not being rotated correctly.

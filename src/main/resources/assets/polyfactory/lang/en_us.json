@@ -5,6 +5,8 @@
   "block.polyfactory.conveyor": "Item Conveyor",
   "block.polyfactory.sticky_conveyor": "Sticky Item Conveyor",
   "block.polyfactory.funnel": "Funnel",
+  "block.polyfactory.slot_aware_funnel": "Slot-Aware Funnel",
+  "block.polyfactory.slot_aware_funnel.set_slot_title": "Set Target for Slot %s",
   "block.polyfactory.fan": "Fan",
   "block.polyfactory.ejector": "Mechanical Ejector",
   "block.polyfactory.metal_grid": "Metal Grid",
@@ -147,6 +149,9 @@
   "block.polyfactory.inverted_fixture_lamp.colored": "Inverted %s Fixture Lamp",
   "block.polyfactory.inverted_fixture_lamp.colored.full": "Inverted %s Fixture Lamp (%s)",
   "block.polyfactory.steel_button": "Steel Button",
+
+  "block.polyfactory.tps_provider": "TPS Provider",
+
 
   "item.polyfactory.item_filter": "Item Filter",
   "item.polyfactory.item_filter.empty": "Empty Item Filter",
@@ -298,8 +303,8 @@
   "effect.polyfactory.sticky.slime": "Sticky (Slime)",
   "effect.polyfactory.sticky.honey": "Sticky (Honey)",
 
-  "death.polyfactory.experience_bolt": "%1$s was shot by %2$s",
-  "death.polyfactory.experience_bolt.item": "%1$s was shot by %2$s using %3$s",
+  "death.attack.polyfactory.experience_bolt": "%1$s was shot by %2$s",
+  "death.attack.polyfactory.experience_bolt.item": "%1$s was shot by %2$s using %3$s",
 
   "enchantment.polyfactory.ignore_movement": "Stable Ground",
   "recipe_type.polyfactory.press": "Press",

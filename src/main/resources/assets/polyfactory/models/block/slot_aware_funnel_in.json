@@ -1,0 +1,7 @@
+{
+	"parent": "polyfactory:block/funnel_in",
+	"textures": {
+		"particle": "polyfactory:block/funnel/slot_aware_frame",
+		"frame": "polyfactory:block/funnel/slot_aware_frame"
+	}
+}

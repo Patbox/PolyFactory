@@ -1,11 +1,17 @@
 package eu.pb4.polyfactory.datagen;
 
 import com.google.common.hash.HashCode;
+import eu.pb4.mapcanvas.api.core.CanvasColor;
+import eu.pb4.mapcanvas.api.core.CanvasImage;
+import eu.pb4.mapcanvas.api.core.DrawableCanvas;
+import eu.pb4.mapcanvas.api.font.DefaultFonts;
+import eu.pb4.mapcanvas.api.utils.CanvasUtils;
 import eu.pb4.polyfactory.item.FactoryDebugItems;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.ConveyorModels;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
+import eu.pb4.polyfactory.util.ResourceUtils;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
@@ -29,6 +35,9 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -56,6 +65,7 @@ class AssetProvider implements DataProvider {
         var map = new HashMap<Identifier, ItemAsset>();
         createItems(map::put);
         map.forEach((id, asset) -> assetWriter.accept(AssetPaths.itemAsset(id), asset.toJson().getBytes(StandardCharsets.UTF_8)));
+        createNumberButtons(assetWriter);
     }
 
     private static void createItems(BiConsumer<Identifier, ItemAsset> consumer) {
@@ -106,6 +116,7 @@ class AssetProvider implements DataProvider {
 
         fromItem.accept(FactoryItems.FAN, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("block/").withSuffixedPath("_base")), ItemAsset.Properties.DEFAULT));
         fromItem.accept(FactoryItems.FUNNEL, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("block/").withSuffixedPath("_out")), ItemAsset.Properties.DEFAULT));
+        fromItem.accept(FactoryItems.SLOT_AWARE_FUNNEL, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("block/").withSuffixedPath("_out")), ItemAsset.Properties.DEFAULT));
         fromItem.accept(FactoryItems.FLUID_TANK, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("block/").withSuffixedPath("/single_single_single")), ItemAsset.Properties.DEFAULT));
         fromItem.accept(FactoryItems.INVERTED_REDSTONE_LAMP, id -> new ItemAsset(new BasicItemModel(Identifier.ofVanilla("block/redstone_lamp_on")), ItemAsset.Properties.DEFAULT));
         fromItem.accept(FactoryItems.ELECTRIC_MOTOR, id -> new ItemAsset(new BasicItemModel(id("block/motor")), ItemAsset.Properties.DEFAULT));
@@ -149,6 +160,70 @@ class AssetProvider implements DataProvider {
                 new BasicItemModel(id("block/redstone_output_overlay"), List.of(new CustomModelDataTintSource(0, 0xFF0000))), ItemAsset.Properties.DEFAULT));
 
         consumer.accept(id("placeholder"), new ItemAsset(new BasicItemModel(id("item/placeholder")), ItemAsset.Properties.DEFAULT));
+    }
+
+
+    private static void createNumberButtons(BiConsumer<String,byte[]> assetWriter) {
+        var empty = ResourceUtils.getTexture(id("sgui/elements/numbered_buttons/empty"));
+        for (int i = 0; i < 100; i++) {
+            var out = new BufferedImage(empty.getWidth(), empty.getHeight(), empty.getType());
+            for (int x = 0; x < out.getWidth(); x++) {
+                for (int y = 0; y < out.getHeight(); y++) {
+                    out.setRGB(x, y, empty.getRGB(x, y));
+                }
+            }
+            var proxy = new DrawableCanvas() {
+                @Override
+                public byte getRaw(int x, int y) {
+                    if (x < 0 || y < 0 || x >= this.getWidth() || y >= this.getHeight()) {
+                        return 0;
+                    }
+                    return CanvasUtils.findClosestRawColorARGB(out.getRGB(x, y));
+                }
+
+                @Override
+                public void setRaw(int x, int y, byte b) {
+                    if (x < 0 || y < 0 || x >= this.getWidth() || y >= this.getHeight()) {
+                        return;
+                    }
+                    var color = CanvasColor.getFromRaw(b);
+                    int rgb = 0;
+                    if (color == CanvasColor.WHITE_HIGH) {
+                        rgb = 0xFFFFFFFF;
+                    } else if (color == CanvasColor.WHITE_LOW) {
+                        rgb = 0xFF222222;
+                    }
+
+                    out.setRGB(x, y, rgb);
+                }
+
+                @Override
+                public int getHeight() {
+                    return out.getHeight();
+                }
+
+                @Override
+                public int getWidth() {
+                    return out.getWidth();
+                }
+            };
+
+
+            var text = String.valueOf(i);
+            var width = DefaultFonts.VANILLA.getTextWidth(text, 8);
+            //DefaultFonts.VANILLA.drawText(proxy, text, proxy.getWidth() / 2 - width / 2, 5, 8, CanvasColor.WHITE_LOW);
+            DefaultFonts.VANILLA.drawText(proxy, text, proxy.getWidth() / 2 - width / 2 - 1, 4, 8, CanvasColor.WHITE_HIGH);
+
+            var buf = new ByteArrayOutputStream();
+
+            try {
+                ImageIO.write(out, "png", buf);
+            } catch (IOException e) {
+
+            }
+
+            assetWriter.accept("assets/polyfactory/textures/sgui/elements/numbered_buttons/num_"  + i + ".png", buf.toByteArray());
+        }
     }
 
     @Override

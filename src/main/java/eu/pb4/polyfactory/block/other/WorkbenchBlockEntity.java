@@ -5,9 +5,11 @@ import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlock;
 import eu.pb4.polyfactory.ui.WorkbenchScreenHandler;
+import eu.pb4.polyfactory.util.inventory.CrafterLikeInsertInventory;
 import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -33,7 +35,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-public class WorkbenchBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, CustomInsertInventory, RecipeInputInventory, BlockEntityExtraListener {
+public class WorkbenchBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, CrafterLikeInsertInventory, RecipeInputInventory, BlockEntityExtraListener {
+
     private static final int[] INPUT_SLOTS = IntStream.range(0, 9).toArray();
     private final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(9, ItemStack.EMPTY);
     private final CraftingResultInventory result = new CraftingResultInventory();
@@ -85,29 +88,9 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
         return slot < 9;
     }
 
-    private int getLeastPopulatedInputSlot(ItemStack stack) {
-        if (stack.isEmpty()) {
-            return -1;
-        }
-        int slot = -1;
-        int count = 9999;
-
-        for (int i = 0; i < 9; i++) {
-            var cur = this.getStack(i);
-
-            if (cur.isEmpty()) {
-                return i;
-            }
-
-            if (ItemStack.areItemsAndComponentsEqual(cur, stack)) {
-                if (count > cur.getCount() && cur.getCount() < cur.getMaxCount()) {
-                    count = cur.getCount();
-                    slot = i;
-                }
-            }
-        }
-
-        return slot;
+    @Override
+    public int inputSize() {
+        return 9;
     }
 
     @Override
@@ -193,6 +176,29 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
                 return init;
             }
             var slot = this.getLeastPopulatedInputSlot(itemStack);
+            if (slot == -1) {
+                return init - itemStack.getCount();
+            }
+
+            var current = this.getStack(slot);
+            if (current.isEmpty()) {
+                this.setStack(slot, itemStack.copyWithCount(1));
+                itemStack.decrement(1);
+            } else {
+                current.increment(1);
+                itemStack.decrement(1);
+            }
+        }
+    }
+
+    @Override
+    public int insertStackSlots(ItemStack itemStack, Direction direction, IntList slots) {
+        var init = itemStack.getCount();
+        while (true) {
+            if (itemStack.isEmpty()) {
+                return init;
+            }
+            var slot = this.getLeastPopulatedInputSlot(itemStack, slots);
             if (slot == -1) {
                 return init - itemStack.getCount();
             }

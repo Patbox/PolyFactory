@@ -38,7 +38,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.STICKY_CONVEYOR);
 
         this.getOrCreateTagBuilder(FactoryBlockTags.CONVEYOR_TOP_OUTPUT)
-                .add(FactoryBlocks.FUNNEL).add(FactoryBlocks.SPLITTER);
+                .add(FactoryBlocks.FUNNEL).add(FactoryBlocks.SLOT_AWARE_FUNNEL).add(FactoryBlocks.SPLITTER);
 
         this.getOrCreateTagBuilder(FactoryBlockTags.GRINDER_TOP_PLACEABLE)
                 .add(FactoryBlocks.HAND_CRANK).add(FactoryBlocks.AXLE);
@@ -79,6 +79,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                         FactoryBlocks.NIXIE_TUBE,
                         FactoryBlocks.PRESS,
                         FactoryBlocks.FUNNEL,
+                        FactoryBlocks.SLOT_AWARE_FUNNEL,
                         FactoryBlocks.GRINDER,
                         FactoryBlocks.MINER,
                         FactoryBlocks.SPLITTER)

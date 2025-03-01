@@ -8,12 +8,16 @@ import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.GuiHelpers;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
+import eu.pb4.sgui.api.gui.GuiInterface;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemStackSet;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
@@ -89,7 +93,6 @@ public class ImprovedFilterItem extends AbstractFilterItem {
 
     private static class Gui extends SimpleGui {
         private final ItemStack stack;
-
         public Gui(ServerPlayerEntity player, ItemStack stack) {
             super(ScreenHandlerType.GENERIC_9X3, player, false);
             this.stack = stack;
@@ -153,6 +156,11 @@ public class ImprovedFilterItem extends AbstractFilterItem {
             } else {
                 stacks.add(this.screenHandler.getCursorStack().copyWithCount(1));
             }
+            var dedupe = ItemStackSet.create();
+            dedupe.addAll(stacks);
+            stacks.clear();
+            stacks.addAll(dedupe);
+
             stack.set(FactoryDataComponents.ITEM_FILTER, stacks);
             GuiUtils.playClickSound(player);
         }
@@ -161,6 +169,16 @@ public class ImprovedFilterItem extends AbstractFilterItem {
         public boolean onAnyClick(int index, ClickType type, SlotActionType action) {
             if (index == -999 || index == -1) {
                 return true;
+            }
+            var stacks = new ArrayList<>(getStacks(stack));
+            if (stacks.size() < 9 && type.shift && index > this.getVirtualSize()) {
+                stacks.add(this.screenHandler.getSlot(index).getStack().copyWithCount(1));
+                var dedupe = ItemStackSet.create();
+                dedupe.addAll(stacks);
+                stacks.clear();
+                stacks.addAll(dedupe);
+                stack.set(FactoryDataComponents.ITEM_FILTER, stacks);
+                GuiUtils.playClickSound(player);
             }
 
             if (this.screenHandler.getSlot(index).getStack() == stack) {

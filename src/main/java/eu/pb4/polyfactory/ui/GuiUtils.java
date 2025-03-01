@@ -22,9 +22,9 @@ public class GuiUtils {
         drawNumberInternal(gui, position, value, size, color, leadingZero, GuiTextures.NUMBERS_FLAT);
     }
 
-    public static void drawShadowNumbers(SlotGuiInterface gui, int position, int value, int size, int color, boolean leadingZero) {
-        drawNumberInternal(gui, position, value, size, color, leadingZero, GuiTextures.NUMBERS_SHADOW);
-    }
+    //public static void drawShadowNumbers(SlotGuiInterface gui, int position, int value, int size, int color, boolean leadingZero) {
+    //    drawNumberInternal(gui, position, value, size, color, leadingZero, GuiTextures.NUMBERS_SHADOW);
+    //}
 
     private static void drawNumberInternal(SlotGuiInterface gui, int position, int value, int size, int color, boolean leadingZero, IntFunction<GuiElementBuilder>[] numbers) {
         for (int i = size - 1; i >= 0; i--)  {
