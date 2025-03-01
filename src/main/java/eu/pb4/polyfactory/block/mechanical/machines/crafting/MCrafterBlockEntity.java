@@ -11,11 +11,13 @@ import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.inventory.CrafterLikeInsertInventory;
 import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
 import eu.pb4.polyfactory.util.inventory.WrappingInputRecipeInput;
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -54,7 +56,7 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class MCrafterBlockEntity extends LockableBlockEntity implements MachineInfoProvider, MinimalSidedInventory, CustomInsertInventory, RecipeInputInventory {
+public class MCrafterBlockEntity extends LockableBlockEntity implements MachineInfoProvider, MinimalSidedInventory, CrafterLikeInsertInventory, RecipeInputInventory {
     private static final int[] INPUT_SLOTS = IntStream.range(0, 9).toArray();
     private static final int[] OUTPUT_SLOTS = IntStream.range(9, 9+9).toArray();
     private static final SoundEvent CRAFT_SOUND_EVENT = SoundEvent.of(Identifier.of("minecraft:block.crafter.craft"));
@@ -119,35 +121,6 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
         return slot >= 9 && (dir == this.getCachedState().get(MCrafterBlock.FACING) || dir == Direction.DOWN)
                 || slot < 9 && this.getCachedState().get(MCrafterBlock.FACING).rotateYClockwise().getAxis() == dir.getAxis();
-    }
-
-
-    private int getLeastPopulatedInputSlot(ItemStack stack) {
-        if (stack.isEmpty()) {
-            return -1;
-        }
-        int slot = -1;
-        int count = 9999;
-
-        for (int i = 0; i < 9; i++) {
-            if (this.lockedSlots.get(i)) {
-                continue;
-            }
-            var cur = this.getStack(i);
-
-            if (cur.isEmpty()) {
-                return i;
-            }
-
-            if (ItemStack.areItemsAndComponentsEqual(cur, stack)) {
-                if (count > cur.getCount() && cur.getCount() < cur.getMaxCount()) {
-                    count = cur.getCount();
-                    slot = i;
-                }
-            }
-        }
-
-        return slot;
     }
 
     public void createGui(ServerPlayerEntity player) {
@@ -242,6 +215,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
                         self.setStack(i, out);
                         break;
                     } else if (ItemStack.areItemsAndComponentsEqual(c, out)) {
+                    } else if (ItemStack.areItemsAndComponentsEqual(c, out)) {
                         var count = Math.min((c.getMaxCount() - c.getCount()), out.getCount());
                         c.increment(count);
                         out.decrement(count);
@@ -326,31 +300,18 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
     }
 
     @Override
-    public int insertStack(ItemStack itemStack, Direction direction) {
-        var init = itemStack.getCount();
-        while (true) {
-            if (itemStack.isEmpty()) {
-                return init;
-            }
-            var slot = this.getLeastPopulatedInputSlot(itemStack);
-            if (slot == -1) {
-                return init - itemStack.getCount();
-            }
-
-            var current = this.getStack(slot);
-            if (current.isEmpty()) {
-                this.setStack(slot, itemStack.copyWithCount(1));
-                itemStack.decrement(1);
-            } else {
-                current.increment(1);
-                itemStack.decrement(1);
-            }
-        }
+    public @Nullable Text getCurrentState() {
+        return this.state;
     }
 
     @Override
-    public @Nullable Text getCurrentState() {
-        return this.state;
+    public boolean isSlotLocked(int i) {
+        return this.lockedSlots.get(i);
+    }
+
+    @Override
+    public int inputSize() {
+        return 9;
     }
 
     private class Gui extends SimpleGui {

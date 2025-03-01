@@ -299,17 +299,17 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
             this.axis = rot.getAxis();
             this.facing = dir;
             this.active = state.get(ACTIVE);
-            float p = 0;
+            float p = -90;
             float y = rot.asRotation();
 
             y = rot.asRotation();
-            var q = new Quaternionf();
+            var q = new Quaternionf().rotateX(MathHelper.HALF_PI);
             if (dir.getAxis() != Direction.Axis.Y) {
-                p = 90;
+                p = 0;
                 y = dir.asRotation();
                 q.rotateY((float) (MathHelper.HALF_PI * state.get(FRONT)));
             } else if (dir == Direction.DOWN) {
-                p = 180;
+                p = 90;
             }
             this.base.setLeftRotation(q);
             this.base.setYaw(y);

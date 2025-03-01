@@ -56,7 +56,7 @@ public class TextInputBlock extends CabledDataProviderBlock {
 
         return super.onUse(state, world, pos, player, hit);
     }
-    private class Gui extends AnvilInputGui {
+    private static class Gui extends AnvilInputGui {
         private final ChanneledDataBlockEntity blockEntity;
 
         public Gui(ServerPlayerEntity player, ChanneledDataBlockEntity blockEntity) {

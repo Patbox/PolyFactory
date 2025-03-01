@@ -8,11 +8,13 @@ import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.sgui.api.GuiHelpers;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -246,7 +248,6 @@ public class FactoryUtil {
         return -1;
     }
 
-
     public static int tryInsertingInv(Inventory inventory, ItemStack itemStack, Direction direction) {
         if (inventory instanceof CustomInsertInventory customInsertInventory) {
             return customInsertInventory.insertStack(itemStack, direction);
@@ -350,6 +351,113 @@ public class FactoryUtil {
         var size = inventory.size();
         var init = itemStack.getCount();
         for (int i = 0; i < size; i++) {
+            var current = inventory.getStack(i);
+
+            if (current.isEmpty()) {
+                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxCountPerStack());
+                inventory.setStack(i, itemStack.copyWithCount(maxMove));
+                itemStack.decrement(maxMove);
+
+            } else if (ItemStack.areItemsAndComponentsEqual(current, itemStack)) {
+                var maxMove = Math.min(Math.min(current.getMaxCount() - current.getCount(), itemStack.getCount()), inventory.getMaxCountPerStack());
+
+                if (maxMove > 0) {
+                    current.increment(maxMove);
+                    itemStack.decrement(maxMove);
+                }
+            }
+
+            if (itemStack.isEmpty()) {
+                return init;
+            }
+        }
+
+        return init - itemStack.getCount();
+    }
+
+
+    public static int tryInsertingIntoSlot(World world, BlockPos pos, ItemStack itemStack, Direction direction, IntList slots) {
+        var inv = HopperBlockEntity.getInventoryAt(world, pos);
+
+        if (inv != null) {
+            return FactoryUtil.tryInsertingInvIntoSlot(inv, itemStack, direction, slots);
+        }
+
+        var storage = ItemStorage.SIDED.find(world, pos, direction);
+        if (storage instanceof SlottedStorage<ItemVariant> slottedStorage) {
+            try (var t = Transaction.openOuter()) {
+                int total = 0;
+                for (var slot : slots) {
+                    if (slot >= slottedStorage.getSlotCount()) {
+                        continue;
+                    }
+                    var x = slottedStorage.getSlot(slot).insert(ItemVariant.of(itemStack), itemStack.getCount(), t);
+                    itemStack.decrement((int) x);
+                    total += x;
+                    if (itemStack.isEmpty()) {
+                        break;
+                    }
+                }
+                t.commit();
+                return total;
+            }
+        }
+
+        return -1;
+    }
+
+    public static int tryInsertingInvIntoSlot(Inventory inventory, ItemStack itemStack, Direction direction, IntList slots) {
+        if (inventory instanceof CustomInsertInventory customInsertInventory) {
+            return customInsertInventory.insertStackSlots(itemStack, direction, slots);
+        } else if (inventory instanceof SidedInventory sidedInventory) {
+            return tryInsertingSidedIntoSlot(sidedInventory, itemStack, direction, slots);
+        } else {
+            return tryInsertingRegularIntoSlot(inventory, itemStack, slots);
+        }
+    }
+
+    private static int tryInsertingSidedIntoSlot(SidedInventory inventory, ItemStack itemStack, Direction direction, IntList allowedSlots) {
+        var slots = inventory.getAvailableSlots(direction);
+        var init = itemStack.getCount();
+
+        for (int i = 0; i < slots.length; i++) {
+            var slot = slots[i];
+
+            if (!inventory.canInsert(slot, itemStack, direction) || !allowedSlots.contains(slot)) {
+                continue;
+            }
+
+            var current = inventory.getStack(slot);
+
+            if (current.isEmpty()) {
+                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxCountPerStack());
+                inventory.setStack(slot, itemStack.copyWithCount(maxMove));
+                itemStack.decrement(maxMove);
+            } else if (ItemStack.areItemsAndComponentsEqual(current, itemStack)) {
+                var maxMove = Math.min(Math.min(current.getMaxCount() - current.getCount(), itemStack.getCount()), inventory.getMaxCountPerStack());
+
+                if (maxMove > 0) {
+                    current.increment(maxMove);
+                    itemStack.decrement(maxMove);
+                }
+            }
+
+            if (itemStack.isEmpty()) {
+                return init;
+            }
+        }
+
+        return init - itemStack.getCount();
+    }
+
+    public static int tryInsertingRegularIntoSlot(Inventory inventory, ItemStack itemStack, IntList slots) {
+        var size = inventory.size();
+        var init = itemStack.getCount();
+        for (int i : slots) {
+            if (i >= size) {
+                continue;
+            }
+
             var current = inventory.getStack(i);
 
             if (current.isEmpty()) {

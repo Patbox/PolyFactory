@@ -6,6 +6,7 @@ import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -25,7 +26,9 @@ public class GuiTextures {
     public static final Function<Text, Text> CENTER_SLOT_GENERIC = background("center_slot");
     public static final Function<Text, Text> FILL3 = background("fill3");
     public static final Function<Text, Text> BLUEPRINT_WORKBENCH = background("blueprint_workbench");
+    public static final Function<Text, Text> SLOT_AWARE_FUNNEL = background("slot_aware_funnel");
     public static final Function<Text, Text> ITEM_FILTER = background("item_filter");
+    public static final Function<Text, Text> INPUT = backgroundAnvil("input");
     public static final Function<Text, Text> TEXT_INPUT = backgroundAnvil("text_input");
     public static final Function<Text, Text> DATA_EXTRACTOR = backgroundAnvil("data_extractor");
     public static final Supplier<GuiElementBuilder> EMPTY_BUILDER = icon16("empty");
@@ -42,6 +45,15 @@ public class GuiTextures {
     public static final Supplier<GuiElementBuilder> BUTTON_ITEM_FILTER_TYPE_ONLY = icon32("button/item_filter/type_only");
     public static final Supplier<GuiElementBuilder> BUTTON_ITEM_FILTER_STRICT = icon32("button/item_filter/strict");
     public static final Supplier<GuiElementBuilder> LOCKED_SLOT = icon32("locked_slot");
+
+    public static final Supplier<GuiElementBuilder> NUMBERED_BUTTONS_DISABLED = icon16("numbered_buttons/disabled");
+    @SuppressWarnings("unchecked")
+    public static final Supplier<GuiElementBuilder>[] NUMBERED_BUTTONS = Util.make(new Supplier[100], (arr) -> {
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = icon16("numbered_buttons/num_" + i);
+        }
+    });
+
     public static final ItemStack ITEM_FILTER_BLOCKED = icon16("item_filter_blocked").get().asStack();
     public static final Progress FLAME = Progress.createVertical("flame", 1, 14, true);
     public static final Progress ICE = Progress.createVertical("ice", 1, 14, true);
@@ -54,7 +66,7 @@ public class GuiTextures {
     public static final Temperature TEMPERATURE = new Temperature(FLAME, ICE);
     public static final Temperature TEMPERATURE_OFFSET_RIGHT = new Temperature(FLAME_OFFSET_RIGHT, ICE_OFFSET_RIGHT);
     public static final IntFunction<GuiElementBuilder>[] NUMBERS_FLAT = createNumbers("flat/");
-    public static final IntFunction<GuiElementBuilder>[] NUMBERS_SHADOW = createNumbers("shadow/");
+    //public static final IntFunction<GuiElementBuilder>[] NUMBERS_SHADOW = createNumbers("shadow/");
     public static final char SPACE_1 = UiResourceCreator.space(1);
     public static final char POLYDEX_OFFSET = UiResourceCreator.space(168);
     public static final char POLYDEX_OFFSET_N = UiResourceCreator.space(-168);

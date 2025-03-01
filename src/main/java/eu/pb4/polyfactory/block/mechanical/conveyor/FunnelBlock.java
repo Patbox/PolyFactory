@@ -245,7 +245,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
 
         var be = world.getBlockEntity(pos) instanceof FunnelBlockEntity x ? x : null;
 
-        if (be == null) {
+        if (be == null || !be.checkUnlocked(player)) {
             return ActionResult.FAIL;
         }
 
@@ -296,7 +296,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
 
     @Override
     public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(world, pos, initialBlockState);
+        return new Model(initialBlockState, pos);
     }
 
     @Override
@@ -308,14 +308,16 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         private static final ItemStack MODEL_IN = new ItemStack(BaseItemProvider.requestModel());
         private static final ItemStack MODEL_OUT = new ItemStack(BaseItemProvider.requestModel());
         final FilterIcon filterElement = new FilterIcon(this);
+        private final ItemDisplayElement mainElement;
+        private final float offset;
 
-        private Model(ServerWorld world, BlockPos pos, BlockState state) {
+        protected Model(BlockState state, BlockPos pos) {
             this.mainElement = new LodItemDisplayElement();
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
             this.mainElement.setInvisible(true);
             this.mainElement.setViewRange(0.8f);
-
+            this.offset = pos.getManhattanDistance(BlockPos.ZERO) % 2 == 0 ? 0.002f : 0;
             this.updateFacing(state);
             this.addElement(this.mainElement);
         }
@@ -324,24 +326,28 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
             var rot = facing.get(FACING).getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
             mat.identity();
             mat.rotate(rot);
+            mat.translate(0, this.offset / 2, this.offset);
             mat.scale(2.01f);
             var outModel = facing.get(MODE) == ConveyorLikeDirectional.TransferMode.FROM_CONVEYOR;
 
-            this.mainElement.setItem(outModel ? MODEL_OUT : MODEL_IN);
+            this.mainElement.setItem(getModel(outModel));
             this.mainElement.setTransformation(mat);
-
 
             mat.identity();
             mat.rotate(rot).rotateY(MathHelper.PI);
             if (outModel) {
                 mat.rotateX(-22.5f * MathHelper.RADIANS_PER_DEGREE);
-                mat.translate(0, 0.50f, 0.008f);
+                mat.translate(0, 7.25f / 16f, 0.008f);
             } else {
                 mat.translate(0, 8.5f / 16f, 0.025f);
             }
             mat.scale(0.3f, 0.3f, 0.005f);
             this.filterElement.setTransformation(mat);
             this.tick();
+        }
+
+        protected ItemStack getModel(boolean outModel) {
+            return outModel ? MODEL_OUT : MODEL_IN;
         }
 
         @Override

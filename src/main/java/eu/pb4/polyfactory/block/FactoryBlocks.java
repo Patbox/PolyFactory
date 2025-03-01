@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.block.creative.CreativeMotorBlock;
 import eu.pb4.polyfactory.block.data.CableBlock;
 import eu.pb4.polyfactory.block.data.GatedCableBlock;
 import eu.pb4.polyfactory.block.data.WallWithCableBlock;
+import eu.pb4.polyfactory.block.data.creative.TpsProviderBlock;
 import eu.pb4.polyfactory.block.data.io.ArithmeticOperatorBlock;
 import eu.pb4.polyfactory.block.data.io.DataComparatorBlock;
 import eu.pb4.polyfactory.block.data.io.DataExtractorBlock;
@@ -19,6 +20,7 @@ import eu.pb4.polyfactory.block.fluids.*;
 import eu.pb4.polyfactory.block.mechanical.*;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlock;
+import eu.pb4.polyfactory.block.mechanical.conveyor.SlotAwareFunnelBlock;
 import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.MinerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.PlacerBlock;
@@ -57,7 +59,8 @@ public class FactoryBlocks {
     private static final List<Block> BLOCKS = new ArrayList<>();
     public static final ConveyorBlock CONVEYOR = register("conveyor", settings -> new ConveyorBlock(settings.hardness(3).nonOpaque()));
     public static final ConveyorBlock STICKY_CONVEYOR = register("sticky_conveyor", settings -> new ConveyorBlock(settings.hardness(3).nonOpaque()));
-    public static final FunnelBlock FUNNEL = register("funnel", Block.Settings.copy(Blocks.SPRUCE_TRAPDOOR), settings -> new FunnelBlock(settings.nonOpaque()));
+    public static final FunnelBlock FUNNEL = register("funnel", Block.Settings.copy(Blocks.SPRUCE_TRAPDOOR).nonOpaque(), FunnelBlock::new);
+    public static final SlotAwareFunnelBlock SLOT_AWARE_FUNNEL = register("slot_aware_funnel", Block.Settings.copy(Blocks.IRON_TRAPDOOR).nonOpaque(), SlotAwareFunnelBlock::new);
     public static final SplitterBlock SPLITTER = register("splitter", settings -> new SplitterBlock(settings.mapColor(MapColor.STONE_GRAY).instrument(NoteBlockInstrument.BASEDRUM).requiresTool().strength(3.3F).nonOpaque()));
     public static final FanBlock FAN = register("fan", settings -> new FanBlock(settings.nonOpaque().hardness(3).requiresTool()));
     public static final EjectorBlock EJECTOR = register("ejector", AbstractBlock.Settings.copy(FAN), EjectorBlock::new);
@@ -142,6 +145,9 @@ public class FactoryBlocks {
     public static final FluidTankBlock FLUID_TANK = register("fluid_tank", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new FluidTankBlock(settings.nonOpaque()));
     public static final PortableFluidTankBlock PORTABLE_FLUID_TANK = register("portable_fluid_tank", settings -> new PortableFluidTankBlock(settings
             .mapColor(MapColor.ORANGE).strength(2.0F).nonOpaque().sounds(BlockSoundGroup.COPPER).pistonBehavior(PistonBehavior.DESTROY)));
+
+    public static final TpsProviderBlock TPS_PROVIDER = register("tps_provider", Block.Settings.copy(Blocks.COMMAND_BLOCK).nonOpaque(), TpsProviderBlock::new);
+
 
     public static void register() {
         var s = System.currentTimeMillis();

@@ -42,10 +42,12 @@ public class FactoryDebugItems {
         });
     }));
     public static final Item ROTATION_DEBUG = register(FactoryBlocks.ROTATION_DEBUG);
+    public static final Item TPS_PROVIDER = register(FactoryBlocks.TPS_PROVIDER);
 
     public static void addItemGroup(ItemGroup.DisplayContext context, ItemGroup.Entries entries) {
         entries.add(DEBUG_PIPE_FLOW, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
         entries.add(DEBUG_NODE_INFO, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
         entries.add(ROTATION_DEBUG, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+        entries.add(TPS_PROVIDER, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
     }
 }
