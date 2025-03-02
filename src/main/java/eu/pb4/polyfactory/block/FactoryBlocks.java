@@ -146,6 +146,7 @@ public class FactoryBlocks {
     public static final PortableFluidTankBlock PORTABLE_FLUID_TANK = register("portable_fluid_tank", settings -> new PortableFluidTankBlock(settings
             .mapColor(MapColor.ORANGE).strength(2.0F).nonOpaque().sounds(BlockSoundGroup.COPPER).pistonBehavior(PistonBehavior.DESTROY)));
 
+    public static final SimpleFastBlock STEEL_BLOCK = register("steel_block", AbstractBlock.Settings.copy(Blocks.IRON_BLOCK), SimpleFastBlock::create);
     public static final TpsProviderBlock TPS_PROVIDER = register("tps_provider", Block.Settings.copy(Blocks.COMMAND_BLOCK).nonOpaque(), TpsProviderBlock::new);
 
 

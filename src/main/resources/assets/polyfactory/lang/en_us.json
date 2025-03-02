@@ -149,6 +149,7 @@
   "block.polyfactory.inverted_fixture_lamp.colored": "Inverted %s Fixture Lamp",
   "block.polyfactory.inverted_fixture_lamp.colored.full": "Inverted %s Fixture Lamp (%s)",
   "block.polyfactory.steel_button": "Steel Button",
+  "block.polyfactory.steel_block": "Block of Steel",
 
   "block.polyfactory.tps_provider": "TPS Provider",
 

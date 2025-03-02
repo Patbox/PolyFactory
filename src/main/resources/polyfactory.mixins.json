@@ -11,6 +11,7 @@
     "ItemEntityAccessor",
     "ProjectileEntityAccessor",
     "ServerRecipeManagerAccessor",
+    "SettingsAccessor",
     "ShapedRecipeAccessor",
     "SimpleBlockGraphAccessor",
     "StatusEffectInstanceAccessor",

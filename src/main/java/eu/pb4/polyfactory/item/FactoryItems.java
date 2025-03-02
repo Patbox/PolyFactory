@@ -82,6 +82,7 @@ public class FactoryItems {
     public static final Item ENDER_INFUSED_AMETHYST_SHARD = register("ender_infused_amethyst_shard", SimplePolymerItem::new);
     public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", SimplePolymerItem::new);
     public static final Item STEEL_INGOT = register("steel_ingot", SimplePolymerItem::new);
+    public static final Item STEEL_BLOCK = register(FactoryBlocks.STEEL_BLOCK);
     public static final Item STEEL_PLATE = register("steel_plate", SimplePolymerItem::new);
     public static final Item COPPER_PLATE = register("copper_plate", SimplePolymerItem::new);
     public static final Item BRITTLE_GLASS_BOTTLE = register("brittle_glass_bottle", SimplePolymerItem::new);
@@ -313,6 +314,7 @@ public class FactoryItems {
                     entries.add(CRUSHED_RAW_GOLD);
                     entries.add(STEEL_ALLOY_MIXTURE);
                     entries.add(STEEL_INGOT);
+                    entries.add(STEEL_BLOCK);
                     entries.add(STEEL_PLATE);
                     entries.add(COPPER_PLATE);
                     entries.add(WOODEN_PLATE);
