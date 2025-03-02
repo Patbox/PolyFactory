@@ -44,6 +44,7 @@
   - Andesite and Diorite into Gravel and 5% chance for Quartz
   - Granite into Gravel and 10% chance for Quartz
 - Added String Mesh - Crafted from 5 strings, currently only a crafting ingredient.
+- Added Block of Steel - Crafted with 9 Steel Ingots, acts as usual compacted block.
 - Fixed and improved Copper waxing recipes in Press.
 - Improved physics of Dynamite and Sticky Dynamite.
 - Drains with Echo Shard will now attract Experience Orbs.

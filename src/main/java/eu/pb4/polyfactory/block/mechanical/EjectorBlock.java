@@ -30,12 +30,14 @@ import net.minecraft.entity.Flutterer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
+import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
@@ -55,6 +57,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
@@ -151,9 +154,10 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
                 .mul((float) (entity.getFinalGravity() / 0.08))
                 .rotateAxis(be.angle() * MathHelper.RADIANS_PER_DEGREE, rot.getOffsetX(), rot.getOffsetY(), rot.getOffsetZ())
         );
-        entity.addVelocity(vec);
+        entity.setOnGround(false);
+        entity.setVelocity(vec);
         if (entity instanceof ServerPlayerEntity player) {
-            FactoryUtil.sendVelocityDelta(player, vec);
+            FactoryUtil.sendVelocityDelta(player, vec.add(0, player.getFinalGravity(), 0));
             TriggerCriterion.trigger(player, FactoryTriggers.LAUNCHED_BY_EJECTOR);
         } else if (entity instanceof LastFanEffectedTickConsumer c) {
             c.polyfactory$setLastFanTick();

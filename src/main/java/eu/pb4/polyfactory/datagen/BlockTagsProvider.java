@@ -81,6 +81,15 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.METAL_GRID)
         ;
 
+        this.getOrCreateTagBuilder(FactoryBlockTags.PIPE_CONNECTABLE)
+                .addOptionalTag(BlockTags.CAULDRONS)
+                .add(Blocks.BEEHIVE)
+        ;
+
+        this.getOrCreateTagBuilder(BlockTags.INCORRECT_FOR_WOODEN_TOOL)
+                .add(FactoryBlocks.STEEL_BLOCK)
+                ;
+
         this.getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE)
                 .addOptionalTag(FactoryBlockTags.CONVEYORS)
                 .add(FactoryBlocks.FAN,
@@ -93,6 +102,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                         FactoryBlocks.SPLITTER)
                 .add(FactoryBlocks.MIXER)
                 .add(FactoryBlocks.EJECTOR)
+                .add(FactoryBlocks.STEEL_BLOCK)
                 .add(FactoryBlocks.PLANTER)
                 .add(FactoryBlocks.PLACER)
                 .add(FactoryBlocks.STEAM_ENGINE)
