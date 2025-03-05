@@ -1,5 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
@@ -9,15 +11,12 @@ import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.ui.GuiTextures;
-import eu.pb4.polyfactory.ui.GuiUtils;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.CrafterLikeInsertInventory;
-import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
 import eu.pb4.polyfactory.util.inventory.WrappingInputRecipeInput;
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -26,6 +25,7 @@ import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.*;
 import net.minecraft.registry.RegistryWrapper;
@@ -40,6 +40,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -51,6 +52,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 public class MCrafterBlockEntity extends LockableBlockEntity implements MachineInfoProvider, MinimalSidedInventory, CrafterLikeInsertInventory, RecipeInputInventory {
@@ -69,6 +71,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
     private final RecipeInputInventory recipeInputProvider = WrappingInputRecipeInput.of(this, 0, 9, 3, 3);
     @Nullable
     private Text state;
+    private ActiveMode activeMode = ActiveMode.FILLED;
 
     public MCrafterBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.CRAFTER, pos, state);
@@ -79,6 +82,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
         Inventories.writeNbt(nbt, stacks, lookup);
         nbt.putDouble("progress", this.process);
         nbt.putByteArray("locked_slots", this.lockedSlots.toByteArray());
+        nbt.putString("active_mode", this.activeMode.asString());
         super.writeNbt(nbt, lookup);
     }
 
@@ -87,6 +91,10 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
         Inventories.readNbt(nbt, this.stacks, lookup);
         this.process = nbt.getDouble("progress");
         this.lockedSlots = BitSet.valueOf(nbt.getByteArray("locked_slots"));
+        if (nbt.contains("active_mode")) {
+            this.activeMode = ActiveMode.CODEC.decode(NbtOps.INSTANCE, nbt.get("active_mode"))
+                    .result().map(Pair::getFirst).orElse(ActiveMode.FILLED);
+        }
         super.readNbt(nbt, lookup);
     }
 
@@ -133,7 +141,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
     public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
         var self = (MCrafterBlockEntity) t;
         self.state = null;
-        if (self.isInputNotFull()) {
+        if (self.activeMode.prevent(self)) {
             self.process = 0;
             self.active = false;
             return;
@@ -211,7 +219,6 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
                     if (c.isEmpty()) {
                         self.setStack(i, out);
                         break;
-                    } else if (ItemStack.areItemsAndComponentsEqual(c, out)) {
                     } else if (ItemStack.areItemsAndComponentsEqual(c, out)) {
                         var count = Math.min((c.getMaxCount() - c.getCount()), out.getCount());
                         c.increment(count);
@@ -311,6 +318,15 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
         return 9;
     }
 
+    public ActiveMode getActiveMode() {
+        return this.activeMode;
+    }
+
+    public void setActiveMode(ActiveMode mode) {
+        this.activeMode = mode;
+        this.markDirty();
+    }
+
     private class Gui extends SimpleGui {
         private final BitSet lockedSlots;
         public Gui(ServerPlayerEntity player) {
@@ -383,6 +399,37 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
 
             this.setSlot(4 + 9, GuiTextures.PROGRESS_HORIZONTAL.get(progress()));
             super.onTick();
+        }
+    }
+
+    public enum ActiveMode implements StringIdentifiable {
+        FILLED("filled", MCrafterBlockEntity::isInputNotFull),
+        ALWAYS("always", be -> false),
+        POWERED("powered", be -> !be.getCachedState().get(MCrafterBlock.POWERED)),
+        NOT_POWERED("not_powered", be -> be.getCachedState().get(MCrafterBlock.POWERED))
+        ;
+
+        public static final Codec<ActiveMode> CODEC = StringIdentifiable.createCodec(ActiveMode::values);
+
+        private final String name;
+        private final Predicate<MCrafterBlockEntity> prevent;
+
+        ActiveMode(String id, Predicate<MCrafterBlockEntity> prevent) {
+            this.name = id;
+            this.prevent = prevent;
+        }
+
+        public boolean prevent(MCrafterBlockEntity be) {
+            return this.prevent.test(be);
+        }
+
+        @Override
+        public String asString() {
+            return this.name;
+        }
+
+        public Text asText() {
+            return Text.translatable("item.polyfactory.wrench.action.mechanical_crafter.active_mode." + asString());
         }
     }
 }

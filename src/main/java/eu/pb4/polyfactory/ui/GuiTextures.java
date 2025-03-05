@@ -44,6 +44,10 @@ public class GuiTextures {
     public static final Supplier<GuiElementBuilder> BUTTON_DONE_BLOCKED = icon32("button/done_blocked");
     public static final Supplier<GuiElementBuilder> BUTTON_ITEM_FILTER_TYPE_ONLY = icon32("button/item_filter/type_only");
     public static final Supplier<GuiElementBuilder> BUTTON_ITEM_FILTER_STRICT = icon32("button/item_filter/strict");
+    public static final Supplier<GuiElementBuilder> BUTTON_CRAFTER_MODEL_ALWAYS = icon32("button/crafter/mode_always");
+    public static final Supplier<GuiElementBuilder> BUTTON_CRAFTER_MODEL_FILLED = icon32("button/crafter/mode_filled");
+    public static final Supplier<GuiElementBuilder> BUTTON_CRAFTER_MODEL_POWERED = icon32("button/crafter/mode_powered");
+    public static final Supplier<GuiElementBuilder> BUTTON_CRAFTER_MODEL_NOT_POWERED = icon32("button/crafter/mode_not_powered");
     public static final Supplier<GuiElementBuilder> LOCKED_SLOT = icon32("locked_slot");
 
     public static final Supplier<GuiElementBuilder> NUMBERED_BUTTONS_DISABLED = icon16("numbered_buttons/disabled");

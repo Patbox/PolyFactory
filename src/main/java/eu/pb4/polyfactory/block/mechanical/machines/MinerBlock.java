@@ -58,6 +58,11 @@ import java.util.List;
 
 public class MinerBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, WrenchableBlock, BarrierBasedWaterloggable {
     public static final Property<Direction> FACING = Properties.FACING;
+    private static final List<WrenchAction> WRENCH_ACTIONS = List.of(
+            WrenchAction.FACING,
+            WrenchAction.ofBlockEntityInt("reach",  MinerBlockEntity.class, 1, 2, 0,
+                    MinerBlockEntity::reach, MinerBlockEntity::setReach)
+    );
 
     public MinerBlock(Settings settings) {
         super(settings);
@@ -179,7 +184,7 @@ public class MinerBlock extends RotationalNetworkBlock implements FactoryBlock, 
 
     @Override
     public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.FACING);
+        return WRENCH_ACTIONS;
     }
 
     public final class Model extends RotationAwareModel {

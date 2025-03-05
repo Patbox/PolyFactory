@@ -189,6 +189,7 @@
   "item.polyfactory.wrench.action.strict": "Strict",
   "item.polyfactory.wrench.action.half": "Half",
   "item.polyfactory.wrench.action.radius": "Radius",
+  "item.polyfactory.wrench.action.reach": "Reach",
   "item.polyfactory.wrench.action.scale": "Scale",
   "item.polyfactory.wrench.action.offset": "Offset",
   "item.polyfactory.wrench.action.force_text": "Force Text",
@@ -230,6 +231,13 @@
   "item.polyfactory.wrench.action.mode.transfer_mode.to_conveyor": "To Conveyor",
   "item.polyfactory.wrench.action.mode.transfer_mode.from_conveyor": "From Conveyor",
   "item.polyfactory.wrench.action.mode.transfer_mode.both": "Both",
+
+  "item.polyfactory.wrench.action.mechanical_crafter.active_mode": "Active",
+  "item.polyfactory.wrench.action.mechanical_crafter.active_mode.always": "Always",
+  "item.polyfactory.wrench.action.mechanical_crafter.active_mode.filled": "Filled",
+  "item.polyfactory.wrench.action.mechanical_crafter.active_mode.powered": "Powered",
+  "item.polyfactory.wrench.action.mechanical_crafter.active_mode.not_powered": "Not Powered",
+
 
   "text.polyfactory.direction.up": "Up",
   "text.polyfactory.direction.down": "Down",

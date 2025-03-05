@@ -39,7 +39,16 @@
 - Workbench improvements:
   - Updated model and texture.
   - It now shows items stored in it.
-- Mechanical Planters can now hold 9 stacks of items (previously could only hold 1).
+- Mechanical Crafter improvements:
+  - You can now change active mode of the crafter, which includes:
+    - "Filled" - Craft only if all slots are filled, matching previous behaviour. Also the default.
+    - "Always" - Craft as long as the recipe is valid.
+    - "Powered" - Craft as long as recipe is valid and the crafter is powered.
+    - "Not Powered" - Craft as long as recipe is valid and crafter isn't powered.
+  - Added wrench actions to the block.
+- Mechanical Miner now has configurable reach. It's limited to 2 blocks, defaulting to 2 (and 1 for old blocks).
+- Mechanical Placer now has configurable reach. It's limited to 2 blocks, defaulting to 1.
+- Mechanical Planter can now hold 9 stacks of items (previously could only hold 1).
 - New griding recipes:
   - Andesite and Diorite into Gravel and 5% chance for Quartz
   - Granite into Gravel and 10% chance for Quartz
@@ -53,6 +62,7 @@
 - Updated Windmill Sail and Cable item textures.
 - Split up texture of Funnel block and updated it's model's UV mappings.
 - Fan can now be only broken with correct tool.
+- Tweaked the look of items on conveyors and similar.
 - New advancements for added content.
 - Fixed Pressure Fluid Gun not working correctly in offhand.
 - Fixed Wireless Redstone sounds not working.

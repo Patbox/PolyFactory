@@ -18,6 +18,7 @@ import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.SidedInventory;
@@ -45,6 +46,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
     private float stress = 0;
     private PlacerBlock.Model model;
     private FactoryPlayer player;
+    private int reach = 1;
 
     public PlacerBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.PLACER, pos, state);
@@ -56,6 +58,12 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         nbt.putDouble("progress", this.process);
         if (this.owner != null) {
             nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+        }
+        nbt.putInt("reach", this.reach);
+        if (nbt.contains("reach")) {
+            this.reach = nbt.getInt("reach");
+        } else {
+            this.reach = 1;
         }
         super.writeNbt(nbt, lookup);
     }
@@ -101,7 +109,6 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
             self.model.setItem(self.stack);
         }
 
-        var blockPos = pos.offset(state.get(PlacerBlock.FACING));
 
         var usable = self.stack.isIn(FactoryItemTags.PLACER_USABLE);
 
@@ -110,6 +117,17 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
             self.model.setItem(ItemStack.EMPTY);
             return;
         }
+
+        BlockPos blockPos = pos;
+        int reach = self.reach;
+        while (reach-- > 0) {
+            blockPos = blockPos.offset(state.get(PlacerBlock.FACING));
+            if (!world.getBlockState(blockPos).isAir() || !world.getBlockState(blockPos.offset(state.get(PlacerBlock.FACING))).isAir()) {
+                break;
+            }
+        }
+
+
         if (!CommonProtection.canPlaceBlock(world, blockPos, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner,null) ||
         !CommonProtection.canInteractBlock(world, blockPos, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner,null)) {
             self.stress = 0;
@@ -233,6 +251,15 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
     public float getStress() {
         return this.stress;
+    }
+
+    public int reach() {
+        return this.reach;
+    }
+
+    public void setReach(int reach) {
+        this.reach = reach;
+        this.markDirty();
     }
 
     @Override
