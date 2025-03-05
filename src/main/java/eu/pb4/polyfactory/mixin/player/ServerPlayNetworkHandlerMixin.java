@@ -1,9 +1,13 @@
 package eu.pb4.polyfactory.mixin.player;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import eu.pb4.polyfactory.block.collection.BlockCollection;
 import eu.pb4.polyfactory.item.util.SwitchActionItem;
 import eu.pb4.polyfactory.item.wrench.WrenchHandler;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
@@ -51,6 +55,18 @@ public abstract class ServerPlayNetworkHandlerMixin implements ServerPlayNetExt 
     public void polyFactory$resetFloating() {
         this.floatingTicks = 0;
         this.vehicleFloatingTicks = 0;
+    }
+
+    @WrapMethod(method = "onPlayerMove")
+    private void wrap(PlayerMoveC2SPacket packet, Operation<Void> original) {
+        var apply = this.player.getServerWorld().getServer().isOnThread();
+        if (apply) {
+            BlockCollection.ignoreCollisions = true;
+        }
+        original.call(packet);
+        if (apply) {
+            BlockCollection.ignoreCollisions = false;
+        }
     }
 
     @Override

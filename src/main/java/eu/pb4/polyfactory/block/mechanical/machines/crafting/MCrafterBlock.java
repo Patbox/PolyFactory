@@ -9,8 +9,11 @@ import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -31,23 +34,36 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
-public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, ItemUseLimiter.All {
+public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, WrenchableBlock, ItemUseLimiter.All {
     public static final Property<Direction> FACING = Properties.HORIZONTAL_FACING;
+    public static final BooleanProperty POWERED = Properties.POWERED;
+
+    public static final List<WrenchAction> WRENCH_ACTIONS = List.of(
+            WrenchAction.FACING_HORIZONTAL,
+            WrenchAction.ofBlockEntity("mechanical_crafter.active_mode", MCrafterBlockEntity.class, be -> be.getActiveMode().asText(),
+                    (be, mode) -> be.setActiveMode(FactoryUtil.nextEnum(be.getActiveMode(), MCrafterBlockEntity.ActiveMode.values(), mode)))
+    );
 
     public MCrafterBlock(Settings settings) {
         super(settings);
@@ -56,7 +72,7 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(FACING);
+        builder.add(FACING, POWERED);
     }
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
@@ -66,6 +82,27 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
     @Override
     public BlockState getPolymerBlockState(BlockState state) {
         return Blocks.BARRIER.getDefaultState();
+    }
+
+    @Override
+    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (!oldState.isOf(state.getBlock())) {
+            this.updatePowered(world, pos, state);
+        }
+        super.onBlockAdded(state, world, pos, oldState, notify);
+    }
+
+    @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
+        this.updatePowered(world, pos, state);
+        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
+    }
+
+    private void updatePowered(World world, BlockPos pos, BlockState state) {
+        boolean powered = world.isReceivingRedstonePower(pos);
+        if (powered != state.get(POWERED)) {
+            world.setBlockState(pos, state.with(POWERED, powered), 4);
+        }
     }
 
     @Nullable
@@ -145,6 +182,11 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
         if (world.getBlockEntity(pos) instanceof MCrafterBlockEntity be) {
             modifier.stress(be.getStress());
         }
+    }
+
+    @Override
+    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return WRENCH_ACTIONS;
     }
 
     public static class Model extends BlockModel {

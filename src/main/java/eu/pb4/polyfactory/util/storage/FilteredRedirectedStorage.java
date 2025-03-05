@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.util.inventory;
+package eu.pb4.polyfactory.util.storage;
 
 import com.google.common.collect.Iterators;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
@@ -16,15 +16,14 @@ import java.util.Iterator;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@SuppressWarnings("UnstableApiUsage")
-public class FilteredRedirectedItemStorage<T extends TransferVariant<?>> implements Storage<T> {
+public class FilteredRedirectedStorage<T extends TransferVariant<?>> implements Storage<T>, RedirectingStorage {
     private final Supplier<World> world;
     private final Supplier<BlockPos> pos;
     private final Supplier<Direction> direction;
     private final BlockApiLookup<Storage<T>, Direction> lookup;
     private final Predicate<T> predicate;
 
-    public FilteredRedirectedItemStorage(BlockApiLookup<Storage<T>, @Nullable Direction> lookup, Supplier<World> world, Supplier<BlockPos> pos, Supplier<Direction> direction, Predicate<T> predicate) {
+    public FilteredRedirectedStorage(BlockApiLookup<Storage<T>, @Nullable Direction> lookup, Supplier<World> world, Supplier<BlockPos> pos, Supplier<Direction> direction, Predicate<T> predicate) {
         this.lookup = lookup;
         this.world = world;
         this.pos = pos;
@@ -37,7 +36,7 @@ public class FilteredRedirectedItemStorage<T extends TransferVariant<?>> impleme
         var dir = direction.get();
         var storage = this.lookup.find(world.get(), pos.get().offset(dir), dir.getOpposite());
 
-        return storage instanceof FilteredRedirectedItemStorage<?> ? null : storage;
+        return storage instanceof RedirectingStorage ? null : storage;
     }
 
     @Override

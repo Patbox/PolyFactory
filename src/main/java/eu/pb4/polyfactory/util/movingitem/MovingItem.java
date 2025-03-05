@@ -46,7 +46,7 @@ public class MovingItem implements VirtualElement, StackReference {
             this.itemDisplay[i].setDisplayWidth(1);
             this.itemDisplay[i].setDisplayHeight(2);
             this.itemDisplay[i].setViewRange(i == 0 ? 0.5f : 0.2f);
-            this.itemDisplay[i].setModelTransformation(ModelTransformationMode.FIXED);
+            this.itemDisplay[i].setModelTransformation(ModelTransformationMode.NONE);
             this.itemDisplay[i].setInterpolationDuration(10);
             this.itemDisplay[i].ignorePositionUpdates();
             this.updateDisplay(i);
@@ -79,7 +79,7 @@ public class MovingItem implements VirtualElement, StackReference {
     }
 
     private void updateScale(int i) {
-        this.itemDisplay[i].setScale(new Vector3f((stack.getItem() instanceof BlockItem ? 0.9f : 0.5f) * this.globalScale ));
+        this.itemDisplay[i].setScale(new Vector3f(0.5f * this.globalScale ));
     }
 
     @Override

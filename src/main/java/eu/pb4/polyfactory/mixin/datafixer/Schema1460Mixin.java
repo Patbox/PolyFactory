@@ -53,6 +53,7 @@ public abstract class Schema1460Mixin extends Schema {
         method_5273(schema, map, mod("blueprint_workbench"));
         method_5273(schema, map, mod("mechanical_drain"));
         method_5273(schema, map, mod("mechanical_spout"));
+        method_5273(schema, map, mod("slot_aware_hopper"));
 
         container(schema, map, "container");
         container(schema, map, "creative_container");

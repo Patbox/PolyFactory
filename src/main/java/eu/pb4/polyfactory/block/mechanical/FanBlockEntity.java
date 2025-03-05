@@ -61,7 +61,7 @@ public class FanBlockEntity extends BlockEntity {
 
         var testState = world.getBlockState(mut);
         var fluidState = Fluids.EMPTY.getDefaultState();
-        while ((!testState.isSideSolidFullSquare(world, mut, dir) || testState.isIn(FactoryBlockTags.WIND_PASSTHROUGH)) && length < speed * 20 * Math.pow(0.98, length)) {
+        while ((!testState.isSideSolidFullSquare(world, mut, dir) || testState.getCollisionShape(world, mut).isEmpty() || testState.isIn(FactoryBlockTags.WIND_PASSTHROUGH)) && length < speed * 20 * Math.pow(0.98, length)) {
             mut.move(dir);
             testState = world.getBlockState(mut);
 

@@ -42,6 +42,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class BlockCollection extends AbstractElement implements CollisionView {
+    public static boolean ignoreCollisions = false;
     private final DisplayElement main = ItemDisplayElementUtil.createSimple(ItemStack.EMPTY, 2);
     private final int[] blockId;
     private final int[] collisionBlockId;
@@ -49,14 +50,13 @@ public class BlockCollection extends AbstractElement implements CollisionView {
     private final IntList blockIdList = new IntArrayList();
     private final IntList allIdList = new IntArrayList();
     private final BlockCollectionData data;
+    private final Quaternionf newQuaternion = Direction.UP.getRotationQuaternion();
+    private final Quaternionf quaternion = Direction.UP.getRotationQuaternion();
     private float centerX;
     private float centerY;
     private float centerZ;
     @Nullable
     private ServerWorld world;
-
-    private final Quaternionf newQuaternion = Direction.UP.getRotationQuaternion();
-    private final Quaternionf quaternion = Direction.UP.getRotationQuaternion();
     private boolean quaternionDirty = false;
     private boolean disableCollision;
 
@@ -129,18 +129,19 @@ public class BlockCollection extends AbstractElement implements CollisionView {
             )));
         }
     }
+
     public void sendInitialBlockCollision(Consumer<Packet<ClientPlayPacketListener>> packetConsumer, int x, int y, int z, Vec3d pos, Vector3f vec, Quaternionf quaternion) {
         var i = index(x, y, z);
         var id = this.collisionBlockId[i];
         if (id != -1) {
             vec.set(x - this.centerX, y - this.centerY, z - this.centerZ).rotate(quaternion);
             packetConsumer.accept(new EntitySpawnS2CPacket(id, UUID.randomUUID(),
-                    pos.x + vec.x, pos.y + vec.y - 0.5, pos.z + vec.z , 0f, 0f,
+                    pos.x + vec.x, pos.y + vec.y - 0.5, pos.z + vec.z, 0f, 0f,
                     EntityType.SHULKER, 0, Vec3d.ZERO, 0d
             ));
 
             packetConsumer.accept(new EntityTrackerUpdateS2CPacket(id, List.of(
-                    //DataTracker.SerializedEntry.of(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
+                    DataTracker.SerializedEntry.of(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
             )));
 
             packetConsumer.accept(new EntitySpawnS2CPacket(this.collisionBlockId2[i], UUID.randomUUID(),
@@ -284,6 +285,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
     public int getHeight() {
         return this.data.sizeY();
     }
+
     @Override
     public int getBottomY() {
         return 0;
@@ -358,7 +360,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
                                     vec.sub(vec2);
                                     evec.y = Math.max(evec.y, vec.y);
 
-                                    vec.set( entity.getX() - previous.getX(), entity.getY() - previous.getY(), entity.getZ() - previous.getZ());
+                                    vec.set(entity.getX() - previous.getX(), entity.getY() - previous.getY(), entity.getZ() - previous.getZ());
                                     vec.rotate(quaternionOldInverted);
                                     vec.rotate(quaternion);
 
@@ -376,11 +378,12 @@ public class BlockCollection extends AbstractElement implements CollisionView {
                 if (!MathHelper.approximatelyEquals(move.x, 0) || !MathHelper.approximatelyEquals(move.y, 0) || !MathHelper.approximatelyEquals(move.z, 0)) {
                     entity.move(MovementType.SHULKER, move);
                     if (entity instanceof ServerPlayerEntity player) {
-                        FactoryUtil.sendVelocityDelta(player, move);
-                        //.networkHandler.sendPacket(new PlayerPositionLookS2CPacket(0, new PlayerPosition(move, move, 0, 0),
-                        //        EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.DELTA_X, PositionFlag.DELTA_Y, PositionFlag.DELTA_Z, PositionFlag.Y_ROT, PositionFlag.X_R
-                        //                )));
-                        newPreviousShift.put(player.getId(), move);
+                        //FactoryUtil.sendVelocityDelta(player, move);
+                        FactoryUtil.runNextTick(() -> player.networkHandler.requestTeleport(new PlayerPosition(move.add(0, player.getFinalGravity(), 0), Vec3d.ZERO, 0, 0),
+                                EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.DELTA_X, PositionFlag.DELTA_Y, PositionFlag.DELTA_Z, PositionFlag.Y_ROT, PositionFlag.X_ROT
+                                )));
+
+                        //newPreviousShift.put(player.getId(), move);
                     }
                 }
             });
@@ -397,7 +400,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
             this.previousShift.forEach((entity, val) -> {
                 if (world.getEntityById(entity) instanceof ServerPlayerEntity player) {
                     var oldMove = this.previousShift.getOrDefault(player.getId(), Vec3d.ZERO);
-                    FactoryUtil.sendVelocityDelta(player, oldMove.multiply(0.54).negate());
+                    //FactoryUtil.sendVelocityDelta(player, oldMove.multiply(0.54).negate());
                 }
             });
         }
@@ -457,7 +460,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
     }
 
     public void provideCollisions(Box box, Consumer<VoxelShape> consumer) {
-        if (this.disableCollision) {
+        if (this.disableCollision || ignoreCollisions) {
             return;
         }
 

@@ -2,23 +2,21 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.data.DataProvider;
-import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polyfactory.util.inventory.MinimalInventory;
-import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
-import eu.pb4.sgui.api.ClickType;
-import eu.pb4.sgui.api.elements.GuiElementBuilder;
+import eu.pb4.polyfactory.util.storage.FilteredRedirectedSlottedStorage;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
@@ -32,7 +30,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Unit;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.Arrays;
@@ -41,9 +38,16 @@ import java.util.Objects;
 public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
     public static final int TARGET_SLOT_COUNT = 9;
 
-    private final DefaultedList<ItemStack> items = DefaultedList.ofSize(TARGET_SLOT_COUNT, ItemStack.EMPTY);
+    static {
+        ItemStorage.SIDED.registerForBlockEntity((self, dir) -> self.storage, FactoryBlockEntities.SLOT_AWARE_FUNNEL);
+    }
+
     final DefaultedList<FilterData> filter = DefaultedList.ofSize(TARGET_SLOT_COUNT, FilterData.EMPTY_FALSE);
     final int[] slotTargets = new int[TARGET_SLOT_COUNT];
+    private final DefaultedList<ItemStack> items = DefaultedList.ofSize(TARGET_SLOT_COUNT, ItemStack.EMPTY);
+    private final Storage<ItemVariant> storage = new FilteredRedirectedSlottedStorage<>(ItemStorage.SIDED,
+            this::getWorld, this::getPos, () -> this.getCachedState().get(FunnelBlock.FACING), ItemVariant.blank(), this.slotTargets,
+            (i, res) -> this.filter.get(i).test(res.toStack()));
 
     public SlotAwareFunnelBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.SLOT_AWARE_FUNNEL, pos, state);
@@ -155,7 +159,8 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
             }
             try {
                 targetSlot = Integer.parseInt(this.getInput());
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) {
+            }
 
 
             if (targetSlot > -2 && targetSlot < 100) {
@@ -172,7 +177,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
         }
 
         @Override
-        public void setDefaultInputValue(String input)  {
+        public void setDefaultInputValue(String input) {
             super.setDefaultInputValue(input);
             if (this.gui != null) {
                 updateDone();

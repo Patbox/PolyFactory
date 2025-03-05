@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlockEntity;
 import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
@@ -579,6 +580,15 @@ public class FactoryUtil {
             default -> state;
         };
     }
+
+    public static RegistryKey<Recipe<?>> recipeKey(String s) {
+        return RegistryKey.of(RegistryKeys.RECIPE, id(s));
+    }
+
+    public static <T extends Enum<T>> T nextEnum(T activeMode, T[] values, boolean next) {
+        return values[(values.length + activeMode.ordinal() + (next ? 1 : -1)) % values.length];
+    }
+
 
 
     public enum MovableResult {

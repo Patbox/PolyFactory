@@ -56,6 +56,8 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
     private float lastAttackedTicks = 0;
     private MinerBlock.Model model;
     private float attackCooldownPerTick = 1;
+    private int reach = 2;
+
 
     public MinerBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.MINER, pos, state);
@@ -70,6 +72,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
             nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
         nbt.putFloat("last_attacked_ticks", this.lastAttackedTicks);
+        nbt.putInt("reach", this.reach);
         super.writeNbt(nbt, lookup);
     }
 
@@ -82,6 +85,12 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         }
         this.targetState = NbtHelper.toBlockState(Registries.BLOCK.getReadOnlyWrapper(), nbt.getCompound("block_state"));
         this.lastAttackedTicks = nbt.getFloat("last_attacked_ticks");
+        if (nbt.contains("reach")) {
+            this.reach = nbt.getInt("reach");
+        } else {
+            this.reach = 1;
+        }
+
         super.readNbt(nbt, lookup);
         this.updateAttackCooldownPerTick();
     }
@@ -164,6 +173,15 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         return 1;
     }
 
+    public int reach() {
+        return this.reach;
+    }
+
+    public void setReach(int reach) {
+        this.reach = reach;
+        this.markDirty();
+    }
+
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
         return this.currentTool.isEmpty() && stack.isIn(FactoryItemTags.ALLOWED_IN_MINER);
@@ -182,13 +200,18 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
             self.model.setItem(self.currentTool);
         }
 
-        var blockPos = pos.offset(state.get(MinerBlock.FACING));
-        var stateFront = world.getBlockState(blockPos);
 
+        BlockPos blockPos = pos;
+        BlockState stateFront = Blocks.AIR.getDefaultState();
+        int reach = self.reach;
+        while (stateFront.isAir() && reach-- > 0) {
+            blockPos = blockPos.offset(state.get(MinerBlock.FACING));
+            stateFront = world.getBlockState(blockPos);
+        }
 
         var entities = world.getEntitiesByClass(Entity.class, new Box(blockPos), Entity::canHit);
         if (!entities.isEmpty()) {
-            var speed = Math.abs(RotationUser.getRotation((ServerWorld) world, pos).speed()) * MathHelper.RADIANS_PER_DEGREE * 3f;
+            var speed = Math.abs(RotationUser.getRotation(world, pos).speed()) * MathHelper.RADIANS_PER_DEGREE * 3f;
 
             self.process = 0;
             world.setBlockBreakingInfo(self.getFakePlayer().getId(), blockPos, -1);
