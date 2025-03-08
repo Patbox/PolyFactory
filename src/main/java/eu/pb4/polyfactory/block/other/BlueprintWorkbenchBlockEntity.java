@@ -20,8 +20,8 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.CraftingRecipe;
+import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.ServerRecipeManager;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
@@ -44,7 +44,7 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
     private final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(9, ItemStack.EMPTY);
     private final DefaultedList<FilterData> filters = DefaultedList.ofSize(9, FilterData.EMPTY_FALSE);
     private ItemStack outputPreview = ItemStack.EMPTY;
-    private final ServerRecipeManager.MatchGetter<CraftingRecipeInput, CraftingRecipe> recipe = ServerRecipeManager.createCachedMatchGetter(RecipeType.CRAFTING);
+    private final RecipeManager.MatchGetter<CraftingRecipeInput, CraftingRecipe> recipe = RecipeManager.createCachedMatchGetter(RecipeType.CRAFTING);
 
     private BlueprintWorkbenchBlock.Model model;
 
@@ -127,16 +127,16 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
         if (result.isEmpty()) {
             return;
         }
-        player.giveOrDropStack(result);
+        player.getInventory().offerOrDrop(result);
 
-        var remainders = recipe.getRecipeRemainders(input);
+        var remainders = recipe.getRemainder(input);
         for (var stack : list) {
             if (!stack.isEmpty()) {
                 stack.decrement(1);
             }
         }
         for (var stack : remainders) {
-            player.giveOrDropStack(stack);
+            player.getInventory().offerOrDrop(stack);
         }
 
         player.playSoundToPlayer(SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.5f, 1);

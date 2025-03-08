@@ -38,7 +38,7 @@ public class BlueprintWorkbenchBlock extends WorkbenchBlock {
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!player.isSneaking() && world.getBlockEntity(pos) instanceof BlueprintWorkbenchBlockEntity be) {
             be.openGui((ServerPlayerEntity) player);
-            return ActionResult.SUCCESS_SERVER;
+            return ActionResult.SUCCESS;
         }
 
         return super.onUse(state, world, pos, player, hit);

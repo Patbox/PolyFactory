@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
+import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -31,13 +32,14 @@ import xyz.nucleoid.packettweaker.PacketContext;
 public class SlotAwareFunnelBlock extends FunnelBlock {
     public SlotAwareFunnelBlock(Settings settings) {
         super(settings);
+        Model.MODEL_IN.isEmpty();
     }
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!player.isSneaking() && player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof SlotAwareFunnelBlockEntity be) {
             be.openGui(serverPlayer);
-            return ActionResult.SUCCESS_SERVER;
+            return ActionResult.SUCCESS;
         }
         return ActionResult.PASS;
     }
@@ -180,13 +182,13 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
     public static final class Model extends FunnelBlock.Model {
-        private static final ItemStack MODEL_IN = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/slot_aware_funnel_in"));
-        private static final ItemStack MODEL_OUT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/slot_aware_funnel_out"));
+        private static final ItemStack MODEL_IN = BaseItemProvider.requestModel(FactoryUtil.id("block/slot_aware_funnel_in"));
+        private static final ItemStack MODEL_OUT = BaseItemProvider.requestModel(FactoryUtil.id("block/slot_aware_funnel_out"));
         private Model(BlockState state, BlockPos pos) {
             super(state, pos);
         }

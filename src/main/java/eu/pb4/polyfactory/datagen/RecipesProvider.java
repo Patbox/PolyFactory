@@ -70,7 +70,7 @@ class RecipesProvider extends FabricRecipeProvider {
     public void generate(RecipeExporter exporter) {
         //noinspection unchecked
 
-        offerReversibleCompactingRecipes(RecipeCategory.MISC, FactoryItems.STEEL_INGOT, RecipeCategory.MISC, FactoryItems.STEEL_BLOCK, "steel_block", null, "steel_ingot_from_block", null);
+        offerReversibleCompactingRecipes(exporter, RecipeCategory.MISC, FactoryItems.STEEL_INGOT, RecipeCategory.MISC, FactoryItems.STEEL_BLOCK, "steel_block", null, "steel_ingot_from_block", null);
 
         var dyes = (List<DyeItem>) (Object) List.of(Items.BLACK_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.CYAN_DYE, Items.GRAY_DYE, Items.GREEN_DYE, Items.LIGHT_BLUE_DYE, Items.LIGHT_GRAY_DYE, Items.LIME_DYE, Items.MAGENTA_DYE, Items.ORANGE_DYE, Items.PINK_DYE, Items.PURPLE_DYE, Items.RED_DYE, Items.YELLOW_DYE, Items.WHITE_DYE);
 
@@ -196,7 +196,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .offerTo(exporter);
 
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.EJECTOR, 1)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.EJECTOR, 1)
                         .pattern("iii")
                         .pattern("wgw")
                         .pattern("waw")
@@ -206,7 +206,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                         .offerTo(exporter);
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.FAN, 1)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.FAN, 1)
                         .pattern("iii")
                         .pattern("wsw")
                         .pattern("waw")
@@ -216,7 +216,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .offerTo(exporter);
 
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.CRAFTER, 1)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.CRAFTER, 1)
                         .pattern("iai")
                         .pattern("wsw")
                         .pattern("www")
@@ -234,13 +234,13 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .offerTo(exporter);
 
-                ShapelessRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, FactoryItems.WORKBENCH, 1)
+                ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, FactoryItems.WORKBENCH, 1)
                         .input(Items.CRAFTING_TABLE)
                         .input(FactoryItems.WOODEN_PLATE)
                         .criterion("get_plate", InventoryChangedCriterion.Conditions.items(FactoryItems.WOODEN_PLATE))
                         .offerTo(exporter);
 
-                ShapelessRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, FactoryItems.BLUEPRINT_WORKBENCH, 1)
+                ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, FactoryItems.BLUEPRINT_WORKBENCH, 1)
                         .input(Items.BLUE_DYE)
                         .input(Items.PAPER)
                         .input(FactoryItems.WORKBENCH)
@@ -372,7 +372,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .offerTo(exporter);
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.SLOT_AWARE_FUNNEL, 1)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.SLOT_AWARE_FUNNEL, 1)
                         .pattern("gcg")
                         .pattern("sfs")
                         .pattern("gsg")
@@ -383,7 +383,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                         .offerTo(exporter);
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.SPLITTER, 1)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.SPLITTER, 1)
                         .pattern("sss")
                         .pattern("fxf")
                         .pattern("sss")
@@ -409,7 +409,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                 .offerTo(exporter);
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.ITEM_FILTER)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.ITEM_FILTER)
                         .pattern(" p ")
                         .pattern("imi")
                         .pattern(" p ")
@@ -420,7 +420,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .offerTo(exporter);
 
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.MISC, FactoryItems.STRING_MESH)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, FactoryItems.STRING_MESH)
                         .pattern(" s ")
                         .pattern("sss")
                         .pattern(" s ")
@@ -428,7 +428,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .criterion("get_item", InventoryChangedCriterion.Conditions.items(Items.STRING))
                         .offerTo(exporter);
 
-                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.ITEM_COUNTER)
+                ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, FactoryItems.ITEM_COUNTER)
                         .pattern("pqp")
                         .pattern("scs")
                         .pattern("scs")
@@ -767,9 +767,9 @@ class RecipesProvider extends FabricRecipeProvider {
                                 OutputStack.of(FactoryItems.NETHERRACK_DUST, 1, 2), OutputStack.of(FactoryItems.NETHERRACK_DUST, 0.25f, 5)),
                         GrindingRecipe.of("ender_dust", Ingredient.ofItems(Items.ENDER_PEARL), 6, 20, 25,
                                 OutputStack.of(FactoryItems.ENDER_DUST, 1, 2), OutputStack.of(FactoryItems.ENDER_DUST, 0.20f, 2)),
-                        GrindingRecipe.of("planks_saw_dust", ingredientFromTag(ItemTags.PLANKS), 1, 5, 6,
+                        GrindingRecipe.of("planks_saw_dust", Ingredient.fromTag(ItemTags.PLANKS), 1, 5, 6,
                                 OutputStack.of(FactoryItems.SAW_DUST, 0.6f, 3), OutputStack.of(Items.STICK, 0.4f, 3)),
-                        GrindingRecipe.of("logs_saw_dust", ingredientFromTag(ItemTags.LOGS), 1, 5, 6,
+                        GrindingRecipe.of("logs_saw_dust", Ingredient.fromTag(ItemTags.LOGS), 1, 5, 6,
                                 OutputStack.of(FactoryItems.SAW_DUST, 0.8f, 6), OutputStack.of(Items.STICK, 0.4f, 8)),
                         GrindingRecipe.of("stone_to_cobblestone", Ingredient.ofItems(Items.STONE), 2, 5, 15, Items.COBBLESTONE),
                         GrindingRecipe.of("cobblestone_to_gravel", Ingredient.ofItems(Items.COBBLESTONE), 4, 6, 15, Items.GRAVEL),

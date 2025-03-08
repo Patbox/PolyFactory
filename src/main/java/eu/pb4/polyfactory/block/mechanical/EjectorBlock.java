@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
@@ -50,8 +51,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
@@ -78,6 +79,7 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
     public EjectorBlock(Settings settings) {
         super(settings);
         setDefaultState(getDefaultState().with(ENABLED, true));
+        Model.BASE_MODEL.isEmpty();
     }
 
     @Nullable
@@ -94,9 +96,9 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         this.updateEnabled(world, pos, state);
-        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
     }
 
     private void updateEnabled(World world, BlockPos pos, BlockState state) {
@@ -187,12 +189,12 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
+    public BlockState getPolymerBlockState(BlockState state) {
         return Blocks.BARRIER.getDefaultState();
     }
 
     @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
+    public BlockState getPolymerBreakEventBlockState(BlockState state, ServerPlayerEntity player) {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
@@ -250,10 +252,10 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
 
         int endTime = (player.age / 4) % 10;
 
-        var particle = new DustParticleEffect(0xFF0000, 1);
+        var particle = new DustParticleEffect(new Vector3f(1, 0, 0), 1);
 
         for (int i = 0; i < 40; i++) {
-            player.networkHandler.sendPacket(new ParticleS2CPacket(particle, true, true,
+            player.networkHandler.sendPacket(new ParticleS2CPacket(particle, true,
                     out.x, out.y, out.z, 0, 0, 0, 0, 0));
             vec = vec.add(0, -0.08, 0);
             out = out.add(vec);
@@ -262,9 +264,9 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack BASE_MODEL = ItemDisplayElementUtil.getModel(id("block/ejector_base"));
-        public static final ItemStack PLATE_MODEL = ItemDisplayElementUtil.getModel(id("block/ejector_plate"));
-        public static final ItemStack LINK_MODEL = ItemDisplayElementUtil.getModel(id("block/ejector_link"));
+        public static final ItemStack BASE_MODEL = BaseItemProvider.requestModel(id("block/ejector_base"));
+        public static final ItemStack PLATE_MODEL = BaseItemProvider.requestModel(id("block/ejector_plate"));
+        public static final ItemStack LINK_MODEL = BaseItemProvider.requestModel(id("block/ejector_link"));
 
         private final ItemDisplayElement base;
         private final ItemDisplayElement plate;
@@ -288,7 +290,7 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
 
         private void updateStatePos(BlockState state) {
             var dir = state.get(FACING);
-            float y = dir.getPositiveHorizontalDegrees();
+            float y = dir.asRotation();
             this.base.setYaw(y);
             this.plate.setYaw(y);
             this.link.setYaw(y);

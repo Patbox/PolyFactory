@@ -16,6 +16,7 @@ public class FactoryBlockTags {
     public static final TagKey<Block> SPRAY_CAN_COLORABLE = of("spray_can_colorable");
     public static final TagKey<Block> CONCRETE = of("concrete");
     public static final TagKey<Block> UNCONNECTABLE = of("unconnectable");
+    public static final TagKey<Block> PIPE_CONNECTABLE = of("pipe_connectable");
 
     private static TagKey<Block> of(String path) {
         return TagKey.of(RegistryKeys.BLOCK, ModInit.id(path));

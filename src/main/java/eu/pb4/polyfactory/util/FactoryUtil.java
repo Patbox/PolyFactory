@@ -581,15 +581,9 @@ public class FactoryUtil {
         };
     }
 
-    public static RegistryKey<Recipe<?>> recipeKey(String s) {
-        return RegistryKey.of(RegistryKeys.RECIPE, id(s));
-    }
-
     public static <T extends Enum<T>> T nextEnum(T activeMode, T[] values, boolean next) {
         return values[(values.length + activeMode.ordinal() + (next ? 1 : -1)) % values.length];
     }
-
-
 
     public enum MovableResult {
         SUCCESS_MOVABLE,

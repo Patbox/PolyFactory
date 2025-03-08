@@ -10,7 +10,6 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.tool.FilterItem;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.item.tool.AbstractFilterItem;
 import eu.pb4.polyfactory.item.wrench.WrenchAction;
@@ -40,7 +39,6 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -304,7 +302,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         return List.of(WrenchAction.FACING, MODE_ACTION);
     }
 
-    public static final class Model extends BlockModel {
+    public static class Model extends BlockModel {
         private static final ItemStack MODEL_IN = new ItemStack(BaseItemProvider.requestModel());
         private static final ItemStack MODEL_OUT = new ItemStack(BaseItemProvider.requestModel());
         final FilterIcon filterElement = new FilterIcon(this);

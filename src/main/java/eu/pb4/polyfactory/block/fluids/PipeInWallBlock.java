@@ -23,7 +23,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;

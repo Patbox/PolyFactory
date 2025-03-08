@@ -51,6 +51,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -60,6 +61,7 @@ import org.joml.Quaternionf;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlock,  BarrierBasedWaterloggable, WrenchableBlock {
     public static final DirectionProperty FACING = Properties.FACING;

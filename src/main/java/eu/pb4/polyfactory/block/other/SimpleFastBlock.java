@@ -18,6 +18,8 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
+import static eu.pb4.polyfactory.ModInit.id;
+
 public abstract class SimpleFastBlock extends Block implements PolymerBlock {
     public SimpleFastBlock(Settings settings) {
         super(settings);
@@ -35,12 +37,12 @@ public abstract class SimpleFastBlock extends Block implements PolymerBlock {
         private final BlockState state;
         public TexturedBlock(Settings settings) {
             super(settings);
-            this.state = PolymerBlockResourceUtils.requestBlock(BlockModelType.FULL_BLOCK, PolymerBlockModel.of(
-                    ((SettingsAccessor) settings).getRegistryKey().getValue().withPrefixedPath("block/")));
+            this.state = PolymerBlockResourceUtils.requestBlock(BlockModelType.FULL_BLOCK, PolymerBlockModel.of(id("block/steel_block")));
+             //       ((SettingsAccessor) settings).getRegistryKey().getValue().withPrefixedPath("block/")));
         }
 
         @Override
-        public BlockState getPolymerBlockState(BlockState blockState, PacketContext packetContext) {
+        public BlockState getPolymerBlockState(BlockState blockState) {
             return this.state;
         }
     }
@@ -51,7 +53,7 @@ public abstract class SimpleFastBlock extends Block implements PolymerBlock {
         }
 
         @Override
-        public BlockState getPolymerBlockState(BlockState blockState, PacketContext packetContext) {
+        public BlockState getPolymerBlockState(BlockState blockState) {
             return Blocks.BARRIER.getDefaultState();
         }
 

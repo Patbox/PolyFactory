@@ -45,6 +45,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -54,6 +55,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -67,7 +69,7 @@ import static eu.pb4.polyfactory.ModInit.id;
 public final class DataMemoryBlock extends DataNetworkBlock implements BlockEntityProvider, FactoryBlock, CableConnectable, DataProvider, DataReceiver, WrenchableBlock, StatePropertiesCodecPatcher {
     public static final BooleanProperty POWERED = Properties.POWERED;
     public static final EnumProperty<OptionalDirection> FACING_INPUT = EnumProperty.of("facing_input", OptionalDirection.class);
-    public static final EnumProperty<Direction> FACING_OUTPUT = EnumProperty.of("facing_output", Direction.class);
+    public static final DirectionProperty FACING_OUTPUT = DirectionProperty.of("facing_output");
 
     public static final List<WrenchAction> ACTIONS = List.of(
             WrenchAction.of("facing_input", FACING_INPUT, OptionalDirection::asText).withAlt(WrenchApplyAction.ofState((player, world, pos, dir, state, next) -> {
@@ -84,6 +86,7 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
     public DataMemoryBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(POWERED, false));
+        Model.COVER.isEmpty();
     }
 
     @Override
@@ -193,7 +196,7 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState blockState, PacketContext packetContext) {
+    public BlockState getPolymerBlockState(BlockState blockState) {
         return Blocks.BARRIER.getDefaultState();
     }
 
@@ -219,7 +222,7 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
     }
 
     @Override
-    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         return state.get(FACING_OUTPUT) == dir || state.get(FACING_INPUT).direction() == dir;
     }
 
@@ -249,11 +252,11 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
     }
 
     public static class Model extends BlockModel {
-        public static final ItemStack BASE = ItemDisplayElementUtil.getModel(id("block/data_memory"));
-        public static final ItemStack COVER = ItemDisplayElementUtil.getModel(id("block/data_memory_cover"));
-        public static final ItemStack COVER_POWERED = ItemDisplayElementUtil.getModel(id("block/data_memory_cover_powered"));
-        public static final ItemStack INPUT = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_input"));
-        public static final ItemStack OUTPUT = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_output"));
+        public static final ItemStack BASE = BaseItemProvider.requestModel(id("block/data_memory"));
+        public static final ItemStack COVER = BaseItemProvider.requestModel(id("block/data_memory_cover"));
+        public static final ItemStack COVER_POWERED = BaseItemProvider.requestModel(id("block/data_memory_cover_powered"));
+        public static final ItemStack INPUT = BaseItemProvider.requestModel(id("block/data_cube_connector_input"));
+        public static final ItemStack OUTPUT = BaseItemProvider.requestModel(id("block/data_cube_connector_output"));
         private final ItemDisplayElement base;
         private final ItemDisplayElement input;
         private final ItemDisplayElement output;
@@ -274,7 +277,7 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
                     this.covers[i].setYaw(0);
                 } else {
                     this.covers[i].setPitch(0);
-                    this.covers[i].setYaw(dir.getPositiveHorizontalDegrees());
+                    this.covers[i].setYaw(dir.asRotation());
                 }
             }
 
@@ -303,7 +306,7 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.getPositiveHorizontalDegrees();
+                y = dir.asRotation();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             }

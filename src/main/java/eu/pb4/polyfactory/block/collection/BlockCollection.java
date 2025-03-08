@@ -379,9 +379,9 @@ public class BlockCollection extends AbstractElement implements CollisionView {
                     entity.move(MovementType.SHULKER, move);
                     if (entity instanceof ServerPlayerEntity player) {
                         //FactoryUtil.sendVelocityDelta(player, move);
-                        FactoryUtil.runNextTick(() -> player.networkHandler.requestTeleport(new PlayerPosition(move.add(0, player.getFinalGravity(), 0), Vec3d.ZERO, 0, 0),
-                                EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.DELTA_X, PositionFlag.DELTA_Y, PositionFlag.DELTA_Z, PositionFlag.Y_ROT, PositionFlag.X_ROT
-                                )));
+                        //FactoryUtil.runNextTick(() -> player.networkHandler.requestTeleport(new PlayerPosition(move.add(0, player.getFinalGravity(), 0), Vec3d.ZERO, 0, 0),
+                        //        EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.DELTA_X, PositionFlag.DELTA_Y, PositionFlag.DELTA_Z, PositionFlag.Y_ROT, PositionFlag.X_ROT
+                         //       )));
 
                         //newPreviousShift.put(player.getId(), move);
                     }

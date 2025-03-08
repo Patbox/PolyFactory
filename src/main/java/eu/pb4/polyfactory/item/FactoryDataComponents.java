@@ -27,7 +27,7 @@ public class FactoryDataComponents {
     public static final ComponentType<Integer> COLOR = register("color", ComponentType.<Integer>builder().codec(Codec.INT).build());
     public static final ComponentType<Integer> USES_LEFT = register("uses_left", ComponentType.<Integer>builder().codec(Codec.INT).build());
     public static final ComponentType<List<ItemStack>> ITEM_FILTER = register("item_filter", ComponentType.<List<ItemStack>>builder()
-            .codec(Codecs.listOrSingle(UNCOUNTED_ITEM_STACK_WITH_AIR)).build());
+            .codec(Codec.withAlternative(UNCOUNTED_ITEM_STACK_WITH_AIR.listOf(), UNCOUNTED_ITEM_STACK_WITH_AIR, List::of)).build());
 
     public static final ComponentType<Pair<ItemStack, ItemStack>> REMOTE_KEYS = register("remote_keys", ComponentType.<Pair<ItemStack, ItemStack>>builder()
             .codec(RecordCodecBuilder.create(instance -> instance.group(

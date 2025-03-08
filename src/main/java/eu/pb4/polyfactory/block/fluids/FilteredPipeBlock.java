@@ -48,7 +48,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 

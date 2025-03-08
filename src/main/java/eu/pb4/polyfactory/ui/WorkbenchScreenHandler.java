@@ -6,19 +6,24 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftingResultInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeMatcher;
+import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
+import net.minecraft.recipe.*;
 import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<CraftingRecipeInput, Recipe<CraftingRecipeInput>> {
     private final RecipeInputInventory recipeInput;
@@ -84,11 +89,6 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<Crafting
 		return recipe.value().matches(CraftingRecipeInput.create(3, 3, this.recipeInput.getHeldStacks()), this.player.getWorld());
 	}
 
-	@Override
-	public void onClosed(PlayerEntity player) {
-		super.onClosed(player);
-		//this.context.run((world, pos) -> this.dropInventory(player, this.input));
-	}
     protected static void updateResult(ScreenHandler handler, ServerWorld world, PlayerEntity player, RecipeInputInventory craftingInventory, CraftingResultInventory resultInventory, @Nullable RecipeEntry<CraftingRecipe> recipe) {
         CraftingRecipeInput craftingRecipeInput = craftingInventory.createRecipeInput();
         ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) player;
@@ -97,7 +97,7 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<Crafting
         if (optional.isPresent()) {
             RecipeEntry<CraftingRecipe> recipeEntry = optional.get();
             CraftingRecipe craftingRecipe = recipeEntry.value();
-            if (resultInventory.shouldCraftRecipe(serverPlayerEntity, recipeEntry)) {
+            if (resultInventory.shouldCraftRecipe(world, serverPlayerEntity, recipeEntry)) {
                 ItemStack itemStack2 = craftingRecipe.craft(craftingRecipeInput, world.getRegistryManager());
                 if (itemStack2.isItemEnabled(world.getEnabledFeatures())) {
                     itemStack = itemStack2;
@@ -173,36 +173,6 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<Crafting
         return slot.inventory != this.result && super.canInsertIntoSlot(stack, slot);
     }
 
-    @Override
-    public PostFillAction fillInputSlots(boolean craftAll, boolean creative, RecipeEntry<?> recipe, ServerWorld world, PlayerInventory inventory) {
-        //noinspection unchecked
-        RecipeEntry<CraftingRecipe> recipeEntry = (RecipeEntry<CraftingRecipe>) recipe;
-        this.onInputSlotFillStart();
-
-        AbstractRecipeScreenHandler.PostFillAction var8;
-        try {
-            List<Slot> list = this.slots.subList(1, 10);
-            var8 = InputSlotFiller.fill(new InputSlotFiller.Handler<CraftingRecipe>() {
-                public void populateRecipeFinder(RecipeFinder finder) {
-                    WorkbenchScreenHandler.this.populateRecipeFinder(finder);
-                }
-
-                public void clear() {
-
-                }
-
-                public boolean matches(RecipeEntry<CraftingRecipe> entry) {
-                    return entry.value().matches(CraftingRecipeInput.create(3, 3, recipeInput.getHeldStacks()),
-                            player.getWorld());
-                }
-            }, 3, 3, list, list, inventory, recipeEntry, craftAll, creative);
-        } finally {
-            this.onInputSlotFillFinish(world, recipeEntry);
-        }
-
-        return var8;
-    }
-
     public void onInputSlotFillStart() {
         this.filling = true;
     }
@@ -242,22 +212,14 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler<Crafting
 	public int getCraftingSlotCount() {
 		return 10;
 	}
+
     @Override
-    public void populateRecipeFinder(RecipeFinder finder) {
-        this.recipeInput.provideRecipeInputs(finder);
+    public RecipeBookCategory getCategory() {
+        return RecipeBookCategory.CRAFTING;
     }
 
-	@Override
-	public RecipeBookCategory getCategory() {
-		return RecipeBookCategory.CRAFTING;
-	}
-
-	@Override
+    @Override
 	public boolean canInsertIntoSlot(int index) {
 		return index != this.getCraftingResultSlotIndex();
 	}
-    @Override
-    public RecipeBookType getCategory() {
-        return RecipeBookType.CRAFTING;
-    }
 }

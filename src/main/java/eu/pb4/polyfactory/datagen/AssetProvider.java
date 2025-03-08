@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
+import static eu.pb4.polyfactory.util.FactoryUtil.id;
+
 class AssetProvider implements DataProvider {
     private final DataOutput output;
 

@@ -111,7 +111,6 @@ public class ModInit implements ModInitializer {
 		RedstoneOutputBlock.Model.OUTPUT_OVERLAY.item();
 		GenericParts.SMALL_GEAR.isEmpty();
 		DoubleInputTransformerBlock.Model.INPUT_A.getItem();
-		DataMemoryBlock.Model.POWERED_MODEL.getItem();
 		PumpBlock.Model.BLOCK_MODEL.getItem();
 		InputTransformerBlock.Model.INPUT.getItem();
 	}

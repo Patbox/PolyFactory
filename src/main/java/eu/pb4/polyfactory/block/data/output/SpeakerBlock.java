@@ -114,7 +114,7 @@ public class SpeakerBlock extends GenericCabledDataBlock implements DataReceiver
         protected void updateStatePos(BlockState state) {
             super.updateStatePos(state);
             if (this.soundSource != null) {
-                this.soundSource.setOffset(state.get(FACING).getDoubleVector().multiply(0.5));
+                this.soundSource.setOffset(new Vec3d(state.get(FACING).getUnitVector().mul(0.5f)));
             }
         }
 

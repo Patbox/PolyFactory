@@ -67,15 +67,15 @@ public class FactoryBlockEntities {
             BlockEntityType.Builder.create(FunnelBlockEntity::new, FactoryBlocks.FUNNEL));
 
     public static final BlockEntityType<SlotAwareFunnelBlockEntity> SLOT_AWARE_FUNNEL = register("slot_aware_funnel",
-            FabricBlockEntityTypeBuilder.create(SlotAwareFunnelBlockEntity::new, FactoryBlocks.SLOT_AWARE_FUNNEL));
+            BlockEntityType.Builder.create(SlotAwareFunnelBlockEntity::new, FactoryBlocks.SLOT_AWARE_FUNNEL));
 
     public static final BlockEntityType<SplitterBlockEntity> SPLITTER = register("splitter",
             BlockEntityType.Builder.create(SplitterBlockEntity::new, FactoryBlocks.SPLITTER));
 
     public static final BlockEntityType<FanBlockEntity> FAN = register("fan",
-             FabricBlockEntityTypeBuilder.create(FanBlockEntity::new, FactoryBlocks.FAN));
+             BlockEntityType.Builder.create(FanBlockEntity::new, FactoryBlocks.FAN));
     public static final BlockEntityType<EjectorBlockEntity> EJECTOR = register("ejector",
-            FabricBlockEntityTypeBuilder.create(EjectorBlockEntity::new, FactoryBlocks.EJECTOR));
+            BlockEntityType.Builder.create(EjectorBlockEntity::new, FactoryBlocks.EJECTOR));
     public static final BlockEntityType<HandCrankBlockEntity> HAND_CRANK = register("hand_crank",
             BlockEntityType.Builder.create(HandCrankBlockEntity::new, FactoryBlocks.HAND_CRANK));
 
@@ -118,14 +118,14 @@ public class FactoryBlockEntities {
             BlockEntityType.Builder.create(CreativeContainerBlockEntity::new, FactoryBlocks.CREATIVE_CONTAINER));
 
     public static final BlockEntityType<CreativeMotorBlockEntity> CREATIVE_MOTOR = register("creative_motor",
-             FabricBlockEntityTypeBuilder.create(CreativeMotorBlockEntity::new, FactoryBlocks.CREATIVE_MOTOR));
+             BlockEntityType.Builder.create(CreativeMotorBlockEntity::new, FactoryBlocks.CREATIVE_MOTOR));
     public static final BlockEntityType<BlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache",
-             FabricBlockEntityTypeBuilder.create(ChanneledDataBlockEntity::migrating, FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
+             BlockEntityType.Builder.create(ChanneledDataBlockEntity::migrating, FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
                     FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER, FactoryBlocks.BLOCK_OBSERVER, FactoryBlocks.DATA_MEMORY, FactoryBlocks.TEXT_INPUT,
                      FactoryBlocks.SPEAKER, FactoryBlocks.TPS_PROVIDER));
 
     public static final BlockEntityType<DataMemoryBlockEntity> DATA_MEMORY = register("data_memory",
-            FabricBlockEntityTypeBuilder.create(DataMemoryBlockEntity::new, FactoryBlocks.DATA_MEMORY));
+            BlockEntityType.Builder.create(DataMemoryBlockEntity::new, FactoryBlocks.DATA_MEMORY));
 
     public static final BlockEntityType<HologramProjectorBlockEntity> HOLOGRAM_PROJECTOR = register("hologram_projector",
             BlockEntityType.Builder.create(HologramProjectorBlockEntity::new, FactoryBlocks.HOLOGRAM_PROJECTOR));
@@ -152,9 +152,9 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<WorkbenchBlockEntity> WORKBENCH = register("workbench", BlockEntityType.Builder
             .create(WorkbenchBlockEntity::new, FactoryBlocks.WORKBENCH));
 
-    public static final BlockEntityType<BlueprintWorkbenchBlockEntity> BLUEPRINT_WORKBENCH = register("blueprint_workbench",  FabricBlockEntityTypeBuilder
+    public static final BlockEntityType<BlueprintWorkbenchBlockEntity> BLUEPRINT_WORKBENCH = register("blueprint_workbench",  BlockEntityType.Builder
             .create(BlueprintWorkbenchBlockEntity::new, FactoryBlocks.BLUEPRINT_WORKBENCH));
-    public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container",  FabricBlockEntityTypeBuilder
+    public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container",  BlockEntityType.Builder
             .create(ColorableBlockEntity::new, FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP, FactoryBlocks.FIXTURE_LAMP, FactoryBlocks.INVERTED_FIXTURE_LAMP));
 
     public static final BlockEntityType<PipeBlockEntity> PIPE = register("pipe", BlockEntityType.Builder.create(PipeBlockEntity::new, Util.make(new ArrayList<Block>(), (a) -> {

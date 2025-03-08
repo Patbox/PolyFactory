@@ -5,7 +5,7 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 

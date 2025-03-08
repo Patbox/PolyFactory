@@ -53,10 +53,6 @@ public enum OptionalDirection implements StringIdentifiable {
         return this.direction == null ? Vec3i.ZERO : this.direction.getVector();
     }
 
-    public Vec3d getDoubleVector() {
-        return this.direction == null ? Vec3d.ZERO : this.direction.getDoubleVector();
-    }
-
     public Text asText() {
         return FactoryUtil.asText(this.direction);
     }

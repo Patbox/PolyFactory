@@ -79,6 +79,7 @@ dependencies {
 
 	modImplementation 'eu.pb4:polymer-core:0.9.18+1.21.1'
 	modImplementation 'eu.pb4:polymer-resource-pack:0.9.18+1.21.1'
+	modImplementation 'eu.pb4:polymer-blocks:0.9.18+1.21.1'
 	modImplementation 'eu.pb4:polymer-autohost:0.9.18+1.21.1'
 	modImplementation 'eu.pb4:polymer-virtual-entity:0.9.18+1.21.1'
 	modImplementation include('eu.pb4:map-canvas-api:0.4.2+1.21.1')

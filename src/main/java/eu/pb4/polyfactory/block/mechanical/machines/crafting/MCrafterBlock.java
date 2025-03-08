@@ -46,7 +46,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -93,9 +92,9 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         this.updatePowered(world, pos, state);
-        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
     }
 
     private void updatePowered(World world, BlockPos pos, BlockState state) {

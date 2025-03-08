@@ -35,8 +35,6 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.item.ModelTransformationMode;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -209,7 +207,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
                             TriggerCriterion.trigger(serverPlayer, FactoryTriggers.ITEM_FILTER_USE);
                         }
                     }
-                    return ActionResult.SUCCESS_SERVER;
+                    return ActionResult.SUCCESS;
                 } else if (!splitterBlockEntity.getFilterRight().isEmpty() || !stack.isEmpty()) {
                     if (stack.isEmpty()) {
                         player.setStackInHand(hand, splitterBlockEntity.getFilterRight());
