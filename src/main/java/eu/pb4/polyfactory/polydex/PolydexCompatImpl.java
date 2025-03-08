@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.polydex;
 import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polydex.api.v1.hover.HoverDisplayBuilder;
 import eu.pb4.polydex.api.v1.recipe.*;
+import eu.pb4.polydex.impl.PolydexImpl;
 import eu.pb4.polydex.impl.book.view.crafting.ShapelessCraftingRecipePage;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
@@ -11,8 +12,11 @@ import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.item.util.ColoredItem;
+import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.polydex.pages.*;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.polyfactory.recipe.ColoringCraftingRecipe;
@@ -33,19 +37,23 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.sgui.api.elements.GuiElement;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
@@ -77,8 +85,12 @@ public class PolydexCompatImpl {
         PolydexEntry.registerEntryCreator(FactoryItems.CABLE, PolydexCompatImpl::seperateColoredItems);
         PolydexEntry.registerEntryCreator(FactoryItems.LAMP, PolydexCompatImpl::seperateColoredItems);
         PolydexEntry.registerEntryCreator(FactoryItems.INVERTED_LAMP, PolydexCompatImpl::seperateColoredItems);
+        PolydexEntry.registerEntryCreator(FactoryItems.FIXTURE_LAMP, PolydexCompatImpl::seperateColoredItems);
+        PolydexEntry.registerEntryCreator(FactoryItems.INVERTED_FIXTURE_LAMP, PolydexCompatImpl::seperateColoredItems);
         PolydexEntry.registerEntryCreator(FactoryItems.CAGED_LAMP, PolydexCompatImpl::seperateColoredItems);
         PolydexEntry.registerEntryCreator(FactoryItems.INVERTED_CAGED_LAMP, PolydexCompatImpl::seperateColoredItems);
+        PolydexEntry.registerEntryCreator(FactoryItems.BRITTLE_POTION, PolydexImpl::seperateCustomPotion);
+        PolydexEntry.registerEntryCreator(FactoryItems.PORTABLE_FLUID_TANK, PolydexCompatImpl::seperateFluidItems);
         HoverDisplayBuilder.register(PolydexCompatImpl::stateAccurateNames);
     }
 
@@ -120,6 +132,42 @@ public class PolydexCompatImpl {
             }
 
             return ColoredItem.getColor(base) == ColoredItem.getColor(stack);
+        }
+
+        return polydexEntry.stack().matches(polydexStack, true);
+    }
+
+    private static PolydexEntry seperateFluidItems(ItemStack stack) {
+        var id = Registries.ITEM.getId(stack.getItem());
+        var fluids = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
+        if (fluids.isEmpty()) {
+            return PolydexEntry.of(id, stack, PolydexCompatImpl::isSameFluidObject);
+        }
+
+        return PolydexEntry.of(id.withSuffixedPath("/" + fluids.fluids().stream().sorted(Comparator.comparing(x -> x.getName().getString())).map((instance) -> {
+            var base = Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.getId(instance.type())).toUnderscoreSeparatedString();
+            if (instance.type().defaultData() == Unit.INSTANCE) {
+                return base;
+            } else if (instance.data() instanceof PotionContentsComponent potion) {
+                if (potion.potion().isPresent() && potion.potion().get().getKey().isPresent()) {
+                    return base + "_" + potion.potion().get().getKey().get().getValue().toUnderscoreSeparatedString();
+                }
+
+                return base + "_" + potion.hashCode();
+            }
+            return base + "_" + instance.hashCode();
+        }).collect(Collectors.joining("/"))), stack, PolydexCompatImpl::isSameFluidObject);
+    }
+
+    private static boolean isSameFluidObject(PolydexEntry polydexEntry, PolydexStack<?> polydexStack) {
+        if (polydexStack.getBacking() instanceof ItemStack stack) {
+            var base = (ItemStack) polydexEntry.stack().getBacking();
+            if (!base.isOf(stack.getItem())) {
+                return false;
+            }
+
+            return Objects.equals(stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT).fluids(),
+                    base.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT).fluids());
         }
 
         return polydexEntry.stack().matches(polydexStack, true);
