@@ -31,6 +31,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -55,10 +56,10 @@ public final class CableBlock extends AbstractCableBlock implements FactoryBlock
             if (convert != null) {
                 stack.decrementUnlessCreative(1, player);
                 var convertState = Objects.requireNonNull(convert.getPlacementState(new ItemPlacementContext(world, player, hand, stack, hit)))
-                        .with(NORTH, state.get(NORTH))
-                        .with(SOUTH, state.get(SOUTH))
-                        .with(WEST, state.get(WEST))
-                        .with(EAST, state.get(EAST));
+                        .with(WallWithCableBlock.NORTH_SHAPE, WallWithCableBlock.Side.NONE.cable(state.get(NORTH)))
+                        .with(WallWithCableBlock.SOUTH_SHAPE, WallWithCableBlock.Side.NONE.cable(state.get(SOUTH)))
+                        .with(WallWithCableBlock.WEST_SHAPE, WallWithCableBlock.Side.NONE.cable(state.get(WEST)))
+                        .with(WallWithCableBlock.EAST_SHAPE, WallWithCableBlock.Side.NONE.cable(state.get(EAST)));
 
                 world.setBlockState(pos, convertState);
                 return ItemActionResult.SUCCESS;
@@ -66,6 +67,11 @@ public final class CableBlock extends AbstractCableBlock implements FactoryBlock
         }
 
         return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+    }
+
+    @Override
+    protected boolean isDirectionBlocked(BlockState state, Direction direction) {
+        return false;
     }
 
     @Nullable

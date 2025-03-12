@@ -150,7 +150,7 @@ class LootTables extends FabricBlockLootTableProvider {
                 .pool(LootPool.builder()
                         .conditionally(SurvivesExplosionLootCondition.builder()
                                 .and(BlockStatePropertyLootCondition.builder(block).properties(StatePredicate.Builder.create()
-                                .exactMatch(GenericCabledDataBlock.HAS_CABLE, true))))
+                                        .exactMatch(GenericCabledDataBlock.HAS_CABLE, true))))
                         .with(ItemEntry.builder(FactoryItems.CABLE)
                                 .apply(() -> CopyColorLootFunction.INSTANCE)
                         )
@@ -189,8 +189,10 @@ class LootTables extends FabricBlockLootTableProvider {
     }
 
     private void addColored(Block block) {
-        addColored(block, (x) -> {});
+        addColored(block, (x) -> {
+        });
     }
+
     private void addColored(Block block, Consumer<LootTable.Builder> consumer) {
         var x = LootTable.builder().pool(LootPool.builder()
                 .conditionally(SurvivesExplosionLootCondition.builder())

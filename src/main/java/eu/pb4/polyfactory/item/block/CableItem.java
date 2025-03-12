@@ -20,8 +20,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
-import java.util.Objects;
-
 public class CableItem extends ColoredDownsampledBlockItem {
     public <T extends Block & PolymerBlock> CableItem(T block, int defaultColor, Settings settings) {
         super(block, defaultColor, settings);

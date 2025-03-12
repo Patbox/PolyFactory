@@ -48,7 +48,7 @@ import java.util.*;
 import java.util.List;
 import java.util.function.BiPredicate;
 
-public abstract class AbstractCableBlock extends CableNetworkBlock implements BlockEntityProvider, CableConnectable {
+public abstract class AbstractCableBlock extends AbstracterCableBlock {
     public static final int DEFAULT_COLOR = 0xbbbbbb;
     public static final BooleanProperty HAS_CABLE = BooleanProperty.of("has_cable");
 
@@ -64,26 +64,6 @@ public abstract class AbstractCableBlock extends CableNetworkBlock implements Bl
         super(settings);
         this.setDefaultState(this.getDefaultState().with(NORTH, false).with(SOUTH, false)
                 .with(EAST, false).with(WEST, false).with(UP, false).with(DOWN, false));
-    }
-
-    @Override
-    protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (stack.isIn(ConventionalItemTags.DYES) && setColor(state, world, pos, FactoryItems.CABLE.downSampleColor(DyeColorExtra.getColor(stack)))) {
-            if (!player.isCreative()) {
-                stack.decrement(1);
-            }
-            world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS);
-
-            return ItemActionResult.SUCCESS;
-        } else if (player.getStackInHand(hand).isOf(FactoryItems.TREATED_DRIED_KELP)
-                && setColor(state, world, pos, DEFAULT_COLOR)
-        ) {
-            world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS);
-
-            return ItemActionResult.SUCCESS;
-        }
-
-        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
     }
 
     @Override
@@ -124,11 +104,8 @@ public abstract class AbstractCableBlock extends CableNetworkBlock implements Bl
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         var hasReceivers = false;
         var hasProviders = false;
+        super.onPlaced(world, pos, state, placer, itemStack);
         if (world.getBlockEntity(pos) instanceof ColorProvider be) {
-            if (itemStack.getItem() instanceof ColoredItem) {
-                be.setColor(FactoryItems.CABLE.getItemColor(itemStack));
-            }
-
             var newState = state;
             for (var dir : Direction.values()) {
                 var newPos = pos.offset(dir);
@@ -156,20 +133,11 @@ public abstract class AbstractCableBlock extends CableNetworkBlock implements Bl
             TriggerCriterion.trigger((ServerPlayerEntity) placer, FactoryTriggers.CABLE_CONNECT);
         }
 
-        super.onPlaced(world, pos, state, placer, itemStack);
     }
 
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         return isDirectionBlocked(state, direction) ? state : state.with(FACING_PROPERTIES.get(direction), canConnectTo(world, getColor(world, pos), neighborPos, neighborState, direction.getOpposite()));
-    }
-
-    public static int getColor(WorldAccess world, BlockPos pos) {
-        return world.getBlockEntity(pos) instanceof ColorProvider be ? be.getColor() : DEFAULT_COLOR;
-    }
-
-    protected boolean canConnectTo(WorldAccess world, int ownColor, BlockPos neighborPos, BlockState neighborState, Direction direction) {
-        return neighborState.getBlock() instanceof CableConnectable connectable && connectable.canCableConnect(world, ownColor, neighborPos, neighborState, direction);
     }
 
     @Override
@@ -194,23 +162,8 @@ public abstract class AbstractCableBlock extends CableNetworkBlock implements Bl
         return list.isEmpty() ? EnumSet.noneOf(Direction.class) : EnumSet.copyOf(list);
     }
 
-    protected boolean isDirectionBlocked(BlockState state, Direction direction) {
-        return false;
-    }
-
     @Override
-    public boolean canCableConnect(WorldAccess world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
-        if (world.getBlockEntity(pos) instanceof ColorProvider be) {
-            return be.getColor() == cableColor || be.isDefaultColor() || cableColor == DEFAULT_COLOR;
-        }
-        return true;
-    }
-
-    public boolean hasCable(BlockState state) {
-        return true;
-    }
-
-    private static boolean checkModelDirection(BlockState state, Direction direction) {
+    protected boolean checkModelDirection(BlockState state, Direction direction) {
         return state.get(FACING_PROPERTIES.get(direction));
     }
 
@@ -222,63 +175,5 @@ public abstract class AbstractCableBlock extends CableNetworkBlock implements Bl
     @Override
     public BlockState mirror(BlockState state, BlockMirror mirror) {
         return FactoryUtil.mirror(state, NORTH, SOUTH, EAST, WEST, mirror);
-    }
-
-
-    public static class BaseCableModel extends BlockModel {
-        private final ItemDisplayElement cable;
-        private int color = AbstractCableBlock.DEFAULT_COLOR;
-        private BlockState state;
-
-        public BaseCableModel(BlockState state) {
-            this.cable = ItemDisplayElementUtil.createSimple();
-            this.cable.setViewRange(0.5f);
-            this.state = state;
-            updateModel();
-            if (((AbstractCableBlock) state.getBlock()).hasCable(state)) {
-                this.addElement(this.cable);
-            }
-        }
-
-        @Override
-        public void notifyUpdate(HolderAttachment.UpdateType updateType) {
-            if (updateType == BlockAwareAttachment.BLOCK_STATE_UPDATE) {
-                this.setState(this.blockState());
-            }
-        }
-
-        protected void setState(BlockState blockState) {
-            this.state = blockState;
-            if (this.hasCable(state)) {
-                this.addElement(this.cable);
-            } else {
-                this.removeElement(this.cable);
-            }
-            updateModel();
-        }
-
-
-        protected final boolean hasCable(BlockState state) {
-            return ((AbstractCableBlock) state.getBlock()).hasCable(state);
-        }
-
-        protected void updateModel() {
-            var stack = getModel(this.state, AbstractCableBlock::checkModelDirection);
-            stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(this.color, false));
-            this.cable.setItem(stack);
-
-            if (this.cable.getHolder() == this && this.color >= 0) {
-                this.cable.tick();
-            }
-        }
-
-        public void setColor(int color) {
-            this.color = color;
-            updateModel();
-        }
-
-        public ItemStack getModel(BlockState state, BiPredicate<BlockState, Direction> directionPredicate) {
-            return FactoryModels.COLORED_CABLE.get(state, directionPredicate).copy();
-        }
     }
 }
