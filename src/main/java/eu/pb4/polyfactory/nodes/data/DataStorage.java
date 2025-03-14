@@ -16,6 +16,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,32 +49,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
     private DataStorage(List<DataEntry> entries) {
         for (var entry : entries) {
             this.currentData.put(entry.key, new SentData(entry.dataContainer, entry.blockPos, entry.direction.orElse(null)));
-        }
-    }
-
-    private static <T> void mergeMap(Int2ObjectOpenHashMap<Set<T>> into, Int2ObjectOpenHashMap<Set<T>> from) {
-        for (var entry : from.int2ObjectEntrySet()) {
-            var self = into.get(entry.getIntKey());
-            if (self == null) {
-                into.put(entry.getIntKey(), new HashSet<>(entry.getValue()));
-            } else {
-                self.addAll(entry.getValue());
-            }
-        }
-    }
-
-    private static <T> void splitMap(Int2ObjectOpenHashMap<Set<Pair<BlockPos, T>>> into, Int2ObjectOpenHashMap<Set<Pair<BlockPos, T>>> from, BlockGraph targetGraph) {
-        for (var entry : from.int2ObjectEntrySet()) {
-            var set = new HashSet<Pair<BlockPos, T>>();
-            for (var pos : List.copyOf(entry.getValue())) {
-                if (targetGraph.getNodesAt(pos.getLeft()).findAny().isPresent()) {
-                    set.add(pos);
-                    entry.getValue().remove(pos);
-                }
-            }
-            if (!set.isEmpty()) {
-                into.put(entry.getIntKey(), set);
-            }
         }
     }
 
@@ -146,8 +121,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
                     }
                 }
             }
-
-
             current.clear();
             this.swapData = current;
         }
@@ -220,6 +193,12 @@ public class DataStorage implements GraphEntity<DataStorage> {
     @Override
     public void onInit(@NotNull GraphEntityContext ctx) {
         this.ctx = ctx;
+        this.reinitializeCache();
+    }
+
+    private void reinitializeCache() {
+        this.providers.clear();
+        this.receivers.clear();
         ctx.getGraph().getNodes().forEach(this::storeReceiverOrProvider);
     }
 
@@ -235,8 +214,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
 
     @Override
     public void merge(@NotNull DataStorage other) {
-        mergeMap(this.providers, other.providers);
-        mergeMap(this.receivers, other.receivers);
+        this.reinitializeCache();
 
         for (var channel : this.receivers.keySet()) {
             var data = getData(channel);
@@ -252,10 +230,8 @@ public class DataStorage implements GraphEntity<DataStorage> {
     }
 
     private @NotNull DataStorage split(@NotNull BlockGraph originalGraph, @NotNull BlockGraph newGraph) {
-        var data = new DataStorage();
-        splitMap(data.receivers, this.receivers, newGraph);
-        splitMap(data.providers, this.providers, newGraph);
-        return data;
+        this.reinitializeCache();
+        return new DataStorage();
     }
 
     public boolean hasReceivers() {
@@ -264,6 +240,16 @@ public class DataStorage implements GraphEntity<DataStorage> {
 
     public boolean hasProviders() {
         return !this.providers.isEmpty();
+    }
+
+    @ApiStatus.Internal
+    public final Int2ObjectOpenHashMap<Set<Pair<BlockPos, DataReceiverNode>>> receivers() {
+        return this.receivers;
+    }
+
+    @ApiStatus.Internal
+    public final Int2ObjectOpenHashMap<Set<Pair<BlockPos, DataProviderNode>>> providers() {
+        return this.providers;
     }
 
     private record DataEntry(int key, BlockPos blockPos, DataContainer dataContainer, Optional<Direction> direction) {
