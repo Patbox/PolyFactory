@@ -120,7 +120,10 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
 
     @Override
     public @Nullable DataContainer provideData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataProviderNode node) {
-        if (world.getBlockEntity(selfPos) instanceof DoubleInputTransformerBlockEntity be) {
+        if (world.getBlockEntity(selfPos) instanceof DoubleInputTransformerBlockEntity be
+                && node instanceof ChannelProviderDirectionNode providerDirectionNode && providerDirectionNode.direction() == selfState.get(FACING_OUTPUT)
+                && be.outputChannel() == channel
+        ) {
             return be.lastOutput();
         }
 
@@ -130,6 +133,10 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
     @Override
     public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
         if (node instanceof ChannelReceiverDirectionNode direction && world.getBlockEntity(selfPos) instanceof DoubleInputTransformerBlockEntity be) {
+            if (channel == 3) {
+                System.out.getClass();
+            }
+
             DataContainer input1 = be.lastInput1();
             DataContainer input2 = be.lastInput2();
             boolean matchingData = false;
