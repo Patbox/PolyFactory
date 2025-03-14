@@ -27,7 +27,7 @@ public record DataType<T extends DataContainer>(String id, MapCodec<T> codec, Li
     public static final DataType<BoolData> BOOL = new DataType<>("bool", BoolData.TYPE_CODEC);
     public static final DataType<LongData> LONG = new DataType<>("long", LongData.TYPE_CODEC);
     public static final DataType<DoubleData> DOUBLE = new DataType<>("double", DoubleData.TYPE_CODEC);
-    public static final DataType<StringData> STRING = new DataType<>("string", StringData.TYPE_CODEC, "length");
+    public static final DataType<StringData> STRING = new DataType<>("string", StringData.TYPE_CODEC, "length", "charat:*", "substring:*");
     public static final DataType<GameEventData> GAME_EVENT = new DataType<>("game_event", GameEventData.TYPE_CODEC, "event", "position", "distance");
     public static final DataType<SoundEventData> SOUND_EVENT = new DataType<>("sound_event", SoundEventData.TYPE_CODEC, "sound", "volume", "pitch");
     public static final DataType<BlockStateData> BLOCK_STATE = new DataType<>("block_state", BlockStateData.TYPE_CODEC, "type", "property:*");

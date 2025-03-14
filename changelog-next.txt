@@ -1,2 +1,4 @@
+- Tweaked placement code of Data Exported, Data Comparator and Arithmetic Operator.
+- Tweaked text position in Hologram Display.
 - Heavily lowered amount of blockstates used by all the Wall with Cable blocks (from 2048 to 162 states per block).
 - Fixed some item variants not showing in Polydex.

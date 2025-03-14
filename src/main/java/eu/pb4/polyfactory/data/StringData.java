@@ -52,6 +52,28 @@ public record StringData(String value) implements DataContainer {
     @Override
     public DataContainer extract(String field) {
         if (field.equals("length")) return new LongData(value.length());
+        if (field.startsWith("charat:")) {
+            try {
+                var num = Integer.parseInt(field.substring("charat:".length()));
+
+                if (num >= 0 && num < this.value.length()) {
+                    return new StringData(Character.toString(this.value.charAt(num)));
+                }
+            } catch (Throwable ignored) {}
+            return StringData.EMPTY;
+        }
+        if (field.startsWith("substring:")) {
+            try {
+                var num = field.substring("substring:".length()).split("\\.", 2);
+                int start = Integer.parseInt(num[0]);
+                int end = num.length == 2 ? Integer.parseInt(num[1]) : this.value.length();
+
+                if (start >= 0 && end <= this.value.length()) {
+                    return new StringData(this.value.substring(start, end));
+                }
+            } catch (Throwable ignored) {}
+            return StringData.EMPTY;
+        }
         return DataContainer.super.extract(field);
     }
 

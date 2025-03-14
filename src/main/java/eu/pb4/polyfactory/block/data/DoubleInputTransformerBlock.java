@@ -69,19 +69,27 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        var facing = ctx.getPlayerLookDirection().getOpposite();
+        var facing = ctx.getPlayerLookDirection();
 
-        Direction.Axis axis;
+        Direction facing2;
 
         if (facing.getAxis() == Direction.Axis.Y) {
-            axis = ctx.getHorizontalPlayerFacing().getAxis();
+            facing2 = ctx.getHorizontalPlayerFacing();
         } else {
-            axis = AxisAndFacingBlock.getAxis(facing, false);
+            facing2 = facing.rotateYClockwise();
+            for (var x : ctx.getPlacementDirections()) {
+                if (x != facing && x.getAxis() != Direction.Axis.Y) {
+                    facing2 = x;
+                    break;
+                }
+            }
         }
 
+
+
         return this.getDefaultState().with(FACING_OUTPUT, facing)
-                .with(FACING_INPUT_1, facing.rotateCounterclockwise(axis))
-                .with(FACING_INPUT_2, facing.rotateClockwise(axis));
+                .with(FACING_INPUT_1, facing.getOpposite())
+                .with(FACING_INPUT_2, facing2);
     }
 
     @Override

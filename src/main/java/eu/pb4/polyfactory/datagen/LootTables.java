@@ -62,6 +62,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.METAL_GRID);
         this.addDrop(FactoryBlocks.DATA_COMPARATOR);
         this.addDrop(FactoryBlocks.DATA_EXTRACTOR);
+        this.addDrop(FactoryBlocks.PROGRAMMABLE_DATA_EXTRACTOR);
         this.addDrop(FactoryBlocks.SPEAKER);
         this.addDrop(FactoryBlocks.RECORD_PLAYER);
         this.addDrop(FactoryBlocks.MINER);
