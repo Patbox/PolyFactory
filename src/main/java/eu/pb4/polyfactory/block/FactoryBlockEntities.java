@@ -140,11 +140,11 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader",
             BlockEntityType.Builder.create(ItemReaderBlockEntity::new, FactoryBlocks.ITEM_READER));
     public static final BlockEntityType<RecordPlayerBlockEntity> RECORD_PLAYER = register("record_player",
-            BlockEntityType.Builder.create(RecordPlayerBlockEntity::new, FactoryBlocks.RECORD_PLAYER));
-    public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer",
-            BlockEntityType.Builder.create(DoubleInputTransformerBlockEntity::new, FactoryBlocks.ARITHMETIC_OPERATOR, FactoryBlocks.DATA_COMPARATOR));
-    public static final BlockEntityType<InputTransformerBlockEntity> INPUT_TRANSFORMER = register("input_transformer",
-            BlockEntityType.Builder.create(InputTransformerBlockEntity::new));
+            FabricBlockEntityTypeBuilder.create(RecordPlayerBlockEntity::new, FactoryBlocks.RECORD_PLAYER));
+    public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer",  FabricBlockEntityTypeBuilder
+            .create(DoubleInputTransformerBlockEntity::new, FactoryBlocks.ARITHMETIC_OPERATOR, FactoryBlocks.DATA_COMPARATOR, FactoryBlocks.PROGRAMMABLE_DATA_EXTRACTOR));
+    public static final BlockEntityType<InputTransformerBlockEntity> INPUT_TRANSFORMER = register("input_transformer",  FabricBlockEntityTypeBuilder
+            .create(InputTransformerBlockEntity::new));
 
     public static final BlockEntityType<DataExtractorBlockEntity> DATA_EXTRACTOR = register("data_extractor", BlockEntityType.Builder
             .create(DataExtractorBlockEntity::new, FactoryBlocks.DATA_EXTRACTOR));

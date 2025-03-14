@@ -117,6 +117,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.ARITHMETIC_OPERATOR)
                 .add(FactoryBlocks.DATA_COMPARATOR)
                 .add(FactoryBlocks.DATA_EXTRACTOR)
+                .add(FactoryBlocks.PROGRAMMABLE_DATA_EXTRACTOR)
                 .add(FactoryBlocks.METAL_GRID)
                 .add(FactoryBlocks.ITEM_READER)
                 .add(FactoryBlocks.SPEAKER)

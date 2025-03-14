@@ -113,7 +113,8 @@ public class FactoryItems {
     public static final Item ARITHMETIC_OPERATOR = register(FactoryBlocks.ARITHMETIC_OPERATOR);
     public static final Item DATA_COMPARATOR = register(FactoryBlocks.DATA_COMPARATOR);
     public static final Item DATA_EXTRACTOR = register(FactoryBlocks.DATA_EXTRACTOR);
-    public static final Item DATA_MEMORY = register("data_memory", (settings) -> new DataMemoryBlockItem(FactoryBlocks.DATA_MEMORY, settings));
+    public static final Item PROGRAMMABLE_DATA_EXTRACTOR = register(FactoryBlocks.PROGRAMMABLE_DATA_EXTRACTOR);
+    public static final Item DATA_MEMORY = register("data_memory", (settings) -> new DataMemoryBlockItem(FactoryBlocks.DATA_MEMORY, settings.useBlockPrefixedTranslationKey()));
     public static final Item NIXIE_TUBE_CONTROLLER = register(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
     public static final Item HOLOGRAM_PROJECTOR = register(FactoryBlocks.HOLOGRAM_PROJECTOR);
     public static final Item WIRELESS_REDSTONE_RECEIVER = register(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
@@ -405,6 +406,7 @@ public class FactoryItems {
                         FactoryDebugItems.addItemGroup(context, entries);
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(PROGRAMMABLE_DATA_EXTRACTOR);
                     })).build()
             );
         }

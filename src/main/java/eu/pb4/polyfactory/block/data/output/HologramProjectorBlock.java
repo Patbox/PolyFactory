@@ -434,8 +434,8 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 t.setShadow(true);
                 t.setLineWidth(120);
                 newDisplayExtra = t;
-                this.extraOffset = -list.size() / 4f;
-                this.customCenter = list.size() / 8f;
+                this.extraOffset = - 4 / 16f;//list.size() / 16f;
+                this.customCenter = 0;//list.size() / 8f;
             }
 
             if (this.currentDisplay != null) {

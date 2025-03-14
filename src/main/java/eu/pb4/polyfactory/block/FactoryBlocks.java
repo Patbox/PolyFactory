@@ -8,10 +8,7 @@ import eu.pb4.polyfactory.block.data.CableBlock;
 import eu.pb4.polyfactory.block.data.GatedCableBlock;
 import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.data.creative.TpsProviderBlock;
-import eu.pb4.polyfactory.block.data.io.ArithmeticOperatorBlock;
-import eu.pb4.polyfactory.block.data.io.DataComparatorBlock;
-import eu.pb4.polyfactory.block.data.io.DataExtractorBlock;
-import eu.pb4.polyfactory.block.data.io.DataMemoryBlock;
+import eu.pb4.polyfactory.block.data.io.*;
 import eu.pb4.polyfactory.block.data.output.*;
 import eu.pb4.polyfactory.block.data.providers.*;
 import eu.pb4.polyfactory.block.electric.ElectricGeneratorBlock;
@@ -34,6 +31,7 @@ import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
 import eu.pb4.polyfactory.block.other.*;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.NoteBlockInstrument;
 import net.minecraft.block.piston.PistonBehavior;
@@ -46,9 +44,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -100,6 +100,7 @@ public class FactoryBlocks {
 
     public static final DataComparatorBlock DATA_COMPARATOR = register("data_comparator", Block.Settings.copy(ITEM_COUNTER), DataComparatorBlock::new);
     public static final DataExtractorBlock DATA_EXTRACTOR = register("data_extractor", Block.Settings.copy(ITEM_COUNTER), DataExtractorBlock::new);
+    public static final ProgrammableDataExtractorBlock PROGRAMMABLE_DATA_EXTRACTOR = register("programmable_data_extractor", Block.Settings.copy(ITEM_COUNTER), ProgrammableDataExtractorBlock::new);
     public static final DataMemoryBlock DATA_MEMORY = register("data_memory", Block.Settings.copy(ITEM_COUNTER), DataMemoryBlock::new);
 
     public static final HologramProjectorBlock HOLOGRAM_PROJECTOR = register("hologram_projector", Block.Settings.copy(SPLITTER), HologramProjectorBlock::new);
@@ -151,14 +152,13 @@ public class FactoryBlocks {
 
 
     public static void register() {
-        var s = System.currentTimeMillis();
-        for (var block : Registries.BLOCK) {
-            if (block instanceof WallBlock wallBlock) {
+        RegistryEntryAddedCallback.allEntries(Registries.BLOCK, block -> {
+            if (block.value() instanceof WallBlock wallBlock) {
                 var id = Registries.BLOCK.getId(wallBlock);
                 register("wall_with_cable/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock), settings -> new WallWithCableBlock(wallBlock));
                 register("wall_with_pipe/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock), settings -> new PipeInWallBlock(wallBlock));
             }
-        }
+        });
 
         if (ModInit.DEV_MODE) {
             ServerLifecycleEvents.SERVER_STARTED.register((FactoryBlocks::validate));
@@ -169,6 +169,9 @@ public class FactoryBlocks {
     }
 
     private static void validate(MinecraftServer server) {
+        //Registries.BLOCK.stream().sorted(Comparator.comparing(x -> -x.getStateManager().getStates().size()))
+        //        .forEachOrdered(block ->
+        //                System.out.println(block.getRegistryEntry().getIdAsString() + " -> " + block.getStateManager().getStates().size()));
         for (var block : BLOCKS) {
             //if (block.getLootTableKey() != ) {
                 var lt = server.getReloadableRegistries().getLootTable(block.getLootTableKey());

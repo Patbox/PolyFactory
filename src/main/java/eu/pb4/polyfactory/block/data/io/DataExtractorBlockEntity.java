@@ -29,10 +29,15 @@ import net.minecraft.util.math.Vec3d;
 import java.util.Objects;
 
 public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
-    private String field = "";
+    private String field;
 
     public DataExtractorBlockEntity(BlockPos pos, BlockState state) {
+        this(pos, state, "");
+    }
+
+    public DataExtractorBlockEntity(BlockPos pos, BlockState state, String defaultValue) {
         super(FactoryBlockEntities.DATA_EXTRACTOR, pos, state);
+        this.field = defaultValue;
     }
 
     @Override

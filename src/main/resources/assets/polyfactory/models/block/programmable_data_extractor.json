@@ -1,0 +1,10 @@
+{
+	"parent": "polyfactory:block/arithmetic_operator",
+	"textures": {
+		"0": "polyfactory:block/cable/data_io/programmable_extractor_outside",
+		"1": "polyfactory:block/empty",
+		"2": "polyfactory:block/cable/data_io/inner",
+		"particle": "polyfactory:block/cable/data_io/programmable_extractor_outside"
+	},
+	"display": {}
+}
