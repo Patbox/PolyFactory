@@ -6,7 +6,7 @@ import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlock;
 import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlockEntity;
 import eu.pb4.polyfactory.data.*;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -30,10 +30,10 @@ public class DataComparatorBlock extends DoubleInputTransformerBlock {
     public static final EnumProperty<Operation> OPERATION = EnumProperty.of("operation", Operation.class);
     public static final BooleanProperty STRICT = BooleanProperty.of("strict");
 
-    public static final List<WrenchAction> WRENCH_ACTIONS = ImmutableList.<WrenchAction>builder()
+    public static final List<BlockConfig<?>> WRENCH_ACTIONS = ImmutableList.<BlockConfig<?>>builder()
             .addAll(DoubleInputTransformerBlock.WRENCH_ACTIONS)
-            .add(WrenchAction.of("operation", OPERATION, t -> t.text))
-            .add(WrenchAction.of("strict", STRICT))
+            .add(BlockConfig.of("operation", OPERATION, (t, world, pos, side, state) -> t.text))
+            .add(BlockConfig.of("strict", STRICT))
             .build();
 
     public DataComparatorBlock(Settings settings) {
@@ -127,7 +127,7 @@ public class DataComparatorBlock extends DoubleInputTransformerBlock {
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return WRENCH_ACTIONS;
     }
 }

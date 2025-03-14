@@ -1,14 +1,16 @@
 package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
+import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -33,16 +35,14 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.hit.BlockHitResult;
@@ -58,21 +58,22 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
-public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider, WrenchableBlock {
+public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider, ConfigurableBlock {
     public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
-    private static final List<WrenchAction> WRENCH_ACTIONS = List.of(
-            WrenchAction.FACING_HORIZONTAL,
-            WrenchAction.ofBlockEntityString("angle", EjectorBlockEntity.class,
-                    x -> String.format(Locale.ROOT, "%.0f", x.angle()),
-                    (x, n) -> x.setAngle(FactoryUtil.wrap(x.angle() + (n ? 5f : -5f), 10, 65))),
-            WrenchAction.ofBlockEntityString("strength", EjectorBlockEntity.class,
-                    x -> String.format(Locale.ROOT, "%.2f", x.strength()),
-                    (x, n) -> x.setStrength(FactoryUtil.wrap(x.strength() + (n ? 0.25f : -0.25f), 1, 2.5f)))
+    private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(
+            BlockConfig.FACING_HORIZONTAL,
+            BlockConfig.ofBlockEntity("angle", Codec.FLOAT, EjectorBlockEntity.class,
+                    (x, world, pos, side, state) -> Text.literal(String.format(Locale.ROOT, "%.0f", x)),
+                    EjectorBlockEntity::angle, EjectorBlockEntity::setAngle,
+                    WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 5f : -5f), 10, 65))),
+            BlockConfig.ofBlockEntity("strength", Codec.FLOAT, EjectorBlockEntity.class,
+                    (x, world, pos, side, state) -> Text.literal(String.format(Locale.ROOT, "%.2f", x)),
+                    EjectorBlockEntity::strength, EjectorBlockEntity::setStrength,
+                    WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.25f : -0.25f), 1, 2.5f)))
             );
 
 
@@ -209,7 +210,7 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return WRENCH_ACTIONS;
     }
 

@@ -11,9 +11,9 @@ import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.AbstractFilterItem;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.factorytools.api.util.WorldPointer;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.FilterIcon;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.filter.FilterData;
@@ -53,7 +53,7 @@ import org.joml.Matrix4fStack;
 import java.util.List;
 
 
-public class SplitterBlock extends Block implements FactoryBlock, MovingItemConsumer, WrenchableBlock, BlockEntityProvider, BarrierBasedWaterloggable {
+public class SplitterBlock extends Block implements FactoryBlock, MovingItemConsumer, ConfigurableBlock, BlockEntityProvider, BarrierBasedWaterloggable {
     public static final BooleanProperty ENABLED = Properties.ENABLED;
     public static final BooleanProperty DISTRIBUTE = BooleanProperty.of("distribute");
     public static final BooleanProperty BLOCKING = BooleanProperty.of("blocking");
@@ -257,8 +257,8 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.FACING_HORIZONTAL);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.FACING_HORIZONTAL);
     }
 
     public static final class Model extends BlockModel {

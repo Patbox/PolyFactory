@@ -9,6 +9,9 @@ import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.generic.SimpleDirectionNode;
@@ -55,12 +58,12 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
-public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider, WrenchableBlock {
-    public static final DirectionProperty FACING = Properties.FACING;
+public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider, ConfigurableBlock {
+    public static final EnumProperty<Direction> FACING = Properties.FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
     public static final BooleanProperty REVERSE = BooleanProperty.of("reverse");
 
-    public static final WrenchAction REVERSE_ACTION = WrenchAction.of("reverse", REVERSE, ScreenTexts::onOrOff);
+    public static final BlockConfig REVERSE_ACTION = BlockConfig.of("reverse", REVERSE, (on, world, pos, side, state) -> ScreenTexts.onOrOff(on));
 
     public FanBlock(Settings settings) {
         super(settings);
@@ -146,8 +149,8 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(REVERSE_ACTION, WrenchAction.FACING);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(REVERSE_ACTION, BlockConfig.FACING);
     }
 
     @Override

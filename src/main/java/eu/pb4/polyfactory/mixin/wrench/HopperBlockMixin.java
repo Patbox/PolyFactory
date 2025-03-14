@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.mixin.wrench;
 
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
 import net.minecraft.state.property.DirectionProperty;
@@ -16,10 +16,10 @@ import org.spongepowered.asm.mixin.Unique;
 import java.util.List;
 
 @Mixin(HopperBlock.class)
-public class HopperBlockMixin implements WrenchableBlock {
+public class HopperBlockMixin implements ConfigurableBlock {
     @SuppressWarnings("AddedMixinMembersNamePattern")
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.FACING_HOPPER);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.FACING_HOPPER);
     }
 }

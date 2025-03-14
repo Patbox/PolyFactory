@@ -4,8 +4,8 @@ import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -41,7 +41,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.List;
 
 
-public class ItemPackerBlock extends Block implements FactoryBlock, BlockEntityProvider, BarrierBasedWaterloggable, InventoryProvider, WrenchableBlock {
+public class ItemPackerBlock extends Block implements FactoryBlock, BlockEntityProvider, BarrierBasedWaterloggable, InventoryProvider, ConfigurableBlock {
     public static EnumProperty<Direction> FACING = Properties.FACING;
 
     public ItemPackerBlock(Settings settings) {
@@ -140,8 +140,8 @@ public class ItemPackerBlock extends Block implements FactoryBlock, BlockEntityP
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.FACING);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.FACING);
     }
 
     public final class Model extends BlockModel {

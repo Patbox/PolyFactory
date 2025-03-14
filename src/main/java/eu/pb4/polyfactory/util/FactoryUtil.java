@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.util;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.resourcepack.BaseItemProvider;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.ModInit;
@@ -584,6 +585,11 @@ public class FactoryUtil {
     public static <T extends Enum<T>> T nextEnum(T activeMode, T[] values, boolean next) {
         return values[(values.length + activeMode.ordinal() + (next ? 1 : -1)) % values.length];
     }
+
+    public static <T extends Comparable<T>> Codec<T> propertyCodec(Property<T> property) {
+        return Codec.stringResolver(property::name, x -> property.parse(x).orElse(property.getValues().getFirst()));
+    }
+
 
     public enum MovableResult {
         SUCCESS_MOVABLE,

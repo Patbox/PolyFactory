@@ -4,8 +4,8 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.RedstoneConnectable;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -46,11 +46,11 @@ import java.util.EnumSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 
-public class RedstoneValvePipeBlock extends PipeBaseBlock implements WrenchableBlock, RedstoneConnectable {
+public class RedstoneValvePipeBlock extends PipeBaseBlock implements ConfigurableBlock, RedstoneConnectable {
     public static final EnumProperty<Direction.Axis> AXIS = Properties.AXIS;
     public static final BooleanProperty POWERED = Properties.POWERED;
     public static final BooleanProperty INVERTED = Properties.INVERTED;
-    private static final List<WrenchAction> WRENCH_ACTIONS = List.of(WrenchAction.AXIS, WrenchAction.INVERTED);
+    private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(BlockConfig.AXIS, BlockConfig.INVERTED);
     public RedstoneValvePipeBlock(AbstractBlock.Settings settings) {
         super(settings);
     }
@@ -133,7 +133,7 @@ public class RedstoneValvePipeBlock extends PipeBaseBlock implements WrenchableB
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return WRENCH_ACTIONS;
     }
 

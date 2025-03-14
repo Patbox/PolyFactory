@@ -1,15 +1,18 @@
 package eu.pb4.polyfactory.block.fluids;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.block.configurable.ValueFormatter;
+import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.nodes.pipe.NozzleNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -50,11 +53,12 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class NozzleBlock extends NetworkBlock implements FactoryBlock, WrenchableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe {
-    public static final DirectionProperty FACING = Properties.FACING;
-    public static final WrenchAction SPREAD = WrenchAction.ofBlockEntityString("spread", NozzleBlockEntity.class,
-            x -> String.format(Locale.ROOT,"%.2f", x.extraSpread()),
-            (x, n) -> x.setExtraSpread(FactoryUtil.wrap(x.extraSpread() + (n ? 0.05f : -0.05f), 0f, 0.8f))
+public class NozzleBlock extends NetworkBlock implements FactoryBlock, ConfigurableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe {
+    public static final EnumProperty<Direction> FACING = Properties.FACING;
+    public static final BlockConfig SPREAD = BlockConfig.ofBlockEntity("spread", Codec.FLOAT, NozzleBlockEntity.class,
+            ValueFormatter.str(x -> String.format(Locale.ROOT,"%.2f", x)),
+            NozzleBlockEntity::extraSpread, NozzleBlockEntity::setExtraSpread,
+            WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.05f : -0.05f), 0f, 0.8f))
     );
     public NozzleBlock(Settings settings) {
         super(settings);
@@ -159,8 +163,8 @@ public class NozzleBlock extends NetworkBlock implements FactoryBlock, Wrenchabl
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.FACING, SPREAD);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.FACING, SPREAD);
     }
 
     public static final class Model extends BlockModel {

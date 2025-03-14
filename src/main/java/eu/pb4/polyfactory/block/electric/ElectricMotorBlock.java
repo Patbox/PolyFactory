@@ -9,8 +9,8 @@ import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.electric.EnergyData;
@@ -46,7 +46,7 @@ import org.joml.Vector3f;
 import java.util.Collection;
 import java.util.List;
 
-public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, BlockEntityProvider, CableConnectable, RotationUser, EnergyUser, WrenchableBlock, ItemUseLimiter.All {
+public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, BlockEntityProvider, CableConnectable, RotationUser, EnergyUser, ConfigurableBlock {
     public static final DirectionProperty FACING = Properties.FACING;
 
     public ElectricMotorBlock(Settings settings) {
@@ -141,8 +141,8 @@ public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, Bl
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.FACING);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.FACING);
     }
 
     public static final class Model extends RotationAwareModel {

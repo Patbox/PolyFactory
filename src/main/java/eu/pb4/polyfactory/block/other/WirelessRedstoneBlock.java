@@ -12,8 +12,8 @@ import eu.pb4.polyfactory.block.FactoryPoi;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -53,8 +53,8 @@ import org.joml.Vector3f;
 import java.util.List;
 
 
-public class WirelessRedstoneBlock extends Block implements FactoryBlock, RedstoneConnectable, BlockEntityProvider, WrenchableBlock, SneakBypassingBlock, BarrierBasedWaterloggable, ItemUseLimiter {
-    public static DirectionProperty FACING = Properties.FACING;
+public class WirelessRedstoneBlock extends Block implements FactoryBlock, RedstoneConnectable, BlockEntityProvider, ConfigurableBlock, SneakBypassingBlock, BarrierBasedWaterloggable {
+    public static EnumProperty<Direction> FACING = Properties.FACING;
     public static BooleanProperty POWERED = Properties.POWERED;
     public WirelessRedstoneBlock(Settings settings) {
         super(settings);
@@ -160,8 +160,8 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.FACING);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.FACING);
     }
 
     public static final class Receiver extends WirelessRedstoneBlock {

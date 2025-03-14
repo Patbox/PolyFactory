@@ -6,9 +6,9 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -49,13 +49,13 @@ import org.joml.Matrix4fStack;
 
 import java.util.List;
 
-public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityProvider, WrenchableBlock, BarrierBasedWaterloggable {
+public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityProvider, ConfigurableBlock, BarrierBasedWaterloggable {
     public static Property<Direction.Axis> AXIS = Properties.HORIZONTAL_AXIS;
     public static BooleanProperty POSITIVE_CONNECTED = FactoryProperties.POSITIVE_CONNECTED;
     public static BooleanProperty NEGATIVE_CONNECTED = FactoryProperties.NEGATIVE_CONNECTED;
     public static EnumProperty<BlockHalf> HALF = Properties.BLOCK_HALF;
 
-    public static final WrenchAction AXIS_ACTION = WrenchAction.of("axis", AXIS);
+    public static final BlockConfig AXIS_ACTION = BlockConfig.of("axis", AXIS);
 
 
     public NixieTubeBlock(Settings settings) {
@@ -69,8 +69,8 @@ public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityPr
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(AXIS_ACTION, WrenchAction.HALF);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(AXIS_ACTION, BlockConfig.HALF);
     }
 
     @Override

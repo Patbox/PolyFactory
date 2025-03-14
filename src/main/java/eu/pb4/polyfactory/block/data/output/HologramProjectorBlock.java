@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.data.output;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
@@ -10,6 +11,8 @@ import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.mapcanvas.api.font.DefaultFonts;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.block.configurable.ValueFormatter;
+import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.block.data.DataReceiver;
@@ -18,9 +21,8 @@ import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.data.BlockStateData;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.ItemStackData;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchApplyAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
 import eu.pb4.polyfactory.nodes.data.DataReceiverNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -66,57 +68,63 @@ import java.util.Locale;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class HologramProjectorBlock extends DataNetworkBlock implements FactoryBlock, WrenchableBlock, BlockEntityProvider, CableConnectable, DataReceiver, BarrierBasedWaterloggable {
+public class HologramProjectorBlock extends DataNetworkBlock implements FactoryBlock, ConfigurableBlock, BlockEntityProvider, CableConnectable, DataReceiver, BarrierBasedWaterloggable {
     public static final BooleanProperty ACTIVE = FactoryProperties.ACTIVE;
     public static final DirectionProperty FACING = Properties.FACING;
     public static final IntProperty FRONT = FactoryProperties.FRONT;
-    private static final WrenchAction CHANGE_ROTATION = WrenchAction.of("front", (world, pos, side, state) -> {
+    private static final BlockConfig<?> CHANGE_ROTATION = BlockConfig.of("front", FRONT, (value, world, pos, side, state) -> {
         var axis = state.get(FACING).getAxis();
         if (axis == Direction.Axis.Y) {
             var rot = Direction.NORTH;
-            for (var i = 0; i < state.get(FRONT); i++) {
+            for (var i = 0; i < value; i++) {
                 rot = rot.rotateClockwise(axis);
             }
             return FactoryUtil.asText(rot);
-        } else  {
+        } else {
             var rot = Direction.UP;
-            for (var i = 0; i < state.get(FRONT); i++) {
+            for (var i = 0; i < value; i++) {
                 rot = rot.rotateCounterclockwise(axis);
             }
             return FactoryUtil.asText(rot);
         }
-    }, WrenchApplyAction.ofProperty(FRONT));
+    });
 
-    public static final WrenchAction SCALE = WrenchAction.ofBlockEntityString("scale", HologramProjectorBlockEntity.class,
-            x -> String.format(Locale.ROOT, "%.1f", x.scale()),
-            (x, n) -> x.setScale(FactoryUtil.wrap(x.scale() + (n ? 0.5f : -0.5f), 1, 5) )
+    public static final BlockConfig<?> SCALE = BlockConfig.ofBlockEntity("scale", Codec.FLOAT, HologramProjectorBlockEntity.class,
+            ValueFormatter.str(x -> String.format(Locale.ROOT, "%.1f", x)),
+            HologramProjectorBlockEntity::scale, HologramProjectorBlockEntity::setScale,
+            WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.5f : -0.5f), 1, 5))
     );
 
-    public static final WrenchAction OFFSET = WrenchAction.ofBlockEntityString("offset", HologramProjectorBlockEntity.class,
-            x -> String.format(Locale.ROOT,"%.1f", x.offset()),
-            (x, n) -> x.setOffset(FactoryUtil.wrap(x.offset() + (n ? 0.1f : -0.1f), 0.1f, 1.5f))
+    public static final BlockConfig<?> OFFSET = BlockConfig.ofBlockEntity("offset", Codec.FLOAT, HologramProjectorBlockEntity.class,
+            ValueFormatter.str(x -> String.format(Locale.ROOT,"%.1f", x)),
+            HologramProjectorBlockEntity::offset, HologramProjectorBlockEntity::setOffset,
+            WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.1f : -0.1f), 0.1f, 1.5f))
     );
 
-    public static final WrenchAction CHANGE_PITCH = WrenchAction.ofBlockEntityString("pitch", HologramProjectorBlockEntity.class,
-            x -> Math.round(x.pitch() * MathHelper.DEGREES_PER_RADIAN) + "°",
-            (x, n) -> x.setPitch(FactoryUtil.wrap(x.pitch() + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
+    public static final BlockConfig<?> CHANGE_PITCH = BlockConfig.ofBlockEntity("pitch", Codec.FLOAT, HologramProjectorBlockEntity.class,
+            ValueFormatter.str(x -> Math.round(x * MathHelper.DEGREES_PER_RADIAN) + "°"),
+            HologramProjectorBlockEntity::pitch, HologramProjectorBlockEntity::setPitch,
+            WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
                     0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
     );
 
-    public static final WrenchAction CHANGE_YAW = WrenchAction.ofBlockEntityString("yaw", HologramProjectorBlockEntity.class,
-            x -> Math.round(x.yaw() * MathHelper.DEGREES_PER_RADIAN) + "°",
-            (x, n) -> x.setYaw(FactoryUtil.wrap(x.yaw() + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
+    public static final BlockConfig<?> CHANGE_YAW = BlockConfig.ofBlockEntity("yaw", Codec.FLOAT, HologramProjectorBlockEntity.class,
+            ValueFormatter.str(x -> Math.round(x * MathHelper.DEGREES_PER_RADIAN) + "°"),
+            HologramProjectorBlockEntity::yaw, HologramProjectorBlockEntity::setYaw,
+            WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
                     0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
     );
-    public static final WrenchAction CHANGE_ROLL = WrenchAction.ofBlockEntityString("roll", HologramProjectorBlockEntity.class,
-            x -> Math.round(x.roll() * MathHelper.DEGREES_PER_RADIAN) + "°",
-            (x, n) -> x.setRoll(FactoryUtil.wrap(x.roll() + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
+    public static final BlockConfig<?> CHANGE_ROLL = BlockConfig.ofBlockEntity("roll", Codec.FLOAT, HologramProjectorBlockEntity.class,
+            ValueFormatter.str(x -> Math.round(x * MathHelper.DEGREES_PER_RADIAN) + "°"),
+            HologramProjectorBlockEntity::roll, HologramProjectorBlockEntity::setRoll,
+            WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
                     0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
     );
 
-    public static final WrenchAction FORCE_TEXT = WrenchAction.ofBlockEntity("force_text", HologramProjectorBlockEntity.class,
-            x -> ScreenTexts.onOrOff(x.forceText()),
-            (x, n) -> x.setForceText(!x.forceText())
+    public static final BlockConfig<?> FORCE_TEXT = BlockConfig.ofBlockEntity("force_text", Codec.BOOL, HologramProjectorBlockEntity.class,
+            ValueFormatter.text(ScreenTexts::onOrOff),
+            HologramProjectorBlockEntity::forceText, HologramProjectorBlockEntity::setForceText,
+            WrenchModifyValue.simple((x, n) -> !x)
     );
 
     public HologramProjectorBlock(Settings settings) {
@@ -159,10 +167,10 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
         return 0;
     }
 
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(
-                WrenchAction.CHANNEL_WITH_DISABLED,
-                WrenchAction.FACING,
+                BlockConfig.CHANNEL_WITH_DISABLED,
+                BlockConfig.FACING,
                 CHANGE_ROTATION,
                 SCALE,
                 OFFSET,

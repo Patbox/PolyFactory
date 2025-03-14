@@ -8,10 +8,11 @@ import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -51,11 +52,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 
-public class MinerBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, WrenchableBlock, BarrierBasedWaterloggable, ItemUseLimiter.All {
+public class MinerBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, ConfigurableBlock, BarrierBasedWaterloggable, ItemUseLimiter.All {
     public static final Property<Direction> FACING = Properties.FACING;
-    private static final List<WrenchAction> WRENCH_ACTIONS = List.of(
-            WrenchAction.FACING,
-            WrenchAction.ofBlockEntityInt("reach",  MinerBlockEntity.class, 1, 2, 0,
+    private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(
+            BlockConfig.FACING,
+            BlockConfig.ofBlockEntityInt("reach",  MinerBlockEntity.class, 1, 2, 0,
                     MinerBlockEntity::reach, MinerBlockEntity::setReach)
     );
 
@@ -178,7 +179,7 @@ public class MinerBlock extends RotationalNetworkBlock implements FactoryBlock, 
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return WRENCH_ACTIONS;
     }
 

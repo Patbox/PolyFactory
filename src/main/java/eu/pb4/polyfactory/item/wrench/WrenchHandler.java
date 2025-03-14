@@ -2,6 +2,8 @@ package eu.pb4.polyfactory.item.wrench;
 
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
@@ -36,7 +38,7 @@ public class WrenchHandler {
     @Nullable
     private BlockPos pos;
 
-    private List<WrenchAction> actions = List.of();
+    private List<BlockConfig<?>> actions = List.of();
 
     public WrenchHandler(ServerPlayNetworkHandler handler) {
         this.sidebar.addPlayer(handler);
@@ -51,17 +53,17 @@ public class WrenchHandler {
         if (player.getMainHandStack().isOf(FactoryItems.WRENCH) && player.raycast(7, 0, false) instanceof BlockHitResult blockHitResult) {
             var state = player.getWorld().getBlockState(blockHitResult.getBlockPos());
             if (state == this.state && blockHitResult.getBlockPos().equals(this.pos)) {
-                if (this.state.getBlock() instanceof WrenchableBlock wrenchableBlock) {
-                    wrenchableBlock.wrenchTick(player, blockHitResult, this.state);
+                if (this.state.getBlock() instanceof ConfigurableBlock configurableBlock) {
+                    configurableBlock.wrenchTick(player, blockHitResult, this.state);
                 }
                 return;
             }
 
             this.state = state;
             this.pos = blockHitResult.getBlockPos();
-            if (this.state.getBlock() instanceof WrenchableBlock wrenchableBlock) {
-                wrenchableBlock.wrenchTick(player, blockHitResult, this.state);
-                this.actions = wrenchableBlock.getWrenchActions(player, blockHitResult.getBlockPos(), blockHitResult.getSide(), this.state);
+            if (this.state.getBlock() instanceof ConfigurableBlock configurableBlock) {
+                configurableBlock.wrenchTick(player, blockHitResult, this.state);
+                this.actions = configurableBlock.getBlockConfiguration(player, blockHitResult.getBlockPos(), blockHitResult.getSide(), this.state);
                 var selected = this.currentAction.get(this.state.getBlock());
                 this.sidebar.setTitle(Text.translatable("item.polyfactory.wrench.title",
                         Text.empty()/*.append(this.state.getBlock().getName())
@@ -82,8 +84,7 @@ public class WrenchHandler {
                         }
 
                         t.append(action.name()).append(": ");
-
-                        b.add(t, Text.empty().append(action.value().getDisplayValue(player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state)).formatted(Formatting.YELLOW));
+                        b.add(t, Text.empty().append(action.getDisplayValue(player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state)).formatted(Formatting.YELLOW));
                     }
                 });
                 this.sidebar.show();
@@ -100,10 +101,10 @@ public class WrenchHandler {
 
     public ActionResult useAction(ServerPlayerEntity player, World world, BlockPos pos, Direction side, boolean alt) {
         var state = world.getBlockState(pos);
-        if (!(state.getBlock() instanceof WrenchableBlock wrenchableBlock)) {
+        if (!(state.getBlock() instanceof ConfigurableBlock configurableBlock)) {
             return ActionResult.PASS;
         }
-        var actions = wrenchableBlock.getWrenchActions(player, pos, side, this.state);
+        var actions = configurableBlock.getBlockConfiguration(player, pos, side, this.state);
 
         if (actions.isEmpty()) {
             return ActionResult.PASS;
@@ -113,9 +114,11 @@ public class WrenchHandler {
             current = actions.get(0).id();
         }
 
-        for (var action : actions) {
+        for (var act : actions) {
+            @SuppressWarnings("unchecked") var action = (BlockConfig<Object>) act;
             if (action.id().equals(current)) {
-                if ((alt ? action.alt() : action.action()).applyAction(player, world, pos, side, state, !player.isSneaking())) {
+                var newValue = (alt ? action.alt() : action.action()).modifyValue(action.value().getValue(world, pos, side, state), !player.isSneaking(), player, world, pos, side, state);
+                if (action.value().setValue(newValue, world, pos, side, state)) {
                     this.pos = null;
                     TriggerCriterion.trigger(player, FactoryTriggers.WRENCH);
                     player.playSoundToPlayer(FactorySoundEvents.ITEM_WRENCH_USE, SoundCategory.PLAYERS, 0.3f, player.getRandom().nextFloat() * 0.1f + 0.95f);
@@ -130,11 +133,11 @@ public class WrenchHandler {
 
     public void attackAction(ServerPlayerEntity player, World world, BlockPos pos, Direction side) {
         var state = world.getBlockState(pos);
-        if (!(state.getBlock() instanceof WrenchableBlock wrenchableBlock)) {
+        if (!(state.getBlock() instanceof ConfigurableBlock configurableBlock)) {
             return;
         }
 
-        var actions = wrenchableBlock.getWrenchActions(player, pos, side, this.state);
+        var actions = configurableBlock.getBlockConfiguration(player, pos, side, this.state);
         if (actions.isEmpty()) {
             return;
         }

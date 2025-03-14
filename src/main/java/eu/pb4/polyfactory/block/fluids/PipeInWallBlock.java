@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block.fluids;
 
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -28,9 +28,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class PipeInWallBlock extends PipeBaseBlock implements WrenchableBlock {
+public class PipeInWallBlock extends PipeBaseBlock implements ConfigurableBlock {
     public static final EnumProperty<Direction.Axis> AXIS = Properties.HORIZONTAL_AXIS;
-    private static final List<WrenchAction> WRENCH_ACTIONS = List.of(WrenchAction.HORIZONTAL_AXIS);
+    private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(BlockConfig.HORIZONTAL_AXIS);
     public static final IdentityHashMap<Block, PipeInWallBlock> MAP = new IdentityHashMap<>();
     private final WallBlock backing;
 
@@ -103,7 +103,7 @@ public class PipeInWallBlock extends PipeBaseBlock implements WrenchableBlock {
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return WRENCH_ACTIONS;
     }
 

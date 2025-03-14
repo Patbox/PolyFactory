@@ -16,9 +16,8 @@ import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
 import eu.pb4.polyfactory.block.other.StatePropertiesCodecPatcher;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchApplyAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
@@ -66,20 +65,20 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public final class DataMemoryBlock extends DataNetworkBlock implements BlockEntityProvider, FactoryBlock, CableConnectable, DataProvider, DataReceiver, WrenchableBlock, StatePropertiesCodecPatcher {
+public final class DataMemoryBlock extends DataNetworkBlock implements BlockEntityProvider, FactoryBlock, CableConnectable, DataProvider, DataReceiver, ConfigurableBlock, StatePropertiesCodecPatcher {
     public static final BooleanProperty POWERED = Properties.POWERED;
     public static final EnumProperty<OptionalDirection> FACING_INPUT = EnumProperty.of("facing_input", OptionalDirection.class);
     public static final DirectionProperty FACING_OUTPUT = DirectionProperty.of("facing_output");
 
-    public static final List<WrenchAction> ACTIONS = List.of(
-            WrenchAction.of("facing_input", FACING_INPUT, OptionalDirection::asText).withAlt(WrenchApplyAction.ofState((player, world, pos, dir, state, next) -> {
+    public static final List<BlockConfig<?>> ACTIONS = List.of(
+            BlockConfig.of("facing_input", FACING_INPUT, (optionalDirection, world, pos, side, state) -> optionalDirection.asText()).withAlt((val, next, player, world, pos, dir, state) -> {
                 var direction = OptionalDirection.of(next ? dir : dir.getOpposite());
-                return state.with(FACING_INPUT, state.get(FACING_INPUT) != direction ? direction : OptionalDirection.NONE);
-            })),
-            WrenchAction.ofChannel("channel_input", DataMemoryBlockEntity.class,
+                return state.get(FACING_INPUT) != direction ? direction : OptionalDirection.NONE;
+            }),
+            BlockConfig.ofChannel("channel_input", DataMemoryBlockEntity.class,
                     DataMemoryBlockEntity::inputChannel, DataMemoryBlockEntity::setInputChannel),
-            WrenchAction.ofDirection(FACING_OUTPUT),
-            WrenchAction.ofChannel("channel_output", DataMemoryBlockEntity.class,
+            BlockConfig.ofDirection(FACING_OUTPUT),
+            BlockConfig.ofChannel("channel_output", DataMemoryBlockEntity.class,
                     DataMemoryBlockEntity::outputChannel, DataMemoryBlockEntity::setOutputChannel)
     );
 
@@ -206,7 +205,7 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return ACTIONS;
     }
 
