@@ -5,8 +5,8 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -33,7 +33,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
-public abstract class GenericDirectionalDataBlock extends DataNetworkBlock implements FactoryBlock, WrenchableBlock, BlockEntityProvider, CableConnectable {
+public abstract class GenericDirectionalDataBlock extends DataNetworkBlock implements FactoryBlock, ConfigurableBlock, BlockEntityProvider, CableConnectable {
     public static EnumProperty<Direction> FACING = Properties.FACING;
     protected final boolean oppositeFacing;
 
@@ -65,10 +65,10 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(
-                WrenchAction.CHANNEL,
-                WrenchAction.FACING
+                BlockConfig.CHANNEL,
+                BlockConfig.FACING
         );
     }
 

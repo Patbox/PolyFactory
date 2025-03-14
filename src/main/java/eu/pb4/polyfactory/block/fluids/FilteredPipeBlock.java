@@ -9,8 +9,8 @@ import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidInstance;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
@@ -56,7 +56,7 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, WrenchableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe {
+public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, ConfigurableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe {
     public static final EnumProperty<Direction.Axis> AXIS = Properties.AXIS;
     public static final BooleanProperty INVERTED = Properties.INVERTED;
 
@@ -168,8 +168,8 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Wre
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.AXIS, WrenchAction.INVERTED);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.AXIS, BlockConfig.INVERTED);
     }
 
     public static final class Model extends RotationAwareModel {

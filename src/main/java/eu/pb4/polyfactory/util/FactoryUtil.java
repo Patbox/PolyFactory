@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.util;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlockEntity;
@@ -534,6 +535,9 @@ public class FactoryUtil {
         return values[(values.length + activeMode.ordinal() + (next ? 1 : -1)) % values.length];
     }
 
+    public static <T extends Comparable<T>> Codec<T> propertyCodec(Property<T> property) {
+        return Codec.stringResolver(property::name, x -> property.parse(x).orElse(property.getValues().getFirst()));
+    }
 
 
     public enum MovableResult {

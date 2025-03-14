@@ -6,10 +6,11 @@ import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -34,12 +35,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -51,17 +50,16 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
-public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, WrenchableBlock {
+public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, ConfigurableBlock {
     public static final Property<Direction> FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty POWERED = Properties.POWERED;
 
-    public static final List<WrenchAction> WRENCH_ACTIONS = List.of(
-            WrenchAction.FACING_HORIZONTAL,
-            WrenchAction.ofBlockEntity("mechanical_crafter.active_mode", MCrafterBlockEntity.class, be -> be.getActiveMode().asText(),
-                    (be, mode) -> be.setActiveMode(FactoryUtil.nextEnum(be.getActiveMode(), MCrafterBlockEntity.ActiveMode.values(), mode)))
+    public static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(
+            BlockConfig.FACING_HORIZONTAL,
+            BlockConfig.ofBlockEntity("mechanical_crafter.active_mode", MCrafterBlockEntity.ActiveMode.CODEC, MCrafterBlockEntity.class, (activeMode, world, pos, side, state) -> activeMode.asText(),
+                    MCrafterBlockEntity::getActiveMode, MCrafterBlockEntity::setActiveMode,
+                    WrenchModifyValue.simple((x, mode) -> FactoryUtil.nextEnum(x, MCrafterBlockEntity.ActiveMode.values(), mode)))
     );
 
     public MCrafterBlock(Settings settings) {
@@ -184,7 +182,7 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return WRENCH_ACTIONS;
     }
 

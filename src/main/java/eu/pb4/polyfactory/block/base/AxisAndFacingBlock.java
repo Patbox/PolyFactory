@@ -1,10 +1,11 @@
 package eu.pb4.polyfactory.block.base;
 
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.polyfactory.block.configurable.ValueFormatter;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchApplyAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemPlacementContext;
@@ -21,12 +22,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public abstract class AxisAndFacingBlock extends Block implements WrenchableBlock, FactoryBlock {
+public abstract class AxisAndFacingBlock extends Block implements ConfigurableBlock, FactoryBlock {
     public static final EnumProperty<Direction> FACING = Properties.FACING;
     public static final BooleanProperty FIRST_AXIS = FactoryProperties.FIRST_AXIS;
-    public static final WrenchAction FIRST_AXIS_ACTION = WrenchAction.of("axis", (World world, BlockPos pos, Direction side, BlockState state) -> {
-        return Text.literal(getAxis(state).asString());
-    }, WrenchApplyAction.ofProperty(FIRST_AXIS));
+    public static final BlockConfig<?> FIRST_AXIS_ACTION = BlockConfig.of("axis", FIRST_AXIS, (value, world, pos, side, state) -> Text.literal(getAxis(state).asString()));
 
     public AxisAndFacingBlock(Settings settings) {
         super(settings);
@@ -64,7 +63,7 @@ public abstract class AxisAndFacingBlock extends Block implements WrenchableBloc
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.FACING, FIRST_AXIS_ACTION);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.FACING, FIRST_AXIS_ACTION);
     }
 }

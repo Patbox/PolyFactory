@@ -15,7 +15,7 @@ import eu.pb4.polyfactory.block.network.AxisAndFacingNetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.LongData;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
 import eu.pb4.polyfactory.nodes.data.DataProviderNode;
@@ -128,8 +128,8 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.CHANNEL, WrenchAction.FACING, FIRST_AXIS_ACTION);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.CHANNEL, BlockConfig.FACING, FIRST_AXIS_ACTION);
     }
 
     @Nullable
@@ -154,7 +154,7 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
     public static final class Stress extends RotationMeterBlock {
         public static final EnumProperty<Type> TYPE = EnumProperty.of("type", Type.class);
 
-        public static final WrenchAction TYPE_ACTION = WrenchAction.of("type", TYPE);
+        public static final BlockConfig TYPE_ACTION = BlockConfig.of("type", TYPE);
 
         public Stress(Settings settings) {
             super(settings);
@@ -178,8 +178,8 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
         }
 
         @Override
-        public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-            return List.of(WrenchAction.CHANNEL, WrenchAction.FACING, FIRST_AXIS_ACTION, TYPE_ACTION);
+        public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+            return List.of(BlockConfig.CHANNEL, BlockConfig.FACING, FIRST_AXIS_ACTION, TYPE_ACTION);
         }
 
         public enum Type implements StringIdentifiable {

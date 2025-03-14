@@ -3,8 +3,8 @@ package eu.pb4.polyfactory.block.fluids;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.block.property.LazyEnumProperty;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.block.Block;
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class PipeBlock extends PipeBaseBlock implements WrenchableBlock {
+public class PipeBlock extends PipeBaseBlock implements ConfigurableBlock {
 
     public static final BooleanProperty LOCKED = FactoryProperties.LOCKED;
     public static final LazyEnumProperty<TriState> NORTH = FactoryProperties.TRI_STATE_NORTH;
@@ -42,7 +42,7 @@ public class PipeBlock extends PipeBaseBlock implements WrenchableBlock {
     public static final LazyEnumProperty<TriState> WEST = FactoryProperties.TRI_STATE_WEST;
     public static final LazyEnumProperty<TriState> UP = FactoryProperties.TRI_STATE_UP;
     public static final LazyEnumProperty<TriState> DOWN = FactoryProperties.TRI_STATE_DOWN;
-    private static final List<WrenchAction> WRENCH_ACTIONS = List.of(WrenchAction.of("locked", LOCKED));
+    private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(BlockConfig.of("locked", LOCKED));
     public static final Map<Direction, LazyEnumProperty<TriState>> FACING_PROPERTIES = FactoryProperties.TRI_STATE_DIRECTIONS;
 
     public PipeBlock(Settings settings) {
@@ -170,7 +170,7 @@ public class PipeBlock extends PipeBaseBlock implements WrenchableBlock {
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return WRENCH_ACTIONS;
     }
 }

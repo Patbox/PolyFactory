@@ -6,8 +6,8 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
 import eu.pb4.polyfactory.data.DataContainer;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
 import eu.pb4.polyfactory.nodes.data.DataProviderNode;
@@ -40,16 +40,16 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public abstract class InputTransformerBlock extends DataNetworkBlock implements BlockEntityProvider, FactoryBlock, CableConnectable, DataProvider, DataReceiver, WrenchableBlock {
+public abstract class InputTransformerBlock extends DataNetworkBlock implements BlockEntityProvider, FactoryBlock, CableConnectable, DataProvider, DataReceiver, ConfigurableBlock {
     public static final EnumProperty<Direction> FACING_INPUT = EnumProperty.of("facing_input", Direction.class);
     public static final EnumProperty<Direction> FACING_OUTPUT = EnumProperty.of("facing_output", Direction.class);
 
-     protected static final List<WrenchAction> WRENCH_ACTIONS = List.of(
-            WrenchAction.ofDirection(FACING_INPUT),
-            WrenchAction.ofChannelWithDisabled("channel_input", InputTransformerBlockEntity.class,
+     protected static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(
+            BlockConfig.ofDirection(FACING_INPUT),
+            BlockConfig.ofChannelWithDisabled("channel_input", InputTransformerBlockEntity.class,
                     InputTransformerBlockEntity::inputChannel, InputTransformerBlockEntity::setInputChannel),
-            WrenchAction.ofDirection(FACING_OUTPUT),
-            WrenchAction.ofChannel("channel_output", InputTransformerBlockEntity.class,
+            BlockConfig.ofDirection(FACING_OUTPUT),
+            BlockConfig.ofChannel("channel_output", InputTransformerBlockEntity.class,
                     InputTransformerBlockEntity::outputChannel, InputTransformerBlockEntity::setOutputChannel)
     );
 
@@ -146,7 +146,7 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return WRENCH_ACTIONS;
     }
 

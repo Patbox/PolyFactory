@@ -10,8 +10,8 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -55,8 +55,8 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
-public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, BarrierBasedWaterloggable, WrenchableBlock {
-    private static final WrenchAction RADIUS_ACTION = WrenchAction.ofBlockEntityInt("radius", PlanterBlockEntity.class, 1, 2, 0,
+public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock, BlockEntityProvider, RotationUser, BarrierBasedWaterloggable, ConfigurableBlock {
+    private static final BlockConfig RADIUS_ACTION = BlockConfig.ofBlockEntityInt("radius", PlanterBlockEntity.class, 1, 2, 0,
             PlanterBlockEntity::radius, PlanterBlockEntity::setRadius);
 
     public PlanterBlock(Settings settings) {
@@ -166,7 +166,7 @@ public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(RADIUS_ACTION);
     }
 

@@ -11,8 +11,8 @@ import eu.pb4.polyfactory.block.mechanical.RotationConstants;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.generic.FunctionalNode;
@@ -51,7 +51,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.Collection;
 import java.util.List;
 
-public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider,  BarrierBasedWaterloggable, WrenchableBlock {
+public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider,  BarrierBasedWaterloggable, ConfigurableBlock {
     public static final EnumProperty<Direction> FACING = Properties.FACING;
 
     public HandCrankBlock(Settings settings) {
@@ -148,8 +148,8 @@ public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlo
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.FACING);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.FACING);
     }
 
     public final class Model extends RotationAwareModel {

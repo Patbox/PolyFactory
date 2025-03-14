@@ -9,8 +9,8 @@ import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.item.tool.AbstractFilterItem;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.FilterIcon;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
@@ -58,13 +58,13 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.List;
 
 
-public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsumer, MovingItemProvider, WrenchableBlock, BlockEntityProvider, BarrierBasedWaterloggable {
+public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsumer, MovingItemProvider, ConfigurableBlock, BlockEntityProvider, BarrierBasedWaterloggable {
     public static final EnumProperty<Direction> FACING = Properties.FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
     public static final EnumProperty<ConveyorLikeDirectional.TransferMode> MODE = EnumProperty.of("mode", ConveyorLikeDirectional.TransferMode.class,
             ConveyorLikeDirectional.TransferMode.FROM_CONVEYOR, ConveyorLikeDirectional.TransferMode.TO_CONVEYOR);
 
-    private static final WrenchAction MODE_ACTION = WrenchAction.of("mode", MODE, t -> Text.translatable("item.polyfactory.wrench.action.mode.transfer_mode." + t.asString()));
+    private static final BlockConfig MODE_ACTION = BlockConfig.of("mode", MODE, (t, world, pos, side, state) -> Text.translatable("item.polyfactory.wrench.action.mode.transfer_mode." + t.asString()));
 
     public FunnelBlock(Settings settings) {
         super(settings);
@@ -300,8 +300,8 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.FACING, MODE_ACTION);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.FACING, MODE_ACTION);
     }
 
     public static class Model extends BlockModel {

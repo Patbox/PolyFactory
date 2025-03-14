@@ -8,8 +8,8 @@ import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -58,7 +58,7 @@ import java.util.List;
 
 import static eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras.bridgeModel;
 
-public class WindmillBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, WrenchableBlock, BlockEntityProvider, BarrierBasedWaterloggable {
+public class WindmillBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, ConfigurableBlock, BlockEntityProvider, BarrierBasedWaterloggable {
     public static final int MAX_SAILS = 8;
     public static final BooleanProperty BIG = BooleanProperty.of("deco_big");
     public static final IntProperty SAIL_COUNT = IntProperty.of("sails", 1, MAX_SAILS);
@@ -162,8 +162,8 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.FACING_HORIZONTAL);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.FACING_HORIZONTAL);
     }
 
     public final class Model extends RotationAwareModel {

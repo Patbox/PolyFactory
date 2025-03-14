@@ -1,11 +1,13 @@
 package eu.pb4.polyfactory.block.data.output;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
 import eu.pb4.polyfactory.data.DataContainer;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverSelectiveSideNode;
 import eu.pb4.polyfactory.nodes.data.DataReceiverNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -36,13 +38,15 @@ import java.util.Locale;
 public class NixieTubeControllerBlock extends GenericCabledDataBlock implements DataReceiver {
     public static final BooleanProperty POWERED = Properties.POWERED;
 
-    public static final WrenchAction SCROLL_LOOP = WrenchAction.ofBlockEntity("scroll_loop", NixieTubeControllerBlockEntity.class,
-            x -> ScreenTexts.onOrOff(x.scrollLoop()),
-            (x, n) -> x.setScrollLoop(!x.scrollLoop())
+    public static final BlockConfig<Boolean> SCROLL_LOOP = BlockConfig.ofBlockEntity("scroll_loop", Codec.BOOL, NixieTubeControllerBlockEntity.class,
+            (on, world, pos, side, state) -> ScreenTexts.onOrOff(on),
+            NixieTubeControllerBlockEntity::scrollLoop, NixieTubeControllerBlockEntity::setScrollLoop,
+            WrenchModifyValue.simple((x, n) -> !x)
     );
-    public static final WrenchAction SCROLL_SPEED = WrenchAction.ofBlockEntity("scroll_speed", NixieTubeControllerBlockEntity.class,
-            x -> Text.translatable("text.polyfactory.char_per_sec", String.format(Locale.ROOT,"%.2f", x.scrollSpeed() == 0 ? 0 : (20f / x.scrollSpeed()))),
-            (x, n) -> x.setScrollSpeed(FactoryUtil.wrap(x.scrollSpeed() + (n ? 1 : -1), 0, 80))
+    public static final BlockConfig<Integer> SCROLL_SPEED = BlockConfig.ofBlockEntity("scroll_speed", Codec.INT, NixieTubeControllerBlockEntity.class,
+            (x, world, pos, side, state) -> Text.translatable("text.polyfactory.char_per_sec", String.format(Locale.ROOT,"%.2f", x == 0f ? 0 : (20f / x))),
+            NixieTubeControllerBlockEntity::scrollSpeed, NixieTubeControllerBlockEntity::setScrollSpeed,
+            WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 1 : -1), 0, 80))
     );
 
     public NixieTubeControllerBlock(Settings settings) {
@@ -57,9 +61,9 @@ public class NixieTubeControllerBlock extends GenericCabledDataBlock implements 
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(
-                WrenchAction.CHANNEL_WITH_DISABLED,
+                BlockConfig.CHANNEL_WITH_DISABLED,
                 this.facingAction,
                 SCROLL_SPEED,
                 SCROLL_LOOP

@@ -6,8 +6,8 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FluidContainer;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.models.fluid.SimpleMultiFluidViewModel;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -47,7 +47,7 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeConnectable, BlockEntityProvider, BarrierBasedWaterloggable, WrenchableBlock {
+public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeConnectable, BlockEntityProvider, BarrierBasedWaterloggable, ConfigurableBlock {
     public static final EnumProperty<Direction> FACING = Properties.FACING;
     public PortableFluidTankBlock(Settings settings) {
         super(settings);
@@ -134,8 +134,8 @@ public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeC
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.FACING);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.FACING);
     }
 
     public static final class Model extends BlockModel {

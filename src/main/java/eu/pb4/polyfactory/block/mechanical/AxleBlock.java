@@ -5,8 +5,8 @@ import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
-import eu.pb4.polyfactory.item.wrench.WrenchAction;
-import eu.pb4.polyfactory.item.wrench.WrenchableBlock;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -44,7 +44,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, WrenchableBlock, BarrierBasedWaterloggable {
+public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, ConfigurableBlock, BarrierBasedWaterloggable {
     public static final Property<Direction.Axis> AXIS = Properties.AXIS;
     public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
 
@@ -119,8 +119,8 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, W
     }
 
     @Override
-    public List<WrenchAction> getWrenchActions(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(WrenchAction.AXIS);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.AXIS);
     }
 
 
