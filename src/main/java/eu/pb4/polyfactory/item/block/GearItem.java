@@ -77,6 +77,9 @@ public class GearItem extends FactoryBlockItem {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
+        if (context.getPlayer() != null && !context.getPlayer().canModifyBlocks()) {
+            return ActionResult.FAIL;
+        }
         var currentState = context.getWorld().getBlockState(context.getBlockPos());
         if (currentState.isOf(FactoryBlocks.AXLE) && !context.shouldCancelInteraction()) {
             var newState = this.getBlock().getStateWithProperties(currentState);

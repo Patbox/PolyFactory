@@ -46,7 +46,7 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
     public static final EnumProperty<Direction> FACING_INPUT = EnumProperty.of("facing_input", Direction.class);
     public static final EnumProperty<Direction> FACING_OUTPUT = EnumProperty.of("facing_output", Direction.class);
 
-     protected static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(
+     protected static final List<BlockConfig<?>> BLOCK_CONFIG = List.of(
             BlockConfig.ofDirection(FACING_INPUT),
             BlockConfig.ofChannelWithDisabled("channel_input", InputTransformerBlockEntity.class,
                     InputTransformerBlockEntity::inputChannel, InputTransformerBlockEntity::setInputChannel),
@@ -149,7 +149,7 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
 
     @Override
     public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return WRENCH_ACTIONS;
+        return BLOCK_CONFIG;
     }
 
     @Override

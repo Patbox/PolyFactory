@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidInteractionMode;
 import eu.pb4.polyfactory.item.component.FluidComponent;
+import eu.pb4.polyfactory.item.configuration.ClipboardData;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 import eu.pb4.polyfactory.item.tool.ImprovedFilterItem;
 import eu.pb4.polymer.core.api.other.PolymerComponent;
@@ -50,6 +51,9 @@ public class FactoryDataComponents {
 
     public static final ComponentType<ImprovedFilterItem.Type> ITEM_FILTER_TYPE = register("item_filter/type", ComponentType.<ImprovedFilterItem.Type>builder()
             .codec(StringIdentifiable.createCodec(ImprovedFilterItem.Type::values)).build());
+
+    public static final ComponentType<ClipboardData> CLIPBOARD_DATA = register("clipboard_data", ComponentType.<ClipboardData>builder().codec(ClipboardData.CODEC).build());
+
 
     public static void register() {
 

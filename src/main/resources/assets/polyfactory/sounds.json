@@ -247,5 +247,45 @@
       "mob/slime/small5"
     ],
     "subtitle": "subtitles.polyfactory.fluid.shoot.slime"
+  },
+  "item.clipboard.write": {
+    "sounds": [
+      {
+        "name": "ui/cartography_table/drawmap1",
+        "pitch": 1.3,
+        "volume": 0.7
+      },
+      {
+        "name": "ui/cartography_table/drawmap2",
+        "pitch": 1.3,
+        "volume": 0.7
+      },
+      {
+        "name": "ui/cartography_table/drawmap3",
+        "pitch": 1.3,
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "subtitles.polyfactory.item.clipboard.write"
+  },
+  "item.clipboard.apply": {
+    "sounds": [
+      {
+        "name": "item/book/open_flip1",
+        "pitch": 1.3,
+        "volume": 0.7
+      },
+      {
+        "name": "item/book/open_flip2",
+        "pitch": 1.3,
+        "volume": 0.7
+      },
+      {
+        "name": "item/book/open_flip3",
+        "pitch": 1.3,
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "subtitles.polyfactory.item.clipboard.apply"
   }
 }

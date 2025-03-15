@@ -6,6 +6,8 @@ import eu.pb4.factorytools.api.block.RedstoneConnectable;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ValueFormatter;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
 import eu.pb4.polyfactory.data.DataContainer;
@@ -22,19 +24,23 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
+import net.minecraft.world.block.OrientationHelper;
+import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -45,17 +51,46 @@ import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
 public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataReceiver, RedstoneConnectable {
     public static final IntProperty POWER = Properties.POWER;
+    public static final BooleanProperty STRONG = BooleanProperty.of("strong");
+
+    public final List<BlockConfig<?>> blockConfigs = List.of(
+            this.facingAction,
+            BlockConfig.of("redstone.strong", STRONG, ValueFormatter.text(ScreenTexts::onOrOff))
+    );
 
     public RedstoneOutputBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(POWER, 0));
+        this.setDefaultState(this.getDefaultState().with(POWER, 0).with(STRONG, false));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(POWER);
+        builder.add(POWER, STRONG);
     }
+
+    @Override
+    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        super.onBlockAdded(state, world, pos, oldState, notify);
+        this.update(world, pos, state.get(FACING));
+    }
+
+    @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (!moved) {
+            this.update(world, pos, state.get(FACING));
+        }
+        super.onStateReplaced(state, world, pos, newState, moved);
+    }
+
+    private void update(World world, BlockPos pos, Direction dir) {
+        var wireOrientation = OrientationHelper.getEmissionOrientation(world, null, dir);
+
+        for(var direction : Direction.values()) {
+            world.updateNeighborsAlways(pos.offset(direction), this, OrientationHelper.withFrontNullable(wireOrientation, direction));
+        }
+    }
+
 
     @Override
     public boolean emitsRedstonePower(BlockState state) {
@@ -65,6 +100,11 @@ public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataR
     @Override
     public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
         return direction.getOpposite() == state.get(FACING) ? state.get(POWER) : 0;
+    }
+
+    @Override
+    protected int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        return state.get(STRONG) ? getWeakRedstonePower(state, world, pos, direction) : 0;
     }
 
     @Override
@@ -98,6 +138,11 @@ public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataR
     @Override
     public boolean canRedstoneConnect(BlockState state, @Nullable Direction dir) {
         return state.get(FACING).getOpposite() == dir;
+    }
+
+    @Override
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return this.blockConfigs;
     }
 
     public static class Model extends GenericCabledDataBlock.Model {

@@ -27,6 +27,9 @@ public class CableItem extends ColoredDownsampledBlockItem {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
+        if (context.getPlayer() != null && !context.getPlayer().canModifyBlocks()) {
+            return ActionResult.FAIL;
+        }
         var state = context.getWorld().getBlockState(context.getBlockPos());
         if (state.getBlock() instanceof WallBlock) {
             var convert = WallWithCableBlock.fromWall(state);

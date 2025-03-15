@@ -169,11 +169,12 @@
   "item.polyfactory.item_filter.type.blacklist.tooltip": "Blocked:",
   "item.polyfactory.item_filter.type.blacklist.desc": "Works as a blacklist, preventing only select items.",
 
+  "item.polyfactory.clipboard": "Clipboard",
   "item.polyfactory.wrench": "Wrench",
   "item.polyfactory.wrench.tooltip.1": "Use [%s] to change block's setting value",
   "item.polyfactory.wrench.tooltip.1.alt": "Use [%s] to change block's setting value depending on context",
   "item.polyfactory.wrench.tooltip.2": "Use [%s] to change selected setting",
-  "item.polyfactory.wrench.title": "Wrench Actions: %s",
+  "item.polyfactory.wrench.title": "Configuration: %s",
   "item.polyfactory.wrench.action.facing": "Facing",
   "item.polyfactory.wrench.action.angle": "Angle",
   "item.polyfactory.wrench.action.strength": "Strength",
@@ -210,6 +211,8 @@
   "item.polyfactory.wrench.action.channel_input_1": "Input A Channel",
   "item.polyfactory.wrench.action.channel_input_2": "Input B Channel",
   "item.polyfactory.wrench.action.channel_output": "Output Channel",
+  "item.polyfactory.wrench.action.data_extractor.field": "Extracted Field",
+  "item.polyfactory.wrench.action.redstone.strong": "Strongly Powered",
 
   "item.polyfactory.wrench.action.mode.arithmetic.integer": "Integer",
   "item.polyfactory.wrench.action.mode.arithmetic.decimal": "Decimal",
@@ -336,6 +339,8 @@
   "subtitles.polyfactory.fluid.shoot.experience": "Experience shoots out",
   "subtitles.polyfactory.fluid.shoot.honey": "Honey shoots out",
   "subtitles.polyfactory.fluid.shoot.slime": "Slime shoots out",
+  "subtitles.polyfactory.item.clipboard.write": "Clipboard rustles",
+  "subtitles.polyfactory.item.clipboard.apply": "Clipboard rustles",
 
 
   "text.polyfactory.artificial_color": "Artificially Colored",

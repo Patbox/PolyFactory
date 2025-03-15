@@ -24,6 +24,8 @@ public interface FactorySoundEvents {
     RegistryEntry<SoundEvent> FLUID_SHOOT_HONEY = ofEntry("fluid.shoot.honey");
     RegistryEntry<SoundEvent> FLUID_SHOOT_LAVA = ofEntry("fluid.shoot.lava");
     RegistryEntry<SoundEvent> FLUID_SHOOT_EXPERIENCE = ofEntry("fluid.shoot.experience");
+    SoundEvent ITEM_CLIPBOARD_WRITE = of("item.clipboard.write");
+    SoundEvent ITEM_CLIPBOARD_APPLY = of("item.clipboard.apply");
 
     static SoundEvent of(String path) {
         return SoundEvent.of(id(path));
