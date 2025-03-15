@@ -41,7 +41,7 @@ public class ClipboardItem extends SimplePolymerItem {
         var data = user.getStackInHand(hand).get(FactoryDataComponents.CLIPBOARD_DATA);
 
 
-        if (data == null || user.shouldCancelInteraction()) {
+        if (data != null && user.shouldCancelInteraction()) {
             user.getStackInHand(hand).set(FactoryDataComponents.CLIPBOARD_DATA, null);
             user.playSoundToPlayer(FactorySoundEvents.ITEM_CLIPBOARD_WRITE, SoundCategory.PLAYERS, 1, 1);
             return ActionResult.SUCCESS_SERVER;
