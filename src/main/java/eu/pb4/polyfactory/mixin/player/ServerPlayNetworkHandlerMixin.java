@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import eu.pb4.polyfactory.block.collection.BlockCollection;
 import eu.pb4.polyfactory.item.util.SwitchActionItem;
-import eu.pb4.polyfactory.item.wrench.WrenchHandler;
+import eu.pb4.polyfactory.item.configuration.WrenchHandler;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
@@ -32,7 +32,7 @@ public abstract class ServerPlayNetworkHandlerMixin implements ServerPlayNetExt 
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo ci) {
-        this.wrenchHandler.tick(this.getPlayer());
+        this.wrenchHandler.tickDisplay(this.getPlayer());
     }
 
     @Inject(method = "onPlayerAction", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/packet/c2s/play/PlayerActionC2SPacket;getAction()Lnet/minecraft/network/packet/c2s/play/PlayerActionC2SPacket$Action;"), cancellable = true)

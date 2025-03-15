@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.configurable;
 
+import com.mojang.serialization.ListBuilder;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;

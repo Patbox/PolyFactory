@@ -42,7 +42,6 @@ import java.util.List;
 public abstract class GenericCabledDataBlock extends AbstractCableBlock implements FactoryBlock, ConfigurableBlock, BlockEntityProvider, CableConnectable, StatePropertiesCodecPatcher {
     public static final EnumProperty<Direction> FACING = Properties.FACING;
 
-
     public final BlockConfig<?> facingAction = BlockConfig.of("facing", Properties.FACING, (dir, world, pos, side, state) -> FactoryUtil.asText(dir), WrenchModifyValue.ofDirection(FACING),
             ConfigValue.ofPropertyCustom(FACING, (property, value, world, pos, side, state) -> {
                 var oldDir = state.get(property);

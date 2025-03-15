@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.item;
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
+import eu.pb4.polyfactory.item.configuration.ClipboardItem;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.factorytools.api.item.MultiBlockItem;
@@ -21,7 +22,7 @@ import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.item.wrench.WrenchItem;
+import eu.pb4.polyfactory.item.configuration.WrenchItem;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
@@ -50,6 +51,7 @@ public class FactoryItems {
     public static final Item FLUID_MODEL = register("fluid_model", FluidModelItem::new);
     // Actual items
     public static final WrenchItem WRENCH = register("wrench", settings -> new WrenchItem(settings.maxCount(1)));
+    public static final Item CLIPBOARD = register("clipboard", settings -> new ClipboardItem(settings.maxCount(1)));
     public static final Item CONVEYOR = register(FactoryBlocks.CONVEYOR);
     public static final Item STICKY_CONVEYOR = register(FactoryBlocks.STICKY_CONVEYOR);
     public static final Item FUNNEL = register(FactoryBlocks.FUNNEL);
@@ -417,7 +419,8 @@ public class FactoryItems {
                         FactoryDebugItems.addItemGroup(context, entries);
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(PROGRAMMABLE_DATA_EXTRACTOR);
+                        entries.add(PROGRAMMABLE_DATA_EXTRACTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(CLIPBOARD, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     })).build()
             );
         }

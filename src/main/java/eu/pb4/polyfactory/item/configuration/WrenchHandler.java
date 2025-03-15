@@ -1,9 +1,12 @@
-package eu.pb4.polyfactory.item.wrench;
+package eu.pb4.polyfactory.item.configuration;
 
+import com.mojang.serialization.JavaOps;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
+import eu.pb4.polyfactory.block.configurable.ValueFormatter;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
@@ -14,6 +17,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.scoreboard.number.BlankNumberFormat;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -24,12 +28,15 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class WrenchHandler {
     private final Sidebar sidebar = new Sidebar(Sidebar.Priority.HIGH);
@@ -40,6 +47,8 @@ public class WrenchHandler {
 
     private List<BlockConfig<?>> actions = List.of();
 
+    private ItemStack currentStack = ItemStack.EMPTY;
+
     public WrenchHandler(ServerPlayNetworkHandler handler) {
         this.sidebar.addPlayer(handler);
         this.sidebar.setDefaultNumberFormat(BlankNumberFormat.INSTANCE);
@@ -49,22 +58,50 @@ public class WrenchHandler {
         return ((ServerPlayNetExt) player.networkHandler).polyFactory$getWrenchHandler();
     }
 
-    public void tick(ServerPlayerEntity player) {
-        if (player.getMainHandStack().isOf(FactoryItems.WRENCH) && player.raycast(7, 0, false) instanceof BlockHitResult blockHitResult) {
+    public void tickDisplay(ServerPlayerEntity player) {
+        var stack = ItemStack.EMPTY;
+        if (player.getMainHandStack().isOf(FactoryItems.WRENCH) || player.getMainHandStack().isOf(FactoryItems.CLIPBOARD)) {
+            stack = player.getMainHandStack();
+        } else if (player.getOffHandStack().isOf(FactoryItems.WRENCH) || player.getOffHandStack().isOf(FactoryItems.CLIPBOARD)) {
+            stack = player.getOffHandStack();
+        }
+        var isWrench = stack.isOf(FactoryItems.WRENCH);
+
+        if (!stack.isEmpty() && player.raycast(7, 0, false) instanceof BlockHitResult blockHitResult) {
             var state = player.getWorld().getBlockState(blockHitResult.getBlockPos());
-            if (state == this.state && blockHitResult.getBlockPos().equals(this.pos)) {
-                if (this.state.getBlock() instanceof ConfigurableBlock configurableBlock) {
+            if (state == this.state && blockHitResult.getBlockPos().equals(this.pos) && ItemStack.areItemsAndComponentsEqual(stack, this.currentStack)) {
+                if (this.state.getBlock() instanceof ConfigurableBlock configurableBlock && isWrench) {
                     configurableBlock.wrenchTick(player, blockHitResult, this.state);
                 }
                 return;
             }
+            this.currentStack = stack.copy();
 
             this.state = state;
             this.pos = blockHitResult.getBlockPos();
             if (this.state.getBlock() instanceof ConfigurableBlock configurableBlock) {
-                configurableBlock.wrenchTick(player, blockHitResult, this.state);
+                if (isWrench) {
+                    configurableBlock.wrenchTick(player, blockHitResult, this.state);
+                }
                 this.actions = configurableBlock.getBlockConfiguration(player, blockHitResult.getBlockPos(), blockHitResult.getSide(), this.state);
                 var selected = this.currentAction.get(this.state.getBlock());
+                var diffMap = new HashMap<String, Object>();
+                if (stack.contains(FactoryDataComponents.CLIPBOARD_DATA)) {
+                    for (var config : this.actions) {
+                        for (var entry : stack.getOrDefault(FactoryDataComponents.CLIPBOARD_DATA, ClipboardData.EMPTY).entries()) {
+                            if (!config.id().equals(entry.id())) {
+                                continue;
+                            }
+
+                            var decoded = config.codec().decode(JavaOps.INSTANCE, entry.value());
+
+                            if (decoded.isSuccess()) {
+                                diffMap.put(config.id(), decoded.getOrThrow().getFirst());
+                            }
+                        }
+                    }
+                }
+
                 this.sidebar.setTitle(Text.translatable("item.polyfactory.wrench.title",
                         Text.empty()/*.append(this.state.getBlock().getName())
                                 .setStyle(Style.EMPTY.withColor(Formatting.YELLOW).withBold(false))*/)
@@ -76,15 +113,30 @@ public class WrenchHandler {
 
                         var t = Text.empty();
 
-                        if ((selected == null && i == 0) || action.id().equals(selected)) {
-                            t.append(Text.literal(String.valueOf(GuiTextures.SPACE_1)).setStyle(UiResourceCreator.STYLE));
-                            t.append(Text.literal("» ").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
-                        } else {
-                            t.append("   ");
+                        if (isWrench) {
+                            if ((selected == null && i == 0) || action.id().equals(selected)) {
+                                t.append(Text.literal(String.valueOf(GuiTextures.SPACE_1)).setStyle(UiResourceCreator.STYLE));
+                                t.append(Text.literal("» ").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+                            } else {
+                                t.append("   ");
+                            }
                         }
 
                         t.append(action.name()).append(": ");
-                        b.add(t, Text.empty().append(action.getDisplayValue(player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state)).formatted(Formatting.YELLOW));
+
+                        var value = action.value().getValue(player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
+                        //noinspection unchecked
+                        var valueFrom = ((ValueFormatter<Object>) action.formatter()).getDisplayValue(value, player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
+
+                        if (isWrench) {
+                            b.add(t, Text.empty().append(valueFrom).formatted(Formatting.YELLOW));
+                        } else if (diffMap.containsKey(action.id()) && !Objects.equals(diffMap.get(action.id()), value)) {
+                            //noinspection unchecked
+                            var diff = ((ValueFormatter<Object>) action.formatter()).getDisplayValue(diffMap.get(action.id()), player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
+                            b.add(t, Text.empty().append(valueFrom).append(Text.literal(" -> ").formatted(Formatting.GOLD)).append(diff).formatted(Formatting.YELLOW));
+                        } else {
+                            b.add(t.formatted(Formatting.GRAY), Text.empty().append(valueFrom).withColor(ColorHelper.scaleRgb(Formatting.YELLOW.getColorValue(), 0.7f)));
+                        }
                     }
                 });
                 this.sidebar.show();

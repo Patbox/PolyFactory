@@ -29,6 +29,9 @@ public class WindmillSailItem extends Item implements SimpleColoredItem {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
+        if (context.getPlayer() != null && !context.getPlayer().canModifyBlocks()) {
+            return ActionResult.FAIL;
+        }
         var oldState = context.getWorld().getBlockState(context.getBlockPos());
         if (oldState.isOf(FactoryBlocks.AXLE)) {
             var axis = oldState.get(AxleBlock.AXIS);
