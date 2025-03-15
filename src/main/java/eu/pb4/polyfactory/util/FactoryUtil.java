@@ -587,7 +587,7 @@ public class FactoryUtil {
     }
 
     public static <T extends Comparable<T>> Codec<T> propertyCodec(Property<T> property) {
-        return Codec.stringResolver(property::name, x -> property.parse(x).orElse(property.getValues().getFirst()));
+        return Codec.stringResolver(property::name, x -> property.parse(x).orElse(property.getValues().iterator().next()));
     }
 
 

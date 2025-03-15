@@ -53,7 +53,7 @@ public interface ConfigValue<T> {
             @Nullable
             @Override
             public T getValue(World world, BlockPos pos, Direction side, BlockState state) {
-                return state.get(property, null);
+                return state.getOrEmpty(property).orElse(null);
             }
 
             @Override

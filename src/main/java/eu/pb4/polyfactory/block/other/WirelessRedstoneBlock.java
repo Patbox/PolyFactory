@@ -37,6 +37,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
@@ -53,7 +54,7 @@ import org.joml.Vector3f;
 import java.util.List;
 
 
-public class WirelessRedstoneBlock extends Block implements FactoryBlock, RedstoneConnectable, BlockEntityProvider, ConfigurableBlock, SneakBypassingBlock, BarrierBasedWaterloggable {
+public class WirelessRedstoneBlock extends Block implements FactoryBlock, RedstoneConnectable, BlockEntityProvider, ConfigurableBlock, SneakBypassingBlock, BarrierBasedWaterloggable, ItemUseLimiter.All {
     public static EnumProperty<Direction> FACING = Properties.FACING;
     public static BooleanProperty POWERED = Properties.POWERED;
     public WirelessRedstoneBlock(Settings settings) {

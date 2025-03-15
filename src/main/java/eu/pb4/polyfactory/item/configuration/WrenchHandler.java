@@ -135,7 +135,9 @@ public class WrenchHandler {
                             var diff = ((ValueFormatter<Object>) action.formatter()).getDisplayValue(diffMap.get(action.id()), player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
                             b.add(t, Text.empty().append(valueFrom).append(Text.literal(" -> ").formatted(Formatting.GOLD)).append(diff).formatted(Formatting.YELLOW));
                         } else {
-                            b.add(t.formatted(Formatting.GRAY), Text.empty().append(valueFrom).withColor(ColorHelper.scaleRgb(Formatting.YELLOW.getColorValue(), 0.7f)));
+
+
+                            b.add(t.formatted(Formatting.GRAY), Text.empty().append(valueFrom).formatted(Formatting.GRAY));
                         }
                     }
                 });

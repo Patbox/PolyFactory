@@ -132,18 +132,14 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<WirelessRedstoneBlockEntity> WIRELESS_REDSTONE = register("wireless_redstone",
             BlockEntityType.Builder.create(WirelessRedstoneBlockEntity::new, FactoryBlocks.WIRELESS_REDSTONE_RECEIVER, FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER));
-    public static final BlockEntityType<CableBlockEntity> CABLE = register("cable", BlockEntityType.Builder.create(CableBlockEntity::new,
-            Util.make(new ArrayList<Block>(), (a) -> {
-                a.add(FactoryBlocks.CABLE);
-                a.addAll(FactoryBlocks.WALL_WITH_CABLE.values());
-            }).toArray(Block[]::new)));
+    public static final BlockEntityType<CableBlockEntity> CABLE = register("cable", BlockEntityType.Builder.create(CableBlockEntity::new, FactoryBlocks.CABLE));
     public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader",
             BlockEntityType.Builder.create(ItemReaderBlockEntity::new, FactoryBlocks.ITEM_READER));
     public static final BlockEntityType<RecordPlayerBlockEntity> RECORD_PLAYER = register("record_player",
-            FabricBlockEntityTypeBuilder.create(RecordPlayerBlockEntity::new, FactoryBlocks.RECORD_PLAYER));
-    public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer",  FabricBlockEntityTypeBuilder
+            BlockEntityType.Builder.create(RecordPlayerBlockEntity::new, FactoryBlocks.RECORD_PLAYER));
+    public static final BlockEntityType<DoubleInputTransformerBlockEntity> DOUBLE_INPUT_TRANSFORMER = register("double_input_transformer",  BlockEntityType.Builder
             .create(DoubleInputTransformerBlockEntity::new, FactoryBlocks.ARITHMETIC_OPERATOR, FactoryBlocks.DATA_COMPARATOR, FactoryBlocks.PROGRAMMABLE_DATA_EXTRACTOR));
-    public static final BlockEntityType<InputTransformerBlockEntity> INPUT_TRANSFORMER = register("input_transformer",  FabricBlockEntityTypeBuilder
+    public static final BlockEntityType<InputTransformerBlockEntity> INPUT_TRANSFORMER = register("input_transformer",  BlockEntityType.Builder
             .create(InputTransformerBlockEntity::new));
 
     public static final BlockEntityType<DataExtractorBlockEntity> DATA_EXTRACTOR = register("data_extractor", BlockEntityType.Builder
@@ -157,10 +153,7 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container",  BlockEntityType.Builder
             .create(ColorableBlockEntity::new, FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP, FactoryBlocks.FIXTURE_LAMP, FactoryBlocks.INVERTED_FIXTURE_LAMP));
 
-    public static final BlockEntityType<PipeBlockEntity> PIPE = register("pipe", BlockEntityType.Builder.create(PipeBlockEntity::new, Util.make(new ArrayList<Block>(), (a) -> {
-        a.add(FactoryBlocks.PIPE);
-        a.addAll(FactoryBlocks.WALL_WITH_PIPE.values());
-    }).toArray(Block[]::new)));
+    public static final BlockEntityType<PipeBlockEntity> PIPE = register("pipe", BlockEntityType.Builder.create(PipeBlockEntity::new, FactoryBlocks.PIPE));
 
     public static final BlockEntityType<FilteredPipeBlockEntity> FILTERED_PIPE = register("filtered_pipe",
             BlockEntityType.Builder.create(FilteredPipeBlockEntity::new, FactoryBlocks.FILTERED_PIPE));

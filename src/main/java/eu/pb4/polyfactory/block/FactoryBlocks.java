@@ -152,11 +152,24 @@ public class FactoryBlocks {
 
 
     public static void register() {
-        RegistryEntryAddedCallback.allEntries(Registries.BLOCK, block -> {
-            if (block.value() instanceof WallBlock wallBlock) {
+        for (var block : Registries.BLOCK) {
+            if (block instanceof WallBlock wallBlock) {
                 var id = Registries.BLOCK.getId(wallBlock);
-                register("wall_with_cable/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock), settings -> new WallWithCableBlock(wallBlock));
-                register("wall_with_pipe/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock), settings -> new PipeInWallBlock(wallBlock));
+                var cable = register("wall_with_cable/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock), settings -> new WallWithCableBlock(wallBlock));
+                var pipe = register("wall_with_pipe/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock), settings -> new PipeInWallBlock(wallBlock));
+
+                FactoryBlockEntities.PIPE.addSupportedBlock(pipe);
+                FactoryBlockEntities.CABLE.addSupportedBlock(cable);
+            }
+        }
+        RegistryEntryAddedCallback.event(Registries.BLOCK).register((a, b, block) -> {
+            if (block instanceof WallBlock wallBlock) {
+                var id = Registries.BLOCK.getId(wallBlock);
+                var cable = register("wall_with_cable/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock), settings -> new WallWithCableBlock(wallBlock));
+                var pipe = register("wall_with_pipe/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock), settings -> new PipeInWallBlock(wallBlock));
+
+                FactoryBlockEntities.PIPE.addSupportedBlock(pipe);
+                FactoryBlockEntities.CABLE.addSupportedBlock(cable);
             }
         });
 

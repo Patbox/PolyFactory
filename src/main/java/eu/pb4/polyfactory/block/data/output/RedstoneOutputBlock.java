@@ -24,6 +24,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.CustomModelDataComponent;
+import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenTexts;
@@ -39,8 +40,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import net.minecraft.world.block.OrientationHelper;
-import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -84,10 +83,8 @@ public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataR
     }
 
     private void update(World world, BlockPos pos, Direction dir) {
-        var wireOrientation = OrientationHelper.getEmissionOrientation(world, null, dir);
-
         for(var direction : Direction.values()) {
-            world.updateNeighborsAlways(pos.offset(direction), this, OrientationHelper.withFrontNullable(wireOrientation, direction));
+            world.updateNeighborsAlways(pos.offset(direction), this);
         }
     }
 

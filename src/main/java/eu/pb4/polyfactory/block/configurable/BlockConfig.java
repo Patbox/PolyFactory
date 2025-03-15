@@ -50,7 +50,7 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, ConfigValue<T
 
     public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, ValueFormatter<T> textFunction) {
         return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
-                Codec.stringResolver(property::name, x -> property.parse(x).orElse(property.getValues().getFirst())),
+                Codec.stringResolver(property::name, x -> property.parse(x).orElse(property.getValues().iterator().next())),
                 ConfigValue.ofProperty(property),
                 textFunction,
                 WrenchModifyValue.ofProperty(property), WrenchModifyValue.ofProperty(property));

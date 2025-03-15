@@ -22,8 +22,8 @@ import net.minecraft.world.World;
 import java.util.List;
 
 public class WrenchItem extends ModeledItem implements SwitchActionItem {
-    public WrenchItem() {
-        super(new Settings().maxCount(1));
+    public WrenchItem(Settings settings) {
+        super(settings);
     }
 
 

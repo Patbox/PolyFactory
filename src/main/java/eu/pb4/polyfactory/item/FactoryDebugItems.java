@@ -48,7 +48,7 @@ public class FactoryDebugItems {
         });
     }));
 
-    public static final Item DEBUG_CABLE_NETWORK = register("debug/cable_network", (settings) -> BaseDebugItem.onBlockInteract(settings, "Cable Network", 0xff00ff, (ctx) -> {
+    public static final Item DEBUG_CABLE_NETWORK = register("debug/cable_network", (settings) -> BaseDebugItem.onBlockInteract("Cable Network", 0xff00ff, (ctx) -> {
         var player = ctx.getPlayer();
         var world = ctx.getWorld();
         var pos = ctx.getBlockPos();

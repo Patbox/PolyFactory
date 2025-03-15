@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.item.configuration;
 
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JavaOps;
+import eu.pb4.factorytools.api.item.ModeledItem;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
@@ -16,13 +17,14 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.dynamic.Codecs;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClipboardItem extends SimplePolymerItem {
+public class ClipboardItem extends ModeledItem {
     public ClipboardItem(Settings settings) {
         super(settings);
     }
@@ -37,14 +39,14 @@ public class ClipboardItem extends SimplePolymerItem {
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity user, Hand hand) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         var data = user.getStackInHand(hand).get(FactoryDataComponents.CLIPBOARD_DATA);
 
 
         if (data != null && user.shouldCancelInteraction()) {
             user.getStackInHand(hand).set(FactoryDataComponents.CLIPBOARD_DATA, null);
             user.playSoundToPlayer(FactorySoundEvents.ITEM_CLIPBOARD_WRITE, SoundCategory.PLAYERS, 1, 1);
-            return ActionResult.SUCCESS_SERVER;
+            return TypedActionResult.success(user.getStackInHand(hand));
         }
 
         return super.use(world, user, hand);
@@ -82,7 +84,7 @@ public class ClipboardItem extends SimplePolymerItem {
 
             context.getStack().set(FactoryDataComponents.CLIPBOARD_DATA, new ClipboardData(entries));
             player.playSoundToPlayer(FactorySoundEvents.ITEM_CLIPBOARD_WRITE, SoundCategory.PLAYERS, 1, 1);
-            return ActionResult.SUCCESS_SERVER;
+            return ActionResult.SUCCESS;
         } else {
             var success = false;
             for (var config : blockConfig) {
@@ -101,7 +103,7 @@ public class ClipboardItem extends SimplePolymerItem {
 
             if (success) {
                 player.playSoundToPlayer(FactorySoundEvents.ITEM_CLIPBOARD_APPLY, SoundCategory.PLAYERS, 1, 1);
-                return ActionResult.SUCCESS_SERVER;
+                return ActionResult.SUCCESS;
             } else  {
                 return ActionResult.FAIL;
             }
