@@ -35,7 +35,7 @@ public class FilteredPipeBlockEntity extends PipeLikeBlockEntity implements Bloc
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
         if (nbt.contains("allowed_fluid")) {
-            this.setAllowedFluid(FluidInstance.CODEC.decode(registryLookup.getOps(NbtOps.INSTANCE), nbt.getCompound("allowed_fluid"))
+            this.setAllowedFluid(FluidInstance.CODEC.decode(registryLookup.getOps(NbtOps.INSTANCE), nbt.getCompoundOrEmpty("allowed_fluid"))
                     .result().map(Pair::getFirst).orElse(null));
         }
     }

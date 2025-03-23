@@ -78,9 +78,9 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         try {
-            if (nbt.getCompound("variant").contains("tag")) {
+            if (nbt.getCompoundOrEmpty("variant").contains("tag")) {
                 var hack = new NbtCompound();
-                var variant = nbt.getCompound("variant");
+                var variant = nbt.getCompoundOrEmpty("variant");
                 hack.put("tag", variant.get("tag"));
                 hack.put("id", variant.get("item"));
                 hack.putInt("Count", 1);

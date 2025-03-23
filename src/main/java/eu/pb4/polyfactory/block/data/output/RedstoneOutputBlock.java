@@ -77,11 +77,11 @@ public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataR
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
         if (!moved) {
             this.update(world, pos, state.get(FACING));
         }
-        super.onStateReplaced(state, world, pos, newState, moved);
+        super.onStateReplaced(state, world, pos, moved);
     }
 
     private void update(World world, BlockPos pos, Direction dir) {

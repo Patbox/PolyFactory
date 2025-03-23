@@ -485,7 +485,7 @@ public class FactoryUtil {
     public static void sendSlotUpdate(Entity entity, Hand hand) {
         if (entity instanceof ServerPlayerEntity player) {
             GuiHelpers.sendSlotUpdate(player, player.playerScreenHandler.syncId, hand == Hand.MAIN_HAND
-                            ? PlayerScreenHandler.HOTBAR_START + player.getInventory().selectedSlot
+                            ? PlayerScreenHandler.HOTBAR_START + player.getInventory().getSelectedSlot()
                             : PlayerScreenHandler.OFFHAND_ID,
                     player.getStackInHand(hand), player.playerScreenHandler.nextRevision());
         }

@@ -56,9 +56,9 @@ public class EjectorBlockEntity extends BlockEntity implements BlockEntityExtraL
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
         super.readNbt(nbt, registries);
-        this.angle = nbt.getFloat("angle");
-        this.strength = nbt.getFloat("strength");
-        this.progress = nbt.getFloat("process");
+        this.angle = nbt.getFloat("angle", 45);
+        this.strength = nbt.getFloat("strength", 2);
+        this.progress = nbt.getFloat("process", 0);
     }
 
     public void setAngle(float angle) {

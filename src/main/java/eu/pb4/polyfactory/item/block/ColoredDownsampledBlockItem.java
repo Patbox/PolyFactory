@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.SimpleColoredItem;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.block.Block;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -15,6 +16,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.ColorHelper;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ColoredDownsampledBlockItem extends FactoryBlockItem implements SimpleColoredItem, ColoredItem {
     private final int defaultColor;
@@ -42,11 +44,10 @@ public class ColoredDownsampledBlockItem extends FactoryBlockItem implements Sim
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> tooltip, TooltipType type) {
         if (ColoredItem.hasColor(stack) && !DyeColorExtra.hasLang(ColoredItem.getColor(stack))) {
-            tooltip.add(Text.translatable("item.color", ColoredItem.getHexName(ColoredItem.getColor(stack))).formatted(Formatting.GRAY));
+            tooltip.accept(Text.translatable("item.color", ColoredItem.getHexName(ColoredItem.getColor(stack))).formatted(Formatting.GRAY));
         }
-        super.appendTooltip(stack, context, tooltip, type);
     }
 
     @Override

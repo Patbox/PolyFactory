@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.entity;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
-import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.data.DataTracker;
@@ -158,7 +158,7 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
             data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.SCALE, new Vector3f(0.6f)));
             data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.BILLBOARD, (byte) DisplayEntity.BillboardMode.CENTER.ordinal()));
             data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.Item.ITEM, this.age < 4 && this.isOwner(player) ? ItemStack.EMPTY : this.itemStack));
-            data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.Item.ITEM_DISPLAY, ModelTransformationMode.FIXED.getIndex()));
+            data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.Item.ITEM_DISPLAY, ItemDisplayContext.FIXED.getIndex()));
         }
     }
 
@@ -175,7 +175,7 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        this.fuse = nbt.getShort("fuse");
+        this.fuse = nbt.getShort("fuse", (short) 0);
     }
 
     @Override

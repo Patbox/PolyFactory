@@ -69,18 +69,18 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        if (nbt.contains("stack", NbtElement.COMPOUND_TYPE) && !nbt.contains("Items", NbtElement.LIST_TYPE)) {
-            this.setStack(0, ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("stack")));
+        if (nbt.contains("stack") && !nbt.contains("Items")) {
+            this.setStack(0, ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("stack")).orElse(ItemStack.EMPTY));
         } else {
             Inventories.readNbt(nbt, this.items, lookup);
         }
 
-        this.process = nbt.getDouble("progress");
+        this.process = nbt.getDouble("progress", 0);
         if (nbt.contains("owner")) {
-            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompound("owner"));
+            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompoundOrEmpty("owner"));
         }
         if (nbt.contains("radius")) {
-            this.radius = nbt.getInt("radius");
+            this.radius = nbt.getInt("radius", 2);
         } else {
             this.radius = 1;
         }

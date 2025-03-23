@@ -27,10 +27,10 @@ public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
-        this.scrollSpeed = nbt.getInt("scroll_speed");
-        this.scrollLoop = nbt.getBoolean("scroll_loop");
-        this.scrollPoint = nbt.getInt("scroll_point");
-        this.text = nbt.getString("text");
+        this.scrollSpeed = nbt.getInt("scroll_speed", 0);
+        this.scrollLoop = nbt.getBoolean("scroll_loop", false);
+        this.scrollPoint = nbt.getInt("scroll_point", 0);
+        this.text = nbt.getString("text", "");
     }
 
     @Override

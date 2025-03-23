@@ -34,7 +34,9 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("FilterStack", this.filterStack.toNbtAllowEmpty(lookup));
+        if (!this.filterStack.isEmpty()) {
+            nbt.put("FilterStack", this.filterStack.toNbt(lookup));
+        }
     }
 
     @Override
@@ -52,7 +54,7 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.filterStack = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("FilterStack"));
+        this.filterStack = ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("FilterStack")).orElse(ItemStack.EMPTY);
         this.filter = FilterData.of(this.filterStack, true);
     }
 

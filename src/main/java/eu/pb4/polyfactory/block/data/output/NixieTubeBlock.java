@@ -27,7 +27,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.Items;
-import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -134,12 +134,11 @@ public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityPr
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (newState.isOf(this) && world.getBlockEntity(pos) instanceof NixieTubeBlockEntity be) {
-            be.updatePositions(world, pos, newState);
+    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        super.onBlockAdded(state, world, pos, oldState, notify);
+        if (oldState.isOf(this) && world.getBlockEntity(pos) instanceof NixieTubeBlockEntity be) {
+            be.updatePositions(world, pos, state);
         }
-
-        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @Override
@@ -179,7 +178,7 @@ public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityPr
             //this.pos = pos;
             this.mainElement = new ItemDisplayElement(FactoryItems.NIXIE_TUBE);
             this.mainElement.setDisplaySize(1, 1);
-            this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
+            this.mainElement.setItemDisplayContext(ItemDisplayContext.FIXED);
             this.mainElement.setInvisible(true);
             this.mainElement.setViewRange(0.8f);
 

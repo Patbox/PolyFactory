@@ -59,12 +59,12 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        this.speed = nbt.getDouble("speed");
-        this.tick = nbt.getInt("tick");
+        this.speed = nbt.getDouble("speed", 0);
+        this.tick = nbt.getInt("tick", 0);
         this.container.fromNbt(registryLookup, nbt, "fluid");
         this.currentFluid = FluidInstance.fromNbt(registryLookup, nbt.get("current_fluid"));
-        this.extraSpread = nbt.getFloat("spread");
-        this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompound("owner"));
+        this.extraSpread = nbt.getFloat("spread", 0);
+        this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompoundOrEmpty("owner"));
     }
 
     public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
@@ -73,7 +73,7 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
         }
         var goodDir = nozzle.getCachedState().get(NozzleBlock.FACING);
 
-        if (!nozzle.world().getChunkManager().chunkLoadingManager.getTicketManager().shouldTickEntities(ChunkPos.toLong(pos.offset(goodDir)))) {
+        if (!nozzle.world().getChunkManager().chunkLoadingManager.getLevelManager().shouldTickEntities(ChunkPos.toLong(pos.offset(goodDir)))) {
             return;
         }
 

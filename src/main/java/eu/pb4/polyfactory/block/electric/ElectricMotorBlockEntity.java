@@ -35,8 +35,8 @@ public class ElectricMotorBlockEntity extends LockableBlockEntity {
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
-        this.speed = nbt.getFloat("speed");
-        this.stress = nbt.getFloat("stress");
+        this.speed = nbt.getFloat("speed", 0);
+        this.stress = nbt.getFloat("stress", 0);
     }
 
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {

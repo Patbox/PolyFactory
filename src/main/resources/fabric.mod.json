@@ -34,7 +34,7 @@
   "depends": {
     "fabricloader": ">=0.16.0",
     "fabric-api": ">=0.116.1",
-    "minecraft": "1.21.4",
+    "minecraft": ">=1.21.5-",
     "polymer-core": ">=0.11.0",
     "polymer-resource-pack": ">=0.11.0",
     "polymer-virtual-entity": ">=0.11.0",

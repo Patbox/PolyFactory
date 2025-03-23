@@ -20,7 +20,7 @@ public abstract class WorldChunkMixin {
     @Shadow @Nullable public abstract BlockEntity getBlockEntity(BlockPos pos);
 
     @Inject(method = "setBlockState", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;hasBlockEntity()Z", ordinal = 0))
-    private void setDefault(BlockPos pos, BlockState state, boolean moved, CallbackInfoReturnable<BlockState> cir, @Share("color") LocalIntRef color, @Local(ordinal = 1) BlockState oldState) {
+    private void setDefault(BlockPos pos, BlockState state, int flags, CallbackInfoReturnable<BlockState> cir, @Share("color") LocalIntRef color, @Local(ordinal = 1) BlockState oldState) {
         if (oldState.hasBlockEntity() && this.getBlockEntity(pos) instanceof ColorProvider provider) {
             color.set(provider.getColor());
         } else {
@@ -29,7 +29,7 @@ public abstract class WorldChunkMixin {
     }
 
     @Inject(method = "setBlockState", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/chunk/WorldChunk;addBlockEntity(Lnet/minecraft/block/entity/BlockEntity;)V", shift = At.Shift.BEFORE))
-    private void setColor(BlockPos pos, BlockState state, boolean moved, CallbackInfoReturnable<BlockState> cir, @Local BlockEntity blockEntity, @Share("color") LocalIntRef color) {
+    private void setColor(BlockPos pos, BlockState state, int flags, CallbackInfoReturnable<BlockState> cir, @Local BlockEntity blockEntity, @Share("color") LocalIntRef color) {
         var c = color.get();
         if (blockEntity instanceof ColorProvider provider && c != -1) {
             provider.setColorFromPreviousBlockEntity(c);

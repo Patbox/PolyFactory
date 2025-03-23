@@ -982,7 +982,7 @@ class RecipesProvider extends FabricRecipeProvider {
                                 .pattern("sps")
                                 .input('r', Items.REDSTONE).input('g', Items.GLOWSTONE)
                                 .input('s', FactoryItems.SAW_DUST)
-                                .input('p', Registries.ITEM.get(Identifier.of(dye.getColor().getName() + "_stained_glass")))
+                                .input('p', Registries.ITEM.get(Identifier.of(dye.getColor().asString() + "_stained_glass")))
                                 .group("polyfactory:colored_lamp")
                                 .criterion("get", InventoryChangedCriterion.Conditions.items(Items.GLOWSTONE));
 
@@ -993,14 +993,14 @@ class RecipesProvider extends FabricRecipeProvider {
                         var x = new CompShapedRecipeJsonBuilder(itemWrap, RecipeCategory.REDSTONE, FactoryItems.WINDMILL_SAIL, 1);
 
                         if (dye != Items.WHITE_DYE) {
-                            x.setComponent(DataComponentTypes.DYED_COLOR, new DyedColorComponent(DyeColorExtra.getColor(dye.getColor()), true));
+                            x.setComponent(DataComponentTypes.DYED_COLOR, new DyedColorComponent(DyeColorExtra.getColor(dye.getColor())));
                         }
 
                         x.pattern(" sw")
                                 .pattern(" ws")
                                 .pattern("wsc")
                                 .input('w', FactoryItems.WOODEN_PLATE).input('s', Items.STICK)
-                                .input('c', Registries.ITEM.get(Identifier.of(dye.getColor().getName() + "_wool")))
+                                .input('c', Registries.ITEM.get(Identifier.of(dye.getColor().asString() + "_wool")))
                                 .group("polyfactory:windmill_sail")
                                 .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.WOODEN_PLATE))
                                 .offerTo(exporter, recipeKey("windmill_sail/wool/" + dye.getColor()));
@@ -1017,7 +1017,7 @@ class RecipesProvider extends FabricRecipeProvider {
                     }
 
                     {
-                        var nameSolid = dye.getColor().getName() + "_concrete";
+                        var nameSolid = dye.getColor().asString() + "_concrete";
                         var namePowder = nameSolid + "_powder";
 
                         var powder = Registries.ITEM.get(Identifier.of(namePowder));

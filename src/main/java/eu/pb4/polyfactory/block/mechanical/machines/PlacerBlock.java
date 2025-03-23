@@ -3,15 +3,14 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
-
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.block.configurable.BlockConfig;
-import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -60,7 +59,7 @@ public class PlacerBlock extends RotationalNetworkBlock implements FactoryBlock,
 
     private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(
             BlockConfig.FACING,
-            BlockConfig.ofBlockEntityInt("reach",  MinerBlockEntity.class, 1, 2, 0,
+            BlockConfig.ofBlockEntityInt("reach", MinerBlockEntity.class, 1, 2, 0,
                     MinerBlockEntity::reach, MinerBlockEntity::setReach)
     );
 
@@ -86,11 +85,13 @@ public class PlacerBlock extends RotationalNetworkBlock implements FactoryBlock,
     public FluidState getFluidState(BlockState state) {
         return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
     }
+
     @Override
     protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
         tickWater(state, world, tickView, pos);
         return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
+
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
         return List.of(new FunctionalDirectionNode(state.get(FACING).getOpposite()));
@@ -132,15 +133,14 @@ public class PlacerBlock extends RotationalNetworkBlock implements FactoryBlock,
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock())) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof Inventory) {
-                ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
-            }
-            world.updateComparators(pos, this);
+    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        if (blockEntity instanceof Inventory) {
+            ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
         }
-        super.onStateReplaced(state, world, pos, newState, moved);
+        world.updateComparators(pos, this);
+
+        super.onStateReplaced(state, world, pos, moved);
     }
 
     @Nullable
@@ -208,7 +208,7 @@ public class PlacerBlock extends RotationalNetworkBlock implements FactoryBlock,
             this.main.setTransformation(mat);
 
             mat.rotateY(MathHelper.HALF_PI);
-            mat.scale( 0.4f);
+            mat.scale(0.4f);
 
             mat.translate((float) (-MathHelper.cos(this.rotation) * 0.3) - 0.3f, -MathHelper.sin(this.rotation) * 4f / 16f - 2 / 16f, 0);
             mat.rotateZ(MathHelper.cos(this.rotation) / 4 + MathHelper.HALF_PI);

@@ -48,12 +48,12 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.value = nbt.getString("Text");
-        this.positiveIndex = nbt.getInt("PIndex");
-        this.negativeIndex = nbt.getInt("NIndex");
-        this.color = nbt.getInt("Color");
-        this.connectionSize = nbt.getInt("ConnSize");
-        this.padding = (char) nbt.getInt("Padding");
+        this.value = nbt.getString("Text", "");
+        this.positiveIndex = nbt.getInt("PIndex", 0);
+        this.negativeIndex = nbt.getInt("NIndex", 0);
+        this.color = nbt.getInt("Color", 0);
+        this.connectionSize = nbt.getInt("ConnSize", 0);
+        this.padding = (char) nbt.getInt("Padding", 0);
         this.updateTextDisplay();
     }
 

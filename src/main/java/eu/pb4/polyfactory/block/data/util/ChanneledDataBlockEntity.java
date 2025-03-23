@@ -17,6 +17,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentsAccess;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
@@ -42,14 +43,10 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
         if (nbt.contains("data")) {
-            this.lastData = DataContainer.fromNbt(nbt.getCompound("data"), lookup);
+            this.lastData = DataContainer.fromNbt(nbt.getCompoundOrEmpty("data"), lookup);
         }
-        setChannel(nbt.getInt("channel"));
-        if (nbt.contains("color")) {
-            this.color = nbt.getInt("color");
-        } else {
-            this.color = AbstractCableBlock.DEFAULT_COLOR;
-        }
+        setChannel(nbt.getInt("channel", 0));
+        this.color = nbt.getInt("color", AbstractCableBlock.DEFAULT_COLOR);
     }
 
     @Override

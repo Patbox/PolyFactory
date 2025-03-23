@@ -55,8 +55,8 @@ public class PipeInWallBlock extends PipeBaseBlock implements ConfigurableBlock 
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        var a = state.get(AXIS) == Direction.Axis.X ? WallBlock.NORTH_SHAPE : WallBlock.WEST_SHAPE;
-        var b = state.get(AXIS) == Direction.Axis.X ? WallBlock.SOUTH_SHAPE : WallBlock.EAST_SHAPE;
+        var a = state.get(AXIS) == Direction.Axis.X ? WallBlock.NORTH_WALL_SHAPE : WallBlock.WEST_WALL_SHAPE;
+        var b = state.get(AXIS) == Direction.Axis.X ? WallBlock.SOUTH_WALL_SHAPE : WallBlock.EAST_WALL_SHAPE;
 
         return this.backing.getDefaultState().with(WATERLOGGED, state.get(WATERLOGGED)).with(WallBlock.UP, false).with(a, WallShape.TALL).with(b, WallShape.TALL);
     }

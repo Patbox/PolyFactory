@@ -51,7 +51,7 @@ public class DirectionConnectingModel {
             for (var element : model.getAsJsonArray("elements")) {
                 var name = element.getAsJsonObject().get("name");
 
-                if (name == null || Direction.byName(name.getAsString()) == null || hasDirection(i, Direction.byName(name.getAsString()))) {
+                if (name == null || Direction.byId(name.getAsString()) == null || hasDirection(i, Direction.byId(name.getAsString()))) {
                     elements.add(element);
                 }
             }

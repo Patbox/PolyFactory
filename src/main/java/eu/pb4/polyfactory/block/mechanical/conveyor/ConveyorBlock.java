@@ -34,10 +34,10 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -48,7 +48,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldEvents;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
@@ -75,6 +74,50 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         super(settings);
         this.setDefaultState(this.getDefaultState().with(VERTICAL, DirectionValue.NONE).with(DIRECTION, Direction.NORTH).with(HAS_OUTPUT_TOP, false)
                 .with(NEXT_CONVEYOR, false).with(PREVIOUS_CONVEYOR, false).with(TOP_CONVEYOR, false).with(BOTTOM_CONVEYOR, false));
+    }
+
+    public static int getModelId(BlockState state) {
+        var value = state.get(VERTICAL);
+        if (value.stack && value.value == 1) {
+            return getModelId(state.get(PREVIOUS_CONVEYOR), state.get(NEXT_CONVEYOR), state.get(BOTTOM_CONVEYOR), state.get(TOP_CONVEYOR));
+        } else if (value.stack && value.value == -1) {
+            return getModelId(state.get(NEXT_CONVEYOR), state.get(PREVIOUS_CONVEYOR), state.get(TOP_CONVEYOR), state.get(BOTTOM_CONVEYOR));
+        }
+
+        return getModelId(state.get(TOP_CONVEYOR), state.get(BOTTOM_CONVEYOR), state.get(PREVIOUS_CONVEYOR), state.get(NEXT_CONVEYOR));
+    }
+
+    public static int getModelId(boolean top, boolean bottom, boolean previous, boolean next) {
+        int i = 0;
+        if (top) {
+            i |= 1;
+        }
+        if (bottom) {
+            i |= 2;
+        }
+        if (previous) {
+            i |= 4;
+        }
+        if (next) {
+            i |= 8;
+        }
+        return i;
+    }
+
+    public static boolean hasTop(int i) {
+        return (i & 1) != 0;
+    }
+
+    public static boolean hasBottom(int i) {
+        return (i & 2) != 0;
+    }
+
+    public static boolean hasPrevious(int i) {
+        return (i & 4) != 0;
+    }
+
+    public static boolean hasNext(int i) {
+        return (i & 8) != 0;
     }
 
     @Override
@@ -313,55 +356,11 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         var bottom = ctx.getWorld().getBlockState(ctx.getBlockPos().down());
 
         return state
-                .with(NEXT_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().offset(direction)), direction , direction, value))
+                .with(NEXT_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().offset(direction)), direction, direction, value))
                 .with(PREVIOUS_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().offset(direction, -1)), direction.getOpposite(), direction, value))
-                .with(TOP_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().up()),Direction.UP, direction, value))
+                .with(TOP_CONVEYOR, isMatchingConveyor(ctx.getWorld().getBlockState(ctx.getBlockPos().up()), Direction.UP, direction, value))
                 .with(BOTTOM_CONVEYOR, isMatchingConveyor(bottom, Direction.DOWN, direction, value))
-                .with(HAS_OUTPUT_TOP, ctx.getWorld().getBlockState( ctx.getBlockPos().up()).isIn(FactoryBlockTags.CONVEYOR_TOP_OUTPUT));
-    }
-
-    public static int getModelId(BlockState state) {
-        var value = state.get(VERTICAL);
-        if (value.stack && value.value == 1) {
-            return getModelId(state.get(PREVIOUS_CONVEYOR), state.get(NEXT_CONVEYOR), state.get(BOTTOM_CONVEYOR), state.get(TOP_CONVEYOR));
-        } else if (value.stack && value.value == -1) {
-            return getModelId(state.get(NEXT_CONVEYOR), state.get(PREVIOUS_CONVEYOR), state.get(TOP_CONVEYOR), state.get(BOTTOM_CONVEYOR));
-        }
-
-        return getModelId(state.get(TOP_CONVEYOR), state.get(BOTTOM_CONVEYOR), state.get(PREVIOUS_CONVEYOR), state.get(NEXT_CONVEYOR));
-    }
-
-    public static int getModelId(boolean top, boolean bottom, boolean previous, boolean next) {
-        int i = 0;
-        if (top) {
-            i |= 1;
-        }
-        if (bottom) {
-            i |= 2;
-        }
-        if (previous) {
-            i |= 4;
-        }
-        if (next) {
-            i |= 8;
-        }
-        return i;
-    }
-
-    public static boolean hasTop(int i) {
-        return (i & 1) != 0;
-    }
-
-    public static boolean hasBottom(int i) {
-        return (i & 2) != 0;
-    }
-
-    public static boolean hasPrevious(int i) {
-        return (i & 4) != 0;
-    }
-
-    public static boolean hasNext(int i) {
-        return (i & 8) != 0;
+                .with(HAS_OUTPUT_TOP, ctx.getWorld().getBlockState(ctx.getBlockPos().up()).isIn(FactoryBlockTags.CONVEYOR_TOP_OUTPUT));
     }
 
     @SuppressWarnings("RedundantIfStatement")
@@ -425,15 +424,16 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         return TransferMode.FROM_CONVEYOR;
     }
 
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock())) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof Inventory) {
-                ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
-                world.updateComparators(pos, this);
-            }
+    @Override
+    protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
+        super.onStateReplaced(state, world, pos, moved);
+
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        if (blockEntity instanceof Inventory) {
+            ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
+            world.updateComparators(pos, this);
         }
-        super.onStateReplaced(state, world, pos, newState, moved);
+
     }
 
     @Override
@@ -529,7 +529,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
             this.base = new FastItemDisplayElement(getModelForSpeed(0, type, state.isOf(FactoryBlocks.STICKY_CONVEYOR), state));
             this.base.setFastItem(getFastModel(type, state.isOf(FactoryBlocks.STICKY_CONVEYOR), state), 24);
             this.base.setDisplaySize(1, 1);
-            this.base.setModelTransformation(ModelTransformationMode.FIXED);
+            this.base.setItemDisplayContext(ItemDisplayContext.FIXED);
             this.base.setViewRange(0.7f);
             this.base.setInvisible(true);
 
@@ -615,7 +615,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
                 if (this.value.stack) {
                     base.rotateX(MathHelper.HALF_PI);
                 } else if (this.value.value != 0) {
-                    base.rotateX( (this.direction.getAxis() == Direction.Axis.X ? -1 : 1) * MathHelper.HALF_PI / 2 * -this.value.value);
+                    base.rotateX((this.direction.getAxis() == Direction.Axis.X ? -1 : 1) * MathHelper.HALF_PI / 2 * -this.value.value);
                 }
 
                 movingItemContainer.setRotation(base.mul(Direction.NORTH.getRotationQuaternion()));

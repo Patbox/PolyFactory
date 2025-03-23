@@ -30,7 +30,7 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.DataWriter;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -137,10 +137,10 @@ class AssetProvider implements DataProvider {
 
         fromItem.accept(FactoryItems.STEEL_GEAR, id -> new ItemAsset(SelectItemModel.builder(new DisplayContextProperty())
                 .withCase(List.of(
-                        ModelTransformationMode.FIRST_PERSON_LEFT_HAND,
-                        ModelTransformationMode.FIRST_PERSON_RIGHT_HAND,
-                        ModelTransformationMode.THIRD_PERSON_LEFT_HAND,
-                        ModelTransformationMode.THIRD_PERSON_RIGHT_HAND
+                        ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
+                        ItemDisplayContext.FIRST_PERSON_RIGHT_HAND,
+                        ItemDisplayContext.THIRD_PERSON_LEFT_HAND,
+                        ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
                 ), new BasicItemModel(id.withPrefixedPath("item/").withSuffixedPath("_world")))
                 .fallback(new BasicItemModel(id.withPrefixedPath("item/")))
                 .build(), ItemAsset.Properties.DEFAULT));

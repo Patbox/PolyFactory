@@ -65,13 +65,15 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.writeNbt(nbt, lookup);
-        nbt.put("item", this.itemStack.toNbtAllowEmpty(lookup));
+        if (!this.itemStack.isEmpty()) {
+            nbt.put("item", this.itemStack.toNbt(lookup));
+        }
     }
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
-        setStack(ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("item")));
+        setStack(ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("item")).orElse(ItemStack.EMPTY));
     }
 
     @Override

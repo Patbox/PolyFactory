@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.item.configuration;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.item.util.SwitchActionItem;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -19,6 +20,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class WrenchItem extends SimplePolymerItem implements SwitchActionItem {
     public WrenchItem(Settings settings) {
@@ -27,11 +29,10 @@ public class WrenchItem extends SimplePolymerItem implements SwitchActionItem {
 
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
-        tooltip.add(Text.translatable("item.polyfactory.wrench.tooltip.1", Text.keybind("key.use")).formatted(Formatting.GRAY));
-        tooltip.add(Text.translatable("item.polyfactory.wrench.tooltip.1.alt", Text.keybind("key.swapOffhand")).formatted(Formatting.GRAY));
-        tooltip.add(Text.translatable("item.polyfactory.wrench.tooltip.2", Text.keybind("key.attack")).formatted(Formatting.GRAY));
+    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> tooltip, TooltipType type) {
+        tooltip.accept(Text.translatable("item.polyfactory.wrench.tooltip.1", Text.keybind("key.use")).formatted(Formatting.GRAY));
+        tooltip.accept(Text.translatable("item.polyfactory.wrench.tooltip.1.alt", Text.keybind("key.swapOffhand")).formatted(Formatting.GRAY));
+        tooltip.accept(Text.translatable("item.polyfactory.wrench.tooltip.2", Text.keybind("key.attack")).formatted(Formatting.GRAY));
     }
 
     @Override

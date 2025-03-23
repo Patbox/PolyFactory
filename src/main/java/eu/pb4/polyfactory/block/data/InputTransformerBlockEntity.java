@@ -46,11 +46,11 @@ public class InputTransformerBlockEntity extends LockableBlockEntity {
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
-        this.channelInput = nbt.getInt("input_channel");
-        this.channelOutput = nbt.getInt("output_channel");
+        this.channelInput = nbt.getInt("input_channel", 0);
+        this.channelOutput = nbt.getInt("output_channel", 0);
 
-        this.lastInput = DataContainer.fromNbt(nbt.getCompound("input_data"), lookup);
-        this.lastOutput = DataContainer.fromNbt(nbt.getCompound("output_data"), lookup);
+        this.lastInput = DataContainer.fromNbt(nbt.getCompoundOrEmpty("input_data"), lookup);
+        this.lastOutput = DataContainer.fromNbt(nbt.getCompoundOrEmpty("output_data"), lookup);
     }
 
     @Override

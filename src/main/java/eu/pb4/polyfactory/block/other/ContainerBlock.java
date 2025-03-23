@@ -22,9 +22,9 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -46,8 +46,8 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 
 public class ContainerBlock extends Block implements FactoryBlock, BlockEntityProvider, AttackableBlock, SneakBypassingBlock, BarrierBasedWaterloggable {
-    public final int maxStackCount;
     public static EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
+    public final int maxStackCount;
 
     public ContainerBlock(int maxStackCount, Settings settings) {
         super(settings);
@@ -75,7 +75,7 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
                 var stack = player.getStackInHand(Hand.MAIN_HAND);
 
                 if (player.isSneaking() && stack.isEmpty() && !be.getItemStack().isEmpty()) {
-                    var inv = player.getInventory().main;
+                    var inv = player.getInventory().getMainStacks();
                     for (int i = 0; i < inv.size(); i++) {
                         var curr = inv.get(i);
                         if (be.matches(curr)) {
@@ -123,7 +123,7 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
                 } else {
                     be.setItemStack(ItemStack.EMPTY);
                 }
-             }
+            }
             return ActionResult.SUCCESS_SERVER;
         }
 
@@ -131,21 +131,19 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock())) {
-            if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be) {
-                var count = be.storage.amount;
-                var max = be.getItemStack().getMaxCount();
-                while (count > 0) {
-                    var stack = be.storage.variant.toStack((int) Math.min(max, count));
-                    count -= stack.getCount();
-                    ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
-                }
-                world.updateComparators(pos, this);
+    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
+        if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be) {
+            var count = be.storage.amount;
+            var max = be.getItemStack().getMaxCount();
+            while (count > 0) {
+                var stack = be.storage.variant.toStack((int) Math.min(max, count));
+                count -= stack.getCount();
+                ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
             }
+            world.updateComparators(pos, this);
         }
-        super.onStateReplaced(state, world, pos, newState, moved);
 
+        super.onStateReplaced(state, world, pos, moved);
     }
 
     @Override
@@ -209,7 +207,7 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
 
             this.itemElement = ItemDisplayElementUtil.createSimple();
             this.itemElement.setDisplaySize(1, 1);
-            this.itemElement.setModelTransformation(ModelTransformationMode.GUI);
+            this.itemElement.setItemDisplayContext(ItemDisplayContext.GUI);
             this.itemElement.setViewRange(0.3f);
 
             this.countElement = new TextDisplayElement(Text.literal("0"));

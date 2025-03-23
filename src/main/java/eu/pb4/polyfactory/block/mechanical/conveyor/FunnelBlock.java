@@ -34,7 +34,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -86,14 +86,13 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
+
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock())) {
-            if (world.getBlockEntity(pos) instanceof FunnelBlockEntity be) {
-                ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, be.getFilter());
-            }
+    protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
+        super.onStateReplaced(state, world, pos, moved);
+        if (world.getBlockEntity(pos) instanceof FunnelBlockEntity be) {
+            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, be.getFilter());
         }
-        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @Override
@@ -314,7 +313,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         protected Model(BlockState state, BlockPos pos) {
             this.mainElement = new LodItemDisplayElement();
             this.mainElement.setDisplaySize(1, 1);
-            this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
+            this.mainElement.setItemDisplayContext(ItemDisplayContext.FIXED);
             this.mainElement.setInvisible(true);
             this.mainElement.setViewRange(0.8f);
             this.offset = pos.getManhattanDistance(BlockPos.ZERO) % 2 == 0 ? 0.002f : 0;

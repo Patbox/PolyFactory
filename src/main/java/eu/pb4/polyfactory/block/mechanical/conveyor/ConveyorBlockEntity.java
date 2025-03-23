@@ -218,15 +218,15 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        if (this.holdStack != null) {
-            nbt.put("HeldStack", this.holdStack.get().toNbtAllowEmpty(lookup));
+        if (this.holdStack != null && !this.holdStack.get().isEmpty()) {
+            nbt.put("HeldStack", this.holdStack.get().toNbt(lookup));
         }
         nbt.putDouble("Delta", this.delta);
     }
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        var stack = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("HeldStack"));
+        var stack = ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("HeldStack")).orElse(ItemStack.EMPTY);
         if (!stack.isEmpty()) {
             if (this.holdStack != null) {
                 this.holdStack.set(stack);
@@ -234,7 +234,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
                 this.setContainer(new MovingItem(stack));
             }
         }
-        this.delta = nbt.getDouble("Delta");
+        this.delta = nbt.getDouble("Delta", 0);
     }
 
     public boolean tryAdding(ItemStack stack) {

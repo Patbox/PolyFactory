@@ -114,9 +114,9 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         Inventories.readNbt(nbt, items, lookup);
-        this.fuelInitial = nbt.getInt("FuelInitial");
-        this.fuelTicks = nbt.getInt("FuelTicks");
-        this.state = nbt.getFloat("State");
+        this.fuelInitial = nbt.getInt("FuelInitial", 0);
+        this.fuelTicks = nbt.getInt("FuelTicks", 0);
+        this.state = nbt.getFloat("State", 0);
         super.readNbt(nbt, lookup);
     }
 

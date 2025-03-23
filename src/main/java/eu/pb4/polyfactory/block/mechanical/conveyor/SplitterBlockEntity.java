@@ -31,8 +31,12 @@ public class SplitterBlockEntity extends LockableBlockEntity implements BlockEnt
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("FilterStackLeft", this.filterStackLeft.toNbtAllowEmpty(lookup));
-        nbt.put("FilterStackRight", this.filterStackRight.toNbtAllowEmpty(lookup));
+        if (!this.filterStackLeft.isEmpty()) {
+            nbt.put("FilterStackLeft", this.filterStackLeft.toNbt(lookup));
+        }
+        if (!this.filterStackRight.isEmpty()) {
+            nbt.put("FilterStackRight", this.filterStackRight.toNbt(lookup));
+        }
         nbt.putByte("CurPos", (byte) this.position);
     }
 
@@ -45,12 +49,12 @@ public class SplitterBlockEntity extends LockableBlockEntity implements BlockEnt
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.filterStackLeft = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("FilterStackLeft"));
-        this.filterStackRight = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("FilterStackRight"));
+        this.filterStackLeft = ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("FilterStackLeft")).orElse(ItemStack.EMPTY);
+        this.filterStackRight = ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("FilterStackRight")).orElse(ItemStack.EMPTY);
         this.filterRight = FilterData.of(this.filterStackRight, false);
         this.filterLeft = FilterData.of(this.filterStackLeft, false);
         this.filtersEqual = Objects.equals(this.filterLeft.filter(), this.filterRight.filter());
-        this.position = nbt.getByte("CurPos");
+        this.position = nbt.getByte("CurPos", (byte) 0);
     }
 
     public int pos(int max) {

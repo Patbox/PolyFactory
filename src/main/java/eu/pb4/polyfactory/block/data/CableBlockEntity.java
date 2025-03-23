@@ -9,6 +9,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentsAccess;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
@@ -33,7 +34,7 @@ public class CableBlockEntity extends BlockEntity implements BlockEntityExtraLis
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
-        setColor(nbt.getInt("color"));
+        setColor(nbt.getInt("color", this.color));
     }
 
     @Override

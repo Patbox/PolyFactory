@@ -22,7 +22,8 @@ class EntityTagsProvider extends FabricTagProvider.EntityTypeTagProvider {
                 .add(EntityType.ITEM)
                 .add(EntityType.EXPERIENCE_ORB)
                 .add(EntityType.EXPERIENCE_BOTTLE)
-                .add(EntityType.POTION)
+                .add(EntityType.LINGERING_POTION)
+                .add(EntityType.SPLASH_POTION)
         ;
     }
 }

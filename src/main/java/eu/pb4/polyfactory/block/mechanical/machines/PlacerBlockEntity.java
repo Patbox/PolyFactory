@@ -54,14 +54,16 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("stack", this.stack.toNbtAllowEmpty(lookup));
+        if (!this.stack.isEmpty()) {
+            nbt.put("stack", this.stack.toNbt(lookup));
+        }
         nbt.putDouble("progress", this.process);
         if (this.owner != null) {
             nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
         nbt.putInt("reach", this.reach);
         if (nbt.contains("reach")) {
-            this.reach = nbt.getInt("reach");
+            this.reach = nbt.getInt("reach", 1);
         } else {
             this.reach = 1;
         }
@@ -70,10 +72,10 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.stack = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("tool"));
-        this.process = nbt.getDouble("progress");
+        this.stack = ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("tool")).orElse(ItemStack.EMPTY);
+        this.process = nbt.getDouble("progress", 0);
         if (nbt.contains("owner")) {
-            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompound("owner"));
+            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompoundOrEmpty("owner"));
         }
         super.readNbt(nbt, lookup);
     }

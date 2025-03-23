@@ -25,6 +25,7 @@ import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentsAccess;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeEntry;
@@ -224,7 +225,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.readInventoryNbt(nbt, lookup);
-        this.process = nbt.getDouble("Progress");
+        this.process = nbt.getDouble("Progress", 0);
         super.readNbt(nbt, lookup);
     }
 

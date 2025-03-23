@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.DyedColorComponent;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class WirelessRedstoneTransmitterItem extends Item implements SimpleColoredItem, ColoredItem {
     public WirelessRedstoneTransmitterItem(Settings settings) {
@@ -47,12 +49,11 @@ public class WirelessRedstoneTransmitterItem extends Item implements SimpleColor
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
+    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> tooltip, TooltipType type) {
         var x = stack.get(FactoryDataComponents.REMOTE_KEYS);
         if (x != null) {
-            tooltip.add(x.getFirst().toHoverableText().copy().formatted(Formatting.GRAY));
-            tooltip.add(x.getSecond().toHoverableText().copy().formatted(Formatting.GRAY));
+            tooltip.accept(x.getFirst().toHoverableText().copy().formatted(Formatting.GRAY));
+            tooltip.accept(x.getSecond().toHoverableText().copy().formatted(Formatting.GRAY));
         }
     }
 

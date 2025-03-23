@@ -41,12 +41,14 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
 
     @Inject(method = "writeNbt", at = @At("TAIL"))
     private void writeFilterNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
-        nbt.put("polydex:filter", this.filterStack.toNbtAllowEmpty(registryLookup));
+        if (!this.filterStack.isEmpty()) {
+            nbt.put("polydex:filter", this.filterStack.toNbt(registryLookup));
+        }
     }
 
     @Inject(method = "readNbt", at = @At("TAIL"))
     private void readFilterNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
-        polyfactory$setFilter(ItemStack.fromNbtOrEmpty(registryLookup, nbt.getCompound("polydex:filter")));
+        polyfactory$setFilter(ItemStack.fromNbt(registryLookup, nbt.getCompoundOrEmpty("polydex:filter")).orElse(ItemStack.EMPTY));
     }
 
     @Inject(method = "transfer(Lnet/minecraft/inventory/Inventory;Lnet/minecraft/inventory/Inventory;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/math/Direction;)Lnet/minecraft/item/ItemStack;", at = @At("HEAD"), cancellable = true)

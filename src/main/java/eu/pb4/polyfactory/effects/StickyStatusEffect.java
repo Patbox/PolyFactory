@@ -34,7 +34,7 @@ public class StickyStatusEffect extends StatusEffect implements PolymerStatusEff
 
     @Override
     public boolean applyUpdateEffect(ServerWorld world, LivingEntity entity, int amplifier) {
-        if (entity.isWet()) {
+        if (entity.isSubmergedInWater()) {
             return false;
         }
 

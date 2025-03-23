@@ -2,15 +2,14 @@ package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
-
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
-import eu.pb4.polyfactory.block.configurable.BlockConfig;
-import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -71,6 +70,7 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
         super.appendProperties(builder);
         builder.add(FACING, POWERED);
     }
+
     @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
         return List.of(new FunctionalAxisNode(state.get(FACING).rotateYClockwise().getAxis()));
@@ -139,15 +139,13 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock())) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof Inventory) {
-                ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
-            }
-            world.updateComparators(pos, this);
+    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        if (blockEntity instanceof Inventory) {
+            ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
         }
-        super.onStateReplaced(state, world, pos, newState, moved);
+        world.updateComparators(pos, this);
+
     }
 
     @Nullable
@@ -171,7 +169,6 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
     public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
-
 
 
     @Override

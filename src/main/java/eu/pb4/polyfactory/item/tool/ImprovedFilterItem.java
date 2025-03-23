@@ -12,6 +12,7 @@ import eu.pb4.sgui.api.gui.GuiInterface;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
 import net.minecraft.component.ComponentType;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemStackSet;
 import net.minecraft.item.tooltip.TooltipType;
@@ -27,6 +28,7 @@ import net.minecraft.util.StringIdentifiable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -55,13 +57,13 @@ public class ImprovedFilterItem extends AbstractFilterItem {
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
-        tooltip.add(stack.getOrDefault(FactoryDataComponents.ITEM_FILTER_MATCH, Match.STRICT).asName().formatted(Formatting.YELLOW));
-        tooltip.add(stack.getOrDefault(FactoryDataComponents.ITEM_FILTER_TYPE, Type.WHITELIST).asTooltip());
+    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> tooltip, TooltipType type) {
+        super.appendTooltip(stack, context, displayComponent, tooltip, type);
+        tooltip.accept(stack.getOrDefault(FactoryDataComponents.ITEM_FILTER_MATCH, Match.STRICT).asName().formatted(Formatting.YELLOW));
+        tooltip.accept(stack.getOrDefault(FactoryDataComponents.ITEM_FILTER_TYPE, Type.WHITELIST).asTooltip());
 
         for (var filtered : getStacks(stack)) {
-            tooltip.add(Text.literal(" ").append(filtered.getName()).formatted(Formatting.GRAY));
+            tooltip.accept(Text.literal(" ").append(filtered.getName()).formatted(Formatting.GRAY));
         }
     }
 

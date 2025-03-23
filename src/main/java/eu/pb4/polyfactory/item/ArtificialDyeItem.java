@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.util.SimpleColoredItem;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.minecraft.block.entity.SignBlockEntity;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ArtificialDyeItem extends Item implements SignChangingItem, SimpleColoredItem, ColoredItem {
     public static final ThreadLocal<List<ItemStack>> CURRENT_DYES = ThreadLocal.withInitial(ArrayList::new);
@@ -50,11 +52,11 @@ public class ArtificialDyeItem extends Item implements SignChangingItem, SimpleC
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> tooltip, TooltipType type) {
+        super.appendTooltip(stack, context, displayComponent, tooltip, type);
         if (ColoredItem.hasColor(stack)) {
-            tooltip.add(Text.translatable("item.color", ColoredItem.getHexName(ColoredItem.getColor(stack))).formatted(Formatting.GRAY));
+            tooltip.accept(Text.translatable("item.color", ColoredItem.getHexName(ColoredItem.getColor(stack))).formatted(Formatting.GRAY));
         }
-        super.appendTooltip(stack, context, tooltip, type);
     }
 
     @Override

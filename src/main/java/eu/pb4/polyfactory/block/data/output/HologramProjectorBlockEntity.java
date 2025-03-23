@@ -39,17 +39,17 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
-        this.scale = nbt.getFloat("scale");
-        this.offset = nbt.getFloat("offset");
-        this.pitch = nbt.getFloat("pitch");
-        this.yaw = nbt.getFloat("yaw");
-        this.roll = nbt.getFloat("roll");
+        this.scale = nbt.getFloat("scale", 1);
+        this.offset = nbt.getFloat("offset", 0.5f);
+        this.pitch = nbt.getFloat("pitch", 0);
+        this.yaw = nbt.getFloat("yaw", 0);
+        this.roll = nbt.getFloat("roll", 0);
 
         if (nbt.contains("rotation_display")) {
-            this.roll = nbt.getFloat("rotation_display");
+            this.roll = nbt.getFloat("rotation_display", 0);
         }
 
-        this.forceText = nbt.getBoolean("force_text");
+        this.forceText = nbt.getBoolean("force_text", false);
     }
 
     @Override

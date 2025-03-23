@@ -23,7 +23,7 @@ public enum OptionalDirection implements StringIdentifiable {
     @Nullable
     private final Direction direction;
     OptionalDirection(@Nullable Direction direction) {
-        this.name = direction != null ? direction.getName() : "none";
+        this.name = direction != null ? direction.asString() : "none";
         this.direction = direction;
     }
 

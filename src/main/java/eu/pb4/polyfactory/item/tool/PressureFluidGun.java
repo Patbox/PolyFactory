@@ -27,6 +27,7 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.network.packet.s2c.play.EntityEquipmentUpdateS2CPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -49,8 +50,8 @@ public class PressureFluidGun extends Item implements PolymerItem {
 
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        super.inventoryTick(stack, world, entity, slot, selected);
+    public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
+        super.inventoryTick(stack, world, entity, slot);
         if (entity instanceof LivingEntity livingEntity && livingEntity.getActiveItem() != stack) {
             onStoppedUsing(stack, world, livingEntity, 0);
         }
@@ -148,7 +149,7 @@ public class PressureFluidGun extends Item implements PolymerItem {
         }
 
         if (user instanceof PlayerEntity player) {
-            for (int i = 0; i < player.getInventory().main.size(); i++) {
+            for (int i = 0; i < player.getInventory().getMainStacks().size(); i++) {
                 var fluid = player.getInventory().getStack(i).getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
                 if (!fluid.isEmpty()) {
                     stacks.add(FluidContainerFromComponent.of(StackReference.of(player.getInventory(), i)));

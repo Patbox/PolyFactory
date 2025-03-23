@@ -92,7 +92,7 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler {
         }
 
         resultInventory.setStack(0, itemStack);
-        handler.setPreviousTrackedSlot(0, itemStack);
+        handler.setReceivedStack(0, itemStack);
         serverPlayerEntity.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(handler.syncId, handler.nextRevision(), 0, itemStack));
     }
 
@@ -115,7 +115,7 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler {
             ItemStack itemStack2 = slot2.getStack();
             itemStack = itemStack2.copy();
             if (slot == 0) {
-                this.context.run((world, pos) -> itemStack2.getItem().onCraftByPlayer(itemStack2, world, player));
+                this.context.run((world, pos) -> itemStack2.getItem().onCraftByPlayer(itemStack2, player));
                 if (!this.insertItem(itemStack2, 10, 46, true)) {
                     return ItemStack.EMPTY;
                 }

@@ -86,7 +86,7 @@ public class DyeSprayItem extends Item implements PolymerItem, ColoredItem {
             for (int i = 0; i < stacks.size(); i++) {
                 var x = stacks.get(i);
                 if (!x.isEmpty() && be.getSailColor(i) != color) {
-                    x.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(color, true));
+                    x.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(color));
                     be.addSail(i, x);
                     success = true;
                     break;
@@ -106,7 +106,7 @@ public class DyeSprayItem extends Item implements PolymerItem, ColoredItem {
                 newId = id.withPrefixedPath(dye.asString() + "_stained_");
             } else {
                 var x = id.getPath().split("_", 2);
-                newId = DyeColor.byName(x[0], null) == null ? id.withPath(dye.asString() + "_" + id.getPath()) : id.withPath(dye.asString() + "_" + x[1]);
+                newId = DyeColor.byId(x[0], null) == null ? id.withPath(dye.asString() + "_" + id.getPath()) : id.withPath(dye.asString() + "_" + x[1]);
             }
 
             var block = Registries.BLOCK.get(newId);

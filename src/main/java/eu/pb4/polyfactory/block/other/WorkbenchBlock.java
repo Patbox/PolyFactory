@@ -102,9 +102,9 @@ public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityPr
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        ItemScatterer.onStateReplaced(state, newState, world, pos);
-        super.onStateReplaced(state, world, pos, newState, moved);
+    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        super.onBlockAdded(state, world, pos, oldState, notify);
+        ItemScatterer.onStateReplaced(state, world, pos);
     }
 
     @Override

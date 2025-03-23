@@ -40,8 +40,8 @@ public class CreativeMotorBlockEntity extends LockableBlockEntity {
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
-        this.speed = nbt.getDouble("Speed");
-        this.stress = nbt.getDouble("Stress");
+        this.speed = nbt.getDouble("Speed", 0);
+        this.stress = nbt.getDouble("Stress", 0);
     }
 
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {

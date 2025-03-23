@@ -55,7 +55,7 @@ public class FluidModelItem extends Item implements PolymerItem {
         //noinspection unchecked
         var x = (FluidInstance<Object>) getFluid(itemStack);
         if (x != null && x.type().color().isPresent()) {
-            base.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent((x.type().color().get()).getColor(x.data()), false));
+            base.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent((x.type().color().get()).getColor(x.data())));
         }
 
         return base;

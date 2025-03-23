@@ -38,7 +38,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.DustColorTransitionParticleEffect;
 import net.minecraft.particle.ParticleEffect;
@@ -366,7 +366,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 this.customCenter = 0;
                 this.extraOffset = 0;
                 var i = new ItemDisplayElement(stackData.stack());
-                i.setModelTransformation(ModelTransformationMode.GUI);
+                i.setItemDisplayContext(ItemDisplayContext.GUI);
                 newDisplay = i;
             } else if (data instanceof BlockStateData blockStateData && !this.forceText) {
                 var asItem = (blockStateData.state().getBlock() instanceof FactoryBlock
@@ -387,7 +387,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 this.extraOffset = 0;
                 if (asItem) {
                     var i = new ItemDisplayElement(ItemDisplayElementUtil.getModel(blockStateData.state().getBlock().asItem()));
-                    i.setModelTransformation(ModelTransformationMode.FIXED);
+                    i.setItemDisplayContext(ItemDisplayContext.FIXED);
                     this.extraScale = 2;
                     newDisplay = i;
                 } else {

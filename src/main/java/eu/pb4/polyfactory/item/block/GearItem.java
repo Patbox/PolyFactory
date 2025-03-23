@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.block.mechanical.AxleWithLargeGearBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemPlacementContext;
@@ -28,6 +29,7 @@ import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class GearItem extends FactoryBlockItem {
 
@@ -36,9 +38,8 @@ public class GearItem extends FactoryBlockItem {
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
-        tooltip.add(Text.translatable("item.polyfactory.steel_gear.tooltip", Text.keybind("key.use")).formatted(Formatting.GRAY));
+    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> tooltip, TooltipType type) {
+        tooltip.accept(Text.translatable("item.polyfactory.steel_gear.tooltip", Text.keybind("key.use")).formatted(Formatting.GRAY));
     }
 
     @Nullable
