@@ -86,15 +86,6 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
-
-    @Override
-    protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        super.onStateReplaced(state, world, pos, moved);
-        if (world.getBlockEntity(pos) instanceof FunnelBlockEntity be) {
-            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, be.getFilter());
-        }
-    }
-
     @Override
     public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         var selfState = self.getBlockState();

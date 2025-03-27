@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.other;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
@@ -42,8 +43,8 @@ public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements 
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.key1 = ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("key1")).orElse(ItemStack.EMPTY);
-        this.key2 = ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("key2")).orElse(ItemStack.EMPTY);
+        this.key1 = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("key1"));
+        this.key2 = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("key2"));
         updateStack();
         super.readNbt(nbt, lookup);
     }

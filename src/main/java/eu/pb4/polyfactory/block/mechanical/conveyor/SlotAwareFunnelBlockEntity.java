@@ -29,6 +29,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.Unit;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -123,6 +124,14 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
                 this.close();
             }
             super.onTick();
+        }
+    }
+
+    @Override
+    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
+        super.onBlockReplaced(pos, oldState);
+        if (this.world != null) {
+            ItemScatterer.spawn(world, pos, this.asInventory());
         }
     }
 

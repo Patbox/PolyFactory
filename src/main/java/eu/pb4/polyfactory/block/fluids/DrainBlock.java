@@ -137,14 +137,6 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
         super.onSteppedOn(world, pos, state, entity);
     }
 
-    @Override
-    protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        if (world.getBlockEntity(pos) instanceof DrainBlockEntity be) {
-            be.onBroken(world, pos);
-        }
-        super.onStateReplaced(state, world, pos, moved);
-    }
-
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {

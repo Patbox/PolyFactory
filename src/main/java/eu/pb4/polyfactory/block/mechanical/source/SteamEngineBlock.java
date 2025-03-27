@@ -119,13 +119,6 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
     @Override
     protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
         super.onStateReplaced(state, world, pos, moved);
-        if (isCenter(state)) {
-            var be = world.getBlockEntity(pos);
-            if (be instanceof Inventory inventory) {
-                ItemScatterer.spawn(world, pos, inventory);
-            }
-        }
-
         if (getY(state) == 2) {
             NetworkComponent.Rotational.updateRotationalAt(world, pos);
         }

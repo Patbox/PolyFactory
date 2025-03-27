@@ -50,12 +50,4 @@ public class HopperBlockMixin {
             cir.setReturnValue(ActionResult.SUCCESS_SERVER);
         }
     }
-
-    @Inject(method = "onStateReplaced", at = @At("HEAD"))
-    private void polyfactory$dropFilter(BlockState state, ServerWorld world, BlockPos pos, boolean moved, CallbackInfo ci) {
-        if (world.getBlockEntity(pos) instanceof FilteredBlockEntity blockEntity) {
-            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5, blockEntity.polyfactory$getFilter());
-            blockEntity.polyfactory$setFilter(ItemStack.EMPTY);
-        }
-    }
 }

@@ -70,7 +70,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         if (nbt.contains("stack") && !nbt.contains("Items")) {
-            this.setStack(0, ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("stack")).orElse(ItemStack.EMPTY));
+            this.setStack(0, FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("stack")));
         } else {
             Inventories.readNbt(nbt, this.items, lookup);
         }

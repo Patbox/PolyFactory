@@ -55,6 +55,7 @@ public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataR
     public static final BooleanProperty STRONG = BooleanProperty.of("strong");
 
     public final List<BlockConfig<?>> blockConfigs = List.of(
+            BlockConfig.CHANNEL,
             this.facingAction,
             BlockConfig.of("redstone.strong", STRONG, ValueFormatter.text(ScreenTexts::onOrOff))
     );

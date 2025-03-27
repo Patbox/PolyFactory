@@ -51,11 +51,7 @@ public class RecordPlayerBlock extends CabledDataProviderBlock {
 
     @Override
     public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof Inventory) {
-            ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
-            world.updateComparators(pos, this);
-        }
+        world.updateComparators(pos, this);
         super.onStateReplaced(state, world, pos, moved);
     }
 

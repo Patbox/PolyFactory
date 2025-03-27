@@ -846,7 +846,10 @@ class RecipesProvider extends FabricRecipeProvider {
                         GrindingRecipe.of("pitcher_to_dye", "dye", Ingredient.ofItems(Items.PITCHER_PLANT), 1, 6, new ItemStack(Items.CYAN_DYE, 6)),
                         GrindingRecipe.of("cactus_to_dye", "dye", Ingredient.ofItems(Items.CACTUS), 1, 6, new ItemStack(Items.GREEN_DYE, 3)),
                         GrindingRecipe.of("closed_eyeblossom_to_dye", "dye", Ingredient.ofItems(Items.CLOSED_EYEBLOSSOM), 1, 6, new ItemStack(Items.GRAY_DYE, 3)),
-                        GrindingRecipe.of("open_eyeblossom_to_dye", "dye", Ingredient.ofItems(Items.OPEN_EYEBLOSSOM), 1, 6, new ItemStack(Items.ORANGE_DYE, 3))
+                        GrindingRecipe.of("open_eyeblossom_to_dye", "dye", Ingredient.ofItems(Items.OPEN_EYEBLOSSOM), 1, 6, new ItemStack(Items.ORANGE_DYE, 3)),
+                        GrindingRecipe.of("cactus_flower_to_dye", "dye", Ingredient.ofItems(Items.CACTUS_FLOWER), 1, 6, new ItemStack(Items.PINK_DYE, 3)),
+                        GrindingRecipe.of("wildflowers_to_dye", "dye", Ingredient.ofItems(Items.WILDFLOWERS), 1, 6, new ItemStack(Items.YELLOW_DYE, 3)),
+                        GrindingRecipe.of("leaf_litter_to_dye", "dye", Ingredient.ofItems(Items.LEAF_LITTER), 1, 6, OutputStack.of(Items.BROWN_DYE, 0.3f))
                 );
 
                 offerSmelting(List.of(FactoryItems.CRUSHED_RAW_IRON), RecipeCategory.MISC, Items.IRON_INGOT, 0.5F, 180, "iron_ingot");

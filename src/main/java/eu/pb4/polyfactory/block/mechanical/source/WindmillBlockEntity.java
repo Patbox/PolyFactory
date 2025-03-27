@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.other.FactoryBiomeTags;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -14,6 +15,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -51,7 +53,7 @@ public class WindmillBlockEntity extends BlockEntity {
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.sails.clear();
         for (var sail : nbt.getListOrEmpty("Sails")) {
-            this.sails.add(ItemStack.fromNbt(lookup, sail).orElse(ItemStack.EMPTY));
+            this.sails.add(FactoryUtil.fromNbtStack(lookup, sail));
         }
     }
 
@@ -141,5 +143,13 @@ public class WindmillBlockEntity extends BlockEntity {
         }
 
         modifier.provide(speed, MathHelper.clamp(speed * 0.15 * sails * 1.2, 0.5, 18), false);
+    }
+
+    @Override
+    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
+        super.onBlockReplaced(pos, oldState);
+        if (this.world != null) {
+            ItemScatterer.spawn(world, pos, this.getSails());
+        }
     }
 }

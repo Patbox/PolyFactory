@@ -28,12 +28,15 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.server.MinecraftServer;
@@ -537,6 +540,10 @@ public class FactoryUtil {
 
     public static <T extends Comparable<T>> Codec<T> propertyCodec(Property<T> property) {
         return Codec.stringResolver(property::name, x -> property.parse(x).orElse(property.getValues().getFirst()));
+    }
+
+    public static ItemStack fromNbtStack(RegistryWrapper.WrapperLookup lookup, NbtElement stack) {
+        return stack instanceof NbtCompound compound && compound.isEmpty() ? ItemStack.EMPTY : ItemStack.fromNbt(lookup, stack).orElse(ItemStack.EMPTY);
     }
 
 

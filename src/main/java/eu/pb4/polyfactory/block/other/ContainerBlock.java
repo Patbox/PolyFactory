@@ -132,17 +132,7 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
 
     @Override
     public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be) {
-            var count = be.storage.amount;
-            var max = be.getItemStack().getMaxCount();
-            while (count > 0) {
-                var stack = be.storage.variant.toStack((int) Math.min(max, count));
-                count -= stack.getCount();
-                ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
-            }
-            world.updateComparators(pos, this);
-        }
-
+        world.updateComparators(pos, this);
         super.onStateReplaced(state, world, pos, moved);
     }
 

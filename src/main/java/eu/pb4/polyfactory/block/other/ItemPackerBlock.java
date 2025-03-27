@@ -75,11 +75,7 @@ public class ItemPackerBlock extends Block implements FactoryBlock, BlockEntityP
 
     @Override
     public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        if (world.getBlockEntity(pos) instanceof ItemPackerBlockEntity be) {
-            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, be.getStack());
-            world.updateComparators(pos, this);
-        }
-
+        world.updateComparators(pos, this);
         super.onStateReplaced(state, world, pos, moved);
     }
 

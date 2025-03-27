@@ -73,12 +73,6 @@ public class DataComparatorBlock extends DoubleInputTransformerBlock {
     }
 
     @Override
-    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        super.onStateReplaced(state, world, pos,  moved);
-
-    }
-
-    @Override
     public int sendData(WorldAccess world, Direction direction, BlockPos selfPos, DataContainer data) {
         var i = super.sendData(world, direction, selfPos, data);
         if (world instanceof World w) {

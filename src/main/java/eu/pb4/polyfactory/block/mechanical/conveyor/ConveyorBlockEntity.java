@@ -226,7 +226,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        var stack = ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("HeldStack")).orElse(ItemStack.EMPTY);
+        var stack = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("HeldStack"));
         if (!stack.isEmpty()) {
             if (this.holdStack != null) {
                 this.holdStack.set(stack);

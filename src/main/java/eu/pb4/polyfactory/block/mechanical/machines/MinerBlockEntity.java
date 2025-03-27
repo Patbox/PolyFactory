@@ -79,7 +79,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.currentTool = ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("tool")).orElse(ItemStack.EMPTY);
+        this.currentTool = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("tool"));
         this.process = nbt.getDouble("progress", 0);
         if (nbt.contains("owner")) {
             this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompoundOrEmpty("owner"));

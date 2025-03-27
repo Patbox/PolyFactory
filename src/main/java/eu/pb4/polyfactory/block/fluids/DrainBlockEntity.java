@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.BlockState;
@@ -58,7 +59,7 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
         this.container.fromNbt(registryLookup, nbt, "fluid");
-        this.setCatalyst(ItemStack.fromNbt(registryLookup, nbt.getCompoundOrEmpty("catalyst")).orElse(ItemStack.EMPTY));
+        this.setCatalyst(FactoryUtil.fromNbtStack(registryLookup, nbt.getCompoundOrEmpty("catalyst")));
     }
 
     @Override
@@ -126,8 +127,12 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
         this.markDirty();
     }
 
-    public void onBroken(World world, BlockPos pos) {
-        ItemScatterer.spawn(world, pos, DefaultedList.copyOf(ItemStack.EMPTY, this.catalyst));
+    @Override
+    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
+        super.onBlockReplaced(pos, oldState);
+        if (this.world != null) {
+            ItemScatterer.spawn(world, pos, DefaultedList.copyOf(ItemStack.EMPTY, this.catalyst));
+        }
     }
 
     public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {

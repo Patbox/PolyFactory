@@ -38,6 +38,10 @@ public record GrindingRecipe(String group, Ingredient input, List<OutputStack> o
         return new RecipeEntry<>(FactoryUtil.recipeKey("grinding/" + string), new GrindingRecipe( "", ingredient, List.of(outputs), grindTime, 0, optimalSpeed));
     }
 
+    public static RecipeEntry<GrindingRecipe> of(String string, String group, Ingredient ingredient, double grindTime, double optimalSpeed, OutputStack... outputs) {
+        return new RecipeEntry<>(FactoryUtil.recipeKey("grinding/" + string), new GrindingRecipe( group, ingredient, List.of(outputs), grindTime, 0, optimalSpeed));
+    }
+
     public static RecipeEntry<GrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double optimalSpeed, ItemStack... outputs) {
         return new RecipeEntry<>(FactoryUtil.recipeKey("grinding/" + string), new GrindingRecipe( "", ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x, 1, 1)).toList(), grindTime, 0, optimalSpeed));
     }

@@ -232,7 +232,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
         this.readInventoryNbt(nbt, lookup);
         this.process = nbt.getDouble("Progress", 0);
         if (nbt.contains("DelayedOutput")) {
-            this.delayedOutput = ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("DelayedOutput")).orElse(ItemStack.EMPTY);
+            this.delayedOutput = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("DelayedOutput"));
             if (this.delayedOutput.isEmpty()) {
                 this.delayedOutput = null;
             }

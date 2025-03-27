@@ -83,7 +83,7 @@ public class RecordPlayerBlockEntity extends ChanneledDataBlockEntity implements
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
-        var newStack = ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("stack")).orElse(ItemStack.EMPTY);
+        var newStack = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("stack"));
         if (!ItemStack.areItemsAndComponentsEqual(newStack, this.stack) || newStack.isEmpty()) {
             this.stopPlaying();
         }

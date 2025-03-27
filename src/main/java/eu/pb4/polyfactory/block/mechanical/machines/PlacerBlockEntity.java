@@ -72,7 +72,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.stack = ItemStack.fromNbt(lookup, nbt.getCompoundOrEmpty("tool")).orElse(ItemStack.EMPTY);
+        this.stack = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("tool"));
         this.process = nbt.getDouble("progress", 0);
         if (nbt.contains("owner")) {
             this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompoundOrEmpty("owner"));

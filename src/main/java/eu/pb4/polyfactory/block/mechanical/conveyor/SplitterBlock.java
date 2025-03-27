@@ -172,17 +172,6 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
     }
 
     @Override
-    protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        super.onStateReplaced(state, world, pos, moved);
-
-        if (world.getBlockEntity(pos) instanceof SplitterBlockEntity be) {
-            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, be.getFilterRight());
-            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, be.getFilterLeft());
-        }
-    }
-
-
-    @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player,  BlockHitResult hit) {
         var be = world.getBlockEntity(pos);
         var hand = Hand.MAIN_HAND;

@@ -427,13 +427,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
     @Override
     protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
         super.onStateReplaced(state, world, pos, moved);
-
-        BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof Inventory) {
-            ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
-            world.updateComparators(pos, this);
-        }
-
+        world.updateComparators(pos, this);
     }
 
     @Override

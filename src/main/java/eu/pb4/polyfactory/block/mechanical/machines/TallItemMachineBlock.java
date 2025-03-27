@@ -124,11 +124,7 @@ public abstract class TallItemMachineBlock extends RotationalNetworkBlock implem
     protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
         super.onStateReplaced(state, world, pos, moved);
         if (state.get(PART) == Part.MAIN) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof Inventory) {
-                ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
-                world.updateComparators(pos, this);
-            }
+            world.updateComparators(pos, this);
         }
     }
 

@@ -103,15 +103,6 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        super.onStateReplaced(state, world, pos, moved);
-
-        if (world.getBlockEntity(pos) instanceof WindmillBlockEntity be) {
-            ItemScatterer.spawn(world, pos, be.getSails());
-        }
-    }
-
-    @Override
     public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
         return List.of(new FunctionalDirectionNode(state.get(FACING)));
     }

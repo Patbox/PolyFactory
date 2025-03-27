@@ -140,12 +140,7 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
 
     @Override
     public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof Inventory) {
-            ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
-        }
         world.updateComparators(pos, this);
-
     }
 
     @Nullable
