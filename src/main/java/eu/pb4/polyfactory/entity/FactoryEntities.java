@@ -14,7 +14,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 
 public class FactoryEntities {
-    public static final EntityType<DynamiteEntity> DYNAMITE = register("dynamite", EntityType.Builder.create(DynamiteEntity::new, SpawnGroup.MISC)
+    public static final EntityType<DynamiteEntity> DYNAMITE = register("dynamite", EntityType.Builder.<DynamiteEntity>create(DynamiteEntity::new, SpawnGroup.MISC)
             .dimensions(0.25f, 0.25f));
 
     public static final EntityType<WaterSplashEntity> WATER_SPLASH = register("water_splash", createSplash(WaterSplashEntity::new));
