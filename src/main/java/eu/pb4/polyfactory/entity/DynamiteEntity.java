@@ -3,6 +3,8 @@ package eu.pb4.polyfactory.entity;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
@@ -23,6 +25,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -40,13 +43,18 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
         super(type, world);
     }
 
-    public static void spawn(Vec3d vector, Position pos, World world, ItemStack stack) {
-        var entity = create(vector, pos, world, stack);
+    public DynamiteEntity(World world, @Nullable LivingEntity igniter) {
+        this(FactoryEntities.DYNAMITE, world);
+        this.setOwner(igniter);
+    }
+
+    public static void spawn(Vec3d vector, Position pos, World world, ItemStack stack, @Nullable LivingEntity igniter) {
+        var entity = create(vector, pos, world, stack, igniter);
         world.spawnEntity(entity);
     }
 
-    public static DynamiteEntity create(Vec3d vector, Position pos, World world, ItemStack stack) {
-        var entity = new DynamiteEntity(FactoryEntities.DYNAMITE, world);
+    public static DynamiteEntity create(Vec3d vector, Position pos, World world, ItemStack stack, @Nullable LivingEntity igniter) {
+        var entity = new DynamiteEntity(world, igniter);
         entity.setItemStack(stack);
         entity.setPosition(new Vec3d(pos.getX(), pos.getY(), pos.getZ()));
         entity.setVelocity(vector);

@@ -28,7 +28,7 @@ public class DynamiteItem extends SimplePolymerItem implements ProjectileItem {
     public ActionResult use(World world, PlayerEntity user, Hand hand) {
         var stack = user.getStackInHand(hand);
 
-        DynamiteEntity.spawn(user.getRotationVector(), user.getEyePos(), world, stack.copyWithCount(1));
+        DynamiteEntity.spawn(user.getRotationVector(), user.getEyePos(), world, stack.copyWithCount(1), user);
 
         world.playSound(null, user.getX(), user.getEyeY(), user.getZ(), FactorySoundEvents.ENTITY_DYNAMITE_THROW, user.getSoundCategory(), 0.5F,
                 0.4F / (world.getRandom().nextFloat() * 0.4F + 1F));
@@ -43,6 +43,6 @@ public class DynamiteItem extends SimplePolymerItem implements ProjectileItem {
 
     @Override
     public ProjectileEntity createEntity(World world, Position pos, ItemStack stack, Direction direction) {
-        return DynamiteEntity.create(Vec3d.of(direction.getVector()), pos, world, stack.copyWithCount(1));
+        return DynamiteEntity.create(Vec3d.of(direction.getVector()), pos, world, stack.copyWithCount(1), null);
     }
 }
