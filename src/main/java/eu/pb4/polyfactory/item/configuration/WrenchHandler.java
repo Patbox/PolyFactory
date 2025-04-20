@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.item.configuration;
 
 import com.mojang.serialization.JavaOps;
+import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
@@ -106,41 +107,43 @@ public class WrenchHandler {
                         Text.empty()/*.append(this.state.getBlock().getName())
                                 .setStyle(Style.EMPTY.withColor(Formatting.YELLOW).withBold(false))*/)
                         .setStyle(Style.EMPTY.withColor(Formatting.GOLD).withBold(true)));
-                this.sidebar.set((b) -> {
-                    int size = Math.min(this.actions.size(), 15);
-                    for (var i = 0; i < size; i++) {
-                        var action = this.actions.get(i);
+                try {
+                    this.sidebar.set((b) -> {
+                        int size = Math.min(this.actions.size(), 15);
+                        for (var i = 0; i < size; i++) {
+                            var action = this.actions.get(i);
 
-                        var t = Text.empty();
+                            var t = Text.empty();
 
-                        if (isWrench) {
-                            if ((selected == null && i == 0) || action.id().equals(selected)) {
-                                t.append(Text.literal(String.valueOf(GuiTextures.SPACE_1)).setStyle(UiResourceCreator.STYLE));
-                                t.append(Text.literal("» ").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+                            if (isWrench) {
+                                if ((selected == null && i == 0) || action.id().equals(selected)) {
+                                    t.append(Text.literal(String.valueOf(GuiTextures.SPACE_1)).setStyle(UiResourceCreator.STYLE));
+                                    t.append(Text.literal("» ").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+                                } else {
+                                    t.append("   ");
+                                }
+                            }
+
+                            t.append(action.name()).append(": ");
+
+                            var value = action.value().getValue(player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
+                            //noinspection unchecked
+                            var valueFrom = ((ValueFormatter<Object>) action.formatter()).getDisplayValue(value, player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
+
+                            if (isWrench) {
+                                b.add(t, Text.empty().append(valueFrom).formatted(Formatting.YELLOW));
+                            } else if (diffMap.containsKey(action.id()) && !Objects.equals(diffMap.get(action.id()), value)) {
+                                //noinspection unchecked
+                                var diff = ((ValueFormatter<Object>) action.formatter()).getDisplayValue(diffMap.get(action.id()), player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
+                                b.add(t, Text.empty().append(valueFrom).append(Text.literal(" -> ").formatted(Formatting.GOLD)).append(diff).formatted(Formatting.YELLOW));
                             } else {
-                                t.append("   ");
+                                b.add(t.formatted(Formatting.GRAY), Text.empty().append(valueFrom).formatted(Formatting.GRAY));
                             }
                         }
-
-                        t.append(action.name()).append(": ");
-
-                        var value = action.value().getValue(player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
-                        //noinspection unchecked
-                        var valueFrom = ((ValueFormatter<Object>) action.formatter()).getDisplayValue(value, player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
-
-                        if (isWrench) {
-                            b.add(t, Text.empty().append(valueFrom).formatted(Formatting.YELLOW));
-                        } else if (diffMap.containsKey(action.id()) && !Objects.equals(diffMap.get(action.id()), value)) {
-                            //noinspection unchecked
-                            var diff = ((ValueFormatter<Object>) action.formatter()).getDisplayValue(diffMap.get(action.id()), player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
-                            b.add(t, Text.empty().append(valueFrom).append(Text.literal(" -> ").formatted(Formatting.GOLD)).append(diff).formatted(Formatting.YELLOW));
-                        } else {
-
-
-                            b.add(t.formatted(Formatting.GRAY), Text.empty().append(valueFrom).formatted(Formatting.GRAY));
-                        }
-                    }
-                });
+                    });
+                } catch (Throwable e) {
+                    ModInit.LOGGER.error("Failed to create wrench display!", e);
+                }
                 this.sidebar.show();
             } else {
                 this.actions = List.of();
