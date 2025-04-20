@@ -152,6 +152,12 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
             return;
         }
 
+        if (self.currentRecipe == null && !self.itemsDirty) {
+            self.state = INCORRECT_ITEMS_TEXT;
+            self.active = false;
+            return;
+        }
+
         var input = self.recipeInputProvider.createRecipeInput();
         if (self.currentRecipe == null || (self.itemsDirty && !self.currentRecipe.value().matches(input, world))) {
             self.process = 0;
