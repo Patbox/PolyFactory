@@ -30,7 +30,7 @@ public class ColorableBlockEntity extends BlockEntity implements BlockEntityExtr
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
-        setColor(nbt.getInt("color"));
+        setColor(nbt.getInt("color", 0));
     }
 
     @Override

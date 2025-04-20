@@ -221,8 +221,8 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.writeInventoryNbt(nbt, lookup);
         nbt.putDouble("Progress", this.process);
-        if (this.delayedOutput != null) {
-            nbt.put("DelayedOutput", this.delayedOutput.toNbtAllowEmpty(lookup));
+        if (this.delayedOutput != null && !this.delayedOutput.isEmpty()) {
+            nbt.put("DelayedOutput", this.delayedOutput.toNbt(lookup));
         }
         super.writeNbt(nbt, lookup);
     }
@@ -230,9 +230,9 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.readInventoryNbt(nbt, lookup);
-        this.process = nbt.getDouble("Progress");
-        if (nbt.contains("DelayedOutput", NbtElement.COMPOUND_TYPE)) {
-            this.delayedOutput = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("DelayedOutput"));
+        this.process = nbt.getDouble("Progress", 0);
+        if (nbt.contains("DelayedOutput")) {
+            this.delayedOutput = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("DelayedOutput"));
             if (this.delayedOutput.isEmpty()) {
                 this.delayedOutput = null;
             }

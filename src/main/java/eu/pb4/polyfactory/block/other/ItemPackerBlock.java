@@ -19,7 +19,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -74,15 +74,9 @@ public class ItemPackerBlock extends Block implements FactoryBlock, BlockEntityP
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock())) {
-            if (world.getBlockEntity(pos) instanceof ItemPackerBlockEntity be) {
-                ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, be.getStack());
-                world.updateComparators(pos, this);
-            }
-        }
-        super.onStateReplaced(state, world, pos, newState, moved);
-
+    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
+        world.updateComparators(pos, this);
+        super.onStateReplaced(state, world, pos, moved);
     }
 
     @Override
@@ -155,7 +149,7 @@ public class ItemPackerBlock extends Block implements FactoryBlock, BlockEntityP
 
             this.itemElement = ItemDisplayElementUtil.createSimple();
             this.itemElement.setDisplaySize(1, 1);
-            this.itemElement.setModelTransformation(ModelTransformationMode.NONE);
+            this.itemElement.setItemDisplayContext(ItemDisplayContext.NONE);
             this.itemElement.setViewRange(0.4f);
 
             //this.countElement.setShadow(true);

@@ -171,7 +171,7 @@ public abstract class Schema1460Mixin extends Schema {
         return "polyfactory:" + path;
     }
 
-    @ModifyArg(method = "method_5259", at = @At(value = "INVOKE", target = "Lcom/mojang/datafixers/DSL;optionalFields([Lcom/mojang/datafixers/util/Pair;)Lcom/mojang/datafixers/types/templates/TypeTemplate;"))
+    /*@ModifyArg(method = "method_5259", at = @At(value = "INVOKE", target = "Lcom/mojang/datafixers/DSL;optionalFields([Lcom/mojang/datafixers/util/Pair;)Lcom/mojang/datafixers/types/templates/TypeTemplate;"))
     private static Pair<String, TypeTemplate>[] addCustomComponents(Pair<String, TypeTemplate>[] components,
                                                                     @Local(argsOnly = true) Schema schema) {
         var list = new ArrayList<>(List.of(components));
@@ -181,5 +181,5 @@ public abstract class Schema1460Mixin extends Schema {
         list.add(Pair.of("key1", TypeReferences.ITEM_STACK.in(schema)));
         list.add(Pair.of("key2", TypeReferences.ITEM_STACK.in(schema)));
         return list.toArray(components);
-    }
+    }*/ // Todo
 }

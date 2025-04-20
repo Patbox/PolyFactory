@@ -121,28 +121,20 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
     public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
         if (world.getBlockEntity(pos) instanceof DrainBlockEntity be) {
             if (entity instanceof ExperienceOrbEntity xp && be.catalyst().isIn(FactoryItemTags.XP_CONVERSION_CATALYST)) {
-                var amount = xp.getExperienceAmount();
+                var amount = xp.getValue();
 
                 if (be.getFluidContainer().canInsert(FactoryFluids.EXPERIENCE.defaultInstance(), FluidBehaviours.EXPERIENCE_ORB_TO_FLUID, true)) {
                     be.getFluidContainer().insert(FactoryFluids.EXPERIENCE.defaultInstance(), FluidBehaviours.EXPERIENCE_ORB_TO_FLUID, false);
                     if (amount - 1 <= 0) {
                         xp.discard();
                     } else {
-                        ((ExperienceOrbEntityAccessor) xp).setAmount(amount - 1);
+                        ((ExperienceOrbEntityAccessor) xp).callSetValue(amount - 1);
                     }
                 }
             }
         }
 
         super.onSteppedOn(world, pos, state, entity);
-    }
-
-    @Override
-    protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof DrainBlockEntity be) {
-            be.onBroken(world, pos);
-        }
-        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @Nullable

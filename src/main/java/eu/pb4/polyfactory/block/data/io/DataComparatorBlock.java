@@ -62,13 +62,13 @@ public class DataComparatorBlock extends DoubleInputTransformerBlock {
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        super.onStateReplaced(state, world, pos, newState, moved);
-        if (state.isOf(newState.getBlock()) && (state.get(OPERATION) != newState.get(OPERATION))
+    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        super.onBlockAdded(state, world, pos, oldState, notify);
+        if (state.isOf(oldState.getBlock()) && (state.get(OPERATION) != oldState.get(OPERATION))
                 && world instanceof ServerWorld serverWorld && world.getBlockEntity(pos) instanceof DoubleInputTransformerBlockEntity be) {
-            sendData(world, newState.get(FACING_OUTPUT), pos, this.transformData(be.lastInput1(), be.lastInput2(), serverWorld, pos, newState, be));
+            sendData(world, state.get(FACING_OUTPUT), pos, this.transformData(be.lastInput1(), be.lastInput2(), serverWorld, pos, state, be));
         } else {
-            world.updateNeighborsAlways(pos, this);
+            world.updateNeighborsAlways(pos, this, null);
         }
     }
 
@@ -76,7 +76,7 @@ public class DataComparatorBlock extends DoubleInputTransformerBlock {
     public int sendData(WorldAccess world, Direction direction, BlockPos selfPos, DataContainer data) {
         var i = super.sendData(world, direction, selfPos, data);
         if (world instanceof World w) {
-            w.updateNeighborsAlways(selfPos, this);
+            w.updateNeighborsAlways(selfPos, this, null);
         }
         return i;
     }

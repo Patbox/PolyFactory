@@ -54,15 +54,17 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
-        this.stack = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("stack"));
-        this.page = nbt.getInt("page");
+        this.stack = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("stack"));
+        this.page = nbt.getInt("page", 0);
         forceUpdate();
     }
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.writeNbt(nbt, lookup);
-        nbt.put("stack", this.stack.toNbtAllowEmpty(lookup));
+        if (!this.stack.isEmpty()) {
+            nbt.put("stack", this.stack.toNbt(lookup));
+        }
         nbt.putInt("page", this.page);
     }
 

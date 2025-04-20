@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.mixin.machines;
 import eu.pb4.polyfactory.block.other.CustomBlockEntityCalls;
 import eu.pb4.polyfactory.block.other.FilteredBlockEntity;
 import eu.pb4.polyfactory.models.HopperModel;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
 import net.minecraft.block.BlockState;
@@ -41,12 +42,14 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
 
     @Inject(method = "writeNbt", at = @At("TAIL"))
     private void writeFilterNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
-        nbt.put("polydex:filter", this.filterStack.toNbtAllowEmpty(registryLookup));
+        if (!this.filterStack.isEmpty()) {
+            nbt.put("polydex:filter", this.filterStack.toNbt(registryLookup));
+        }
     }
 
     @Inject(method = "readNbt", at = @At("TAIL"))
     private void readFilterNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
-        polyfactory$setFilter(ItemStack.fromNbtOrEmpty(registryLookup, nbt.getCompound("polydex:filter")));
+        polyfactory$setFilter(FactoryUtil.fromNbtStack(registryLookup, nbt.getCompoundOrEmpty("polydex:filter")));
     }
 
     @Inject(method = "transfer(Lnet/minecraft/inventory/Inventory;Lnet/minecraft/inventory/Inventory;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/math/Direction;)Lnet/minecraft/item/ItemStack;", at = @At("HEAD"), cancellable = true)

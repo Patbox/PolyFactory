@@ -29,6 +29,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -65,13 +66,15 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.writeNbt(nbt, lookup);
-        nbt.put("item", this.itemStack.toNbtAllowEmpty(lookup));
+        if (!this.itemStack.isEmpty()) {
+            nbt.put("item", this.itemStack.toNbt(lookup));
+        }
     }
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
-        setStack(ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("item")));
+        setStack(FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("item")));
     }
 
     @Override
@@ -184,6 +187,14 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     private void runAdvancement() {
         if (this.world != null && FactoryUtil.getClosestPlayer(this.world, this.pos, 16) instanceof ServerPlayerEntity player) {
             TriggerCriterion.trigger(player, FactoryTriggers.ITEM_PACKER_ACCESSES);
+        }
+    }
+
+    @Override
+    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
+        super.onBlockReplaced(pos, oldState);
+        if (this.world != null) {
+            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, this.getStack());
         }
     }
 

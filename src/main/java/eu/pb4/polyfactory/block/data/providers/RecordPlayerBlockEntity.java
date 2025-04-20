@@ -73,7 +73,7 @@ public class RecordPlayerBlockEntity extends ChanneledDataBlockEntity implements
         var song = stack.get(DataComponentTypes.JUKEBOX_PLAYABLE);
         this.stopPlaying();
         if (song != null) {
-            this.startPlaying(song.song().getEntry(this.world.getRegistryManager()).get());
+            this.startPlaying(song.song().resolveEntry(this.world.getRegistryManager()).get());
         } else {
             DataProvider.sendData(this.world, pos, CapacityData.ZERO);
         }
@@ -83,19 +83,19 @@ public class RecordPlayerBlockEntity extends ChanneledDataBlockEntity implements
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
-        var newStack = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("stack"));
+        var newStack = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("stack"));
         if (!ItemStack.areItemsAndComponentsEqual(newStack, this.stack) || newStack.isEmpty()) {
             this.stopPlaying();
         }
         this.stack = newStack;
 
-        if (nbt.contains("ticks_since_song_started", NbtElement.NUMBER_TYPE)) {
+        if (nbt.contains("ticks_since_song_started")) {
             JukeboxSong.getSongEntryFromStack(lookup, this.stack).ifPresent((song) -> {
-                this.setValues(song, nbt.getLong("ticks_since_song_started"));
+                this.setValues(song, nbt.getLong("ticks_since_song_started", 0));
             });
         }
-        if (nbt.contains("volume", NbtElement.NUMBER_TYPE)) {
-            this.volume = nbt.getFloat("volume");
+        if (nbt.contains("volume")) {
+            this.volume = nbt.getFloat("volume", 0);
         } else {
             this.volume = 1;
         }
@@ -104,7 +104,9 @@ public class RecordPlayerBlockEntity extends ChanneledDataBlockEntity implements
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.writeNbt(nbt, lookup);
-        nbt.put("stack", this.stack.toNbtAllowEmpty(lookup));
+        if (!this.stack.isEmpty()) {
+            nbt.put("stack", this.stack.toNbt(lookup));
+        }
         if (this.song != null) {
             nbt.putLong("ticks_since_song_started", this.ticksSinceSongStarted);
         }

@@ -9,6 +9,8 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentsAccess;
+import net.minecraft.component.ComponentsAccess;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
@@ -40,14 +42,14 @@ public class DataMemoryBlockEntity extends LockableBlockEntity implements DataCa
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
         if (nbt.contains("channel")) {
-            this.channelInput = this.channelOutput = nbt.getInt("channel");
+            this.channelInput = this.channelOutput = nbt.getInt("channel", 0);
         } else {
-            this.channelInput = nbt.getInt("input_channel");
-            this.channelOutput = nbt.getInt("output_channel");
+            this.channelInput = nbt.getInt("input_channel", 0);
+            this.channelOutput = nbt.getInt("output_channel", 0);
         }
 
         if (nbt.contains("data")) {
-            this.data = DataContainer.fromNbt(nbt.getCompound("data"), lookup);
+            this.data = DataContainer.fromNbt(nbt.getCompoundOrEmpty("data"), lookup);
         }
     }
 

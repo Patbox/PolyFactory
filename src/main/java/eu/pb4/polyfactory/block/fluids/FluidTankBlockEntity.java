@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentsAccess;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
@@ -60,6 +61,7 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
             this.postInitialRead = true;
         }
     }
+
     @Override
     protected void readComponents(ComponentsAccess components) {
         super.readComponents(components);

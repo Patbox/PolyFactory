@@ -24,6 +24,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.OperatorBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentsAccess;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -63,7 +64,9 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("tool", this.currentTool.toNbtAllowEmpty(lookup));
+        if (!this.currentTool.isEmpty()) {
+            nbt.put("tool", this.currentTool.toNbt(lookup));
+        }
         nbt.putDouble("progress", this.process);
         nbt.put("block_state", NbtHelper.fromBlockState(this.targetState));
         if (this.owner != null) {
@@ -76,15 +79,15 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.currentTool = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("tool"));
-        this.process = nbt.getDouble("progress");
+        this.currentTool = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("tool"));
+        this.process = nbt.getDouble("progress", 0);
         if (nbt.contains("owner")) {
-            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompound("owner"));
+            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompoundOrEmpty("owner"));
         }
-        this.targetState = NbtHelper.toBlockState(Registries.BLOCK, nbt.getCompound("block_state"));
-        this.lastAttackedTicks = nbt.getFloat("last_attacked_ticks");
+        this.targetState = NbtHelper.toBlockState(Registries.BLOCK, nbt.getCompoundOrEmpty("block_state"));
+        this.lastAttackedTicks = nbt.getFloat("last_attacked_ticks", -1);
         if (nbt.contains("reach")) {
-            this.reach = nbt.getInt("reach");
+            this.reach = nbt.getInt("reach", 2);
         } else {
             this.reach = 1;
         }
@@ -251,7 +254,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
 
         var player = self.getFakePlayer();
 
-        if (self.currentTool.isEmpty() || !self.currentTool.getItem().canMine(stateFront, world, blockPos, player)) {
+        if (self.currentTool.isEmpty() || !self.currentTool.getItem().canMine(self.currentTool, stateFront, world, blockPos, player)) {
             self.stress = 0;
             return;
         }

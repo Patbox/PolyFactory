@@ -101,7 +101,7 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
                 continue;
             }
 
-            for (var stack : player.getInventory().main) {
+            for (var stack : player.getInventory().getMainStacks()) {
                 if (filter.test(stack)) {
                     int count = 1;
                     for (int a = 0; a < i; a++) {

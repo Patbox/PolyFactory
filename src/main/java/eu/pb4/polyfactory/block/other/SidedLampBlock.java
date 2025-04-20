@@ -56,6 +56,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
@@ -192,12 +193,12 @@ public abstract class SidedLampBlock extends Block implements FactoryBlock, Bloc
     }
 
     public static final class Flat extends SidedLampBlock implements PolymerTexturedBlock {
-        private static final EnumMap<Direction, BlockState> STATES_REGULAR = Util.mapEnum(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
+        private static final Map<Direction, BlockState> STATES_REGULAR = Util.mapEnum(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
             case UP -> "BOTTOM";
             case DOWN -> "TOP";
             default -> x.asString().toUpperCase(Locale.ROOT);
         } + "_TRAPDOOR")));
-        private static final EnumMap<Direction, BlockState> STATES_WATERLOGGED = Util.mapEnum(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
+        private static final Map<Direction, BlockState> STATES_WATERLOGGED = Util.mapEnum(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
             case UP -> "BOTTOM";
             case DOWN -> "TOP";
             default -> x.asString().toUpperCase(Locale.ROOT);

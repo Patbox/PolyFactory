@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.util.movingitem;
 
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -99,11 +100,11 @@ public class SimpleContainer implements ContainerHolder {
     }
 
     public NbtElement writeNbt(RegistryWrapper.WrapperLookup lookup) {
-        return this.movingItem == null ? new NbtCompound() : this.movingItem.get().toNbtAllowEmpty(lookup);
+        return this.movingItem == null || this.movingItem.get().isEmpty() ? new NbtCompound() : this.movingItem.get().toNbt(lookup);
     }
 
     public void readNbt(NbtCompound compound, RegistryWrapper.WrapperLookup lookup) {
-        var itemStack = ItemStack.fromNbtOrEmpty(lookup, compound);
+        var itemStack = FactoryUtil.fromNbtStack(lookup, compound);
 
         if (itemStack == ItemStack.EMPTY) {
             clearContainer();

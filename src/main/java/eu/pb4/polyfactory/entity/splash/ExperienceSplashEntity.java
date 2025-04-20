@@ -30,7 +30,7 @@ public class ExperienceSplashEntity extends SplashEntity<Unit> {
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        this.amount = nbt.getInt("xp");
+        this.amount = nbt.getInt("xp", 1);
     }
 
     @Override

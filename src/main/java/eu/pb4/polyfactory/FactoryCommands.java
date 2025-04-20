@@ -16,6 +16,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +54,7 @@ public class FactoryCommands {
         var url = "https://modded.wiki/w/Mod:PolyFactory";
         context.getSource().sendMessage(Text.translatable("text.polyfactory.wiki_link",
                 Text.literal(url)
-                        .setStyle(Style.EMPTY.withUnderline(true).withColor(Formatting.BLUE).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url)))
+                        .setStyle(Style.EMPTY.withUnderline(true).withColor(Formatting.BLUE).withClickEvent(new ClickEvent.OpenUrl(URI.create(url))))
         ).setStyle(Style.EMPTY.withColor(Formatting.YELLOW)));
         return 0;
     }

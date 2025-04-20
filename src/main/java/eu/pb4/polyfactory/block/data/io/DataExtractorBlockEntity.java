@@ -9,8 +9,10 @@ import eu.pb4.polyfactory.data.DataType;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
+import it.unimi.dsi.fastutil.objects.ReferenceSortedSets;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -49,7 +51,7 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         super.readNbt(nbt, lookup);
-        this.field = nbt.getString("field");
+        this.field = nbt.getString("field", "");
     }
 
     public void setField(String field) {
@@ -87,7 +89,7 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
             super.onInput(input);
             this.updateDone();
             if (this.screenHandler != null) {
-                this.screenHandler.setPreviousTrackedSlot(2, ItemStack.EMPTY);
+                this.screenHandler.setReceivedStack(2, ItemStack.EMPTY);
             }
 
         }
@@ -157,7 +159,7 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
             }
             var itemStack = GuiTextures.EMPTY.getItemStack().copy();
             itemStack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(input));
-            itemStack.set(DataComponentTypes.HIDE_TOOLTIP, Unit.INSTANCE);
+            itemStack.set(DataComponentTypes.TOOLTIP_DISPLAY, new TooltipDisplayComponent(true, ReferenceSortedSets.emptySet()));
             this.setSlot(0, itemStack, Objects.requireNonNull(this.getSlot(0)).getGuiCallback());
         }
 

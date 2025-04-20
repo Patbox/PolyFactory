@@ -5,6 +5,7 @@ import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -22,6 +23,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class BrittlePotionItem extends Item implements PolymerItem {
     public BrittlePotionItem(Settings settings) {
@@ -39,14 +41,6 @@ public class BrittlePotionItem extends Item implements PolymerItem {
     public Text getName(ItemStack stack) {
         return Text.translatable(this.getTranslationKey(),
                 stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT).getName(Items.POTION.getTranslationKey() + ".effect."));
-    }
-
-    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType type) {
-        PotionContentsComponent potionContentsComponent = stack.get(DataComponentTypes.POTION_CONTENTS);
-        if (potionContentsComponent != null) {
-            Objects.requireNonNull(tooltip);
-            potionContentsComponent.buildTooltip(tooltip::add, 1.0F, context.getUpdateTickRate());
-        }
     }
 
     @Override

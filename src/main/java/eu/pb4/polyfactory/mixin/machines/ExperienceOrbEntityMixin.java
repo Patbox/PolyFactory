@@ -1,7 +1,5 @@
 package eu.pb4.polyfactory.mixin.machines;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import eu.pb4.polyfactory.block.fluids.DrainBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import net.minecraft.entity.Entity;
@@ -67,8 +65,10 @@ public abstract class ExperienceOrbEntityMixin extends Entity {
         this.drainTarget = null;
     }
 
-    @WrapOperation(method = "expensiveUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getClosestPlayer(Lnet/minecraft/entity/Entity;D)Lnet/minecraft/entity/player/PlayerEntity;"))
-    private PlayerEntity skipPlayerIfTargetIsSet(World instance, Entity entity, double v, Operation<PlayerEntity> original) {
-        return this.drainTarget == null ? original.call(instance, entity, v) : null;
+    @Inject(method = "moveTowardsPlayer", at = @At("HEAD"), cancellable = true)
+    private void skipPlayerIfTargetIsSet(CallbackInfo ci) {
+        if (this.drainTarget != null) {
+            ci.cancel();
+        }
     }
 }

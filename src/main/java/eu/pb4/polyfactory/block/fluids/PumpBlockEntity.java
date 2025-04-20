@@ -28,7 +28,7 @@ public class PumpBlockEntity extends PipeLikeBlockEntity {
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        this.speed = nbt.getDouble("speed");
+        this.speed = nbt.getDouble("speed", 0);
     }
 
     @Override

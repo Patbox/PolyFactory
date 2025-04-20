@@ -89,8 +89,8 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         Inventories.readNbt(nbt, this.stacks, lookup);
-        this.process = nbt.getDouble("progress");
-        this.lockedSlots = BitSet.valueOf(nbt.getByteArray("locked_slots"));
+        this.process = nbt.getDouble("progress", 0);
+        this.lockedSlots = nbt.getByteArray("locked_slots").map(BitSet::valueOf).orElseGet(() -> new BitSet(9));
         if (nbt.contains("active_mode")) {
             this.activeMode = ActiveMode.CODEC.decode(NbtOps.INSTANCE, nbt.get("active_mode"))
                     .result().map(Pair::getFirst).orElse(ActiveMode.FILLED);

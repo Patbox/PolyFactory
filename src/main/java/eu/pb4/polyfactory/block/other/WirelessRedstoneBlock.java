@@ -34,7 +34,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -243,12 +243,12 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
 
             this.key1 = ItemDisplayElementUtil.createSimple();
             this.key1.setDisplaySize(1, 1);
-            this.key1.setModelTransformation(ModelTransformationMode.GUI);
+            this.key1.setItemDisplayContext(ItemDisplayContext.GUI);
             this.key1.setViewRange(0.3f);
 
             this.key2 = LodItemDisplayElement.createSimple();
             this.key2.setDisplaySize(1, 1);
-            this.key2.setModelTransformation(ModelTransformationMode.GUI);
+            this.key2.setItemDisplayContext(ItemDisplayContext.GUI);
             this.key2.setViewRange(0.3f);
 
             this.key1.setScale(new Vector3f(4 / 16f, 4 / 16f, 0.01f));

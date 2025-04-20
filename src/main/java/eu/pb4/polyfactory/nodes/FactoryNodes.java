@@ -68,18 +68,22 @@ public class FactoryNodes {
             }
             return List.of();
         });
-        addSimpleNodes(universe);
-        universe.addNodeType(ChannelProviderDirectionNode.TYPE);
-        universe.addNodeType(ChannelReceiverDirectionNode.TYPE);
-        universe.addNodeType(ChannelReceiverSelectiveSideNode.TYPE);
-        universe.addNodeType(ChannelProviderSelectiveSideNode.TYPE);
-        universe.addNodeType(SpeakerNode.TYPE);
+        addCommonCableNodes(universe);
         universe.addCacheCategory(SpeakerNode.CACHE);
 
         universe.addGraphEntityType(DataStorage.TYPE);
 
         universe.register();
         return universe;
+    }
+
+    private static void addCommonCableNodes(GraphUniverse universe) {
+        addSimpleNodes(universe);
+        universe.addNodeType(ChannelProviderDirectionNode.TYPE);
+        universe.addNodeType(ChannelReceiverDirectionNode.TYPE);
+        universe.addNodeType(ChannelReceiverSelectiveSideNode.TYPE);
+        universe.addNodeType(ChannelProviderSelectiveSideNode.TYPE);
+        universe.addNodeType(SpeakerNode.TYPE);
     }
 
     private static GraphUniverse registerPipe() {
@@ -113,7 +117,7 @@ public class FactoryNodes {
             return List.of();
         });
 
-        addSimpleNodes(universe);
+        addCommonCableNodes(universe);
         universe.addGraphEntityType(EnergyData.TYPE);
         universe.register();
         return universe;

@@ -14,7 +14,7 @@ public interface InventorySimpleContainerProvider extends InventoryContainerHold
     }
 
     default void readInventoryNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        SimpleContainer.readArray(this.getContainers(), nbt.getList("Items", NbtElement.COMPOUND_TYPE), lookup);
+        SimpleContainer.readArray(this.getContainers(), nbt.getListOrEmpty("Items"), lookup);
     }
 
     default void writeInventoryNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {

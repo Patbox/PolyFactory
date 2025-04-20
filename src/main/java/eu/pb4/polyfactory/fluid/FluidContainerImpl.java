@@ -176,19 +176,20 @@ public class FluidContainerImpl implements FluidContainer {
     }
 
     public void fromNbt(RegistryWrapper.WrapperLookup lookup, NbtCompound base, String fluidKey) {
-        var nbt = base.getList(fluidKey, NbtElement.COMPOUND_TYPE);
+        var nbt = base.getListOrEmpty(fluidKey);
         var ops = lookup.getOps(NbtOps.INSTANCE);
         this.storedFluids.clear();
         this.fluids.clear();
         this.stored = 0;
         for (var t : nbt) {
-            var cp = (NbtCompound) t;
-            var type = FluidInstance.MAP_CODEC.decode(ops, ops.getMap(cp).getOrThrow()).getOrThrow();
+            if (t instanceof NbtCompound cp) {
+                var type = FluidInstance.MAP_CODEC.decode(ops, ops.getMap(cp).getOrThrow()).getOrThrow();
 
-            var value = cp.getLong("amount");
-            if (value != 0) {
-                this.storedFluids.put(type, value);
-                this.stored += value;
+                var value = cp.getLong("amount", 0);
+                if (value != 0) {
+                    this.storedFluids.put(type, value);
+                    this.stored += value;
+                }
             }
         }
         this.updateTemperature();

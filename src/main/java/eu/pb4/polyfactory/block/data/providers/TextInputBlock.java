@@ -6,9 +6,11 @@ import eu.pb4.polyfactory.data.BasicDataType;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
+import it.unimi.dsi.fastutil.objects.ReferenceSortedSets;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenTexts;
@@ -76,7 +78,7 @@ public class TextInputBlock extends CabledDataProviderBlock {
             super.onInput(input);
             this.updateDone();
             if (this.screenHandler != null) {
-                this.screenHandler.setPreviousTrackedSlot(2, ItemStack.EMPTY);
+                this.screenHandler.setReceivedStack(2, ItemStack.EMPTY);
             }
         }
 
@@ -101,7 +103,7 @@ public class TextInputBlock extends CabledDataProviderBlock {
             }
             var itemStack = GuiTextures.EMPTY.getItemStack().copy();
             itemStack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(input));
-            itemStack.set(DataComponentTypes.HIDE_TOOLTIP, Unit.INSTANCE);
+            itemStack.set(DataComponentTypes.TOOLTIP_DISPLAY, new TooltipDisplayComponent(true, ReferenceSortedSets.emptySet()));
             this.setSlot(0, itemStack, Objects.requireNonNull(this.getSlot(0)).getGuiCallback());
         }
 

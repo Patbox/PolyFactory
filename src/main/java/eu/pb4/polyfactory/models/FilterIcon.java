@@ -5,7 +5,7 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.item.ItemDisplayContext;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 
@@ -93,7 +93,7 @@ public class FilterIcon {
     private static ItemDisplayElement createDefaultElement() {
         var element = new ItemDisplayElement();
         element.setDisplaySize(1, 1);
-        element.setModelTransformation(ModelTransformationMode.GUI);
+        element.setItemDisplayContext(ItemDisplayContext.GUI);
         element.setInvisible(true);
         element.setViewRange(0.3f);
         return element;

@@ -20,6 +20,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
@@ -78,9 +79,9 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         try {
-            if (nbt.getCompound("variant").contains("tag")) {
+            if (nbt.getCompoundOrEmpty("variant").contains("tag")) {
                 var hack = new NbtCompound();
-                var variant = nbt.getCompound("variant");
+                var variant = nbt.getCompoundOrEmpty("variant");
                 hack.put("tag", variant.get("tag"));
                 hack.put("id", variant.get("item"));
                 hack.putInt("Count", 1);
@@ -109,6 +110,20 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
         updateStack();
         if (this.model != null && this.world != null) {
             model.tick();
+        }
+    }
+
+    @Override
+    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
+        super.onBlockReplaced(pos, oldState);
+        if (this.world != null){
+            var count = this.storage.amount;
+            var max = this.getItemStack().getMaxCount();
+            while (count > 0) {
+                var stack = this.storage.variant.toStack((int) Math.min(max, count));
+                count -= stack.getCount();
+                ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
+            }
         }
     }
 

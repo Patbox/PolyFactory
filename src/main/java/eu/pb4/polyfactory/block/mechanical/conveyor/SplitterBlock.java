@@ -30,7 +30,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -172,18 +172,6 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock())) {
-            if (world.getBlockEntity(pos) instanceof SplitterBlockEntity be) {
-                ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, be.getFilterRight());
-                ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, be.getFilterLeft());
-            }
-        }
-        super.onStateReplaced(state, world, pos, newState, moved);
-    }
-
-
-    @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player,  BlockHitResult hit) {
         var be = world.getBlockEntity(pos);
         var hand = Hand.MAIN_HAND;
@@ -272,7 +260,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
         private Model(BlockState state) {
             this.mainElement = new ItemDisplayElement();
             this.mainElement.setDisplaySize(1, 1);
-            this.mainElement.setModelTransformation(ModelTransformationMode.FIXED);
+            this.mainElement.setItemDisplayContext(ItemDisplayContext.FIXED);
             this.mainElement.setItem(FactoryItems.SPLITTER.getDefaultStack());
             this.mainElement.setInvisible(true);
             this.mainElement.setViewRange(0.8f);

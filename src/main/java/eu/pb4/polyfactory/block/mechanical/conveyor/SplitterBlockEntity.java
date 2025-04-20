@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.block.BlockState;
@@ -10,6 +11,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 
@@ -31,8 +33,12 @@ public class SplitterBlockEntity extends LockableBlockEntity implements BlockEnt
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("FilterStackLeft", this.filterStackLeft.toNbtAllowEmpty(lookup));
-        nbt.put("FilterStackRight", this.filterStackRight.toNbtAllowEmpty(lookup));
+        if (!this.filterStackLeft.isEmpty()) {
+            nbt.put("FilterStackLeft", this.filterStackLeft.toNbt(lookup));
+        }
+        if (!this.filterStackRight.isEmpty()) {
+            nbt.put("FilterStackRight", this.filterStackRight.toNbt(lookup));
+        }
         nbt.putByte("CurPos", (byte) this.position);
     }
 
@@ -45,12 +51,12 @@ public class SplitterBlockEntity extends LockableBlockEntity implements BlockEnt
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.filterStackLeft = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("FilterStackLeft"));
-        this.filterStackRight = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("FilterStackRight"));
+        this.filterStackLeft = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("FilterStackLeft"));
+        this.filterStackRight = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("FilterStackRight"));
         this.filterRight = FilterData.of(this.filterStackRight, false);
         this.filterLeft = FilterData.of(this.filterStackLeft, false);
         this.filtersEqual = Objects.equals(this.filterLeft.filter(), this.filterRight.filter());
-        this.position = nbt.getByte("CurPos");
+        this.position = nbt.getByte("CurPos", (byte) 0);
     }
 
     public int pos(int max) {
@@ -120,5 +126,14 @@ public class SplitterBlockEntity extends LockableBlockEntity implements BlockEnt
 
     public boolean isRightFilterEmpty() {
         return this.filterRight.isEmpty();
+    }
+
+    @Override
+    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
+        super.onBlockReplaced(pos, oldState);
+        if (this.world != null) {
+            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, this.getFilterRight());
+            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, this.getFilterLeft());
+        }
     }
 }

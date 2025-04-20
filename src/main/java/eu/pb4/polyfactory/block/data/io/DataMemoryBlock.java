@@ -103,7 +103,9 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
 
         return x;
     }
-    @Override
+
+
+    /*@Override
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         if (stack.contains(FactoryDataComponents.STORED_DATA)) {
 
@@ -126,7 +128,8 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
                     ).formatted(Formatting.DARK_GRAY));
         }
     }
-
+*/
+    // Todo
     @Override
     public void afterBreak(World world, PlayerEntity player1, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         if (blockEntity instanceof DataCache cache && cache.getCachedData() != null && !cache.getCachedData().isEmpty()
@@ -238,7 +241,7 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
             var readOnly = input.get("read_only");
             if (facing != null && readOnly != null) {
                 try {
-                    var dir = Direction.byName(ops.getStringValue(facing).getOrThrow());
+                    var dir = Direction.byId(ops.getStringValue(facing).getOrThrow());
                     return state.with(FACING_OUTPUT, dir).with(FACING_INPUT, ops.getStringValue(readOnly).getOrThrow().equals("true") ? OptionalDirection.NONE : OptionalDirection.of(dir));
                 } catch (Throwable ignored) {
                     ignored.printStackTrace();
@@ -268,7 +271,7 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
 
             for (var i = 0; i < 6; i++) {
                 this.covers[i] = ItemDisplayElementUtil.createSimple(state.get(POWERED) ? COVER_POWERED : COVER);
-                var dir = Direction.byId(i);
+                var dir = Direction.byIndex(i);
                 if (dir.getAxis() == Direction.Axis.Y) {
                     this.covers[i].setPitch(dir.getDirection() == Direction.AxisDirection.POSITIVE ? -90 : 90);
                     this.covers[i].setYaw(0);
@@ -278,13 +281,13 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
                 }
             }
 
-            this.covers[state.get(FACING_OUTPUT).getId()].setItem(ItemStack.EMPTY);
+            this.covers[state.get(FACING_OUTPUT).getIndex()].setItem(ItemStack.EMPTY);
             updateStatePos(state.get(FACING_OUTPUT), output);
 
             if (state.get(FACING_INPUT) == OptionalDirection.NONE) {
                 this.input.setItem(ItemStack.EMPTY);
             } else {
-                this.covers[state.get(FACING_INPUT).direction().getId()].setItem(ItemStack.EMPTY);
+                this.covers[state.get(FACING_INPUT).direction().getIndex()].setItem(ItemStack.EMPTY);
                 updateStatePos(state.get(FACING_INPUT).direction(), this.input);
             }
 
@@ -319,13 +322,13 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
                     this.covers[i].setItem(powered);
                 }
                 updateStatePos(this.blockState().get(FACING_OUTPUT), output);
-                this.covers[this.blockState().get(FACING_OUTPUT).getId()].setItem(ItemStack.EMPTY);
+                this.covers[this.blockState().get(FACING_OUTPUT).getIndex()].setItem(ItemStack.EMPTY);
 
                 var input = this.blockState().get(FACING_INPUT);
                 if (input == OptionalDirection.NONE) {
                     this.input.setItem(ItemStack.EMPTY);
                 } else {
-                    this.covers[input.direction().getId()].setItem(ItemStack.EMPTY);
+                    this.covers[input.direction().getIndex()].setItem(ItemStack.EMPTY);
                     this.input.setItem(INPUT);
                     updateStatePos(input.direction(), this.input);
                 }

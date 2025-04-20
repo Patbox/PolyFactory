@@ -19,6 +19,8 @@ import net.minecraft.world.World;
 import org.joml.Quaternionf;
 import xyz.nucleoid.packettweaker.PacketContext;
 
+import java.util.Optional;
+
 public class MinecartWithBlocksEntity extends AbstractMinecartEntity implements PolymerEntity {
     private final ElementHolder holder;
     private final BlockCollection blocks;
@@ -31,8 +33,8 @@ public class MinecartWithBlocksEntity extends AbstractMinecartEntity implements 
         this.blocks.setOffset(new Vec3d(0, 2f, 0));
         this.holder.addElement(this.blocks);
         EntityAttachment.ofTicking(this.holder, this);
-        this.setCustomBlock(Blocks.DROPPER.getDefaultState());
-        this.setCustomBlockOffset(8);
+        this.setCustomBlockState(Optional.of(Blocks.DROPPER.getDefaultState()));
+        this.setBlockOffset(8);
     }
 
     @Override

@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -21,6 +22,7 @@ import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ClipboardItem extends SimplePolymerItem {
     public ClipboardItem(Settings settings) {
@@ -28,11 +30,10 @@ public class ClipboardItem extends SimplePolymerItem {
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
+    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> tooltip, TooltipType type) {
         var data = stack.get(FactoryDataComponents.CLIPBOARD_DATA);
         if (data != null) {
-            data.addToTooltip(tooltip::add);
+            data.addToTooltip(tooltip);
         }
     }
 

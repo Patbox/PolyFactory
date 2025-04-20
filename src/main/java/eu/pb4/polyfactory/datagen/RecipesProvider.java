@@ -846,7 +846,10 @@ class RecipesProvider extends FabricRecipeProvider {
                         GrindingRecipe.of("pitcher_to_dye", "dye", Ingredient.ofItems(Items.PITCHER_PLANT), 1, 6, new ItemStack(Items.CYAN_DYE, 6)),
                         GrindingRecipe.of("cactus_to_dye", "dye", Ingredient.ofItems(Items.CACTUS), 1, 6, new ItemStack(Items.GREEN_DYE, 3)),
                         GrindingRecipe.of("closed_eyeblossom_to_dye", "dye", Ingredient.ofItems(Items.CLOSED_EYEBLOSSOM), 1, 6, new ItemStack(Items.GRAY_DYE, 3)),
-                        GrindingRecipe.of("open_eyeblossom_to_dye", "dye", Ingredient.ofItems(Items.OPEN_EYEBLOSSOM), 1, 6, new ItemStack(Items.ORANGE_DYE, 3))
+                        GrindingRecipe.of("open_eyeblossom_to_dye", "dye", Ingredient.ofItems(Items.OPEN_EYEBLOSSOM), 1, 6, new ItemStack(Items.ORANGE_DYE, 3)),
+                        GrindingRecipe.of("cactus_flower_to_dye", "dye", Ingredient.ofItems(Items.CACTUS_FLOWER), 1, 6, new ItemStack(Items.PINK_DYE, 3)),
+                        GrindingRecipe.of("wildflowers_to_dye", "dye", Ingredient.ofItems(Items.WILDFLOWERS), 1, 6, new ItemStack(Items.YELLOW_DYE, 3)),
+                        GrindingRecipe.of("leaf_litter_to_dye", "dye", Ingredient.ofItems(Items.LEAF_LITTER), 1, 6, OutputStack.of(Items.BROWN_DYE, 0.3f))
                 );
 
                 offerSmelting(List.of(FactoryItems.CRUSHED_RAW_IRON), RecipeCategory.MISC, Items.IRON_INGOT, 0.5F, 180, "iron_ingot");
@@ -982,7 +985,7 @@ class RecipesProvider extends FabricRecipeProvider {
                                 .pattern("sps")
                                 .input('r', Items.REDSTONE).input('g', Items.GLOWSTONE)
                                 .input('s', FactoryItems.SAW_DUST)
-                                .input('p', Registries.ITEM.get(Identifier.of(dye.getColor().getName() + "_stained_glass")))
+                                .input('p', Registries.ITEM.get(Identifier.of(dye.getColor().asString() + "_stained_glass")))
                                 .group("polyfactory:colored_lamp")
                                 .criterion("get", InventoryChangedCriterion.Conditions.items(Items.GLOWSTONE));
 
@@ -993,14 +996,14 @@ class RecipesProvider extends FabricRecipeProvider {
                         var x = new CompShapedRecipeJsonBuilder(itemWrap, RecipeCategory.REDSTONE, FactoryItems.WINDMILL_SAIL, 1);
 
                         if (dye != Items.WHITE_DYE) {
-                            x.setComponent(DataComponentTypes.DYED_COLOR, new DyedColorComponent(DyeColorExtra.getColor(dye.getColor()), true));
+                            x.setComponent(DataComponentTypes.DYED_COLOR, new DyedColorComponent(DyeColorExtra.getColor(dye.getColor())));
                         }
 
                         x.pattern(" sw")
                                 .pattern(" ws")
                                 .pattern("wsc")
                                 .input('w', FactoryItems.WOODEN_PLATE).input('s', Items.STICK)
-                                .input('c', Registries.ITEM.get(Identifier.of(dye.getColor().getName() + "_wool")))
+                                .input('c', Registries.ITEM.get(Identifier.of(dye.getColor().asString() + "_wool")))
                                 .group("polyfactory:windmill_sail")
                                 .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.WOODEN_PLATE))
                                 .offerTo(exporter, recipeKey("windmill_sail/wool/" + dye.getColor()));
@@ -1017,7 +1020,7 @@ class RecipesProvider extends FabricRecipeProvider {
                     }
 
                     {
-                        var nameSolid = dye.getColor().getName() + "_concrete";
+                        var nameSolid = dye.getColor().asString() + "_concrete";
                         var namePowder = nameSolid + "_powder";
 
                         var powder = Registries.ITEM.get(Identifier.of(namePowder));

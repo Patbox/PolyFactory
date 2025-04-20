@@ -32,6 +32,8 @@ import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentsAccess;
+import net.minecraft.component.ComponentsAccess;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
@@ -113,7 +115,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.readInventoryNbt(nbt, lookup);
-        this.process = nbt.getDouble("Progress");
+        this.process = nbt.getDouble("Progress", 0);
         this.fluidContainer.fromNbt(lookup, nbt, "fluid");
         super.readNbt(nbt, lookup);
     }

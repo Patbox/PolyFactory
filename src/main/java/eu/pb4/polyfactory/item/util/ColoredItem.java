@@ -83,6 +83,6 @@ public interface ColoredItem {
 
         DyeColor dyeColor = DyeColorExtra.BY_COLOR.get(color);
 
-        return dyeColor == null ? Text.translatable("item.minecraft.firework_star.custom_color") : Text.translatable("item.minecraft.firework_star." + dyeColor.getName());
+        return dyeColor == null ? Text.translatable("item.minecraft.firework_star.custom_color") : Text.translatable("item.minecraft.firework_star." + dyeColor.asString());
     }
 }

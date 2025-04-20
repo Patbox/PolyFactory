@@ -76,7 +76,7 @@ public interface MinimalInventory extends Inventory {
 
     @Override
     default boolean isEmpty() {
-        Iterator var1 = this.getStacks().iterator();
+        var var1 = this.getStacks().iterator();
 
         ItemStack itemStack;
         do {

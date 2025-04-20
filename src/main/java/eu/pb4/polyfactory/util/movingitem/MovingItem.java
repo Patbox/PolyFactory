@@ -5,7 +5,7 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.elements.*;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -46,7 +46,7 @@ public class MovingItem implements VirtualElement, StackReference {
             this.itemDisplay[i].setDisplayWidth(1);
             this.itemDisplay[i].setDisplayHeight(2);
             this.itemDisplay[i].setViewRange(i == 0 ? 0.5f : 0.2f);
-            this.itemDisplay[i].setModelTransformation(ModelTransformationMode.NONE);
+            this.itemDisplay[i].setItemDisplayContext(ItemDisplayContext.NONE);
             this.itemDisplay[i].setInterpolationDuration(10);
             this.itemDisplay[i].ignorePositionUpdates();
             this.updateDisplay(i);

@@ -4,12 +4,12 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.block.configurable.BlockConfig;
-import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -46,7 +46,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
@@ -64,15 +63,16 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
     public static final IntProperty SAIL_COUNT = IntProperty.of("sails", 1, MAX_SAILS);
     public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
 
-    @Override
-    public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
-    }
     public WindmillBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(SAIL_COUNT, 4).with(BIG, false));
         Model.MODEL.getItem();
         this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
+    }
+
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
     }
 
     @Override
@@ -100,16 +100,6 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getSide().getOpposite()));
-    }
-
-    @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock())) {
-            if (world.getBlockEntity(pos) instanceof WindmillBlockEntity be) {
-                ItemScatterer.spawn(world, pos, be.getSails());
-            }
-        }
-        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @Override
@@ -246,7 +236,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
         private void updateAnimation(float speed, Direction direction, boolean reverse) {
             this.center.setYaw(direction.getPositiveHorizontalDegrees() - 90);
             mat.identity();
-            mat.rotateX(((float) (reverse ? speed : -speed)));
+            mat.rotateX(reverse ? speed : -speed);
 
             mat.pushMatrix();
             mat.rotateZ(-MathHelper.HALF_PI);
@@ -281,7 +271,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
 
 
             if (tick % this.getUpdateRate() == 0) {
-                    this.updateAnimation(this.getRotation(),
+                this.updateAnimation(this.getRotation(),
                         this.blockState().get(WindmillBlock.FACING),
                         this.blockState().get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
 

@@ -7,12 +7,14 @@ import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentsAccess;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
@@ -47,7 +49,9 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         nbt.put("fluid", this.container.toNbt(registryLookup));
-        nbt.put("catalyst", this.catalyst.toNbtAllowEmpty(registryLookup));
+        if (!this.catalyst.isEmpty()) {
+            nbt.put("catalyst", this.catalyst.toNbt(registryLookup));
+        }
         updateModel();
     }
 
@@ -55,7 +59,7 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
         this.container.fromNbt(registryLookup, nbt, "fluid");
-        this.setCatalyst(ItemStack.fromNbtOrEmpty(registryLookup, nbt.getCompound("catalyst")));
+        this.setCatalyst(FactoryUtil.fromNbtStack(registryLookup, nbt.getCompoundOrEmpty("catalyst")));
     }
 
     @Override
@@ -123,8 +127,12 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
         this.markDirty();
     }
 
-    public void onBroken(World world, BlockPos pos) {
-        ItemScatterer.spawn(world, pos, DefaultedList.copyOf(ItemStack.EMPTY, this.catalyst));
+    @Override
+    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
+        super.onBlockReplaced(pos, oldState);
+        if (this.world != null) {
+            ItemScatterer.spawn(world, pos, DefaultedList.copyOf(ItemStack.EMPTY, this.catalyst));
+        }
     }
 
     public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {

@@ -353,7 +353,7 @@ public class FactoryItems {
 
                     for (var dye : FactoryUtil.COLORS_CREATIVE) {
                         var stack = WINDMILL_SAIL.getDefaultStack();
-                        stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(DyeColorExtra.getColor(dye), true));
+                        stack.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(DyeColorExtra.getColor(dye)));
                         entries.add(stack);
                     }
 

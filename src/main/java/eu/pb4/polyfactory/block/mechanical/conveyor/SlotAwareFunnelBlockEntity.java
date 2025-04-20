@@ -9,11 +9,13 @@ import eu.pb4.polyfactory.util.storage.FilteredRedirectedSlottedStorage;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import it.unimi.dsi.fastutil.objects.ReferenceSortedSets;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -27,6 +29,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.Unit;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -67,7 +70,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
         for (var i = 0; i < this.items.size(); i++) {
             this.filter.set(i, FilterData.of(this.items.get(i), false));
         }
-        var targets = nbt.getIntArray("targets");
+        var targets = nbt.getIntArray("targets").orElseGet(() -> new int[this.slotTargets.length]);
         System.arraycopy(targets, 0, this.slotTargets, 0, Math.min(targets.length, this.slotTargets.length));
     }
 
@@ -124,6 +127,14 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
         }
     }
 
+    @Override
+    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
+        super.onBlockReplaced(pos, oldState);
+        if (this.world != null) {
+            ItemScatterer.spawn(world, pos, this.asInventory());
+        }
+    }
+
     private static class SetSlotGui extends AnvilInputGui {
         private final Gui gui;
         private final int slot;
@@ -148,7 +159,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
             super.onInput(input);
             this.updateDone();
             if (this.screenHandler != null) {
-                this.screenHandler.setPreviousTrackedSlot(2, ItemStack.EMPTY);
+                this.screenHandler.setReceivedStack(2, ItemStack.EMPTY);
             }
         }
 
@@ -184,7 +195,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
             }
             var itemStack = GuiTextures.EMPTY.getItemStack().copy();
             itemStack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(input));
-            itemStack.set(DataComponentTypes.HIDE_TOOLTIP, Unit.INSTANCE);
+            itemStack.set(DataComponentTypes.TOOLTIP_DISPLAY, new TooltipDisplayComponent(true, ReferenceSortedSets.emptySet()));
             this.setSlot(0, itemStack, Objects.requireNonNull(this.getSlot(0)).getGuiCallback());
         }
 

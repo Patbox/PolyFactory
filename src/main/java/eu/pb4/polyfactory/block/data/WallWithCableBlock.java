@@ -65,10 +65,10 @@ public class WallWithCableBlock extends AbstracterCableBlock implements PolymerB
 
     @SuppressWarnings("rawtypes")
     private static final List<Pair> SELF_TO_BACKING = List.of(
-            new Pair<>(EAST_SHAPE, WallBlock.EAST_SHAPE, x -> x == Side.WALL ? WallShape.TALL : WallShape.NONE, x -> x == WallShape.NONE ? Side.NONE : Side.WALL),
-            new Pair<>(WEST_SHAPE, WallBlock.WEST_SHAPE, x -> x == Side.WALL ? WallShape.TALL : WallShape.NONE, x -> x == WallShape.NONE ? Side.NONE : Side.WALL),
-            new Pair<>(SOUTH_SHAPE, WallBlock.SOUTH_SHAPE, x -> x == Side.WALL ? WallShape.TALL : WallShape.NONE, x -> x == WallShape.NONE ? Side.NONE : Side.WALL),
-            new Pair<>(NORTH_SHAPE, WallBlock.NORTH_SHAPE, x -> x == Side.WALL ? WallShape.TALL : WallShape.NONE, x -> x == WallShape.NONE ? Side.NONE : Side.WALL),
+            new Pair<>(EAST_SHAPE, WallBlock.EAST_WALL_SHAPE, x -> x == Side.WALL ? WallShape.TALL : WallShape.NONE, x -> x == WallShape.NONE ? Side.NONE : Side.WALL),
+            new Pair<>(WEST_SHAPE, WallBlock.WEST_WALL_SHAPE, x -> x == Side.WALL ? WallShape.TALL : WallShape.NONE, x -> x == WallShape.NONE ? Side.NONE : Side.WALL),
+            new Pair<>(SOUTH_SHAPE, WallBlock.SOUTH_WALL_SHAPE, x -> x == Side.WALL ? WallShape.TALL : WallShape.NONE, x -> x == WallShape.NONE ? Side.NONE : Side.WALL),
+            new Pair<>(NORTH_SHAPE, WallBlock.NORTH_WALL_SHAPE, x -> x == Side.WALL ? WallShape.TALL : WallShape.NONE, x -> x == WallShape.NONE ? Side.NONE : Side.WALL),
             new Pair<>(UP_WALL, WallBlock.UP, Function.identity(), Function.identity())
     );
     private final WallBlock backing;

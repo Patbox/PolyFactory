@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polyfactory.util.storage.FilteredRedirectedStorage;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -13,6 +14,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
@@ -34,7 +36,9 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("FilterStack", this.filterStack.toNbtAllowEmpty(lookup));
+        if (!this.filterStack.isEmpty()) {
+            nbt.put("FilterStack", this.filterStack.toNbt(lookup));
+        }
     }
 
     @Override
@@ -52,7 +56,7 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
 
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.filterStack = ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("FilterStack"));
+        this.filterStack = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("FilterStack"));
         this.filter = FilterData.of(this.filterStack, true);
     }
 
@@ -80,5 +84,13 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
     public void onListenerUpdate(WorldChunk chunk) {
         this.model = BlockBoundAttachment.get(chunk, this.pos).holder() instanceof FunnelBlock.Model model ? model : null;
         this.updateHologram();
+    }
+
+    @Override
+    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
+        super.onBlockReplaced(pos, oldState);
+        if (this.world != null) {
+            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, this.getFilter());
+        }
     }
 }

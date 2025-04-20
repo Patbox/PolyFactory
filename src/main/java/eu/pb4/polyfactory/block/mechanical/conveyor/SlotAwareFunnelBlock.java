@@ -48,16 +48,6 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock())) {
-            if (world.getBlockEntity(pos) instanceof SlotAwareFunnelBlockEntity be) {
-                ItemScatterer.spawn(world, pos, be.asInventory());
-            }
-        }
-        super.onStateReplaced(state, world, pos, newState, moved);
-    }
-
-    @Override
     public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
         var selfState = self.getBlockState();
         if (!selfState.get(ENABLED)) {
