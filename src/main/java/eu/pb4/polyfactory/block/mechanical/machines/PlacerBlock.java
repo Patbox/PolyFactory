@@ -60,8 +60,8 @@ public class PlacerBlock extends RotationalNetworkBlock implements FactoryBlock,
 
     private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(
             BlockConfig.FACING,
-            BlockConfig.ofBlockEntityInt("reach",  MinerBlockEntity.class, 1, 2, 0,
-                    MinerBlockEntity::reach, MinerBlockEntity::setReach)
+            BlockConfig.ofBlockEntityInt("reach", PlacerBlockEntity.class, 1, 2, 0,
+                    PlacerBlockEntity::reach, PlacerBlockEntity::setReach)
     );
 
     public PlacerBlock(Settings settings) {
