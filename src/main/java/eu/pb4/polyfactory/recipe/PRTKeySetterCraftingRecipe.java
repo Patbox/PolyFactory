@@ -75,7 +75,7 @@ public class PRTKeySetterCraftingRecipe extends SpecialCraftingRecipe {
 
         var x = transmitter.copy();
 
-        x.set(FactoryDataComponents.REMOTE_KEYS, new Pair<>(key1, key2));
+        x.set(FactoryDataComponents.REMOTE_KEYS, new Pair<>(key1.copyWithCount(1), key2.copyWithCount(1)));
 
         return x;
     }
