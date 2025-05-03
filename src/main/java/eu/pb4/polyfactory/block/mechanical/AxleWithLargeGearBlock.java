@@ -42,6 +42,11 @@ public class AxleWithLargeGearBlock extends AxleWithGearBlock {
         return List.of(new LargeGearNode(state.get(AXIS)));
     }
 
+    @Override
+    public boolean isLargeGear(BlockState state) {
+        return true;
+    }
+
     public static final class Model extends RotationAwareModel {
         public static final ItemStack GEAR_MODEL = ItemDisplayElementUtil.getModel(id("block/large_gear"));
 

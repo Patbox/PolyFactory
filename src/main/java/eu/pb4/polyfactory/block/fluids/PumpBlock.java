@@ -5,6 +5,7 @@ import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.block.mechanical.GearPlacementAligner;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
@@ -56,7 +57,8 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class PumpBlock extends NetworkBlock implements FactoryBlock, RotationUser, ConfigurableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe, NetworkComponent.Rotational, NetworkComponent.RotationalConnector {
+public class PumpBlock extends NetworkBlock implements FactoryBlock, RotationUser, ConfigurableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider,
+        NetworkComponent.Pipe, NetworkComponent.Rotational, NetworkComponent.RotationalConnector, GearPlacementAligner {
     public static final EnumProperty<Direction> FACING = Properties.FACING;
     public PumpBlock(Settings settings) {
         super(settings);
@@ -176,6 +178,16 @@ public class PumpBlock extends NetworkBlock implements FactoryBlock, RotationUse
     @Override
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
         modifier.stress(5);
+    }
+
+    @Override
+    public boolean isLargeGear(BlockState state) {
+        return false;
+    }
+
+    @Override
+    public Direction.Axis getGearAxis(BlockState state) {
+        return state.get(FACING).getAxis();
     }
 
     public static final class Model extends RotationAwareModel {

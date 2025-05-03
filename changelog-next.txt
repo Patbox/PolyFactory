@@ -1,6 +1,2 @@
-- Redstone Output can now output strong redstone power (disabled by default, configurable with Wrench).
-- Tweaked placement code of Data Exported, Data Comparator and Arithmetic Operator.
-- Tweaked text position in Hologram Display.
-- Fixed Cable connections / data blocks behaving weirdly in case of some connections until reloaded.
-- Heavily lowered amount of block states used by all the Wall with Cable blocks (from 2048 to 162 states per block).
-- Fixed some item variants not showing in Polydex.
+- Mechanical Pumps (and pipes powered by them) will now pull fluid blocks that are further away (as long as they are connected, by safe fluid blocks).
+- Gears are now placed correctly aside of Mechanical Pump.

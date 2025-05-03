@@ -4,6 +4,7 @@ import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleWithLargeGearBlock;
+import eu.pb4.polyfactory.block.mechanical.GearPlacementAligner;
 import eu.pb4.polyfactory.item.FactoryItems;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
@@ -50,8 +51,13 @@ public class GearItem extends FactoryBlockItem {
         }
         var otherPos = ctx.getBlockPos().offset(ctx.getSide().getOpposite());
         var otherState = ctx.getWorld().getBlockState(otherPos);
-        if (otherState.getBlock() instanceof AxleWithGearBlock && !otherState.isOf(this.getBlock())) {
-            var zeroAxis  = otherState.get(AxleWithGearBlock.AXIS);
+        if (!(otherState.getBlock() instanceof GearPlacementAligner gearPlacementAligner)) {
+            return super.getPlacementContext(ctx);
+        }
+        var isSelfLarge = ((GearPlacementAligner) this.getBlock()).isLargeGear(this.getBlock().getDefaultState());
+        var isOtherLarge = gearPlacementAligner.isLargeGear(otherState);
+        if (isSelfLarge != isOtherLarge) {
+            var zeroAxis = gearPlacementAligner.getGearAxis(otherState);
 
             if (ctx.getSide().getAxis() == zeroAxis) {
                 return ctx;
@@ -62,8 +68,8 @@ public class GearItem extends FactoryBlockItem {
             ctx = ItemPlacementContext.offset(ctx, otherPos
                     .add(MathHelper.sign(offset.x), MathHelper.sign(offset.y), MathHelper.sign(offset.z)), zeroAxis.getPositiveDirection());
             return ctx.canReplaceExisting() ? ctx : null;
-        } else if (otherState.isOf(this.getBlock()) && this.getBlock() instanceof AxleWithLargeGearBlock) {
-            var zeroAxis = otherState.get(AxleWithGearBlock.AXIS);
+        } else if (isOtherLarge) {
+            var zeroAxis = gearPlacementAligner.getGearAxis(otherState);
 
             if (ctx.getSide().getAxis() == zeroAxis) {
                 return ctx;

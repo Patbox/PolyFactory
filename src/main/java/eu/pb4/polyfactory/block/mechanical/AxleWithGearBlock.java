@@ -5,8 +5,8 @@ import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
-import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.block.network.NetworkComponent.RotationalConnector;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.mechanical.AxleWithGearMechanicalNode;
@@ -19,7 +19,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -31,7 +30,6 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -41,7 +39,7 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
-public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.RotationalConnector {
+public class AxleWithGearBlock extends AxleBlock implements RotationalConnector, GearPlacementAligner {
     public AxleWithGearBlock(Settings settings) {
         super(settings);
     }
@@ -55,8 +53,10 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
     public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
         var otherState = ctx.getWorld().getBlockState(ctx.getBlockPos().offset(ctx.getSide().getOpposite()));
         var axis = ctx.getSide().getAxis();
-        if (otherState.isOf(this) && !ctx.shouldCancelInteraction()) {
-            axis = otherState.get(AXIS);
+        if (otherState.getBlock() instanceof GearPlacementAligner gearPlacementAligner
+                && gearPlacementAligner.isLargeGear(otherState) == this.isLargeGear(this.getDefaultState())
+                && !ctx.shouldCancelInteraction()) {
+            axis = gearPlacementAligner.getGearAxis(otherState);
         }
 
         return waterLog(ctx, this.getDefaultState()).with(AXIS, axis);
@@ -122,7 +122,17 @@ public class AxleWithGearBlock extends AxleBlock implements NetworkComponent.Rot
     @Override
     protected void updateNetworkAt(WorldView world, BlockPos pos) {
         super.updateNetworkAt(world, pos);
-        NetworkComponent.RotationalConnector.updateRotationalConnectorAt(world, pos);
+        RotationalConnector.updateRotationalConnectorAt(world, pos);
+    }
+
+    @Override
+    public boolean isLargeGear(BlockState state) {
+        return false;
+    }
+
+    @Override
+    public Direction.Axis getGearAxis(BlockState state) {
+        return state.get(AXIS);
     }
 
     public static final class Model extends RotationAwareModel {
