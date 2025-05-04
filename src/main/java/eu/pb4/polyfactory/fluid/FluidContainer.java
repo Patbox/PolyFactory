@@ -80,6 +80,12 @@ public interface FluidContainer {
         }
     }
 
+    default void forEachReversed(BiConsumer<FluidInstance<?>, Long> consumer) {
+        for (var f : this.fluids().reversed()) {
+            consumer.accept(f, this.get(f));
+        }
+    }
+
     default boolean isEmpty() {
         return this.stored() == 0;
     }

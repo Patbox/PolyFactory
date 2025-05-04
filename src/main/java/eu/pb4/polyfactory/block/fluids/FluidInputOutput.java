@@ -5,7 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 public interface FluidInputOutput extends FluidOutput, FluidInput {
-    interface ContainerBased extends FluidOutput.ContainerBased, FluidInput.ContainerBased {
+    interface ContainerBased extends FluidInputOutput, FluidOutput.ContainerBased, FluidInput.ContainerBased {
 
     }
 

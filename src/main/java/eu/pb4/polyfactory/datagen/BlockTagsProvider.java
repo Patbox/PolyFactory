@@ -93,6 +93,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.PLANTER)
                 .add(FactoryBlocks.PLACER)
                 .add(FactoryBlocks.STEAM_ENGINE)
+                .add(FactoryBlocks.SMELTERY)
                 .add(FactoryBlocks.ITEM_COUNTER)
                 .add(FactoryBlocks.TEXT_INPUT)
                 .add(FactoryBlocks.GATED_CABLE)

@@ -4,6 +4,7 @@ import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.block.fluids.transport.PipeConnectable;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;

@@ -8,6 +8,7 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.configurable.ValueFormatter;
 import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
+import eu.pb4.polyfactory.block.fluids.transport.PipeConnectable;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;

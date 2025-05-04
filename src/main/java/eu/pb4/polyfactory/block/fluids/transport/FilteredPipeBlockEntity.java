@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.block.fluids;
+package eu.pb4.polyfactory.block.fluids.transport;
 
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;

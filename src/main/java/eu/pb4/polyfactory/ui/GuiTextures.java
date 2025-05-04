@@ -4,7 +4,9 @@ import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 
@@ -12,6 +14,7 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
+import static eu.pb4.polyfactory.ModInit.id;
 import static eu.pb4.polyfactory.ui.UiResourceCreator.*;
 
 public class GuiTextures {
@@ -23,6 +26,7 @@ public class GuiTextures {
     public static final Function<Text, Text> MECHANICAL_SPOUT = background("mechanical_spout");
     public static final Function<Text, Text> MECHANICAL_SPOUT_NO_CONN = background("mechanical_spout_noconn");
     public static final Function<Text, Text> STEAM_ENGINE = background("steam_engine");
+    public static final Function<Text, Text> SMELTERY = background("smeltery");
     public static final Function<Text, Text> CENTER_SLOT_GENERIC = background("center_slot");
     public static final Function<Text, Text> FILL3 = background("fill3");
     public static final Function<Text, Text> BLUEPRINT_WORKBENCH = background("blueprint_workbench");
@@ -59,6 +63,8 @@ public class GuiTextures {
     });
 
     public static final ItemStack ITEM_FILTER_BLOCKED = icon16("item_filter_blocked").get().asStack();
+
+    public static final ItemStack LEFT_SHIFTED_3_BARS = new GuiElementBuilder(Items.TRIAL_KEY).hideTooltip().model(id("-/sgui/left_shifted_3_bars")).asStack();
     public static final Progress FLAME = Progress.createVertical("flame", 1, 14, true);
     public static final Progress ICE = Progress.createVertical("ice", 1, 14, true);
     public static final Progress FLAME_OFFSET_RIGHT = Progress.createVertical32Right("flame_offset_right", 9, 22, true);
@@ -80,6 +86,9 @@ public class GuiTextures {
     public static final char MECHANICAL_DRAIN_FLUID_OFFSET_N = UiResourceCreator.space(-118 + 8);
     public static final char MECHANICAL_SPOUT_FLUID_OFFSET = UiResourceCreator.space(46 - 8);
     public static final char MECHANICAL_SPOUT_FLUID_OFFSET_N = UiResourceCreator.space(-46 + 8);
+
+    public static final char SMELTERY_FLUID_OFFSET = UiResourceCreator.space(99 - 8);
+    public static final char SMELTERY_FLUID_OFFSET_N = UiResourceCreator.space(-99 + 8);
     public static final char DRAIN_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(110 + 7);
     public static final char DRAIN_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-110 - 7);
     public static final char SPOUT_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(38 + 7);
@@ -90,6 +99,14 @@ public class GuiTextures {
 
     public static void register() {
         PolydexTextures.register();
+        Progress.createHorizontal("generic_bar", 1, 15, false, 0);
+        Progress.createHorizontal("generic_bar", 1, 15, false, -18);
+        Progress.createHorizontal("generic_bar", 1, 15, false, -18 * 2);
+        Progress.createHorizontal("generic_bar", 1, 15, false, -18 * 3);
+        UiResourceCreator.icon16Offset("generic_bar_background", 0);
+        UiResourceCreator.icon16Offset("generic_bar_background", -18);
+        UiResourceCreator.icon16Offset("generic_bar_background", -18 * 2);
+        UiResourceCreator.icon16Offset("generic_bar_background", -18 * 3);
     }
 
     public record Temperature(Progress fire, Progress ice) {
@@ -143,7 +160,14 @@ public class GuiTextures {
 
         public static Progress createHorizontal(String path, int start, int stop, boolean reverse) {
             var size = stop - start;
-            var function = horizontalProgress16(path, start, stop, reverse);
+            var function = horizontalProgress16(path, start, stop, reverse, 0);
+
+            return create(size, function);
+        }
+
+        public static Progress createHorizontal(String path, int start, int stop, boolean reverse, int offset) {
+            var size = stop - start;
+            var function = horizontalProgress16(path, start, stop, reverse, offset);
 
             return create(size, function);
         }

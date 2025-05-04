@@ -18,6 +18,7 @@ import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.*;
 import eu.pb4.polyfactory.recipe.press.FillSprayCanPressRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
+import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
 import eu.pb4.polyfactory.recipe.spout.PotionSpoutRecipe;
 import eu.pb4.polyfactory.recipe.spout.RepairSpoutRecipe;
 import eu.pb4.polyfactory.recipe.spout.SimpleDrainRecipe;
@@ -1257,7 +1258,8 @@ class RecipesProvider extends FabricRecipeProvider {
                         FactoryFluids.SLIME.of(FluidConstants.INGOT), Items.SLIME_BALL, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
                 exporter.accept(recipeKey("spout/snowball"), SimpleSpoutRecipe.template(Items.BOWL,
                         FactoryFluids.SNOW.of(FluidConstants.BLOCK / 4), Items.SNOWBALL, SoundEvents.BLOCK_SNOW_PLACE), null);
-
+                exporter.accept(recipeKey("spout/iron_ingot"), SimpleSpoutRecipe.template(FactoryItems.TEMPLATE_BALL,
+                        FactoryFluids.IRON.of(FluidConstants.INGOT), Items.IRON_INGOT, SoundEvents.BLOCK_LAVA_EXTINGUISH), null);
 
                 destructiveItemCreatingFluidInteraction(exporter, "water_lava", 1, List.of(FactoryFluids.WATER.of(6000), FactoryFluids.LAVA.of(3000)),
                         OutputStack.of(Items.FLINT, 0.15f, 1), ParticleTypes.LARGE_SMOKE, SoundEvents.BLOCK_LAVA_EXTINGUISH);
@@ -1273,6 +1275,16 @@ class RecipesProvider extends FabricRecipeProvider {
                         List.of(),
                         Optional.empty(), Optional.empty(), 0, BlockHeat.TORCH, Float.POSITIVE_INFINITY, 1
                 ), null);
+
+
+                of(exporter,
+                        SimpleSmelteryRecipe.of("raw_iron", Items.RAW_IRON, FactoryFluids.IRON.of(FluidConstants.INGOT + FluidConstants.NUGGET / 2), 20 * 8),
+                        SimpleSmelteryRecipe.of("raw_gold", Items.RAW_GOLD, FactoryFluids.GOLD.of(FluidConstants.INGOT + FluidConstants.NUGGET / 2), 20 * 7),
+                        SimpleSmelteryRecipe.of("raw_copper", Items.RAW_COPPER, FactoryFluids.COPPER.of(FluidConstants.INGOT + FluidConstants.NUGGET / 2), 20 * 7),
+                        SimpleSmelteryRecipe.of("crushed_raw_iron", FactoryItems.CRUSHED_RAW_IRON, FactoryFluids.IRON.of(FluidConstants.INGOT), 20 * 6),
+                        SimpleSmelteryRecipe.of("crushed_raw_gold", FactoryItems.CRUSHED_RAW_GOLD, FactoryFluids.GOLD.of(FluidConstants.INGOT), 20 * 5),
+                        SimpleSmelteryRecipe.of("crushed_raw_copper", FactoryItems.CRUSHED_RAW_COPPER, FactoryFluids.COPPER.of(FluidConstants.INGOT), 20 * 5)
+                );
             }
 
             private void destructiveItemCreatingFluidInteraction(RecipeExporter exporter, String name, int repeats, List<FluidStack<?>> fluids, OutputStack item, ParticleEffect particleEffect, SoundEvent soundEvent) {

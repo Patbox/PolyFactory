@@ -1,5 +1,6 @@
-package eu.pb4.polyfactory.block.fluids;
+package eu.pb4.polyfactory.block.fluids.transport;
 
+import eu.pb4.polyfactory.block.fluids.FluidInput;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;

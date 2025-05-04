@@ -14,6 +14,7 @@ import eu.pb4.polyfactory.block.data.providers.*;
 import eu.pb4.polyfactory.block.electric.ElectricGeneratorBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.fluids.*;
+import eu.pb4.polyfactory.block.fluids.transport.*;
 import eu.pb4.polyfactory.block.mechanical.*;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.block.mechanical.conveyor.FunnelBlock;
@@ -44,11 +45,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -137,6 +136,7 @@ public class FactoryBlocks {
     public static final RedstoneValvePipeBlock REDSTONE_VALVE_PIPE = register("redstone_valve_pipe", Block.Settings.copy(PIPE), settings -> new RedstoneValvePipeBlock(settings.nonOpaque()));
     public static final Map<Block, PipeInWallBlock> WALL_WITH_PIPE = PipeInWallBlock.MAP;
 
+    public static final SmelteryBlock SMELTERY = register("smeltery", Block.Settings.copy(STEAM_ENGINE  ), SmelteryBlock::new);
     public static final PumpBlock PUMP = register("pump", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new PumpBlock(settings.nonOpaque()));
     public static final NozzleBlock NOZZLE = register("nozzle", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new NozzleBlock(settings.nonOpaque()));
     public static final DrainBlock DRAIN = register("drain", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new DrainBlock(settings.nonOpaque()));

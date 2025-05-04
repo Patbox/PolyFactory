@@ -150,6 +150,13 @@ public class FluidContainerImpl implements FluidContainer {
     }
 
     @Override
+    public void forEachReversed(BiConsumer<FluidInstance<?>, Long> consumer) {
+        for (var f : this.fluids.reversed()) {
+            consumer.accept(f, this.storedFluids.getOrDefault(f, 0));
+        }
+    }
+
+    @Override
     public long capacity() {
         return this.capacity;
     }

@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.item.block;
 
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
-import eu.pb4.polyfactory.block.fluids.PipeInWallBlock;
+import eu.pb4.polyfactory.block.fluids.transport.PipeInWallBlock;
 import eu.pb4.polyfactory.mixin.util.BlockItemAccessor;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import net.minecraft.advancement.criterion.Criteria;

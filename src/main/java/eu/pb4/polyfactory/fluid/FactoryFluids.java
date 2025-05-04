@@ -50,6 +50,24 @@ public class FactoryFluids {
             FluidType.of().density(200).flowSpeedMultiplier(0.95)
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.MILK_SPLASH, 10,350, FactorySoundEvents.FLUID_SHOOT_MILK))
                     .build());
+
+    public static final FluidType<Unit> IRON = register(Identifier.ofVanilla("iron"),
+            FluidType.of().density(1005).brightness(15).heat(BlockHeat.LAVA)
+                    .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
+                    .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
+                    .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
+
+    public static final FluidType<Unit> GOLD = register(Identifier.ofVanilla("gold"),
+            FluidType.of().density(1010).brightness(15).heat(BlockHeat.LAVA)
+                    .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
+                    .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
+                    .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
+
+    public static final FluidType<Unit> COPPER = register(Identifier.ofVanilla("copper"),
+            FluidType.of().density(1000).brightness(15).heat(BlockHeat.LAVA)
+                    .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
+                    .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
+                    .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
     public static final FluidType<Unit> EXPERIENCE = register(Identifier.ofVanilla("experience"),
             FluidType.of().density(50).flowSpeedMultiplier(1.3).maxFlow(FluidConstants.BOTTLE * 2).brightness(14).heat(BlockHeat.EXPERIENCE)
                     .shootingBehavior(new ShootProjectileEntity<>((world, fluid, amount) -> {

@@ -8,9 +8,7 @@ import eu.pb4.polyfactory.block.creative.CreativeMotorBlockEntity;
 import eu.pb4.polyfactory.block.data.CableBlockEntity;
 import eu.pb4.polyfactory.block.data.DoubleInputTransformerBlockEntity;
 import eu.pb4.polyfactory.block.data.InputTransformerBlockEntity;
-import eu.pb4.polyfactory.block.data.io.DataExtractorBlock;
 import eu.pb4.polyfactory.block.data.io.DataExtractorBlockEntity;
-import eu.pb4.polyfactory.block.data.io.DataMemoryBlock;
 import eu.pb4.polyfactory.block.data.io.DataMemoryBlockEntity;
 import eu.pb4.polyfactory.block.data.output.HologramProjectorBlockEntity;
 import eu.pb4.polyfactory.block.data.output.NixieTubeBlockEntity;
@@ -20,6 +18,10 @@ import eu.pb4.polyfactory.block.data.providers.ItemReaderBlockEntity;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlockEntity;
 import eu.pb4.polyfactory.block.fluids.*;
+import eu.pb4.polyfactory.block.fluids.transport.FilteredPipeBlockEntity;
+import eu.pb4.polyfactory.block.fluids.transport.PipeBlockEntity;
+import eu.pb4.polyfactory.block.fluids.transport.PumpBlockEntity;
+import eu.pb4.polyfactory.block.fluids.transport.RedstoneValvePipeBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.EjectorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.FanBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlockEntity;
@@ -75,6 +77,9 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<SteamEngineBlockEntity> STEAM_ENGINE = register("steam_engine",
              FabricBlockEntityTypeBuilder.create(SteamEngineBlockEntity::new, FactoryBlocks.STEAM_ENGINE));
+
+    public static final BlockEntityType<SmelteryBlockEntity> SMELTERY = register("smeltery",
+            FabricBlockEntityTypeBuilder.create(SmelteryBlockEntity::new, FactoryBlocks.SMELTERY));
 
     public static final BlockEntityType<ContainerBlockEntity> CONTAINER = register("container",
              FabricBlockEntityTypeBuilder.create(ContainerBlockEntity::new, FactoryBlocks.CONTAINER));

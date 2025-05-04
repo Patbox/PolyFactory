@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.block.fluids;
+package eu.pb4.polyfactory.block.fluids.transport;
 
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.property.FactoryProperties;

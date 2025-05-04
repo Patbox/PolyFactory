@@ -51,7 +51,8 @@ public abstract class Schema1460Mixin extends Schema {
         registerInventory(schema, map, mod("blueprint_workbench"));
         registerInventory(schema, map, mod("mechanical_drain"));
         registerInventory(schema, map, mod("mechanical_spout"));
-        registerInventory(schema, map, mod("slot_aware_funnel"));
+        registerInventory(schema, map, mod("mechanical_spout"));
+        registerInventory(schema, map, mod("smeltery"));
 
         container(schema, map, "container");
         container(schema, map, "creative_container");

@@ -1,19 +1,23 @@
-package eu.pb4.polyfactory.block.fluids;
+package eu.pb4.polyfactory.block.fluids.transport;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.block.mechanical.GearPlacementAligner;
+import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;
-import eu.pb4.polyfactory.fluid.FluidBehaviours;
-import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
-import eu.pb4.polyfactory.models.FactoryModels;
+import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.RotationAwareModel;
-import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
+import eu.pb4.polyfactory.nodes.mechanical.RotationData;
+import eu.pb4.polyfactory.nodes.mechanical.UnconnectedGearMechanicalNode;
+import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
+import eu.pb4.polyfactory.nodes.pipe.PumpNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -26,7 +30,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
@@ -34,15 +37,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
+import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
@@ -56,14 +57,12 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, ConfigurableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe {
-    public static final EnumProperty<Direction.Axis> AXIS = Properties.AXIS;
-    public static final BooleanProperty INVERTED = Properties.INVERTED;
-
-    public FilteredPipeBlock(Settings settings) {
+public class PumpBlock extends NetworkBlock implements FactoryBlock, RotationUser, ConfigurableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider,
+        NetworkComponent.Pipe, NetworkComponent.Rotational, NetworkComponent.RotationalConnector, GearPlacementAligner {
+    public static final EnumProperty<Direction> FACING = Properties.FACING;
+    public PumpBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false).with(INVERTED, false));
-        Model.NEGATED.isEmpty();
+        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
     }
 
     @Override
@@ -82,36 +81,25 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Con
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterLog(ctx, this.getDefaultState().with(AXIS, ctx.getSide().getAxis()));
+        return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getSide().getOpposite()));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(AXIS, INVERTED, WATERLOGGED);
+        builder.add(FACING, WATERLOGGED);
     }
 
     @Override
     protected void updateNetworkAt(WorldView world, BlockPos pos) {
         Pipe.updatePipeAt(world, pos);
+        RotationalConnector.updateRotationalConnectorAt(world, pos);
+        Rotational.updateRotationalAt(world, pos);
     }
 
     @Override
     protected boolean isSameNetworkType(Block block) {
-        return block instanceof Pipe;
-    }
-
-    @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        var stack = player.getStackInHand(Hand.MAIN_HAND);
-        var func = FluidBehaviours.ITEM_TO_FLUID.get(stack.getItem());
-        if (func != null && world.getBlockEntity(pos) instanceof FilteredPipeBlockEntity be) {
-            be.setAllowedFluid(func.apply(stack));
-            be.markDirty();
-            return ActionResult.SUCCESS_SERVER;
-        }
-
-        return super.onUse(state, world, pos, player, hit);
+        return block instanceof Pipe || block instanceof RotationalConnector || block instanceof Rotational;
     }
 
     @Override
@@ -121,13 +109,23 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Con
     }
 
     @Override
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return FactoryUtil.transform(state, rotation::rotate, FACING);
+    }
+
+    @Override
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return FactoryUtil.transform(state, mirror::apply, FACING);
+    }
+
+    @Override
     public FluidState getFluidState(BlockState state) {
         return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
     }
 
     @Override
     public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
-        return dir.getAxis() == state.get(AXIS);
+        return dir.getAxis() == state.get(FACING).getAxis();
     }
 
     @Override
@@ -143,18 +141,28 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Con
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new FilteredPipeBlockEntity(pos, state);
+        return new PumpBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return FilteredPipeBlockEntity::tick;
+        return PumpBlockEntity::tick;
     }
 
     @Override
     public Collection<BlockNode> createPipeNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new SimpleAxisNode(state.get(AXIS)));
+        return List.of(new PumpNode(state.get(FACING), false, PumpNode.DEFAULT_RANGE), new PumpNode(state.get(FACING), true, PumpNode.DEFAULT_RANGE));
+    }
+
+    @Override
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        return List.of(new UnconnectedGearMechanicalNode());
+    }
+
+    @Override
+    public Collection<BlockNode> createRotationalConnectorNodes(BlockState state, ServerWorld world, BlockPos pos) {
+        return List.of(new SmallGearNode(state.get(FACING).getAxis()));
     }
 
     @Override
@@ -163,32 +171,47 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Con
     }
 
     @Override
-    protected BlockState rotate(BlockState state, BlockRotation rotation) {
-        return FactoryUtil.rotateAxis(state, AXIS, rotation);
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        return List.of(BlockConfig.FACING);
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(BlockConfig.AXIS, BlockConfig.INVERTED);
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+        modifier.stress(5);
+    }
+
+    @Override
+    public boolean isLargeGear(BlockState state) {
+        return false;
+    }
+
+    @Override
+    public Direction.Axis getGearAxis(BlockState state) {
+        return state.get(FACING).getAxis();
     }
 
     public static final class Model extends RotationAwareModel {
-        private static final ItemStack NEGATED = ItemDisplayElementUtil.getModel(id("block/filtered_pipe_negated"));
+        public static final ItemStack BLOCK_MODEL = ItemDisplayElementUtil.getModel(id("block/pump"));
         private final ItemDisplayElement mainElement;
-        private final ItemDisplayElement fluid;
+        private final ItemDisplayElement gear;
+        private final boolean offset;
+        private Direction.Axis axis = Direction.Axis.Y;
+
         private Model(BlockState state, BlockPos pos) {
-            this.mainElement = ItemDisplayElementUtil.createSimple(state.get(FilteredPipeBlock.INVERTED) ? NEGATED : ItemDisplayElementUtil.getModel(state.getBlock().asItem()));
+            this.mainElement = ItemDisplayElementUtil.createSimple(BLOCK_MODEL);
             this.mainElement.setScale(new Vector3f(2f));
-            this.fluid = ItemDisplayElementUtil.createSimple();
-            this.fluid.setScale(new Vector3f(2f));
-            this.fluid.setViewRange(0.4f);
+            this.offset = (pos.getX() + pos.getY() + pos.getZ()) % 2 == 0;
+            this.gear = LodItemDisplayElement.createSimple(GenericParts.REGULAR_GEAR, this.getUpdateRate(), 0.3f, 0.6f);
+            this.gear.setViewRange(0.7f);
             this.updateStatePos(state);
+            this.updateAnimation(0);
             this.addElement(this.mainElement);
-            this.addElement(this.fluid);
+            this.addElement(this.gear);
         }
 
         private void updateStatePos(BlockState state) {
-            var dir = Direction.get(Direction.AxisDirection.POSITIVE, state.get(AXIS));
+            var dir = state.get(FACING);
+            this.axis = dir.getAxis();
             float p = -90;
             float y = 0;
 
@@ -202,23 +225,35 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Con
 
             this.mainElement.setYaw(y);
             this.mainElement.setPitch(p);
-            this.fluid.setYaw(y);
-            this.fluid.setPitch(p);
+        }
+
+        private void updateAnimation(float rotation) {
+            var mat = mat();
+            switch (axis) {
+                case X -> mat.rotate(Direction.EAST.getRotationQuaternion());
+                case Z -> mat.rotate(Direction.SOUTH.getRotationQuaternion());
+            }
+
+            mat.rotateY(rotation + (this.offset ? MathHelper.PI / 8 : 0));
+            this.gear.setTransformation(mat);
+        }
+
+        @Override
+        protected void onTick() {
+            var tick = this.getAttachment().getWorld().getTime();
+
+            if (tick % this.getUpdateRate() == 0) {
+                this.updateAnimation(this.getRotationData().rotation());
+                if (this.gear.isDirty()) {
+                    this.gear.startInterpolation();
+                }
+            }
         }
 
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.mainElement.setItem(this.blockState().get(FilteredPipeBlock.INVERTED) ? NEGATED : ItemDisplayElementUtil.getModel(this.blockState().getBlock().asItem()));
                 updateStatePos(this.blockState());
-            }
-        }
-
-        public void setAllowedFluid(FluidInstance<?> fluid) {
-            if (fluid == null) {
-                this.fluid.setItem(ItemStack.EMPTY);
-            } else {
-                this.fluid.setItem(FactoryModels.FLUID_FILTERED_PIPE.get(fluid));
             }
         }
     }

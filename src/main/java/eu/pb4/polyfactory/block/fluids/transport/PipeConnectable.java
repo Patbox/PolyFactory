@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.block.fluids;
+package eu.pb4.polyfactory.block.fluids.transport;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;

@@ -10,21 +10,22 @@ import eu.pb4.polyfactory.item.FactoryDebugItems;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.ConveyorModels;
 import eu.pb4.polyfactory.models.FactoryModels;
+import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.ResourceUtils;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
-import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
-import eu.pb4.polymer.resourcepack.extras.api.format.item.model.ConditionItemModel;
-import eu.pb4.polymer.resourcepack.extras.api.format.item.model.SelectItemModel;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.model.*;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.CustomModelDataFlagProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.UsingItemProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.ViewEntityProperty;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.property.numeric.CustomModelDataFloatProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.select.DisplayContextProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.ConstantTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.CustomModelDataTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.PotionTintSource;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.data.DataOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.DataWriter;
@@ -40,8 +41,10 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -160,6 +163,32 @@ class AssetProvider implements DataProvider {
                 new BasicItemModel(id("block/redstone_output_overlay"), List.of(new CustomModelDataTintSource(0, 0xFF0000))), ItemAsset.Properties.DEFAULT));
 
         consumer.accept(id("placeholder"), new ItemAsset(new BasicItemModel(id("item/placeholder")), ItemAsset.Properties.DEFAULT));
+
+        var list = new ArrayList<ItemModel>();
+
+        {
+            var offsets = new int[]{-18 * 3, -18 * 2, -18};
+
+            for (int i = 0; i < 3; i++) {
+                var builder = RangeDispatchItemModel.builder(new CustomModelDataFloatProperty(i)).scale(15);
+                builder.fallback(new EmptyItemModel());
+
+                for (int a = 1; a <= 14; a++) {
+                    builder.entry(a, new BasicItemModel(id("sgui/elements/gen/generic_bar_" + a + "_offset_" + offsets[i]),
+                            List.of(new CustomModelDataTintSource(i, 0xFFFFFF))));
+                }
+
+                list.add(new ConditionItemModel(new CustomModelDataFlagProperty(i),
+                        new CompositeItemModel(List.of(
+                                new BasicItemModel(id("sgui/elements/generic_bar_background_offset_" + offsets[i])),
+                                builder.build())
+                        ),
+                        new EmptyItemModel()
+                ));
+            }
+        }
+
+        consumer.accept(GuiTextures.LEFT_SHIFTED_3_BARS.get(DataComponentTypes.ITEM_MODEL), new ItemAsset(new CompositeItemModel(list), ItemAsset.Properties.DEFAULT));
     }
 
 

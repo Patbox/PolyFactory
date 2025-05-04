@@ -53,9 +53,25 @@ public class UiResourceCreator {
             }
             """.replace(" ", "").replace("\n", "");
 
+    private static final String ITEM_TEMPLATE_OFFSET = """
+            {
+              "parent": "|BASE|",
+              "textures": {
+                "layer0": "|ID|"
+              },
+              "display": {
+                  "gui": {
+                    "rotation": [ 0, 0, 0 ],
+                    "translation": [ |OFFSET|, 0, 0 ],
+                    "scale": [ 1, 1, 1 ]
+                  }
+                }
+            }
+            """.replace(" ", "").replace("\n", "");
+
     private static final List<SlicedTexture> VERTICAL_PROGRESS = new ArrayList<>();
     private static final List<SlicedTexture> HORIZONTAL_PROGRESS = new ArrayList<>();
-    private static final List<Pair<Identifier, String>> SIMPLE_MODEL = new ArrayList<>();
+    private static final List<SimpleModel> SIMPLE_MODEL = new ArrayList<>();
     private static final Char2IntMap SPACES = new Char2IntOpenHashMap();
     private static final List<FontTexture> FONT_TEXTURES = new ArrayList<>();
     private static final List<String> TEXTURES_NUMBERS = new ArrayList<>();
@@ -67,17 +83,22 @@ public class UiResourceCreator {
     private static final char ANVIL_SPACE1 = character++;
 
     public static Supplier<GuiElementBuilder> icon16(String path) {
-        var model = genericIconRaw(Items.ALLIUM, path, BASE_MODEL);
+        var model = genericIconRaw(Items.ALLIUM, path, BASE_MODEL, 0);
+        return () -> new GuiElementBuilder(model).setName(Text.empty()).hideDefaultTooltip();
+    }
+
+    public static Supplier<GuiElementBuilder> icon16Offset(String path, int offset) {
+        var model = genericIconRaw(Items.ALLIUM, path, BASE_MODEL, offset);
         return () -> new GuiElementBuilder(model).setName(Text.empty()).hideDefaultTooltip();
     }
 
     public static Supplier<GuiElementBuilder> icon32(String path) {
-        var model = genericIconRaw(Items.ALLIUM, path, X32_MODEL);
+        var model = genericIconRaw(Items.ALLIUM, path, X32_MODEL, 0);
         return () -> new GuiElementBuilder(model).setName(Text.empty()).hideDefaultTooltip();
     }
 
     public static IntFunction<GuiElementBuilder> icon32Color(String path) {
-        var model = genericIconRaw(Items.LEATHER_LEGGINGS, path, X32_MODEL);
+        var model = genericIconRaw(Items.LEATHER_LEGGINGS, path, X32_MODEL, 0);
         return (i) -> {
             return new GuiElementBuilder(model).setName(Text.empty()).hideDefaultTooltip().setComponent(DataComponentTypes.DYED_COLOR, new DyedColorComponent(i));
         };
@@ -87,43 +108,43 @@ public class UiResourceCreator {
         var models = new ItemStack[size];
 
         for (var i = 0; i < size; i++) {
-            models[i] = genericIconRaw(Items.ALLIUM, path + "_" + i, BASE_MODEL);
+            models[i] = genericIconRaw(Items.ALLIUM, path + "_" + i, BASE_MODEL, 0);
         }
         return (i) -> new GuiElementBuilder(models[i]).setName(Text.empty()).hideDefaultTooltip();
     }
 
-    public static IntFunction<GuiElementBuilder> horizontalProgress16(String path, int start, int stop, boolean reverse) {
-        return genericProgress(path, start, stop, reverse, BASE_MODEL, HORIZONTAL_PROGRESS);
+    public static IntFunction<GuiElementBuilder> horizontalProgress16(String path, int start, int stop, boolean reverse, int offset) {
+        return genericProgress(path, start, stop, reverse, BASE_MODEL, HORIZONTAL_PROGRESS, offset);
     }
 
     public static IntFunction<GuiElementBuilder> horizontalProgress32(String path, int start, int stop, boolean reverse) {
-        return genericProgress(path, start, stop, reverse, X32_MODEL, HORIZONTAL_PROGRESS);
+        return genericProgress(path, start, stop, reverse, X32_MODEL, HORIZONTAL_PROGRESS, 0);
     }
 
     public static IntFunction<GuiElementBuilder> horizontalProgress32Right(String path, int start, int stop, boolean reverse) {
-        return genericProgress(path, start, stop, reverse, X32_RIGHT_MODEL, HORIZONTAL_PROGRESS);
+        return genericProgress(path, start, stop, reverse, X32_RIGHT_MODEL, HORIZONTAL_PROGRESS, 0);
     }
 
     public static IntFunction<GuiElementBuilder> verticalProgress32(String path, int start, int stop, boolean reverse) {
-        return genericProgress(path, start, stop, reverse, X32_MODEL, VERTICAL_PROGRESS);
+        return genericProgress(path, start, stop, reverse, X32_MODEL, VERTICAL_PROGRESS, 0);
     }
 
     public static IntFunction<GuiElementBuilder> verticalProgress32Right(String path, int start, int stop, boolean reverse) {
-        return genericProgress(path, start, stop, reverse, X32_RIGHT_MODEL, VERTICAL_PROGRESS);
+        return genericProgress(path, start, stop, reverse, X32_RIGHT_MODEL, VERTICAL_PROGRESS, 0);
     }
 
     public static IntFunction<GuiElementBuilder> verticalProgress16(String path, int start, int stop, boolean reverse) {
-        return genericProgress(path, start, stop, reverse, BASE_MODEL, VERTICAL_PROGRESS);
+        return genericProgress(path, start, stop, reverse, BASE_MODEL, VERTICAL_PROGRESS, 0);
     }
 
-    public static IntFunction<GuiElementBuilder> genericProgress(String path, int start, int stop, boolean reverse, String base, List<SlicedTexture> progressType) {
+    public static IntFunction<GuiElementBuilder> genericProgress(String path, int start, int stop, boolean reverse, String base, List<SlicedTexture> progressType, int offset) {
 
         var models = new ItemStack[stop - start];
 
         progressType.add(new SlicedTexture(path, start, stop, reverse));
 
         for (var i = start; i < stop; i++) {
-            models[i - start] = genericIconRaw(Items.ALLIUM,  "gen/" + path + "_" + i, base);
+            models[i - start] = genericIconRaw(Items.ALLIUM,  "gen/" + path + "_" + i, base, offset);
         }
         return (i) -> new GuiElementBuilder(models[i]).setName(Text.empty()).hideDefaultTooltip();
     }
@@ -142,10 +163,13 @@ public class UiResourceCreator {
     }
 
 
-    public static ItemStack genericIconRaw(Item item, String path, String base) {
-        var elementPath = elementPath(path);
-        SIMPLE_MODEL.add(new Pair<>(elementPath, base));
-        return ItemDisplayElementUtil.getModel(elementPath);
+    public static ItemStack genericIconRaw(Item item, String path, String base, int offset) {
+        var extra = offset == 0 ? "" : "_offset_" + offset;
+
+        var texturePath = elementPath(path);
+        var modelPath = elementPath(path + extra);
+        SIMPLE_MODEL.add(new SimpleModel(texturePath, modelPath, base, offset));
+        return ItemDisplayElementUtil.getModel(texturePath);
     }
 
     private static Identifier elementPath(String path) {
@@ -250,8 +274,14 @@ public class UiResourceCreator {
 
     public static void generateAssets(BiConsumer<String, byte[]> assetWriter) {
         for (var texture : SIMPLE_MODEL) {
-            assetWriter.accept("assets/" + texture.getLeft().getNamespace() + "/models/" + texture.getLeft().getPath() + ".json",
-                    ITEM_TEMPLATE.replace("|ID|", texture.getLeft().toString()).replace("|BASE|", texture.getRight()).getBytes(StandardCharsets.UTF_8));
+            if (texture.offset == 0) {
+                assetWriter.accept("assets/" + texture.modelPath.getNamespace() + "/models/" + texture.modelPath.getPath() + ".json",
+                        ITEM_TEMPLATE.replace("|ID|", texture.texturePath.toString()).replace("|BASE|", texture.base).getBytes(StandardCharsets.UTF_8));
+            } else {
+                assetWriter.accept("assets/" + texture.modelPath.getNamespace() + "/models/" + texture.modelPath.getPath() + ".json",
+                        ITEM_TEMPLATE_OFFSET.replace("|ID|", texture.texturePath.toString()).replace("|BASE|", texture.base)
+                                .replace("|OFFSET|", "" + texture.offset).getBytes(StandardCharsets.UTF_8));
+            }
         }
 
         generateProgress(assetWriter, VERTICAL_PROGRESS, false);
@@ -331,4 +361,6 @@ public class UiResourceCreator {
     public record SlicedTexture(String path, int start, int stop, boolean reverse) {};
 
     public record FontTexture(Identifier path, int ascent, int height, char[][] chars) {};
+
+    public record SimpleModel(Identifier texturePath, Identifier modelPath, String base, int offset) {}
 }

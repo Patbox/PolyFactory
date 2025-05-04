@@ -1,2 +1,6 @@
+- Added Molten Iron, Molten Copper and Molten Gold fluids.
+- Added Smeltery (WIP):
+  - Used to smelt raw ores and other metallic items into Molten Metals.
 - Mechanical Pumps (and pipes powered by them) will now pull fluid blocks that are further away (as long as they are connected, by safe fluid blocks).
 - Gears are now placed correctly aside of Mechanical Pump.
+- Fixed fluid order being reversed in tooltips.

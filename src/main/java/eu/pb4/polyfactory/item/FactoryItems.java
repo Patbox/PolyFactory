@@ -61,6 +61,7 @@ public class FactoryItems {
     public static final Item EJECTOR = register(FactoryBlocks.EJECTOR);
     public static final Item HAND_CRANK = register(FactoryBlocks.HAND_CRANK);
     public static final Item STEAM_ENGINE = register(FactoryBlocks.STEAM_ENGINE);
+    public static final Item SMELTERY = register(FactoryBlocks.SMELTERY);
     public static final Item GRINDER = register(FactoryBlocks.GRINDER);
     public static final Item PRESS = register(FactoryBlocks.PRESS);
     public static final Item CRAFTER = register(FactoryBlocks.CRAFTER);
@@ -421,6 +422,7 @@ public class FactoryItems {
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(PROGRAMMABLE_DATA_EXTRACTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(CLIPBOARD, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
+                        entries.add(SMELTERY, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     })).build()
             );
         }

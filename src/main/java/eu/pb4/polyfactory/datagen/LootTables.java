@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.datagen;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
-import eu.pb4.polyfactory.block.fluids.PipeInWallBlock;
+import eu.pb4.polyfactory.block.fluids.transport.PipeInWallBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -67,6 +67,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.RECORD_PLAYER);
         this.addDrop(FactoryBlocks.MINER);
         this.addDrop(FactoryBlocks.STEAM_ENGINE);
+        this.addDrop(FactoryBlocks.SMELTERY);
         this.addDrop(FactoryBlocks.HOLOGRAM_PROJECTOR);
         this.addDrop(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
         this.addDrop(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER);

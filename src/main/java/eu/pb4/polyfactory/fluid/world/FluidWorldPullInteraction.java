@@ -1,15 +1,13 @@
 package eu.pb4.polyfactory.fluid.world;
 
-import eu.pb4.polyfactory.block.fluids.FluidInput;
 import eu.pb4.polyfactory.block.fluids.FluidOutput;
-import eu.pb4.polyfactory.block.fluids.PipeBaseBlock;
+import eu.pb4.polyfactory.block.fluids.transport.PipeBaseBlock;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.block.*;
-import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.registry.tag.FluidTags;

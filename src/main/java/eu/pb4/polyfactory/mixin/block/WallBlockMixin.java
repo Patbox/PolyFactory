@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.mixin.block;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import eu.pb4.polyfactory.block.fluids.PipeInWallBlock;
+import eu.pb4.polyfactory.block.fluids.transport.PipeInWallBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.WallBlock;
 import net.minecraft.util.math.Direction;
