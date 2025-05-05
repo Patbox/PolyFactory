@@ -1,0 +1,7 @@
+{
+	"parent": "polyfactory:block/smeltery",
+	"texture_size": [32, 32],
+	"textures": {
+		"front": "polyfactory:block/smeltery/front_lit"
+	}
+}

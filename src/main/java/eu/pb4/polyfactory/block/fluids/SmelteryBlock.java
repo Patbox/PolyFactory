@@ -4,8 +4,10 @@ import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.block.fluids.transport.PipeConnectable;
 import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlock;
 import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlockEntity;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -17,6 +19,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -27,13 +30,17 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEntityProvider, InventoryProvider, FluidOutput.Getter {
+import static eu.pb4.polyfactory.ModInit.id;
+
+public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEntityProvider, InventoryProvider, FluidOutput.Getter, PipeConnectable {
     public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty LIT = Properties.LIT;
 
@@ -62,11 +69,6 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
-    }
-
-    @Override
-    protected boolean isValid(BlockState state, int x, int y, int z) {
-        return y != 2 || x == 1 || z == 1;
     }
 
     @Override
@@ -109,12 +111,21 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
         return (FluidOutput) world.getBlockEntity(getCenter(world.getBlockState(pos), pos));
     }
 
+    @Override
+    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
+        return true;
+    }
+
 
     public static final class Model extends BlockModel {
+        private static final ItemStack REGULAR = ItemDisplayElementUtil.getModel(id("block/smeltery"));
+        private static final ItemStack LIT = ItemDisplayElementUtil.getModel(id("block/smeltery_lit"));
+
         private final ItemDisplayElement main;
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
-            this.main.setScale(new Vector3f(2f));
+            this.main = ItemDisplayElementUtil.createSimple(state.get(SmelteryBlock.LIT) ? LIT : REGULAR);
+            this.main.setOffset(FactoryUtil.HALF_BELOW);
+            this.main.setScale(new Vector3f(2f * 2));
             this.main.setDisplaySize(5, 5);
             this.updateStatePos(state);
             this.addElement(this.main);
@@ -139,6 +150,7 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
+                this.main.setItem(this.blockState().get(SmelteryBlock.LIT) ? LIT : REGULAR);
                 updateStatePos(this.blockState());
                 this.tick();
             }
