@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.fluids;
 
+import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
@@ -9,6 +10,7 @@ import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlock;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
+import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.smeltery.SmelteryRecipe;
 import eu.pb4.polyfactory.ui.FluidTextures;
@@ -23,7 +25,9 @@ import it.unimi.dsi.fastutil.booleans.BooleanList;
 import it.unimi.dsi.fastutil.floats.FloatList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
@@ -42,11 +46,14 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
 public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, FluidOutput.ContainerBased {
+    public static final int FLUID_CAPACITY = (int) (FluidConstants.BUCKET * 12 * 2);
+    private static final Codec<List<BlockState>> BLOCK_STATE_LIST_CODEC = BlockState.CODEC.listOf();
     private static final int[] ALL_SLOTS = IntStream.range(0, 12).toArray();
     private static final int[] INPUT_SLOTS = IntStream.range(0, 9).toArray();
     private static final int[] FUEL_SLOTS = IntStream.range(9, 12).toArray();
@@ -56,10 +63,12 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
     @SuppressWarnings("unchecked")
     private final RecipeEntry<SmelteryRecipe>[] recipes = new RecipeEntry[9];
     private final ItemStack[] currentStacks = new ItemStack[9];
+    private List<BlockState> positionedStates = new ArrayList<>();
 
-    private final FluidContainerImpl fluidContainer = new FluidContainerImpl(FluidConstants.BUCKET * 12 * 2, this::markDirty);
+    private final FluidContainerImpl fluidContainer = new FluidContainerImpl(FLUID_CAPACITY, this::markDirty);
     public int fuelTicks = 0;
     public int fuelInitial = 1;
+    private boolean alreadyBreaking = false;
 
     public SmelteryBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.SMELTERY, pos, state);
@@ -205,8 +214,9 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         Inventories.writeNbt(nbt, this.items, lookup);
         nbt.put("fluids", this.fluidContainer.toNbt(lookup));
-        nbt.putInt("FuelTicks", this.fuelTicks);
-        nbt.putInt("FuelInitial", this.fuelInitial);
+        nbt.putInt("fuel_ticks", this.fuelTicks);
+        nbt.putInt("fuel_initial", this.fuelInitial);
+        nbt.put("positioned_states", BLOCK_STATE_LIST_CODEC, this.positionedStates);
         super.writeNbt(nbt, lookup);
     }
 
@@ -214,8 +224,9 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         Inventories.readNbt(nbt, items, lookup);
         this.fluidContainer.fromNbt(lookup, nbt, "fluids");
-        this.fuelInitial = nbt.getInt("FuelInitial", 0);
-        this.fuelTicks = nbt.getInt("FuelTicks", 0);
+        this.fuelInitial = nbt.getInt("fuel_initial", 0);
+        this.fuelTicks = nbt.getInt("fuel_ticks", 0);
+        this.positionedStates = nbt.get("positioned_states", BLOCK_STATE_LIST_CODEC).orElse(List.of());
         super.readNbt(nbt, lookup);
         Arrays.fill(this.currentStacks, ItemStack.EMPTY);
     }
@@ -259,6 +270,36 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
         super.markDirty();
     }
 
+    @Override
+    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
+        //super.onBlockReplaced(pos, oldState);
+        breakSmeltery((ServerWorld) world, pos, pos, true);
+    }
+
+    public void breakSmeltery(ServerWorld world, BlockPos pos, BlockPos brokenPos, boolean center) {
+        if (this.alreadyBreaking) {
+            return;
+        }
+        this.alreadyBreaking = true;
+        int i = 0;
+        ItemScatterer.spawn(world, pos.offset(this.getCachedState().get(SmelteryBlock.FACING), 2), this);
+        for (var blockPos : BlockPos.iterate(pos.add(-1, -1, -1), pos.add(1, 1, 1))) {
+            var state = this.positionedStates.size() > i ? this.positionedStates.get(i) : Blocks.AIR.getDefaultState();
+            i++;
+            if (brokenPos.equals(blockPos) && !state.isAir()) {
+                ItemScatterer.spawn(world, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5,
+                        state.getBlock().asItem().getDefaultStack());
+            } else {
+                world.setBlockState(blockPos, state);
+            }
+        }
+
+    }
+
+    public void setPositionedBlocks(List<BlockState> list) {
+        this.positionedStates = list;
+    }
+
     private class Gui extends SimpleGui {
         private boolean active;
         private int lastFluidUpdate = -1;
@@ -276,7 +317,8 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
                 }
                 this.setSlotRedirect(9 * 4 + 1 + x, new FuelSlot(SmelteryBlockEntity.this, 9 + x, player.getServerWorld().getFuelRegistry()));
             }
-            this.setSlot(9 * 3 + 2, GuiTextures.FLAME.get(fuelProgress()));
+            this.setSlot(9 * 3 + 2, GuiTextures.FLAME.getCeil(fuelProgress()));
+            this.setSlot(9 * 3, PolydexCompat.getButton(FactoryRecipeTypes.SMELTERY));
             this.active = SmelteryBlockEntity.this.fuelTicks > 0;
             this.updateTitleAndFluid();
             this.updateSmeltingProgress();
@@ -345,7 +387,7 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
                 this.active = true;
                 TriggerCriterion.trigger(this.player, FactoryTriggers.FUEL_STEAM_ENGINE);
             }
-            this.setSlot(9 * 3 + 2, GuiTextures.FLAME.get(fuelProgress()));
+            this.setSlot(9 * 3 + 2, GuiTextures.FLAME.getCeil(fuelProgress()));
             super.onTick();
         }
     }

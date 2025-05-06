@@ -4,9 +4,8 @@ import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.fluids.transport.PipeConnectable;
-import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlock;
-import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlockEntity;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -30,13 +29,16 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
+
+import java.util.ArrayList;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
@@ -47,6 +49,42 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
     public SmelteryBlock(Settings settings) {
         super(3, 3, 3, settings);
         this.setDefaultState(this.getDefaultState().with(LIT, false));
+    }
+
+    public boolean placeSmeltery(ServerWorld world, BlockPos pos) {
+        var list = new ArrayList<BlockState>();
+        int steel = 0;
+        int deepslate = 0;
+        BlockState controller = null;
+        var start = pos.add(-1, -1, -1);
+        var end = pos.add(1, 1, 1);
+        for (var blockPos : BlockPos.iterate(start, end)) {
+            var state = world.getBlockState(blockPos);
+            list.add(state);
+            if (state.isOf(Blocks.DEEPSLATE_BRICKS)) deepslate++;
+            else if (state.isOf(FactoryBlocks.STEEL_BLOCK)) steel++;
+            else if (state.isOf(FactoryBlocks.SMELTERY_CORE) && controller == null) controller = state;
+            else if ((state.isAir() && !blockPos.equals(pos)) || !state.isAir()) return false;
+        }
+
+        if (steel < 5 || deepslate < 20 || controller == null) {
+            return false;
+        }
+
+        var state = FactoryBlocks.SMELTERY.getDefaultState().with(FACING, controller.get(BlastFurnaceBlock.FACING));
+        for (var blockPos : BlockPos.iterate(start, end)) {
+            int x = blockPos.getX() - start.getX();
+            int y = blockPos.getY() - start.getY();
+            int z = blockPos.getZ() - start.getZ();
+
+            world.setBlockState(blockPos, state.with(this.partX, x).with(this.partY, y).with(this.partZ, z));
+
+            if (x == 1 && y == 1 && z == 1 && world.getBlockEntity(blockPos) instanceof SmelteryBlockEntity be) {
+                be.setPositionedBlocks(list);
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -63,6 +101,29 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
         }
 
         return super.onUse(state, world, pos, player, hit);
+    }
+
+    @Override
+    protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
+        super.onStateReplaced(state, world, pos, moved);
+        if (isCenter(state)) {
+            return;
+        }
+        var center = getCenter(state, pos);
+        if (world.getBlockEntity(center) instanceof SmelteryBlockEntity be) {
+            be.breakSmeltery(world, center, pos, false);
+        }
+    }
+
+
+    @Override
+    protected boolean canDropStackFrom(BlockState state) {
+        return false;
+    }
+
+    @Override
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        return state;
     }
 
     @Nullable
@@ -115,7 +176,6 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
     public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
         return true;
     }
-
 
     public static final class Model extends BlockModel {
         private static final ItemStack REGULAR = ItemDisplayElementUtil.getModel(id("block/smeltery"));

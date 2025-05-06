@@ -96,6 +96,8 @@ public class GuiTextures {
     public static final char MIXER_POLYDEX_FLUID_OFFSET_1 = UiResourceCreator.space(28 - 8 + 7);
     public static final char MIXER_POLYDEX_FLUID_OFFSET_2 = UiResourceCreator.space(108);
     public static final char MIXER_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-28 + 8 - 7 - 108);
+    public static final char SMELTERY_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(91 + 7);
+    public static final char SMELTERY_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-91 - 7);
 
     public static void register() {
         PolydexTextures.register();
@@ -129,6 +131,10 @@ public class GuiTextures {
     public record Progress(GuiElement[] elements, ItemStack[] withTooltip) {
         public GuiElement get(float progress) {
             return elements[Math.min((int) (progress * elements.length), elements.length - 1)];
+        }
+
+        public GuiElement getCeil(float progress) {
+            return elements[Math.min((int) Math.ceil(progress * elements.length), elements.length - 1)];
         }
 
         public ItemStack getNamed(float progress, Text text) {

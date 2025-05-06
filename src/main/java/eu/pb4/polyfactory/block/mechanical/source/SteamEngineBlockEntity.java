@@ -159,7 +159,7 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
             this.setSlotRedirect(9 + 3, new FuelSlot(SteamEngineBlockEntity.this, 0, player.getServerWorld().getFuelRegistry()));
             this.setSlotRedirect(9 + 4, new FuelSlot(SteamEngineBlockEntity.this, 1, player.getServerWorld().getFuelRegistry()));
             this.setSlotRedirect(9 + 5, new FuelSlot(SteamEngineBlockEntity.this, 2, player.getServerWorld().getFuelRegistry()));
-            this.setSlot(4, GuiTextures.FLAME.get(progress()));
+            this.setSlot(4, GuiTextures.FLAME.getCeil(progress()));
             this.active = SteamEngineBlockEntity.this.fuelTicks > 0;
             this.open();
         }
@@ -181,7 +181,7 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
                 this.active = true;
                 TriggerCriterion.trigger(this.player, FactoryTriggers.FUEL_STEAM_ENGINE);
             }
-            this.setSlot(4, GuiTextures.FLAME.get(progress()));
+            this.setSlot(4, GuiTextures.FLAME.getCeil(progress()));
             super.onTick();
         }
     }

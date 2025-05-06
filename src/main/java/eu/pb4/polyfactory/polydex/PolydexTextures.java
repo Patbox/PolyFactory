@@ -11,6 +11,7 @@ public class PolydexTextures {
     public static final Text MIXER;
     public static final Text DRAIN;
     public static final Text SPOUT;
+    public static final Text SMELTERY;
 
     public static void register() {
 
@@ -23,6 +24,7 @@ public class PolydexTextures {
         PRESS = t0.getLeft();
         MIXER = t0.getRight();
         GRINDER = t1.getLeft();
+        SMELTERY = t1.getRight();
         DRAIN = t2.getLeft();
         SPOUT = t2.getRight();
     }

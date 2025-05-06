@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.util;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.ModInit;
@@ -37,6 +38,9 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryEntryList;
+import net.minecraft.registry.entry.RegistryEntryOwner;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.server.MinecraftServer;
@@ -49,15 +53,15 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 @SuppressWarnings("UnstableApiUsage")
 public class FactoryUtil {
@@ -544,6 +548,61 @@ public class FactoryUtil {
 
     public static ItemStack fromNbtStack(RegistryWrapper.WrapperLookup lookup, NbtElement stack) {
         return stack instanceof NbtCompound compound && compound.isEmpty() ? ItemStack.EMPTY : ItemStack.fromNbt(lookup, stack).orElse(ItemStack.EMPTY);
+    }
+
+    public static <T> RegistryEntryList<T> fakeTagList(TagKey<T> tag) {
+        return new RegistryEntryList<T>() {
+            @Override
+            public Stream<RegistryEntry<T>> stream() {
+                return Stream.empty();
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+
+            @Override
+            public boolean isBound() {
+                return true;
+            }
+
+            @Override
+            public Either<TagKey<T>, List<RegistryEntry<T>>> getStorage() {
+                return Either.left(tag);
+            }
+
+            @Override
+            public Optional<RegistryEntry<T>> getRandom(Random random) {
+                return Optional.empty();
+            }
+
+            @Override
+            public RegistryEntry<T> get(int index) {
+                return null;
+            }
+
+            @Override
+            public boolean contains(RegistryEntry<T> entry) {
+                return false;
+            }
+
+            @Override
+            public boolean ownerEquals(RegistryEntryOwner<T> owner) {
+                return true;
+            }
+
+            @Override
+            public Optional<TagKey<T>> getTagKey() {
+                return Optional.of(tag);
+            }
+
+            @NotNull
+            @Override
+            public Iterator<RegistryEntry<T>> iterator() {
+                return Collections.emptyIterator();
+            }
+        };
     }
 
 

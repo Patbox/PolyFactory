@@ -3,11 +3,14 @@ package eu.pb4.polyfactory.datagen;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.block.BlockHeat;
+import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidStack;
+import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.mixin.BrewingRecipeRegistryAccessor;
+import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.polyfactory.recipe.drain.PotionAddDrainRecipe;
@@ -26,6 +29,7 @@ import eu.pb4.polyfactory.recipe.spout.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
@@ -45,6 +49,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.sound.SoundEvent;
@@ -705,6 +710,15 @@ class RecipesProvider extends FabricRecipeProvider {
                         .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.AXLE))
                         .offerTo(exporter);
 
+                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.SMELTERY_CORE, 1)
+                        .pattern(" d ")
+                        .pattern("dpd")
+                        .pattern(" d ")
+                        .input('d', Items.DEEPSLATE_BRICKS)
+                        .input('p', FactoryItems.STEEL_PLATE)
+                        .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                        .offerTo(exporter);
+
                 ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.HAND_CRANK)
                         .pattern("ip")
                         .pattern("l ")
@@ -1276,14 +1290,30 @@ class RecipesProvider extends FabricRecipeProvider {
                         Optional.empty(), Optional.empty(), 0, BlockHeat.TORCH, Float.POSITIVE_INFINITY, 1
                 ), null);
 
+                smelteryOreSet(FactoryFluids.IRON, 20 * 5, ItemTags.IRON_ORES, Items.RAW_IRON, Items.RAW_IRON_BLOCK,
+                        FactoryItems.CRUSHED_RAW_IRON, Items.IRON_INGOT, Items.IRON_NUGGET, Items.IRON_BLOCK);
+                smelteryOreSet(FactoryFluids.GOLD, 20 * 4, ItemTags.GOLD_ORES, Items.RAW_GOLD, Items.RAW_GOLD_BLOCK,
+                        FactoryItems.CRUSHED_RAW_GOLD, Items.GOLD_INGOT, Items.GOLD_NUGGET, Items.GOLD_BLOCK);
+                smelteryOreSet(FactoryFluids.COPPER, 20 * 4, ItemTags.COPPER_ORES, Items.RAW_COPPER, Items.RAW_COPPER_BLOCK,
+                        FactoryItems.CRUSHED_RAW_COPPER, Items.COPPER_INGOT, null, null);
 
+                of(exporter, SimpleSmelteryRecipe.of("minecraft_copper", ConventionalItemTags.STORAGE_BLOCKS_COPPER, FactoryFluids.COPPER.of(FluidConstants.BLOCK), 20 * 4 * 9));
+
+                smelteryOreSet(FactoryFluids.STEEL, 20 * 5, null, FactoryItems.STEEL_ALLOY_MIXTURE, null,
+                        null, FactoryItems.STEEL_INGOT, null, FactoryItems.STEEL_BLOCK);
+
+            }
+
+            private void smelteryOreSet(FluidType<?> fluidType, int ingotTime, TagKey<Item> oreBlock, Item raw, Item rawBlock, Item crushed, Item ingot, Item nugget, Item block) {
+                var group = FactoryRegistries.FLUID_TYPES.getId(fluidType).toUnderscoreSeparatedString();
                 of(exporter,
-                        SimpleSmelteryRecipe.of("raw_iron", Items.RAW_IRON, FactoryFluids.IRON.of(FluidConstants.INGOT + FluidConstants.NUGGET / 2), 20 * 8),
-                        SimpleSmelteryRecipe.of("raw_gold", Items.RAW_GOLD, FactoryFluids.GOLD.of(FluidConstants.INGOT + FluidConstants.NUGGET / 2), 20 * 7),
-                        SimpleSmelteryRecipe.of("raw_copper", Items.RAW_COPPER, FactoryFluids.COPPER.of(FluidConstants.INGOT + FluidConstants.NUGGET / 2), 20 * 7),
-                        SimpleSmelteryRecipe.of("crushed_raw_iron", FactoryItems.CRUSHED_RAW_IRON, FactoryFluids.IRON.of(FluidConstants.INGOT), 20 * 6),
-                        SimpleSmelteryRecipe.of("crushed_raw_gold", FactoryItems.CRUSHED_RAW_GOLD, FactoryFluids.GOLD.of(FluidConstants.INGOT), 20 * 5),
-                        SimpleSmelteryRecipe.of("crushed_raw_copper", FactoryItems.CRUSHED_RAW_COPPER, FactoryFluids.COPPER.of(FluidConstants.INGOT), 20 * 5)
+                        raw != null ? SimpleSmelteryRecipe.of(group, raw, fluidType.of(FluidConstants.INGOT + FluidConstants.NUGGET / 2), ingotTime + 20 * 3) : null,
+                        oreBlock != null ? SimpleSmelteryRecipe.of(group, oreBlock, fluidType.of(FluidConstants.INGOT * 2), ingotTime + 20 * 5) : null,
+                        rawBlock != null ? SimpleSmelteryRecipe.of(group, rawBlock, fluidType.of((FluidConstants.INGOT + FluidConstants.NUGGET / 2) * 9), (ingotTime + 20 * 3) * 9) : null,
+                        crushed != null ? SimpleSmelteryRecipe.of(group, crushed, fluidType.of(FluidConstants.INGOT), (ingotTime + 10 * 3)) : null,
+                        ingot != null ? SimpleSmelteryRecipe.of(group, ingot, fluidType.of(FluidConstants.INGOT), ingotTime) : null,
+                        nugget != null ? SimpleSmelteryRecipe.of(group, nugget, fluidType.of(FluidConstants.NUGGET), ingotTime / 9) : null,
+                        block != null ? SimpleSmelteryRecipe.of(group, block, fluidType.of(FluidConstants.BLOCK), ingotTime * 9) : null
                 );
             }
 
@@ -1330,7 +1360,9 @@ class RecipesProvider extends FabricRecipeProvider {
 
             public void of(RecipeExporter exporter, RecipeEntry<?>... recipes) {
                 for (var recipe : recipes) {
-                    exporter.accept(recipe.id(), recipe.value(), null);
+                    if (recipe != null){
+                        exporter.accept(recipe.id(), recipe.value(), null);
+                    }
                 }
             }
         };

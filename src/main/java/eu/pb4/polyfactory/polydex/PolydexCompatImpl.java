@@ -24,6 +24,7 @@ import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.recipe.ShapelessNbtCopyRecipe;
 import eu.pb4.polyfactory.recipe.mixing.TransformMixingRecipe;
+import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
 import eu.pb4.polyfactory.recipe.spout.SimpleDrainRecipe;
 import eu.pb4.polyfactory.recipe.spout.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
@@ -78,6 +79,7 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(ShapelessNbtCopyRecipe.class, (x) -> new ShapelessCraftingRecipePage((RecipeEntry<ShapelessRecipe>) (Object) x));
         PolydexPage.registerRecipeViewer(SimpleSpoutRecipe.class, SimpleSpoutRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleDrainRecipe.class, SimpleDrainRecipePage::new);
+        PolydexPage.registerRecipeViewer(SimpleSmelteryRecipe.class, SimpleSmelteryRecipePage::new);
         PolydexPage.register(PolydexCompatImpl::createPages);
 
         PolydexEntry.registerProvider(PolydexCompatImpl::createFluidEntries);

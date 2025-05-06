@@ -6,7 +6,8 @@
 		"side": "polyfactory:block/smeltery/side",
 		"bottom": "polyfactory:block/smeltery/bottom",
 		"front": "polyfactory:block/smeltery/front",
-		"top": "polyfactory:block/smeltery/top"
+		"top": "polyfactory:block/smeltery/top",
+		"back": "polyfactory:block/smeltery/back"
 	},
 	"elements": [
 		{
@@ -16,10 +17,10 @@
 			"faces": {
 				"north": {"uv": [0, 2, 12, 12], "texture": "#front"},
 				"east": {"uv": [0, 2, 12, 12], "texture": "#side"},
-				"south": {"uv": [0, 2, 12, 12], "texture": "#side"},
+				"south": {"uv": [0, 2, 12, 12], "texture": "#back"},
 				"west": {"uv": [12, 2, 0, 12], "texture": "#side"},
 				"up": {"uv": [0, 0, 12, 12], "texture": "#top"},
-				"down": {"uv": [0, 0, 12, 12], "texture": "#bottom"}
+				"down": {"uv": [0, 12, 12, 0], "texture": "#bottom"}
 			}
 		},
 		{
@@ -29,7 +30,7 @@
 			"faces": {
 				"north": {"uv": [2, 0, 10, 2], "texture": "#front"},
 				"east": {"uv": [12, 0, 0, 2], "texture": "#side"},
-				"south": {"uv": [2, 0, 10, 2], "texture": "#side"},
+				"south": {"uv": [2, 0, 10, 2], "texture": "#back"},
 				"west": {"uv": [0, 0, 12, 2], "texture": "#side"},
 				"up": {"uv": [2, 0, 10, 12], "texture": "#top"},
 				"down": {"uv": [0, 0, 8, 12], "texture": "#top"}

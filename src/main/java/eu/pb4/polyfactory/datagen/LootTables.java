@@ -67,7 +67,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.RECORD_PLAYER);
         this.addDrop(FactoryBlocks.MINER);
         this.addDrop(FactoryBlocks.STEAM_ENGINE);
-        this.addDrop(FactoryBlocks.SMELTERY);
+        this.addDrop(FactoryBlocks.SMELTERY_CORE);
         this.addDrop(FactoryBlocks.HOLOGRAM_PROJECTOR);
         this.addDrop(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
         this.addDrop(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER);

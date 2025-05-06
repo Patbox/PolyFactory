@@ -61,6 +61,7 @@ public class FactoryItems {
     public static final Item EJECTOR = register(FactoryBlocks.EJECTOR);
     public static final Item HAND_CRANK = register(FactoryBlocks.HAND_CRANK);
     public static final Item STEAM_ENGINE = register(FactoryBlocks.STEAM_ENGINE);
+    public static final Item SMELTERY_CORE = register(FactoryBlocks.SMELTERY_CORE);
     public static final Item SMELTERY = register(FactoryBlocks.SMELTERY);
     public static final Item GRINDER = register(FactoryBlocks.GRINDER);
     public static final Item PRESS = register(FactoryBlocks.PRESS);
@@ -250,6 +251,8 @@ public class FactoryItems {
                     entries.add(FLUID_TANK);
                     entries.add(PORTABLE_FLUID_TANK);
                     entries.add(NOZZLE);
+
+                    entries.add(SMELTERY_CORE);
 
                     // Data
                     entries.add(CABLE);

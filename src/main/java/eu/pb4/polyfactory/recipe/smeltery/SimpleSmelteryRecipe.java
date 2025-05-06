@@ -9,6 +9,9 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.item.Item;
 import net.minecraft.recipe.*;
 import net.minecraft.recipe.input.SingleStackRecipeInput;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.dynamic.Codecs;
 import net.minecraft.world.World;
 
@@ -38,12 +41,20 @@ public record SimpleSmelteryRecipe(String group, Ingredient ingredient, List<Flu
         return new RecipeEntry<>(FactoryUtil.recipeKey("smeltery/" + path), new SimpleSmelteryRecipe("", ingredient, List.of(output), time));
     }
 
-    public static RecipeEntry<SimpleSmelteryRecipe> of(String path, String group, Item ingredient, FluidStack<?> output, int time) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("smeltery/" + path), new SimpleSmelteryRecipe(group, Ingredient.ofItems(ingredient), List.of(output), time));
+    public static RecipeEntry<SimpleSmelteryRecipe> of(String group, Item ingredient, FluidStack<?> output, int time) {
+        return new RecipeEntry<>(FactoryUtil.recipeKey("smeltery/from_" + Registries.ITEM.getId(ingredient).getPath()), new SimpleSmelteryRecipe(group, Ingredient.ofItems(ingredient), List.of(output), time));
     }
 
-    public static RecipeEntry<SimpleSmelteryRecipe> of(String path, Item ingredient, FluidStack<?> output, int time) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("smeltery/" + path), new SimpleSmelteryRecipe("",  Ingredient.ofItems(ingredient), List.of(output), time));
+    public static RecipeEntry<SimpleSmelteryRecipe> of(Item ingredient, FluidStack<?> output, int time) {
+        return new RecipeEntry<>(FactoryUtil.recipeKey("smeltery/from_" + Registries.ITEM.getId(ingredient).getPath()), new SimpleSmelteryRecipe("",  Ingredient.ofItems(ingredient), List.of(output), time));
+    }
+
+    public static RecipeEntry<SimpleSmelteryRecipe> of(String group, TagKey<Item> ingredient, FluidStack<?> output, int time) {
+        return new RecipeEntry<>(FactoryUtil.recipeKey("smeltery/from_" + ingredient.id().getPath()), new SimpleSmelteryRecipe(group, Ingredient.fromTag(FactoryUtil.fakeTagList(ingredient)), List.of(output), time));
+    }
+
+    public static RecipeEntry<SimpleSmelteryRecipe> of(TagKey<Item> ingredient, FluidStack<?> output, int time) {
+        return new RecipeEntry<>(FactoryUtil.recipeKey("smeltery/from_" + ingredient.id().getPath()), new SimpleSmelteryRecipe("",  Ingredient.fromTag(FactoryUtil.fakeTagList(ingredient)), List.of(output), time));
     }
 
     @Override
@@ -64,5 +75,10 @@ public record SimpleSmelteryRecipe(String group, Ingredient ingredient, List<Flu
     @Override
     public int time(SingleStackRecipeInput input, World world) {
         return this.time;
+    }
+
+    @Override
+    public String getGroup() {
+        return this.group;
     }
 }

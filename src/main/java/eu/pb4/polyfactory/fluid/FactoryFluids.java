@@ -57,6 +57,13 @@ public class FactoryFluids {
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
                     .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
 
+    public static final FluidType<Unit> STEEL = register(Identifier.ofVanilla("steel"),
+            FluidType.of().density(1007).brightness(15).heat(BlockHeat.LAVA)
+                    .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
+                    .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
+                    .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
+
+
     public static final FluidType<Unit> GOLD = register(Identifier.ofVanilla("gold"),
             FluidType.of().density(1010).brightness(15).heat(BlockHeat.LAVA)
                     .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))

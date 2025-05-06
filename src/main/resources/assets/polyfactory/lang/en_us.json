@@ -80,6 +80,7 @@
   "block.polyfactory.mechanical_drain": "Mechanical Fluid Drain",
   "block.polyfactory.mechanical_spout": "Mechanical Spout",
   "block.polyfactory.smeltery": "Smeltery",
+  "block.polyfactory.smeltery_core": "Smeltery Core",
   "block.polyfactory.creative_drain": "Creative Fluid Drain",
   "block.polyfactory.fluid_tank": "Fluid Tank",
   "block.polyfactory.portable_fluid_tank": "Portable Fluid Tank",
@@ -309,6 +310,7 @@
   "fluid_type.minecraft.honey": "Honey",
   "fluid_type.minecraft.slime": "Slime",
   "fluid_type.minecraft.snow": "Snow",
+  "fluid_type.minecraft.steel": "Molten Steel",
   "fluid_type.minecraft.iron": "Molten Iron",
   "fluid_type.minecraft.gold": "Molten Gold",
   "fluid_type.minecraft.copper": "Molten Copper",
@@ -331,6 +333,7 @@
   "recipe_type.polyfactory.grinding": "Grinder",
   "recipe_type.polyfactory.drain": "Drain",
   "recipe_type.polyfactory.spout": "Spout",
+  "recipe_type.polyfactory.smeltery": "Smeltery",
 
   "stat.polyfactory.taters_clicked": "Potatoes Clicked",
   "subtitles.polyfactory.block.press.craft": "Mechanical Press presses",

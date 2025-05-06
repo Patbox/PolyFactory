@@ -38,4 +38,9 @@ public interface SmelteryRecipe extends Recipe<SingleStackRecipeInput> {
     default RecipeBookCategory getRecipeBookCategory() {
         return RecipeBookCategories.CAMPFIRE;
     }
+
+    @Override
+    default boolean isIgnoredInRecipeBook() {
+        return true;
+    }
 }
