@@ -31,6 +31,10 @@ public interface SpoutRecipe extends Recipe<SpoutInput> {
         return 1;
     }
 
+    default int damageInputItemAmount(SpoutInput input) {
+        return 0;
+    }
+
     List<FluidStack<?>> fluidInput(SpoutInput input);
 
     RegistryEntry<SoundEvent> soundEvent();

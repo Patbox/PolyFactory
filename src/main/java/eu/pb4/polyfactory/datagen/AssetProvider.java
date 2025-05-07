@@ -2,12 +2,12 @@ package eu.pb4.polyfactory.datagen;
 
 import com.google.common.hash.HashCode;
 import eu.pb4.mapcanvas.api.core.CanvasColor;
-import eu.pb4.mapcanvas.api.core.CanvasImage;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import eu.pb4.mapcanvas.api.font.DefaultFonts;
 import eu.pb4.mapcanvas.api.utils.CanvasUtils;
 import eu.pb4.polyfactory.item.FactoryDebugItems;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.tool.SpoutMolds;
 import eu.pb4.polyfactory.models.ConveyorModels;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.ui.GuiTextures;
@@ -18,12 +18,12 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.model.*;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.CustomModelDataFlagProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.UsingItemProperty;
-import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.ViewEntityProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.numeric.CustomModelDataFloatProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.select.DisplayContextProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.ConstantTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.CustomModelDataTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.PotionTintSource;
+import eu.pb4.polymer.resourcepack.extras.api.format.model.ModelAsset;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.data.DataOutput;
@@ -44,7 +44,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -69,6 +68,38 @@ class AssetProvider implements DataProvider {
         createItems(map::put);
         map.forEach((id, asset) -> assetWriter.accept(AssetPaths.itemAsset(id), asset.toJson().getBytes(StandardCharsets.UTF_8)));
         createNumberButtons(assetWriter);
+
+        createMold(assetWriter, FactoryItems.INGOT_MOLD);
+    }
+
+    private static void createMold(BiConsumer<String, byte[]> assetWriter, SpoutMolds mold) {
+        {
+            var id = Registries.ITEM.getId(mold.mold());
+            assetWriter.accept(AssetPaths.itemModel(id),
+                    ModelAsset.builder().parent(Identifier.of("item/generated"))
+                            .texture("layer0", id.withPrefixedPath("item/").toString())
+                            .build().toBytes()
+            );
+        }
+
+        {
+            var id = Registries.ITEM.getId(mold.clay());
+            assetWriter.accept(AssetPaths.itemModel(id),
+                    ModelAsset.builder().parent(Identifier.of("item/generated"))
+                            .texture("layer0", id.withPrefixedPath("item/").toString())
+                            .build().toBytes()
+            );
+        }
+
+
+        {
+            var id = Registries.ITEM.getId(mold.hardened());
+            assetWriter.accept(AssetPaths.itemModel(id),
+                    ModelAsset.builder().parent(Identifier.of("item/generated"))
+                            .texture("layer0", id.withPrefixedPath("item/").toString())
+                            .build().toBytes()
+            );
+        }
     }
 
     private static void createItems(BiConsumer<Identifier, ItemAsset> consumer) {

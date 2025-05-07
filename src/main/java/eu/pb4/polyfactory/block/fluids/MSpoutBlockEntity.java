@@ -40,6 +40,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
@@ -157,6 +158,11 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
                 Criteria.RECIPE_CRAFTED.trigger(serverPlayer, self.currentRecipe.id(), List.of(inputStack.copy()));
             }
             inputStack.decrement(self.currentRecipe.value().decreasedInputItemAmount(input));
+            var damage = self.currentRecipe.value().damageInputItemAmount(input);
+
+            if (damage > 0) {
+                inputStack.damage(damage, (ServerWorld) world,null, Consumers.nop());
+            }
             if (inputStack.isEmpty()) {
                 self.setStack(INPUT_FIRST, ItemStack.EMPTY);
             }

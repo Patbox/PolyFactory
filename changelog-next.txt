@@ -4,3 +4,4 @@
 - Mechanical Pumps (and pipes powered by them) will now pull fluid blocks that are further away (as long as they are connected, by safe fluid blocks).
 - Gears are now placed correctly aside of Mechanical Pump.
 - Fixed fluid order being reversed in tooltips.
+- Tried to improve compatibility with Lithium's Hopper optimalizations.

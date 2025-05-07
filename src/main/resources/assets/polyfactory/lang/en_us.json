@@ -133,6 +133,10 @@
   "item.polyfactory.crispy_honey": "Crispy Honey",
   "item.polyfactory.honeyed_apple": "Honeyed Apple",
 
+  "item.polyfactory.mold.ingot": "Ingot Mold",
+  "item.polyfactory.mold.ingot_clay": "Clay Ingot Mold",
+  "item.polyfactory.mold.ingot_hardened": "Hardened Clay Ingot Mold",
+
   "block.polyfactory.colored_lamp": "Colored Lamp",
   "block.polyfactory.colored_lamp.colored": "%s Lamp",
   "block.polyfactory.colored_lamp.colored.full": "%s Lamp (%s)",

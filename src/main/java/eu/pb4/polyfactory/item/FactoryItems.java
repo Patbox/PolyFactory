@@ -185,6 +185,8 @@ public class FactoryItems {
 
     public static final Item ITEM_PACKER = register(FactoryBlocks.ITEM_PACKER);
 
+    public static final SpoutMolds INGOT_MOLD = SpoutMolds.create("ingot");
+
     public static void register() {
         FuelRegistryEvents.BUILD.register(((builder, context) -> {
             builder.add(SAW_DUST, (int) (context.baseSmeltTime() * 0.3));
@@ -253,6 +255,7 @@ public class FactoryItems {
                     entries.add(NOZZLE);
 
                     entries.add(SMELTERY_CORE);
+                    INGOT_MOLD.addItemGroup(entries);
 
                     // Data
                     entries.add(CABLE);
@@ -435,12 +438,14 @@ public class FactoryItems {
         PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(PortableFluidTankBlockItem::createItemAsset);
     }
 
-
-    public static <T extends Item> T register(String path, Function<Item.Settings, T> function) {
-        var id = Identifier.of(ModInit.ID, path);
+    public static <T extends Item> T register(Identifier id, Function<Item.Settings, T> function) {
         var item = function.apply(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, id)));
         Registry.register(Registries.ITEM, id, item);
         return item;
+    }
+
+    public static <T extends Item> T register(String path, Function<Item.Settings, T> function) {
+        return register(Identifier.of(ModInit.ID, path), function);
     }
 
     public static <E extends Block & PolymerBlock> ColoredDownsampledBlockItem registerColored(E block, int color) {

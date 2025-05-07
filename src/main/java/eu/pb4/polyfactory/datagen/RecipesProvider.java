@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.tool.SpoutMolds;
 import eu.pb4.polyfactory.mixin.BrewingRecipeRegistryAccessor;
 import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
@@ -39,9 +40,7 @@ import net.minecraft.data.recipe.*;
 import net.minecraft.item.*;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.recipe.BrewingRecipeRegistry;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.*;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
@@ -1272,8 +1271,6 @@ class RecipesProvider extends FabricRecipeProvider {
                         FactoryFluids.SLIME.of(FluidConstants.INGOT), Items.SLIME_BALL, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
                 exporter.accept(recipeKey("spout/snowball"), SimpleSpoutRecipe.template(Items.BOWL,
                         FactoryFluids.SNOW.of(FluidConstants.BLOCK / 4), Items.SNOWBALL, SoundEvents.BLOCK_SNOW_PLACE), null);
-                exporter.accept(recipeKey("spout/iron_ingot"), SimpleSpoutRecipe.template(FactoryItems.TEMPLATE_BALL,
-                        FactoryFluids.IRON.of(FluidConstants.INGOT), Items.IRON_INGOT, SoundEvents.BLOCK_LAVA_EXTINGUISH), null);
 
                 destructiveItemCreatingFluidInteraction(exporter, "water_lava", 1, List.of(FactoryFluids.WATER.of(6000), FactoryFluids.LAVA.of(3000)),
                         OutputStack.of(Items.FLINT, 0.15f, 1), ParticleTypes.LARGE_SMOKE, SoundEvents.BLOCK_LAVA_EXTINGUISH);
@@ -1302,19 +1299,48 @@ class RecipesProvider extends FabricRecipeProvider {
                 smelteryOreSet(FactoryFluids.STEEL, 20 * 5, null, FactoryItems.STEEL_ALLOY_MIXTURE, null,
                         null, FactoryItems.STEEL_INGOT, null, FactoryItems.STEEL_BLOCK);
 
+                this.spoutMolds(ConventionalItemTags.INGOTS, FactoryItems.INGOT_MOLD);
+
             }
+
+            private void spoutMolds(TagKey<Item> tag, SpoutMolds mold) {
+                CookingRecipeJsonBuilder.create(Ingredient.ofItems(mold.clay()), RecipeCategory.TOOLS, mold.hardened(),
+                        0, 40, RecipeSerializer.SMELTING, SmeltingRecipe::new)
+                        .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(Items.CLAY))
+                        .offerTo(exporter);
+
+                this.createShaped(RecipeCategory.TOOLS, mold.clay()).pattern(" x ").pattern("xox").pattern(" x ")
+                        .input('x', Items.CLAY)
+                        .input('o', tag)
+                        .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(Items.CLAY))
+                        .offerTo(exporter);
+            }
+
 
             private void smelteryOreSet(FluidType<?> fluidType, int ingotTime, TagKey<Item> oreBlock, Item raw, Item rawBlock, Item crushed, Item ingot, Item nugget, Item block) {
                 var group = FactoryRegistries.FLUID_TYPES.getId(fluidType).toUnderscoreSeparatedString();
                 of(exporter,
-                        raw != null ? SimpleSmelteryRecipe.of(group, raw, fluidType.of(FluidConstants.INGOT + FluidConstants.NUGGET / 2), ingotTime + 20 * 3) : null,
+                        raw != null ? SimpleSmelteryRecipe.of(group, raw, fluidType.of(FluidConstants.INGOT + FluidConstants.NUGGET * 2), ingotTime + 20 * 3) : null,
                         oreBlock != null ? SimpleSmelteryRecipe.of(group, oreBlock, fluidType.of(FluidConstants.INGOT * 2), ingotTime + 20 * 5) : null,
-                        rawBlock != null ? SimpleSmelteryRecipe.of(group, rawBlock, fluidType.of((FluidConstants.INGOT + FluidConstants.NUGGET / 2) * 9), (ingotTime + 20 * 3) * 9) : null,
-                        crushed != null ? SimpleSmelteryRecipe.of(group, crushed, fluidType.of(FluidConstants.INGOT), (ingotTime + 10 * 3)) : null,
-                        ingot != null ? SimpleSmelteryRecipe.of(group, ingot, fluidType.of(FluidConstants.INGOT), ingotTime) : null,
+                        rawBlock != null ? SimpleSmelteryRecipe.of(group, rawBlock, fluidType.of((FluidConstants.INGOT + FluidConstants.NUGGET) * 9), (ingotTime + 20 * 3) * 9) : null,
+                        crushed != null ? SimpleSmelteryRecipe.of(group, crushed, fluidType.of(FluidConstants.INGOT + FluidConstants.NUGGET * 2), (ingotTime + 10 * 3)) : null,
                         nugget != null ? SimpleSmelteryRecipe.of(group, nugget, fluidType.of(FluidConstants.NUGGET), ingotTime / 9) : null,
                         block != null ? SimpleSmelteryRecipe.of(group, block, fluidType.of(FluidConstants.BLOCK), ingotTime * 9) : null
                 );
+
+                if (ingot != null) {
+                    of(exporter,
+                            SimpleSmelteryRecipe.of(group, ingot, fluidType.of(FluidConstants.INGOT), ingotTime)
+                    );
+
+
+                    exporter.accept(recipeKey("spout/" + Registries.ITEM.getId(ingot).getPath()),
+                            SimpleSpoutRecipe.templateDamaged(FactoryItems.INGOT_MOLD.tag(), fluidType.of(FluidConstants.INGOT),
+                                    ingot, SoundEvents.BLOCK_LAVA_EXTINGUISH), null
+                    );
+                }
+
+
             }
 
             private void destructiveItemCreatingFluidInteraction(RecipeExporter exporter, String name, int repeats, List<FluidStack<?>> fluids, OutputStack item, ParticleEffect particleEffect, SoundEvent soundEvent) {

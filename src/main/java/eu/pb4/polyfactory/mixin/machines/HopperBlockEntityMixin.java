@@ -43,13 +43,14 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
     @Inject(method = "writeNbt", at = @At("TAIL"))
     private void writeFilterNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
         if (!this.filterStack.isEmpty()) {
-            nbt.put("polydex:filter", this.filterStack.toNbt(registryLookup));
+            nbt.put("polyfactory:filter", this.filterStack.toNbt(registryLookup));
         }
     }
 
     @Inject(method = "readNbt", at = @At("TAIL"))
     private void readFilterNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
-        polyfactory$setFilter(FactoryUtil.fromNbtStack(registryLookup, nbt.getCompoundOrEmpty("polydex:filter")));
+        polyfactory$setFilter(FactoryUtil.fromNbtStack(registryLookup, nbt.getCompound("polyfactory:filter")
+                .orElse(nbt.getCompoundOrEmpty("polydex:filter"))));
     }
 
     @Inject(method = "transfer(Lnet/minecraft/inventory/Inventory;Lnet/minecraft/inventory/Inventory;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/math/Direction;)Lnet/minecraft/item/ItemStack;", at = @At("HEAD"), cancellable = true)
@@ -57,6 +58,15 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
         if (to instanceof FilteredBlockEntity filteredHopper) {
             if (!filteredHopper.polyfactory$matchesFilter(stack)) {
                 cir.setReturnValue(stack);
+            }
+        }
+    }
+
+    @Inject(method = "canExtract", at = @At("HEAD"), cancellable = true)
+    private static void cancelUnfiltered2(Inventory hopperInventory, Inventory fromInventory, ItemStack stack, int slot, Direction facing, CallbackInfoReturnable<Boolean> cir) {
+        if (hopperInventory instanceof FilteredBlockEntity filteredHopper) {
+            if (!filteredHopper.polyfactory$matchesFilter(stack)) {
+                cir.setReturnValue(false);
             }
         }
     }

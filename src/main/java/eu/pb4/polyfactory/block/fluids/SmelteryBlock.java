@@ -46,6 +46,10 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
     public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty LIT = Properties.LIT;
 
+    public static final int STEEL_BLOCKS = 3;
+    public static final int DEEPSLATE_BRICK_BLOCKS = 22;
+
+
     public SmelteryBlock(Settings settings) {
         super(3, 3, 3, settings);
         this.setDefaultState(this.getDefaultState().with(LIT, false));
@@ -67,7 +71,7 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
             else if ((state.isAir() && !blockPos.equals(pos)) || !state.isAir()) return false;
         }
 
-        if (steel < 5 || deepslate < 20 || controller == null) {
+        if (steel < STEEL_BLOCKS || deepslate < DEEPSLATE_BRICK_BLOCKS || controller == null) {
             return false;
         }
 
