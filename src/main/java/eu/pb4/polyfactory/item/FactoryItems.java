@@ -165,7 +165,6 @@ public class FactoryItems {
     public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", SimplePolymerItem::new);
     public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", SimplePolymerItem::new);
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", SimplePolymerItem::new);
-    public static final Item TEMPLATE_BALL = register("template_ball", SimplePolymerItem::new);
     public static final Item SPRAY_CAN = register("spray_can", settings -> new DyeSprayItem(settings.maxCount(1)));
     public static final Item PIPE = register("pipe", settings -> new PipeItem(FactoryBlocks.PIPE, settings.useBlockPrefixedTranslationKey()));
     public static final Item FILTERED_PIPE = register(FactoryBlocks.FILTERED_PIPE);

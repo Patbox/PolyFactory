@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
+import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
@@ -202,7 +203,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             Quaternionf rot;
             var dir = this.getCachedState().get(MDrainBlock.INPUT_FACING);
             if (id == INPUT_FIRST) {
-                if (container.get().isOf(FactoryItems.TEMPLATE_BALL)) {
+                if (container.get().isIn(FactoryItemTags.SPOUT_ITEM_HORIZONTAL)) {
                     base = base.add(0, 8.2f / 16, 0);
                     rot = RotationAxis.POSITIVE_Y.rotation(MathHelper.HALF_PI).mul(dir.getOpposite().getRotationQuaternion());
                     scale = 1.25f;

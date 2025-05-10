@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.polyfactory.datagen.ItemTagsProvider;
+import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import net.minecraft.item.Item;
@@ -37,5 +38,6 @@ public record SpoutMolds(Identifier name, Item clay, Item hardened, Item mold, T
 
     public void createTag(ItemTagsProvider itemTagsProvider) {
         itemTagsProvider.getOrCreateTagBuilder(tag).add(hardened, mold);
+        itemTagsProvider.getOrCreateTagBuilder(FactoryItemTags.SPOUT_ITEM_HORIZONTAL).add(hardened, mold);
     }
 }
