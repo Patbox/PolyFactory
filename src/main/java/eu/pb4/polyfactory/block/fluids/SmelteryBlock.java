@@ -29,6 +29,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -188,8 +189,9 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
         private final ItemDisplayElement main;
         private Model(BlockState state) {
             this.main = ItemDisplayElementUtil.createSimple(state.get(SmelteryBlock.LIT) ? LIT : REGULAR);
-            this.main.setOffset(FactoryUtil.HALF_BELOW);
+            this.main.setOffset(new Vec3d(0, -1, 0));
             this.main.setScale(new Vector3f(2f * 2));
+            this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.main.setDisplaySize(5, 5);
             this.updateStatePos(state);
             this.addElement(this.main);

@@ -1,0 +1,7 @@
+{
+  "parent": "polyfactory:block/mechanical_spout",
+  "textures": {
+    "table": "polyfactory:block/fluids/mechanical_spout_table",
+    "holder": "polyfactory:block/empty"
+  }
+}

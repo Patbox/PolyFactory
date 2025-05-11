@@ -27,8 +27,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.ComponentsAccess;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ItemStackParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
@@ -85,6 +88,8 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
                 self.containers[i].maybeAdd(self.model);
             }
         }
+
+        self.model.altModel(!self.containers[0].isContainerEmpty() && self.containers[0].getContainer().get().isIn(FactoryItemTags.SPOUT_ITEM_HORIZONTAL));
         self.state = null;
         var posAbove = pos.up();
 
@@ -162,7 +167,16 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             var damage = self.currentRecipe.value().damageInputItemAmount(input);
 
             if (damage > 0) {
+                var x = inputStack.copy();
                 inputStack.damage(damage, (ServerWorld) world,null, Consumers.nop());
+                if (inputStack.isEmpty()) {
+                    if (x.contains(DataComponentTypes.BREAK_SOUND)) {
+                        world.playSound(null, pos, x.get(DataComponentTypes.BREAK_SOUND).value(), SoundCategory.BLOCKS);
+                    }
+                    ((ServerWorld) world).spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, x),
+                            pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.51, 5,
+                            0.2, 0, 0.2, 0.5);
+                }
             }
             if (inputStack.isEmpty()) {
                 self.setStack(INPUT_FIRST, ItemStack.EMPTY);
@@ -195,6 +209,8 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
     protected void updatePosition(int id) {
         var c = containers[id];
 
+
+
         if (!c.isContainerEmpty()) {
             assert c.getContainer() != null;
             var container = c.getContainer();
@@ -204,9 +220,9 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             var dir = this.getCachedState().get(MDrainBlock.INPUT_FACING);
             if (id == INPUT_FIRST) {
                 if (container.get().isIn(FactoryItemTags.SPOUT_ITEM_HORIZONTAL)) {
-                    base = base.add(0, 8.2f / 16, 0);
+                    base = base.add(0, 7f / 16, 0);
                     rot = RotationAxis.POSITIVE_Y.rotation(MathHelper.HALF_PI).mul(dir.getOpposite().getRotationQuaternion());
-                    scale = 1.25f;
+                    scale = 2;//1.25f;
                 } else {
                     base = base.add(0, 10f / 16, 0);
                     rot = Direction.UP.getRotationQuaternion().rotateY(dir.getPositiveHorizontalDegrees() * MathHelper.RADIANS_PER_DEGREE);

@@ -60,8 +60,9 @@ public class FactoryBlocks {
     public static final ConveyorBlock STICKY_CONVEYOR = register("sticky_conveyor", settings -> new ConveyorBlock(settings.hardness(3).nonOpaque()));
     public static final FunnelBlock FUNNEL = register("funnel", Block.Settings.copy(Blocks.SPRUCE_TRAPDOOR).nonOpaque(), FunnelBlock::new);
     public static final SlotAwareFunnelBlock SLOT_AWARE_FUNNEL = register("slot_aware_funnel", Block.Settings.copy(Blocks.IRON_TRAPDOOR).nonOpaque(), SlotAwareFunnelBlock::new);
-    public static final SplitterBlock SPLITTER = register("splitter", settings -> new SplitterBlock(settings.mapColor(MapColor.STONE_GRAY).instrument(NoteBlockInstrument.BASEDRUM).requiresTool().strength(3.3F).nonOpaque()));
-    public static final FanBlock FAN = register("fan", settings -> new FanBlock(settings.nonOpaque().hardness(3).requiresTool()));
+    public static final SplitterBlock SPLITTER = register("splitter", settings -> new SplitterBlock(settings.mapColor(MapColor.STONE_GRAY).instrument(NoteBlockInstrument.BASEDRUM)
+            .requiresTool().strength(3.3F).nonOpaque().sounds(BlockSoundGroup.IRON)));
+    public static final FanBlock FAN = register("fan", settings -> new FanBlock(settings.nonOpaque().hardness(3).sounds(BlockSoundGroup.IRON).requiresTool()));
     public static final EjectorBlock EJECTOR = register("ejector", AbstractBlock.Settings.copy(FAN), EjectorBlock::new);
     public static final SelectivePassthroughBlock METAL_GRID = register("metal_grid", Block.Settings.copy(Blocks.IRON_BLOCK), settings -> new SelectivePassthroughBlock(settings.strength(4.0F, 3.0F).nonOpaque()));
     public static final HandCrankBlock HAND_CRANK = register("hand_crank", settings -> new HandCrankBlock(settings.hardness(1).nonOpaque()));
@@ -74,8 +75,8 @@ public class FactoryBlocks {
     public static final PlacerBlock PLACER = register("placer", Block.Settings.copy(SPLITTER), PlacerBlock::new);
     public static final PlanterBlock PLANTER = register("planter", Block.Settings.copy(SPLITTER), PlanterBlock::new);
     public static final AxleBlock AXLE = register("axle", Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD), settings -> new AxleBlock(settings.strength(2.5F).nonOpaque()));
-    public static final AxleWithGearBlock AXLE_WITH_GEAR = register("axle_with_gear", Block.Settings.copy(AXLE), AxleWithGearBlock::new);
-    public static final AxleWithLargeGearBlock AXLE_WITH_LARGE_GEAR = register("axle_with_large_gear", Block.Settings.copy(AXLE), AxleWithLargeGearBlock::new);
+    public static final AxleWithGearBlock AXLE_WITH_GEAR = register("axle_with_gear", Block.Settings.copy(AXLE).sounds(BlockSoundGroup.IRON), AxleWithGearBlock::new);
+    public static final AxleWithLargeGearBlock AXLE_WITH_LARGE_GEAR = register("axle_with_large_gear", Block.Settings.copy(AXLE_WITH_GEAR), AxleWithLargeGearBlock::new);
     public static final TurntableBlock TURNTABLE = register("turntable", Block.Settings.copy(AXLE), TurntableBlock::new);
     public static final GearboxBlock GEARBOX = register("gearbox", Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD), settings -> new GearboxBlock(settings.strength(2.5F).nonOpaque()));
     public static final ClutchBlock CLUTCH = register("clutch", Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD), settings -> new ClutchBlock(settings.strength(2.5F).nonOpaque()));
@@ -136,8 +137,8 @@ public class FactoryBlocks {
     public static final RedstoneValvePipeBlock REDSTONE_VALVE_PIPE = register("redstone_valve_pipe", Block.Settings.copy(PIPE), settings -> new RedstoneValvePipeBlock(settings.nonOpaque()));
     public static final Map<Block, PipeInWallBlock> WALL_WITH_PIPE = PipeInWallBlock.MAP;
 
-    public static final SmelteryBlock SMELTERY = register("smeltery", Block.Settings.copy(STEAM_ENGINE).dropsNothing(), SmelteryBlock::new);
-    public static final SmelteryCoreBlock SMELTERY_CORE = register("smeltery_core", Block.Settings.copy(STEAM_ENGINE), SmelteryCoreBlock::new);
+    public static final SmelteryBlock SMELTERY = register("smeltery", Block.Settings.copy(STEAM_ENGINE).sounds(BlockSoundGroup.DEEPSLATE_BRICKS).dropsNothing(), SmelteryBlock::new);
+    public static final SmelteryCoreBlock SMELTERY_CORE = register("smeltery_core", Block.Settings.copy(SMELTERY), SmelteryCoreBlock::new);
     public static final PumpBlock PUMP = register("pump", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new PumpBlock(settings.nonOpaque()));
     public static final NozzleBlock NOZZLE = register("nozzle", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new NozzleBlock(settings.nonOpaque()));
     public static final DrainBlock DRAIN = register("drain", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new DrainBlock(settings.nonOpaque()));

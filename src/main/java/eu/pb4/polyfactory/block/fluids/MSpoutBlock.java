@@ -39,6 +39,8 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.Collection;
 import java.util.List;
 
+import static eu.pb4.polyfactory.ModInit.id;
+
 public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponent.Pipe, PipeConnectable {
     public MSpoutBlock(Settings settings) {
         super(settings);
@@ -161,12 +163,15 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
     }
 
     public static final class Model extends RotationAwareModel {
+        private final ItemStack DEFAULT_MODEL = ItemDisplayElementUtil.getModel(id("block/mechanical_spout"));
+        private final ItemStack ALT_MODEL = ItemDisplayElementUtil.getModel(id("block/mechanical_spout_alt"));
         private final ItemDisplayElement main;
         private final ItemDisplayElement gearA;
         private final ItemDisplayElement gearB;
+        private boolean altModel = false;
 
         private Model(ServerWorld world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.main = ItemDisplayElementUtil.createSimple(DEFAULT_MODEL);
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, this.getUpdateRate(), 0.3f, 0.5f);
@@ -225,6 +230,16 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
         }
 
         public void setActive(boolean b) {
+        }
+
+        public void altModel(boolean b) {
+            if (this.altModel == b) {
+                return;
+            }
+
+            this.altModel = b;
+            this.main.setItem(b ? ALT_MODEL : DEFAULT_MODEL);
+            this.main.tick();
         }
     }
 }
