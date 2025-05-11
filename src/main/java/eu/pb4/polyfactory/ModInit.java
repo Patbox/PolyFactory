@@ -24,9 +24,11 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras;
+import eu.pb4.polymer.soundpatcher.api.SoundPatcher;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,5 +88,9 @@ public class ModInit implements ModInitializer {
 		FluidTextures.setup();
 
 		ServerPlayConnectionEvents.JOIN.register(FactorySecrets::onJoin);
+
+		//for (var block : Registries.BLOCK) {
+		//	SoundPatcher.convertIntoServerSound(block.getDefaultState().getSoundGroup());
+		//}
 	}
 }

@@ -136,9 +136,9 @@ public class FactoryBlocks {
     public static final FilteredPipeBlock FILTERED_PIPE = register("filtered_pipe", Block.Settings.copy(PIPE), settings -> new FilteredPipeBlock(settings.nonOpaque()));
     public static final RedstoneValvePipeBlock REDSTONE_VALVE_PIPE = register("redstone_valve_pipe", Block.Settings.copy(PIPE), settings -> new RedstoneValvePipeBlock(settings.nonOpaque()));
     public static final Map<Block, PipeInWallBlock> WALL_WITH_PIPE = PipeInWallBlock.MAP;
+    public static final SmelteryCoreBlock SMELTERY_CORE = register("smeltery_core", Block.Settings.copy(STEAM_ENGINE).sounds(BlockSoundGroup.DEEPSLATE_BRICKS), SmelteryCoreBlock::new);
 
-    public static final SmelteryBlock SMELTERY = register("smeltery", Block.Settings.copy(STEAM_ENGINE).sounds(BlockSoundGroup.DEEPSLATE_BRICKS).dropsNothing(), SmelteryBlock::new);
-    public static final SmelteryCoreBlock SMELTERY_CORE = register("smeltery_core", Block.Settings.copy(SMELTERY), SmelteryCoreBlock::new);
+    public static final SmelteryBlock SMELTERY = register("smeltery", Block.Settings.copy(SMELTERY_CORE).dropsNothing(), SmelteryBlock::new);
     public static final PumpBlock PUMP = register("pump", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new PumpBlock(settings.nonOpaque()));
     public static final NozzleBlock NOZZLE = register("nozzle", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new NozzleBlock(settings.nonOpaque()));
     public static final DrainBlock DRAIN = register("drain", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new DrainBlock(settings.nonOpaque()));
