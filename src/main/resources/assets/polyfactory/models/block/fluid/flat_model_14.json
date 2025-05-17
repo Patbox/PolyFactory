@@ -1,0 +1,26 @@
+{
+	"textures": {
+		"texture": "polyfactory:block/fluid/experience",
+		"particle": "#texture"
+	},
+	"elements": [
+		{
+			"from": [1, 8, 1],
+			"to": [15, 8, 15],
+			"faces": {
+				"north": {"uv": [1, 1, 15, 15], "texture": "#texture", "tintindex": 0},
+				"east": {"uv": [1, 1, 15, 15], "texture": "#texture", "tintindex": 0},
+				"south": {"uv":[1, 1, 15, 15], "texture": "#texture", "tintindex": 0},
+				"west": {"uv": [1, 1, 15, 15], "texture": "#texture", "tintindex": 0},
+				"up": {"uv": [1, 1, 15, 15], "texture": "#texture", "tintindex": 0},
+				"down": {"uv": [1, 15, 15, 1], "texture": "#texture", "tintindex": 0}
+			}
+		}
+	],
+	"gui_light": "front",
+	"display": {
+		"gui": {
+			"rotation": [90, 0, 0]
+		}
+	}
+}

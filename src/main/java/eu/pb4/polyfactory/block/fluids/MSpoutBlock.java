@@ -9,6 +9,8 @@ import eu.pb4.polyfactory.block.fluids.transport.PipeConnectable;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.fluid.FluidInstance;
+import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.pipe.PumpNode;
@@ -30,6 +32,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
@@ -168,7 +171,10 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
         private final ItemDisplayElement main;
         private final ItemDisplayElement gearA;
         private final ItemDisplayElement gearB;
+        private final ItemDisplayElement fluid;
         private boolean altModel = false;
+        private double progress;
+        private FluidInstance<?> castingFluid;
 
         private Model(ServerWorld world, BlockState state) {
             this.main = ItemDisplayElementUtil.createSimple(DEFAULT_MODEL);
@@ -176,13 +182,18 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, this.getUpdateRate(), 0.3f, 0.5f);
             this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, this.getUpdateRate(), 0.3f, 0.5f);
+            this.fluid = ItemDisplayElementUtil.createSimple();
             this.gearA.setViewRange(0.4f);
             this.gearB.setViewRange(0.4f);
+            this.fluid.setViewRange(0.4f);
+            this.fluid.setScale(new Vector3f(12 / 16f));
+            this.fluid.setOffset(new Vec3d(0, 7.5 / 16f - (2 / 16f / 16f), 0));
 
             updateStatePos(state);
             var dir = state.get(INPUT_FACING);
             this.updateAnimation(0, (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
             this.addElement(this.main);
+            this.addElement(this.fluid);
             this.addElement(this.gearA);
             this.addElement(this.gearB);
         }
@@ -240,6 +251,27 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             this.altModel = b;
             this.main.setItem(b ? ALT_MODEL : DEFAULT_MODEL);
             this.main.tick();
+        }
+
+        public void setProgress(double process, FluidInstance<?> castingFluid) {
+            if (this.progress == process && this.castingFluid == castingFluid) {
+                return;
+            }
+
+            if (castingFluid == null) {
+                this.fluid.setItem(ItemStack.EMPTY);
+                this.fluid.setTranslation(new Vector3f(0, -0.1f, 0));
+            } else {
+                this.fluid.setItem(FactoryModels.FLUID_FLAT_14.get(castingFluid));
+                this.fluid.setTranslation(new Vector3f( 0, (float) (process - 0.5) / 16.2f * 12 / 16f, 0));
+            }
+            if (process > this.progress) {
+                this.fluid.startInterpolationIfDirty();
+            }
+
+            this.fluid.tick();
+            this.progress = process;
+            this.castingFluid = castingFluid;
         }
     }
 }

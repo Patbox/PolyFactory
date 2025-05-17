@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
+import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
@@ -149,7 +150,9 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
         self.model.setActive(true);
         self.model.tick();
 
-        if (self.process >= self.currentRecipe.value().time(input)) {
+        var time = self.currentRecipe.value().time(input);
+
+        if (self.process >= time) {
             var itemOut = self.currentRecipe.value().craft(input, world.getRegistryManager());
             var currentOutput = self.getStack(OUTPUT_FIRST);
             if (currentOutput.isEmpty()) {
@@ -181,11 +184,13 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             if (inputStack.isEmpty()) {
                 self.setStack(INPUT_FIRST, ItemStack.EMPTY);
             }
+
             for (var fluid : self.currentRecipe.value().fluidInput(input)) {
                 container.extract(fluid, false);
             }
             world.playSound(null, pos, self.currentRecipe.value().soundEvent().value(), SoundCategory.BLOCKS);
             self.process = 0;
+            self.model.setProgress(0, null);
             self.markDirty();
         } else {
             var speed = Math.min(Math.abs(strength) * 1, 1);
@@ -198,9 +203,13 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
                     ((ServerWorld) world).spawnParticles(fluid.get().instance().particle(),
                             pos.getX() + 0.5, pos.getY() + 0.5 + 1 + 4 / 16f, pos.getZ() + 0.5, 0,
                             0, -1, 0, 0.1);
+
+                    self.model.setProgress(self.process / time, fluid.get().instance());
                 }
+
                 return;
             }
+
 
             self.state = rot.getStateTextOrElse(TOO_SLOW_TEXT);
         }
@@ -208,8 +217,6 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
 
     protected void updatePosition(int id) {
         var c = containers[id];
-
-
 
         if (!c.isContainerEmpty()) {
             assert c.getContainer() != null;
@@ -220,16 +227,20 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             var dir = this.getCachedState().get(MDrainBlock.INPUT_FACING);
             if (id == INPUT_FIRST) {
                 if (container.get().isIn(FactoryItemTags.SPOUT_ITEM_HORIZONTAL)) {
-                    base = base.add(0, 7f / 16, 0);
-                    rot = RotationAxis.POSITIVE_Y.rotation(MathHelper.HALF_PI).mul(dir.getOpposite().getRotationQuaternion());
-                    scale = 2;//1.25f;
+                    base = base.add(0, 7.5f / 16 - (2 / 16f / 16f), 0);
+                    rot = RotationAxis.POSITIVE_Y.rotation(0).mul(dir.getOpposite().getRotationQuaternion());
+                    scale = 2 * 12 / 16f;//1.25f;
                 } else {
                     base = base.add(0, 10f / 16, 0);
                     rot = Direction.UP.getRotationQuaternion().rotateY(dir.getPositiveHorizontalDegrees() * MathHelper.RADIANS_PER_DEGREE);
                 }
             } else {
+                if (!containers[0].isContainerEmpty() && containers[0].getContainer().get().isIn(FactoryItemTags.SPOUT_ITEM_HORIZONTAL)) {
+                    base = base.add(0, 1 / 16f, 0);
+                }
+
                 base = base.add(0, 7.5 / 16, 0).offset(dir, -0.4);
-                rot = RotationAxis.POSITIVE_Y.rotation(MathHelper.HALF_PI).mul(dir.getOpposite().getRotationQuaternion());
+                rot = RotationAxis.POSITIVE_Y.rotation(MathHelper.PI).mul(dir.getOpposite().getRotationQuaternion());
             }
 
             container.setPos(base);

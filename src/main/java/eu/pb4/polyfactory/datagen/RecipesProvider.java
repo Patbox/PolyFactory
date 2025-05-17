@@ -1265,6 +1265,8 @@ class RecipesProvider extends FabricRecipeProvider {
                 exporter.accept(recipeKey("spout/sticky_conveyor"), SimpleSpoutRecipe.toItem(FactoryItems.CONVEYOR, FactoryFluids.SLIME.of(FluidConstants.BLOCK / 10), FactoryItems.STICKY_CONVEYOR, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
                 exporter.accept(recipeKey("spout/sticky_dynamite"), SimpleSpoutRecipe.toItem(FactoryItems.DYNAMITE, FactoryFluids.SLIME.of(FluidConstants.BLOCK / 10), FactoryItems.STICKY_DYNAMITE, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
                 exporter.accept(recipeKey("spout/honeyed_apple"), SimpleSpoutRecipe.toItem(Items.APPLE, FactoryFluids.HONEY.of(FluidConstants.BLOCK / 4), FactoryItems.HONEYED_APPLE, SoundEvents.BLOCK_HONEY_BLOCK_PLACE), null);
+                exporter.accept(recipeKey("spout/golden_apple"), SimpleSpoutRecipe.toItem(Items.APPLE, FactoryFluids.GOLD.of(FluidConstants.INGOT * 7), Items.GOLDEN_APPLE, SoundEvents.BLOCK_LAVA_EXTINGUISH), null);
+                exporter.accept(recipeKey("spout/golden_carrot"), SimpleSpoutRecipe.toItem(Items.CARROT, FactoryFluids.GOLD.of(FluidConstants.NUGGET * 7), Items.GOLDEN_CARROT, SoundEvents.BLOCK_LAVA_EXTINGUISH), null);
                 exporter.accept(recipeKey("spout/brittle_glass_bottle"), SimpleSpoutRecipe.toItem(Items.GLASS_BOTTLE, FactoryFluids.LAVA.of(FluidConstants.NUGGET), FactoryItems.BRITTLE_GLASS_BOTTLE, SoundEvents.BLOCK_GLASS_HIT), null);
                 exporter.accept(recipeKey("spout/brittle_potion"), SimpleSpoutRecipe.toItemCopy(Items.POTION, FactoryFluids.LAVA.of(FluidConstants.NUGGET), FactoryItems.BRITTLE_POTION, SoundEvents.BLOCK_GLASS_HIT), null);
                 exporter.accept(recipeKey("spout/slimeball"), SimpleSpoutRecipe.template(Items.BOWL,
@@ -1310,7 +1312,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .offerTo(exporter);
 
                 this.createShaped(RecipeCategory.TOOLS, mold.clay()).pattern(" x ").pattern("xox").pattern(" x ")
-                        .input('x', Items.CLAY)
+                        .input('x', Items.CLAY_BALL)
                         .input('o', tag)
                         .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(Items.CLAY))
                         .offerTo(exporter);
