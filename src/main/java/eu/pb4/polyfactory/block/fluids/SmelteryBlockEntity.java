@@ -300,6 +300,21 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
         this.positionedStates = list;
     }
 
+    @Nullable
+    public BlockState getPositionedBlock(Vec3i subtract) {
+        int x = subtract.getX() + 1;
+        int y = subtract.getY() + 1;
+        int z = subtract.getZ() + 1;
+
+        var i = z * 3 * 3 + y * 3 + x;
+
+        if (this.positionedStates.size() < i) {
+            return null;
+        }
+
+        return this.positionedStates.get(i);
+    }
+
     private class Gui extends SimpleGui {
         private boolean active;
         private int lastFluidUpdate = -1;

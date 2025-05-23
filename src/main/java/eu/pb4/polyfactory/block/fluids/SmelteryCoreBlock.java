@@ -67,6 +67,10 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock {
 
     @Override
     protected ActionResult onUse(BlockState state, World worldx, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if (state.get(FACING) != hit.getSide()) {
+            return ActionResult.PASS;
+        }
+
         var world = (ServerWorld) worldx;
         var center = pos.offset(state.get(FACING).getOpposite());
         if (FactoryBlocks.SMELTERY.placeSmeltery(world, center)) {

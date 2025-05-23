@@ -109,6 +109,18 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
     }
 
     @Override
+    protected ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
+        var center = getCenter(state, pos);
+        if (world.getBlockEntity(center) instanceof SmelteryBlockEntity be) {
+            var x = be.getPositionedBlock(pos.subtract(center));
+            if (x != null && !x.isAir()) {
+                return x.getPickStack(world, pos, false);
+            }
+        }
+        return super.getPickStack(world, pos, state, includeData);
+    }
+
+    @Override
     protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
         super.onStateReplaced(state, world, pos, moved);
         if (isCenter(state)) {

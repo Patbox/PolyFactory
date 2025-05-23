@@ -10,6 +10,8 @@ import net.minecraft.nbt.NbtHelper;
 import net.minecraft.registry.Registries;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public record ItemStackData(ItemStack stack, String name) implements DataContainer {
     public static MapCodec<ItemStackData> TYPE_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             ItemStack.OPTIONAL_CODEC.orElse(ItemStack.EMPTY).fieldOf("value").forGetter(ItemStackData::stack),
@@ -57,6 +59,18 @@ public record ItemStackData(ItemStack stack, String name) implements DataContain
         };
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        ItemStackData that = (ItemStackData) object;
+        return Objects.equals(name, that.name) && ItemStack.areItemsAndComponentsEqual(stack, that.stack);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode() * 31 + ItemStack.hashCode(stack);
+    }
 
     @Override
     public int compareTo(DataContainer other) {
