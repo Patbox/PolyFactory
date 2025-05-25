@@ -2,7 +2,9 @@
 - Added Smeltery (WIP):
   - Used to smelt raw ores and other metallic items into Molten Metals.
 - Mechanical Pumps (and pipes powered by them) will now pull fluid blocks that are further away (as long as they are connected, by safe fluid blocks).
+- Added Golden Potato on a Spring.
 - Gears are now placed correctly aside of Mechanical Pump.
-- Fixed fluid order being reversed in tooltips.
 - Tweaked some default block sounds.
 - Tried to improve compatibility with Lithium's Hopper optimalizations.
+- Fixed fluid order being reversed in tooltips.
+- Fixed wrong translation key in Item Filter name.

@@ -59,6 +59,7 @@
   "block.polyfactory.creative_container": "Creative Container",
   "block.polyfactory.inverted_redstone_lamp": "Inverted Redstone Lamp",
   "block.polyfactory.tiny_potato_spring": "Potato on a Spring",
+  "block.polyfactory.golden_tiny_potato_spring": "Golden Potato on a Spring",
   "block.polyfactory.wireless_redstone_receiver": "Wireless Redstone Receiver",
   "block.polyfactory.wireless_redstone_transmitter": "Wireless Redstone Transmitter",
   "block.polyfactory.arithmetic_operator": "Arithmetic Operator",
@@ -136,6 +137,9 @@
   "item.polyfactory.mold.ingot": "Ingot Mold",
   "item.polyfactory.mold.ingot_clay": "Clay Ingot Mold",
   "item.polyfactory.mold.ingot_hardened": "Hardened Clay Ingot Mold",
+  "item.polyfactory.mold.nugget": "Nugget Mold",
+  "item.polyfactory.mold.nugget_clay": "Clay Nugget Mold",
+  "item.polyfactory.mold.nugget_hardened": "Hardened Clay Nugget Mold",
 
   "block.polyfactory.colored_lamp": "Colored Lamp",
   "block.polyfactory.colored_lamp.colored": "%s Lamp",

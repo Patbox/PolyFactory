@@ -67,7 +67,7 @@ public class FactoryBlocks {
     public static final SelectivePassthroughBlock METAL_GRID = register("metal_grid", Block.Settings.copy(Blocks.IRON_BLOCK), settings -> new SelectivePassthroughBlock(settings.strength(4.0F, 3.0F).nonOpaque()));
     public static final HandCrankBlock HAND_CRANK = register("hand_crank", settings -> new HandCrankBlock(settings.hardness(1).nonOpaque()));
     public static final SteamEngineBlock STEAM_ENGINE = register("steam_engine", Block.Settings.copy(SPLITTER), settings -> new SteamEngineBlock(settings.strength(4F).nonOpaque()));
-    public static final GrinderBlock GRINDER = register("grinder", Block.Settings.copy(SPLITTER), GrinderBlock::new);
+    public static final GrinderBlock GRINDER = register("grinder", Block.Settings.copy(SPLITTER).sounds(BlockSoundGroup.WOOD), GrinderBlock::new);
     public static final PressBlock PRESS = register("press", Block.Settings.copy(SPLITTER), PressBlock::new);
     public static final MixerBlock MIXER = register("mixer", Block.Settings.copy(SPLITTER), MixerBlock::new);
     public static final MCrafterBlock CRAFTER = register("crafter", Block.Settings.copy(SPLITTER), MCrafterBlock::new);
@@ -131,6 +131,7 @@ public class FactoryBlocks {
     public static final SidedLampBlock INVERTED_FIXTURE_LAMP = register("inverted_fixture_lamp", Block.Settings.copy(INVERTED_REDSTONE_LAMP), settings -> new SidedLampBlock.Flat(settings.nonOpaque(), id("fixture_lamp"), true));
     public static final PolymerButtonBlock STEEL_BUTTON = register("steel_button", Block.Settings.copy(Blocks.STONE_BUTTON), settings -> new PolymerButtonBlock("steel", BlockSetType.IRON, 5, settings.nonOpaque()));
     public static final TinyPotatoSpringBlock TINY_POTATO_SPRING = register("tiny_potato_spring", settings -> new TinyPotatoSpringBlock(settings.strength(1).nonOpaque()));
+    public static final TinyPotatoSpringBlock GOLDEN_TINY_POTATO_SPRING = register("golden_tiny_potato_spring", settings -> new TinyPotatoSpringBlock(settings.strength(2).nonOpaque()));
     public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", settings -> new RotationalDebugBlock(settings.strength(-1, -1)));
     public static final PipeBlock PIPE = register("pipe", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new PipeBlock(settings.nonOpaque()));
     public static final FilteredPipeBlock FILTERED_PIPE = register("filtered_pipe", Block.Settings.copy(PIPE), settings -> new FilteredPipeBlock(settings.nonOpaque()));

@@ -52,7 +52,7 @@ public class ImprovedFilterItem extends AbstractFilterItem {
 
         return Text.translatable(this.getTranslationKey() + ".with", stacks.size() == 1
                 ? stacks.getFirst().getName()
-                : Text.empty().append(stacks.getFirst().getName()).append(" ").append(Text.translatable("container.shulkerBox.more", stacks.size() - 1))
+                : Text.empty().append(stacks.getFirst().getName()).append(" ").append(Text.translatable("item.container.more_items", stacks.size() - 1))
                 );
     }
 

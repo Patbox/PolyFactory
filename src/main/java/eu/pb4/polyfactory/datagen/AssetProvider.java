@@ -70,6 +70,7 @@ class AssetProvider implements DataProvider {
         createNumberButtons(assetWriter);
 
         createMold(assetWriter, FactoryItems.INGOT_MOLD);
+        createMold(assetWriter, FactoryItems.NUGGET_MOLD);
     }
 
     private static void createMold(BiConsumer<String, byte[]> assetWriter, SpoutMolds mold) {
@@ -163,7 +164,7 @@ class AssetProvider implements DataProvider {
                 new BasicItemModel(id.withPrefixedPath("item/"))
         ), new ItemAsset.Properties(false)));
 
-        for (var item : List.of(FactoryItems.TINY_POTATO_SPRING, FactoryItems.PIPE, FactoryItems.MECHANICAL_DRAIN, FactoryItems.PORTABLE_FLUID_TANK,
+        for (var item : List.of(FactoryItems.TINY_POTATO_SPRING, FactoryItems.GOLDEN_TINY_POTATO_SPRING, FactoryItems.PIPE, FactoryItems.MECHANICAL_DRAIN, FactoryItems.PORTABLE_FLUID_TANK,
                 FactoryItems.LARGE_STEEL_GEAR,
                 FactoryItems.PUMP, FactoryItems.STEEL_BUTTON, FactoryDebugItems.ROTATION_DEBUG)) {
             fromItem.accept(item, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("item/")), ItemAsset.Properties.DEFAULT));

@@ -13,6 +13,7 @@ import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.data.StringData;
+import eu.pb4.polyfactory.mixin.SettingsAccessor;
 import eu.pb4.polyfactory.nodes.data.ChannelProviderDirectionNode;
 import eu.pb4.polyfactory.util.PotatoWisdom;
 import eu.pb4.polymer.core.api.other.PolymerStat;
@@ -69,9 +70,16 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
     public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
 
+    private final Identifier taterModelId;
+    private final Identifier baseModelId;
+
+
     public TinyPotatoSpringBlock(Settings settings) {
         super(settings.ticksRandomly());
         this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
+        var id = ((SettingsAccessor) settings).getRegistryKey().getValue();
+        this.taterModelId = id.withPrefixedPath("block/");
+        this.baseModelId = this.taterModelId.withSuffixedPath("_base");
     }
 
     @Override
@@ -172,9 +180,7 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
         return List.of(new ChannelProviderDirectionNode(Direction.DOWN, 0));
     }
 
-    public static final class Model extends BlockModel {
-        public static final ItemStack BASE_MODEL = ItemDisplayElementUtil.getModel(id("block/tiny_potato_spring_base"));
-        public static final ItemStack TATER_MODEL = ItemDisplayElementUtil.getModel(id("block/tiny_potato_spring"));
+    public class Model extends BlockModel {
         private final ItemDisplayElement base;
         private final LodItemDisplayElement tater;
         private float extraRotation = 0;
@@ -183,8 +189,8 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
         private float interactionYaw;
 
         private Model(ServerWorld world, BlockPos pos, BlockState state) {
-            this.base = ItemDisplayElementUtil.createSimple(BASE_MODEL);
-            this.tater = LodItemDisplayElement.createSimple(TATER_MODEL, 1);
+            this.base = ItemDisplayElementUtil.createSimple(baseModelId);
+            this.tater = LodItemDisplayElement.createSimple(taterModelId, 1);
             this.tater.setTranslation(new Vector3f(0, -6f / 16, 0));
             //this.tater.setOffset(new Vec3d(0, 2f / 16, 0));
 

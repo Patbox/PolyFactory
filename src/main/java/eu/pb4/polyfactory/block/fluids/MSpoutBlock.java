@@ -247,13 +247,18 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             if (this.altModel == b) {
                 return;
             }
-
+            if (!b) {
+                setProgress(0, null);
+            }
             this.altModel = b;
             this.main.setItem(b ? ALT_MODEL : DEFAULT_MODEL);
             this.main.tick();
         }
 
         public void setProgress(double process, FluidInstance<?> castingFluid) {
+            if (!this.altModel) {
+                return;
+            }
             if (this.progress == process && this.castingFluid == castingFluid) {
                 return;
             }

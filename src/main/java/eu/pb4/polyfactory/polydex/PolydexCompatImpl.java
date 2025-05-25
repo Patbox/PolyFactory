@@ -20,6 +20,7 @@ import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.polydex.pages.*;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.polyfactory.recipe.ColoringCraftingRecipe;
+import eu.pb4.polyfactory.recipe.CraftingWithLeftoverRecipe;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.recipe.ShapelessNbtCopyRecipe;
@@ -41,10 +42,9 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.ShapelessRecipe;
+import net.minecraft.recipe.*;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
@@ -80,6 +80,11 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(SimpleSpoutRecipe.class, SimpleSpoutRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleDrainRecipe.class, SimpleDrainRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleSmelteryRecipe.class, SimpleSmelteryRecipePage::new);
+        //noinspection RedundantCast
+        PolydexPage.registerRecipeViewer((Class<? extends Recipe<?>>) (Object) CraftingWithLeftoverRecipe.class,
+                x -> PolydexImpl.RECIPE_VIEWS.get(((CraftingWithLeftoverRecipe) x.value()).backingRecipe().getClass()).apply(new RecipeEntry<Recipe<?>>(
+                        (RegistryKey<Recipe<?>>) (Object) x.id(),
+                        (Recipe<?>) (Object) ((CraftingWithLeftoverRecipe) x.value()).backingRecipe())));
         PolydexPage.register(PolydexCompatImpl::createPages);
 
         PolydexEntry.registerProvider(PolydexCompatImpl::createFluidEntries);

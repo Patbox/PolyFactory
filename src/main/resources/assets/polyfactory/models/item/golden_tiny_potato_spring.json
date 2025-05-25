@@ -1,0 +1,7 @@
+{
+	"parent": "polyfactory:item/tiny_potato_spring",
+	"textures": {
+		"0": "polyfactory:block/golden_tiny_potato_spring",
+		"particle": "polyfactory:block/golden_tiny_potato_spring"
+	}
+}

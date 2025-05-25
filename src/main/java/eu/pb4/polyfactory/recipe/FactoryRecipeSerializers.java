@@ -8,13 +8,14 @@ import eu.pb4.polyfactory.recipe.drain.PotionRemoveDrainRecipe;
 import eu.pb4.polyfactory.recipe.fluid.RemovingFluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.fluid.SimpleFluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
-import eu.pb4.polyfactory.recipe.smeltery.SmelteryRecipe;
 import eu.pb4.polyfactory.recipe.spout.*;
 import eu.pb4.polyfactory.recipe.mixing.*;
 import eu.pb4.polyfactory.recipe.press.FillSprayCanPressRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.recipe.ShapedRecipe;
+import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -33,8 +34,11 @@ public class FactoryRecipeSerializers {
     public static final LazyRecipeSerializer<BrewingMixingRecipe> MIXING_BREWING = register("mixing/brewing", BrewingMixingRecipe.CODEC);
     public static final LazyRecipeSerializer<ColoringCraftingRecipe> CRAFTING_COLORING = register("crafting/coloring", ColoringCraftingRecipe.CODEC);
     public static final LazyRecipeSerializer<ShapelessNbtCopyRecipe> CRAFTING_SHAPELESS_NBT_COPY = register("crafting/shapeless_nbt_copy", ShapelessNbtCopyRecipe.CODEC);
-
     public static final LazyRecipeSerializer<PRTKeySetterCraftingRecipe> CRAFTING_PRT_KEY_SETTER = register("crafting/prt_key_setter", PRTKeySetterCraftingRecipe.CODEC);
+    public static final LazyRecipeSerializer<CraftingWithLeftoverRecipe<ShapedRecipe>> CRAFTING_SHAPED_LEFTOVER = register("crafting/shaped_leftover",
+            CraftingWithLeftoverRecipe.createCodec(RecipeSerializer.SHAPED.codec(), () -> FactoryRecipeSerializers.CRAFTING_SHAPED_LEFTOVER));
+    public static final LazyRecipeSerializer<CraftingWithLeftoverRecipe<ShapelessRecipe>> CRAFTING_SHAPELESS_LEFTOVER = register("crafting/shapeless_leftover",
+            CraftingWithLeftoverRecipe.createCodec(RecipeSerializer.SHAPELESS.codec(), () -> FactoryRecipeSerializers.CRAFTING_SHAPELESS_LEFTOVER));
 
     public static final LazyRecipeSerializer<FillSprayCanCraftingRecipe> CRAFTING_FILL_SPRAY_CAN = register("crafting/fill_spray_can",
             CraftingRecipeCategory.CODEC.xmap(FillSprayCanCraftingRecipe::new, FillSprayCanCraftingRecipe::category).fieldOf("category"));

@@ -146,6 +146,7 @@ public class FactoryItems {
     public static final Item STICKY_DYNAMITE = register("sticky_dynamite", settings -> new DynamiteItem(settings.maxCount(16)));
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
     public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING, settings -> settings.equippableUnswappable(EquipmentSlot.HEAD));
+    public static final Item GOLDEN_TINY_POTATO_SPRING = register(FactoryBlocks.GOLDEN_TINY_POTATO_SPRING, settings -> settings.equippableUnswappable(EquipmentSlot.HEAD));
     public static final Item EXPERIENCE_BUCKET = register("experience_bucket", settings -> new SimplePolymerItem(settings.maxCount(1).recipeRemainder(Items.BUCKET)));
     public static final Item SLIME_BUCKET = register("slime_bucket", settings -> new SimplePolymerItem(settings.maxCount(1).recipeRemainder(Items.BUCKET)));
     public static final Item HONEY_BUCKET = register("honey_bucket", settings -> new SimplePolymerItem(settings.recipeRemainder(Items.BUCKET)
@@ -185,6 +186,7 @@ public class FactoryItems {
     public static final Item ITEM_PACKER = register(FactoryBlocks.ITEM_PACKER);
 
     public static final SpoutMolds INGOT_MOLD = SpoutMolds.create("ingot");
+    public static final SpoutMolds NUGGET_MOLD = SpoutMolds.create("nugget");
 
     public static void register() {
         FuelRegistryEvents.BUILD.register(((builder, context) -> {
@@ -254,7 +256,6 @@ public class FactoryItems {
                     entries.add(NOZZLE);
 
                     entries.add(SMELTERY_CORE);
-                    INGOT_MOLD.addItemGroup(entries);
 
                     // Data
                     entries.add(CABLE);
@@ -298,6 +299,7 @@ public class FactoryItems {
                     entries.add(ColoredItem.stack(INVERTED_FIXTURE_LAMP, 1, DyeColor.WHITE));
                     entries.add(STEEL_BUTTON);
                     entries.add(TINY_POTATO_SPRING);
+                    entries.add(GOLDEN_TINY_POTATO_SPRING);
 
                     // Other items
                     entries.add(DYNAMITE);
@@ -333,6 +335,11 @@ public class FactoryItems {
                     entries.add(GENERIC_MACHINE_PART);
                     entries.add(REDSTONE_CHIP);
                     entries.add(INTEGRATED_CIRCUIT);
+
+                    // Mold stuff
+                    INGOT_MOLD.addItemGroup(entries);
+                    NUGGET_MOLD.addItemGroup(entries);
+
 
                     // Fancy dyes
                     entries.add(ArtificialDyeItem.of(0xFF0000));

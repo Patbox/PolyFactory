@@ -1267,6 +1267,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 exporter.accept(recipeKey("spout/honeyed_apple"), SimpleSpoutRecipe.toItem(Items.APPLE, FactoryFluids.HONEY.of(FluidConstants.BLOCK / 4), FactoryItems.HONEYED_APPLE, SoundEvents.BLOCK_HONEY_BLOCK_PLACE), null);
                 exporter.accept(recipeKey("spout/golden_apple"), SimpleSpoutRecipe.toItem(Items.APPLE, FactoryFluids.GOLD.of(FluidConstants.INGOT * 7), Items.GOLDEN_APPLE, SoundEvents.BLOCK_LAVA_EXTINGUISH), null);
                 exporter.accept(recipeKey("spout/golden_carrot"), SimpleSpoutRecipe.toItem(Items.CARROT, FactoryFluids.GOLD.of(FluidConstants.NUGGET * 7), Items.GOLDEN_CARROT, SoundEvents.BLOCK_LAVA_EXTINGUISH), null);
+                exporter.accept(recipeKey("spout/golden_tiny_potato"), SimpleSpoutRecipe.toItem(FactoryItems.TINY_POTATO_SPRING, FactoryFluids.GOLD.of(FluidConstants.INGOT * 3), FactoryItems.GOLDEN_TINY_POTATO_SPRING, SoundEvents.BLOCK_LAVA_EXTINGUISH), null);
                 exporter.accept(recipeKey("spout/brittle_glass_bottle"), SimpleSpoutRecipe.toItem(Items.GLASS_BOTTLE, FactoryFluids.LAVA.of(FluidConstants.NUGGET), FactoryItems.BRITTLE_GLASS_BOTTLE, SoundEvents.BLOCK_GLASS_HIT), null);
                 exporter.accept(recipeKey("spout/brittle_potion"), SimpleSpoutRecipe.toItemCopy(Items.POTION, FactoryFluids.LAVA.of(FluidConstants.NUGGET), FactoryItems.BRITTLE_POTION, SoundEvents.BLOCK_GLASS_HIT), null);
                 exporter.accept(recipeKey("spout/slimeball"), SimpleSpoutRecipe.template(Items.BOWL,
@@ -1302,7 +1303,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         null, FactoryItems.STEEL_INGOT, null, FactoryItems.STEEL_BLOCK);
 
                 this.spoutMolds(ConventionalItemTags.INGOTS, FactoryItems.INGOT_MOLD);
-
+                this.spoutMolds(ConventionalItemTags.NUGGETS, FactoryItems.NUGGET_MOLD);
             }
 
             private void spoutMolds(TagKey<Item> tag, SpoutMolds mold) {
@@ -1315,7 +1316,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .input('x', Items.CLAY_BALL)
                         .input('o', tag)
                         .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(Items.CLAY))
-                        .offerTo(exporter);
+                        .offerTo(CraftingWithLeftoverRecipe.asExporter(exporter, ingredientFromTag(ConventionalItemTags.INGOTS)));
             }
 
 
@@ -1326,7 +1327,6 @@ class RecipesProvider extends FabricRecipeProvider {
                         oreBlock != null ? SimpleSmelteryRecipe.of(group, oreBlock, fluidType.of(FluidConstants.INGOT * 2), ingotTime + 20 * 5) : null,
                         rawBlock != null ? SimpleSmelteryRecipe.of(group, rawBlock, fluidType.of((FluidConstants.INGOT + FluidConstants.NUGGET) * 9), (ingotTime + 20 * 3) * 9) : null,
                         crushed != null ? SimpleSmelteryRecipe.of(group, crushed, fluidType.of(FluidConstants.INGOT + FluidConstants.NUGGET * 2), (ingotTime + 10 * 3)) : null,
-                        nugget != null ? SimpleSmelteryRecipe.of(group, nugget, fluidType.of(FluidConstants.NUGGET), ingotTime / 9) : null,
                         block != null ? SimpleSmelteryRecipe.of(group, block, fluidType.of(FluidConstants.BLOCK), ingotTime * 9) : null
                 );
 
@@ -1338,6 +1338,17 @@ class RecipesProvider extends FabricRecipeProvider {
 
                     exporter.accept(recipeKey("spout/" + Registries.ITEM.getId(ingot).getPath()),
                             SimpleSpoutRecipe.templateDamaged(FactoryItems.INGOT_MOLD.tag(), fluidType.of(FluidConstants.INGOT),
+                                    ingot, SoundEvents.BLOCK_LAVA_EXTINGUISH), null
+                    );
+                }
+
+                if (nugget != null) {
+                    of(exporter,
+                            SimpleSmelteryRecipe.of(group, nugget, fluidType.of(FluidConstants.NUGGET), ingotTime / 9)
+                    );
+
+                    exporter.accept(recipeKey("spout/" + Registries.ITEM.getId(nugget).getPath()),
+                            SimpleSpoutRecipe.templateDamaged(FactoryItems.NUGGET_MOLD.tag(), fluidType.of(FluidConstants.NUGGET),
                                     ingot, SoundEvents.BLOCK_LAVA_EXTINGUISH), null
                     );
                 }

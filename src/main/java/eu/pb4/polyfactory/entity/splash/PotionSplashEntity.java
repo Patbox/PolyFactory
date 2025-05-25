@@ -12,6 +12,7 @@ import net.minecraft.particle.EntityEffectParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
@@ -87,6 +88,6 @@ public class PotionSplashEntity extends SplashEntity<PotionContentsComponent> {
 
     @Override
     public ParticleEffect getBaseParticle() {
-        return this.particles.get(this.random.nextInt(this.particles.size()));
+        return Util.getRandomOrEmpty(this.particles, random).orElse(ParticleTypes.SPLASH);
     }
 }
