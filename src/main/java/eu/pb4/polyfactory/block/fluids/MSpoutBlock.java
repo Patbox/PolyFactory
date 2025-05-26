@@ -19,6 +19,7 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -29,10 +30,8 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
@@ -187,7 +186,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             this.gearB.setViewRange(0.4f);
             this.fluid.setViewRange(0.4f);
             this.fluid.setScale(new Vector3f(12 / 16f));
-            this.fluid.setOffset(new Vec3d(0, 7.5 / 16f - (2 / 16f / 16f), 0));
+            this.fluid.setOffset(new Vec3d(0, 7.5 / 16f - (2 / 16f / 16f) - 0.01, 0));
 
             updateStatePos(state);
             var dir = state.get(INPUT_FACING);
@@ -267,8 +266,13 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
                 this.fluid.setItem(ItemStack.EMPTY);
                 this.fluid.setTranslation(new Vector3f(0, -0.1f, 0));
             } else {
-                this.fluid.setItem(FactoryModels.FLUID_FLAT_14.get(castingFluid));
-                this.fluid.setTranslation(new Vector3f( 0, (float) (process - 0.5) / 16.2f * 12 / 16f, 0));
+                var solid = process > 0.70;
+                var value = MathHelper.clamp((float) (solid ? ((process - 0.70f) / 0.30f) : (1 - (process - 0.55) / 0.15f)), 0, 1);
+                var color = ColorHelper.fromFloats(1, 1f, 0.6f + value * 0.4f, 0.5f + value * 0.5f);
+                this.fluid.setItem(FactoryModels.FLUID_FLAT_14.get(castingFluid,
+                        color,
+                        solid));
+                this.fluid.setTranslation(new Vector3f( 0, (float) (MathHelper.clamp(process / 0.55, 0, 1) - 0.5) / 16.2f * 12 / 16f, 0));
             }
             if (process > this.progress) {
                 this.fluid.startInterpolationIfDirty();

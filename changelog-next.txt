@@ -1,6 +1,10 @@
 - Added Molten Iron, Molten Copper and Molten Gold fluids.
-- Added Smeltery (WIP):
+- Added Industrial Smeltery:
+  - A 3x3x3 multiblock made out of 22 Deepslate Bricks, 3 Steel Blocks and 1 Industrial Smeltery Core (placed in a center of a horizontal side).
   - Used to smelt raw ores and other metallic items into Molten Metals.
+  - Can hold up to 9 stacks of items (melting 1 item per stack at the same).
+  - Can hold up to 24 blocks of Molten Metals.
+  - Uses furnace fuels.
 - Mechanical Pumps (and pipes powered by them) will now pull fluid blocks that are further away (as long as they are connected, by safe fluid blocks).
 - Added Golden Potato on a Spring.
 - Gears are now placed correctly aside of Mechanical Pump.
@@ -8,3 +12,4 @@
 - Tried to improve compatibility with Lithium's Hopper optimalizations.
 - Fixed fluid order being reversed in tooltips.
 - Fixed wrong translation key in Item Filter name.
+- Fixed advancement background.

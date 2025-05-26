@@ -287,5 +287,15 @@
       }
     ],
     "subtitle": "subtitles.polyfactory.item.clipboard.apply"
+  },
+  "block.spout.metal_cooled": {
+    "sounds": [
+      {
+        "name": "random/fizz",
+        "pitch": 1.1,
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "subtitles.polyfactory.block.spout.metal_cooled"
   }
 }

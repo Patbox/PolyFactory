@@ -34,6 +34,8 @@ import net.minecraft.util.math.MathHelper;
 
 import java.util.function.Function;
 
+import static eu.pb4.polyfactory.ModInit.id;
+
 public class FactoryFluids {
     public static final FluidType<Unit> WATER = register(Identifier.ofVanilla("water"),
             FluidType.of().density(100).fluid(Fluids.WATER).color(0x385dc6)
@@ -53,12 +55,14 @@ public class FactoryFluids {
 
     public static final FluidType<Unit> IRON = register(Identifier.ofVanilla("iron"),
             FluidType.of().density(1005).brightness(15).heat(BlockHeat.LAVA)
+                    .solidTexture(Identifier.ofVanilla("block/iron_block"))
                     .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
                     .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
 
-    public static final FluidType<Unit> STEEL = register(Identifier.ofVanilla("steel"),
+    public static final FluidType<Unit> STEEL = register(id("steel"),
             FluidType.of().density(1007).brightness(15).heat(BlockHeat.LAVA)
+                    .solidTexture(id("block/steel_block"))
                     .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
                     .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
@@ -66,12 +70,14 @@ public class FactoryFluids {
 
     public static final FluidType<Unit> GOLD = register(Identifier.ofVanilla("gold"),
             FluidType.of().density(1010).brightness(15).heat(BlockHeat.LAVA)
+                    .solidTexture(Identifier.ofVanilla("block/gold_block"))
                     .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
                     .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
 
     public static final FluidType<Unit> COPPER = register(Identifier.ofVanilla("copper"),
             FluidType.of().density(1000).brightness(15).heat(BlockHeat.LAVA)
+                    .solidTexture(Identifier.ofVanilla("block/copper_block"))
                     .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
                     .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());

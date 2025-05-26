@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.other;
 
 import eu.pb4.polyfactory.fluid.FluidType;
+import eu.pb4.polymer.core.api.utils.PolymerUtils;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.registry.Registry;
@@ -13,5 +14,6 @@ public interface FactoryRegistries {
     Registry<FluidType<?>> FLUID_TYPES = FabricRegistryBuilder.createSimple(FLUID_TYPES_KEY).attribute(RegistryAttribute.OPTIONAL).buildAndRegister();
 
     static void setup() {
+        PolymerUtils.markAsServerOnlyRegistry(FLUID_TYPES_KEY);
     }
 }

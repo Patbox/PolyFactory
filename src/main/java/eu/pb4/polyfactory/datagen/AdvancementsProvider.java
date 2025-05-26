@@ -60,7 +60,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         FactoryItems.WINDMILL_SAIL,
                         Text.translatable("advancements.polyfactory.root.title"),
                         Text.translatable("advancements.polyfactory.root.description"),
-                        id("textures/advancements/background.png"),
+                        id("advancements/background"),
                         AdvancementFrame.TASK,
                         false,
                         false,

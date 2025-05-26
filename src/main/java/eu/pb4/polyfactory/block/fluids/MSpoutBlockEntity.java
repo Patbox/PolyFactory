@@ -90,7 +90,8 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             }
         }
 
-        self.model.altModel(!self.containers[0].isContainerEmpty() && self.containers[0].getContainer().get().isIn(FactoryItemTags.SPOUT_ITEM_HORIZONTAL));
+        var alt = !self.containers[0].isContainerEmpty() && self.containers[0].getContainer().get().isIn(FactoryItemTags.SPOUT_ITEM_HORIZONTAL);
+        self.model.altModel(alt);
         self.state = null;
         var posAbove = pos.up();
 
@@ -200,11 +201,13 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
                 markDirty(world, pos, self.getCachedState());
                 var fluid = Util.getRandomOrEmpty(self.currentRecipe.value().fluidInput(input), world.random);
                 if (fluid.isPresent()) {
-                    ((ServerWorld) world).spawnParticles(fluid.get().instance().particle(),
-                            pos.getX() + 0.5, pos.getY() + 0.5 + 1 + 4 / 16f, pos.getZ() + 0.5, 0,
-                            0, -1, 0, 0.1);
-
-                    self.model.setProgress(self.process / time, fluid.get().instance());
+                    var progress = self.process / time;
+                    if (!alt || progress < 0.55) {
+                        ((ServerWorld) world).spawnParticles(fluid.get().instance().particle(),
+                                pos.getX() + 0.5, pos.getY() + 0.5 + 1 + 4 / 16f, pos.getZ() + 0.5, 0,
+                                0, -1, 0, 0.1);
+                    }
+                    self.model.setProgress(progress, fluid.get().instance());
                 }
 
                 return;

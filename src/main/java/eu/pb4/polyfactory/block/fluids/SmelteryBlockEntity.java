@@ -84,44 +84,7 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
 
         var dirty = false;
 
-        if (self.fuelTicks > 0) {
-            self.fuelTicks -= 1;
-
-            if (!state.get(SteamEngineBlock.LIT)) {
-                world.setBlockState(pos, state.with(SteamEngineBlock.LIT, true));
-            }
-        } else {
-            for (int i = 9; i < 12; i++) {
-                var stack = self.getStack(i);
-
-                if (!stack.isEmpty()) {
-                    var value = world.getFuelRegistry().getFuelTicks(stack);
-                    if (value > 0) {
-                        var remainder = stack.getRecipeRemainder();
-                        stack.decrement(1);
-                        self.fuelTicks = value / 2;
-                        self.fuelInitial = self.fuelTicks;
-                        if (stack.isEmpty()) {
-                            self.setStack(i, ItemStack.EMPTY);
-                        }
-
-                        if (!remainder.isEmpty()) {
-                            FactoryUtil.insertBetween(self, 9, 12, remainder);
-                            if (!remainder.isEmpty()) {
-                                ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, remainder);
-                            }
-                        }
-
-                        dirty = true;
-                        break;
-                    }
-                }
-            }
-
-            if (state.get(SteamEngineBlock.LIT)) {
-                world.setBlockState(pos, state.with(SteamEngineBlock.LIT, false));
-            }
-        }
+        var triesSmelting = false;
 
         for (int i = 0; i < 9; i++) {
             var stack = self.items.get(i);
@@ -162,23 +125,22 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
                 continue;
             }
 
+            var result = self.recipes[i].value().output(input, world);
+            var stored = self.fluidContainer.stored();
 
+            for (var x : result) {
+                stored += x.amount();
+            }
+
+            if (stored < self.fluidContainer.capacity()) {
+                triesSmelting = true;
+            }
             if (self.fuelTicks > 0) {
                 if (self.progress[i] < self.recipes[i].value().time(input, world)) {
                     self.progress[i]++;
                     dirty = true;
                     continue;
-                }
-
-                var result = self.recipes[i].value().output(input, world);
-
-                var stored = self.fluidContainer.stored();
-
-                for (var x : result) {
-                    stored += x.amount();
-                }
-
-                if (stored >= self.fluidContainer.capacity()) {
+                } else if (stored >= self.fluidContainer.capacity()) {
                     continue;
                 }
                 dirty = true;
@@ -194,6 +156,49 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
                     self.progress[i] = x;
                     dirty = true;
                 }
+            }
+        }
+
+        if (self.fuelTicks > 0) {
+            self.fuelTicks -= triesSmelting ? 2 : 1;
+
+            if (!state.get(SteamEngineBlock.LIT)) {
+                world.setBlockState(pos, state.with(SteamEngineBlock.LIT, true));
+            }
+        } else {
+            var isFueled = false;
+            if (triesSmelting) {
+                for (int i = 9; i < 12; i++) {
+                    var stack = self.getStack(i);
+
+                    if (!stack.isEmpty()) {
+                        var value = world.getFuelRegistry().getFuelTicks(stack);
+                        if (value > 0) {
+                            var remainder = stack.getRecipeRemainder();
+                            stack.decrement(1);
+                            self.fuelTicks = value;
+                            self.fuelInitial = self.fuelTicks;
+                            isFueled = true;
+                            if (stack.isEmpty()) {
+                                self.setStack(i, ItemStack.EMPTY);
+                            }
+
+                            if (!remainder.isEmpty()) {
+                                FactoryUtil.insertBetween(self, 9, 12, remainder);
+                                if (!remainder.isEmpty()) {
+                                    ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, remainder);
+                                }
+                            }
+
+                            dirty = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (state.get(SteamEngineBlock.LIT) != isFueled) {
+                world.setBlockState(pos, state.with(SteamEngineBlock.LIT, isFueled));
             }
         }
 
@@ -248,7 +253,7 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
 
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return true;
+        return !this.world.getFuelRegistry().isFuel(stack) && slot >= 9;
     }
 
     public void createGui(ServerPlayerEntity player) {

@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.models;
 
 import eu.pb4.polyfactory.models.fluid.FluidModel;
+import eu.pb4.polyfactory.models.fluid.SpoutFluidModel;
 import eu.pb4.polyfactory.util.ModelRenderType;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.minecraft.item.Items;
@@ -12,7 +13,7 @@ import static eu.pb4.polyfactory.ModInit.id;
 public interface FactoryModels {
     Identifier PLACEHOLDER = id("placeholder");
     FluidModel FLUID_FLAT_FULL = new FluidModel(id("block/fluid/flat_model"));
-    FluidModel FLUID_FLAT_14 = new FluidModel(id("block/fluid/flat_model_14"));
+    SpoutFluidModel FLUID_FLAT_14 = new SpoutFluidModel(id("block/fluid/flat_model_14"));
     FluidModel FLUID_PARTICLE = new FluidModel(id("particle/fluid/particle"));
 
     FluidModel[] FLUID_FLAT_SCALED = Util.make(new FluidModel[16], (arr) -> {

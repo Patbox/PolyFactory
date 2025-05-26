@@ -17,7 +17,7 @@ class FluidTypeTagsProvider extends FabricTagProvider<FluidType<?>> {
 
     @Override
     protected void configure(RegistryWrapper.WrapperLookup arg) {
-        /*this.getOrCreateTagBuilder(FactoryFluidTags.MOLTEN_METAL)
+        this.getOrCreateTagBuilder(FactoryFluidTags.MOLTEN_METAL)
                 .add(FactoryFluids.IRON)
                 .add(FactoryFluids.GOLD)
                 .add(FactoryFluids.COPPER)
@@ -25,6 +25,6 @@ class FluidTypeTagsProvider extends FabricTagProvider<FluidType<?>> {
 
         this.getOrCreateTagBuilder(FactoryFluidTags.SMELTERY_ALLOWED_FLUIDS)
                 .addOptionalTag(FactoryFluidTags.MOLTEN_METAL)
-        ;*/
+        ;
     }
 }

@@ -69,8 +69,9 @@ class AssetProvider implements DataProvider {
         map.forEach((id, asset) -> assetWriter.accept(AssetPaths.itemAsset(id), asset.toJson().getBytes(StandardCharsets.UTF_8)));
         createNumberButtons(assetWriter);
 
-        createMold(assetWriter, FactoryItems.INGOT_MOLD);
-        createMold(assetWriter, FactoryItems.NUGGET_MOLD);
+        for (var mold : FactoryItems.MOLDS) {
+            createMold(assetWriter, mold);
+        }
     }
 
     private static void createMold(BiConsumer<String, byte[]> assetWriter, SpoutMolds mold) {

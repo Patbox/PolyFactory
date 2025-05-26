@@ -80,8 +80,9 @@
   "block.polyfactory.drain": "Fluid Drain",
   "block.polyfactory.mechanical_drain": "Mechanical Fluid Drain",
   "block.polyfactory.mechanical_spout": "Mechanical Spout",
-  "block.polyfactory.smeltery": "Smeltery",
-  "block.polyfactory.smeltery_core": "Smeltery Core",
+  "block.polyfactory.primitive_smeltery": "Primitive Smeltery",
+  "block.polyfactory.smeltery": "Industrial Smeltery",
+  "block.polyfactory.smeltery_core": "Industrial Smeltery Core",
   "block.polyfactory.creative_drain": "Creative Fluid Drain",
   "block.polyfactory.fluid_tank": "Fluid Tank",
   "block.polyfactory.portable_fluid_tank": "Portable Fluid Tank",
@@ -140,6 +141,9 @@
   "item.polyfactory.mold.nugget": "Nugget Mold",
   "item.polyfactory.mold.nugget_clay": "Clay Nugget Mold",
   "item.polyfactory.mold.nugget_hardened": "Hardened Clay Nugget Mold",
+  "item.polyfactory.mold.pipe": "Nugget Mold",
+  "item.polyfactory.mold.pipe_clay": "Clay Nugget Mold",
+  "item.polyfactory.mold.pipe_hardened": "Hardened Clay Nugget Mold",
 
   "block.polyfactory.colored_lamp": "Colored Lamp",
   "block.polyfactory.colored_lamp.colored": "%s Lamp",
@@ -356,7 +360,7 @@
   "subtitles.polyfactory.fluid.shoot.slime": "Slime shoots out",
   "subtitles.polyfactory.item.clipboard.write": "Clipboard rustles",
   "subtitles.polyfactory.item.clipboard.apply": "Clipboard rustles",
-
+  "subtitles.polyfactory.block.spout.metal_cooled": "Metal cools down",
 
   "text.polyfactory.artificial_color": "Artificially Colored",
   "text.polyfactory.recipes": "Recipes",

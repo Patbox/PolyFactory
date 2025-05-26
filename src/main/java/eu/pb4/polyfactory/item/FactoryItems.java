@@ -42,6 +42,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -95,7 +96,7 @@ public class FactoryItems {
     public static final Item LINGERING_THROWABLE_GLASS_BOTTLE = register("lingering_throwable_glass_bottle", SimplePolymerItem::new);
     public static final Item STEEL_GEAR = register("steel_gear", (settings) -> new GearItem(FactoryBlocks.AXLE_WITH_GEAR, settings));
     public static final Item LARGE_STEEL_GEAR = register("large_steel_gear", (settings) -> new GearItem(FactoryBlocks.AXLE_WITH_LARGE_GEAR, settings));
-    public static final Item GENERIC_MACHINE_PART = register("generic_machine_part", SimplePolymerItem::new);
+    public static final Item STEEL_MACHINE_GEARBOX = register("generic_machine_part", SimplePolymerItem::new);
     public static final Item WOODEN_PLATE = register("wooden_plate", SimplePolymerItem::new);
     public static final Item TREATED_DRIED_KELP = register("treated_dried_kelp", SimplePolymerItem::new);
     public static final Item INTEGRATED_CIRCUIT = register("integrated_circuit", SimplePolymerItem::new);
@@ -187,6 +188,10 @@ public class FactoryItems {
 
     public static final SpoutMolds INGOT_MOLD = SpoutMolds.create("ingot");
     public static final SpoutMolds NUGGET_MOLD = SpoutMolds.create("nugget");
+    public static final SpoutMolds PIPE_MOLD = SpoutMolds.create("pipe");
+
+
+    public static final List<SpoutMolds> MOLDS = List.of(INGOT_MOLD, NUGGET_MOLD, PIPE_MOLD);
 
     public static void register() {
         FuelRegistryEvents.BUILD.register(((builder, context) -> {
@@ -332,13 +337,14 @@ public class FactoryItems {
                     entries.add(TREATED_DRIED_KELP);
                     entries.add(STRING_MESH);
                     entries.add(ENDER_INFUSED_AMETHYST_SHARD);
-                    entries.add(GENERIC_MACHINE_PART);
+                    entries.add(STEEL_MACHINE_GEARBOX);
                     entries.add(REDSTONE_CHIP);
                     entries.add(INTEGRATED_CIRCUIT);
 
                     // Mold stuff
-                    INGOT_MOLD.addItemGroup(entries);
-                    NUGGET_MOLD.addItemGroup(entries);
+                    for (var mold : MOLDS) entries.add(mold.clay());
+                    for (var mold : MOLDS) entries.add(mold.hardened());
+                    for (var mold : MOLDS) entries.add(mold.mold());
 
 
                     // Fancy dyes

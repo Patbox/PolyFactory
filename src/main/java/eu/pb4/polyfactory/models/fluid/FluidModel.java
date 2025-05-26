@@ -40,29 +40,45 @@ public class FluidModel {
             }
             """.replace(" ", "").replace("\n", "");
 
-    private final Identifier baseModel;
-    private final List<Texture> textures = new ArrayList<>();
-    private final Map<FluidType<?>, ItemStack> model = new IdentityHashMap<>();
+    protected final Identifier baseModel;
+    protected final List<Texture> textures = new ArrayList<>();
+    protected final Map<FluidType<?>, ItemStack> model = new IdentityHashMap<>();
+    private final Function<ModelRenderType, Item> function;
+    protected boolean alwaysColored;
 
     public FluidModel(Identifier model) {
         this(model, FactoryUtil::requestModelBase);
     }
     public FluidModel(Identifier model, Function<ModelRenderType, Item> function) {
+        this(model, function, false);
+    }
+    public FluidModel(Identifier model, Function<ModelRenderType, Item> function, boolean alwaysColored) {
         this.baseModel = model;
+        this.alwaysColored = alwaysColored;
+        this.function = function;
 
+        this.runStuff();
+    }
+
+    protected void runStuff() {
         for (var fluid : FactoryRegistries.FLUID_TYPES.getIds()) {
-            this.addTextures(fluid, Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.get(fluid)), function);
+            this.handleFluidTexture(fluid, Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.get(fluid)), function);
         }
 
         RegistryEntryAddedCallback.event(FactoryRegistries.FLUID_TYPES).register((rawId, id, object) -> {
-            this.addTextures(id, object, function);
+            this.handleFluidTexture(id, object, function);
         });
 
         PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register((b) -> generateAssets(b::addData));
     }
+
+    protected void handleFluidTexture(Identifier id, FluidType<?> fluidType, Function<ModelRenderType, Item> function) {
+        this.addTextures(id, fluidType, function);
+    }
+
     public <T> ItemStack get(FluidType<T> fluid, T data) {
         var stack = this.model.getOrDefault(fluid, ItemStack.EMPTY);
-        if (fluid.color().isEmpty()) {
+        if (fluid.color().isEmpty() && !this.alwaysColored) {
             return stack;
         }
         stack = stack.copy();
@@ -78,14 +94,14 @@ public class FluidModel {
         return get(type.type(), type.data());
     }
 
-    private void addTextures(Identifier id, FluidType<?> object, Function<ModelRenderType, Item> function) {
-        this.textures.add(new Texture(id, object.texture(), object.color().isPresent()));
-        var stack = new ItemStack(function.apply(object.modelRenderType()));
+    protected void addTextures(Identifier id, FluidType<?> object, Function<ModelRenderType, Item> function) {
+        this.textures.add(new Texture(id, object.texture(), object.color().isPresent() || this.alwaysColored));
+        var stack = new ItemStack(function.apply(this.alwaysColored ? ModelRenderType.COLORED : object.modelRenderType()));
         stack.set(DataComponentTypes.ITEM_MODEL, bridgeModelNoItem(this.baseModel.withSuffixedPath("/" + id.getNamespace() + "/" + id.getPath())));
         this.model.put(object, stack);
     }
 
-    private void generateAssets(BiConsumer<String, byte[]> assetWriter) {
+    protected void generateAssets(BiConsumer<String, byte[]> assetWriter) {
         for (var fluid : this.textures) {
             var modelId = bridgeModelNoItem(baseModel.withSuffixedPath("/" + fluid.id().getNamespace() + "/" + fluid.id().getPath()));
             assetWriter.accept(AssetPaths.model(modelId) + ".json",
@@ -93,7 +109,7 @@ public class FluidModel {
                             .replace("|ID|", fluid.texture().toString())
                             .getBytes(StandardCharsets.UTF_8));
 
-            if (fluid.colored) {
+            if (fluid.colored || this.alwaysColored) {
                 assetWriter.accept(AssetPaths.itemAsset(modelId),
                         new ItemAsset(new BasicItemModel(modelId, List.of(new CustomModelDataTintSource(0, -1))),
                                 ItemAsset.Properties.DEFAULT).toJson().getBytes(StandardCharsets.UTF_8));
@@ -113,5 +129,5 @@ public class FluidModel {
         return bridgeModelNoItem(baseModel.withSuffixedPath("/" + type.getNamespace() + "/" + type.getPath()));
     }
 
-    private record Texture(Identifier id, Identifier texture, boolean colored) {}
+    protected record Texture(Identifier id, Identifier texture, boolean colored) {}
 }

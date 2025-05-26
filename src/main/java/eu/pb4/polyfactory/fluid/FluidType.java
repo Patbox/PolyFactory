@@ -31,6 +31,7 @@ import static eu.pb4.polyfactory.ModInit.id;
 public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaultData,
                            Optional<Fluid> backingFluid,
                            Optional<Identifier> textureOverride,
+                           Optional<Identifier> solidTexture,
                            ModelRenderType modelRenderType,
                            Optional<ColorProvider<T>> color,
                            Optional<BiFunction<FluidType<T>, T, Text>> name,
@@ -148,6 +149,7 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         private Optional<Brightness> brightness = Optional.empty();
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         private Optional<Identifier> texture = Optional.empty();
+        private Optional<Identifier> solidTexture = Optional.empty();
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         private Optional<ColorProvider<T>> color = Optional.empty();
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -182,6 +184,11 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
 
         public Builder<T> texture(Identifier identifier) {
             this.texture = Optional.ofNullable(identifier);
+            return this;
+        }
+
+        public Builder<T> solidTexture(Identifier identifier) {
+            this.solidTexture = Optional.ofNullable(identifier);
             return this;
         }
 
@@ -250,7 +257,7 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         }
 
         public FluidType<T> build() {
-            return new FluidType<>(this.density, this.heat, this.dataCodec, this.defaultData, this.fluid, this.texture, this.modelRenderType,
+            return new FluidType<>(this.density, this.heat, this.dataCodec, this.defaultData, this.fluid, this.texture, this.solidTexture, this.modelRenderType,
                     this.color, this.name, this.particleGetter, this.maxFlow, this.flowSpeedMultiplier, this.brightness, this.shootingBehavior);
         }
     }
