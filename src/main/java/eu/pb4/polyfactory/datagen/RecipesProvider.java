@@ -14,6 +14,7 @@ import eu.pb4.polyfactory.mixin.BrewingRecipeRegistryAccessor;
 import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polyfactory.recipe.*;
+import eu.pb4.polyfactory.recipe.casting.SimpleCastingRecipe;
 import eu.pb4.polyfactory.recipe.drain.PotionAddDrainRecipe;
 import eu.pb4.polyfactory.recipe.drain.PotionRemoveDrainRecipe;
 import eu.pb4.polyfactory.recipe.fluid.RemovingFluidInteractionRecipe;
@@ -25,7 +26,7 @@ import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
 import eu.pb4.polyfactory.recipe.spout.PotionSpoutRecipe;
 import eu.pb4.polyfactory.recipe.spout.RepairSpoutRecipe;
-import eu.pb4.polyfactory.recipe.spout.SimpleDrainRecipe;
+import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
 import eu.pb4.polyfactory.recipe.spout.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -717,6 +718,24 @@ class RecipesProvider extends FabricRecipeProvider {
                         .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                         .offerTo(exporter);
 
+                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.CASTING_TABLE, 1)
+                        .pattern("i i")
+                        .pattern("iii")
+                        .pattern("s s")
+                        .input('i', Items.IRON_INGOT)
+                        .input('s', Items.SMOOTH_STONE_SLAB)
+                        .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                        .offerTo(exporter);
+
+                ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.SMELTERY_FAUCED, 1)
+                        .pattern("csc")
+                        .pattern("cic")
+                        .input('c', Items.COPPER_INGOT)
+                        .input('i', Items.IRON_INGOT)
+                        .input('s', Items.STONE)
+                        .criterion("get_axle", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                        .offerTo(exporter);
+
                 ShapedRecipeJsonBuilder.create(itemWrap, RecipeCategory.REDSTONE, FactoryItems.HAND_CRANK)
                         .pattern("ip")
                         .pattern("l ")
@@ -1264,9 +1283,9 @@ class RecipesProvider extends FabricRecipeProvider {
                 exporter.accept(recipeKey("spout/sticky_conveyor"), SimpleSpoutRecipe.toItem(FactoryItems.CONVEYOR, FactoryFluids.SLIME.of(FluidConstants.BLOCK / 10), FactoryItems.STICKY_CONVEYOR, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
                 exporter.accept(recipeKey("spout/sticky_dynamite"), SimpleSpoutRecipe.toItem(FactoryItems.DYNAMITE, FactoryFluids.SLIME.of(FluidConstants.BLOCK / 10), FactoryItems.STICKY_DYNAMITE, SoundEvents.BLOCK_SLIME_BLOCK_PLACE), null);
                 exporter.accept(recipeKey("spout/honeyed_apple"), SimpleSpoutRecipe.toItem(Items.APPLE, FactoryFluids.HONEY.of(FluidConstants.BLOCK / 4), FactoryItems.HONEYED_APPLE, SoundEvents.BLOCK_HONEY_BLOCK_PLACE), null);
-                exporter.accept(recipeKey("spout/golden_apple"), SimpleSpoutRecipe.toItem(Items.APPLE, FactoryFluids.GOLD.of(FluidConstants.INGOT * 7), Items.GOLDEN_APPLE, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED), null);
-                exporter.accept(recipeKey("spout/golden_carrot"), SimpleSpoutRecipe.toItem(Items.CARROT, FactoryFluids.GOLD.of(FluidConstants.NUGGET * 7), Items.GOLDEN_CARROT, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED), null);
-                exporter.accept(recipeKey("spout/golden_tiny_potato"), SimpleSpoutRecipe.toItem(FactoryItems.TINY_POTATO_SPRING, FactoryFluids.GOLD.of(FluidConstants.INGOT * 3), FactoryItems.GOLDEN_TINY_POTATO_SPRING, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED), null);
+                exporter.accept(recipeKey("spout/golden_apple"), SimpleSpoutRecipe.toItem(Items.APPLE, FactoryFluids.GOLD.of(FluidConstants.INGOT * 7), Items.GOLDEN_APPLE, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value()), null);
+                exporter.accept(recipeKey("spout/golden_carrot"), SimpleSpoutRecipe.toItem(Items.CARROT, FactoryFluids.GOLD.of(FluidConstants.NUGGET * 7), Items.GOLDEN_CARROT, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value()), null);
+                exporter.accept(recipeKey("spout/golden_tiny_potato"), SimpleSpoutRecipe.toItem(FactoryItems.TINY_POTATO_SPRING, FactoryFluids.GOLD.of(FluidConstants.INGOT * 3), FactoryItems.GOLDEN_TINY_POTATO_SPRING, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value()), null);
                 exporter.accept(recipeKey("spout/brittle_glass_bottle"), SimpleSpoutRecipe.toItem(Items.GLASS_BOTTLE, FactoryFluids.LAVA.of(FluidConstants.NUGGET), FactoryItems.BRITTLE_GLASS_BOTTLE, SoundEvents.BLOCK_GLASS_HIT), null);
                 exporter.accept(recipeKey("spout/brittle_potion"), SimpleSpoutRecipe.toItemCopy(Items.POTION, FactoryFluids.LAVA.of(FluidConstants.NUGGET), FactoryItems.BRITTLE_POTION, SoundEvents.BLOCK_GLASS_HIT), null);
                 exporter.accept(recipeKey("spout/slimeball"), SimpleSpoutRecipe.template(Items.BOWL,
@@ -1275,11 +1294,11 @@ class RecipesProvider extends FabricRecipeProvider {
                         FactoryFluids.SNOW.of(FluidConstants.BLOCK / 4), Items.SNOWBALL, SoundEvents.BLOCK_SNOW_PLACE), null);
 
                 destructiveItemCreatingFluidInteraction(exporter, "water_lava", 1, List.of(FactoryFluids.WATER.of(6000), FactoryFluids.LAVA.of(3000)),
-                        OutputStack.of(Items.FLINT, 0.15f, 1), ParticleTypes.LARGE_SMOKE, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED);
+                        OutputStack.of(Items.FLINT, 0.15f, 1), ParticleTypes.LARGE_SMOKE, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value());
                 destructiveItemCreatingFluidInteraction(exporter, "milk_lava", 1, List.of(FactoryFluids.MILK.of(6000), FactoryFluids.LAVA.of(3000)),
-                        OutputStack.of(Items.FLINT, 0.15f, 1), ParticleTypes.LARGE_SMOKE, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED);
+                        OutputStack.of(Items.FLINT, 0.15f, 1), ParticleTypes.LARGE_SMOKE, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value());
                 destructiveItemCreatingFluidInteraction(exporter, "honey_lava", 1, List.of(FactoryFluids.HONEY.of(8000), FactoryFluids.LAVA.of(4000)),
-                        OutputStack.of(FactoryItems.CRISPY_HONEY, 0.15f, 1), ParticleTypes.LARGE_SMOKE, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED);
+                        OutputStack.of(FactoryItems.CRISPY_HONEY, 0.15f, 1), ParticleTypes.LARGE_SMOKE, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value());
 
 
                 exporter.accept(recipeKey("fluid_interaction/snow_melting"), new SimpleFluidInteractionRecipe(
@@ -1315,10 +1334,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         SimpleSmelteryRecipe.of("minecraft_copper", FactoryItems.PIPE, FactoryFluids.COPPER.of(FluidConstants.INGOT * 2), 20 * 4 * 2)
                 );
 
-                exporter.accept(recipeKey("spout/copper_pipe"),
-                        SimpleSpoutRecipe.templateDamaged(FactoryItems.PIPE_MOLD.tag(), FactoryFluids.COPPER.of(FluidConstants.INGOT * 2),
-                                FactoryItems.PIPE, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED), null
-                );
+                moldRecipes(FactoryItems.PIPE_MOLD, FactoryFluids.COPPER.of(FluidConstants.INGOT * 2), FactoryItems.PIPE);
 
                 smelteryOreSet(FactoryFluids.STEEL, 20 * 5, null, FactoryItems.STEEL_ALLOY_MIXTURE, null,
                         null, FactoryItems.STEEL_INGOT, null, FactoryItems.STEEL_BLOCK);
@@ -1336,12 +1352,29 @@ class RecipesProvider extends FabricRecipeProvider {
                 this.spoutMolds(FactoryItemTags.PIPES, FactoryItems.PIPE_MOLD);
             }
 
+            private void moldRecipes(SpoutMolds molds, FluidStack<?> fluidStack, Item item) {
+                exporter.accept(recipeKey("spout/" + Registries.ITEM.getId(item).getPath() + "_with_molds"),
+                        SimpleSpoutRecipe.templateDamaged(molds.tag(), fluidStack,
+                                item, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value(), 40), null
+                );
+
+                exporter.accept(recipeKey("casting/" + Registries.ITEM.getId(item).getPath() + "_with_molds"),
+                        SimpleCastingRecipe.templateDamaged(molds.tag(), fluidStack,
+                                item, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value(), 40), null
+                );
+            }
+
             private void spoutMolds(TagKey<Item> tag, SpoutMolds mold) {
                 CookingRecipeJsonBuilder.create(Ingredient.ofItems(mold.clay()), RecipeCategory.TOOLS, mold.hardened(),
                         0, 40, RecipeSerializer.SMELTING, SmeltingRecipe::new)
                         .criterion("steel_ingot", InventoryChangedCriterion.Conditions.items(Items.CLAY))
                         .group("polyfactory:hardened_molds")
                         .offerTo(exporter);
+
+                exporter.accept(recipeKey("casting/mold_" + mold.name().getPath()),
+                        SimpleCastingRecipe.toItem(tag, FactoryFluids.STEEL.of(FluidConstants.INGOT * 4),
+                                mold.mold(), FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value(), 40), null
+                );
 
                 this.createShaped(RecipeCategory.TOOLS, mold.clay()).pattern(" x ").pattern("xox").pattern(" x ")
                         .input('x', Items.CLAY_BALL)
@@ -1367,11 +1400,7 @@ class RecipesProvider extends FabricRecipeProvider {
                             SimpleSmelteryRecipe.of(group, ingot, fluidType.of(FluidConstants.INGOT), ingotTime)
                     );
 
-
-                    exporter.accept(recipeKey("spout/" + Registries.ITEM.getId(ingot).getPath()),
-                            SimpleSpoutRecipe.templateDamaged(FactoryItems.INGOT_MOLD.tag(), fluidType.of(FluidConstants.INGOT),
-                                    ingot, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED), null
-                    );
+                    moldRecipes(FactoryItems.INGOT_MOLD, fluidType.of(FluidConstants.INGOT), ingot);
                 }
 
                 if (nugget != null) {
@@ -1379,10 +1408,7 @@ class RecipesProvider extends FabricRecipeProvider {
                             SimpleSmelteryRecipe.of(group, nugget, fluidType.of(FluidConstants.NUGGET), ingotTime / 9)
                     );
 
-                    exporter.accept(recipeKey("spout/" + Registries.ITEM.getId(nugget).getPath()),
-                            SimpleSpoutRecipe.templateDamaged(FactoryItems.NUGGET_MOLD.tag(), fluidType.of(FluidConstants.NUGGET),
-                                    ingot, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED), null
-                    );
+                    moldRecipes(FactoryItems.NUGGET_MOLD, fluidType.of(FluidConstants.NUGGET), nugget);
                 }
 
 

@@ -29,14 +29,8 @@ public record SpoutMolds(Identifier name, Item clay, Item hardened, Item mold, T
         );
     }
 
-    public void addItemGroup(ItemGroup.Entries entries) {
-        entries.add(this.clay);
-        entries.add(this.hardened);
-        entries.add(this.mold);
-    }
-
     public void createTag(ItemTagsProvider itemTagsProvider) {
         itemTagsProvider.getOrCreateTagBuilder(tag).add(hardened, mold);
-        itemTagsProvider.getOrCreateTagBuilder(FactoryItemTags.SPOUT_ITEM_HORIZONTAL).add(hardened, mold);
+        itemTagsProvider.getOrCreateTagBuilder(FactoryItemTags.MOLDS).addOptionalTag(tag);
     }
 }

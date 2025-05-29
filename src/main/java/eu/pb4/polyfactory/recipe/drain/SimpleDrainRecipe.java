@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.recipe.spout;
+package eu.pb4.polyfactory.recipe.drain;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -6,8 +6,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
-import eu.pb4.polyfactory.recipe.drain.DrainRecipe;
 import eu.pb4.polyfactory.recipe.input.DrainInput;
+import eu.pb4.polyfactory.recipe.spout.SpoutRecipe;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;

@@ -24,6 +24,8 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -80,7 +82,10 @@ public class ModInit implements ModInitializer {
 		GuiTextures.register();
 		PolydexCompat.register();
 		PolymerResourcePackUtils.addModAssets(ID);
-		ResourcePackExtras.forDefault().addBridgedModelsFolder(id("block"), id("sgui"), id("particle"));
+		ResourcePackExtras.forDefault().addBridgedModelsFolder(id("block"), id("particle"));
+		ResourcePackExtras.forDefault().addBridgedModelsFolder(id("sgui"), ((identifier, builder) -> {
+			return  new ItemAsset(new BasicItemModel(identifier),  new ItemAsset.Properties(false, true));
+		}));
 		PolymerResourcePackUtils.markAsRequired();
 
 		FluidTextures.setup();

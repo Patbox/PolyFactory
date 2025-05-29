@@ -29,7 +29,7 @@ public interface FactorySoundEvents {
     RegistryEntry<SoundEvent> FLUID_SHOOT_EXPERIENCE = ofEntry("fluid.shoot.experience");
     SoundEvent ITEM_CLIPBOARD_WRITE = of("item.clipboard.write");
     SoundEvent ITEM_CLIPBOARD_APPLY = of("item.clipboard.apply");
-    SoundEvent BLOCK_SPOUT_METAL_COOLED = of("block.spout.metal_cooled");
+    RegistryEntry<SoundEvent> BLOCK_SPOUT_METAL_COOLED = ofEntry("block.spout.metal_cooled");
 
     static SoundEvent of(String path) {
         var obj = SoundEvent.of(id(path));

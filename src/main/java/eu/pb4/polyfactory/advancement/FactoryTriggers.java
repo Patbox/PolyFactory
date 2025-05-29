@@ -41,4 +41,6 @@ public interface FactoryTriggers {
     Identifier CRAFT_WITH_BLUEPRINT_WORKBENCH = id("craft_with_blueprint_workbench");
     Identifier ITEM_FILTER_USE = id("item_filter_use");
     Identifier CONNECT_RECORD_PLAYER_AND_SPEAKERS = id("connect_record_player_and_speakers");
+    Identifier CASTING_METAL = id("casting_metal");
+
 }

@@ -6,16 +6,14 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
-import eu.pb4.polyfactory.recipe.input.SpoutInput;
+import eu.pb4.polyfactory.recipe.input.SingleItemWithFluid;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.IngredientPlacement;
 import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -40,7 +38,7 @@ public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, 
     }
 
     @Override
-    public boolean matches(SpoutInput input, World world) {
+    public boolean matches(SingleItemWithFluid input, World world) {
         if (!item.test(input.stack())) {
             return false;
         }
@@ -55,7 +53,7 @@ public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, 
     }
 
     @Override
-    public ItemStack craft(SpoutInput input, RegistryWrapper.WrapperLookup lookup) {
+    public ItemStack craft(SingleItemWithFluid input, RegistryWrapper.WrapperLookup lookup) {
         for (var key : input.fluids()) {
             if ((key.type() == FactoryFluids.POTION || key.type() == FactoryFluids.WATER) && input.getFluid(key) >= amount) {
                 var stack = this.output.copy();
@@ -75,7 +73,7 @@ public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, 
     }
 
     @Override
-    public List<FluidStack<?>> fluidInput(SpoutInput input) {
+    public List<FluidStack<?>> fluidInput(SingleItemWithFluid input) {
         for (var key : input.fluids()) {
             if ((key.type() == FactoryFluids.POTION || key.type() == FactoryFluids.WATER) && input.getFluid(key) >= amount) {
                 return List.of(key.stackOf(this.amount));
@@ -85,7 +83,7 @@ public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, 
     }
 
     @Override
-    public double time(SpoutInput input) {
+    public double time(SingleItemWithFluid input) {
         return this.time;
     }
 }

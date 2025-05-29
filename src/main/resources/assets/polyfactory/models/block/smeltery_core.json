@@ -1,7 +1,7 @@
 {
 	"parent": "minecraft:block/orientable",
 	"textures": {
-		"front": "polyfactory:block/smeltery/front_core",
+		"front": "polyfactory:block/smeltery/industrial/front_core",
 		"side": "minecraft:block/deepslate_bricks",
 		"top": "minecraft:block/deepslate_bricks"
 	}

@@ -221,7 +221,7 @@ class AssetProvider implements DataProvider {
             }
         }
 
-        consumer.accept(GuiTextures.LEFT_SHIFTED_3_BARS.get(DataComponentTypes.ITEM_MODEL), new ItemAsset(new CompositeItemModel(list), ItemAsset.Properties.DEFAULT));
+        consumer.accept(GuiTextures.LEFT_SHIFTED_3_BARS.get(DataComponentTypes.ITEM_MODEL), new ItemAsset(new CompositeItemModel(list), new ItemAsset.Properties(false, true)));
     }
 
 

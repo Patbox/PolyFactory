@@ -24,9 +24,10 @@ import eu.pb4.polyfactory.recipe.CraftingWithLeftoverRecipe;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.recipe.ShapelessNbtCopyRecipe;
+import eu.pb4.polyfactory.recipe.casting.SimpleCastingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.TransformMixingRecipe;
 import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
-import eu.pb4.polyfactory.recipe.spout.SimpleDrainRecipe;
+import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
 import eu.pb4.polyfactory.recipe.spout.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.BrewingMixingRecipe;
@@ -39,13 +40,11 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.sgui.api.elements.GuiElement;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -78,6 +77,7 @@ public class PolydexCompatImpl {
         //noinspection unchecked
         PolydexPage.registerRecipeViewer(ShapelessNbtCopyRecipe.class, (x) -> new ShapelessCraftingRecipePage((RecipeEntry<ShapelessRecipe>) (Object) x));
         PolydexPage.registerRecipeViewer(SimpleSpoutRecipe.class, SimpleSpoutRecipePage::new);
+        PolydexPage.registerRecipeViewer(SimpleCastingRecipe.class, SimpleCastingRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleDrainRecipe.class, SimpleDrainRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleSmelteryRecipe.class, SimpleSmelteryRecipePage::new);
         //noinspection RedundantCast

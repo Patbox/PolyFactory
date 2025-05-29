@@ -14,6 +14,8 @@ public class FactoryItemTags {
     public static final TagKey<Item> DRAIN_CATALYST = of("drain_catalyst");
     public static final TagKey<Item> XP_CONVERSION_CATALYST = of("xp_conversion_catalyst");
     public static final TagKey<Item> SPOUT_ITEM_HORIZONTAL = of("spout_item_horizontal");
+    public static final TagKey<Item> CASTING_SMALL_FLUID = of("casting_small_fluid");
+    public static final TagKey<Item> MOLDS = of("molds");
     public static final TagKey<Item> PIPES = of("pipes");
 
     private static TagKey<Item> of(String path) {

@@ -9,12 +9,10 @@ import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
-import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.item.FactoryItemTags;
-import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
-import eu.pb4.polyfactory.recipe.input.SpoutInput;
+import eu.pb4.polyfactory.recipe.input.SingleItemWithFluid;
 import eu.pb4.polyfactory.recipe.spout.SpoutRecipe;
 import eu.pb4.polyfactory.ui.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
@@ -71,13 +69,14 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
     private int containerUpdateId = -1;
     @Nullable
     private FluidContainer fluidContainer;
+    private boolean isCooling = false;
 
     public MSpoutBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.MECHANICAL_SPOUT, pos, state);
     }
 
-    private SpoutInput asInput() {
-        return SpoutInput.of(this.getStack(INPUT_FIRST).copy(), fluidContainer, (ServerWorld) world);
+    private SingleItemWithFluid asInput() {
+        return SingleItemWithFluid.of(this.getStack(INPUT_FIRST).copy(), fluidContainer, (ServerWorld) world);
     }
     public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
         var self = (MSpoutBlockEntity) t;
@@ -106,6 +105,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             self.process = 0;
             self.speedScale = 0;
             self.active = false;
+            self.isCooling = false;
             self.model.setActive(false);
             self.model.tick();
             self.fluidContainer = container;
@@ -119,6 +119,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             self.model.setActive(false);
             self.model.tick();
             self.state = INCORRECT_ITEMS_TEXT;
+            self.isCooling = false;
             self.fluidContainer = container;
             return;
         }
@@ -140,6 +141,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
                 self.model.setActive(false);
                 self.model.tick();
                 self.inventoryChanged = false;
+                self.isCooling = false;
                 self.state = INCORRECT_ITEMS_TEXT;
                 return;
             }
@@ -151,9 +153,18 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
         self.model.setActive(true);
         self.model.tick();
 
-        var time = self.currentRecipe.value().time(input);
+        var coolingTime = self.currentRecipe.value().coolingTime(input);
+
+        var time = self.isCooling ? coolingTime : self.currentRecipe.value().time(input);
 
         if (self.process >= time) {
+            if (coolingTime > 0 && !self.isCooling) {
+                self.isCooling = true;
+                self.process = 0;
+                self.markDirty();
+                return;
+            }
+
             var itemOut = self.currentRecipe.value().craft(input, world.getRegistryManager());
             var currentOutput = self.getStack(OUTPUT_FIRST);
             if (currentOutput.isEmpty()) {
@@ -191,23 +202,26 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             }
             world.playSound(null, pos, self.currentRecipe.value().soundEvent().value(), SoundCategory.BLOCKS);
             self.process = 0;
-            self.model.setProgress(0, null);
+            self.isCooling = false;
+            self.model.setProgress(false,0, null);
             self.markDirty();
         } else {
             var speed = Math.min(Math.abs(strength) * 1, 1);
             self.speedScale = speed;
-            if (speed > 0) {
-                self.process += speed;
+            if (speed > 0 || self.isCooling) {
+                self.process += self.isCooling ? 1 : speed;
                 markDirty(world, pos, self.getCachedState());
                 var fluid = Util.getRandomOrEmpty(self.currentRecipe.value().fluidInput(input), world.random);
                 if (fluid.isPresent()) {
                     var progress = self.process / time;
-                    if (!alt || progress < 0.55) {
+                    if (!self.isCooling) {
                         ((ServerWorld) world).spawnParticles(fluid.get().instance().particle(),
                                 pos.getX() + 0.5, pos.getY() + 0.5 + 1 + 4 / 16f, pos.getZ() + 0.5, 0,
                                 0, -1, 0, 0.1);
                     }
-                    self.model.setProgress(progress, fluid.get().instance());
+
+                    self.model.setProgress(self.isCooling, progress, fluid.get().instance());
+
                 }
 
                 return;
@@ -256,6 +270,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.writeInventoryNbt(nbt, lookup);
         nbt.putDouble("Progress", this.process);
+        nbt.putBoolean("is_cooling", this.isCooling);
         super.writeNbt(nbt, lookup);
     }
 
@@ -263,6 +278,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         this.readInventoryNbt(nbt, lookup);
         this.process = nbt.getDouble("Progress", 0);
+        this.isCooling = nbt.getBoolean("is_cooling", false);
         super.readNbt(nbt, lookup);
     }
 
@@ -375,9 +391,21 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
         }
 
         private float progress() {
-            return MSpoutBlockEntity.this.currentRecipe != null
-                    ? (float) MathHelper.clamp(MSpoutBlockEntity.this.process / MSpoutBlockEntity.this.currentRecipe.value().time(asInput()), 0, 1)
-                    : 0;
+            if (MSpoutBlockEntity.this.currentRecipe == null) {
+                return 0;
+            }
+            var value = 0d;
+            var coolingTime = MSpoutBlockEntity.this.currentRecipe.value().coolingTime(asInput());
+            if (coolingTime > 0 && MSpoutBlockEntity.this.isCooling) {
+                value = MSpoutBlockEntity.this.process / coolingTime * 0.5 + 0.5;
+            } else if (coolingTime > 0) {
+                value = MSpoutBlockEntity.this.process / MSpoutBlockEntity.this.currentRecipe.value().time(asInput()) * 0.5;
+            } else {
+                value = MSpoutBlockEntity.this.process / MSpoutBlockEntity.this.currentRecipe.value().time(asInput());
+            }
+
+
+            return (float) MathHelper.clamp(value, 0, 1);
         }
 
         @Override

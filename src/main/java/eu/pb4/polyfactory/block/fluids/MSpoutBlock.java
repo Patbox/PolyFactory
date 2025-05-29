@@ -19,7 +19,6 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -30,7 +29,6 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
@@ -174,6 +172,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
         private boolean altModel = false;
         private double progress;
         private FluidInstance<?> castingFluid;
+        private boolean isCooling = false;
 
         private Model(ServerWorld world, BlockState state) {
             this.main = ItemDisplayElementUtil.createSimple(DEFAULT_MODEL);
@@ -181,12 +180,12 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, this.getUpdateRate(), 0.3f, 0.5f);
             this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, this.getUpdateRate(), 0.3f, 0.5f);
-            this.fluid = ItemDisplayElementUtil.createSimple();
+            this.fluid = LodItemDisplayElement.createSimple();
             this.gearA.setViewRange(0.4f);
             this.gearB.setViewRange(0.4f);
             this.fluid.setViewRange(0.4f);
             this.fluid.setScale(new Vector3f(12 / 16f));
-            this.fluid.setOffset(new Vec3d(0, 7.5 / 16f - (2 / 16f / 16f) - 0.01, 0));
+            this.fluid.setOffset(new Vec3d(0, 7.5 / 16f - (2 / 16f / 16f), 0));
 
             updateStatePos(state);
             var dir = state.get(INPUT_FACING);
@@ -201,6 +200,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             var direction = state.get(INPUT_FACING);
 
             this.main.setYaw(direction.getPositiveHorizontalDegrees());
+            this.fluid.setYaw(direction.getPositiveHorizontalDegrees());
             this.gearA.setYaw(direction.getPositiveHorizontalDegrees());
             this.gearB.setYaw(direction.getPositiveHorizontalDegrees());
         }
@@ -240,6 +240,9 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
         }
 
         public void setActive(boolean b) {
+            if (!b) {
+                setProgress(false, 0, null);
+            }
         }
 
         public void altModel(boolean b) {
@@ -247,18 +250,18 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
                 return;
             }
             if (!b) {
-                setProgress(0, null);
+                setProgress(false, 0, null);
             }
             this.altModel = b;
             this.main.setItem(b ? ALT_MODEL : DEFAULT_MODEL);
             this.main.tick();
         }
 
-        public void setProgress(double process, FluidInstance<?> castingFluid) {
+        public void setProgress(boolean isCooling, double process, FluidInstance<?> castingFluid) {
             if (!this.altModel) {
                 return;
             }
-            if (this.progress == process && this.castingFluid == castingFluid) {
+            if (this.progress == process && this.castingFluid == castingFluid && this.isCooling == isCooling) {
                 return;
             }
 
@@ -266,21 +269,22 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
                 this.fluid.setItem(ItemStack.EMPTY);
                 this.fluid.setTranslation(new Vector3f(0, -0.1f, 0));
             } else {
-                var solid = process > 0.70;
-                var value = MathHelper.clamp((float) (solid ? ((process - 0.70f) / 0.30f) : (1 - (process - 0.55) / 0.15f)), 0, 1);
-                var color = ColorHelper.fromFloats(1, 1f, 0.6f + value * 0.4f, 0.5f + value * 0.5f);
-                this.fluid.setItem(FactoryModels.FLUID_FLAT_14.get(castingFluid,
+                var isSolid = process > 0.5 && isCooling;
+                var value = MathHelper.clamp((float) (isSolid ? ((process - 0.50f) / 0.50f) : (1 - (process) / 0.50f)), 0, 1);
+                var color = isCooling ? ColorHelper.fromFloats(1, 1f, 0.6f + value * 0.4f, 0.5f + value * 0.5f) : 0xFFFFFF;
+                this.fluid.setItem(FactoryModels.FLUID_FLAT_14_SPOUT.get(castingFluid,
                         color,
-                        solid));
-                this.fluid.setTranslation(new Vector3f( 0, (float) (MathHelper.clamp(process / 0.55, 0, 1) - 0.5) / 16.2f * 12 / 16f, 0));
+                        isSolid));
+                this.fluid.setTranslation(new Vector3f( 0, (float) ((isCooling ? 1 : MathHelper.clamp(process, 0, 1)) - 0.5) / 16.2f * 12 / 16f, 0));
             }
-            if (process > this.progress) {
+            if (process > this.progress && !isCooling) {
                 this.fluid.startInterpolationIfDirty();
             }
 
             this.fluid.tick();
             this.progress = process;
             this.castingFluid = castingFluid;
+            this.isCooling = isCooling;
         }
     }
 }

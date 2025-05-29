@@ -5,7 +5,7 @@ import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
-import eu.pb4.polyfactory.recipe.input.SpoutInput;
+import eu.pb4.polyfactory.recipe.input.SingleItemWithFluid;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
@@ -22,12 +22,12 @@ import java.util.List;
 public record RepairSpoutRecipe() implements SpoutRecipe {
     public static final MapCodec<RepairSpoutRecipe> CODEC = MapCodec.unit(RepairSpoutRecipe::new);
     @Override
-    public boolean matches(SpoutInput input, World world) {
+    public boolean matches(SingleItemWithFluid input, World world) {
         return EnchantmentHelper.hasAnyEnchantmentsWith(input.stack(), EnchantmentEffectComponentTypes.REPAIR_WITH_XP) && input.getFluid(FactoryFluids.EXPERIENCE.defaultInstance()) >= FluidBehaviours.EXPERIENCE_ORB_TO_FLUID;
     }
 
     @Override
-    public ItemStack craft(SpoutInput input, RegistryWrapper.WrapperLookup lookup) {
+    public ItemStack craft(SingleItemWithFluid input, RegistryWrapper.WrapperLookup lookup) {
         var stack = input.stack().copy();
         int i = EnchantmentHelper.getRepairWithExperience(input.world(), stack, (int) (input.getFluid(FactoryFluids.EXPERIENCE.defaultInstance()) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID));
         int j = Math.min(i, stack.getDamage());
@@ -41,7 +41,7 @@ public record RepairSpoutRecipe() implements SpoutRecipe {
     }
 
     @Override
-    public List<FluidStack<?>> fluidInput(SpoutInput input) {
+    public List<FluidStack<?>> fluidInput(SingleItemWithFluid input) {
         var stack = input.stack().copy();
         int i = EnchantmentHelper.getRepairWithExperience(input.world(), stack, (int) (input.getFluid(FactoryFluids.EXPERIENCE.defaultInstance()) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID));
         int j = Math.min(i, stack.getDamage());
@@ -54,7 +54,7 @@ public record RepairSpoutRecipe() implements SpoutRecipe {
     }
 
     @Override
-    public double time(SpoutInput input) {
+    public double time(SingleItemWithFluid input) {
         var stack = input.stack().copy();
         int i = EnchantmentHelper.getRepairWithExperience(input.world(), stack, (int) (input.getFluid(FactoryFluids.EXPERIENCE.defaultInstance()) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID));
         return Math.min(i, stack.getDamage()) / 10f;

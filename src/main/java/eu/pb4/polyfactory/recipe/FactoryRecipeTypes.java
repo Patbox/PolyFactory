@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.recipe;
 
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.recipe.casting.CastingRecipe;
 import eu.pb4.polyfactory.recipe.drain.DrainRecipe;
 import eu.pb4.polyfactory.recipe.fluid.FluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;
@@ -20,6 +21,7 @@ public class FactoryRecipeTypes {
     public static final RecipeType<DrainRecipe> DRAIN = register("drain");
     public static final RecipeType<SpoutRecipe> SPOUT = register("spout");
     public static final RecipeType<SmelteryRecipe> SMELTERY = register("smeltery");
+    public static final RecipeType<CastingRecipe> CASTING = register("casting");
     public static final RecipeType<FluidInteractionRecipe> FLUID_INTERACTION = register("fluid_interaction");
 
     public static void register() {

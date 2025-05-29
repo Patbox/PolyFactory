@@ -64,6 +64,8 @@ public class FactoryItems {
     public static final Item STEAM_ENGINE = register(FactoryBlocks.STEAM_ENGINE);
     public static final Item SMELTERY_CORE = register(FactoryBlocks.SMELTERY_CORE);
     public static final Item SMELTERY = register(FactoryBlocks.SMELTERY);
+    public static final Item CASTING_TABLE = register(FactoryBlocks.CASTING_TABLE);
+    public static final Item SMELTERY_FAUCED = register(FactoryBlocks.SMELTERY_FAUCED);
     public static final Item GRINDER = register(FactoryBlocks.GRINDER);
     public static final Item PRESS = register(FactoryBlocks.PRESS);
     public static final Item CRAFTER = register(FactoryBlocks.CRAFTER);
@@ -261,6 +263,8 @@ public class FactoryItems {
                     entries.add(NOZZLE);
 
                     entries.add(SMELTERY_CORE);
+                    entries.add(CASTING_TABLE);
+                    entries.add(SMELTERY_FAUCED);
 
                     // Data
                     entries.add(CABLE);

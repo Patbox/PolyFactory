@@ -3,8 +3,10 @@ package eu.pb4.polyfactory.recipe;
 import com.mojang.serialization.MapCodec;
 import eu.pb4.factorytools.api.recipe.LazyRecipeSerializer;
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.recipe.casting.SimpleCastingRecipe;
 import eu.pb4.polyfactory.recipe.drain.PotionAddDrainRecipe;
 import eu.pb4.polyfactory.recipe.drain.PotionRemoveDrainRecipe;
+import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
 import eu.pb4.polyfactory.recipe.fluid.RemovingFluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.fluid.SimpleFluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
@@ -52,6 +54,8 @@ public class FactoryRecipeSerializers {
     public static final LazyRecipeSerializer<PotionSpoutRecipe> SPOUT_POTION = register("spout/potion", PotionSpoutRecipe.CODEC);
     public static final LazyRecipeSerializer<RepairSpoutRecipe> SPOUT_EXPERIENCE_REPAIR = register("spout/experience_repair", RepairSpoutRecipe.CODEC);
     public static final LazyRecipeSerializer<SimpleSmelteryRecipe> SMELTERY = register("smeltery/simple", SimpleSmelteryRecipe.CODEC);
+    public static final LazyRecipeSerializer<SimpleCastingRecipe> CASTING_SIMPLE = register("casting/simple", SimpleCastingRecipe.CODEC);
+
     public static final LazyRecipeSerializer<SimpleFluidInteractionRecipe> FLUID_INTERACTION_SIMPLE = register("fluid_interaction/simple", SimpleFluidInteractionRecipe.CODEC);
     public static final LazyRecipeSerializer<RemovingFluidInteractionRecipe> FLUID_INTERACTION_REMOVING = register("fluid_interaction/removing", RemovingFluidInteractionRecipe.CODEC);
 

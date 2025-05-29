@@ -62,7 +62,7 @@ public class FactoryFluids {
 
     public static final FluidType<Unit> STEEL = register(id("steel"),
             FluidType.of().density(1007).brightness(15).heat(BlockHeat.LAVA)
-                    .solidTexture(id("block/steel_block"))
+                    .solidTexture(id("block/steel_plate_base"))
                     .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
                     .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());

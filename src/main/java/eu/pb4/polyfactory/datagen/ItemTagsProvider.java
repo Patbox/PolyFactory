@@ -88,6 +88,9 @@ public class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
         for (var mold : FactoryItems.MOLDS) {
             mold.createTag(this);
         }
+
+        this.getOrCreateTagBuilder(FactoryItemTags.SPOUT_ITEM_HORIZONTAL).addOptionalTag(FactoryItemTags.MOLDS);
+        this.getOrCreateTagBuilder(FactoryItemTags.CASTING_SMALL_FLUID).addOptionalTag(FactoryItemTags.MOLDS);
     }
 
     @Override
