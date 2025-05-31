@@ -22,12 +22,13 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public abstract class SmelteryRecipePage<T extends SmelteryRecipe> extends PrioritizedRecipePage<T> {
-    private static final ItemStack ICON = FactoryItems.SMELTERY.getDefaultStack();
+    private static final ItemStack ICON = new GuiElementBuilder(FactoryItems.SMELTERY).setName(Text.translatable("polydex_category.polyfactory.polyfactory.smeltery")).asStack();
     private final PolydexIngredient<?> ingredient;
     private final PolydexStack<?>[] outputFluids;
 
@@ -38,7 +39,7 @@ public abstract class SmelteryRecipePage<T extends SmelteryRecipe> extends Prior
                 .append(Text.literal("" + GuiTextures.POLYDEX_OFFSET_N + GuiTextures.SMELTERY_POLYDEX_FLUID_OFFSET).setStyle(UiResourceCreator.STYLE))
                 .append(FluidTextures.SMELTERY.render((a) -> {
                     for (var x : getFluidOutput()) {
-                        //a.accept(x.instance(), (float) (x.amount() / (double) SmelteryBlockEntity.FLUID_CAPACITY));
+                        //a.accept(x.instance(), (float) (x.amount() / (double) IndustrialSmelteryBlockEntity.FLUID_CAPACITY));
                         a.accept(x.instance(), (float) (x.amount() / (double) (FluidConstants.BLOCK * 8)));
                     }
                 }))

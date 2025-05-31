@@ -6,6 +6,7 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.fluids.FluidOutput;
+import eu.pb4.polyfactory.block.fluids.transport.PipeBaseBlock;
 import eu.pb4.polyfactory.block.fluids.transport.PipeConnectable;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -43,55 +44,15 @@ import java.util.ArrayList;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEntityProvider, InventoryProvider, FluidOutput.Getter, PipeConnectable {
+public class PrimitiveSmelteryBlock extends MultiBlock implements FactoryBlock, BlockEntityProvider, InventoryProvider, FluidOutput.Getter, PipeConnectable {
     public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty LIT = Properties.LIT;
 
-    public static final int STEEL_BLOCKS = 3;
-    public static final int DEEPSLATE_BRICK_BLOCKS = 22;
 
-
-    public SmelteryBlock(Settings settings) {
-        super(3, 3, 3, settings);
+    public PrimitiveSmelteryBlock(Settings settings) {
+        super(1, 2, 1, settings);
         this.setDefaultState(this.getDefaultState().with(LIT, false));
     }
-
-    public boolean placeSmeltery(ServerWorld world, BlockPos pos) {
-        var list = new ArrayList<BlockState>();
-        int steel = 0;
-        int deepslate = 0;
-        BlockState controller = null;
-        var start = pos.add(-1, -1, -1);
-        var end = pos.add(1, 1, 1);
-        for (var blockPos : BlockPos.iterate(start, end)) {
-            var state = world.getBlockState(blockPos);
-            list.add(state);
-            if (state.isOf(Blocks.DEEPSLATE_BRICKS)) deepslate++;
-            else if (state.isOf(FactoryBlocks.STEEL_BLOCK)) steel++;
-            else if (state.isOf(FactoryBlocks.SMELTERY_CORE) && controller == null) controller = state;
-            else if ((state.isAir() && !blockPos.equals(pos)) || !state.isAir()) return false;
-        }
-
-        if (steel < STEEL_BLOCKS || deepslate < DEEPSLATE_BRICK_BLOCKS || controller == null) {
-            return false;
-        }
-
-        var state = FactoryBlocks.SMELTERY.getDefaultState().with(FACING, controller.get(BlastFurnaceBlock.FACING));
-        for (var blockPos : BlockPos.iterate(start, end)) {
-            int x = blockPos.getX() - start.getX();
-            int y = blockPos.getY() - start.getY();
-            int z = blockPos.getZ() - start.getZ();
-
-            world.setBlockState(blockPos, state.with(this.partX, x).with(this.partY, y).with(this.partZ, z));
-
-            if (x == 1 && y == 1 && z == 1 && world.getBlockEntity(blockPos) instanceof SmelteryBlockEntity be) {
-                be.setPositionedBlocks(list);
-            }
-        }
-
-        return true;
-    }
-
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
@@ -100,47 +61,12 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!player.isSneaking() && world.getBlockEntity(getCenter(state, pos)) instanceof SmelteryBlockEntity be) {
+        if (!player.isSneaking() && world.getBlockEntity(getCenter(state, pos)) instanceof PrimitiveSmelteryBlockEntity be) {
             be.openGui((ServerPlayerEntity) player);
             return ActionResult.SUCCESS_SERVER;
         }
 
         return super.onUse(state, world, pos, player, hit);
-    }
-
-    @Override
-    protected ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        var center = getCenter(state, pos);
-        if (world.getBlockEntity(center) instanceof SmelteryBlockEntity be) {
-            var x = be.getPositionedBlock(pos.subtract(center));
-            if (x != null && !x.isAir()) {
-                return x.getPickStack(world, pos, false);
-            }
-        }
-        return super.getPickStack(world, pos, state, includeData);
-    }
-
-    @Override
-    protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        super.onStateReplaced(state, world, pos, moved);
-        if (isCenter(state)) {
-            return;
-        }
-        var center = getCenter(state, pos);
-        if (world.getBlockEntity(center) instanceof SmelteryBlockEntity be) {
-            be.breakSmeltery(world, center, pos, false);
-        }
-    }
-
-
-    @Override
-    protected boolean canDropStackFrom(BlockState state) {
-        return false;
-    }
-
-    @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
-        return state;
     }
 
     @Nullable
@@ -157,13 +83,13 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return isCenter(state) ? new SmelteryBlockEntity(pos, state) : null;
+        return isCenter(state) ? new PrimitiveSmelteryBlockEntity(pos, state) : null;
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return isCenter(state) ? SmelteryBlockEntity::tick : null;
+        return isCenter(state) ? PrimitiveSmelteryBlockEntity::tick : null;
     }
 
     @Override
@@ -181,7 +107,7 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.DEEPSLATE_BRICKS.getDefaultState();
+        return Blocks.BRICKS.getDefaultState();
     }
 
     @Override
@@ -194,17 +120,22 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
         return true;
     }
 
+    @Override
+    public boolean forceLightUpdates(BlockState blockState) {
+        return isCenter(blockState);
+    }
+
     public static final class Model extends BlockModel {
-        private static final ItemStack REGULAR = ItemDisplayElementUtil.getModel(id("block/smeltery"));
-        private static final ItemStack LIT = ItemDisplayElementUtil.getModel(id("block/smeltery_lit"));
+        private static final ItemStack REGULAR = ItemDisplayElementUtil.getModel(id("block/primitive_smeltery"));
+        private static final ItemStack LIT = ItemDisplayElementUtil.getModel(id("block/primitive_smeltery_lit"));
 
         private final ItemDisplayElement main;
+
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.get(SmelteryBlock.LIT) ? LIT : REGULAR);
-            this.main.setOffset(new Vec3d(0, -1, 0));
-            this.main.setScale(new Vector3f(2f * 2));
+            this.main = ItemDisplayElementUtil.createSimple(state.get(PrimitiveSmelteryBlock.LIT) ? LIT : REGULAR);
+            this.main.setScale(new Vector3f(2f));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
-            this.main.setDisplaySize(5, 5);
+            this.main.setDisplaySize(3, 3);
             this.updateStatePos(state);
             this.addElement(this.main);
         }
@@ -228,7 +159,7 @@ public class SmelteryBlock extends MultiBlock implements FactoryBlock, BlockEnti
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.main.setItem(this.blockState().get(SmelteryBlock.LIT) ? LIT : REGULAR);
+                this.main.setItem(this.blockState().get(PrimitiveSmelteryBlock.LIT) ? LIT : REGULAR);
                 updateStatePos(this.blockState());
                 this.tick();
             }

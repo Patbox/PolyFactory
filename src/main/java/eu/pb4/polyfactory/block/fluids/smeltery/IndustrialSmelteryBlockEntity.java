@@ -22,6 +22,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import eu.pb4.sgui.virtual.inventory.VirtualSlot;
 import it.unimi.dsi.fastutil.booleans.BooleanList;
 import it.unimi.dsi.fastutil.floats.FloatList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -51,7 +52,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, FluidOutput.ContainerBased {
+public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, FluidOutput.ContainerBased {
     public static final int FLUID_CAPACITY = (int) (FluidConstants.BUCKET * 12 * 2);
     private static final Codec<List<BlockState>> BLOCK_STATE_LIST_CODEC = BlockState.CODEC.listOf();
     private static final int[] ALL_SLOTS = IntStream.range(0, 12).toArray();
@@ -64,13 +65,12 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
     private final RecipeEntry<SmelteryRecipe>[] recipes = new RecipeEntry[9];
     private final ItemStack[] currentStacks = new ItemStack[9];
     private List<BlockState> positionedStates = new ArrayList<>();
-
     private final FluidContainerImpl fluidContainer = new FluidContainerImpl(FLUID_CAPACITY, this::markDirty);
     public int fuelTicks = 0;
     public int fuelInitial = 1;
     private boolean alreadyBreaking = false;
 
-    public SmelteryBlockEntity(BlockPos pos, BlockState state) {
+    public IndustrialSmelteryBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.SMELTERY, pos, state);
         Arrays.fill(this.currentStacks, ItemStack.EMPTY);
         Arrays.fill(this.progress, -1);
@@ -78,7 +78,7 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
     }
 
     public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
-        var self = (SmelteryBlockEntity) t;
+        var self = (IndustrialSmelteryBlockEntity) t;
 
         FluidContainerUtil.tick(self.fluidContainer, (ServerWorld) world, pos, self.fuelTicks > 0 ? BlockHeat.LAVA : BlockHeat.NEUTRAL, self::addToOutputOrDrop);
 
@@ -132,7 +132,7 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
                 stored += x.amount();
             }
 
-            if (stored < self.fluidContainer.capacity()) {
+            if (stored <= self.fluidContainer.capacity()) {
                 triesSmelting = true;
             }
             if (self.fuelTicks > 0) {
@@ -140,7 +140,7 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
                     self.progress[i]++;
                     dirty = true;
                     continue;
-                } else if (stored >= self.fluidContainer.capacity()) {
+                } else if (stored > self.fluidContainer.capacity()) {
                     continue;
                 }
                 dirty = true;
@@ -160,7 +160,7 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
         }
 
         if (self.fuelTicks > 0) {
-            self.fuelTicks -= triesSmelting ? 2 : 1;
+            self.fuelTicks -= triesSmelting ? 3 : 1;
 
             if (!state.get(SteamEngineBlock.LIT)) {
                 world.setBlockState(pos, state.with(SteamEngineBlock.LIT, true));
@@ -287,7 +287,7 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
         }
         this.alreadyBreaking = true;
         int i = 0;
-        ItemScatterer.spawn(world, pos.offset(this.getCachedState().get(SmelteryBlock.FACING), 2), this);
+        ItemScatterer.spawn(world, pos.offset(this.getCachedState().get(IndustrialSmelteryBlock.FACING), 2), this);
         for (var blockPos : BlockPos.iterate(pos.add(-1, -1, -1), pos.add(1, 1, 1))) {
             var state = this.positionedStates.size() > i ? this.positionedStates.get(i) : Blocks.AIR.getDefaultState();
             i++;
@@ -325,21 +325,32 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
         private int lastFluidUpdate = -1;
         private int delayTick = -1;
 
+        private final List<Slot> inputSlots = new ArrayList<>();
+        private final List<Slot> fuelSlots = new ArrayList<>();
+
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X5, player, false);
-            for (int x = 0; x < 3; x++) {
-                for (int y = 0; y < 3; y++) {
-                    this.setSlotRedirect(9 * y + 1 + x, new Slot(SmelteryBlockEntity.this, y * 3 + x, x, y));
+            for (int y = 0; y < 3; y++) {
+                for (int x = 0; x < 3; x++) {
+                    var slot = new Slot(IndustrialSmelteryBlockEntity.this, y * 3 + x, x, y);
+                    this.inputSlots.add(slot);
+                    this.setSlotRedirect(9 * y + 1 + x, slot);
                 }
+            }
+            for (int x = 0; x < 3; x++) {
                 var fluid = FluidContainerUtil.guiElement(fluidContainer, false);
                 for (int y = 0; y < 5; y++) {
                     this.setSlot(9 * y + 5 + x, fluid);
                 }
-                this.setSlotRedirect(9 * 4 + 1 + x, new FuelSlot(SmelteryBlockEntity.this, 9 + x, player.getServerWorld().getFuelRegistry()));
+                var slot = new FuelSlot(IndustrialSmelteryBlockEntity.this, 9 + x, player.getServerWorld().getFuelRegistry());
+
+                this.setSlotRedirect(9 * 4 + 1 + x, slot);
+                this.fuelSlots.add(slot);
+
             }
             this.setSlot(9 * 3 + 2, GuiTextures.FLAME.getCeil(fuelProgress()));
             this.setSlot(9 * 3, PolydexCompat.getButton(FactoryRecipeTypes.SMELTERY));
-            this.active = SmelteryBlockEntity.this.fuelTicks > 0;
+            this.active = IndustrialSmelteryBlockEntity.this.fuelTicks > 0;
             this.updateTitleAndFluid();
             this.updateSmeltingProgress();
 
@@ -350,9 +361,9 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
             var text = GuiTextures.SMELTERY.apply(
                     Text.empty()
                             .append(Text.literal(GuiTextures.SMELTERY_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
-                            .append(FluidTextures.SMELTERY.render(SmelteryBlockEntity.this.fluidContainer::provideRender))
+                            .append(FluidTextures.SMELTERY.render(IndustrialSmelteryBlockEntity.this.fluidContainer::provideRender))
                             .append(Text.literal(GuiTextures.SMELTERY_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
-                            .append(SmelteryBlockEntity.this.getCachedState().getBlock().getName())
+                            .append(IndustrialSmelteryBlockEntity.this.getCachedState().getBlock().getName())
             );
 
 
@@ -361,7 +372,7 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
             }
 
 
-            this.lastFluidUpdate = SmelteryBlockEntity.this.fluidContainer.updateId();
+            this.lastFluidUpdate = IndustrialSmelteryBlockEntity.this.fluidContainer.updateId();
         }
 
         private void updateSmeltingProgress() {
@@ -371,8 +382,8 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
                 var color = new int[3];
                 for (int x = 0; x < 3; x++) {
                     int i = y * 3 + x;
-                    progress[x] = (float) SmelteryBlockEntity.this.progress[i] / SmelteryBlockEntity.this.progressEnd[i];
-                    enabled[x] = SmelteryBlockEntity.this.progress[i] > -1 && !SmelteryBlockEntity.this.getStack(i).isEmpty();
+                    progress[x] = (float) IndustrialSmelteryBlockEntity.this.progress[i] / IndustrialSmelteryBlockEntity.this.progressEnd[i];
+                    enabled[x] = IndustrialSmelteryBlockEntity.this.progress[i] > -1 && !IndustrialSmelteryBlockEntity.this.getStack(i).isEmpty();
                     color[x] = ColorHelper.lerp(progress[x], 0xFFFFFF, 0xFF2200);
                 }
                 this.setSlot(y * 9 + 4, new GuiElementBuilder(GuiTextures.LEFT_SHIFTED_3_BARS)
@@ -383,18 +394,18 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
 
 
         private float fuelProgress() {
-            return SmelteryBlockEntity.this.fuelInitial > 0
-                    ? MathHelper.clamp(SmelteryBlockEntity.this.fuelTicks / (float) SmelteryBlockEntity.this.fuelInitial, 0, 1)
+            return IndustrialSmelteryBlockEntity.this.fuelInitial > 0
+                    ? MathHelper.clamp(IndustrialSmelteryBlockEntity.this.fuelTicks / (float) IndustrialSmelteryBlockEntity.this.fuelInitial, 0, 1)
                     : 0;
         }
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(SmelteryBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(IndustrialSmelteryBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
 
-            if (SmelteryBlockEntity.this.fluidContainer.updateId() != this.lastFluidUpdate && delayTick < 0) {
+            if (IndustrialSmelteryBlockEntity.this.fluidContainer.updateId() != this.lastFluidUpdate && delayTick < 0) {
                 delayTick = 3;
             }
             if (this.delayTick-- == 0) {
@@ -402,13 +413,46 @@ public class SmelteryBlockEntity extends LockableBlockEntity implements MinimalS
             }
             this.updateSmeltingProgress();
 
-            var active = SmelteryBlockEntity.this.fuelTicks > 0;
+            var active = IndustrialSmelteryBlockEntity.this.fuelTicks > 0;
             if (!this.active && active) {
                 this.active = true;
                 TriggerCriterion.trigger(this.player, FactoryTriggers.FUEL_STEAM_ENGINE);
             }
             this.setSlot(9 * 3 + 2, GuiTextures.FLAME.getCeil(fuelProgress()));
             super.onTick();
+        }
+
+        @Override
+        public ItemStack quickMove(int index) {
+            ItemStack itemStack = ItemStack.EMPTY;
+            Slot slot = this.getSlotRedirectOrPlayer(index);
+            if (slot != null && slot.hasStack() && !(slot instanceof VirtualSlot)) {
+                ItemStack itemStack2 = slot.getStack();
+                itemStack = itemStack2.copy();
+                if (index < this.getVirtualSize()) {
+                    if (!this.insertItem(itemStack2, this.getVirtualSize(), this.getVirtualSize() + 36, true)) {
+                        return ItemStack.EMPTY;
+                    }
+                } else if (this.player.getWorld().getFuelRegistry().isFuel(itemStack2)) {
+                    if (!FactoryUtil.insertItemIntoSlots(itemStack2, this.fuelSlots, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                } else {
+                    if (!FactoryUtil.insertItemIntoSlots(itemStack2, this.inputSlots, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                }
+
+                if (itemStack2.isEmpty()) {
+                    slot.setStack(ItemStack.EMPTY);
+                } else {
+                    slot.markDirty();
+                }
+            } else if (slot instanceof VirtualSlot) {
+                return slot.getStack();
+            }
+
+            return itemStack;
         }
     }
 }

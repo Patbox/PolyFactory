@@ -5,7 +5,6 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.ModInit;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlockEntity;
 import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
@@ -43,11 +42,13 @@ import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.entry.RegistryEntryOwner;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.PlayerScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Property;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
@@ -118,7 +119,25 @@ public class FactoryUtil {
         return Identifier.of(ModInit.ID, path);
     }
 
-    public static Text fluidText(long amount) {
+    public static MutableText fluidTextIngots(long amount) {
+        if (amount >= FluidConstants.BLOCK) {
+            long buckets = amount / (FluidConstants.BLOCK / 1000);
+            return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + "B");
+        } else if (amount >= FluidConstants.INGOT) {
+            long buckets = amount / (FluidConstants.INGOT / 1000);
+            return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + "i");
+        } else if (amount >= FluidConstants.NUGGET) {
+            //noinspection PointlessArithmeticExpression
+            long buckets = amount / (FluidConstants.NUGGET / 1000);
+            return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + "n");
+        } else if (amount != 0) {
+            return Text.literal((amount) + "d");
+        } else {
+            return Text.literal("0");
+        }
+    }
+
+    public static MutableText fluidTextGeneric(long amount) {
         if (amount >= FluidConstants.BLOCK) {
             long buckets = amount / (FluidConstants.BLOCK / 1000);
             return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + "B");
@@ -603,6 +622,58 @@ public class FactoryUtil {
                 return Collections.emptyIterator();
             }
         };
+    }
+
+    public static boolean insertItemIntoSlots(ItemStack stack, List<Slot> slots, boolean fromLast) {
+        boolean modified = false;
+
+        if (fromLast) {
+            slots = slots.reversed();
+        }
+
+        if (stack.isStackable()) {
+            for (var slot : slots) {
+                if (stack.isEmpty()) {
+                    break;
+                }
+
+                if (slot.canInsert(stack)) {
+                    var stackInSlot = slot.getStack();
+                    if (!stackInSlot.isEmpty() && ItemStack.areItemsAndComponentsEqual(stack, stackInSlot)) {
+                        var totalCount = stackInSlot.getCount() + stack.getCount();
+                        var maxSize = slot.getMaxItemCount(stackInSlot);
+                        if (totalCount <= maxSize) {
+                            stack.setCount(0);
+                            stackInSlot.setCount(totalCount);
+                            slot.markDirty();
+                            modified = true;
+                        } else if (stackInSlot.getCount() < maxSize) {
+                            stack.decrement(maxSize - stackInSlot.getCount());
+                            stackInSlot.setCount(maxSize);
+                            slot.markDirty();
+                            modified = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!stack.isEmpty()) {
+            for (var slot : slots) {
+                if (slot.canInsert(stack)) {
+                    var stackInSlot = slot.getStack();
+                    if (stackInSlot.isEmpty() && slot.canInsert(stack)) {
+                        var maxSize = slot.getMaxItemCount(stack);
+                        slot.setStack(stack.split(Math.min(stack.getCount(), maxSize)));
+                        slot.markDirty();
+                        modified = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return modified;
     }
 
 

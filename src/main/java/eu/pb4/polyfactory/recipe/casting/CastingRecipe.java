@@ -14,7 +14,7 @@ import net.minecraft.sound.SoundEvent;
 
 public interface CastingRecipe extends Recipe<SingleItemWithFluid> {
     static double getTime(FluidInstance<?> fluidInstance, long amount) {
-        return Math.max(20 * amount / fluidInstance.getMaxFlow(null), 1);
+        return Math.max(30 * amount / fluidInstance.getFlowSpeedMultiplier(null) / fluidInstance.getMaxFlow(null), 1);
     }
 
     int decreasedInputItemAmount(SingleItemWithFluid input) ;

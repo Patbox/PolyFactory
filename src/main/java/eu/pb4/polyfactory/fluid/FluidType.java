@@ -65,7 +65,15 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
     }
 
     public MutableText toLabeledAmount(long amount, T data) {
-        return Text.empty().append(getName(data)).append(": ").append(FactoryUtil.fluidText(amount));
+        return Text.empty().append(getName(data)).append(": ").append(getAmountText(amount, data));
+    }
+
+    public MutableText getAmountText(long amount, T data) {
+        if (FactoryRegistries.FLUID_TYPES.getEntry(this).isIn(FactoryFluidTags.USE_INGOTS_FOR_AMOUNT)) {
+            return FactoryUtil.fluidTextIngots(amount);
+        }
+
+        return FactoryUtil.fluidTextGeneric(amount);
     }
 
     public FluidStack<T> ofBottle() {

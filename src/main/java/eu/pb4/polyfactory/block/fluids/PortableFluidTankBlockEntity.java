@@ -78,7 +78,7 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
     }
     @Override
     public FluidContainer getFluidContainer(Direction direction) {
-        return this.container;
+        return this.getCachedState().get(PortableFluidTankBlock.FACING) == direction ? this.container : null;
     }
 
     @Override

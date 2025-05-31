@@ -18,6 +18,7 @@ public record FluidTextures(Map<FluidType<?>, char[]> textures, FluidUiPositionC
     public static final FluidTextures MIXER = FluidTextures.of("mixer", 10, 48, 19);
     public static final FluidTextures MIXER_POLYDEX = FluidTextures.of("mixer_polydex", 10, 48, 19 + 18);
     public static final FluidTextures SMELTERY = FluidTextures.of("smeltery", 48, 80, 21);
+    public static final FluidTextures PRIMITIVE_SMELTERY = FluidTextures.of("primitive_smeltery", 48, 44, 21);
 
 
     public Text render(Consumer<BiConsumer<FluidInstance<?>, Float>> provider) {

@@ -2,12 +2,12 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [32, 32],
 	"textures": {
-		"particle": "polyfactory:block/smelteryindustrial//side",
 		"side": "polyfactory:block/smeltery/industrial/side",
 		"bottom": "polyfactory:block/smeltery/industrial/bottom",
 		"front": "polyfactory:block/smeltery/industrial/front",
 		"top": "polyfactory:block/smeltery/industrial/top",
-		"back": "polyfactory:block/smeltery/industrial/back"
+		"back": "polyfactory:block/smeltery/industrial/back",
+		"particle": "polyfactory:block/smelteryindustrial//side"
 	},
 	"elements": [
 		{
@@ -62,6 +62,7 @@
 		},
 		"gui": {
 			"rotation": [30, 225, 0],
+			"translation": [0, -1.25, 0],
 			"scale": [0.41667, 0.41667, 0.41667]
 		},
 		"head": {

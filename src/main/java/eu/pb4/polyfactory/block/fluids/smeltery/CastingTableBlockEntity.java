@@ -5,9 +5,6 @@ import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.mechanical.RotationUser;
-import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.casting.CastingRecipe;
 import eu.pb4.polyfactory.recipe.input.SingleItemWithFluid;
@@ -17,8 +14,6 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentsAccess;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
@@ -30,7 +25,6 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -55,7 +49,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
     private CastingTableBlock.Model model;
     private boolean activate = false;
     private boolean isCooling;
-    private SmelteryFaucedBlock.FaucedProvider output = SmelteryFaucedBlock.FaucedProvider.EMPTY;
+    private FaucedBlock.FaucedProvider output = FaucedBlock.FaucedProvider.EMPTY;
 
     public CastingTableBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.CASTING_TABLE, pos, state);
@@ -73,10 +67,10 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
 
         if (!self.output.isValid()) {
             self.output.setActiveFluid(null);
-            self.output = SmelteryFaucedBlock.FaucedProvider.EMPTY;
+            self.output = FaucedBlock.FaucedProvider.EMPTY;
             if (self.activate) {
-                if (world.getBlockState(pos.up()).isOf(FactoryBlocks.SMELTERY_FAUCED)) {
-                    self.output = SmelteryFaucedBlock.getOutput(world.getBlockState(pos.up()), (ServerWorld) world, pos.up());
+                if (world.getBlockState(pos.up()).isOf(FactoryBlocks.FAUCED)) {
+                    self.output = FaucedBlock.getOutput(world.getBlockState(pos.up()), (ServerWorld) world, pos.up());
                 }
 
                 if (!self.output.isValid()) {
@@ -85,7 +79,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
             }
         }
 
-        if (self.output == SmelteryFaucedBlock.FaucedProvider.EMPTY || self.isInputEmpty() || !self.isOutputEmpty() || !self.activate) {
+        if (self.output == FaucedBlock.FaucedProvider.EMPTY || self.isInputEmpty() || !self.isOutputEmpty() || !self.activate) {
             self.process = 0;
             self.model.setProgress(false, 0, null);
             self.activate = false;
@@ -93,7 +87,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
             self.isCooling = false;
             self.model.tick();
             self.output.setActiveFluid(null);
-            self.output = SmelteryFaucedBlock.FaucedProvider.EMPTY;
+            self.output = FaucedBlock.FaucedProvider.EMPTY;
             return;
         }
 
@@ -247,7 +241,17 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
         return this.stacks;
     }
 
-    public ActionResult activate(SmelteryFaucedBlock.FaucedProvider provider) {
+    public ActionResult activate(FaucedBlock.FaucedProvider provider) {
+        if (this.isInputEmpty() && !this.isOutputEmpty()) {
+            var input = new SingleItemWithFluid(this.getStack(1), provider.getFluidContainerInput(), (ServerWorld) this.world);
+
+            if ((this.currentRecipe != null && this.currentRecipe.value().matches(input, input.world()))
+                    || (this.currentRecipe = ((ServerWorld) world).getRecipeManager().getFirstMatch(FactoryRecipeTypes.CASTING, input, world).orElse(null)) != null) {
+                this.setStack(0, this.getStack(1));
+                this.setStack(1, ItemStack.EMPTY);
+            }
+        }
+
         if (this.activate || this.isInputEmpty() || !this.isOutputEmpty() || !provider.isValid()) {
             return ActionResult.FAIL;
         }

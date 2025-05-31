@@ -1,14 +1,43 @@
-- Added Molten Iron, Molten Copper and Molten Gold fluids.
+- Added Molten Iron, Molten Copper, Molten Gold and Molten Steel fluids.
 - Added Industrial Smeltery:
   - A 3x3x3 multiblock made out of 22 Deepslate Bricks, 3 Steel Blocks and 1 Industrial Smeltery Core (placed in a center of a horizontal side).
-  - Used to smelt raw ores and other metallic items into Molten Metals.
-  - Can hold up to 9 stacks of items (melting 1 item per stack at the same).
+  - Used to melt raw ores and other metallic items into Molten Metals.
+  - Can hold up to 9 stacks of items (melting 1 item per stack at the same) as input.
   - Can hold up to 24 blocks of Molten Metals.
-  - Uses furnace fuels.
+- Added Primitive Smeltery:
+  - 2 block tall block acting as early game Industrial Smeltery.
+  - Used to melt raw ores and other metallic items into Molten Metals.
+  - It's 2 times slower than Industrial Smeltery.
+  - Can hold up to 1 stacks of items as input.
+  - Can hold up to 1 block of Molten Metals.
+  - Uses furnace fuel to work, burning through it four times as fast.
+- Added Fauced:
+  - Crafted with 4 Copper Ingots, 1 Iron Ingot and 1 Stone.
+  - Can be used to extract fluids from containers and pipes by using items on it.
+  - When placed above Casting Table, it's used to start metal casting.
+- Added Casting Table:
+  - Crafted with 5 Iron Ingots and 2 Smooth Stone Slabs.
+  - Used for Casting recipes.
+  - Can hold only single input item and single output item.
+  - Can't be automated, designed for manual usage (Mechanical Spout can be used for most recipes instead).
+- Added Industrial Smeltery Core:
+  - Crafted with 4 Deepslate Bricks and 1 Steel Plate.
+  - Used to make Industrial Smeltery.
+  - When clicked, it will show missing / wrong blocks.
+- Added Casting Molds:
+  - Have 2 variants, regular / steel and clay:
+    - Clay variant is made out of 4 Clay Balls and "shape item" in the middle (only clay is used).
+    - Then it needs to be fired in a furnace, creating Hardened Clay Mold.
+    - Has limited durability (16).
+    - Steel variant is made by poring 4 ingot equivalent of Molten Steel on "shape item", destroying it, placed on a Casting Table.
+    - It's unbreakable.
+  - Molds can be used with Mechanical Spout and Casting Table to shape fluids into items.
+  - Molds do not get used when crafting (aside of clay variant getting damaged).
 - Mechanical Pumps (and pipes powered by them) will now pull fluid blocks that are further away (as long as they are connected, by safe fluid blocks).
 - Added Golden Potato on a Spring.
 - Gears are now placed correctly aside of Mechanical Pump.
 - Tweaked some default block sounds.
+- Portable Fluid Tank now only provides fluids when it's pointed towards block trying to source them.
 - Tried to improve compatibility with Lithium's Hopper optimalizations.
 - Fixed fluid order being reversed in tooltips.
 - Fixed wrong translation key in Item Filter name.

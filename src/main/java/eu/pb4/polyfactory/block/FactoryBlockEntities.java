@@ -19,7 +19,8 @@ import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlockEntity;
 import eu.pb4.polyfactory.block.fluids.*;
 import eu.pb4.polyfactory.block.fluids.smeltery.CastingTableBlockEntity;
-import eu.pb4.polyfactory.block.fluids.smeltery.SmelteryBlockEntity;
+import eu.pb4.polyfactory.block.fluids.smeltery.IndustrialSmelteryBlockEntity;
+import eu.pb4.polyfactory.block.fluids.smeltery.PrimitiveSmelteryBlockEntity;
 import eu.pb4.polyfactory.block.fluids.transport.FilteredPipeBlockEntity;
 import eu.pb4.polyfactory.block.fluids.transport.PipeBlockEntity;
 import eu.pb4.polyfactory.block.fluids.transport.PumpBlockEntity;
@@ -80,8 +81,11 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<SteamEngineBlockEntity> STEAM_ENGINE = register("steam_engine",
              FabricBlockEntityTypeBuilder.create(SteamEngineBlockEntity::new, FactoryBlocks.STEAM_ENGINE));
 
-    public static final BlockEntityType<SmelteryBlockEntity> SMELTERY = register("smeltery",
-            FabricBlockEntityTypeBuilder.create(SmelteryBlockEntity::new, FactoryBlocks.SMELTERY));
+    public static final BlockEntityType<IndustrialSmelteryBlockEntity> SMELTERY = register("smeltery",
+            FabricBlockEntityTypeBuilder.create(IndustrialSmelteryBlockEntity::new, FactoryBlocks.SMELTERY));
+
+    public static final BlockEntityType<PrimitiveSmelteryBlockEntity> PRIMITIVE_SMELTERY = register("primitive_smeltery",
+            FabricBlockEntityTypeBuilder.create(PrimitiveSmelteryBlockEntity::new, FactoryBlocks.PRIMITIVE_SMELTERY));
 
     public static final BlockEntityType<CastingTableBlockEntity> CASTING_TABLE = register("casting_table",
             FabricBlockEntityTypeBuilder.create(CastingTableBlockEntity::new, FactoryBlocks.CASTING_TABLE));

@@ -3,10 +3,13 @@ package eu.pb4.polyfactory.block.fluids.smeltery;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.fluids.FluidOutput;
+import eu.pb4.polyfactory.block.fluids.transport.PipeConnectable;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.models.RotationAwareModel;
+import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
+import eu.pb4.polyfactory.recipe.input.DrainInput;
 import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polymer.blocks.api.BlockModelType;
 import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
@@ -16,22 +19,29 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.TrapdoorBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsage;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -40,7 +50,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 
-public class SmelteryFaucedBlock extends Block implements FactoryBlock, PolymerTexturedBlock {
+public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedBlock, PipeConnectable {
     public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
     private static final Map<Direction, BlockState> STATES_REGULAR = Util.mapEnum(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
         case UP -> "BOTTOM";
@@ -48,7 +58,7 @@ public class SmelteryFaucedBlock extends Block implements FactoryBlock, PolymerT
         default -> x.asString().toUpperCase(Locale.ROOT);
     } + "_TRAPDOOR")));
 
-    public SmelteryFaucedBlock(Settings settings) {
+    public FaucedBlock(Settings settings) {
         super(settings);
     }
 
@@ -69,8 +79,8 @@ public class SmelteryFaucedBlock extends Block implements FactoryBlock, PolymerT
         var sourcePos = pos.offset(state.get(FACING).getOpposite());
         var source = world.getBlockState(sourcePos);
         var model = (Model) (BlockAwareAttachment.get(world, pos) instanceof BlockAwareAttachment attachment ? attachment.holder() : null);
-        if (source.getBlock() instanceof FluidOutput.Getter getter) {
-            return new DynamicProvider(model, state, pos, world, getter, sourcePos, state.get(FACING));
+        if (source.getBlock() instanceof FluidOutput.Getter) {
+            return new DynamicProvider(model, state, pos, world, sourcePos, state.get(FACING));
         } else if (world.getBlockEntity(sourcePos) instanceof BlockEntity be && be instanceof FluidOutput output1) {
             return new SimpleProvider(model, state, pos, world, be::isRemoved, output1, state.get(FACING));
         } else {
@@ -79,10 +89,36 @@ public class SmelteryFaucedBlock extends Block implements FactoryBlock, PolymerT
     }
 
     @Override
+    protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World worldx, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        var world = (ServerWorld) worldx;
+        var output = getOutput(state, world, pos);
+        if (!output.isValid()) {
+            return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+        }
+
+        var copy = stack.copy();
+        var input = new DrainInput(copy, ItemStack.EMPTY, output.getFluidContainerInput(), !(player instanceof FakePlayer));
+        var optional = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, player.getWorld());
+        if (optional.isEmpty() || !optional.get().value().fluidOutput(input).isEmpty()) {
+            return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+        }
+
+        var recipe = optional.get().value();
+        var itemOut = recipe.craft(input, player.getRegistryManager());
+        for (var fluid : recipe.fluidInput(input)) {
+            output.extract(fluid);
+        }
+        ItemUsage.exchangeStack(stack, player, itemOut, false);
+
+        player.playSoundToPlayer(recipe.soundEvent().value(), SoundCategory.BLOCKS, 0.5f, 1f);
+
+        return ActionResult.SUCCESS_SERVER;
+    }
+
+    @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         var output = getOutput(state, (ServerWorld) world, pos);
-
-        if (output == null || !output.isValid()) {
+        if (!output.isValid()) {
             return ActionResult.PASS;
         }
 
@@ -110,7 +146,12 @@ public class SmelteryFaucedBlock extends Block implements FactoryBlock, PolymerT
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.ANVIL.getDefaultState();
+        return Blocks.COPPER_TRAPDOOR.getDefaultState().with(TrapdoorBlock.FACING, state.get(FACING)).with(TrapdoorBlock.OPEN, true);
+    }
+
+    @Override
+    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
+        return state.get(FACING) == dir.getOpposite();
     }
 
     public static final class Model extends RotationAwareModel {
@@ -154,7 +195,7 @@ public class SmelteryFaucedBlock extends Block implements FactoryBlock, PolymerT
         }
     }
 
-    public record SimpleProvider(SmelteryFaucedBlock.Model model, BlockState selfState, BlockPos faucedPos, ServerWorld world, BooleanSupplier removed, FluidOutput output, Direction direction) implements FaucedProvider {
+    public record SimpleProvider(FaucedBlock.Model model, BlockState selfState, BlockPos faucedPos, ServerWorld world, BooleanSupplier removed, FluidOutput output, Direction direction) implements FaucedProvider {
         @Override
         public FluidContainerInput getFluidContainerInput() {
             return output.getFluidContainerInput(direction);
@@ -178,9 +219,9 @@ public class SmelteryFaucedBlock extends Block implements FactoryBlock, PolymerT
         }
     }
 
-    public record DynamicProvider(SmelteryFaucedBlock.Model model, BlockState selfState, BlockPos faucedPos, ServerWorld world, FluidOutput.Getter getter, BlockPos sourcePos, Direction direction) implements FaucedProvider {
+    public record DynamicProvider(FaucedBlock.Model model, BlockState selfState, BlockPos faucedPos, ServerWorld world, BlockPos sourcePos, Direction direction) implements FaucedProvider {
         private FluidOutput getOutput() {
-            return getter.getFluidOutput(world, sourcePos, direction);
+            return world.getBlockState(sourcePos).getBlock() instanceof FluidOutput.Getter getter ? getter.getFluidOutput(world, sourcePos, direction) : null;
         }
 
         @Override
@@ -210,7 +251,7 @@ public class SmelteryFaucedBlock extends Block implements FactoryBlock, PolymerT
         }
     }
 
-    public record ModelOnlyProvider(SmelteryFaucedBlock.Model model) implements FaucedProvider {
+    public record ModelOnlyProvider(FaucedBlock.Model model) implements FaucedProvider {
         @Override
         public FluidContainerInput getFluidContainerInput() {
             return FluidContainerInput.EMPTY;

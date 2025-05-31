@@ -14,10 +14,7 @@ import eu.pb4.polyfactory.block.data.providers.*;
 import eu.pb4.polyfactory.block.electric.ElectricGeneratorBlock;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlock;
 import eu.pb4.polyfactory.block.fluids.*;
-import eu.pb4.polyfactory.block.fluids.smeltery.CastingTableBlock;
-import eu.pb4.polyfactory.block.fluids.smeltery.SmelteryBlock;
-import eu.pb4.polyfactory.block.fluids.smeltery.SmelteryCoreBlock;
-import eu.pb4.polyfactory.block.fluids.smeltery.SmelteryFaucedBlock;
+import eu.pb4.polyfactory.block.fluids.smeltery.*;
 import eu.pb4.polyfactory.block.fluids.transport.*;
 import eu.pb4.polyfactory.block.mechanical.*;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
@@ -143,9 +140,11 @@ public class FactoryBlocks {
     public static final Map<Block, PipeInWallBlock> WALL_WITH_PIPE = PipeInWallBlock.MAP;
     public static final SmelteryCoreBlock SMELTERY_CORE = register("smeltery_core", Block.Settings.copy(STEAM_ENGINE).sounds(BlockSoundGroup.DEEPSLATE_BRICKS), SmelteryCoreBlock::new);
 
-    public static final SmelteryBlock SMELTERY = register("smeltery", Block.Settings.copy(SMELTERY_CORE).dropsNothing(), SmelteryBlock::new);
+    public static final IndustrialSmelteryBlock SMELTERY = register("smeltery", Block.Settings.copy(SMELTERY_CORE).dropsNothing().luminance(x -> x.get(IndustrialSmelteryBlock.LIT) ? 14 : 0), IndustrialSmelteryBlock::new);
+    public static final PrimitiveSmelteryBlock PRIMITIVE_SMELTERY = register("primitive_smeltery", Block.Settings.copy(SMELTERY_CORE).sounds(BlockSoundGroup.STONE)
+            .luminance(x -> x.get(PrimitiveSmelteryBlock.LIT) ? 8 : 0), PrimitiveSmelteryBlock::new);
     public static final CastingTableBlock CASTING_TABLE = register("casting_table", Block.Settings.copy(Blocks.CAULDRON), CastingTableBlock::new);
-    public static final SmelteryFaucedBlock SMELTERY_FAUCED = register("smeltery_fauced", Block.Settings.copy(Blocks.CAULDRON), SmelteryFaucedBlock::new);
+    public static final FaucedBlock FAUCED = register("fauced", Block.Settings.copy(Blocks.CAULDRON).sounds(BlockSoundGroup.COPPER), FaucedBlock::new);
     public static final PumpBlock PUMP = register("pump", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new PumpBlock(settings.nonOpaque()));
     public static final NozzleBlock NOZZLE = register("nozzle", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new NozzleBlock(settings.nonOpaque()));
     public static final DrainBlock DRAIN = register("drain", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new DrainBlock(settings.nonOpaque()));

@@ -112,7 +112,7 @@ public class CastingTableBlock extends Block implements FactoryBlock, BlockEntit
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.ANVIL.getDefaultState();
+        return Blocks.CAULDRON.getDefaultState();
     }
 
     public static final class Model extends RotationAwareModel {

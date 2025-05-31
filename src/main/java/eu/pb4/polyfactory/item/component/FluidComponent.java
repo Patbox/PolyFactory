@@ -153,7 +153,7 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
         }
 
         if (this.capacity != -1) {
-            tooltip.accept(Text.translatable("text.polyfactory.x_out_of_y", FactoryUtil.fluidText(this.stored), FactoryUtil.fluidText(this.capacity)).formatted(Formatting.YELLOW));
+            tooltip.accept(Text.translatable("text.polyfactory.x_out_of_y", FactoryUtil.fluidTextGeneric(this.stored), FactoryUtil.fluidTextGeneric(this.capacity)).formatted(Formatting.YELLOW));
         }
     }
 

@@ -27,6 +27,7 @@ public class GuiTextures {
     public static final Function<Text, Text> MECHANICAL_SPOUT_NO_CONN = background("mechanical_spout_noconn");
     public static final Function<Text, Text> STEAM_ENGINE = background("steam_engine");
     public static final Function<Text, Text> SMELTERY = background("smeltery");
+    public static final Function<Text, Text> PRIMITIVE_SMELTERY = background("primitive_smeltery");
     public static final Function<Text, Text> CENTER_SLOT_GENERIC = background("center_slot");
     public static final Function<Text, Text> FILL3 = background("fill3");
     public static final Function<Text, Text> BLUEPRINT_WORKBENCH = background("blueprint_workbench");

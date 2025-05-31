@@ -4,6 +4,7 @@ import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.block.other.BlockWithTooltip;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
@@ -12,17 +13,23 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Pair;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -38,9 +45,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 
-public class SmelteryCoreBlock extends Block implements FactoryBlock {
+public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithTooltip {
     public static EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
 
     private static final Set<Vec3i> SUGGESTED_STEEL = Set.of(
@@ -101,35 +109,35 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock {
         //    highlight.put(Vec3i.ZERO, new Pair<>(Blocks.AIR.getDefaultState(), !currentBlocks.get(Vec3i.ZERO).isAir()));
         //}
 
-        if (steel < SmelteryBlock.STEEL_BLOCKS) {
+        if (steel < IndustrialSmelteryBlock.STEEL_BLOCKS) {
             for (var sug : SUGGESTED_STEEL) {
                 var current = currentBlocks.get(sug);
-                if (!current.isOf(FactoryBlocks.STEEL_BLOCK) && (bricks > SmelteryBlock.DEEPSLATE_BRICK_BLOCKS || !current.isOf(Blocks.DEEPSLATE_BRICKS))) {
+                if (!current.isOf(FactoryBlocks.STEEL_BLOCK) && (bricks > IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS || !current.isOf(Blocks.DEEPSLATE_BRICKS))) {
                     if (current.isOf(Blocks.DEEPSLATE_BRICKS)) {
                         bricks--;
                     }
                     highlight.put(sug, new Pair<>(FactoryBlocks.STEEL_BLOCK.getDefaultState(), !current.isAir()));
                     steel++;
-                    if (steel >= SmelteryBlock.STEEL_BLOCKS) {
+                    if (steel >= IndustrialSmelteryBlock.STEEL_BLOCKS) {
                         break;
                     }
                 }
             }
 
-            if (steel < SmelteryBlock.STEEL_BLOCKS) {
+            if (steel < IndustrialSmelteryBlock.STEEL_BLOCKS) {
                 for (var key : currentBlocks.keySet()) {
                     if (highlight.containsKey(key)) {
                         continue;
                     }
 
                     var current = currentBlocks.get(key);
-                    if (!current.isOf(FactoryBlocks.STEEL_BLOCK) && (bricks > SmelteryBlock.DEEPSLATE_BRICK_BLOCKS || !current.isOf(Blocks.DEEPSLATE_BRICKS))) {
+                    if (!current.isOf(FactoryBlocks.STEEL_BLOCK) && (bricks > IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS || !current.isOf(Blocks.DEEPSLATE_BRICKS))) {
                         if (current.isOf(Blocks.DEEPSLATE_BRICKS)) {
                             bricks--;
                         }
                         highlight.put(key, new Pair<>(FactoryBlocks.STEEL_BLOCK.getDefaultState(), !current.isAir()));
                         steel++;
-                        if (steel >= SmelteryBlock.STEEL_BLOCKS) {
+                        if (steel >= IndustrialSmelteryBlock.STEEL_BLOCKS) {
                             break;
                         }
                     }
@@ -137,30 +145,30 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock {
             }
         }
 
-        if (bricks < SmelteryBlock.DEEPSLATE_BRICK_BLOCKS) {
+        if (bricks < IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS) {
             for (var key : List.copyOf(currentBlocks.keySet())) {
                 if (SUGGESTED_STEEL.contains(key) || key.equals(Vec3i.ZERO) || highlight.containsKey(key)) {
                     continue;
                 }
                 var current = currentBlocks.get(key);
-                if ((steel > SmelteryBlock.STEEL_BLOCKS || !current.isOf(FactoryBlocks.STEEL_BLOCK)) && (!current.isOf(Blocks.DEEPSLATE_BRICKS))) {
+                if ((steel > IndustrialSmelteryBlock.STEEL_BLOCKS || !current.isOf(FactoryBlocks.STEEL_BLOCK)) && (!current.isOf(Blocks.DEEPSLATE_BRICKS))) {
                     highlight.put(key, new Pair<>(Blocks.DEEPSLATE_BRICKS.getDefaultState(), !current.isAir()));
                     bricks++;
                     if (current.isOf(FactoryBlocks.STEEL_BLOCK)) {
                         steel--;
                     }
-                    if (bricks >= SmelteryBlock.DEEPSLATE_BRICK_BLOCKS) {
+                    if (bricks >= IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS) {
                         break;
                     }
                 }
             }
-            if (bricks < SmelteryBlock.DEEPSLATE_BRICK_BLOCKS) {
+            if (bricks < IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS) {
                 for (var key : SUGGESTED_STEEL) {
                     var current = currentBlocks.get(key);
                     if (!current.isOf(Blocks.DEEPSLATE_BRICKS)) {
                         highlight.put(key, new Pair<>(Blocks.DEEPSLATE_BRICKS.getDefaultState(), !current.isAir()));
                         bricks++;
-                        if (bricks >= SmelteryBlock.DEEPSLATE_BRICK_BLOCKS) {
+                        if (bricks >= IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS) {
                             break;
                         }
                     }
@@ -207,6 +215,14 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock {
     @Override
     public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return true;
+    }
+
+    @Override
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
+        textConsumer.accept(Text.translatable(getTranslationKey() + ".tooltip.1").formatted(Formatting.GRAY));
+        textConsumer.accept(Text.translatable(getTranslationKey() + ".tooltip.2", IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS, IndustrialSmelteryBlock.STEEL_BLOCKS).formatted(Formatting.GRAY));
+        textConsumer.accept(Text.translatable(getTranslationKey() + ".tooltip.3").formatted(Formatting.GRAY));
+        textConsumer.accept(Text.translatable(getTranslationKey() + ".tooltip.4").formatted(Formatting.GRAY));
     }
 
     public static final class Model extends BlockModel {

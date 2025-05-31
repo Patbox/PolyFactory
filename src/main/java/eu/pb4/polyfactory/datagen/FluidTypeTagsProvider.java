@@ -21,7 +21,11 @@ class FluidTypeTagsProvider extends FabricTagProvider<FluidType<?>> {
                 .add(FactoryFluids.IRON)
                 .add(FactoryFluids.GOLD)
                 .add(FactoryFluids.COPPER)
+                .add(FactoryFluids.STEEL)
         ;
+
+        this.getOrCreateTagBuilder(FactoryFluidTags.USE_INGOTS_FOR_AMOUNT)
+                .addOptionalTag(FactoryFluidTags.MOLTEN_METAL);
 
         this.getOrCreateTagBuilder(FactoryFluidTags.SMELTERY_ALLOWED_FLUIDS)
                 .addOptionalTag(FactoryFluidTags.MOLTEN_METAL)

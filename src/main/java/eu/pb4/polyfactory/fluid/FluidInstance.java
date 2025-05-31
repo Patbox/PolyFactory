@@ -86,6 +86,10 @@ public record FluidInstance<T>(FluidType<T> type, T data) {
         return this.type.toLabeledAmount(amount, this.data);
     }
 
+    public MutableText getAmountText(long amount) {
+        return this.type.getAmountText(amount, this.data);
+    }
+
     public Text getName() {
         return this.type.getName(data);
     }

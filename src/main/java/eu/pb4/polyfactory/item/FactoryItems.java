@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.item;
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
+import eu.pb4.polyfactory.block.other.BlockWithTooltip;
 import eu.pb4.polyfactory.item.configuration.ClipboardItem;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
@@ -64,8 +65,9 @@ public class FactoryItems {
     public static final Item STEAM_ENGINE = register(FactoryBlocks.STEAM_ENGINE);
     public static final Item SMELTERY_CORE = register(FactoryBlocks.SMELTERY_CORE);
     public static final Item SMELTERY = register(FactoryBlocks.SMELTERY);
+    public static final Item PRIMITIVE_SMELTERY = register(FactoryBlocks.PRIMITIVE_SMELTERY);
     public static final Item CASTING_TABLE = register(FactoryBlocks.CASTING_TABLE);
-    public static final Item SMELTERY_FAUCED = register(FactoryBlocks.SMELTERY_FAUCED);
+    public static final Item SMELTERY_FAUCED = register(FactoryBlocks.FAUCED);
     public static final Item GRINDER = register(FactoryBlocks.GRINDER);
     public static final Item PRESS = register(FactoryBlocks.PRESS);
     public static final Item CRAFTER = register(FactoryBlocks.CRAFTER);
@@ -89,9 +91,11 @@ public class FactoryItems {
     public static final Item ENDER_INFUSED_AMETHYST_SHARD = register("ender_infused_amethyst_shard", SimplePolymerItem::new);
     public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", SimplePolymerItem::new);
     public static final Item STEEL_INGOT = register("steel_ingot", SimplePolymerItem::new);
+    public static final Item STEEL_NUGGET = register("steel_nugget", SimplePolymerItem::new);
     public static final Item STEEL_BLOCK = register(FactoryBlocks.STEEL_BLOCK);
     public static final Item STEEL_PLATE = register("steel_plate", SimplePolymerItem::new);
     public static final Item COPPER_PLATE = register("copper_plate", SimplePolymerItem::new);
+    public static final Item COPPER_NUGGET = register("copper_nugget", SimplePolymerItem::new);
     public static final Item BRITTLE_GLASS_BOTTLE = register("brittle_glass_bottle", SimplePolymerItem::new);
     public static final Item BRITTLE_POTION = register("brittle_potion", settings -> new BrittlePotionItem(settings.component(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT).component(DataComponentTypes.CONSUMABLE, ConsumableComponents.drink().finishSound(SoundEvents.ITEM_OMINOUS_BOTTLE_DISPOSE).build()).maxCount(1)));
     public static final Item THROWABLE_GLASS_BOTTLE = register("throwable_glass_bottle", SimplePolymerItem::new);
@@ -262,6 +266,7 @@ public class FactoryItems {
                     entries.add(PORTABLE_FLUID_TANK);
                     entries.add(NOZZLE);
 
+                    entries.add(PRIMITIVE_SMELTERY);
                     entries.add(SMELTERY_CORE);
                     entries.add(CASTING_TABLE);
                     entries.add(SMELTERY_FAUCED);
@@ -334,8 +339,10 @@ public class FactoryItems {
                     entries.add(CRUSHED_RAW_GOLD);
                     entries.add(STEEL_ALLOY_MIXTURE);
                     entries.add(STEEL_INGOT);
+                    entries.add(STEEL_NUGGET);
                     entries.add(STEEL_BLOCK);
                     entries.add(STEEL_PLATE);
+                    entries.add(COPPER_NUGGET);
                     entries.add(COPPER_PLATE);
                     entries.add(WOODEN_PLATE);
                     entries.add(TREATED_DRIED_KELP);
@@ -488,6 +495,8 @@ public class FactoryItems {
             item = new PortableFluidTankBlockItem(block, settings);
         } else if (block instanceof AxleBlock axleBlock) {
             item = new AxleItem(axleBlock, settings);
+        } else if (block instanceof BlockWithTooltip) {
+            item = new TooltippedBlockItem(block, settings);
         } else {
             item = new FactoryBlockItem(block, settings);
         }

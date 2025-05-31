@@ -17,7 +17,7 @@ public interface FluidContainerOwner extends FilledStateProvider {
     default Text getFilledStateText() {
         var main = getMainFluidContainer();
         return main != null ?
-                Text.translatable("text.polyfactory.x_out_of_y", FactoryUtil.fluidText(main.stored()), FactoryUtil.fluidText(main.capacity()))
+                Text.translatable("text.polyfactory.x_out_of_y", FactoryUtil.fluidTextGeneric(main.stored()), FactoryUtil.fluidTextGeneric(main.capacity()))
                 : null;
     }
 

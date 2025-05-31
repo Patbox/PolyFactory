@@ -171,7 +171,7 @@ public interface FluidContainerUtil {
             @Override
             public ItemStack getItemStack() {
                 var b = GuiTextures.EMPTY_BUILDER.get()
-                        .setName(Text.empty().append(FactoryUtil.fluidText(container.stored())).append(" / ").append(FactoryUtil.fluidText(container.capacity())));
+                        .setName(Text.empty().append(FactoryUtil.fluidTextGeneric(container.stored())).append(" / ").append(FactoryUtil.fluidTextGeneric(container.capacity())));
 
                 container.forEachReversed((type, amount) -> {
                     b.addLoreLine(type.toLabeledAmount(amount).setStyle(Style.EMPTY.withColor(Formatting.GRAY).withItalic(false)));
