@@ -10,11 +10,9 @@ import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
 import eu.pb4.polyfactory.data.CapacityData;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.data.SpeakerNode;
-import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
-import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.jukebox.JukeboxSong;
@@ -22,19 +20,15 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
@@ -181,7 +175,9 @@ public class RecordPlayerBlockEntity extends ChanneledDataBlockEntity implements
         assert this.world != null;
         DataProvider.sendData(this.world, pos, new CapacityData(0, this.song.value().getLengthInTicks()));
         if (this.model != null) {
-            this.model.startPlaying(song.value().soundEvent(), this.speakers, this.volume);
+            this.model.startPlaying();
+            this.model.updatePosition(this.speakers, this.volume);
+            this.model.playSoundIfActive(song.value().soundEvent());
         }
         this.markDirty();
     }

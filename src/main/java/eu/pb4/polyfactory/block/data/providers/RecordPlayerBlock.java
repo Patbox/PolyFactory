@@ -10,22 +10,17 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerPosition;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityPositionSyncS2CPacket;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -123,12 +118,15 @@ public class RecordPlayerBlock extends CabledDataProviderBlock {
             this.removeElement(this.soundSource);
         }
 
-        public void startPlaying(RegistryEntry<SoundEvent> event, List<Vec3d> speakers, float volume) {
+        public void startPlaying() {
             this.isPlaying = true;
             this.addElement(this.soundSource);
-            this.updatePosition(speakers, volume);
+        }
+
+        public void playSoundIfActive(RegistryEntry<SoundEvent> event) {
             this.sendPacket(VirtualEntityUtils.createPlaySoundFromEntityPacket(this.soundSource.getEntityId(), event, SoundCategory.RECORDS, 4F + 1 / 16f, 1, 0));
         }
+
 
         public void updatePosition(List<Vec3d> speakers, float volume) {
             if (!this.isPlaying) {

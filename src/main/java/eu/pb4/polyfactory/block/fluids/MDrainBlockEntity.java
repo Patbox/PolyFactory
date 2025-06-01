@@ -258,6 +258,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
         this.readInventoryNbt(nbt, lookup);
         this.process = nbt.getDouble("Progress", 0);
         this.fluidContainer.fromNbt(lookup, nbt, "fluid");
+        this.inventoryChanged = true;
         super.readNbt(nbt, lookup);
     }
 

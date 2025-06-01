@@ -49,7 +49,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
     private CastingTableBlock.Model model;
     private boolean activate = false;
     private boolean isCooling;
-    private FaucedBlock.FaucedProvider output = FaucedBlock.FaucedProvider.EMPTY;
+    private FaucedBlock.FaucedProvider provider = FaucedBlock.FaucedProvider.EMPTY;
 
     public CastingTableBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.CASTING_TABLE, pos, state);
@@ -65,29 +65,29 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
         self.model.setMold(self.getStack(0));
         self.model.setOutput(self.getStack(1));
 
-        if (!self.output.isValid()) {
-            self.output.setActiveFluid(null);
-            self.output = FaucedBlock.FaucedProvider.EMPTY;
+        if (!self.provider.isValid()) {
+            self.provider.setActiveFluid(null);
+            self.provider = FaucedBlock.FaucedProvider.EMPTY;
             if (self.activate) {
                 if (world.getBlockState(pos.up()).isOf(FactoryBlocks.FAUCED)) {
-                    self.output = FaucedBlock.getOutput(world.getBlockState(pos.up()), (ServerWorld) world, pos.up());
+                    self.provider = FaucedBlock.getOutput(world.getBlockState(pos.up()), (ServerWorld) world, pos.up());
                 }
 
-                if (!self.output.isValid()) {
+                if (!self.provider.isValid()) {
                     self.activate = false;
                 }
             }
         }
 
-        if (self.output == FaucedBlock.FaucedProvider.EMPTY || self.isInputEmpty() || !self.isOutputEmpty() || !self.activate) {
+        if (self.provider == FaucedBlock.FaucedProvider.EMPTY || self.isInputEmpty() || !self.isOutputEmpty() || !self.activate) {
             self.process = 0;
             self.model.setProgress(false, 0, null);
             self.activate = false;
             self.active = false;
             self.isCooling = false;
             self.model.tick();
-            self.output.setActiveFluid(null);
-            self.output = FaucedBlock.FaucedProvider.EMPTY;
+            self.provider.setActiveFluid(null);
+            self.provider = FaucedBlock.FaucedProvider.EMPTY;
             return;
         }
 
@@ -103,7 +103,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
                 self.active = false;
                 self.model.tick();
                 self.isCooling = false;
-                self.output.setActiveFluid(null);
+                self.provider.setActiveFluid(null);
                 self.model.setProgress(false, 0, null);
                 self.activate = false;
                 return;
@@ -117,7 +117,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
         var time = self.isCooling ? coolingTime : self.currentRecipe.value().time(input);
 
         if (self.process >= time) {
-            self.output.setActiveFluid(null);
+            self.provider.setActiveFluid(null);
 
             if (coolingTime > 0 && !self.isCooling) {
                 self.isCooling = true;
@@ -152,12 +152,14 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
                 self.setStack(INPUT_FIRST, ItemStack.EMPTY);
             }
 
-            self.output.extract(self.currentRecipe.value().fluidInput(input));
+            self.provider.extract(self.currentRecipe.value().fluidInput(input));
 
             world.playSound(null, pos, self.currentRecipe.value().soundEvent().value(), SoundCategory.BLOCKS);
             self.process = 0;
             self.isCooling = false;
             self.model.setProgress(false, 0, null);
+            self.model.setMold(self.getStack(0));
+            self.model.setOutput(self.getStack(1));
             self.markDirty();
         } else {
             self.process += 1;
@@ -168,9 +170,12 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
             var progress = self.process / time;
             if (!self.isCooling) {
                 ((ServerWorld) world).spawnParticles(fluid.instance().particle(),
-                        pos.getX() + 0.5, pos.getY() + 1 + 4 / 16f, pos.getZ() + 0.5, 0,
+                        pos.getX() + 0.5 + self.provider.direction().getOffsetX() / 16f,
+                        pos.getY() + 1 + 4 / 16f,
+                        pos.getZ() + 0.5 + self.provider.direction().getOffsetZ() / 16f,
+                        0,
                         0, -1, 0, 0.1);
-                self.output.setActiveFluid(fluid.instance());
+                self.provider.setActiveFluid(fluid.instance());
             }
 
             self.model.setProgress(self.isCooling, progress, fluid.instance());
@@ -178,7 +183,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
     }
 
     private SingleItemWithFluid asInput() {
-        return new SingleItemWithFluid(this.getStack(INPUT_FIRST).copy(), this.output.getFluidContainerInput(), (ServerWorld) world);
+        return new SingleItemWithFluid(this.getStack(INPUT_FIRST).copy(), this.provider.getFluidContainerInput(), (ServerWorld) world);
     }
 
     @Override
@@ -201,6 +206,14 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
             this.activate = true;
         }
         super.readNbt(nbt, lookup);
+    }
+
+    @Override
+    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
+        super.onBlockReplaced(pos, oldState);
+        if (this.provider != null) {
+            this.provider.setActiveFluid(null);
+        }
     }
 
     @Override
@@ -255,7 +268,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
         if (this.activate || this.isInputEmpty() || !this.isOutputEmpty() || !provider.isValid()) {
             return ActionResult.FAIL;
         }
-        this.output = provider;
+        this.provider = provider;
         this.activate = true;
         return ActionResult.SUCCESS_SERVER;
     }

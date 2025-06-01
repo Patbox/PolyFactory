@@ -279,6 +279,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
         this.readInventoryNbt(nbt, lookup);
         this.process = nbt.getDouble("Progress", 0);
         this.isCooling = nbt.getBoolean("is_cooling", false);
+        this.inventoryChanged = true;
         super.readNbt(nbt, lookup);
     }
 

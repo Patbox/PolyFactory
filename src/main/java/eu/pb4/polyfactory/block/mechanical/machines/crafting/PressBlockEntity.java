@@ -19,6 +19,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleTypes;
@@ -237,6 +238,8 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
                 this.delayedOutput = null;
             }
         }
+        this.currentItem = null;
+        this.currentItem2 = null;
         super.readNbt(nbt, lookup);
     }
 

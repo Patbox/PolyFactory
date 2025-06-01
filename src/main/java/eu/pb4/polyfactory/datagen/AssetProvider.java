@@ -35,6 +35,7 @@ import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.ColorHelper;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -69,12 +70,25 @@ class AssetProvider implements DataProvider {
         map.forEach((id, asset) -> assetWriter.accept(AssetPaths.itemAsset(id), asset.toJson().getBytes(StandardCharsets.UTF_8)));
         createNumberButtons(assetWriter);
 
+        var moldTexture = new MoldTextures();
+
         for (var mold : FactoryItems.MOLDS) {
-            createMold(assetWriter, mold);
+            createMold(assetWriter, mold, moldTexture);
         }
     }
+    private static class MoldTextures {
+        BufferedImage steelBase = ResourceUtils.getTexture(id("item/mold/template/template"));
+        BufferedImage steelBorder = ResourceUtils.getTexture(id("item/mold/template/template_border"));
+        BufferedImage clayBase = ResourceUtils.getTexture(id("item/mold/template/template_clay"));
+        BufferedImage clayBorder = ResourceUtils.getTexture(id("item/mold/template/template_clay_border"));
+        BufferedImage hardenedBase = ResourceUtils.getTexture(id("item/mold/template/template_hardened"));
+        BufferedImage hardenedBorder = ResourceUtils.getTexture(id("item/mold/template/template_hardened_border"));
+    }
 
-    private static void createMold(BiConsumer<String, byte[]> assetWriter, SpoutMolds mold) {
+    private static void createMold(BiConsumer<String, byte[]> assetWriter, SpoutMolds mold, MoldTextures moldTexture) {
+        var stencil = ResourceUtils.getTexture(mold.name().withPrefixedPath("item/mold/source/"));
+
+
         {
             var id = Registries.ITEM.getId(mold.mold());
             assetWriter.accept(AssetPaths.itemModel(id),
@@ -82,6 +96,7 @@ class AssetProvider implements DataProvider {
                             .texture("layer0", id.withPrefixedPath("item/").toString())
                             .build().toBytes()
             );
+            createStencilTexture(id.withPrefixedPath("item/"), moldTexture.steelBase, moldTexture.steelBorder, stencil, assetWriter);
         }
 
         {
@@ -91,6 +106,8 @@ class AssetProvider implements DataProvider {
                             .texture("layer0", id.withPrefixedPath("item/").toString())
                             .build().toBytes()
             );
+            createStencilTexture(id.withPrefixedPath("item/"), moldTexture.clayBase, moldTexture.clayBorder, stencil, assetWriter);
+
         }
 
 
@@ -101,7 +118,36 @@ class AssetProvider implements DataProvider {
                             .texture("layer0", id.withPrefixedPath("item/").toString())
                             .build().toBytes()
             );
+            createStencilTexture(id.withPrefixedPath("item/"), moldTexture.hardenedBase, moldTexture.hardenedBorder, stencil, assetWriter);
         }
+    }
+
+    private static void createStencilTexture(Identifier identifier, BufferedImage base, BufferedImage border, BufferedImage stencil, BiConsumer<String,byte[]> assetWriter) {
+        if (base.getWidth() != border.getWidth() || border.getWidth() != stencil.getWidth() || base.getHeight() != border.getHeight() || border.getHeight() != stencil.getHeight()) {
+            throw new IllegalArgumentException("Mismatched image width and height for stenccil texture " + identifier);
+        }
+
+        var image = new BufferedImage(base.getWidth(), base.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+        for (var x = 0; x < base.getWidth(); x++) {
+            for (var y = 0; y < base.getHeight(); y++) {
+                var s = stencil.getRGB(x, y);
+                if (ColorHelper.getAlpha(s) == 0) {
+                    image.setRGB(x, y, base.getRGB(x, y));
+                } else if (s == 0xFF000000) {
+                    image.setRGB(x, y, border.getRGB(x, y));
+                }
+            }
+        }
+        var stream = new ByteArrayOutputStream();
+
+        try {
+            ImageIO.write(image, "png", stream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        assetWriter.accept(AssetPaths.texture(identifier.withSuffixedPath(".png")), stream.toByteArray());
     }
 
     private static void createItems(BiConsumer<Identifier, ItemAsset> consumer) {

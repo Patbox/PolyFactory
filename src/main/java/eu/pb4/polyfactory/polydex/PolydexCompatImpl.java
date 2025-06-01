@@ -25,6 +25,7 @@ import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.recipe.ShapelessNbtCopyRecipe;
 import eu.pb4.polyfactory.recipe.casting.SimpleCastingRecipe;
+import eu.pb4.polyfactory.recipe.casting.SimpleCauldronCastingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.TransformMixingRecipe;
 import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
 import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
@@ -78,6 +79,7 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(ShapelessNbtCopyRecipe.class, (x) -> new ShapelessCraftingRecipePage((RecipeEntry<ShapelessRecipe>) (Object) x));
         PolydexPage.registerRecipeViewer(SimpleSpoutRecipe.class, SimpleSpoutRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleCastingRecipe.class, SimpleCastingRecipePage::new);
+        PolydexPage.registerRecipeViewer(SimpleCauldronCastingRecipe.class, SimpleCauldronCastingRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleDrainRecipe.class, SimpleDrainRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleSmelteryRecipe.class, SimpleSmelteryRecipePage::new);
         //noinspection RedundantCast

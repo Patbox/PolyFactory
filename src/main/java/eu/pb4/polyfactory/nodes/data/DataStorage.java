@@ -13,9 +13,9 @@ import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,8 +38,8 @@ public class DataStorage implements GraphEntity<DataStorage> {
     public static final GraphEntityType<DataStorage> TYPE = GraphEntityType.of(id("data_storage"), CODEC, DataStorage::new, DataStorage::split);
     public static DataStorage EMPTY = new DataStorage() {
     };
-    private final Int2ObjectOpenHashMap<Set<Pair<BlockPos, DataReceiverNode>>> receivers = new Int2ObjectOpenHashMap<>();
-    private final Int2ObjectOpenHashMap<Set<Pair<BlockPos, DataProviderNode>>> providers = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectOpenHashMap<Set<DataHandler<DataReceiverNode>>> receivers = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectOpenHashMap<Set<DataHandler<DataProviderNode>>> providers = new Int2ObjectOpenHashMap<>();
     private Int2ObjectOpenHashMap<SentData> currentData = new Int2ObjectOpenHashMap<>();
     private Int2ObjectOpenHashMap<SentData> swapData = new Int2ObjectOpenHashMap<>();
     private GraphEntityContext ctx;
@@ -70,11 +70,11 @@ public class DataStorage implements GraphEntity<DataStorage> {
         }
 
         for (var x : providers) {
-            var state = world.getBlockState(x.getLeft());
+            var state = world.getBlockState(x.pos());
             if (state.getBlock() instanceof DataProvider provider) {
-                var c = provider.provideData(world, x.getLeft(), state, channel, x.getRight());
+                var c = provider.provideData(world, x.pos(), state, channel, x.node());
                 if (c != null) {
-                    return new SentData(c, x.getLeft(), x.getRight() instanceof DirectionNode d ? d.direction() : null);
+                    return new SentData(c, x.pos(), x.node() instanceof DirectionNode d ? d.direction() : null);
                 }
             }
         }
@@ -114,9 +114,9 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 var rec = receivers.get(data.getIntKey());
                 if (rec != null) {
                     for (var x : rec) {
-                        var state = world.getBlockState(x.getLeft());
+                        var state = world.getBlockState(x.pos());
                         if (state.getBlock() instanceof DataReceiver receiver) {
-                            receiver.receiveData(world, x.getLeft(), state, data.getIntKey(), data.getValue().container(), x.getRight(), data.getValue().pos, data.getValue().direction);
+                            receiver.receiveData(world, x.pos(), state, data.getIntKey(), data.getValue().container(), x.node(), data.getValue().pos, data.getValue().direction);
                         }
                     }
                 }
@@ -129,7 +129,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
     @Override
     public void onPostNodeCreated(@NotNull NodeHolder<BlockNode> node, @Nullable NodeEntity nodeEntity) {
         GraphEntity.super.onPostNodeCreated(node, nodeEntity);
-
         storeReceiverOrProvider(node);
         if (node.getBlockWorld() instanceof ServerWorld serverWorld) {
             if (node.getNode() instanceof DataProviderNode providerNode) {
@@ -170,21 +169,21 @@ public class DataStorage implements GraphEntity<DataStorage> {
         }
     }
 
-    private <T> void addMap(Int2ObjectOpenHashMap<Set<Pair<BlockPos, T>>> map, int channel, BlockPos blockPos, T data) {
+    private <T> void addMap(Int2ObjectOpenHashMap<Set<DataHandler<T>>> map, int channel, BlockPos blockPos, T data) {
         var set = map.get(channel);
         if (set == null) {
             set = new HashSet<>();
             map.put(channel, set);
         }
-        set.add(new Pair<>(blockPos, data));
+        set.add(new DataHandler<>(blockPos, data));
     }
 
-    private <T> void removeMap(Int2ObjectOpenHashMap<Set<Pair<BlockPos, T>>> map, int channel, BlockPos blockPos, T data) {
+    private <T> void removeMap(Int2ObjectOpenHashMap<Set<DataHandler<T>>> map, int channel, BlockPos blockPos, T data) {
         var set = map.get(channel);
         if (set == null) {
             return;
         }
-        set.removeIf(x -> x.getLeft().equals(blockPos) && x.getRight().equals(data));
+        set.removeIf(x -> x.pos().equals(blockPos) && x.node().equals(data));
         if (set.isEmpty()) {
             map.remove(channel);
         }
@@ -199,6 +198,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
     private void reinitializeCache() {
         this.providers.clear();
         this.receivers.clear();
+
         ctx.getGraph().getNodes().forEach(this::storeReceiverOrProvider);
     }
 
@@ -219,10 +219,11 @@ public class DataStorage implements GraphEntity<DataStorage> {
         for (var channel : this.receivers.keySet()) {
             var data = getData(channel);
             if (data != null) {
+
                 for (var x : this.receivers.get(channel.intValue())) {
-                    var state = this.ctx.getBlockWorld().getBlockState(x.getLeft());
+                    var state = this.ctx.getBlockWorld().getBlockState(x.pos());
                     if (state.getBlock() instanceof DataReceiver receiver) {
-                        receiver.receiveData((ServerWorld) this.ctx.getBlockWorld(), x.getLeft(), state, channel, data.container, x.getRight(), data.pos, data.direction);
+                        receiver.receiveData((ServerWorld) this.ctx.getBlockWorld(), x.pos(), state, channel, data.container, x.node(), data.pos, data.direction);
                     }
                 }
             }
@@ -243,12 +244,12 @@ public class DataStorage implements GraphEntity<DataStorage> {
     }
 
     @ApiStatus.Internal
-    public final Int2ObjectOpenHashMap<Set<Pair<BlockPos, DataReceiverNode>>> receivers() {
+    public final Int2ObjectOpenHashMap<Set<DataHandler<DataReceiverNode>>> receivers() {
         return this.receivers;
     }
 
     @ApiStatus.Internal
-    public final Int2ObjectOpenHashMap<Set<Pair<BlockPos, DataProviderNode>>> providers() {
+    public final Int2ObjectOpenHashMap<Set<DataHandler<DataProviderNode>>> providers() {
         return this.providers;
     }
 
@@ -268,4 +269,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
 
     public record SentData(DataContainer container, BlockPos pos, @Nullable Direction direction) {
     }
+
+    public record DataHandler<T>(BlockPos pos, T node) { }
 }

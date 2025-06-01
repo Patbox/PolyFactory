@@ -53,6 +53,13 @@ public class FactoryFluids {
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.MILK_SPLASH, 10,350, FactorySoundEvents.FLUID_SHOOT_MILK))
                     .build());
 
+    public static final FluidType<Unit> GLASS = register(Identifier.ofVanilla("glass"),
+            FluidType.of().density(800).brightness(15).heat(BlockHeat.LAVA / 2)
+                    .solidTexture(id("block/fluid/glass_solid"))
+                    .flowSpeedMultiplier(1)
+                    .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
+                    .maxFlow((world, data) -> FluidConstants.BOTTLE * 2 / 3).build());
+
     public static final FluidType<Unit> IRON = register(Identifier.ofVanilla("iron"),
             FluidType.of().density(1005).brightness(15).heat(BlockHeat.LAVA)
                     .solidTexture(id("block/fluid/iron_solid"))

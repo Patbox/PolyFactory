@@ -91,6 +91,31 @@ public class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
 
         this.getOrCreateTagBuilder(FactoryItemTags.SPOUT_ITEM_HORIZONTAL).addOptionalTag(FactoryItemTags.MOLDS);
         this.getOrCreateTagBuilder(FactoryItemTags.CASTING_SMALL_FLUID).addOptionalTag(FactoryItemTags.MOLDS);
+
+        this.getOrCreateTagBuilder(FactoryItemTags.MOLD_SHAPE_BOTTLE)
+                .add(Items.GLASS_BOTTLE)
+                .add(Items.POTION)
+                .add(Items.EXPERIENCE_BOTTLE)
+                .add(Items.HONEY_BOTTLE)
+        ;
+
+        this.getOrCreateTagBuilder(FactoryItemTags.MOLD_SHAPE_THROWABLE_BOTTLE)
+                .add(Items.SPLASH_POTION)
+                .add(FactoryItems.THROWABLE_GLASS_BOTTLE)
+        ;
+
+        this.getOrCreateTagBuilder(FactoryItemTags.MOLD_SHAPE_BRITTLE_BOTTLE)
+                .add(Items.OMINOUS_BOTTLE)
+                .add(FactoryItems.BRITTLE_GLASS_BOTTLE)
+                .add(FactoryItems.BRITTLE_POTION)
+        ;
+
+        this.getOrCreateTagBuilder(FactoryItemTags.GLASS_BOTTLE_MELTABLE)
+                .add(Items.GLASS_BOTTLE)
+                .add(FactoryItems.THROWABLE_GLASS_BOTTLE)
+                .add(FactoryItems.BRITTLE_GLASS_BOTTLE)
+                .add(FactoryItems.LINGERING_THROWABLE_GLASS_BOTTLE)
+        ;
     }
 
     @Override

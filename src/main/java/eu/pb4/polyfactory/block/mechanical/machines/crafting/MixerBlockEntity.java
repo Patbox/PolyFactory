@@ -117,6 +117,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         this.readInventoryNbt(nbt, lookup);
         this.process = nbt.getDouble("Progress", 0);
         this.fluidContainer.fromNbt(lookup, nbt, "fluid");
+        this.inventoryChanged = true;
         super.readNbt(nbt, lookup);
     }
 

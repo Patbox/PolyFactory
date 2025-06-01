@@ -144,6 +144,7 @@ public class FactoryBlocks {
     public static final PrimitiveSmelteryBlock PRIMITIVE_SMELTERY = register("primitive_smeltery", Block.Settings.copy(SMELTERY_CORE).sounds(BlockSoundGroup.STONE)
             .luminance(x -> x.get(PrimitiveSmelteryBlock.LIT) ? 8 : 0), PrimitiveSmelteryBlock::new);
     public static final CastingTableBlock CASTING_TABLE = register("casting_table", Block.Settings.copy(Blocks.CAULDRON), CastingTableBlock::new);
+    public static final CastingCauldronBlock CASTING_CAULDRON = register("casting_cauldron", Block.Settings.copy(Blocks.CAULDRON).lootTable(Blocks.CAULDRON.getLootTableKey()), CastingCauldronBlock::new);
     public static final FaucedBlock FAUCED = register("fauced", Block.Settings.copy(Blocks.CAULDRON).sounds(BlockSoundGroup.COPPER), FaucedBlock::new);
     public static final PumpBlock PUMP = register("pump", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new PumpBlock(settings.nonOpaque()));
     public static final NozzleBlock NOZZLE = register("nozzle", Block.Settings.copy(Blocks.COPPER_BLOCK), settings -> new NozzleBlock(settings.nonOpaque()));

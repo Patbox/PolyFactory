@@ -61,7 +61,7 @@ public class FactoryDebugItems {
                 player.sendMessage(Text.literal(">> Channel: " + rec.getIntKey()), false);
 
                 for (var node : rec.getValue()) {
-                    player.sendMessage(Text.literal("   " + node.getLeft().toShortString() + " | " + node.getRight().toString()), false);
+                    player.sendMessage(Text.literal("   " + node.pos().toShortString() + " | " + node.node().toString()), false);
                 }
             }
             player.sendMessage(Text.literal("> Providers: "), false);
@@ -69,7 +69,7 @@ public class FactoryDebugItems {
                 player.sendMessage(Text.literal(">> Channel: " + rec.getIntKey()), false);
 
                 for (var node : rec.getValue()) {
-                    player.sendMessage(Text.literal("   " + node.getLeft().toShortString() + " | " + node.getRight().toString()), false);
+                    player.sendMessage(Text.literal("   " + node.pos().toShortString() + " | " + node.node().toString()), false);
                 }
             }
 

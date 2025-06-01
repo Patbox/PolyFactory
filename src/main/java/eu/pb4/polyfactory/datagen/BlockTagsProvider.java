@@ -97,6 +97,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.SMELTERY)
                 .add(FactoryBlocks.SMELTERY_CORE)
                 .add(FactoryBlocks.CASTING_TABLE)
+                .add(FactoryBlocks.CASTING_CAULDRON)
                 .add(FactoryBlocks.FAUCED)
                 .add(FactoryBlocks.ITEM_COUNTER)
                 .add(FactoryBlocks.TEXT_INPUT)

@@ -72,6 +72,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         Inventories.readNbt(nbt, this.stacks, lookup);
         this.process = nbt.getDouble("Progress", 0);
+        this.currentItem = null;
         super.readNbt(nbt, lookup);
     }
 

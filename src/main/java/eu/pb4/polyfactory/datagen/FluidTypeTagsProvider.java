@@ -29,6 +29,7 @@ class FluidTypeTagsProvider extends FabricTagProvider<FluidType<?>> {
 
         this.getOrCreateTagBuilder(FactoryFluidTags.SMELTERY_ALLOWED_FLUIDS)
                 .addOptionalTag(FactoryFluidTags.MOLTEN_METAL)
+                .add(FactoryFluids.GLASS)
         ;
     }
 }

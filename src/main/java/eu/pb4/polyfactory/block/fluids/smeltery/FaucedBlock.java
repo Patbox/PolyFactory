@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.fluids.smeltery;
 
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.fluids.FluidOutput;
 import eu.pb4.polyfactory.block.fluids.transport.PipeConnectable;
 import eu.pb4.polyfactory.fluid.FluidInstance;
@@ -84,7 +85,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         } else if (world.getBlockEntity(sourcePos) instanceof BlockEntity be && be instanceof FluidOutput output1) {
             return new SimpleProvider(model, state, pos, world, be::isRemoved, output1, state.get(FACING));
         } else {
-            return new ModelOnlyProvider(model);
+            return new ModelOnlyProvider(model, state.get(FACING));
         }
     }
 
@@ -124,6 +125,8 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
 
         if (!player.shouldCancelInteraction() && world.getBlockEntity(pos.down()) instanceof CastingTableBlockEntity be) {
             return be.activate(output);
+        } else if (!player.shouldCancelInteraction() && world.getBlockState(pos.down()).isOf(Blocks.CAULDRON)) {
+            return FactoryBlocks.CASTING_CAULDRON.tryCauldronCasting((ServerWorld) world, pos.down(), output);
         }
         return super.onUse(state, world, pos, player, hit);
     }
@@ -251,7 +254,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         }
     }
 
-    public record ModelOnlyProvider(FaucedBlock.Model model) implements FaucedProvider {
+    public record ModelOnlyProvider(FaucedBlock.Model model, Direction direction) implements FaucedProvider {
         @Override
         public FluidContainerInput getFluidContainerInput() {
             return FluidContainerInput.EMPTY;
@@ -295,6 +298,11 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
             public void setActiveFluid(@Nullable FluidInstance<?> fluid) {
 
             }
+
+            @Override
+            public Direction direction() {
+                return Direction.UP;
+            }
         };
 
         FluidContainerInput getFluidContainerInput();
@@ -304,5 +312,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         void extract(FluidStack<?> fluidStacks);
 
         void setActiveFluid(@Nullable FluidInstance<?> fluid);
+
+        Direction direction();
     }
 }

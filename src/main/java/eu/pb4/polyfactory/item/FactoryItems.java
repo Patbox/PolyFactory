@@ -195,9 +195,12 @@ public class FactoryItems {
     public static final SpoutMolds INGOT_MOLD = SpoutMolds.create("ingot");
     public static final SpoutMolds NUGGET_MOLD = SpoutMolds.create("nugget");
     public static final SpoutMolds PIPE_MOLD = SpoutMolds.create("pipe");
+    public static final SpoutMolds BOTTLE_MOLD = SpoutMolds.create("bottle");
+    public static final SpoutMolds THROWABLE_BOTTLE_MOLD = SpoutMolds.create("throwable_bottle");
+    public static final SpoutMolds BRITTLE_BOTTLE_MOLD = SpoutMolds.create("brittle_bottle");
 
 
-    public static final List<SpoutMolds> MOLDS = List.of(INGOT_MOLD, NUGGET_MOLD, PIPE_MOLD);
+    public static final List<SpoutMolds> MOLDS = List.of(INGOT_MOLD, NUGGET_MOLD, PIPE_MOLD, BOTTLE_MOLD, THROWABLE_BOTTLE_MOLD, BRITTLE_BOTTLE_MOLD);
 
     public static void register() {
         FuelRegistryEvents.BUILD.register(((builder, context) -> {
@@ -292,6 +295,7 @@ public class FactoryItems {
                     entries.add(SPEAKER);
                     entries.add(DATA_MEMORY);
                     entries.add(DATA_EXTRACTOR);
+                    entries.add(PROGRAMMABLE_DATA_EXTRACTOR);
                     entries.add(DATA_COMPARATOR);
                     entries.add(ARITHMETIC_OPERATOR);
 
@@ -449,7 +453,6 @@ public class FactoryItems {
                         FactoryDebugItems.addItemGroup(context, entries);
                         entries.add(ELECTRIC_GENERATOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(ELECTRIC_MOTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
-                        entries.add(PROGRAMMABLE_DATA_EXTRACTOR, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(CLIPBOARD, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                         entries.add(SMELTERY, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     })).build()

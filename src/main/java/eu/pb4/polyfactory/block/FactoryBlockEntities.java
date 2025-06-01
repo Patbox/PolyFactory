@@ -18,6 +18,7 @@ import eu.pb4.polyfactory.block.data.providers.ItemReaderBlockEntity;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.block.electric.ElectricMotorBlockEntity;
 import eu.pb4.polyfactory.block.fluids.*;
+import eu.pb4.polyfactory.block.fluids.smeltery.CastingCauldronBlockEntity;
 import eu.pb4.polyfactory.block.fluids.smeltery.CastingTableBlockEntity;
 import eu.pb4.polyfactory.block.fluids.smeltery.IndustrialSmelteryBlockEntity;
 import eu.pb4.polyfactory.block.fluids.smeltery.PrimitiveSmelteryBlockEntity;
@@ -89,7 +90,8 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<CastingTableBlockEntity> CASTING_TABLE = register("casting_table",
             FabricBlockEntityTypeBuilder.create(CastingTableBlockEntity::new, FactoryBlocks.CASTING_TABLE));
-
+    public static final BlockEntityType<CastingCauldronBlockEntity> CASTING_CAULDRON = register("casting_cauldron",
+            FabricBlockEntityTypeBuilder.create(CastingCauldronBlockEntity::new, FactoryBlocks.CASTING_CAULDRON));
     public static final BlockEntityType<ContainerBlockEntity> CONTAINER = register("container",
              FabricBlockEntityTypeBuilder.create(ContainerBlockEntity::new, FactoryBlocks.CONTAINER));
 
