@@ -400,6 +400,13 @@
   "polydex_category.polyfactory.fluids": "Item to Fluid",
   "polydex_category.polyfactory.polyfactory.smeltery": "Smeltery",
 
+  "text.polyfactory.amount.bucket": "Buckets",
+  "text.polyfactory.amount.milibucket": "Milibuckets",
+  "text.polyfactory.amount.block": "Blocks",
+  "text.polyfactory.amount.ingot": "Ingots",
+  "text.polyfactory.amount.nuggets": "Nuggets",
+  "text.polyfactory.amount.droplet": "Droplets",
+
 
   "advancements.polyfactory.root.title": "PolyFactory",
   "advancements.polyfactory.root.description": "Welcome to the factory!",
@@ -565,12 +572,25 @@
   "advancements.polyfactory.crushed_raw_ore.title": "More ore per ore",
   "advancements.polyfactory.crushed_raw_ore.description": "Crush raw ores to get more of them!",
 
+  "advancements.polyfactory.primitive_smeltery.title": "Efficient smelting",
+  "advancements.polyfactory.primitive_smeltery.description": "Use Smeltery to get some molten metals (or glass).",
+
+  "advancements.polyfactory.smeltery.title": "Industrial Smelting",
+  "advancements.polyfactory.smeltery.description": "Make a Industrial Smeltery.",
+
+  "advancements.polyfactory.mold.title": "Reliable Casting",
+  "advancements.polyfactory.mold.description": "Make a Mold ouf of Steel and stop worrying about it breaking!",
+
+  "advancements.polyfactory.casting_table.title": "Let's start casting!",
+  "advancements.polyfactory.casting_table.description": "Use Casting Table or Cauldron to cast some metal or glass into a form.",
+
   "advancements.polyfactory.tater_16.title": "Potato Beginner",
   "advancements.polyfactory.tater_16.description": "Click Potato on a Spring 16 times...",
   "advancements.polyfactory.tater_128.title": "2 stacks of taters",
   "advancements.polyfactory.tater_128.description": "Click Potato on a Spring 128 times...",
   "advancements.polyfactory.tater_1024.title": "The Potato Master",
   "advancements.polyfactory.tater_1024.description": "Click Potato on a Spring 1024 times. The End! Nothing more",
+
 
   "text.polyfactory.color_simple": "%s (%s)",
   "color.polyfactory.teal": "Teal"

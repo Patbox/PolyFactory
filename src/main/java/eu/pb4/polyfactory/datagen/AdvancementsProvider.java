@@ -21,15 +21,14 @@ import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.advancement.AdvancementRequirements;
-import net.minecraft.advancement.criterion.InventoryChangedCriterion;
-import net.minecraft.advancement.criterion.ItemCriterion;
-import net.minecraft.advancement.criterion.RecipeCraftedCriterion;
-import net.minecraft.component.DataComponentTypes;
+import net.minecraft.advancement.criterion.*;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.loot.condition.AnyOfLootCondition;
 import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
 import net.minecraft.potion.Potions;
 import net.minecraft.predicate.entity.LocationPredicate;
+import net.minecraft.predicate.entity.LootContextPredicate;
 import net.minecraft.predicate.item.ItemPredicate;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -39,6 +38,7 @@ import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -71,8 +71,72 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 ))
                 .build(exporter, "polyfactory:main/root");
 
-        this.base(registryLookup, root, exporter);
+        this.mainline(registryLookup, root, exporter);
+        this.smeltery(registryLookup, root, exporter);
         this.taters(registryLookup, root, exporter);
+    }
+
+    private void smeltery(RegistryWrapper.WrapperLookup registryLookup, AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
+        var primitiveSmeltery = Advancement.Builder.create()
+                .parent(root)
+                .display(
+                        FactoryItems.PRIMITIVE_SMELTERY,
+                        Text.translatable("advancements.polyfactory.primitive_smeltery.title"),
+                        Text.translatable("advancements.polyfactory.primitive_smeltery.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.SMELTERY_MELTS))
+                .build(exporter, "polyfactory:main/smeltery/primitive_smeltery");
+
+        var smeltery = Advancement.Builder.create()
+                .parent(primitiveSmeltery)
+                .display(
+                        FactoryItems.SMELTERY,
+                        Text.translatable("advancements.polyfactory.smeltery.title"),
+                        Text.translatable("advancements.polyfactory.smeltery.description"),
+                        null,
+                        AdvancementFrame.GOAL,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.INDUSTRIAL_SMELTERY_CREATED))
+                .build(exporter, "polyfactory:main/smeltery/smeltery");
+
+        var castingTable = Advancement.Builder.create()
+                .parent(primitiveSmeltery)
+                .display(
+                        FactoryItems.CASTING_TABLE,
+                        Text.translatable("advancements.polyfactory.casting_table.title"),
+                        Text.translatable("advancements.polyfactory.casting_table.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.CASTING_METAL))
+                .build(exporter, "polyfactory:main/smeltery/casting_table");
+
+
+        var mold = Advancement.Builder.create()
+                .parent(castingTable)
+                .display(
+                        FactoryItems.INGOT_MOLD.mold(),
+                        Text.translatable("advancements.polyfactory.mold.title"),
+                        Text.translatable("advancements.polyfactory.mold.description"),
+                        null,
+                        AdvancementFrame.GOAL,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.CASTING_MOLD))
+                .build(exporter, "polyfactory:main/smeltery/mold");
     }
 
     private void taters(RegistryWrapper.WrapperLookup registryLookup, AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
@@ -124,7 +188,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .build(exporter, "polyfactory:main/taters/1023");
     }
 
-    private void base(RegistryWrapper.WrapperLookup registryLookup, AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
+    private void mainline(RegistryWrapper.WrapperLookup registryLookup, AdvancementEntry root, Consumer<AdvancementEntry> exporter) {
         var itemWrap = registryLookup.getOrThrow(RegistryKeys.ITEM);
 
         // Start
@@ -346,160 +410,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .build(exporter, "polyfactory:main/base/mixer/firework");
 
 
-        var cable = Advancement.Builder.create()
-                .parent(mixer)
-                .display(
-                        ColoredItem.stack(FactoryItems.CABLE, 1, DyeColor.RED),
-                        Text.translatable("advancements.polyfactory.cable.title"),
-                        Text.translatable("advancements.polyfactory.cable.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("use", TriggerCriterion.of(FactoryTriggers.CABLE_CONNECT))
-                .build(exporter, "polyfactory:main/base/cable");
-
-        var recordPlayer = Advancement.Builder.create()
-                .parent(cable)
-                .display(
-                        FactoryItems.RECORD_PLAYER,
-                        Text.translatable("advancements.polyfactory.record_player.title"),
-                        Text.translatable("advancements.polyfactory.record_player.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("a", TriggerCriterion.of(FactoryTriggers.CONNECT_RECORD_PLAYER_AND_SPEAKERS))
-                .build(exporter, "polyfactory:main/base/record_player");
-
-        var redstone = Advancement.Builder.create()
-                .parent(cable)
-                .display(
-                        FactoryItems.REDSTONE_INPUT,
-                        Text.translatable("advancements.polyfactory.redstone.title"),
-                        Text.translatable("advancements.polyfactory.redstone.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("a", TriggerCriterion.of(FactoryTriggers.REDSTONE_IN))
-                .criterion("b", TriggerCriterion.of(FactoryTriggers.REDSTONE_OUT))
-                .criteriaMerger(AdvancementRequirements.CriterionMerger.AND)
-                .build(exporter, "polyfactory:main/base/redstone");
-
-
-        var wirelessRedstone = Advancement.Builder.create()
-                .parent(redstone)
-                .display(
-                        FactoryItems.WIRELESS_REDSTONE_TRANSMITTER,
-                        Text.translatable("advancements.polyfactory.wireless_redstone.title"),
-                        Text.translatable("advancements.polyfactory.wireless_redstone.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("a", TriggerCriterion.of(FactoryTriggers.WIRELESS_REDSTONE))
-                .build(exporter, "polyfactory:main/base/wireless_redstone");
-
-        // Mixer -> Cable
-
-        var itemReader = Advancement.Builder.create()
-                .parent(cable)
-                .display(
-                        FactoryItems.ITEM_READER,
-                        Text.translatable("advancements.polyfactory.item_reader.title"),
-                        Text.translatable("advancements.polyfactory.item_reader.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("use", TriggerCriterion.of(FactoryTriggers.ITEM_READER))
-                .build(exporter, "polyfactory:main/base/item_reader");
-
-        var aritheticOperator = Advancement.Builder.create()
-                .parent(cable)
-                .display(
-                        FactoryItems.ARITHMETIC_OPERATOR,
-                        Text.translatable("advancements.polyfactory.arithmetic_operator.title"),
-                        Text.translatable("advancements.polyfactory.arithmetic_operator.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("use", TriggerCriterion.of(FactoryTriggers.ARITHMETIC_OPERATOR))
-                .build(exporter, "polyfactory:main/base/arithmetic_operator");
-
-        var dataComparator = Advancement.Builder.create()
-                .parent(aritheticOperator)
-                .display(
-                        FactoryItems.DATA_COMPARATOR,
-                        Text.translatable("advancements.polyfactory.data_comparator.title"),
-                        Text.translatable("advancements.polyfactory.data_comparator.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("use", TriggerCriterion.of(FactoryTriggers.DATA_COMPARATOR))
-                .build(exporter, "polyfactory:main/base/data_comparator");
-
-        var dataMemory = Advancement.Builder.create()
-                .parent(aritheticOperator)
-                .display(
-                        FactoryItems.DATA_MEMORY,
-                        Text.translatable("advancements.polyfactory.data_memory.title"),
-                        Text.translatable("advancements.polyfactory.data_memory.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("use", TriggerCriterion.of(FactoryTriggers.DATA_MEMORY))
-                .build(exporter, "polyfactory:main/base/data_memory");
-
-        var nixieTubes = Advancement.Builder.create()
-                .parent(cable)
-                .display(
-                        FactoryItems.NIXIE_TUBE,
-                        Text.translatable("advancements.polyfactory.nixie_tube.title"),
-                        Text.translatable("advancements.polyfactory.nixie_tube.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("use", TriggerCriterion.of(FactoryTriggers.NIXIE_TUBE_CONNECTED_3_OR_MORE))
-                .build(exporter, "polyfactory:main/base/nixie_tube");
-
-        var hologramProjector = Advancement.Builder.create()
-                .parent(nixieTubes)
-                .display(
-                        FactoryItems.HOLOGRAM_PROJECTOR,
-                        Text.translatable("advancements.polyfactory.hologram_projector.title"),
-                        Text.translatable("advancements.polyfactory.hologram_projector.description"),
-                        null,
-                        AdvancementFrame.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .criterion("use", TriggerCriterion.of(FactoryTriggers.HOLOGRAM_PROJECTOR_ACTIVATES))
-                .build(exporter, "polyfactory:main/base/hologram_projector");
+        this.cables(exporter, itemWrap, mixer);
 
         // Steel
 
@@ -788,7 +699,10 @@ class AdvancementsProvider extends FabricAdvancementProvider {
 
 
         // Plates -> Fluids
+        this.fluids(exporter, itemWrap, press);
+    }
 
+    private void fluids(Consumer<AdvancementEntry> exporter, RegistryWrapper.Impl<Item> itemWrap, AdvancementEntry press) {
         var pipe = Advancement.Builder.create()
                 .parent(press)
                 .display(
@@ -995,5 +909,162 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .criterion("use2", FluidShootsCriterion.ofFluidLauncher(FactoryFluids.LAVA.defaultInstance()))
                 .criteriaMerger(AdvancementRequirements.CriterionMerger.OR)
                 .build(exporter, "polyfactory:main/base/nozzle_lava");
+    }
+
+    private void cables(Consumer<AdvancementEntry> exporter, RegistryWrapper.Impl<Item> itemWrap, AdvancementEntry mixer) {
+        var cable = Advancement.Builder.create()
+                .parent(mixer)
+                .display(
+                        ColoredItem.stack(FactoryItems.CABLE, 1, DyeColor.RED),
+                        Text.translatable("advancements.polyfactory.cable.title"),
+                        Text.translatable("advancements.polyfactory.cable.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.CABLE_CONNECT))
+                .build(exporter, "polyfactory:main/base/cable");
+
+        var recordPlayer = Advancement.Builder.create()
+                .parent(cable)
+                .display(
+                        FactoryItems.RECORD_PLAYER,
+                        Text.translatable("advancements.polyfactory.record_player.title"),
+                        Text.translatable("advancements.polyfactory.record_player.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("a", TriggerCriterion.of(FactoryTriggers.CONNECT_RECORD_PLAYER_AND_SPEAKERS))
+                .build(exporter, "polyfactory:main/base/record_player");
+
+        var redstone = Advancement.Builder.create()
+                .parent(cable)
+                .display(
+                        FactoryItems.REDSTONE_INPUT,
+                        Text.translatable("advancements.polyfactory.redstone.title"),
+                        Text.translatable("advancements.polyfactory.redstone.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("a", TriggerCriterion.of(FactoryTriggers.REDSTONE_IN))
+                .criterion("b", TriggerCriterion.of(FactoryTriggers.REDSTONE_OUT))
+                .criteriaMerger(AdvancementRequirements.CriterionMerger.AND)
+                .build(exporter, "polyfactory:main/base/redstone");
+
+
+        var wirelessRedstone = Advancement.Builder.create()
+                .parent(redstone)
+                .display(
+                        FactoryItems.WIRELESS_REDSTONE_TRANSMITTER,
+                        Text.translatable("advancements.polyfactory.wireless_redstone.title"),
+                        Text.translatable("advancements.polyfactory.wireless_redstone.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("a", TriggerCriterion.of(FactoryTriggers.WIRELESS_REDSTONE))
+                .build(exporter, "polyfactory:main/base/wireless_redstone");
+
+        // Mixer -> Cable
+
+        var itemReader = Advancement.Builder.create()
+                .parent(cable)
+                .display(
+                        FactoryItems.ITEM_READER,
+                        Text.translatable("advancements.polyfactory.item_reader.title"),
+                        Text.translatable("advancements.polyfactory.item_reader.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.ITEM_READER))
+                .build(exporter, "polyfactory:main/base/item_reader");
+
+        var aritheticOperator = Advancement.Builder.create()
+                .parent(cable)
+                .display(
+                        FactoryItems.ARITHMETIC_OPERATOR,
+                        Text.translatable("advancements.polyfactory.arithmetic_operator.title"),
+                        Text.translatable("advancements.polyfactory.arithmetic_operator.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.ARITHMETIC_OPERATOR))
+                .build(exporter, "polyfactory:main/base/arithmetic_operator");
+
+        var dataComparator = Advancement.Builder.create()
+                .parent(aritheticOperator)
+                .display(
+                        FactoryItems.DATA_COMPARATOR,
+                        Text.translatable("advancements.polyfactory.data_comparator.title"),
+                        Text.translatable("advancements.polyfactory.data_comparator.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.DATA_COMPARATOR))
+                .build(exporter, "polyfactory:main/base/data_comparator");
+
+        var dataMemory = Advancement.Builder.create()
+                .parent(aritheticOperator)
+                .display(
+                        FactoryItems.DATA_MEMORY,
+                        Text.translatable("advancements.polyfactory.data_memory.title"),
+                        Text.translatable("advancements.polyfactory.data_memory.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.DATA_MEMORY))
+                .build(exporter, "polyfactory:main/base/data_memory");
+
+        var nixieTubes = Advancement.Builder.create()
+                .parent(cable)
+                .display(
+                        FactoryItems.NIXIE_TUBE,
+                        Text.translatable("advancements.polyfactory.nixie_tube.title"),
+                        Text.translatable("advancements.polyfactory.nixie_tube.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.NIXIE_TUBE_CONNECTED_3_OR_MORE))
+                .build(exporter, "polyfactory:main/base/nixie_tube");
+
+        var hologramProjector = Advancement.Builder.create()
+                .parent(nixieTubes)
+                .display(
+                        FactoryItems.HOLOGRAM_PROJECTOR,
+                        Text.translatable("advancements.polyfactory.hologram_projector.title"),
+                        Text.translatable("advancements.polyfactory.hologram_projector.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.HOLOGRAM_PROJECTOR_ACTIVATES))
+                .build(exporter, "polyfactory:main/base/hologram_projector");
     }
 }

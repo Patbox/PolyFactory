@@ -1,8 +1,10 @@
 package eu.pb4.polyfactory.block.fluids.smeltery;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.other.BlockWithTooltip;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -21,6 +23,7 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -30,6 +33,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Pair;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -83,6 +87,9 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithT
         var center = pos.offset(state.get(FACING).getOpposite());
         if (FactoryBlocks.SMELTERY.placeSmeltery(world, center)) {
             world.playSound(null, center, SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS);
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                TriggerCriterion.trigger(serverPlayer, FactoryTriggers.INDUSTRIAL_SMELTERY_CREATED);
+            }
             return ActionResult.SUCCESS_SERVER;
         }
 
@@ -92,7 +99,6 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithT
         int bricks = 0;
         int steel = 0;
 
-        int i = 0;
         for (var blockPos : BlockPos.iterate(center.add(-1, -1, -1), center.add(1, 1, 1))) {
             if (pos.equals(blockPos)) {
                 continue;
@@ -104,10 +110,6 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithT
             currentBlocks.put(blockPos.subtract(center), current);
         }
         var highlight = new HashMap<Vec3i, Pair<BlockState, Boolean>>();
-
-        //if (!currentBlocks.get(Vec3i.ZERO).isOf(Blocks.DEEPSLATE_BRICKS) && !currentBlocks.get(Vec3i.ZERO).isOf(FactoryBlocks.STEEL_BLOCK)) {
-        //    highlight.put(Vec3i.ZERO, new Pair<>(Blocks.AIR.getDefaultState(), !currentBlocks.get(Vec3i.ZERO).isAir()));
-        //}
 
         if (steel < IndustrialSmelteryBlock.STEEL_BLOCKS) {
             for (var sug : SUGGESTED_STEEL) {

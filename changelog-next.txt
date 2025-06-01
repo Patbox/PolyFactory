@@ -9,7 +9,7 @@
   - 2 block tall block acting as early game Industrial Smeltery.
   - Used to melt raw ores and other metallic items into Molten Metals.
   - It gives a bit more from raw ores than regular Furnace ingot recipes.
-  - It's 2 times slower than Industrial Smeltery.
+  - It's 2.5 times slower than Industrial Smeltery.
   - Can hold up to 1 stacks of items as input.
   - Can hold up to 1 block of Molten Metals.
   - Uses furnace fuel to work, burning through it four times as fast.
@@ -34,12 +34,13 @@
     - Has limited durability (16).
     - Steel variant is made by poring 4 ingot equivalent of Molten Steel on "shape item", destroying it, placed on a Casting Table.
     - It's unbreakable.
-  - There are
+  - There are 6 variants of molds: Ingot, Nugget, Pipe, Bottle, Throwable Bottle, Brittle Bottle
   - Molds can be used with Mechanical Spout and Casting Table to shape fluids into items.
   - Molds do not get used when crafting (aside of clay variant getting damaged).
 - Added Programmable Data Extractor:
   - Crafted with Data Extractor, Integrated Circuit, Cable and 4 Copper Ingots.
   - Data Extractor variant, that can be modified by inputting data into second (blue) input.
+- Added Steel Nugget and Copper Nugget.
 - Mechanical Pumps (and pipes powered by them) will now pull fluid blocks that are further away (as long as they are connected, by safe fluid blocks).
 - Added Golden Potato on a Spring.
 - Gears are now placed correctly aside of Mechanical Pump.
@@ -48,4 +49,4 @@
 - Tried to improve compatibility with Lithium's Hopper optimalizations.
 - Fixed fluid order being reversed in tooltips.
 - Fixed wrong translation key in Item Filter name.
-- Fixed advancement background.
+- Fixed advancement background. Additionally, updated its texture to current Steel Block texture.

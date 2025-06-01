@@ -25,6 +25,6 @@ public class SimpleCastingRecipePage extends CastingRecipePage<SimpleCastingReci
     }
     @Override
     protected CountedIngredient getBaseIngredient() {
-        return this.recipe.item();
+        return this.recipe.item().isPresent() ? this.recipe.item().get() : CountedIngredient.EMPTY;
     }
 }

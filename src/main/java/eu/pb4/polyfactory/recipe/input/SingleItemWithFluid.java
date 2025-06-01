@@ -13,7 +13,6 @@ public record SingleItemWithFluid(ItemStack stack, FluidContainerInput fluidCont
     public static SingleItemWithFluid of(ItemStack stack, @Nullable FluidContainer fluidContainer, ServerWorld world) {
         return new SingleItemWithFluid(stack, FluidContainerInput.of(fluidContainer), world);
     }
-
     @Override
     public ItemStack getStackInSlot(int slot) {
         return stack;
@@ -25,6 +24,12 @@ public record SingleItemWithFluid(ItemStack stack, FluidContainerInput fluidCont
     public long getFluid(FluidInstance<?> type) {
         return this.fluidContainer.get(type);
     }
+
+    @Override
+    public boolean isEmpty() {
+        return RecipeInput.super.isEmpty() && this.fluidContainer.isEmpty();
+    }
+
     public List<FluidInstance<?>> fluids() {
         return this.fluidContainer.fluids();
     }}

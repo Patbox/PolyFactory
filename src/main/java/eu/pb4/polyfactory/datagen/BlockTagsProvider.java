@@ -150,6 +150,8 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.PORTABLE_FLUID_TANK)
                 .add(FactoryBlocks.AXLE)
                 .add(FactoryBlocks.AXLE_WITH_GEAR)
+                .add(FactoryBlocks.TINY_POTATO_SPRING)
+                .add(FactoryBlocks.GOLDEN_TINY_POTATO_SPRING)
                 .add(FactoryBlocks.AXLE_WITH_LARGE_GEAR)
                 .add(FactoryBlocks.NIXIE_TUBE)
                 .add(FactoryBlocks.HOLOGRAM_PROJECTOR)

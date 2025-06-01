@@ -1,6 +1,8 @@
 package eu.pb4.polyfactory.block.fluids.smeltery;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
@@ -106,7 +108,7 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
             self.setStack(output);
 
             if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity serverPlayer) {
-                //TriggerCriterion.trigger(serverPlayer, FactoryTriggers.CASTING_METAL);
+                TriggerCriterion.trigger(serverPlayer, FactoryTriggers.CASTING_METAL);
                 Criteria.RECIPE_CRAFTED.trigger(serverPlayer, self.currentRecipe.id(), List.of());
             }
 

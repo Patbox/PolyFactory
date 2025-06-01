@@ -5,6 +5,8 @@ import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.item.FactoryItemTags;
+import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.casting.CastingRecipe;
 import eu.pb4.polyfactory.recipe.input.SingleItemWithFluid;
@@ -79,7 +81,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
             }
         }
 
-        if (self.provider == FaucedBlock.FaucedProvider.EMPTY || self.isInputEmpty() || !self.isOutputEmpty() || !self.activate) {
+        if (self.provider == FaucedBlock.FaucedProvider.EMPTY || !self.isOutputEmpty() || !self.activate) {
             self.process = 0;
             self.model.setProgress(false, 0, null);
             self.activate = false;
@@ -131,6 +133,9 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
 
             if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity serverPlayer) {
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.CASTING_METAL);
+                if (itemOut.isIn(FactoryItemTags.MOLDS)) {
+                    TriggerCriterion.trigger(serverPlayer, FactoryTriggers.CASTING_MOLD);
+                }
                 Criteria.RECIPE_CRAFTED.trigger(serverPlayer, self.currentRecipe.id(), List.of(inputStack.copy()));
             }
             inputStack.decrement(self.currentRecipe.value().decreasedInputItemAmount(input));
@@ -265,7 +270,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
             }
         }
 
-        if (this.activate || this.isInputEmpty() || !this.isOutputEmpty() || !provider.isValid()) {
+        if (this.activate || !this.isOutputEmpty() || !provider.isValid()) {
             return ActionResult.FAIL;
         }
         this.provider = provider;

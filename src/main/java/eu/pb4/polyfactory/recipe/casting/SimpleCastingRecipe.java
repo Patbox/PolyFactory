@@ -19,11 +19,13 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.world.World;
 
-public record SimpleCastingRecipe(CountedIngredient item, FluidStack<?> fluidInput,
+import java.util.Optional;
+
+public record SimpleCastingRecipe(Optional<CountedIngredient> item, FluidStack<?> fluidInput,
                                   ItemStack output, boolean copyComponents, int itemDamage, RegistryEntry<SoundEvent> soundEvent,
                                   double time, double coolingTime) implements CastingRecipe {
     public static final MapCodec<SimpleCastingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
-                    CountedIngredient.CODEC.fieldOf("item").forGetter(SimpleCastingRecipe::item),
+                    CountedIngredient.CODEC.optionalFieldOf("item").forGetter(SimpleCastingRecipe::item),
                     FluidStack.CODEC.fieldOf("fluid_input").forGetter(SimpleCastingRecipe::fluidInput),
                     ItemStack.UNCOUNTED_CODEC.fieldOf("result").forGetter(SimpleCastingRecipe::output),
                     Codec.BOOL.optionalFieldOf("copy_components", false).forGetter(SimpleCastingRecipe::copyComponents),
@@ -33,31 +35,35 @@ public record SimpleCastingRecipe(CountedIngredient item, FluidStack<?> fluidInp
                     Codec.DOUBLE.fieldOf("cooling_ticks").forGetter(SimpleCastingRecipe::coolingTime)
             ).apply(x, SimpleCastingRecipe::new)
     );
-    
+
+    public static SimpleCastingRecipe fluid(FluidStack<?> stack, Item out, SoundEvent sound, int coolingTime) {
+        return new SimpleCastingRecipe(Optional.empty(), stack, out.getDefaultStack(), false, 0,
+                Registries.SOUND_EVENT.getEntry(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
+    }
 
     public static SimpleCastingRecipe toItem(Item item, FluidStack<?> stack, Item out, SoundEvent sound, int coolingTime) {
-        return new SimpleCastingRecipe(CountedIngredient.ofItems(1, item), stack, out.getDefaultStack(), false, 0,
+        return new SimpleCastingRecipe(Optional.of(CountedIngredient.ofItems(1, item)), stack, out.getDefaultStack(), false, 0,
                 Registries.SOUND_EVENT.getEntry(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
     }
 
     public static SimpleCastingRecipe toItem(TagKey<Item> item, FluidStack<?> stack, Item out, SoundEvent sound, int coolingTime) {
-        return new SimpleCastingRecipe(CountedIngredient.fromTag(1, FactoryUtil.fakeTagList(item)), stack, out.getDefaultStack(), false, 0,
+        return new SimpleCastingRecipe(Optional.of(CountedIngredient.fromTag(1, FactoryUtil.fakeTagList(item))), stack, out.getDefaultStack(), false, 0,
                 Registries.SOUND_EVENT.getEntry(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
     }
 
     public static SimpleCastingRecipe templateDamaged(TagKey<Item> template, FluidStack<?> stack, Item out, SoundEvent sound, double coolingTicks) {
-        return new SimpleCastingRecipe(CountedIngredient.fromTag(0, FactoryUtil.fakeTagList(template)), stack, out.getDefaultStack(), false, 1,
+        return new SimpleCastingRecipe(Optional.of(CountedIngredient.fromTag(0, FactoryUtil.fakeTagList(template))), stack, out.getDefaultStack(), false, 1,
                 Registries.SOUND_EVENT.getEntry(sound), CastingRecipe.getTime(stack.instance(), stack.amount()),coolingTicks);
     }
 
     public static SimpleCastingRecipe templateDamaged(Item template, FluidStack<?> stack, Item out, SoundEvent sound, double coolingTicks) {
-        return new SimpleCastingRecipe(CountedIngredient.ofItems(0, template), stack, out.getDefaultStack(), false, 1,
+        return new SimpleCastingRecipe(Optional.of(CountedIngredient.ofItems(0, template)), stack, out.getDefaultStack(), false, 1,
                 Registries.SOUND_EVENT.getEntry(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTicks);
     }
 
     @Override
     public int decreasedInputItemAmount(SingleItemWithFluid input) {
-        return this.item.count();
+        return this.item.isPresent() ? this.item.get().count() : 0;
     }
 
     @Override
@@ -72,7 +78,7 @@ public record SimpleCastingRecipe(CountedIngredient item, FluidStack<?> fluidInp
 
     @Override
     public boolean matches(SingleItemWithFluid input, World world) {
-        if (!item.test(input.stack())) {
+        if ((item.isPresent() && !item.get().test(input.stack())) || (item.isEmpty() && !input.stack().isEmpty())) {
             return false;
         }
 

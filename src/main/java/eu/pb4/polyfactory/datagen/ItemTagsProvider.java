@@ -44,6 +44,14 @@ public class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
                 .add(FactoryItems.PRESSURE_FLUID_GUN)
         ;
 
+        this.getOrCreateTagBuilder(ConventionalItemTags.NUGGETS)
+                .add(FactoryItems.COPPER_NUGGET)
+                .add(FactoryItems.STEEL_NUGGET)
+        ;
+        this.getOrCreateTagBuilder(ConventionalItemTags.INGOTS)
+                .add(FactoryItems.STEEL_INGOT)
+        ;
+
         this.getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
                 .add(FactoryItems.PRESSURE_FLUID_GUN)
         ;

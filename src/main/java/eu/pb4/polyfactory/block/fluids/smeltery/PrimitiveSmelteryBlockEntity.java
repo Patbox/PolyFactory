@@ -26,6 +26,7 @@ import it.unimi.dsi.fastutil.booleans.BooleanList;
 import it.unimi.dsi.fastutil.floats.FloatList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -99,7 +100,7 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
                             if (!nullRecipe) {
                                 self.progress = 0;
                             }
-                            self.progressEnd = self.recipes.value().time(input, world) * 3;
+                            self.progressEnd = self.recipes.value().time(input, world) * 5 / 2;
                         }
                         dirty = true;
                         self.currentStack = stack.copyWithCount(1);
@@ -121,7 +122,7 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
                             triesSmelting = true;
                         }
                         if (self.fuelTicks > 0) {
-                            if (self.progress < self.recipes.value().time(input, world) * 3) {
+                            if (self.progress < self.recipes.value().time(input, world) * 5 / 2) {
                                 self.progress++;
                                 dirty = true;
                             } else if (stored <= self.fluidContainer.capacity()) {
@@ -131,6 +132,10 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
 
                                 for (var x : result) {
                                     self.fluidContainer.insert(x, false);
+                                }
+                                if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
+                                    TriggerCriterion.trigger(player, FactoryTriggers.SMELTERY_MELTS);
+                                    Criteria.RECIPE_CRAFTED.trigger(player, self.recipes.id(), List.of());
                                 }
                             }
                         } else if (self.world.getServer().getTicks() % 4 == 0) {

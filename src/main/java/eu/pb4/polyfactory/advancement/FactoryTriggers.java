@@ -42,5 +42,7 @@ public interface FactoryTriggers {
     Identifier ITEM_FILTER_USE = id("item_filter_use");
     Identifier CONNECT_RECORD_PLAYER_AND_SPEAKERS = id("connect_record_player_and_speakers");
     Identifier CASTING_METAL = id("casting_metal");
-
+    Identifier CASTING_MOLD = id("casting_mold");
+    Identifier SMELTERY_MELTS = id("smeltery_melts");
+    Identifier INDUSTRIAL_SMELTERY_CREATED = id("industrial_smeltery");
 }

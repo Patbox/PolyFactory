@@ -122,14 +122,14 @@ public class FactoryUtil {
     public static MutableText fluidTextIngots(long amount) {
         if (amount >= FluidConstants.BLOCK) {
             long buckets = amount / (FluidConstants.BLOCK / 1000);
-            return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + "B");
+            return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + " ").append(Text.translatable("text.polyfactory.amount.block"));
         } else if (amount >= FluidConstants.INGOT) {
             long buckets = amount / (FluidConstants.INGOT / 1000);
-            return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + "i");
+            return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + " ").append(Text.translatable("text.polyfactory.amount.ingot"));
         } else if (amount >= FluidConstants.NUGGET) {
             //noinspection PointlessArithmeticExpression
             long buckets = amount / (FluidConstants.NUGGET / 1000);
-            return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + "n");
+            return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + " ").append(Text.translatable("text.polyfactory.amount.nuggets"));
         } else if (amount != 0) {
             return Text.literal((amount) + "d");
         } else {

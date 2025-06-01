@@ -27,6 +27,8 @@ import it.unimi.dsi.fastutil.booleans.BooleanList;
 import it.unimi.dsi.fastutil.floats.FloatList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.minecraft.advancement.criterion.Criteria;
+import net.minecraft.advancement.criterion.RecipeCraftedCriterion;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -149,6 +151,11 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
 
                 for (var x : result) {
                     self.fluidContainer.insert(x, false);
+                }
+
+                if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
+                    TriggerCriterion.trigger(player, FactoryTriggers.SMELTERY_MELTS);
+                    Criteria.RECIPE_CRAFTED.trigger(player, self.recipes[i].id(), List.of());
                 }
             } else if (self.world.getServer().getTicks() % 4 == 0) {
                 var x = Math.max(self.progress[i] - 1, -1);
@@ -416,7 +423,6 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
             var active = IndustrialSmelteryBlockEntity.this.fuelTicks > 0;
             if (!this.active && active) {
                 this.active = true;
-                TriggerCriterion.trigger(this.player, FactoryTriggers.FUEL_STEAM_ENGINE);
             }
             this.setSlot(9 * 3 + 2, GuiTextures.FLAME.getCeil(fuelProgress()));
             super.onTick();
