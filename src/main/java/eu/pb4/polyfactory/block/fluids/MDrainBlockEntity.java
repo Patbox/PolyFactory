@@ -46,6 +46,8 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -246,20 +248,20 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.writeInventoryNbt(nbt, lookup);
-        nbt.putDouble("Progress", this.process);
-        nbt.put("fluid", this.fluidContainer.toNbt(lookup));
-        super.writeNbt(nbt, lookup);
+    protected void writeData(WriteView view) {
+        this.writeInventoryView(view);
+        view.putDouble("Progress", this.process);
+        this.fluidContainer.writeData(view, "fluid");
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.readInventoryNbt(nbt, lookup);
-        this.process = nbt.getDouble("Progress", 0);
-        this.fluidContainer.fromNbt(lookup, nbt, "fluid");
+    public void readData(ReadView view) {
+        this.readInventoryView(view);
+        this.process = view.getDouble("Progress", 0);
+        this.fluidContainer.readData(view, "fluid");
         this.inventoryChanged = true;
-        super.readNbt(nbt, lookup);
+        super.readData(view);
     }
 
     @Override
@@ -279,9 +281,9 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
     }
 
     @Override
-    public void removeFromCopiedStackNbt(NbtCompound nbt) {
-        super.removeFromCopiedStackNbt(nbt);
-        nbt.remove("fluid");
+    public void removeFromCopiedStackData(WriteView view) {
+        super.removeFromCopiedStackData(view);
+        view.remove("fluid");
     }
 
     @Override
@@ -449,7 +451,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             this.setSlot(6 + 2 * 9, fluidSlot);
 
             this.setSlotRedirect(2, new Slot(MDrainBlockEntity.this, 0, 0, 0));
-            this.setSlotRedirect(9 + 5, new FurnaceOutputSlot(player,MDrainBlockEntity.this, 1, 1, 0));
+            this.setSlotRedirect(9 + 5, new FurnaceOutputSlot(player, MDrainBlockEntity.this, 1, 1, 0));
             this.setSlotRedirect(9 * 2 + 2, new TagLimitedSlot(MDrainBlockEntity.this, 2, FactoryItemTags.DRAIN_CATALYST) {
                 @Override
                 public int getMaxItemCount() {

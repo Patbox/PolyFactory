@@ -18,6 +18,8 @@ import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -181,14 +183,14 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
     }
 
     @Override
-    protected void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
-        this.fuse = nbt.getShort("fuse", (short) 0);
+    protected void readCustomData(ReadView view) {
+        super.readCustomData(view);
+        this.fuse = view.getShort("fuse", (short) 0);
     }
 
     @Override
-    protected void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
-        nbt.putShort("fuse", (short) this.fuse);
+    protected void writeCustomData(WriteView view) {
+        super.writeCustomData(view);
+        view.putShort("fuse", (short) this.fuse);
     }
 }

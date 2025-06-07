@@ -8,6 +8,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -20,15 +22,15 @@ public class PumpBlockEntity extends PipeLikeBlockEntity {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
-        nbt.putDouble("speed", this.speed);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putDouble("speed", this.speed);
     }
 
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        this.speed = nbt.getDouble("speed", 0);
+    protected void readData(ReadView view) {
+        super.readData(view);
+        this.speed = view.getDouble("speed", 0);
     }
 
     @Override

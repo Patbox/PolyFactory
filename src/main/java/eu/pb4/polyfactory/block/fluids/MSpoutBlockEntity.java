@@ -39,6 +39,8 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.*;
@@ -49,7 +51,7 @@ import org.joml.Quaternionf;
 
 import java.util.List;
 
-public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
+public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
 
     public static final int OUTPUT_FIRST = 1;
     public static final int INPUT_FIRST = 0;
@@ -78,6 +80,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
     private SingleItemWithFluid asInput() {
         return SingleItemWithFluid.of(this.getStack(INPUT_FIRST).copy(), fluidContainer, (ServerWorld) world);
     }
+
     public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
         var self = (MSpoutBlockEntity) t;
 
@@ -183,7 +186,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
 
             if (damage > 0) {
                 var x = inputStack.copy();
-                inputStack.damage(damage, (ServerWorld) world,null, Consumers.nop());
+                inputStack.damage(damage, (ServerWorld) world, null, Consumers.nop());
                 if (inputStack.isEmpty()) {
                     if (x.contains(DataComponentTypes.BREAK_SOUND)) {
                         world.playSound(null, pos, x.get(DataComponentTypes.BREAK_SOUND).value(), SoundCategory.BLOCKS);
@@ -203,7 +206,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
             world.playSound(null, pos, self.currentRecipe.value().soundEvent().value(), SoundCategory.BLOCKS);
             self.process = 0;
             self.isCooling = false;
-            self.model.setProgress(false,0, null);
+            self.model.setProgress(false, 0, null);
             self.markDirty();
         } else {
             var speed = Math.min(Math.abs(strength) * 1, 1);
@@ -267,20 +270,20 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.writeInventoryNbt(nbt, lookup);
-        nbt.putDouble("Progress", this.process);
-        nbt.putBoolean("is_cooling", this.isCooling);
-        super.writeNbt(nbt, lookup);
+    protected void writeData(WriteView view) {
+        this.writeInventoryView(view);
+        view.putDouble("Progress", this.process);
+        view.putBoolean("is_cooling", this.isCooling);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.readInventoryNbt(nbt, lookup);
-        this.process = nbt.getDouble("Progress", 0);
-        this.isCooling = nbt.getBoolean("is_cooling", false);
+    public void readData(ReadView view) {
+        this.readInventoryView(view);
+        this.process = view.getDouble("Progress", 0);
+        this.isCooling = view.getBoolean("is_cooling", false);
         this.inventoryChanged = true;
-        super.readNbt(nbt, lookup);
+        super.readData(view);
     }
 
     @Override
@@ -294,8 +297,9 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity  {
     }
 
     @Override
-    public void removeFromCopiedStackNbt(NbtCompound nbt) {
-        super.removeFromCopiedStackNbt(nbt);
+    public void removeFromCopiedStackData(WriteView view) {
+        super.removeFromCopiedStackData(view);
+        view.remove("fluid");
     }
 
     @Override

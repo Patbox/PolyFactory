@@ -24,6 +24,8 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -50,18 +52,18 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.writeNbt(nbt, stacks, lookup);
-        super.writeNbt(nbt, lookup);
+    protected void writeData(WriteView view) {
+        Inventories.writeData(view, this.stacks);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.readNbt(nbt, this.stacks, lookup);
+    public void readData(ReadView view) {
+        Inventories.readData(view, this.stacks);
         if (this.world != null) {
             updateResult();
         }
-        super.readNbt(nbt, lookup);
+        super.readData(view);
         if (this.model != null) {
             for (int i = 0; i < 9; i++) {
                 this.markSlotDirty(i);
@@ -142,10 +144,10 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
             RecipeEntry<CraftingRecipe> recipeEntry = optional.get();
             CraftingRecipe craftingRecipe = recipeEntry.value();
             //if (result.shouldCraftRecipe(world, null, recipeEntry)) {
-                ItemStack itemStack2 = craftingRecipe.craft(this.createRecipeInput(), world.getRegistryManager());
-                if (itemStack2.isItemEnabled(world.getEnabledFeatures())) {
-                    itemStack = itemStack2;
-                }
+            ItemStack itemStack2 = craftingRecipe.craft(this.createRecipeInput(), world.getRegistryManager());
+            if (itemStack2.isItemEnabled(world.getEnabledFeatures())) {
+                itemStack = itemStack2;
+            }
             //}
             this.currentRecipe = recipeEntry;
         } else {

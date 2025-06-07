@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.util.movingitem;
 
+import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.item.ItemStack;
@@ -7,14 +8,16 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiConsumer;
-
 public class SimpleContainer implements ContainerHolder {
-    private static final AddedCallback NOOP_ADD = (a, b, c) -> {};
-    private static final RemovedCallback NOOP_REMOVE = (a, b) -> {};
+    private static final AddedCallback NOOP_ADD = (a, b, c) -> {
+    };
+    private static final RemovedCallback NOOP_REMOVE = (a, b) -> {
+    };
     private final int id;
 
     @Nullable
@@ -25,29 +28,60 @@ public class SimpleContainer implements ContainerHolder {
     public SimpleContainer() {
         this(-1, NOOP_ADD, NOOP_REMOVE);
     }
+
     public SimpleContainer(int id, AddedCallback added, RemovedCallback removed) {
         this.id = id;
         this.added = added;
         this.removed = removed;
     }
 
-    public static void readArray(SimpleContainer[] containers, NbtList items, RegistryWrapper.WrapperLookup lookup) {
-        var l = Math.min(containers.length, items.size());
+    public static void readArray(SimpleContainer[] containers, ReadView.ListReadView listView) {
+        if (listView.isEmpty()) {
+            for (var x : containers) {
+                x.clearContainer();
+            }
+        } else {
+            int i = 0;
+            for (var view : listView) {
+                containers[i].readData(view);
+                if (i++ >= containers.length) {
+                    break;
+                }
+            }
+        }
 
-        for (int i = 0; i < l; i++) {
-            if (items.get(i) instanceof NbtCompound compound) {
-                containers[i].readNbt(compound, lookup);
+
+    }
+
+    public static void writeArray(SimpleContainer[] containers, WriteView.ListAppender<ItemStack> appender) {
+        for (var container : containers) {
+            appender.add(container.getStack());
+        }
+    }
+
+    public void writeData(WriteView view) {
+        if (this.movingItem != null && !this.movingItem.get().isEmpty()) {
+            view.put(ItemStack.MAP_CODEC, this.getStack());
+        }
+    }
+
+    public void readData(ReadView view) {
+        if (view.getString("id", "").isEmpty()) {
+            this.clearContainer();
+        } else {
+            var stack = view.read(ItemStack.MAP_CODEC);
+            if (stack.isEmpty()) {
+                this.clearContainer();
+                return;
+            }
+            if (this.movingItem != null) {
+                this.movingItem.set(stack.get());
+            } else {
+                this.setContainer(new MovingItem(stack.get()));
             }
         }
     }
 
-    public static NbtElement writeArray(SimpleContainer[] containers, RegistryWrapper.WrapperLookup lookup) {
-        var list = new NbtList();
-        for (var cotnainer : containers) {
-            list.add(cotnainer.writeNbt(lookup));
-        }
-        return list;
-    }
 
     public static SimpleContainer[] createArray(int size, AddedCallback added, RemovedCallback removed) {
         var arr = new SimpleContainer[size];
@@ -96,20 +130,6 @@ public class SimpleContainer implements ContainerHolder {
             this.added.accept(this.id, container, false);
         } else {
             this.setContainer(null);
-        }
-    }
-
-    public NbtElement writeNbt(RegistryWrapper.WrapperLookup lookup) {
-        return this.movingItem == null || this.movingItem.get().isEmpty() ? new NbtCompound() : this.movingItem.get().toNbt(lookup);
-    }
-
-    public void readNbt(NbtCompound compound, RegistryWrapper.WrapperLookup lookup) {
-        var itemStack = FactoryUtil.fromNbtStack(lookup, compound);
-
-        if (itemStack == ItemStack.EMPTY) {
-            clearContainer();
-        } else {
-            setContainer(new MovingItem(itemStack));
         }
     }
 

@@ -565,9 +565,9 @@ public class FactoryUtil {
         return Codec.stringResolver(property::name, x -> property.parse(x).orElse(property.getValues().getFirst()));
     }
 
-    public static ItemStack fromNbtStack(RegistryWrapper.WrapperLookup lookup, NbtElement stack) {
+    /*public static ItemStack fromNbtStack(RegistryWrapper.WrapperLookup lookup, NbtElement stack) {
         return stack instanceof NbtCompound compound && compound.isEmpty() ? ItemStack.EMPTY : ItemStack.fromNbt(lookup, stack).orElse(ItemStack.EMPTY);
-    }
+    }*/
 
     public static <T> RegistryEntryList<T> fakeTagList(TagKey<T> tag) {
         return new RegistryEntryList<T>() {

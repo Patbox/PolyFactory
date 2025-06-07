@@ -7,6 +7,8 @@ import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.nbt.*;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -170,31 +172,26 @@ public class FluidContainerImpl implements FluidContainer {
         return this.fluidTemperature;
     }
 
-    public NbtElement toNbt(RegistryWrapper.WrapperLookup lookup) {
-        var nbt = new NbtList();
-        var ops = lookup.getOps(NbtOps.INSTANCE);
-
+    public void writeData(WriteView view, String key) {
+        var out = view.getList(key);
         storedFluids.forEach((a, b) -> {
-            var x = FluidInstance.MAP_CODEC.encode(a, ops, new RecordBuilder.MapBuilder<>(ops));
-            x.add("amount", NbtLong.of(b));
-            nbt.add(x.build(new NbtCompound()).getOrThrow());
+            var x = out.add();
+            x.put(FluidInstance.MAP_CODEC, a);
+            x.putLong("amount", b);
         });
-        return nbt;
     }
 
-    public void fromNbt(RegistryWrapper.WrapperLookup lookup, NbtCompound base, String fluidKey) {
-        var nbt = base.getListOrEmpty(fluidKey);
-        var ops = lookup.getOps(NbtOps.INSTANCE);
+    public void readData(ReadView view, String fluidKey) {
+        var nbt = view.getListReadView(fluidKey);
         this.storedFluids.clear();
         this.fluids.clear();
         this.stored = 0;
         for (var t : nbt) {
-            if (t instanceof NbtCompound cp) {
-                var type = FluidInstance.MAP_CODEC.decode(ops, ops.getMap(cp).getOrThrow()).getOrThrow();
-
-                var value = cp.getLong("amount", 0);
+            var type = t.read(FluidInstance.MAP_CODEC);
+            if (type.isPresent()) {
+                var value = t.getLong("amount", 0);
                 if (value != 0) {
-                    this.storedFluids.put(type, value);
+                    this.storedFluids.put(type.get(), value);
                     this.stored += value;
                 }
             }

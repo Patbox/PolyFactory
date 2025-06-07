@@ -1,12 +1,12 @@
 package eu.pb4.polyfactory.datagen;
 
 import eu.pb4.polyfactory.ModInit;
-import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
+import net.minecraft.data.tag.ProvidedTagBuilder;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
@@ -15,7 +15,6 @@ import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
@@ -67,7 +66,7 @@ public class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
         var x = this.getOrCreateTagBuilder(FactoryItemTags.ROOT_ADVANCEMENT);
         for (var item : Registries.ITEM.getIds()) {
             if (item.getNamespace().equals(ModInit.ID)) {
-                x.add(item);
+                x.add(Registries.ITEM.get(item));
             }
         }
 
@@ -126,8 +125,8 @@ public class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
         ;
     }
 
-    @Override
-    public FabricTagProvider<Item>.FabricTagBuilder getOrCreateTagBuilder(TagKey<Item> tag) {
-        return super.getOrCreateTagBuilder(tag);
+
+    public ProvidedTagBuilder<Item, Item> getOrCreateTagBuilder(TagKey<Item> tag) {
+        return super.valueLookupBuilder(tag);
     }
 }

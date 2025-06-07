@@ -11,6 +11,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
@@ -32,14 +34,14 @@ public class SplitterBlockEntity extends LockableBlockEntity implements BlockEnt
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+    protected void writeData(WriteView view) {
         if (!this.filterStackLeft.isEmpty()) {
-            nbt.put("FilterStackLeft", this.filterStackLeft.toNbt(lookup));
+            view.put("FilterStackLeft", ItemStack.OPTIONAL_CODEC, this.filterStackLeft);
         }
         if (!this.filterStackRight.isEmpty()) {
-            nbt.put("FilterStackRight", this.filterStackRight.toNbt(lookup));
+            view.put("FilterStackRight", ItemStack.OPTIONAL_CODEC, this.filterStackRight);
         }
-        nbt.putByte("CurPos", (byte) this.position);
+        view.putByte("CurPos", (byte) this.position);
     }
 
     private void updateHologram() {
@@ -50,13 +52,13 @@ public class SplitterBlockEntity extends LockableBlockEntity implements BlockEnt
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.filterStackLeft = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("FilterStackLeft"));
-        this.filterStackRight = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("FilterStackRight"));
+    public void readData(ReadView view) {
+        this.filterStackLeft = view.read("FilterStackLeft", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        this.filterStackRight = view.read("FilterStackRight", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         this.filterRight = FilterData.of(this.filterStackRight, false);
         this.filterLeft = FilterData.of(this.filterStackLeft, false);
         this.filtersEqual = Objects.equals(this.filterLeft.filter(), this.filterRight.filter());
-        this.position = nbt.getByte("CurPos", (byte) 0);
+        this.position = view.getByte("CurPos", (byte) 0);
     }
 
     public int pos(int max) {

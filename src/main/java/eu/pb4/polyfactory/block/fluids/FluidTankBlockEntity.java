@@ -20,6 +20,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -47,15 +49,15 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
-        nbt.put("fluid", this.container.toNbt(registryLookup));
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        this.container.writeData(view, "fluid");
     }
 
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        this.container.fromNbt(registryLookup, nbt, "fluid");
+    protected void readData(ReadView view) {
+        super.readData(view);
+        this.container.readData(view, "fluid");
         if (!this.postInitialRead) {
             updateModel();
             this.postInitialRead = true;
@@ -79,9 +81,9 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
     }
 
     @Override
-    public void removeFromCopiedStackNbt(NbtCompound nbt) {
-        super.removeFromCopiedStackNbt(nbt);
-        nbt.remove("fluid");
+    public void removeFromCopiedStackData(WriteView view) {
+        super.removeFromCopiedStackData(view);
+        view.remove("fluid");
     }
 
     @Override

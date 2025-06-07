@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.ArrayList;
@@ -55,14 +56,6 @@ public interface DataContainer extends Comparable<DataContainer> {
             case "" -> this;
             default -> empty();
         };
-    }
-
-    static DataContainer fromNbt(NbtElement compound, RegistryWrapper.WrapperLookup lookup) {
-        return CODEC.decode(lookup.getOps(NbtOps.INSTANCE), compound).getOrThrow().getFirst();
-    }
-
-    default NbtElement createNbt(RegistryWrapper.WrapperLookup lookup) {
-        return CODEC.encodeStart(lookup.getOps(NbtOps.INSTANCE), this).getOrThrow();
     }
 
     default boolean isTrue() {

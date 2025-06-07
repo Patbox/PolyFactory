@@ -14,6 +14,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -32,19 +34,16 @@ public class FilteredPipeBlockEntity extends PipeLikeBlockEntity implements Bloc
 
 
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        if (nbt.contains("allowed_fluid")) {
-            this.setAllowedFluid(FluidInstance.CODEC.decode(registryLookup.getOps(NbtOps.INSTANCE), nbt.getCompoundOrEmpty("allowed_fluid"))
-                    .result().map(Pair::getFirst).orElse(null));
-        }
+    protected void readData(ReadView view) {
+        super.readData(view);
+        this.setAllowedFluid(view.read("allowed_fluid", FluidInstance.CODEC).orElse(null));
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
         if (this.allowedFluid != null) {
-            nbt.put("allowed_fluid", FluidInstance.CODEC.encodeStart(registryLookup.getOps(NbtOps.INSTANCE), this.allowedFluid).getOrThrow());
+            view.put("allowed_fluid", FluidInstance.CODEC, this.allowedFluid);
         }
     }
 

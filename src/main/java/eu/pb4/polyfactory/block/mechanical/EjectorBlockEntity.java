@@ -9,6 +9,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -45,20 +47,22 @@ public class EjectorBlockEntity extends BlockEntity implements BlockEntityExtraL
         }
     }
 
-    @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
-        super.writeNbt(nbt, registries);
-        nbt.putFloat("angle", this.angle);
-        nbt.putFloat("strength", this.strength);
-        nbt.putFloat("progress", this.progress);
-    }
 
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
-        super.readNbt(nbt, registries);
-        this.angle = nbt.getFloat("angle", 45);
-        this.strength = nbt.getFloat("strength", 2);
-        this.progress = nbt.getFloat("process", 0);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putFloat("angle", this.angle);
+        view.putFloat("strength", this.strength);
+        view.putFloat("progress", this.progress);
+    }
+
+
+    @Override
+    protected void readData(ReadView view) {
+        super.readData(view);
+        this.angle = view.getFloat("angle", 45);
+        this.strength = view.getFloat("strength", 2);
+        this.progress = view.getFloat("process", 0);
     }
 
     public void setAngle(float angle) {

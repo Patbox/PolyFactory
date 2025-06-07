@@ -13,6 +13,8 @@ import net.minecraft.component.ComponentsAccess;
 import net.minecraft.component.ComponentsAccess;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +30,7 @@ public class DataMemoryBlockEntity extends LockableBlockEntity implements DataCa
     protected DataMemoryBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
+
     public DataContainer data() {
         return data;
     }
@@ -39,27 +42,26 @@ public class DataMemoryBlockEntity extends LockableBlockEntity implements DataCa
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.readNbt(nbt, lookup);
-        if (nbt.contains("channel")) {
-            this.channelInput = this.channelOutput = nbt.getInt("channel", 0);
+    public void readData(ReadView view) {
+        super.readData(view);
+        if (view.getInt("channel", -999) != -999) {
+            this.channelInput = this.channelOutput = view.getInt("channel", 0);
         } else {
-            this.channelInput = nbt.getInt("input_channel", 0);
-            this.channelOutput = nbt.getInt("output_channel", 0);
+            this.channelInput = view.getInt("input_channel", 0);
+            this.channelOutput = view.getInt("output_channel", 0);
         }
 
-        if (nbt.contains("data")) {
-            this.data = DataContainer.fromNbt(nbt.getCompoundOrEmpty("data"), lookup);
-        }
+        this.data = view.read("data", DataContainer.CODEC).orElse(DataContainer.empty());
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.writeNbt(nbt, lookup);
-        nbt.putInt("input_channel", this.channelInput);
-        nbt.putInt("output_channel", this.channelOutput);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putInt("input_channel", this.channelInput);
+        view.putInt("output_channel", this.channelOutput);
 
-        nbt.put("data", this.data.createNbt(lookup));}
+        view.put("data", DataContainer.CODEC, this.data);
+    }
 
     public int inputChannel() {
         return this.channelInput;
@@ -97,14 +99,14 @@ public class DataMemoryBlockEntity extends LockableBlockEntity implements DataCa
     protected void readComponents(ComponentsAccess components) {
         super.readComponents(components);
         this.data = components.getOrDefault(FactoryDataComponents.STORED_DATA, this.data);
-        this.channelOutput  = components.getOrDefault(FactoryDataComponents.CHANNEL, this.outputChannel());
+        this.channelOutput = components.getOrDefault(FactoryDataComponents.CHANNEL, this.outputChannel());
     }
 
     @Override
-    public void removeFromCopiedStackNbt(NbtCompound nbt) {
-        super.removeFromCopiedStackNbt(nbt);
-        nbt.remove("channel");
-        nbt.remove("data");
+    public void removeFromCopiedStackData(WriteView view) {
+        super.removeFromCopiedStackData(view);
+        view.remove("channel");
+        view.remove("data");
     }
 
     @Override

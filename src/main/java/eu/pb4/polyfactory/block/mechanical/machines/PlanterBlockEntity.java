@@ -31,6 +31,8 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -57,35 +59,30 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.writeNbt(nbt, this.items, lookup);
-        nbt.putDouble("progress", this.process);
+    protected void writeData(WriteView view) {
+        Inventories.writeData(view, this.items);
+        view.putDouble("progress", this.process);
         if (this.owner != null) {
-            nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+            view.put("owner", NbtCompound.CODEC, LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
-        nbt.putInt("radius", this.radius);
-        super.writeNbt(nbt, lookup);
+        view.putInt("radius", this.radius);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        if (nbt.contains("stack") && !nbt.contains("Items")) {
-            this.setStack(0, FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("stack")));
+    public void readData(ReadView view) {
+        if (!view.getReadView("stack").getString("id", "").isEmpty() && view.getListReadView("Items").isEmpty()) {
+            this.setStack(0, view.read("stack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY));
         } else {
-            Inventories.readNbt(nbt, this.items, lookup);
+            Inventories.readData(view, this.items);
         }
 
-        this.process = nbt.getDouble("progress", 0);
-        if (nbt.contains("owner")) {
-            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompoundOrEmpty("owner"));
-        }
-        if (nbt.contains("radius")) {
-            this.radius = nbt.getInt("radius", 2);
-        } else {
-            this.radius = 1;
-        }
+        this.process = view.getDouble("progress", 0);
+        view.read("owner", NbtCompound.CODEC).ifPresent(x -> this.owner = LegacyNbtHelper.toGameProfile(x));
 
-        super.readNbt(nbt, lookup);
+        this.radius = view.getInt("radius", 1);
+
+        super.readData(view);
     }
 
     @Override

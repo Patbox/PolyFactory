@@ -48,7 +48,7 @@ public record ColoringCraftingRecipe(String group, Item input, Ingredient dye, i
     }
 
     private static Ingredient defaultDyes(RegistryEntryLookup<Item> itemWrap) {
-        return Ingredient.fromTag(itemWrap.getOrThrow(ConventionalItemTags.DYES));
+        return Ingredient.ofTag(itemWrap.getOrThrow(ConventionalItemTags.DYES));
     }
 
     @Override

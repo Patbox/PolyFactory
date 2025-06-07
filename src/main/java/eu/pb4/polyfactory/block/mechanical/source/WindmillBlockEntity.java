@@ -15,6 +15,8 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -36,24 +38,21 @@ public class WindmillBlockEntity extends BlockEntity {
 
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        var list = new NbtList();
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        var list = view.getListAppender("Sails", ItemStack.OPTIONAL_CODEC);
         for (var sail : this.sails) {
-            if (!sail.isEmpty()) {
-                list.add(sail.toNbt(lookup));
-            } else {
-                list.add(new NbtCompound());
-            }
+            list.add(sail);
         }
-        nbt.put("Sails", list);
     }
 
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+    public void readData(ReadView view) {
+        super.readData(view);
         this.sails.clear();
-        for (var sail : nbt.getListOrEmpty("Sails")) {
-            this.sails.add(FactoryUtil.fromNbtStack(lookup, sail));
+        for (var sail : view.getTypedListView("Sails", ItemStack.OPTIONAL_CODEC)) {
+            this.sails.add(sail);
         }
     }
 

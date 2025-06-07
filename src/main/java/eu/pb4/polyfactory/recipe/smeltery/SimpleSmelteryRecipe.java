@@ -50,11 +50,11 @@ public record SimpleSmelteryRecipe(String group, Ingredient ingredient, List<Flu
     }
 
     public static RecipeEntry<SimpleSmelteryRecipe> of(String group, TagKey<Item> ingredient, FluidStack<?> output, int time) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("smeltery/from_" + ingredient.id().getPath()), new SimpleSmelteryRecipe(group, Ingredient.fromTag(FactoryUtil.fakeTagList(ingredient)), List.of(output), time));
+        return new RecipeEntry<>(FactoryUtil.recipeKey("smeltery/from_" + ingredient.id().getPath()), new SimpleSmelteryRecipe(group, Ingredient.ofTag(FactoryUtil.fakeTagList(ingredient)), List.of(output), time));
     }
 
     public static RecipeEntry<SimpleSmelteryRecipe> of(TagKey<Item> ingredient, FluidStack<?> output, int time) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("smeltery/from_" + ingredient.id().getPath()), new SimpleSmelteryRecipe("",  Ingredient.fromTag(FactoryUtil.fakeTagList(ingredient)), List.of(output), time));
+        return new RecipeEntry<>(FactoryUtil.recipeKey("smeltery/from_" + ingredient.id().getPath()), new SimpleSmelteryRecipe("",  Ingredient.ofTag(FactoryUtil.fakeTagList(ingredient)), List.of(output), time));
     }
 
     @Override

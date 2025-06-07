@@ -1,9 +1,12 @@
 package eu.pb4.polyfactory.util.movingitem;
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 
 public interface InventorySimpleContainerProvider extends InventoryContainerHolderProvider{
     SimpleContainer[] getContainers();
@@ -13,12 +16,12 @@ public interface InventorySimpleContainerProvider extends InventoryContainerHold
         return this.getContainers()[slot];
     }
 
-    default void readInventoryNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        SimpleContainer.readArray(this.getContainers(), nbt.getListOrEmpty("Items"), lookup);
+    default void readInventoryView(ReadView view) {
+        SimpleContainer.readArray(this.getContainers(), view.getListReadView("Items"));
     }
 
-    default void writeInventoryNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("Items", SimpleContainer.writeArray(this.getContainers(), lookup));
+    default void writeInventoryView(WriteView view) {
+        SimpleContainer.writeArray(this.getContainers(), view.getListAppender("Items", ItemStack.OPTIONAL_CODEC));
     }
 
     @Override

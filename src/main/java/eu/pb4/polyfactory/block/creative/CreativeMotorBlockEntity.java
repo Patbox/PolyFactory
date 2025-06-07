@@ -13,6 +13,8 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 
@@ -30,18 +32,18 @@ public class CreativeMotorBlockEntity extends LockableBlockEntity {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.writeNbt(nbt, lookup);
-        nbt.putDouble("Speed", this.speed);
-        nbt.putDouble("Stress", this.stress);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putDouble("Speed", this.speed);
+        view.putDouble("Stress", this.stress);
     }
 
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.readNbt(nbt, lookup);
-        this.speed = nbt.getDouble("Speed", 0);
-        this.stress = nbt.getDouble("Stress", 0);
+    public void readData(ReadView view) {
+        super.readData(view);
+        this.speed = view.getDouble("Speed", 0);
+        this.stress = view.getDouble("Stress", 0);
     }
 
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {

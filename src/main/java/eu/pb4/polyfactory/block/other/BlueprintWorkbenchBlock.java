@@ -29,7 +29,7 @@ public class BlueprintWorkbenchBlock extends WorkbenchBlock {
     }
 
     private static void clickForCrafting(ServerPlayerEntity player, BlockPos blockPos) {
-        if (!player.isSneaking() && player.getServerWorld().getBlockEntity(blockPos) instanceof BlueprintWorkbenchBlockEntity be) {
+        if (!player.isSneaking() && player.getWorld().getBlockEntity(blockPos) instanceof BlueprintWorkbenchBlockEntity be) {
             be.clickForCrafting(player);
         }
     }

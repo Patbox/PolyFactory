@@ -4,6 +4,7 @@ import com.mojang.serialization.Dynamic;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.mixin.NbtReadViewAccessor;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -18,7 +19,9 @@ import net.minecraft.datafixer.TypeReferences;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.NbtReadView;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
@@ -27,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("UnstableApiUsage")
 public class ContainerBlockEntity extends LockableBlockEntity implements BlockEntityExtraListener, FilledStateProvider {
-    static  {
+    static {
         ItemStorage.SIDED.registerForBlockEntity((self, dir) -> self.storage, FactoryBlockEntities.CONTAINER);
     }
 
@@ -37,11 +40,10 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     public ContainerBlockEntity(BlockPos pos, BlockState state) {
         this(FactoryBlockEntities.CONTAINER, pos, state);
     }
-    public final SingleItemStorage storage = createStorage();
 
     protected ContainerBlockEntity(BlockEntityType<? extends ContainerBlockEntity> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
-    }
+    }    public final SingleItemStorage storage = createStorage();
 
     protected SingleItemStorage createStorage() {
         return new SingleItemStorage() {
@@ -69,34 +71,35 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.storage.writeNbt(nbt, lookup);
+    protected void writeData(WriteView view) {
+        this.storage.writeData(view);
         // amount -> long
         // variant -> { item -> string/id, tag -> compound/null }
-        super.writeNbt(nbt, lookup);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        try {
-            if (nbt.getCompoundOrEmpty("variant").contains("tag")) {
-                var hack = new NbtCompound();
-                var variant = nbt.getCompoundOrEmpty("variant");
-                hack.put("tag", variant.get("tag"));
-                hack.put("id", variant.get("item"));
-                hack.putInt("Count", 1);
-                var updated = (NbtCompound) Schemas.getFixer().update(TypeReferences.ITEM_STACK, new Dynamic<>(NbtOps.INSTANCE, hack), 3700, SharedConstants.getGameVersion().getSaveVersion().getId()).getValue();
-                variant.put("components", updated.get("components"));
+    public void readData(ReadView view) {
+        updateStackWithTick();
+        super.readData(view);
+        if (view instanceof NbtReadView) {
+            var nbt = ((NbtReadViewAccessor) view).getNbt();
+            try {
+                if (nbt.getCompoundOrEmpty("variant").contains("tag")) {
+                    var hack = new NbtCompound();
+                    var variant = nbt.getCompoundOrEmpty("variant");
+                    hack.put("tag", variant.get("tag"));
+                    hack.put("id", variant.get("item"));
+                    hack.putInt("Count", 1);
+                    var updated = (NbtCompound) Schemas.getFixer().update(TypeReferences.ITEM_STACK, new Dynamic<>(NbtOps.INSTANCE, hack), 3700, SharedConstants.WORLD_VERSION).getValue();
+                    variant.put("components", updated.get("components"));
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
-        } catch (Throwable e) {
-            e.printStackTrace();
         }
 
-
-        this.storage.readNbt(nbt, lookup);
-
-        updateStackWithTick();
-        super.readNbt(nbt, lookup);
+        this.storage.readData(view);
     }
 
     private void updateStack() {
@@ -116,7 +119,7 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     @Override
     public void onBlockReplaced(BlockPos pos, BlockState oldState) {
         super.onBlockReplaced(pos, oldState);
-        if (this.world != null){
+        if (this.world != null) {
             var count = this.storage.amount;
             var max = this.getItemStack().getMaxCount();
             while (count > 0) {
@@ -170,7 +173,6 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
         return this.storage.amount == 0;
     }
 
-
     @Override
     public void onListenerUpdate(WorldChunk chunk) {
         this.model = BlockBoundAttachment.get(chunk, this.pos).holder() instanceof ContainerBlock.Model model ? model : null;
@@ -191,4 +193,6 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     public long getFillCapacity() {
         return this.storage.getCapacity();
     }
+
+
 }

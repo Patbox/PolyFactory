@@ -32,6 +32,8 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
@@ -53,31 +55,26 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+    protected void writeData(WriteView view) {
         if (!this.stack.isEmpty()) {
-            nbt.put("stack", this.stack.toNbt(lookup));
+            view.put("stack", ItemStack.OPTIONAL_CODEC, this.stack);
         }
-        nbt.putDouble("progress", this.process);
+        view.putDouble("progress", this.process);
         if (this.owner != null) {
-            nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+            view.put("owner", NbtCompound.CODEC, LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
-        nbt.putInt("reach", this.reach);
-        if (nbt.contains("reach")) {
-            this.reach = nbt.getInt("reach", 1);
-        } else {
-            this.reach = 1;
-        }
-        super.writeNbt(nbt, lookup);
+        view.putInt("reach", this.reach);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.stack = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("tool"));
-        this.process = nbt.getDouble("progress", 0);
-        if (nbt.contains("owner")) {
-            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompoundOrEmpty("owner"));
-        }
-        super.readNbt(nbt, lookup);
+    public void readData(ReadView view) {
+        this.stack = view.read("tool", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        this.process = view.getDouble("progress", 0);
+        view.read("owner", NbtCompound.CODEC).ifPresent(x -> this.owner = LegacyNbtHelper.toGameProfile(x));
+
+        this.reach = view.getInt("reach", 1);
+        super.readData(view);
     }
 
     @Override
@@ -93,6 +90,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         }
         this.markDirty();
     }
+
     @Override
     public int getMaxCountPerStack() {
         return 64;
@@ -130,8 +128,8 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         }
 
 
-        if (!CommonProtection.canPlaceBlock(world, blockPos, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner,null) ||
-        !CommonProtection.canInteractBlock(world, blockPos, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner,null)) {
+        if (!CommonProtection.canPlaceBlock(world, blockPos, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner, null) ||
+                !CommonProtection.canInteractBlock(world, blockPos, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner, null)) {
             self.stress = 0;
             return;
         }
@@ -186,7 +184,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                 } else if (dir == Direction.DOWN) {
                     p.setYaw(0);
                     p.setPitch(90);
-                } else  {
+                } else {
                     p.setYaw(dir.getPositiveHorizontalDegrees());
                     p.setPitch(0);
                 }
@@ -219,7 +217,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                 } else if (dir == Direction.DOWN) {
                     p.setYaw(0);
                     p.setPitch(90);
-                } else  {
+                } else {
                     p.setYaw(dir.getPositiveHorizontalDegrees());
                     p.setPitch(0);
                 }
@@ -234,7 +232,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                         actionResult = self.stack.use(world, self.getFakePlayer(), Hand.MAIN_HAND);
                     }
                 }
-                if (actionResult instanceof ActionResult.Success success ) {
+                if (actionResult instanceof ActionResult.Success success) {
                     var newStack = success.getNewHandStack();
                     if (newStack != null) {
                         self.setStack(newStack);

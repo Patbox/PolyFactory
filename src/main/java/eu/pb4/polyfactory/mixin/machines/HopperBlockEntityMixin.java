@@ -15,6 +15,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -40,17 +42,16 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
         super(blockEntityType, blockPos, blockState);
     }
 
-    @Inject(method = "writeNbt", at = @At("TAIL"))
-    private void writeFilterNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
+    @Inject(method = "writeData", at = @At("TAIL"))
+    private void writeFilterNbt(WriteView view, CallbackInfo ci) {
         if (!this.filterStack.isEmpty()) {
-            nbt.put("polyfactory:filter", this.filterStack.toNbt(registryLookup));
+            view.put("polyfactory:filter", ItemStack.CODEC, this.filterStack);
         }
     }
 
-    @Inject(method = "readNbt", at = @At("TAIL"))
-    private void readFilterNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
-        polyfactory$setFilter(FactoryUtil.fromNbtStack(registryLookup, nbt.getCompound("polyfactory:filter")
-                .orElse(nbt.getCompoundOrEmpty("polydex:filter"))));
+    @Inject(method = "readData", at = @At("TAIL"))
+    private void readFilterNbt(ReadView view, CallbackInfo ci) {
+        polyfactory$setFilter(view.read("polyfactory:filter", ItemStack.OPTIONAL_CODEC).orElse(view.read("polydex:filter", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY)));
     }
 
     @Inject(method = "transfer(Lnet/minecraft/inventory/Inventory;Lnet/minecraft/inventory/Inventory;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/math/Direction;)Lnet/minecraft/item/ItemStack;", at = @At("HEAD"), cancellable = true)

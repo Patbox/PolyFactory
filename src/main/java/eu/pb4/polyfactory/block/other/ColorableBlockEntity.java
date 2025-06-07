@@ -8,6 +8,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
@@ -22,15 +24,15 @@ public class ColorableBlockEntity extends BlockEntity implements BlockEntityExtr
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.writeNbt(nbt, lookup);
-        nbt.putInt("color", this.color);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putInt("color", this.color);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.readNbt(nbt, lookup);
-        setColor(nbt.getInt("color", 0));
+    public void readData(ReadView view) {
+        super.readData(view);
+        setColor(view.getInt("color", 0));
     }
 
     @Override
@@ -52,7 +54,7 @@ public class ColorableBlockEntity extends BlockEntity implements BlockEntityExtr
 
     @Override
     public void onListenerUpdate(WorldChunk chunk) {
-        this.model = (ColorProvider.Consumer) BlockBoundAttachment.get(chunk, this.getPos()).holder();
+        this.model = (Consumer) BlockBoundAttachment.get(chunk, this.getPos()).holder();
         this.model.setColor(this.color);
     }
 

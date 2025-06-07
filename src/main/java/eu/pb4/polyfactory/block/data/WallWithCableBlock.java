@@ -160,7 +160,7 @@ public class WallWithCableBlock extends AbstracterCableBlock implements PolymerB
                         newState = newState.with(getProperty(dir), newState.get(getProperty(dir)).cable(true));
                     }
                     if (placer instanceof ServerPlayerEntity serverPlayer && (!hasReceivers || !hasProviders)) {
-                        var net = NetworkComponent.Data.getLogic(serverPlayer.getServerWorld(), newPos);
+                        var net = NetworkComponent.Data.getLogic(serverPlayer.getWorld(), newPos);
                         if (net.hasReceivers()) {
                             hasReceivers = true;
                         }

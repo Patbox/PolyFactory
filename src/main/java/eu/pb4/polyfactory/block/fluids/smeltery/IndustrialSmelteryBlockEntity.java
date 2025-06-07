@@ -42,6 +42,8 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
@@ -223,23 +225,23 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.writeNbt(nbt, this.items, lookup);
-        nbt.put("fluids", this.fluidContainer.toNbt(lookup));
-        nbt.putInt("fuel_ticks", this.fuelTicks);
-        nbt.putInt("fuel_initial", this.fuelInitial);
-        nbt.put("positioned_states", BLOCK_STATE_LIST_CODEC, this.positionedStates);
-        super.writeNbt(nbt, lookup);
+    protected void writeData(WriteView view) {
+        Inventories.writeData(view, this.items);
+        this.fluidContainer.writeData(view, "fluids");
+        view.putInt("fuel_ticks", this.fuelTicks);
+        view.putInt("fuel_initial", this.fuelInitial);
+        view.put("positioned_states", BLOCK_STATE_LIST_CODEC, this.positionedStates);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.readNbt(nbt, items, lookup);
-        this.fluidContainer.fromNbt(lookup, nbt, "fluids");
-        this.fuelInitial = nbt.getInt("fuel_initial", 0);
-        this.fuelTicks = nbt.getInt("fuel_ticks", 0);
-        this.positionedStates = nbt.get("positioned_states", BLOCK_STATE_LIST_CODEC).orElse(List.of());
-        super.readNbt(nbt, lookup);
+    public void readData(ReadView view) {
+        Inventories.readData(view, items);
+        this.fluidContainer.readData(view, "fluids");
+        this.fuelInitial = view.getInt("fuel_initial", 0);
+        this.fuelTicks = view.getInt("fuel_ticks", 0);
+        this.positionedStates = view.read("positioned_states", BLOCK_STATE_LIST_CODEC).orElse(List.of());
+        super.readData(view);
         Arrays.fill(this.currentStacks, ItemStack.EMPTY);
     }
 
@@ -349,7 +351,7 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                 for (int y = 0; y < 5; y++) {
                     this.setSlot(9 * y + 5 + x, fluid);
                 }
-                var slot = new FuelSlot(IndustrialSmelteryBlockEntity.this, 9 + x, player.getServerWorld().getFuelRegistry());
+                var slot = new FuelSlot(IndustrialSmelteryBlockEntity.this, 9 + x, player.getWorld().getFuelRegistry());
 
                 this.setSlotRedirect(9 * 4 + 1 + x, slot);
                 this.fuelSlots.add(slot);

@@ -27,6 +27,8 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -192,25 +194,25 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.writeNbt(nbt, this.stacks, lookup);
+    protected void writeData(WriteView view) {
+        Inventories.writeData(view, this.stacks);
         if (this.activate) {
-            nbt.putDouble("Progress", this.process);
-            nbt.putBoolean("is_cooling", this.isCooling);
+            view.putDouble("Progress", this.process);
+            view.putBoolean("is_cooling", this.isCooling);
         }
 
-        super.writeNbt(nbt, lookup);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.readNbt(nbt, this.stacks, lookup);
-        if (nbt.contains("Progress")) {
-            this.process = nbt.getDouble("Progress", 0);
-            this.isCooling = nbt.getBoolean("is_cooling", false);
+    public void readData(ReadView view) {
+        Inventories.readData(view, this.stacks);
+        if (view.getDouble("Progress", Double.POSITIVE_INFINITY) != Double.POSITIVE_INFINITY) {
+            this.process = view.getDouble("Progress", 0);
+            this.isCooling = view.getBoolean("is_cooling", false);
             this.activate = true;
         }
-        super.readNbt(nbt, lookup);
+        super.readData(view);
     }
 
     @Override

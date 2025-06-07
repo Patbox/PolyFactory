@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.mixin.ProjectileEntityAccessor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LazyEntityReference;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -66,7 +67,7 @@ public record ShootProjectileEntity<T>(EntityCreator<T> entityCreator,
         for (int i = 0; i < this.splashPerTick; i++) {
             var entity = entityCreator.createEntity(world, fluidInstance, amount);
             if (entity instanceof ProjectileEntity projectile) {
-                ((ProjectileEntityAccessor) projectile).setOwnerUuid(context.uuid());
+                ((ProjectileEntityAccessor) projectile).setOwner(new LazyEntityReference<>(context.uuid()));
 
                 if (!context.isEntity()) {
                     ((ProjectileEntityAccessor) projectile).setLeftOwner(true);

@@ -30,6 +30,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -53,18 +55,18 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.writeNbt(nbt, stacks, lookup);
-        super.writeNbt(nbt, lookup);
+    protected void writeData(WriteView view) {
+        Inventories.writeData(view, this.stacks);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.readNbt(nbt, this.stacks, lookup);
+    public void readData(ReadView view) {
+        Inventories.readData(view, this.stacks);
         for (int i = 0; i < 9; i++) {
             this.filters.set(i, FilterData.of(this.stacks.get(i), false));
         }
-        super.readNbt(nbt, lookup);
+        super.readData(view);
         if (this.world != null) {
             this.updatePreview();
         }
@@ -118,12 +120,12 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
         }
         var input = CraftingRecipeInput.create(3, 3, list);
 
-        var optional = this.recipe.getFirstMatch(input, player.getServerWorld());
+        var optional = this.recipe.getFirstMatch(input, player.getWorld());
         if (optional.isEmpty()) {
             return;
         }
         var recipe = optional.get().value();
-        var result = recipe.craft(input, player.getServerWorld().getRegistryManager());
+        var result = recipe.craft(input, player.getWorld().getRegistryManager());
         if (result.isEmpty()) {
             return;
         }

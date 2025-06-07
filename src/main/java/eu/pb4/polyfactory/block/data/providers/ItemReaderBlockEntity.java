@@ -27,6 +27,8 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -36,7 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements SingleStackInventory, ChanneledDataCache, BlockEntityExtraListener {
-    private static final String[] NO_DATA = new String[] { "" };
+    private static final String[] NO_DATA = new String[]{""};
     private ItemStack stack = ItemStack.EMPTY;
     private int page = 0;
     private String[] lines = NO_DATA;
@@ -52,20 +54,18 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.readNbt(nbt, lookup);
-        this.stack = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("stack"));
-        this.page = nbt.getInt("page", 0);
+    public void readData(ReadView view) {
+        super.readData(view);
+        this.stack = view.read("stack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        this.page = view.getInt("page", 0);
         forceUpdate();
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.writeNbt(nbt, lookup);
-        if (!this.stack.isEmpty()) {
-            nbt.put("stack", this.stack.toNbt(lookup));
-        }
-        nbt.putInt("page", this.page);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.put("stack", ItemStack.OPTIONAL_CODEC, this.stack);
+        view.putInt("page", this.page);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
             var song = JukeboxSong.getSongEntryFromStack(this.world.getRegistryManager(), this.stack);
             this.lines = song.map(jukeboxSongRegistryEntry -> new String[]{jukeboxSongRegistryEntry.value().description().getString()}).orElseGet(() -> new String[]{this.stack.getName().getString()});
         } else if (!this.stack.isEmpty()) {
-            this.lines = new String[] { this.stack.getName().getString() };
+            this.lines = new String[]{this.stack.getName().getString()};
         } else {
             this.lines = NO_DATA;
         }
@@ -128,6 +128,7 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
             }
         }
     }
+
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
         return this.stack.isEmpty();

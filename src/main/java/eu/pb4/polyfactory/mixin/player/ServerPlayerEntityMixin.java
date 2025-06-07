@@ -29,8 +29,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements La
     @Unique
     private double lastFanY = -9999;
 
-    public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
-        super(world, pos, yaw, gameProfile);
+    public ServerPlayerEntityMixin(World world, GameProfile gameProfile) {
+        super(world, gameProfile);
     }
 
     @Override

@@ -29,6 +29,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -75,21 +77,17 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     }
 
     @Override
-    protected void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
+    protected void writeCustomData(WriteView view) {
+        super.writeCustomData(view);
         if (this.data != this.fluid.defaultData()) {
-            nbt.put("fluid_data", this.fluid.dataCodec().encodeStart(this.getRegistryManager().getOps(NbtOps.INSTANCE), this.data).getOrThrow());
+            view.put("fluid_data", this.fluid.dataCodec(), this.data);
         }
     }
 
     @Override
-    protected void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
-        if (nbt.contains("fluid_data")) {
-            this.data = this.fluid.dataCodec().decode(this.getRegistryManager().getOps(NbtOps.INSTANCE), nbt.get("fluid_data")).result().map(Pair::getFirst).orElse(fluid.defaultData());
-        } else {
-            this.data = this.fluid.defaultData();
-        }
+    protected void readCustomData(ReadView view) {
+        super.readCustomData(view);
+        this.data = view.read("fluid_data", this.fluid.dataCodec()).orElse(this.fluid.defaultData());
     }
 
     public ParticleEffect getBaseParticle() {
@@ -240,8 +238,8 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
         if (this.getOwner() instanceof PlayerEntity player) {
             this.profile = player.getGameProfile();
         } else if (this.profile == null) {
-            var x = ((ProjectileEntityAccessor) this).getOwnerUuid();
-            this.profile = new GameProfile(x != null ? x : this.getUuid(), "Splash");
+            var x = ((ProjectileEntityAccessor) this).getOwner();
+            this.profile = new GameProfile(x != null ? x.getUuid() : this.getUuid(), "Splash");
         }
         return this.profile;
     }

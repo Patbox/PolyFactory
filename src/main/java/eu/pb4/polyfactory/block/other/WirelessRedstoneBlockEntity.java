@@ -11,6 +11,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -20,7 +22,7 @@ import net.minecraft.world.chunk.WorldChunk;
 public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements BlockEntityExtraListener {
     private ItemStack key1 = ItemStack.EMPTY;
     private ItemStack key2 = ItemStack.EMPTY;
-    private WirelessRedstoneBlockEntity.ItemUpdater model;
+    private ItemUpdater model;
 
     public WirelessRedstoneBlockEntity(BlockPos pos, BlockState state) {
         this(FactoryBlockEntities.WIRELESS_REDSTONE, pos, state);
@@ -31,22 +33,22 @@ public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements 
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+    protected void writeData(WriteView view) {
         if (!this.key1.isEmpty()) {
-            nbt.put("key1", this.key1.toNbt(lookup));
+            view.put("key1", ItemStack.OPTIONAL_CODEC, this.key1);
         }
         if (!this.key2.isEmpty()) {
-            nbt.put("key2", this.key2.toNbt(lookup));
+            view.put("key2", ItemStack.OPTIONAL_CODEC, this.key2);
         }
-        super.writeNbt(nbt, lookup);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.key1 = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("key1"));
-        this.key2 = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("key2"));
+    public void readData(ReadView view) {
+        this.key1 = view.read("key1", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        this.key2 = view.read("key2", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         updateStack();
-        super.readNbt(nbt, lookup);
+        super.readData(view);
     }
 
     private void updateStack() {
@@ -58,7 +60,7 @@ public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements 
     private void updateStackWithTick() {
         updateStack();
         if (this.model != null && this.world != null) {
-                model.tick();
+            model.tick();
         }
     }
 

@@ -28,6 +28,8 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
@@ -37,7 +39,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockEntityExtraListener, FilledStateProvider, SingleStackInventory {
-    static  {
+    static {
         ItemStorage.SIDED.registerForBlockEntity((self, dir) -> {
             var facing = self.getCachedState().get(ItemPackerBlock.FACING);
 
@@ -64,17 +66,17 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.writeNbt(nbt, lookup);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
         if (!this.itemStack.isEmpty()) {
-            nbt.put("item", this.itemStack.toNbt(lookup));
+            view.put("item", ItemStack.OPTIONAL_CODEC, this.itemStack);
         }
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.readNbt(nbt, lookup);
-        setStack(FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("item")));
+    public void readData(ReadView view) {
+        super.readData(view);
+        setStack(view.read("item", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY));
     }
 
     @Override

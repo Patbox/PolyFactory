@@ -9,6 +9,7 @@
     "ExperienceOrbEntityAccessor",
     "FallingBlockAccessor",
     "ItemEntityAccessor",
+    "NbtReadViewAccessor",
     "ProjectileEntityAccessor",
     "ServerRecipeManagerAccessor",
     "SettingsAccessor",

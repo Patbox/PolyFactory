@@ -16,7 +16,7 @@ class EntityTagsProvider extends FabricTagProvider.EntityTypeTagProvider {
 
     @Override
     protected void configure(RegistryWrapper.WrapperLookup arg) {
-        this.getOrCreateTagBuilder(FactoryEntityTags.GRID_PASSABLE)
+        this.valueLookupBuilder(FactoryEntityTags.GRID_PASSABLE)
                 .addOptionalTag(EntityTypeTags.ARROWS)
                 .addOptionalTag(EntityTypeTags.IMPACT_PROJECTILES)
                 .add(EntityType.ITEM)

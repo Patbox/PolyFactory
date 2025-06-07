@@ -59,15 +59,15 @@ public class EnchantmentProvider extends FabricCodecDataProvider<Enchantment> {
 
         @Override
         protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
-            this.getOrCreateTagBuilder(EnchantmentTags.IN_ENCHANTING_TABLE)
-                    .addOptional(FactoryEnchantments.IGNORE_MOVEMENT);
+            this.getTagBuilder(EnchantmentTags.IN_ENCHANTING_TABLE)
+                    .addOptional(FactoryEnchantments.IGNORE_MOVEMENT.getValue());
 
-            this.getOrCreateTagBuilder(EnchantmentTags.TRADEABLE)
-                    .addOptional(FactoryEnchantments.IGNORE_MOVEMENT);
-            this.getOrCreateTagBuilder(EnchantmentTags.DESERT_COMMON_TRADE)
-                    .addOptional(FactoryEnchantments.IGNORE_MOVEMENT);
-            this.getOrCreateTagBuilder(EnchantmentTags.ON_TRADED_EQUIPMENT)
-                    .addOptional(FactoryEnchantments.IGNORE_MOVEMENT);
+            this.getTagBuilder(EnchantmentTags.TRADEABLE)
+                    .addOptional(FactoryEnchantments.IGNORE_MOVEMENT.getValue());
+            this.getTagBuilder(EnchantmentTags.DESERT_COMMON_TRADE)
+                    .addOptional(FactoryEnchantments.IGNORE_MOVEMENT.getValue());
+            this.getTagBuilder(EnchantmentTags.ON_TRADED_EQUIPMENT)
+                    .addOptional(FactoryEnchantments.IGNORE_MOVEMENT.getValue());
         }
     }
 }

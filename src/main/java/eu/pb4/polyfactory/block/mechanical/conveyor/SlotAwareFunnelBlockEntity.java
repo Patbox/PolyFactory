@@ -27,6 +27,8 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.ItemScatterer;
@@ -59,18 +61,18 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
 
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.writeNbt(nbt, items, lookup);
-        nbt.putIntArray("targets", slotTargets.clone());
+    protected void writeData(WriteView view) {
+        Inventories.writeData(view, items);
+        view.putIntArray("targets", slotTargets.clone());
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.readNbt(nbt, items, lookup);
+    public void readData(ReadView view) {
+        Inventories.readData(view, items);
         for (var i = 0; i < this.items.size(); i++) {
             this.filter.set(i, FilterData.of(this.items.get(i), false));
         }
-        var targets = nbt.getIntArray("targets").orElseGet(() -> new int[this.slotTargets.length]);
+        var targets = view.getOptionalIntArray("targets").orElseGet(() -> new int[this.slotTargets.length]);
         System.arraycopy(targets, 0, this.slotTargets, 0, Math.min(targets.length, this.slotTargets.length));
     }
 
@@ -110,7 +112,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
                     public ClickCallback getGuiCallback() {
                         return (i1, clickType, slotActionType, slotGuiInterface) -> {
                             new SetSlotGui(player, Gui.this, index);
-                            player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.5f, 1);
+                            player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
                         };
                     }
                 });
@@ -147,7 +149,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
             this.setDefaultInputValue(gui.be.slotTargets[slot] == -1 ? "" : String.valueOf(gui.be.slotTargets[slot]));
             this.updateDone();
             this.setSlot(2, GuiTextures.BUTTON_CLOSE.get().setName(ScreenTexts.BACK).setCallback(x -> {
-                player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.5f, 1);
+                player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
                 this.close(true);
                 this.gui.open();
             }));
@@ -177,7 +179,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
             if (targetSlot > -2 && targetSlot < 100) {
                 int finalTargetSlot = targetSlot;
                 this.setSlot(1, GuiTextures.BUTTON_DONE.get().setName(ScreenTexts.DONE).setCallback(x -> {
-                    player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.5f, 1);
+                    player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
                     this.gui.be.slotTargets[this.slot] = finalTargetSlot;
                     this.close(true);
                     this.gui.open();

@@ -235,7 +235,7 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
             return;
         }
 
-        var world = player.getServerWorld();
+        var world = player.getWorld();
         if (!(world.getBlockEntity(hit.getBlockPos()) instanceof EjectorBlockEntity be)) {
             return;
         }

@@ -25,6 +25,8 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -75,34 +77,35 @@ public class RecordPlayerBlockEntity extends ChanneledDataBlockEntity implements
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.readNbt(nbt, lookup);
-        var newStack = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("stack"));
+    public void readData(ReadView view) {
+        super.readData(view);
+        var newStack = view.read("stack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        view.read("stack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         if (!ItemStack.areItemsAndComponentsEqual(newStack, this.stack) || newStack.isEmpty()) {
             this.stopPlaying();
         }
         this.stack = newStack;
 
-        if (nbt.contains("ticks_since_song_started")) {
-            JukeboxSong.getSongEntryFromStack(lookup, this.stack).ifPresent((song) -> {
-                this.setValues(song, nbt.getLong("ticks_since_song_started", 0));
+        if (view.getInt("ticks_since_song_started", -999) != -999) {
+            JukeboxSong.getSongEntryFromStack(view.getRegistries(), this.stack).ifPresent((song) -> {
+                this.setValues(song, view.getLong("ticks_since_song_started", 0));
             });
         }
-        if (nbt.contains("volume")) {
-            this.volume = nbt.getFloat("volume", 0);
+        if (view.getFloat("volume", Float.POSITIVE_INFINITY) != Float.POSITIVE_INFINITY) {
+            this.volume = view.getFloat("volume", 0);
         } else {
             this.volume = 1;
         }
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.writeNbt(nbt, lookup);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
         if (!this.stack.isEmpty()) {
-            nbt.put("stack", this.stack.toNbt(lookup));
+            view.put("stack", ItemStack.OPTIONAL_CODEC, this.stack);
         }
         if (this.song != null) {
-            nbt.putLong("ticks_since_song_started", this.ticksSinceSongStarted);
+            view.putLong("ticks_since_song_started", this.ticksSinceSongStarted);
         }
     }
 

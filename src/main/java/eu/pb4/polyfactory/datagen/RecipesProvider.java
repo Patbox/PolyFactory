@@ -1090,11 +1090,11 @@ class RecipesProvider extends FabricRecipeProvider {
                         ));
 
                         of(exporter, GenericMixingRecipe.ofCounted(namePowder, "concrete_powder",
-                                List.of(CountedIngredient.fromTag(4, itemWrap.getOrThrow(ItemTags.SMELTS_TO_GLASS)), CountedIngredient.ofItems(4, Items.GRAVEL), CountedIngredient.ofItems(1, dye)),
+                                List.of(CountedIngredient.ofTag(4, itemWrap.getOrThrow(ItemTags.SMELTS_TO_GLASS)), CountedIngredient.ofItems(4, Items.GRAVEL), CountedIngredient.ofItems(1, dye)),
                                 4, 1, 13, new ItemStack(powder, 8)));
 
                         of(exporter, GenericMixingRecipe.ofCounted(nameSolid + "_direct", "concrete_direct",
-                                List.of(CountedIngredient.fromTag(4, itemWrap.getOrThrow(ItemTags.SMELTS_TO_GLASS)),
+                                List.of(CountedIngredient.ofTag(4, itemWrap.getOrThrow(ItemTags.SMELTS_TO_GLASS)),
                                         CountedIngredient.ofItems(4, Items.GRAVEL),
                                         CountedIngredient.ofItems(0, Items.WATER_BUCKET),
                                         CountedIngredient.ofItems(1, dye)),
@@ -1106,7 +1106,7 @@ class RecipesProvider extends FabricRecipeProvider {
 
 
                         of(exporter, GenericMixingRecipe.ofCounted(nameSolid + "_direct_new", "concrete_direct",
-                                List.of(CountedIngredient.fromTag(4, itemWrap.getOrThrow(ItemTags.SMELTS_TO_GLASS)),
+                                List.of(CountedIngredient.ofTag(4, itemWrap.getOrThrow(ItemTags.SMELTS_TO_GLASS)),
                                         CountedIngredient.ofItems(4, Items.GRAVEL),
                                         CountedIngredient.ofItems(1, dye)),
                                 List.of(new FluidInputStack(FactoryFluids.WATER.defaultInstance(), FluidConstants.BOTTLE, FluidConstants.BOTTLE / 10)),
@@ -1144,7 +1144,7 @@ class RecipesProvider extends FabricRecipeProvider {
                                 new ItemStack(Items.FERMENTED_SPIDER_EYE, 1)),
 
                         GenericMixingRecipe.ofCounted("fire_charge", List.of(CountedIngredient.ofItems(1, Items.GUNPOWDER),
-                                        CountedIngredient.fromTag(1, itemWrap.getOrThrow(ItemTags.COALS)),
+                                        CountedIngredient.ofTag(1, itemWrap.getOrThrow(ItemTags.COALS)),
                                         CountedIngredient.ofItems(1, Items.BLAZE_POWDER)), 3, 4, 8f,
                                 new ItemStack(Items.FIRE_CHARGE, 1)),
                         GenericMixingRecipe.ofCounted("magma_cream", List.of(CountedIngredient.ofItems(1, Items.SLIME_BALL),
@@ -1189,7 +1189,7 @@ class RecipesProvider extends FabricRecipeProvider {
                                         CountedIngredient.ofItems(1, Items.REDSTONE)),
                                 2, 4, 15, new ItemStack(FactoryItems.STEEL_ALLOY_MIXTURE, 2)),
                         GenericMixingRecipe.ofCounted("tnt",
-                                List.of(CountedIngredient.fromTag(4, itemWrap.getOrThrow(ItemTags.SMELTS_TO_GLASS)), CountedIngredient.ofItems(5, Items.GUNPOWDER)),
+                                List.of(CountedIngredient.ofTag(4, itemWrap.getOrThrow(ItemTags.SMELTS_TO_GLASS)), CountedIngredient.ofItems(5, Items.GUNPOWDER)),
                                 2, 4, 16, new ItemStack(Items.TNT)),
                         GenericMixingRecipe.ofCounted("redstone_to_glowstone",
                                 List.of(CountedIngredient.ofItems(8, Items.REDSTONE), CountedIngredient.ofItems(1, Items.BLAZE_POWDER)),
@@ -1198,7 +1198,7 @@ class RecipesProvider extends FabricRecipeProvider {
                                 List.of(CountedIngredient.ofItems(8, Items.REDSTONE), CountedIngredient.ofItems(3, FactoryItems.NETHERRACK_DUST)),
                                 8, 5, 16, new ItemStack(Items.GLOWSTONE_DUST, 8)),
                         GenericMixingRecipe.ofCounted("dynamite",
-                                List.of(CountedIngredient.ofItems(1, Items.PAPER), CountedIngredient.ofItems(1, FactoryItems.SAW_DUST), CountedIngredient.fromTag(1, itemWrap.getOrThrow(ItemTags.SAND)), CountedIngredient.ofItems(2, Items.GUNPOWDER)),
+                                List.of(CountedIngredient.ofItems(1, Items.PAPER), CountedIngredient.ofItems(1, FactoryItems.SAW_DUST), CountedIngredient.ofTag(1, itemWrap.getOrThrow(ItemTags.SAND)), CountedIngredient.ofItems(2, Items.GUNPOWDER)),
                                 2, 1, 6f, new ItemStack(FactoryItems.DYNAMITE, 1)),
                         GenericMixingRecipe.ofCounted("gunpowder",
                                 List.of(CountedIngredient.ofItems(2, FactoryItems.NETHERRACK_DUST),

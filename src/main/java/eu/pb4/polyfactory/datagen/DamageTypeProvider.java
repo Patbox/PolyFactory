@@ -36,20 +36,20 @@ public class DamageTypeProvider extends FabricCodecDataProvider<DamageType> {
 
         @Override
         protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
-            this.getOrCreateTagBuilder(DamageTypeTags.BYPASSES_COOLDOWN)
-                    .addOptionalTag(FactoryDamageTypes.EXPERIENCE_SPLASH.getValue());
-            this.getOrCreateTagBuilder(DamageTypeTags.BYPASSES_ARMOR)
-                    .addOptionalTag(FactoryDamageTypes.EXPERIENCE_SPLASH.getValue());
-            this.getOrCreateTagBuilder(DamageTypeTags.BYPASSES_SHIELD)
-                    .addOptionalTag(FactoryDamageTypes.EXPERIENCE_SPLASH.getValue());
-            this.getOrCreateTagBuilder(DamageTypeTags.IS_PROJECTILE)
-                    .addOptionalTag(FactoryDamageTypes.EXPERIENCE_SPLASH.getValue());
-            this.getOrCreateTagBuilder(DamageTypeTags.ALWAYS_HURTS_ENDER_DRAGONS)
-                    .addOptionalTag(FactoryDamageTypes.EXPERIENCE_SPLASH.getValue());
-            this.getOrCreateTagBuilder(DamageTypeTags.PANIC_CAUSES)
-                    .addOptionalTag(FactoryDamageTypes.EXPERIENCE_SPLASH.getValue());
-            this.getOrCreateTagBuilder(DamageTypeTags.BYPASSES_EFFECTS)
-                    .addOptionalTag(FactoryDamageTypes.EXPERIENCE_SPLASH.getValue());
+            this.builder(DamageTypeTags.BYPASSES_COOLDOWN)
+                    .add(FactoryDamageTypes.EXPERIENCE_SPLASH);
+            this.builder(DamageTypeTags.BYPASSES_ARMOR)
+                    .add(FactoryDamageTypes.EXPERIENCE_SPLASH);
+            this.builder(DamageTypeTags.BYPASSES_SHIELD)
+                    .add(FactoryDamageTypes.EXPERIENCE_SPLASH);
+            this.builder(DamageTypeTags.IS_PROJECTILE)
+                    .add(FactoryDamageTypes.EXPERIENCE_SPLASH);
+            this.builder(DamageTypeTags.ALWAYS_HURTS_ENDER_DRAGONS)
+                    .add(FactoryDamageTypes.EXPERIENCE_SPLASH);
+            this.builder(DamageTypeTags.PANIC_CAUSES)
+                    .add(FactoryDamageTypes.EXPERIENCE_SPLASH);
+            this.builder(DamageTypeTags.BYPASSES_EFFECTS)
+                    .add(FactoryDamageTypes.EXPERIENCE_SPLASH);
 
         }
     }

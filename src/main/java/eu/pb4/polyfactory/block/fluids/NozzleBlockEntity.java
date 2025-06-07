@@ -19,6 +19,8 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
@@ -42,29 +44,29 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
-        nbt.putDouble("speed", this.speed);
-        nbt.putInt("tick", this.tick);
-        nbt.put("fluid", this.container.toNbt(registryLookup));
-        nbt.putFloat("spread", this.extraSpread);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putDouble("speed", this.speed);
+        view.putInt("tick", this.tick);
+        this.container.writeData(view, "fluid");
+        view.putFloat("spread", this.extraSpread);
         if (this.currentFluid != null) {
-            nbt.put("current_fluid", this.currentFluid.toNbt(registryLookup));
+            view.put("current_fluid", FluidInstance.CODEC, this.currentFluid);
         }
         if (this.owner != null) {
-            nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+            view.put("owner", NbtCompound.CODEC, LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
     }
 
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        this.speed = nbt.getDouble("speed", 0);
-        this.tick = nbt.getInt("tick", 0);
-        this.container.fromNbt(registryLookup, nbt, "fluid");
-        this.currentFluid = FluidInstance.fromNbt(registryLookup, nbt.get("current_fluid"));
-        this.extraSpread = nbt.getFloat("spread", 0);
-        this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompoundOrEmpty("owner"));
+    protected void readData(ReadView view) {
+        super.readData(view);
+        this.speed = view.getDouble("speed", 0);
+        this.tick = view.getInt("tick", 0);
+        this.container.readData(view, "fluid");
+        this.currentFluid = view.read("current_fluid", FluidInstance.CODEC).orElse(null);
+        this.extraSpread = view.getFloat("spread", 0);
+        view.read("owner", NbtCompound.CODEC).ifPresent(x -> this.owner = LegacyNbtHelper.toGameProfile(x));
     }
 
     public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {

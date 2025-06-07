@@ -21,34 +21,34 @@ class BiomeTagsProvider extends FabricTagProvider<Biome> {
 
     @Override
     protected void configure(RegistryWrapper.WrapperLookup arg) {
-        this.getOrCreateTagBuilder(FactoryBiomeTags.WINDMILL_HIGH_SPEED_BONUS)
+        this.builder(FactoryBiomeTags.WINDMILL_HIGH_SPEED_BONUS)
                 .addOptionalTag(ConventionalBiomeTags.IS_OCEAN);
         ;
 
-        this.getOrCreateTagBuilder(FactoryBiomeTags.WINDMILL_MIDDLE_SPEED_BONUS)
+        this.builder(FactoryBiomeTags.WINDMILL_MIDDLE_SPEED_BONUS)
                 .addOptionalTag(ConventionalBiomeTags.IS_BEACH)
                 .addOptionalTag(ConventionalBiomeTags.IS_MOUNTAIN)
         ;
 
-        this.getOrCreateTagBuilder(FactoryBiomeTags.WINDMILL_LOW_SPEED_BONUS)
+        this.builder(FactoryBiomeTags.WINDMILL_LOW_SPEED_BONUS)
                 .addOptionalTag(ConventionalBiomeTags.IS_OLD_GROWTH)
         ;
 
-        this.getOrCreateTagBuilder(FactoryBiomeTags.TEMPERATURE_REALLY_HOT)
+        this.builder(FactoryBiomeTags.TEMPERATURE_REALLY_HOT)
                 .addOptionalTag(ConventionalBiomeTags.IS_NETHER)
         ;
 
-        this.getOrCreateTagBuilder(FactoryBiomeTags.TEMPERATURE_HOT)
+        this.builder(FactoryBiomeTags.TEMPERATURE_HOT)
                 .addOptionalTag(ConventionalBiomeTags.IS_DESERT)
                 .addOptionalTag(ConventionalBiomeTags.IS_BADLANDS)
                 .addOptionalTag(ConventionalBiomeTags.IS_SAVANNA)
         ;
 
-        this.getOrCreateTagBuilder(FactoryBiomeTags.TEMPERATURE_COLD)
+        this.builder(FactoryBiomeTags.TEMPERATURE_COLD)
                 .addOptionalTag(ConventionalBiomeTags.IS_SNOWY)
         ;
 
-        this.getOrCreateTagBuilder(FactoryBiomeTags.TEMPERATURE_REALLY_COLD)
+        this.builder(FactoryBiomeTags.TEMPERATURE_REALLY_COLD)
                 .addOptionalTag(ConventionalBiomeTags.IS_ICY)
         ;
     }

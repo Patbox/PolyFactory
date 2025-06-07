@@ -186,11 +186,11 @@ public class PolydexCompatImpl {
         var target = hoverDisplayBuilder.getTarget();
         if (target.hasTarget() && target.entity() == null
                 && target.blockState().getBlock() instanceof BlockStateNameProvider provider) {
-            hoverDisplayBuilder.setComponent(HoverDisplayBuilder.NAME, provider.getName(target.player().getServerWorld(), target.pos(), target.blockState(), target.blockEntity()));
+            hoverDisplayBuilder.setComponent(HoverDisplayBuilder.NAME, provider.getName(target.player().getWorld(), target.pos(), target.blockState(), target.blockEntity()));
         }
 
         if (target.blockState().getBlock() instanceof NetworkComponent.Rotational) {
-            var rot = RotationUser.getRotation(target.player().getServerWorld(), target.pos()).getStateText();
+            var rot = RotationUser.getRotation(target.player().getWorld(), target.pos()).getStateText();
             if (rot != null) {
                 hoverDisplayBuilder.setComponent(MACHINE_STATE, rot);
             }
@@ -199,10 +199,10 @@ public class PolydexCompatImpl {
         BlockEntity entity = target.blockEntity();
         if (entity == null) {
             if (target.blockState().getBlock() instanceof MultiBlock multiBlock) {
-                entity = target.player().getServerWorld().getBlockEntity(multiBlock.getCenter(target.blockState(), target.pos()));
+                entity = target.player().getWorld().getBlockEntity(multiBlock.getCenter(target.blockState(), target.pos()));
             } else if (target.blockState().getBlock() instanceof TallItemMachineBlock
                     && target.blockState().get(TallItemMachineBlock.PART) == TallItemMachineBlock.Part.TOP) {
-                entity = target.player().getServerWorld().getBlockEntity(target.pos().down());
+                entity = target.player().getWorld().getBlockEntity(target.pos().down());
             }
         }
 

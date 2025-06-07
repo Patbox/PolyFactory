@@ -109,7 +109,7 @@ public abstract class AbstractCableBlock extends AbstracterCableBlock {
                 if (!isDirectionBlocked(state, dir) && canConnectTo(world, be.getColor(), newPos, block, dir.getOpposite())) {
                     newState = newState.with(FACING_PROPERTIES.get(dir), true);
                     if (placer instanceof ServerPlayerEntity serverPlayer && (!hasReceivers || !hasProviders)) {
-                        var net = NetworkComponent.Data.getLogic(serverPlayer.getServerWorld(), newPos);
+                        var net = NetworkComponent.Data.getLogic(serverPlayer.getWorld(), newPos);
                         if (net.hasReceivers()) {
                             hasReceivers = true;
                         }

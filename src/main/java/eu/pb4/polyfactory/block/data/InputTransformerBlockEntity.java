@@ -8,6 +8,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 
 public class InputTransformerBlockEntity extends LockableBlockEntity {
@@ -23,6 +25,7 @@ public class InputTransformerBlockEntity extends LockableBlockEntity {
     protected InputTransformerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
+
     public DataContainer lastInput() {
         return lastInput;
     }
@@ -44,23 +47,23 @@ public class InputTransformerBlockEntity extends LockableBlockEntity {
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.readNbt(nbt, lookup);
-        this.channelInput = nbt.getInt("input_channel", 0);
-        this.channelOutput = nbt.getInt("output_channel", 0);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putInt("input_channel", this.channelInput);
+        view.putInt("output_channel", this.channelOutput);
 
-        this.lastInput = DataContainer.fromNbt(nbt.getCompoundOrEmpty("input_data"), lookup);
-        this.lastOutput = DataContainer.fromNbt(nbt.getCompoundOrEmpty("output_data"), lookup);
+        view.put("input_data", DataContainer.CODEC, this.lastInput);
+        view.put("output_data", DataContainer.CODEC, this.lastOutput);
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.writeNbt(nbt, lookup);
-        nbt.putInt("input_channel", this.channelInput);
-        nbt.putInt("output_channel", this.channelOutput);
+    public void readData(ReadView view) {
+        super.readData(view);
+        this.channelInput = view.getInt("input_channel", 0);
+        this.channelOutput = view.getInt("output_channel", 0);
 
-        nbt.put("input_data", this.lastInput.createNbt(lookup));
-        nbt.put("output_data", this.lastOutput.createNbt(lookup));
+        this.lastInput = view.read("input_data", DataContainer.CODEC).orElse(DataContainer.empty());
+        this.lastOutput = view.read("output_data", DataContainer.CODEC).orElse(DataContainer.empty());
     }
 
     public int inputChannel() {

@@ -40,8 +40,8 @@ public class WirelessRedstoneTransmitterItem extends Item implements SimpleColor
 
         if (x != null && world instanceof ServerWorld serverWorld) {
             WirelessRedstoneBlock.send(serverWorld, user.getBlockPos(), 20, x.getFirst(), x.getSecond());
-            user.playSoundToPlayer(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_ON, SoundCategory.MASTER, 1f, 1.5f);
-            user.playSoundToPlayer(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_OFF, SoundCategory.MASTER, 1f, 1.4f);
+            user.playSoundToPlayer(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1.5f);
+            user.playSoundToPlayer(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_OFF, SoundCategory.PLAYERS, 1f, 1.4f);
             return ActionResult.SUCCESS_SERVER;
         }
 

@@ -67,7 +67,7 @@ public class TextInputBlock extends CabledDataProviderBlock {
             this.setTitle(GuiTextures.TEXT_INPUT.apply(blockEntity.getDisplayName()));
             this.updateDone();
             this.setSlot(2, GuiTextures.BUTTON_CLOSE.get().setName(ScreenTexts.BACK).setCallback(x -> {
-                player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.5f, 1);
+                player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
                 this.close();
             }));
             this.open();
@@ -86,7 +86,7 @@ public class TextInputBlock extends CabledDataProviderBlock {
             var data = this.blockEntity.getCachedState().get(MODE).parse(this.getInput());
             if (data != null) {
                 this.setSlot(1, GuiTextures.BUTTON_DONE.get().setName(ScreenTexts.DONE).setCallback(x -> {
-                    player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.5f, 1);
+                    player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
                     DataProvider.sendData(blockEntity.getWorld(), blockEntity.getPos(), data);
                     this.close();
                 }));

@@ -38,10 +38,13 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.dynamic.Codecs;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -49,18 +52,23 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 public class MCrafterBlockEntity extends LockableBlockEntity implements MachineInfoProvider, MinimalSidedInventory, CrafterLikeInsertInventory, RecipeInputInventory {
+    private static final Codec<BitSet> BIT_SET = Codec.BYTE_BUFFER.xmap(
+            (stream) -> BitSet.valueOf(stream.array()), (set) -> ByteBuffer.wrap(set.toByteArray()));
+
     private static final int[] INPUT_SLOTS = IntStream.range(0, 9).toArray();
-    private static final int[] OUTPUT_SLOTS = IntStream.range(9, 9+9).toArray();
+    private static final int[] OUTPUT_SLOTS = IntStream.range(9, 9 + 9).toArray();
     private static final SoundEvent CRAFT_SOUND_EVENT = SoundEvent.of(Identifier.of("minecraft:block.crafter.craft"));
     //private static final int[] OUTPUT_SLOTS = {1, 2, 3};
-    private final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(9+9, ItemStack.EMPTY);
+    private final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(9 + 9, ItemStack.EMPTY);
 
     private BitSet lockedSlots = new BitSet(9);
     protected double process = 0;
@@ -78,24 +86,22 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.writeNbt(nbt, stacks, lookup);
-        nbt.putDouble("progress", this.process);
-        nbt.putByteArray("locked_slots", this.lockedSlots.toByteArray());
-        nbt.putString("active_mode", this.activeMode.asString());
-        super.writeNbt(nbt, lookup);
+    protected void writeData(WriteView view) {
+        Inventories.writeData(view, this.stacks);
+        view.putDouble("progress", this.process);
+        view.put("locked_slots", Codecs.BIT_SET, this.lockedSlots);
+        view.putString("active_mode", this.activeMode.asString());
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.readNbt(nbt, this.stacks, lookup);
-        this.process = nbt.getDouble("progress", 0);
-        this.lockedSlots = nbt.getByteArray("locked_slots").map(BitSet::valueOf).orElseGet(() -> new BitSet(9));
-        if (nbt.contains("active_mode")) {
-            this.activeMode = ActiveMode.CODEC.decode(NbtOps.INSTANCE, nbt.get("active_mode"))
-                    .result().map(Pair::getFirst).orElse(ActiveMode.FILLED);
-        }
-        super.readNbt(nbt, lookup);
+    public void readData(ReadView view) {
+        Inventories.readData(view, this.stacks);
+        this.process = view.getDouble("progress", 0);
+        this.lockedSlots = view.read("locked_slots", BIT_SET).orElseGet(() -> new BitSet(9));
+        this.activeMode = view.read("active_mode", ActiveMode.CODEC).orElse(ActiveMode.FILLED);
+
+        super.readData(view);
     }
 
     @Override
@@ -335,6 +341,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
 
     private class Gui extends SimpleGui {
         private final BitSet lockedSlots;
+
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X3, player, false);
             this.lockedSlots = (BitSet) MCrafterBlockEntity.this.lockedSlots.clone();
@@ -369,11 +376,11 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
                 var locked = MCrafterBlockEntity.this.lockedSlots.get(slot);
                 if (locked) {
                     MCrafterBlockEntity.this.lockedSlots.set(slot, false);
-                    player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.4f, 1);
+                    player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.4f, 1);
                     return true;
                 } else if (MCrafterBlockEntity.this.getStack(slot).isEmpty() && this.getPlayer().currentScreenHandler.getCursorStack().isEmpty()) {
                     MCrafterBlockEntity.this.lockedSlots.set(slot, true);
-                    player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.4f, 0.75f);
+                    player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.4f, 0.75f);
                     return true;
                 }
             }
@@ -390,7 +397,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(MCrafterBlockEntity.this.pos)) > (18*18)) {
+            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(MCrafterBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             for (int y = 0; y < 3; y++) {
@@ -412,8 +419,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
         FILLED("filled", MCrafterBlockEntity::isInputNotFull),
         ALWAYS("always", be -> false),
         POWERED("powered", be -> !be.getCachedState().get(MCrafterBlock.POWERED)),
-        NOT_POWERED("not_powered", be -> be.getCachedState().get(MCrafterBlock.POWERED))
-        ;
+        NOT_POWERED("not_powered", be -> be.getCachedState().get(MCrafterBlock.POWERED));
 
         public static final Codec<ActiveMode> CODEC = StringIdentifiable.createCodec(ActiveMode::values);
 

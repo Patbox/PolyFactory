@@ -38,6 +38,9 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
+import net.minecraft.util.dynamic.Codecs;
 import net.minecraft.util.math.*;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
@@ -63,36 +66,31 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+    protected void writeData(WriteView view) {
         if (!this.currentTool.isEmpty()) {
-            nbt.put("tool", this.currentTool.toNbt(lookup));
+            view.put("tool", ItemStack.OPTIONAL_CODEC, this.currentTool);
         }
-        nbt.putDouble("progress", this.process);
-        nbt.put("block_state", NbtHelper.fromBlockState(this.targetState));
+        view.putDouble("progress", this.process);
+        view.put("block_state", Codecs.NBT_ELEMENT, NbtHelper.fromBlockState(this.targetState));
         if (this.owner != null) {
-            nbt.put("owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+            view.put("owner", Codecs.NBT_ELEMENT, LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
-        nbt.putFloat("last_attacked_ticks", this.lastAttackedTicks);
-        nbt.putInt("reach", this.reach);
-        super.writeNbt(nbt, lookup);
+        view.putFloat("last_attacked_ticks", this.lastAttackedTicks);
+        view.putInt("reach", this.reach);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.currentTool = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("tool"));
-        this.process = nbt.getDouble("progress", 0);
-        if (nbt.contains("owner")) {
-            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompoundOrEmpty("owner"));
-        }
-        this.targetState = NbtHelper.toBlockState(Registries.BLOCK, nbt.getCompoundOrEmpty("block_state"));
-        this.lastAttackedTicks = nbt.getFloat("last_attacked_ticks", -1);
-        if (nbt.contains("reach")) {
-            this.reach = nbt.getInt("reach", 2);
-        } else {
-            this.reach = 1;
-        }
+    public void readData(ReadView view) {
+        this.currentTool = view.read("tool", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        this.process = view.getDouble("progress", 0);
+        view.read("owner", NbtCompound.CODEC).ifPresent((x) -> this.owner = LegacyNbtHelper.toGameProfile(x));
 
-        super.readNbt(nbt, lookup);
+        this.targetState = NbtHelper.toBlockState(Registries.BLOCK, view.read("block_state", NbtCompound.CODEC).orElse(new NbtCompound()));
+        this.lastAttackedTicks = view.getFloat("last_attacked_ticks", -1);
+        this.reach = view.getInt("reach", 1);
+
+        super.readData(view);
         this.updateAttackCooldownPerTick();
     }
 
@@ -141,19 +139,19 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         var baseSpeed = attackSpeed.get();
         var out = baseSpeed;
 
-        for(var val : multiplier) {
+        for (var val : multiplier) {
             out += baseSpeed * val;
         }
 
-        for(var val : multiplier2) {
+        for (var val : multiplier2) {
             out *= 1.0 + val;
         }
 
-        this.attackCooldownPerTick = (float)(1.0 / out * 20.0);
+        this.attackCooldownPerTick = (float) (1.0 / out * 20.0);
     }
 
     public float getAttackCooldownProgress() {
-        return MathHelper.clamp(((float)this.lastAttackedTicks + 0.5f) / this.attackCooldownPerTick, 0.0F, 1.0F);
+        return MathHelper.clamp(((float) this.lastAttackedTicks + 0.5f) / this.attackCooldownPerTick, 0.0F, 1.0F);
     }
 
 
@@ -259,7 +257,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
             return;
         }
 
-        if (!CommonProtection.canBreakBlock(world, blockPos, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner,null)) {
+        if (!CommonProtection.canBreakBlock(world, blockPos, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner, null)) {
             self.stress = 0;
             return;
         }
@@ -312,7 +310,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
                     }
                 }
             }
-           self.markDirty();
+            self.markDirty();
         }
     }
 

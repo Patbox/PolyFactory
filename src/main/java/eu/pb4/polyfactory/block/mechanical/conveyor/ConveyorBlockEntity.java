@@ -19,6 +19,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -217,24 +219,24 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+    protected void writeData(WriteView view) {
         if (this.holdStack != null && !this.holdStack.get().isEmpty()) {
-            nbt.put("HeldStack", this.holdStack.get().toNbt(lookup));
+            view.put("HeldStack", ItemStack.OPTIONAL_CODEC, this.holdStack.get());
         }
-        nbt.putDouble("Delta", this.delta);
+        view.putDouble("Delta", this.delta);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        var stack = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("HeldStack"));
-        if (!stack.isEmpty()) {
+    public void readData(ReadView view) {
+        var stack = view.read("HeldStack", ItemStack.OPTIONAL_CODEC);
+        if (stack.isPresent()) {
             if (this.holdStack != null) {
-                this.holdStack.set(stack);
+                this.holdStack.set(stack.get());
             } else {
-                this.setContainer(new MovingItem(stack));
+                this.setContainer(new MovingItem(stack.get()));
             }
         }
-        this.delta = nbt.getDouble("Delta", 0);
+        this.delta = view.getDouble("Delta", 0);
     }
 
     public boolean tryAdding(ItemStack stack) {
@@ -311,7 +313,7 @@ public class ConveyorBlockEntity extends BlockEntity implements InventoryContain
 
     @Override
     public int[] getAvailableSlots(Direction side) {
-        return new int[] { 0 };
+        return new int[]{0};
     }
 
     @Override

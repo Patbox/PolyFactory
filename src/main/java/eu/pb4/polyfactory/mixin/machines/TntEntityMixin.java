@@ -27,12 +27,12 @@ public abstract class TntEntityMixin extends Entity implements LastFanEffectedTi
 
     /*@Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     private void addExtraNbt(NbtCompound nbt, CallbackInfo ci) {
-        nbt.putInt("polyfactory:last_fan_age", this.lastFanAge);
+        view.putInt("polyfactory:last_fan_age", this.lastFanAge);
     }
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
     private void readExtraNbt(NbtCompound nbt, CallbackInfo ci) {
-        this.lastFanAge = nbt.getInt("polyfactory:last_fan_age");
+        this.lastFanAge = view.getInt("polyfactory:last_fan_age");
     }*/
 
     @Override

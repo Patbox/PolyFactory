@@ -8,6 +8,8 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 
@@ -26,30 +28,25 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.writeNbt(nbt, lookup);
-        nbt.putFloat("scale", scale);
-        nbt.putFloat("offset", offset);
-        nbt.putFloat("pitch", pitch);
-        nbt.putFloat("yaw", yaw);
-        nbt.putFloat("roll", roll);
-        nbt.putBoolean("force_text", forceText);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putFloat("scale", scale);
+        view.putFloat("offset", offset);
+        view.putFloat("pitch", pitch);
+        view.putFloat("yaw", yaw);
+        view.putFloat("roll", roll);
+        view.putBoolean("force_text", forceText);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.readNbt(nbt, lookup);
-        this.scale = nbt.getFloat("scale", 1);
-        this.offset = nbt.getFloat("offset", 0.5f);
-        this.pitch = nbt.getFloat("pitch", 0);
-        this.yaw = nbt.getFloat("yaw", 0);
-        this.roll = nbt.getFloat("roll", 0);
-
-        if (nbt.contains("rotation_display")) {
-            this.roll = nbt.getFloat("rotation_display", 0);
-        }
-
-        this.forceText = nbt.getBoolean("force_text", false);
+    public void readData(ReadView view) {
+        super.readData(view);
+        this.scale = view.getFloat("scale", 1);
+        this.offset = view.getFloat("offset", 0.5f);
+        this.pitch = view.getFloat("pitch", 0);
+        this.yaw = view.getFloat("yaw", 0);
+        this.roll = view.getFloat("roll", view.getFloat("rotation_display", 0));
+        this.forceText = view.getBoolean("force_text", false);
     }
 
     @Override
@@ -108,6 +105,7 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
     public float pitch() {
         return this.pitch;
     }
+
     public void setPitch(float pitch) {
         if (this.pitch == pitch) {
             return;
@@ -122,6 +120,7 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
     public float yaw() {
         return this.yaw;
     }
+
     public void setYaw(float yaw) {
         if (this.yaw == yaw) {
             return;
@@ -136,6 +135,7 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
     public float roll() {
         return this.roll;
     }
+
     public void setRoll(float roll) {
         if (this.roll == roll) {
             return;

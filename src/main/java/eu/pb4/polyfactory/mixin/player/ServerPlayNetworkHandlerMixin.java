@@ -59,7 +59,7 @@ public abstract class ServerPlayNetworkHandlerMixin implements ServerPlayNetExt 
 
     @WrapMethod(method = "onPlayerMove")
     private void wrap(PlayerMoveC2SPacket packet, Operation<Void> original) {
-        var apply = this.player.getServerWorld().getServer().isOnThread();
+        var apply = this.player.getWorld().getServer().isOnThread();
         if (apply) {
             BlockCollection.ignoreCollisions = true;
         }

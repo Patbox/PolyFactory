@@ -48,6 +48,8 @@ import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -69,8 +71,8 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
     public static final int INPUT_FIRST = 0;
     public static final int SIZE = 9;
     public static final long FLUID_CAPACITY = FluidType.BLOCK_AMOUNT * 2;
-    private static final int[] OUTPUT_SLOTS = { 6, 7, 8 };
-    private static final int[] INPUT_SLOTS = { 0, 1, 2, 3, 4, 5 };
+    private static final int[] OUTPUT_SLOTS = {6, 7, 8};
+    private static final int[] INPUT_SLOTS = {0, 1, 2, 3, 4, 5};
     protected double process = 0;
     protected float temperature = 0;
     @Nullable
@@ -94,7 +96,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             Vec3d base;
             if (id >= OUTPUT_FIRST) {
                 id = id - OUTPUT_FIRST;
-                base = Vec3d.ofCenter(this.pos).add(((id >> 1) - 0.5f) * 0.12f, - id * 0.005, ((id % 2) - 0.5) * 0.2);
+                base = Vec3d.ofCenter(this.pos).add(((id >> 1) - 0.5f) * 0.12f, -id * 0.005, ((id % 2) - 0.5) * 0.2);
             } else {
                 base = Vec3d.ofCenter(this.pos).add(((id >> 1) - 0.5f) * 0.15f, -0.15 - id * 0.005, ((id % 2) - 0.5) * 0.2);
             }
@@ -105,20 +107,20 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.writeInventoryNbt(nbt, lookup);
-        nbt.putDouble("Progress", this.process);
-        nbt.put("fluid", this.fluidContainer.toNbt(lookup));
-        super.writeNbt(nbt, lookup);
+    protected void writeData(WriteView view) {
+        this.writeInventoryView(view);
+        view.putDouble("Progress", this.process);
+        this.fluidContainer.writeData(view, "fluid");
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.readInventoryNbt(nbt, lookup);
-        this.process = nbt.getDouble("Progress", 0);
-        this.fluidContainer.fromNbt(lookup, nbt, "fluid");
+    public void readData(ReadView view) {
+        this.readInventoryView(view);
+        this.process = view.getDouble("Progress", 0);
+        this.fluidContainer.readData(view, "fluid");
         this.inventoryChanged = true;
-        super.readNbt(nbt, lookup);
+        super.readData(view);
     }
 
     @Override
@@ -138,9 +140,9 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
     }
 
     @Override
-    public void removeFromCopiedStackNbt(NbtCompound nbt) {
-        super.removeFromCopiedStackNbt(nbt);
-        nbt.remove("fluid");
+    public void removeFromCopiedStackData(WriteView view) {
+        super.removeFromCopiedStackData(view);
+        view.remove("fluid");
     }
 
     @Override
@@ -349,7 +351,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         FactoryUtil.insertBetween(this, OUTPUT_FIRST, this.size(), stack);
         if (!stack.isEmpty()) {
             assert this.world != null;
-            ItemScatterer.spawn(this.world, this.pos.getX() + 0.5, this.pos.getY()+ 0.5, this.pos.getZ() + 0.5, stack);
+            ItemScatterer.spawn(this.world, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, stack);
         }
     }
 
@@ -473,13 +475,13 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         private float progress() {
             return MixerBlockEntity.this.currentRecipe != null
                     ? (float) MathHelper.clamp(MixerBlockEntity.this.process / MixerBlockEntity.this.currentRecipe.value().time(
-                            new MixingInput(stacks, FluidContainerInput.of(fluidContainer), world)), 0, 1)
+                    new MixingInput(stacks, FluidContainerInput.of(fluidContainer), world)), 0, 1)
                     : 0;
         }
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(MixerBlockEntity.this.pos)) > (18*18)) {
+            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(MixerBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             if (MixerBlockEntity.this.fluidContainer.updateId() != this.lastFluidUpdate && delayTick < 0) {

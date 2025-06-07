@@ -23,6 +23,8 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -156,25 +158,25 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.put("stack", ItemStack.OPTIONAL_CODEC, lookup.getOps(NbtOps.INSTANCE), this.stack);
+    protected void writeData(WriteView view) {
+        view.put("stack", ItemStack.OPTIONAL_CODEC, this.stack);
         if (this.currentRecipe != null || this.findRecipe) {
-            nbt.putDouble("Progress", this.process);
-            nbt.putBoolean("is_cooling", this.isCooling);
+            view.putDouble("Progress", this.process);
+            view.putBoolean("is_cooling", this.isCooling);
         }
 
-        super.writeNbt(nbt, lookup);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.stack = nbt.get("stack", ItemStack.OPTIONAL_CODEC, lookup.getOps(NbtOps.INSTANCE)).orElse(ItemStack.EMPTY);
-        if (nbt.contains("Progress")) {
-            this.process = nbt.getDouble("Progress", 0);
-            this.isCooling = nbt.getBoolean("is_cooling", false);
+    public void readData(ReadView view) {
+        this.stack = view.read("stack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        if (view.getDouble("Progress", Double.POSITIVE_INFINITY) != Double.POSITIVE_INFINITY) {
+            this.process = view.getDouble("Progress", 0);
+            this.isCooling = view.getBoolean("is_cooling", false);
             this.findRecipe = true;
         }
-        super.readNbt(nbt, lookup);
+        super.readData(view);
     }
 
     @Override

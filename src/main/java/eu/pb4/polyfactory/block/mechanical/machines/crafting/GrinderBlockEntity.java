@@ -32,6 +32,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -62,18 +64,18 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.writeNbt(nbt, stacks, lookup);
-        nbt.putDouble("Progress", this.process);
-        super.writeNbt(nbt, lookup);
+    protected void writeData(WriteView view) {
+        Inventories.writeData(view, this.stacks);
+        view.putDouble("Progress", this.process);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.readNbt(nbt, this.stacks, lookup);
-        this.process = nbt.getDouble("Progress", 0);
+    public void readData(ReadView view) {
+        Inventories.readData(view, this.stacks);
+        this.process = view.getDouble("Progress", 0);
         this.currentItem = null;
-        super.readNbt(nbt, lookup);
+        super.readData(view);
     }
 
     @Override
@@ -215,7 +217,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
                     MathHelper.clamp(this.currentRecipe.value().optimalSpeed() * 0.7 * this.speedScale,
                             this.currentRecipe.value().minimumSpeed() * 0.7,
                             this.currentRecipe.value().optimalSpeed() * 0.7
-                            ) : 1;
+                    ) : 1;
         }
         return 0;
     }
@@ -247,7 +249,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(GrinderBlockEntity.this.pos)) > (18*18)) {
+            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(GrinderBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             this.setSlot(13, GuiTextures.PROGRESS_VERTICAL.get(progress()));

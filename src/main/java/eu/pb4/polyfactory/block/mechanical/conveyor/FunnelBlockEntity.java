@@ -14,6 +14,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -35,9 +37,9 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+    protected void writeData(WriteView view) {
         if (!this.filterStack.isEmpty()) {
-            nbt.put("FilterStack", this.filterStack.toNbt(lookup));
+            view.put("FilterStack", ItemStack.OPTIONAL_CODEC, this.filterStack);
         }
     }
 
@@ -55,8 +57,8 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.filterStack = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("FilterStack"));
+    public void readData(ReadView view) {
+        this.filterStack = view.read("FilterStack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         this.filter = FilterData.of(this.filterStack, true);
     }
 

@@ -23,7 +23,7 @@ public class DataMemoryBlockItem extends FactoryBlockItem {
     public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
         if (stack.contains(FactoryDataComponents.STORED_DATA) && clickType == ClickType.RIGHT && otherStack.isOf(FactoryItems.WRENCH)) {
             stack.set(FactoryDataComponents.READ_ONLY, !stack.getOrDefault(FactoryDataComponents.READ_ONLY, false));
-            player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.5f, 1f);
+            player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1f);
             return true;
         }
         return false;

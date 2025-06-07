@@ -9,6 +9,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 
 public class DoubleInputTransformerBlockEntity extends LockableBlockEntity {
@@ -62,27 +64,27 @@ public class DoubleInputTransformerBlockEntity extends LockableBlockEntity {
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.readNbt(nbt, lookup);
-        this.channelInput1 = nbt.getInt("input_channel_1", 0);
-        this.channelInput2 = nbt.getInt("input_channel_2", 0);
-        this.channelOutput = nbt.getInt("output_channel", 0);
+    public void readData(ReadView view) {
+        super.readData(view);
+        this.channelInput1 = view.getInt("input_channel_1", 0);
+        this.channelInput2 = view.getInt("input_channel_2", 0);
+        this.channelOutput = view.getInt("output_channel", 0);
 
-        this.lastInput1 = DataContainer.fromNbt(nbt.getCompoundOrEmpty("input_data_1"), lookup);
-        this.lastInput2 = DataContainer.fromNbt(nbt.getCompoundOrEmpty("input_data_2"), lookup);
-        this.lastOutput = DataContainer.fromNbt(nbt.getCompoundOrEmpty("output_data"), lookup);
+        this.lastInput1 = view.read("input_data_1", DataContainer.CODEC).orElse(DataContainer.empty());
+        this.lastInput2 = view.read("input_data_2", DataContainer.CODEC).orElse(DataContainer.empty());
+        this.lastOutput = view.read("output_data", DataContainer.CODEC).orElse(DataContainer.empty());
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.writeNbt(nbt, lookup);
-        nbt.putInt("input_channel_1", this.channelInput1);
-        nbt.putInt("input_channel_2", this.channelInput2);
-        nbt.putInt("output_channel", this.channelOutput);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putInt("input_channel_1", this.channelInput1);
+        view.putInt("input_channel_2", this.channelInput2);
+        view.putInt("output_channel", this.channelOutput);
 
-        nbt.put("input_data_1", this.lastInput1.createNbt(lookup));
-        nbt.put("input_data_2", this.lastInput2.createNbt(lookup));
-        nbt.put("output_data", this.lastOutput.createNbt(lookup));
+        view.put("input_data_1", DataContainer.CODEC, this.lastInput1);
+        view.put("input_data_2", DataContainer.CODEC, this.lastInput2);
+        view.put("output_data", DataContainer.CODEC, this.lastOutput);
     }
 
     public int inputChannel1() {

@@ -21,6 +21,8 @@ import net.minecraft.screen.ScreenTexts;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -43,15 +45,15 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.writeNbt(nbt, lookup);
-        nbt.putString("field", this.field);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putString("field", this.field);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.readNbt(nbt, lookup);
-        this.field = nbt.getString("field", "");
+    public void readData(ReadView view) {
+        super.readData(view);
+        this.field = view.getString("field", "");
     }
 
     public void setField(String field) {
@@ -78,7 +80,7 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
             this.setDefaultInputValue(blockEntity.field);
             this.updateDone();
             this.setSlot(2, GuiTextures.BUTTON_CLOSE.get().setName(ScreenTexts.BACK).setCallback(x -> {
-                player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.5f, 1);
+                player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
                 this.close();
             }));
             this.open();
@@ -96,7 +98,7 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
 
         private void updateDone() {
             this.setSlot(1, GuiTextures.BUTTON_DONE.get().setName(ScreenTexts.DONE).setCallback(x -> {
-                player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.MASTER, 0.5f, 1);
+                player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
                 this.blockEntity.setField(this.getInput());
                 var b = ((DataExtractorBlock) this.blockEntity.getCachedState().getBlock());
                 b.sendData(this.blockEntity.world, this.blockEntity.getCachedState().get(DataExtractorBlock.FACING_OUTPUT), this.blockEntity.getPos(), this.blockEntity.lastInput());
@@ -152,7 +154,7 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
         }
 
         @Override
-        public void setDefaultInputValue(String input)  {
+        public void setDefaultInputValue(String input) {
             super.setDefaultInputValue(input);
             if (this.blockEntity != null) {
                 updateDone();

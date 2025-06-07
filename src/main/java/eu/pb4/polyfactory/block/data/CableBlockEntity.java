@@ -12,6 +12,8 @@ import net.minecraft.component.ComponentMap;
 import net.minecraft.component.ComponentsAccess;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
@@ -26,15 +28,15 @@ public class CableBlockEntity extends BlockEntity implements BlockEntityExtraLis
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.writeNbt(nbt, lookup);
-        nbt.putInt("color", this.color);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putInt("color", this.color);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.readNbt(nbt, lookup);
-        setColor(nbt.getInt("color", this.color));
+    public void readData(ReadView view) {
+        super.readData(view);
+        setColor(view.getInt("color", this.color));
     }
 
     @Override
@@ -70,9 +72,9 @@ public class CableBlockEntity extends BlockEntity implements BlockEntityExtraLis
     }
 
     @Override
-    public void removeFromCopiedStackNbt(NbtCompound nbt) {
-        super.removeFromCopiedStackNbt(nbt);
-        nbt.remove("color");
+    public void removeFromCopiedStackData(WriteView view) {
+        super.removeFromCopiedStackData(view);
+        view.remove("color");
     }
 
     @Override

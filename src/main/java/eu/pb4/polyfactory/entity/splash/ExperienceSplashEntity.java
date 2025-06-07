@@ -8,6 +8,8 @@ import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -22,15 +24,15 @@ public class ExperienceSplashEntity extends SplashEntity<Unit> {
     }
 
     @Override
-    protected void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
-        nbt.putInt("xp", this.amount);
+    protected void writeCustomData(WriteView view) {
+        super.writeCustomData(view);
+        view.putInt("xp", this.amount);
     }
 
     @Override
-    protected void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
-        this.amount = nbt.getInt("xp", 1);
+    protected void readCustomData(ReadView view) {
+        super.readCustomData(view);
+        this.amount = view.getInt("xp", 1);
     }
 
     @Override

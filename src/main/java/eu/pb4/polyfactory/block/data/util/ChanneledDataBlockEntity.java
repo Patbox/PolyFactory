@@ -5,6 +5,7 @@ import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
+import eu.pb4.polyfactory.block.data.AbstracterCableBlock;
 import eu.pb4.polyfactory.block.data.io.DataMemoryBlockEntity;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.data.DataContainer;
@@ -20,6 +21,8 @@ import net.minecraft.component.ComponentMap;
 import net.minecraft.component.ComponentsAccess;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
@@ -30,6 +33,7 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
     private AbstractCableBlock.BaseCableModel model;
     protected DataContainer lastData = DataContainer.empty();
     private int channel;
+
     @Nullable
     public DataContainer getCachedData() {
         return this.lastData;
@@ -40,21 +44,19 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.readNbt(nbt, lookup);
-        if (nbt.contains("data")) {
-            this.lastData = DataContainer.fromNbt(nbt.getCompoundOrEmpty("data"), lookup);
-        }
-        setChannel(nbt.getInt("channel", 0));
-        this.color = nbt.getInt("color", AbstractCableBlock.DEFAULT_COLOR);
+    public void readData(ReadView view) {
+        super.readData(view);
+        this.lastData = view.read("data", DataContainer.CODEC).orElse(DataContainer.empty());
+        setChannel(view.getInt("channel", 0));
+        this.color = view.getInt("color", AbstractCableBlock.DEFAULT_COLOR);
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.writeNbt(nbt, lookup);
-        nbt.putInt("channel", this.channel);
-        nbt.put("data", this.lastData.createNbt(lookup));
-        nbt.putInt("color", this.color);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putInt("channel", this.channel);
+        view.put("data", DataContainer.CODEC, this.lastData);
+        view.putInt("color", this.color);
     }
 
     public int channel() {
@@ -139,10 +141,10 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
     }
 
     @Override
-    public void removeFromCopiedStackNbt(NbtCompound nbt) {
-        super.removeFromCopiedStackNbt(nbt);
-        nbt.remove("channel");
-        nbt.remove("data");
-        nbt.remove("color");
+    public void removeFromCopiedStackData(WriteView view) {
+        super.removeFromCopiedStackData(view);
+        view.remove("channel");
+        view.remove("data");
+        view.remove("color");
     }
 }

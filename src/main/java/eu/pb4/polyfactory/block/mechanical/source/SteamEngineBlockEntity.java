@@ -22,6 +22,8 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -81,7 +83,7 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
                         if (!remainder.isEmpty()) {
                             FactoryUtil.tryInsertingRegular(self, remainder);
                             if (!remainder.isEmpty()) {
-                                ItemScatterer.spawn(world, pos.getX()  + 0.5, pos.getY(), pos.getZ() + 0.5, remainder);
+                                ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, remainder);
                             }
                         }
 
@@ -103,21 +105,21 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.writeNbt(nbt, this.items, lookup);
-        nbt.putInt("FuelTicks", this.fuelTicks);
-        nbt.putInt("FuelInitial", this.fuelInitial);
-        nbt.putFloat("State", this.state);
-        super.writeNbt(nbt, lookup);
+    protected void writeData(WriteView view) {
+        Inventories.writeData(view, this.items);
+        view.putInt("FuelTicks", this.fuelTicks);
+        view.putInt("FuelInitial", this.fuelInitial);
+        view.putFloat("State", this.state);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.readNbt(nbt, items, lookup);
-        this.fuelInitial = nbt.getInt("FuelInitial", 0);
-        this.fuelTicks = nbt.getInt("FuelTicks", 0);
-        this.state = nbt.getFloat("State", 0);
-        super.readNbt(nbt, lookup);
+    public void readData(ReadView view) {
+        Inventories.readData(view, items);
+        this.fuelInitial = view.getInt("FuelInitial", 0);
+        this.fuelTicks = view.getInt("FuelTicks", 0);
+        this.state = view.getFloat("State", 0);
+        super.readData(view);
     }
 
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {
@@ -156,9 +158,9 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X2, player, false);
             this.setTitle(GuiTextures.STEAM_ENGINE.apply(SteamEngineBlockEntity.this.getCachedState().getBlock().getName()));
-            this.setSlotRedirect(9 + 3, new FuelSlot(SteamEngineBlockEntity.this, 0, player.getServerWorld().getFuelRegistry()));
-            this.setSlotRedirect(9 + 4, new FuelSlot(SteamEngineBlockEntity.this, 1, player.getServerWorld().getFuelRegistry()));
-            this.setSlotRedirect(9 + 5, new FuelSlot(SteamEngineBlockEntity.this, 2, player.getServerWorld().getFuelRegistry()));
+            this.setSlotRedirect(9 + 3, new FuelSlot(SteamEngineBlockEntity.this, 0, player.getWorld().getFuelRegistry()));
+            this.setSlotRedirect(9 + 4, new FuelSlot(SteamEngineBlockEntity.this, 1, player.getWorld().getFuelRegistry()));
+            this.setSlotRedirect(9 + 5, new FuelSlot(SteamEngineBlockEntity.this, 2, player.getWorld().getFuelRegistry()));
             this.setSlot(4, GuiTextures.FLAME.getCeil(progress()));
             this.active = SteamEngineBlockEntity.this.fuelTicks > 0;
             this.open();
@@ -176,7 +178,7 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
                 this.close();
             }
 
-            var active =  SteamEngineBlockEntity.this.fuelTicks > 0;
+            var active = SteamEngineBlockEntity.this.fuelTicks > 0;
             if (!this.active && active) {
                 this.active = true;
                 TriggerCriterion.trigger(this.player, FactoryTriggers.FUEL_STEAM_ENGINE);

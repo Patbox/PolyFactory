@@ -31,6 +31,8 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -145,7 +147,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
 
         if (self.process >= 1 || self.delayedOutput != null) {
             var nextOut = self.delayedOutput != null ? self.delayedOutput : self.currentRecipe.value().craft(input, self.world.getRegistryManager());
-            var currentOut =  self.getStack(OUTPUT_SLOT);
+            var currentOut = self.getStack(OUTPUT_SLOT);
 
             boolean success = false;
 
@@ -219,28 +221,27 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.writeInventoryNbt(nbt, lookup);
-        nbt.putDouble("Progress", this.process);
+    protected void writeData(WriteView view) {
+        this.writeInventoryView(view);
+        view.putDouble("Progress", this.process);
         if (this.delayedOutput != null && !this.delayedOutput.isEmpty()) {
-            nbt.put("DelayedOutput", this.delayedOutput.toNbt(lookup));
+            view.put("DelayedOutput", ItemStack.OPTIONAL_CODEC, this.delayedOutput);
         }
-        super.writeNbt(nbt, lookup);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.readInventoryNbt(nbt, lookup);
-        this.process = nbt.getDouble("Progress", 0);
-        if (nbt.contains("DelayedOutput")) {
-            this.delayedOutput = FactoryUtil.fromNbtStack(lookup, nbt.getCompoundOrEmpty("DelayedOutput"));
-            if (this.delayedOutput.isEmpty()) {
-                this.delayedOutput = null;
-            }
+    public void readData(ReadView view) {
+        this.readInventoryView(view);
+        this.process = view.getDouble("Progress", 0);
+        this.delayedOutput = view.read("DelayedOutput", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        if (this.delayedOutput.isEmpty()) {
+            this.delayedOutput = null;
         }
+
         this.currentItem = null;
         this.currentItem2 = null;
-        super.readNbt(nbt, lookup);
+        super.readData(view);
     }
 
     @Override

@@ -40,6 +40,8 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
@@ -205,21 +207,21 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.writeNbt(nbt, this.items, lookup);
-        nbt.put("fluids", this.fluidContainer.toNbt(lookup));
-        nbt.putInt("fuel_ticks", this.fuelTicks);
-        nbt.putInt("fuel_initial", this.fuelInitial);
-        super.writeNbt(nbt, lookup);
+    protected void writeData(WriteView view) {
+        Inventories.writeData(view, this.items);
+        this.fluidContainer.writeData(view, "fluids");
+        view.putInt("fuel_ticks", this.fuelTicks);
+        view.putInt("fuel_initial", this.fuelInitial);
+        super.writeData(view);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        Inventories.readNbt(nbt, items, lookup);
-        this.fluidContainer.fromNbt(lookup, nbt, "fluids");
-        this.fuelInitial = nbt.getInt("fuel_initial", 0);
-        this.fuelTicks = nbt.getInt("fuel_ticks", 0);
-        super.readNbt(nbt, lookup);
+    public void readData(ReadView view) {
+        Inventories.readData(view, items);
+        this.fluidContainer.readData(view, "fluids");
+        this.fuelInitial = view.getInt("fuel_initial", 0);
+        this.fuelTicks = view.getInt("fuel_ticks", 0);
+        super.readData(view);
         this.currentStack = ItemStack.EMPTY;
     }
 
@@ -235,7 +237,7 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
 
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return this.world != null && (slot == 1  == this.world.getFuelRegistry().isFuel(stack));
+        return this.world != null && (slot == 1 == this.world.getFuelRegistry().isFuel(stack));
     }
 
     @Override
@@ -263,7 +265,6 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
     }
 
 
-
     private class Gui extends SimpleGui {
         private final Slot inputSlot;
         private final FuelSlot fuelSlot;
@@ -274,7 +275,7 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X3, player, false);
             this.inputSlot = new Slot(PrimitiveSmelteryBlockEntity.this, 0, 0, 0);
-            this.fuelSlot = new FuelSlot(PrimitiveSmelteryBlockEntity.this, 1, player.getServerWorld().getFuelRegistry());
+            this.fuelSlot = new FuelSlot(PrimitiveSmelteryBlockEntity.this, 1, player.getWorld().getFuelRegistry());
             this.setSlotRedirect(2, this.inputSlot);
             this.setSlotRedirect(9 * 2 + 2, this.fuelSlot);
 

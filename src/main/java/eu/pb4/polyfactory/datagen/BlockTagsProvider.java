@@ -20,7 +20,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
 
     @Override
     protected void configure(RegistryWrapper.WrapperLookup arg) {
-        this.getOrCreateTagBuilder(FactoryBlockTags.SPRAY_CAN_COLORABLE)
+        this.builder(FactoryBlockTags.SPRAY_CAN_COLORABLE)
                 .addOptionalTag(BlockTags.WOOL)
                 .addOptionalTag(BlockTags.WOOL_CARPETS)
                 .addOptionalTag(BlockTags.BEDS)
@@ -33,17 +33,17 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .addOptionalTag(FactoryBlockTags.CONCRETE)
         ;
 
-        this.getOrCreateTagBuilder(FactoryBlockTags.CONVEYORS)
+        this.valueLookupBuilder(FactoryBlockTags.CONVEYORS)
                 .add(FactoryBlocks.CONVEYOR)
                 .add(FactoryBlocks.STICKY_CONVEYOR);
 
-        this.getOrCreateTagBuilder(FactoryBlockTags.CONVEYOR_TOP_OUTPUT)
+        this.valueLookupBuilder(FactoryBlockTags.CONVEYOR_TOP_OUTPUT)
                 .add(FactoryBlocks.FUNNEL).add(FactoryBlocks.SLOT_AWARE_FUNNEL).add(FactoryBlocks.SPLITTER);
 
-        this.getOrCreateTagBuilder(FactoryBlockTags.GRINDER_TOP_PLACEABLE)
+        this.valueLookupBuilder(FactoryBlockTags.GRINDER_TOP_PLACEABLE)
                 .add(FactoryBlocks.HAND_CRANK).add(FactoryBlocks.AXLE);
 
-        this.getOrCreateTagBuilder(FactoryBlockTags.CONVEYOR_SIDE_OUTPUT)
+        this.valueLookupBuilder(FactoryBlockTags.CONVEYOR_SIDE_OUTPUT)
                 .add(FactoryBlocks.PRESS)
                 .add(FactoryBlocks.MIXER)
                 .add(FactoryBlocks.MECHANICAL_SPOUT)
@@ -53,11 +53,11 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(Blocks.COMPOSTER)
         ;
 
-        this.getOrCreateTagBuilder(FactoryBlockTags.SPLITTER_SIDE_OUTPUT)
+        this.valueLookupBuilder(FactoryBlockTags.SPLITTER_SIDE_OUTPUT)
                 .addOptionalTag(FactoryBlockTags.CONVEYOR_SIDE_OUTPUT)
                 .addOptionalTag(FactoryBlockTags.CONVEYORS);
 
-        this.getOrCreateTagBuilder(FactoryBlockTags.WIND_PASSTHROUGH)
+        this.valueLookupBuilder(FactoryBlockTags.WIND_PASSTHROUGH)
                 .addOptionalTag(BlockTags.TRAPDOORS)
                 .addOptionalTag(BlockTags.FENCES)
                 .addOptionalTag(BlockTags.FENCE_GATES)
@@ -68,16 +68,16 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.METAL_GRID)
         ;
 
-        this.getOrCreateTagBuilder(FactoryBlockTags.PIPE_CONNECTABLE)
+        this.valueLookupBuilder(FactoryBlockTags.PIPE_CONNECTABLE)
                 .addOptionalTag(BlockTags.CAULDRONS)
                 .add(Blocks.BEEHIVE)
         ;
 
-        this.getOrCreateTagBuilder(BlockTags.INCORRECT_FOR_WOODEN_TOOL)
+        this.valueLookupBuilder(BlockTags.INCORRECT_FOR_WOODEN_TOOL)
                 .add(FactoryBlocks.STEEL_BLOCK)
                 ;
 
-        this.getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE)
+        this.valueLookupBuilder(BlockTags.PICKAXE_MINEABLE)
                 .addOptionalTag(FactoryBlockTags.CONVEYORS)
                 .add(FactoryBlocks.FAN,
                         FactoryBlocks.NIXIE_TUBE,
@@ -141,7 +141,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.WALL_WITH_CABLE.values().toArray(new Block[0]))
         ;
 
-        this.getOrCreateTagBuilder(FactoryBlockTags.UNCONNECTABLE)
+        this.valueLookupBuilder(FactoryBlockTags.UNCONNECTABLE)
                 .add(FactoryBlocks.PUMP)
                 .add(FactoryBlocks.PIPE)
                 .add(FactoryBlocks.NOZZLE)
@@ -162,7 +162,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
 
         ;
 
-        this.getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)
+        this.valueLookupBuilder(BlockTags.AXE_MINEABLE)
                 .add(FactoryBlocks.WINDMILL)
                 .add(FactoryBlocks.AXLE)
                 .add(FactoryBlocks.AXLE_WITH_GEAR)
@@ -175,10 +175,10 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.BLUEPRINT_WORKBENCH)
         ;
 
-        this.getOrCreateTagBuilder(BlockTags.WALLS)
+        this.valueLookupBuilder(BlockTags.WALLS)
                 .add(FactoryBlocks.WALL_WITH_CABLE.values().toArray(new Block[0]));
 
-        var conc = this.getOrCreateTagBuilder(FactoryBlockTags.CONCRETE);
+        var conc = this.valueLookupBuilder(FactoryBlockTags.CONCRETE);
 
         for (var block : Registries.BLOCK) {
             var id = Registries.BLOCK.getId(block);

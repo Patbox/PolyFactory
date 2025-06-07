@@ -19,6 +19,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
@@ -46,15 +48,15 @@ public abstract class PipeLikeBlockEntity extends BlockEntity implements FluidIn
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
-        nbt.put("fluid", this.container.toNbt(registryLookup));
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        this.container.writeData(view, "fluid");
     }
 
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        this.container.fromNbt(registryLookup, nbt, "fluid");
+    protected void readData(ReadView view) {
+        super.readData(view);
+        this.container.readData(view, "fluid");
         this.fluidPush.setMaxPush(this.container.stored());
     }
 
@@ -74,9 +76,9 @@ public abstract class PipeLikeBlockEntity extends BlockEntity implements FluidIn
     }
 
     @Override
-    public void removeFromCopiedStackNbt(NbtCompound nbt) {
-        super.removeFromCopiedStackNbt(nbt);
-        nbt.remove("fluid");
+    public void removeFromCopiedStackData(WriteView view) {
+        view.remove("fluid");
+        super.removeFromCopiedStackData(view);
     }
 
     public void preTick() {

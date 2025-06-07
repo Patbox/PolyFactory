@@ -8,6 +8,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -25,21 +27,21 @@ public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.readNbt(nbt, lookup);
-        this.scrollSpeed = nbt.getInt("scroll_speed", 0);
-        this.scrollLoop = nbt.getBoolean("scroll_loop", false);
-        this.scrollPoint = nbt.getInt("scroll_point", 0);
-        this.text = nbt.getString("text", "");
+    public void readData(ReadView view) {
+        super.readData(view);
+        this.scrollSpeed = view.getInt("scroll_speed", 0);
+        this.scrollLoop = view.getBoolean("scroll_loop", false);
+        this.scrollPoint = view.getInt("scroll_point", 0);
+        this.text = view.getString("text", "");
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.writeNbt(nbt, lookup);
-        nbt.putInt("scroll_speed", this.scrollSpeed);
-        nbt.putInt("scroll_point", this.scrollPoint);
-        nbt.putBoolean("scroll_loop", this.scrollLoop);
-        nbt.putString("text", this.text);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putInt("scroll_speed", this.scrollSpeed);
+        view.putInt("scroll_point", this.scrollPoint);
+        view.putBoolean("scroll_loop", this.scrollLoop);
+        view.putString("text", this.text);
     }
 
     public boolean receiveData(DataContainer data) {

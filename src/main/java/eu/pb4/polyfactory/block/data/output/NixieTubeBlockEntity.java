@@ -11,6 +11,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -27,6 +29,7 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
     private int connectionSize = 1;
     private int color = 0xff6e19;
     private NixieTubeBlock.Model model;
+
     public NixieTubeBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.NIXIE_TUBE, pos, state);
     }
@@ -36,24 +39,24 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        super.writeNbt(nbt, lookup);
-        nbt.putString("Text", this.value);
-        nbt.putInt("PIndex", this.positiveIndex);
-        nbt.putInt("NIndex", this.negativeIndex);
-        nbt.putInt("ConnSize", this.connectionSize);
-        nbt.putInt("Color", this.color);
-        nbt.putInt("Padding", this.padding);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putString("Text", this.value);
+        view.putInt("PIndex", this.positiveIndex);
+        view.putInt("NIndex", this.negativeIndex);
+        view.putInt("ConnSize", this.connectionSize);
+        view.putInt("Color", this.color);
+        view.putInt("Padding", this.padding);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        this.value = nbt.getString("Text", "");
-        this.positiveIndex = nbt.getInt("PIndex", 0);
-        this.negativeIndex = nbt.getInt("NIndex", 0);
-        this.color = nbt.getInt("Color", 0);
-        this.connectionSize = nbt.getInt("ConnSize", 0);
-        this.padding = (char) nbt.getInt("Padding", 0);
+    public void readData(ReadView view) {
+        this.value = view.getString("Text", "");
+        this.positiveIndex = view.getInt("PIndex", 0);
+        this.negativeIndex = view.getInt("NIndex", 0);
+        this.color = view.getInt("Color", 0);
+        this.connectionSize = view.getInt("ConnSize", 0);
+        this.padding = (char) view.getInt("Padding", 0);
         this.updateTextDisplay();
     }
 
@@ -93,6 +96,7 @@ public class NixieTubeBlockEntity extends BlockEntity implements BlockEntityExtr
             return b;
         });
     }
+
     public void pushUpdate(Predicate<NixieTubeBlockEntity> modifierAndPredicate) {
         var axis = this.getCachedState().get(NixieTubeBlock.AXIS);
         var dir = Direction.get(Direction.AxisDirection.NEGATIVE, axis);
