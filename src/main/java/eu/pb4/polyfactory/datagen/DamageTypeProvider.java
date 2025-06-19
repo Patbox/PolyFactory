@@ -37,19 +37,19 @@ public class DamageTypeProvider extends FabricCodecDataProvider<DamageType> {
         @Override
         protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
             this.builder(DamageTypeTags.BYPASSES_COOLDOWN)
-                    .add(FactoryDamageTypes.EXPERIENCE_SPLASH);
+                    .addOptional(FactoryDamageTypes.EXPERIENCE_SPLASH);
             this.builder(DamageTypeTags.BYPASSES_ARMOR)
-                    .add(FactoryDamageTypes.EXPERIENCE_SPLASH);
+                    .addOptional(FactoryDamageTypes.EXPERIENCE_SPLASH);
             this.builder(DamageTypeTags.BYPASSES_SHIELD)
-                    .add(FactoryDamageTypes.EXPERIENCE_SPLASH);
+                    .addOptional(FactoryDamageTypes.EXPERIENCE_SPLASH);
             this.builder(DamageTypeTags.IS_PROJECTILE)
-                    .add(FactoryDamageTypes.EXPERIENCE_SPLASH);
+                    .addOptional(FactoryDamageTypes.EXPERIENCE_SPLASH);
             this.builder(DamageTypeTags.ALWAYS_HURTS_ENDER_DRAGONS)
-                    .add(FactoryDamageTypes.EXPERIENCE_SPLASH);
+                    .addOptional(FactoryDamageTypes.EXPERIENCE_SPLASH);
             this.builder(DamageTypeTags.PANIC_CAUSES)
-                    .add(FactoryDamageTypes.EXPERIENCE_SPLASH);
+                    .addOptional(FactoryDamageTypes.EXPERIENCE_SPLASH);
             this.builder(DamageTypeTags.BYPASSES_EFFECTS)
-                    .add(FactoryDamageTypes.EXPERIENCE_SPLASH);
+                    .addOptional(FactoryDamageTypes.EXPERIENCE_SPLASH);
 
         }
     }
