@@ -8,7 +8,7 @@ import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.particle.EntityEffectParticleEffect;
+import net.minecraft.particle.TintedParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
@@ -38,7 +38,7 @@ public class PotionSplashEntity extends SplashEntity<PotionContentsComponent> {
         super.setFluidData(data);
         this.particles.clear();
         if (!data.hasEffects()) {
-            this.particles.add(EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, -13083194));
+            this.particles.add(TintedParticleEffect.create(ParticleTypes.ENTITY_EFFECT, -13083194));
             return;
         }
         for (var effect : data.getEffects()) {

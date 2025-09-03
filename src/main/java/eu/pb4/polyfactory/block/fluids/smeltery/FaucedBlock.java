@@ -12,6 +12,7 @@ import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.DrainInput;
 import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.blocks.api.BlockModelType;
 import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
 import eu.pb4.polymer.blocks.api.PolymerTexturedBlock;
@@ -53,11 +54,6 @@ import java.util.function.BooleanSupplier;
 
 public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedBlock, PipeConnectable {
     public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
-    private static final Map<Direction, BlockState> STATES_REGULAR = Util.mapEnum(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
-        case UP -> "BOTTOM";
-        case DOWN -> "TOP";
-        default -> x.asString().toUpperCase(Locale.ROOT);
-    } + "_TRAPDOOR")));
 
     public FaucedBlock(Settings settings) {
         super(settings);
@@ -144,7 +140,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
 
     @Override
     public BlockState getPolymerBlockState(BlockState blockState, PacketContext packetContext) {
-        return STATES_REGULAR.get(blockState.get(FACING));
+        return FactoryUtil.TRAPDOOR_REGULAR.get(blockState.get(FACING));
     }
 
     @Override

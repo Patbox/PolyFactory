@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.mixin.machines;
 
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.DataProvider;
+import eu.pb4.polyfactory.block.data.output.GaugeBlock;
 import eu.pb4.polyfactory.block.data.providers.DataProviderBlock;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.data.CapacityData;
@@ -29,6 +30,8 @@ public abstract class WorldMixin implements WorldAccess {
     @Shadow public abstract BlockState getBlockState(BlockPos pos);
 
     @Shadow @Nullable public abstract BlockEntity getBlockEntity(BlockPos pos);
+
+    @Shadow public abstract boolean setBlockState(BlockPos pos, BlockState state, int flags);
 
     @Inject(method = "updateComparators", at = @At("HEAD"))
     private void polyfactory$onComparatorUpdate(BlockPos pos, Block block, CallbackInfo ci) {
@@ -66,6 +69,8 @@ public abstract class WorldMixin implements WorldAccess {
                 var state = this.getBlockState(selfPos);
                 if (state.isOf(FactoryBlocks.ITEM_COUNTER) && state.get(DataProviderBlock.FACING) == dir.getOpposite()) {
                     DataProvider.sendData(world, selfPos, data);
+                } else if (state.isOf(FactoryBlocks.GAUGE) && state.get(GaugeBlock.ORIENTATION).getFacing() == dir) {
+                    FactoryBlocks.GAUGE.receiveData(world, selfPos, state, -2, data, null, pos, null);
                 }
             }
         }

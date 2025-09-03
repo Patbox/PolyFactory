@@ -13,6 +13,7 @@ import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.AxisAndFacingNetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.data.CapacityData;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.LongData;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
@@ -170,11 +171,11 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
         @Override
         protected <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
             var rot = RotationUser.getRotation(world, pos);
-            DataProvider.sendData(world, pos, new LongData(switch (state.get(TYPE)) {
-                case LEFT -> (long) (rot.stressCapacity() - rot.stressUsage());
-                case CAPACITY -> (long) rot.stressCapacity();
-                case USED -> (long) rot.stressUsage();
-            }));
+            DataProvider.sendData(world, pos, switch (state.get(TYPE)) {
+                case LEFT -> new CapacityData((long) (rot.stressCapacity() - rot.stressUsage()), (long) rot.stressCapacity());
+                case CAPACITY -> new LongData((long) rot.stressCapacity());
+                case USED ->  new CapacityData((long) rot.stressUsage(), (long) rot.stressCapacity());
+            });
         }
 
         @Override

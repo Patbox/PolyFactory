@@ -5,11 +5,9 @@ import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
-import eu.pb4.polyfactory.block.data.AbstracterCableBlock;
 import eu.pb4.polyfactory.block.data.io.DataMemoryBlockEntity;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.data.DataContainer;
-import eu.pb4.polyfactory.data.StringData;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.ColorProvider;
@@ -19,8 +17,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.ComponentsAccess;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
@@ -99,6 +95,10 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
             this.model = baseCableModel;
             baseCableModel.setColor(this.color);
         }
+
+        if (x != null && x.holder() instanceof InitDataListener initDataListener && this.lastData != null) {
+            initDataListener.provideInitialCachedData(this.lastData);
+        }
     }
 
     @Override
@@ -146,5 +146,10 @@ public class ChanneledDataBlockEntity extends LockableBlockEntity implements Cha
         view.remove("channel");
         view.remove("data");
         view.remove("color");
+    }
+
+
+    public interface InitDataListener {
+        void provideInitialCachedData(DataContainer lastData);
     }
 }

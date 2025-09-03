@@ -76,6 +76,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addDrop(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER);
         this.addDrop(FactoryBlocks.ARITHMETIC_OPERATOR);
         this.addDrop(FactoryBlocks.TACHOMETER);
+        this.addDrop(FactoryBlocks.GAUGE);
         this.addDrop(FactoryBlocks.GATED_CABLE);
         this.addDrop(FactoryBlocks.STRESSOMETER);
         this.addDrop(FactoryBlocks.PIPE);

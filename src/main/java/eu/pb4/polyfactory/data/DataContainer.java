@@ -2,20 +2,15 @@ package eu.pb4.polyfactory.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.MathHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface DataContainer extends Comparable<DataContainer> {
-    MapCodec<DataContainer> MAP_CODEC = DataType.CODEC.dispatchMap("type", DataContainer::type, DataType::codec);
+    MapCodec<DataContainer> MAP_CODEC = MapCodec.recursive("data_container", x -> DataType.CODEC.dispatchMap("type", DataContainer::type, DataType::codec));
     Codec<DataContainer> CODEC = MAP_CODEC.codec();
 
-    List<String> GENERIC_EXTRACTS = List.of("decimal", "integer", "string", "boolean", "redstone");
+    List<String> GENERIC_EXTRACTS = List.of("decimal", "integer", "string", "boolean", "redstone", "progress");
     static DataContainer of(long count) {
         return new LongData(count);
     }
@@ -31,6 +26,10 @@ public interface DataContainer extends Comparable<DataContainer> {
     String asString();
     long asLong();
     double asDouble();
+
+    default float asProgress() {
+        return (float) (asDouble() / 100);
+    }
     default boolean isEmpty() {
         return false;
     }
@@ -41,7 +40,6 @@ public interface DataContainer extends Comparable<DataContainer> {
     default char padding() {
         return ' ';
     }
-
     default boolean forceRight() {
         return false;
     }
@@ -50,9 +48,10 @@ public interface DataContainer extends Comparable<DataContainer> {
         return switch (field) {
             case "decimal" -> new DoubleData(asDouble());
             case "integer" -> new LongData(asLong());
-            case "redstone" -> new LongData(asRedstoneOutput());
+            case "redstone" -> new RedstoneData(asRedstoneOutput());
             case "string" -> new StringData(asString());
             case "boolean" -> BoolData.of(this.isTrue());
+            case "progress" -> new ProgressData(this.asProgress());
             case "" -> this;
             default -> empty();
         };

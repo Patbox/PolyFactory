@@ -5,6 +5,7 @@ import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
@@ -52,9 +53,7 @@ import static eu.pb4.polyfactory.util.FactoryUtil.id;
 public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider, ConfigurableBlock {
     public static final EnumProperty<Direction> FACING = Properties.FACING;
     public static final BooleanProperty ENABLED = Properties.ENABLED;
-    public static final BooleanProperty REVERSE = BooleanProperty.of("reverse");
-
-    public static final BlockConfig REVERSE_ACTION = BlockConfig.of("reverse", REVERSE, (on, world, pos, side, state) -> ScreenTexts.onOrOff(on));
+    public static final BooleanProperty REVERSE = FactoryProperties.REVERSE;
 
     public FanBlock(Settings settings) {
         super(settings);
@@ -142,13 +141,14 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
 
     @Override
     public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(REVERSE_ACTION, BlockConfig.FACING);
+        return List.of(BlockConfig.REVERSE, BlockConfig.FACING);
     }
 
     @Override
     public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
         modifier.stress(0.1);
     }
+
     public static final class Model extends RotationAwareModel {
         public static final ItemStack ITEM_MODEL = ItemDisplayElementUtil.getModel(id("block/fan_rotating"));
 

@@ -2,10 +2,12 @@ package eu.pb4.polyfactory.block.configurable;
 
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
+import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.nodes.data.DataStorage;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.BlockHalf;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
@@ -35,6 +37,7 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, ConfigValue<T
     );
     public static final BlockConfig<Direction> FACING_HOPPER = ofDirection("rotation", Properties.HOPPER_FACING);
     public static final BlockConfig<Boolean> INVERTED = of("inverted", Properties.INVERTED);
+    public static final BlockConfig<Boolean> REVERSE = BlockConfig.of("reverse", FactoryProperties.REVERSE, (on, world, pos, side, state) -> ScreenTexts.onOrOff(on));
 
     public static <T extends Comparable<T>> BlockConfig<T> of(Property<T> property) {
         return of(property.getName(), property);

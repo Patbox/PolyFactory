@@ -1,0 +1,24 @@
+{
+	"format_version": "1.21.6",
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "polyfactory:block/gauge/front_inner",
+		"particle": "polyfactory:block/gauge/front_inner"
+	},
+	"elements": [
+		{
+			"from": [7.5, 7, 6.75],
+			"to": [8.5, 12, 6.75],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 6.75]},
+			"faces": {
+				"north": {"uv": [15, 11, 16, 16], "texture": "#0"},
+				"east": {"uv": [15, 11, 15, 16], "texture": "#0"},
+				"south": {"uv": [15, 11, 16, 16], "texture": "#0"},
+				"west": {"uv": [15, 11, 15, 16], "texture": "#0"},
+				"up": {"uv": [15, 11, 16, 11], "texture": "#0"},
+				"down": {"uv": [15, 11, 16, 11], "texture": "#0"}
+			}
+		}
+	],
+	"display": {}
+}

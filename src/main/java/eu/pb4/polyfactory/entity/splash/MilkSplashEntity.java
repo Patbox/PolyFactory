@@ -1,24 +1,14 @@
 package eu.pb4.polyfactory.entity.splash;
 
-import eu.pb4.polyfactory.entity.FactoryEntities;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
-import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.mixin.StatusEffectInstanceAccessor;
-import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.particle.EntityEffectParticleEffect;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MilkSplashEntity extends SplashEntity<Unit> {
     public MilkSplashEntity(EntityType<MilkSplashEntity> entityType, World world) {

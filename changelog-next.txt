@@ -1,0 +1,13 @@
+- Added Gauge:
+  - New data output block, used to show progress.
+  - While it uses cable system, it can also extract data from other blocks (like Storage Counter).
+  - For progress information, it will start at zero and end at max value / capacity.
+  - For Redstone signal it will show value between 0 and 15 (max redstone signal).
+  - For other signals it will display between 0 and 100, based on double value.
+  - Can be placed on walls and floor, with floor allowing to rotate it.
+  - You can change its style between Default (white background), red-green and green-red.
+  - Crafted with 4 Steel Ingots and single Paper.
+- Steel and Copper Places can now be recycled in Smeltery.
+- Added Redstone, Progress and List data types.
+- Redstone signal is now sent as its own data type (instead of being a Integer).
+- Updated Mold Template textures.

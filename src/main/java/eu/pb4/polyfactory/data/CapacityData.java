@@ -36,6 +36,11 @@ public record CapacityData(long stored, long capacity) implements DataContainer 
     }
 
     @Override
+    public float asProgress() {
+        return (float) (((double) this.stored) / Math.max(this.capacity, 1));
+    }
+
+    @Override
     public int asRedstoneOutput() {
         return (int) MathHelper.clamp((15 * this.stored / this.capacity), 0, 15);
     }

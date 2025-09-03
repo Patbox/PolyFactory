@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.LongData;
+import eu.pb4.polyfactory.data.RedstoneData;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import net.minecraft.block.AbstractBlock;
@@ -52,7 +53,7 @@ public class RedstoneInputBlock extends CabledDataProviderBlock implements Redst
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
-        sendData((ServerWorld) world, pos, new LongData(state.get(POWER)));
+        sendData((ServerWorld) world, pos, new RedstoneData(state.get(POWER)));
     }
 
     private int clamp(int receivedRedstonePower) {
@@ -67,7 +68,7 @@ public class RedstoneInputBlock extends CabledDataProviderBlock implements Redst
             var input = clamp(world.getEmittedRedstonePower(pos.offset(dir), dir));
             if (power != input) {
                 world.setBlockState(pos, state.with(POWER, input), Block.NOTIFY_LISTENERS);
-                sendData((ServerWorld) world, pos, new LongData(input));
+                sendData((ServerWorld) world, pos, new RedstoneData(input));
             }
         }
     }

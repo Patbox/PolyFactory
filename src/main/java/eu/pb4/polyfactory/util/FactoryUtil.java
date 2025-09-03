@@ -8,6 +8,8 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
 import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
+import eu.pb4.polymer.blocks.api.BlockModelType;
+import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
 import eu.pb4.sgui.api.GuiHelpers;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -87,6 +89,19 @@ public class FactoryUtil {
             DyeColor.PURPLE,
             DyeColor.MAGENTA,
             DyeColor.PINK);
+
+    public static final Map<Direction, BlockState> TRAPDOOR_REGULAR = Util.mapEnum(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
+        case UP -> "BOTTOM";
+        case DOWN -> "TOP";
+        default -> x.asString().toUpperCase(Locale.ROOT);
+    } + "_TRAPDOOR")));
+
+    public static final Map<Direction, BlockState> TRAPDOOR_WATERLOGGED = Util.mapEnum(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
+        case UP -> "BOTTOM";
+        case DOWN -> "TOP";
+        default -> x.asString().toUpperCase(Locale.ROOT);
+    } + "_TRAPDOOR_WATERLOGGED")));
+
     private static final List<Runnable> RUN_NEXT_TICK = new ArrayList<>();
 
     public static Item requestModelBase(ModelRenderType type) {

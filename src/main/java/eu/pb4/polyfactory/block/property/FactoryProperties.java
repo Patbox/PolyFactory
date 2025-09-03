@@ -51,4 +51,6 @@ public interface FactoryProperties {
     BooleanProperty NEGATIVE_CONNECTED = BooleanProperty.of("negative_connected");
     EnumProperty<Direction> HORIZONTAL_DIRECTION = EnumProperty.of("direction", Direction.class, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
     BooleanProperty LOCKED = BooleanProperty.of("locked");
+    BooleanProperty REVERSE = BooleanProperty.of("reverse");
+
 }

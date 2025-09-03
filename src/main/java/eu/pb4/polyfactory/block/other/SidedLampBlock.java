@@ -10,8 +10,7 @@ import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import eu.pb4.polymer.blocks.api.BlockModelType;
-import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.blocks.api.PolymerTexturedBlock;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -193,23 +192,13 @@ public abstract class SidedLampBlock extends Block implements FactoryBlock, Bloc
     }
 
     public static final class Flat extends SidedLampBlock implements PolymerTexturedBlock {
-        private static final Map<Direction, BlockState> STATES_REGULAR = Util.mapEnum(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
-            case UP -> "BOTTOM";
-            case DOWN -> "TOP";
-            default -> x.asString().toUpperCase(Locale.ROOT);
-        } + "_TRAPDOOR")));
-        private static final Map<Direction, BlockState> STATES_WATERLOGGED = Util.mapEnum(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
-            case UP -> "BOTTOM";
-            case DOWN -> "TOP";
-            default -> x.asString().toUpperCase(Locale.ROOT);
-        } + "_TRAPDOOR_WATERLOGGED")));
         public Flat(Settings settings, Identifier id, boolean inverted) {
             super(settings, id, inverted);
         }
 
         @Override
         public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-            return (state.get(WATERLOGGED) ? STATES_WATERLOGGED : STATES_REGULAR).get(state.get(FACING));
+            return (state.get(WATERLOGGED) ? FactoryUtil.TRAPDOOR_WATERLOGGED : FactoryUtil.TRAPDOOR_REGULAR).get(state.get(FACING));
         }
     }
 

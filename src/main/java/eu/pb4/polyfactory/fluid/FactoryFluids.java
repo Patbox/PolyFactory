@@ -18,9 +18,9 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.particle.EntityEffectParticleEffect;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.particle.TintedParticleEffect;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
@@ -112,7 +112,7 @@ public class FactoryFluids {
                             return Text.translatable("fluid_type.minecraft.potion.strong", base);
                         }
                         return base;
-                    }).particle((data) -> EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, data.data().getColor()))
+                    }).particle((data) -> TintedParticleEffect.create(ParticleTypes.ENTITY_EFFECT, data.data().getColor()))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.POTION_SPLASH, 4, FluidConstants.BOTTLE / 60, FactorySoundEvents.FLUID_SHOOT_POTION))
                     .build());
 

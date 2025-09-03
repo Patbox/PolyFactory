@@ -38,7 +38,7 @@ public abstract class Schema1460Mixin extends Schema {
     private void registerPolyFactoryBlockEntities(Schema schema, CallbackInfoReturnable<Map<String, Supplier<TypeTemplate>>> cir) {
         var map = cir.getReturnValue();
 
-        //schema.register(map, mod("conveyor"), (name) -> {
+        //schema.register(list, mod("conveyor"), (name) -> {
         //    return DSL.optionalFields("HeldStack", TypeReferences.ITEM_STACK.in(schema));
         //});
 

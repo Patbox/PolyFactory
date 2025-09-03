@@ -4,18 +4,16 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
 import eu.pb4.polyfactory.data.DataContainer;
+import eu.pb4.polyfactory.data.ListData;
 import eu.pb4.polyfactory.data.SoundEventData;
-import eu.pb4.polyfactory.nodes.data.ChannelReceiverSelectiveSideNode;
 import eu.pb4.polyfactory.nodes.data.DataReceiverNode;
 import eu.pb4.polyfactory.nodes.data.SpeakerNode;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
-import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.NoteBlockInstrument;
-import net.minecraft.network.packet.s2c.play.PlaySoundFromEntityS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -48,6 +46,18 @@ public class SpeakerBlock extends GenericCabledDataBlock implements DataReceiver
             return false;
         }
 
+        final var x = BlockAwareAttachment.get(world, selfPos);
+        if (x == null || !(x.holder() instanceof Model model)) {
+            return false;
+        }
+        if (data instanceof ListData listData) {
+            return listData.forEachFlatBool(d -> playNote(d, model, selfPos, selfState, world));
+        } else {
+            return playNote(data, model, selfPos, selfState, world);
+        }
+    }
+
+    private boolean playNote(DataContainer data, Model model, BlockPos selfPos, BlockState selfState, ServerWorld world)  {
         var soundEvent = Registries.SOUND_EVENT.getEntry(SoundEvents.INTENTIONALLY_EMPTY);
         var volume = 1f;
         var pitch = 1f;
@@ -86,13 +96,11 @@ public class SpeakerBlock extends GenericCabledDataBlock implements DataReceiver
             }
         }
 
-        var x = BlockAwareAttachment.get(world, selfPos);
-        if (x != null && x.holder() instanceof Model model) {
-            model.playSound(soundEvent, Math.min(volume, 1.5f), pitch, seed);
-        }
+        model.playSound(soundEvent, Math.min(volume, 1.5f), pitch, seed);
 
         var facing = Vec3d.ofCenter(selfPos).offset(selfState.get(FACING), 0.6);
         world.spawnParticles(ParticleTypes.NOTE, facing.x, facing.y, facing.z, 0, pitch / 24, 0, 0, 1);
+
         return true;
     }
 

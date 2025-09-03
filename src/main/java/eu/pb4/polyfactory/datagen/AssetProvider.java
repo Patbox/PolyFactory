@@ -5,6 +5,7 @@ import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import eu.pb4.mapcanvas.api.font.DefaultFonts;
 import eu.pb4.mapcanvas.api.utils.CanvasUtils;
+import eu.pb4.polyfactory.block.data.output.GaugeBlock;
 import eu.pb4.polyfactory.item.FactoryDebugItems;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.SpoutMolds;
@@ -69,6 +70,7 @@ class AssetProvider implements DataProvider {
         createItems(map::put);
         map.forEach((id, asset) -> assetWriter.accept(AssetPaths.itemAsset(id), asset.toJson().getBytes(StandardCharsets.UTF_8)));
         createNumberButtons(assetWriter);
+        createGaugeStyles(assetWriter);
 
         var moldTexture = new MoldTextures();
 
@@ -76,6 +78,19 @@ class AssetProvider implements DataProvider {
             createMold(assetWriter, mold, moldTexture);
         }
     }
+
+    private static void createGaugeStyles(BiConsumer<String,byte[]> assetWriter) {
+        for (var style : GaugeBlock.Style.values()) {
+            if (style == GaugeBlock.Style.DEFAULT) continue;
+
+            assetWriter.accept("assets/polyfactory/models/block/gauge_" + style.asString() +".json", ModelAsset.builder()
+                    .parent(id("block/gauge"))
+                    .texture("front_inner", "polyfactory:block/gauge/front_inner_" + style.asString())
+                    .build().toBytes()
+            );
+        }
+    }
+
     private static class MoldTextures {
         BufferedImage steelBase = ResourceUtils.getTexture(id("item/mold/template/template"));
         BufferedImage steelBorder = ResourceUtils.getTexture(id("item/mold/template/template_border"));

@@ -104,6 +104,7 @@ public class FactoryBlocks {
     public static final ProgrammableDataExtractorBlock PROGRAMMABLE_DATA_EXTRACTOR = register("programmable_data_extractor", Block.Settings.copy(ITEM_COUNTER), ProgrammableDataExtractorBlock::new);
     public static final DataMemoryBlock DATA_MEMORY = register("data_memory", Block.Settings.copy(ITEM_COUNTER), DataMemoryBlock::new);
 
+    public static final GaugeBlock GAUGE = register("gauge", Block.Settings.copy(Blocks.IRON_TRAPDOOR), GaugeBlock::new);
     public static final HologramProjectorBlock HOLOGRAM_PROJECTOR = register("hologram_projector", Block.Settings.copy(SPLITTER), HologramProjectorBlock::new);
     public static final NixieTubeBlock NIXIE_TUBE = register("nixie_tube", Block.Settings.copy(Blocks.GLASS), settings -> new NixieTubeBlock(settings.nonOpaque()));
 

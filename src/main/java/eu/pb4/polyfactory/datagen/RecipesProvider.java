@@ -619,6 +619,15 @@ class RecipesProvider extends FabricRecipeProvider {
                         .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
                         .offerTo(exporter);
 
+                this.createShaped(RecipeCategory.REDSTONE, FactoryItems.GAUGE)
+                        .pattern(" s ")
+                        .pattern("sps")
+                        .pattern(" s ")
+                        .input('s', FactoryItems.STEEL_INGOT)
+                        .input('p', Items.PAPER)
+                        .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                        .offerTo(exporter);
+
                 this.createShaped(RecipeCategory.REDSTONE, FactoryItems.HOLOGRAM_PROJECTOR, 1)
                         .pattern("pdp")
                         .pattern("ese")
@@ -1357,7 +1366,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 ), null);
 
                 smelteryOreSet(FactoryFluids.IRON, FactoryFluidConstants.IRON_INGOT_MELTING, ItemTags.IRON_ORES, Items.RAW_IRON, Items.RAW_IRON_BLOCK,
-                        FactoryItems.CRUSHED_RAW_IRON, Items.IRON_INGOT, Items.IRON_NUGGET, Items.IRON_BLOCK);
+                        FactoryItems.CRUSHED_RAW_IRON, Items.IRON_INGOT, Items.IRON_NUGGET, Items.IRON_BLOCK, null);
                 of(exporter,
                         SimpleSmelteryRecipe.of("minecraft_iron", Items.ANVIL, FactoryFluids.IRON.of(FluidConstants.INGOT * (9 * 3 + 4) * 3 / 4),FactoryFluidConstants.IRON_INGOT_MELTING * (9 * 3 + 4) * 3 / 4),
                         SimpleSmelteryRecipe.of("minecraft_iron", Items.CHIPPED_ANVIL, FactoryFluids.IRON.of(FluidConstants.INGOT * (9 * 3 + 4) * 2 / 4),FactoryFluidConstants.IRON_INGOT_MELTING * (9 * 3 + 4) * 3 / 4),
@@ -1373,9 +1382,9 @@ class RecipesProvider extends FabricRecipeProvider {
                 );
 
                 smelteryOreSet(FactoryFluids.GOLD, FactoryFluidConstants.GOLD_INGOT_MELTING, ItemTags.GOLD_ORES, Items.RAW_GOLD, Items.RAW_GOLD_BLOCK,
-                        FactoryItems.CRUSHED_RAW_GOLD, Items.GOLD_INGOT, Items.GOLD_NUGGET, Items.GOLD_BLOCK);
+                        FactoryItems.CRUSHED_RAW_GOLD, Items.GOLD_INGOT, Items.GOLD_NUGGET, Items.GOLD_BLOCK, null);
                 smelteryOreSet(FactoryFluids.COPPER, FactoryFluidConstants.COPPER_INGOT_MELTING, ItemTags.COPPER_ORES, Items.RAW_COPPER, Items.RAW_COPPER_BLOCK,
-                        FactoryItems.CRUSHED_RAW_COPPER, Items.COPPER_INGOT, FactoryItems.COPPER_NUGGET, Items.COPPER_BLOCK);
+                        FactoryItems.CRUSHED_RAW_COPPER, Items.COPPER_INGOT, FactoryItems.COPPER_NUGGET, Items.COPPER_BLOCK, FactoryItems.COPPER_PLATE);
 
 
                 of(exporter,
@@ -1386,7 +1395,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 moldRecipes(FactoryItems.PIPE_MOLD, FactoryFluids.COPPER.of(FluidConstants.INGOT * 2), FactoryItems.PIPE);
 
                 smelteryOreSet(FactoryFluids.STEEL, FactoryFluidConstants.STEEL_INGOT_MELTING, null, FactoryItems.STEEL_ALLOY_MIXTURE, null,
-                        null, FactoryItems.STEEL_INGOT, FactoryItems.STEEL_NUGGET, FactoryItems.STEEL_BLOCK);
+                        null, FactoryItems.STEEL_INGOT, FactoryItems.STEEL_NUGGET, FactoryItems.STEEL_BLOCK, FactoryItems.STEEL_PLATE);
 
                 // Smeltery Steel recycling
                 of(exporter,
@@ -1486,13 +1495,14 @@ class RecipesProvider extends FabricRecipeProvider {
             }
 
 
-            private void smelteryOreSet(FluidType<?> fluidType, int ingotTime, TagKey<Item> oreBlock, Item raw, Item rawBlock, Item crushed, Item ingot, Item nugget, Item block) {
+            private void smelteryOreSet(FluidType<?> fluidType, int ingotTime, TagKey<Item> oreBlock, Item raw, Item rawBlock, Item crushed, Item ingot, Item nugget, Item block, Item plate) {
                 var group = FactoryRegistries.FLUID_TYPES.getId(fluidType).toUnderscoreSeparatedString();
                 of(exporter,
                         raw != null ? SimpleSmelteryRecipe.of(group, raw, fluidType.of(FluidConstants.INGOT + FluidConstants.NUGGET * 2), ingotTime * 5 / 4) : null,
                         oreBlock != null ? SimpleSmelteryRecipe.of(group, oreBlock, fluidType.of(FluidConstants.INGOT * 2), ingotTime * 3 / 2) : null,
                         rawBlock != null ? SimpleSmelteryRecipe.of(group, rawBlock, fluidType.of((FluidConstants.INGOT + FluidConstants.NUGGET) * 9), (ingotTime * 3 / 2) * 9) : null,
-                        crushed != null ? SimpleSmelteryRecipe.of(group, crushed, fluidType.of(FluidConstants.INGOT + FluidConstants.NUGGET * 2), (ingotTime * 5 / 4)) : null
+                        crushed != null ? SimpleSmelteryRecipe.of(group, crushed, fluidType.of(FluidConstants.INGOT + FluidConstants.NUGGET * 2), (ingotTime * 5 / 4)) : null,
+                        plate != null ? SimpleSmelteryRecipe.of(group, plate, fluidType.of(FluidConstants.INGOT), ingotTime) : null
                 );
 
                 if (ingot != null) {
