@@ -131,8 +131,8 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addColored(FactoryBlocks.INVERTED_CAGED_LAMP);
         this.addColored(FactoryBlocks.FIXTURE_LAMP);
         this.addColored(FactoryBlocks.INVERTED_FIXTURE_LAMP);
-        FactoryBlocks.WALL_WITH_CABLE.values().forEach(this::addWallWithCable);
-        FactoryBlocks.WALL_WITH_PIPE.values().forEach(this::addWallWithPipe);
+        //FactoryBlocks.WALL_WITH_CABLE.values().forEach(this::addWallWithCable);
+        //FactoryBlocks.WALL_WITH_PIPE.values().forEach(this::addWallWithPipe);
     }
 
     private void addTallMachineDrop(TallItemMachineBlock block) {
@@ -179,7 +179,7 @@ class LootTables extends FabricBlockLootTableProvider {
                 .pool(LootPool.builder()
                         .conditionally(SurvivesExplosionLootCondition.builder())
                         .rolls(ConstantLootNumberProvider.create(1.0F))
-                        .with(ItemEntry.builder(block.getBacking())))
+                        .with(ItemEntry.builder(block.backing())))
         );
     }
 
@@ -191,7 +191,7 @@ class LootTables extends FabricBlockLootTableProvider {
                 .pool(LootPool.builder()
                         .conditionally(SurvivesExplosionLootCondition.builder())
                         .rolls(ConstantLootNumberProvider.create(1.0F))
-                        .with(ItemEntry.builder(block.getBacking())))
+                        .with(ItemEntry.builder(block.backing())))
         );
     }
 

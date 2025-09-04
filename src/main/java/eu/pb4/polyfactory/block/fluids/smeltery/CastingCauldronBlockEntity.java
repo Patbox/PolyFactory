@@ -192,7 +192,7 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
 
     @Override
     public int[] getAvailableSlots(Direction side) {
-        return new int[0];
+        return new int[] { 0 };
     }
 
     @Override
@@ -202,7 +202,7 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
 
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return false;
+        return true;
     }
 
 

@@ -8,6 +8,9 @@
   - You can change its style between Default (white background), red-green and green-red.
   - Crafted with 4 Steel Ingots and single Paper.
 - Steel and Copper Places can now be recycled in Smeltery.
+- Resulting item can now be pulled with from Casting Table and Casting Cauldron (with Hopper or alike).
 - Added Redstone, Progress and List data types.
 - Redstone signal is now sent as its own data type (instead of being a Integer).
+- Changed implementation of Wall with Cable and Wall with Pipe to be more compatible with other mods.
 - Updated Mold Template textures.
+- Fixed Industrial Smeltery's progress not showing correctly sometimes.

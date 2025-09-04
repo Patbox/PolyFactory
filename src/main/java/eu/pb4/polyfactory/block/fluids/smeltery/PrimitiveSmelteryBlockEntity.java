@@ -262,6 +262,9 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
     @Override
     public void markDirty() {
         super.markDirty();
+        if (this.world != null) {
+            this.world.updateComparators(this.getPos().up(), this.getCachedState().getBlock());
+        }
     }
 
 

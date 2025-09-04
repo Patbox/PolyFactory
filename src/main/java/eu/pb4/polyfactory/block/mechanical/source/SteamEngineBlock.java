@@ -83,12 +83,12 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
     }
 
     @Override
-    protected int getMaxX(BlockState state) {
+    public int getMaxX(BlockState state) {
         return state.get(FACING).getAxis() == Direction.Axis.X ? 0 : 1;
     }
 
     @Override
-    protected int getMaxZ(BlockState state) {
+    public int getMaxZ(BlockState state) {
         return state.get(FACING).getAxis() == Direction.Axis.Z ? 0 : 1;
     }
 

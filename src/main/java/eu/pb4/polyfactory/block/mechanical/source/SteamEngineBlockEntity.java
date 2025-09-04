@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.source;
 
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
@@ -150,6 +151,23 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
 
     public void createGui(ServerPlayerEntity player) {
         new Gui(player);
+    }
+
+    @Override
+    public void markDirty() {
+        super.markDirty();
+        if (this.world == null) {
+            return;
+        }
+
+        var block = (SteamEngineBlock) this.getCachedState().getBlock();
+        for (var pos : BlockPos.iterate(this.getPos().add(0, -1, 0),
+                this.getPos().add(block.getMaxX(this.getCachedState()), 1, block.getMaxZ(this.getCachedState())))) {
+            if (pos.equals(this.getPos())) {
+                continue;
+            }
+            this.world.updateComparators(pos, this.getCachedState().getBlock());
+        }
     }
 
     private class Gui extends SimpleGui {

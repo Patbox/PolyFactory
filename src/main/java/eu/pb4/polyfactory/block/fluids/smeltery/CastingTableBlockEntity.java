@@ -225,7 +225,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
 
     @Override
     public int[] getAvailableSlots(Direction side) {
-        return new int[0];
+        return OUTPUT_SLOTS;
     }
 
     @Override
@@ -235,7 +235,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
 
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return false;
+        return slot == OUTPUT_FIRST;
     }
 
     public boolean isInputEmpty() {

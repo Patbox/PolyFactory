@@ -139,7 +139,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.FLUID_TANK)
                 .add(FactoryBlocks.NOZZLE)
                 .add(FactoryBlocks.PORTABLE_FLUID_TANK)
-                .add(FactoryBlocks.WALL_WITH_CABLE.values().toArray(new Block[0]))
+                //.add(FactoryBlocks.WALL_WITH_CABLE.values().toArray(new Block[0]))
         ;
 
         this.valueLookupBuilder(FactoryBlockTags.UNCONNECTABLE)
@@ -176,8 +176,8 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.BLUEPRINT_WORKBENCH)
         ;
 
-        this.valueLookupBuilder(BlockTags.WALLS)
-                .add(FactoryBlocks.WALL_WITH_CABLE.values().toArray(new Block[0]));
+        //this.valueLookupBuilder(BlockTags.WALLS)
+        //        .add(FactoryBlocks.WALL_WITH_CABLE.values().toArray(new Block[0]));
 
         var conc = this.valueLookupBuilder(FactoryBlockTags.CONCRETE);
 

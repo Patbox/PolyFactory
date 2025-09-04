@@ -1,14 +1,20 @@
 package eu.pb4.polyfactory.block.fluids.transport;
 
+import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
+import eu.pb4.polyfactory.block.other.TagRedirector;
+import eu.pb4.polyfactory.block.other.XInWallBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.WallBlock;
 import net.minecraft.block.enums.WallShape;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.loot.context.LootWorldContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
@@ -19,16 +25,18 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 
-public class PipeInWallBlock extends PipeBaseBlock implements ConfigurableBlock {
+public class PipeInWallBlock extends PipeBaseBlock implements ConfigurableBlock, XInWallBlock {
     public static final EnumProperty<Direction.Axis> AXIS = Properties.HORIZONTAL_AXIS;
     private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(BlockConfig.HORIZONTAL_AXIS);
     public static final IdentityHashMap<Block, PipeInWallBlock> MAP = new IdentityHashMap<>();
@@ -54,7 +62,7 @@ public class PipeInWallBlock extends PipeBaseBlock implements ConfigurableBlock 
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
+    public BlockState convertToBacking(BlockState state) {
         var a = state.get(AXIS) == Direction.Axis.X ? WallBlock.NORTH_WALL_SHAPE : WallBlock.WEST_WALL_SHAPE;
         var b = state.get(AXIS) == Direction.Axis.X ? WallBlock.SOUTH_WALL_SHAPE : WallBlock.EAST_WALL_SHAPE;
 
@@ -68,6 +76,19 @@ public class PipeInWallBlock extends PipeBaseBlock implements ConfigurableBlock 
         var axis = ctx.getSide().getAxis() == Direction.Axis.Y ? ctx.getHorizontalPlayerFacing().getAxis() : ctx.getSide().getAxis();
 
         return waterLog(ctx, state.with(AXIS, axis));
+    }
+
+    @Override
+    protected float calcBlockBreakingDelta(BlockState state, PlayerEntity player, BlockView world, BlockPos pos) {
+        return this.getPolymerBlockState(state, null).calcBlockBreakingDelta(player, world, pos);
+    }
+
+    @Override
+    protected List<ItemStack> getDroppedStacks(BlockState state, LootWorldContext.Builder builder) {
+        var list = new ArrayList<ItemStack>();
+        list.addAll(this.getPolymerBlockState(state, null).getDroppedStacks(builder));
+        list.addAll(FactoryBlocks.PIPE.getDefaultState().getDroppedStacks(builder));
+        return list;
     }
 
     @Override
@@ -102,7 +123,12 @@ public class PipeInWallBlock extends PipeBaseBlock implements ConfigurableBlock 
         return WRENCH_ACTIONS;
     }
 
-    public WallBlock getBacking() {
+    public WallBlock backing() {
         return this.backing;
+    }
+
+    @Override
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
+        return this.convertToBacking(state);
     }
 }

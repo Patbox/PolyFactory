@@ -1,13 +1,12 @@
 package eu.pb4.polyfactory.block.data;
 
-import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.MapLike;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
-import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
+import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.block.other.StatePropertiesCodecPatcher;
+import eu.pb4.polyfactory.block.other.XInWallBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.mixin.util.WallBlockAccessor;
@@ -15,19 +14,20 @@ import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.WallBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.WallShape;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.pathing.NavigationType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.context.LootWorldContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -45,16 +45,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
 
-import java.util.EnumSet;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-public class WallWithCableBlock extends AbstracterCableBlock implements PolymerBlock, BlockWithElementHolder, BlockStateNameProvider, StatePropertiesCodecPatcher {
+public class WallWithCableBlock extends AbstracterCableBlock implements BlockStateNameProvider, StatePropertiesCodecPatcher, XInWallBlock {
     public static final Map<Block, WallWithCableBlock> MAP = new IdentityHashMap<>();
 
     public static final BooleanProperty UP_WALL = BooleanProperty.of("up_wall");
@@ -236,7 +232,21 @@ public class WallWithCableBlock extends AbstracterCableBlock implements PolymerB
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
+    protected float calcBlockBreakingDelta(BlockState state, PlayerEntity player, BlockView world, BlockPos pos) {
+        return this.getPolymerBlockState(state, null).calcBlockBreakingDelta(player, world, pos);
+    }
+
+    @Override
+    protected List<ItemStack> getDroppedStacks(BlockState state, LootWorldContext.Builder builder) {
+        var list = new ArrayList<ItemStack>();
+        list.addAll(this.getPolymerBlockState(state, null).getDroppedStacks(builder));
+        list.addAll(FactoryBlocks.CABLE.getDefaultState().getDroppedStacks(builder));
+        return list;
+    }
+
+
+    @Override
+    public BlockState convertToBacking(BlockState state) {
         var backing = this.backing.getDefaultState();
         for (var x : SELF_TO_BACKING) {
             //noinspection unchecked,rawtypes
@@ -253,7 +263,9 @@ public class WallWithCableBlock extends AbstracterCableBlock implements PolymerB
 
     @Override
     public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(initialBlockState);
+        var converted = this.convertToBacking(initialBlockState);
+        var elementHolder = BlockWithElementHolder.get(converted) instanceof BlockWithElementHolder holder ? holder.createElementHolder(world, pos, converted) : null;
+        return new Model(initialBlockState, elementHolder, this::convertToBacking);
     }
 
     @Override
@@ -275,7 +287,8 @@ public class WallWithCableBlock extends AbstracterCableBlock implements PolymerB
         return this.getName();
     }
 
-    public WallBlock getBacking() {
+    @Override
+    public WallBlock backing() {
         return this.backing;
     }
 
@@ -298,11 +311,29 @@ public class WallWithCableBlock extends AbstracterCableBlock implements PolymerB
 
 
     public static final class Model extends AbstracterCableBlock.BaseCableModel {
-        public Model(BlockState state) {
+        @Nullable
+        private final ProxyAttachement proxied;
+
+        public Model(BlockState state, @Nullable ElementHolder elementHolder, Function<BlockState, BlockState> convertToBacking) {
             super(state);
+            if (elementHolder != null) {
+                this.proxied = new ProxyAttachement(this, elementHolder, () -> convertToBacking.apply(blockState()));
+                elementHolder.setAttachment(this.proxied);
+                this.addElement(proxied);
+            } else {
+                proxied = null;
+            }
         }
 
-        //@Override
+        @Override
+        public void notifyUpdate(HolderAttachment.UpdateType updateType) {
+            super.notifyUpdate(updateType);
+            if (this.proxied != null) {
+                this.proxied.holder().notifyUpdate(updateType);
+            }
+        }
+
+        @Override
         public ItemStack getModel(BlockState state, BiPredicate<BlockState, Direction> directionPredicate) {
             return FactoryModels.COLORED_WALL_CABLE.get(state, directionPredicate).copy();
         }

@@ -16,6 +16,7 @@
     "ShapedRecipeAccessor",
     "SimpleBlockGraphAccessor",
     "StatusEffectInstanceAccessor",
+    "block.AbstractBlockStateMixin",
     "block.BlockMixin",
     "block.CrafterBlockEntityMixin",
     "block.EntityViewMixin",

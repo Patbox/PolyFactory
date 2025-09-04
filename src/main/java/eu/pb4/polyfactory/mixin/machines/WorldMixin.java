@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.mixin.machines;
 
+import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.output.GaugeBlock;
@@ -47,6 +48,13 @@ public abstract class WorldMixin implements WorldAccess {
         long count = 0;
         long max = 0;
 
+        var originalPos = pos;
+
+        var state = world.getBlockState(pos);
+        if (state.getBlock() instanceof MultiBlock multiBlock) {
+            pos = multiBlock.getCenter(state, pos);
+        }
+
         if (world.getBlockEntity(pos) instanceof FilledStateProvider provider) {
             count = provider.getFilledAmount();
             max = provider.getFillCapacity();
@@ -64,13 +72,13 @@ public abstract class WorldMixin implements WorldAccess {
         var data = new CapacityData(count, max);
 
         for (var dir : Direction.values()) {
-            var selfPos = pos.offset(dir);
+            var selfPos = originalPos.offset(dir);
             if (this.isChunkLoaded(ChunkSectionPos.getSectionCoord(selfPos.getX()), ChunkSectionPos.getSectionCoord(selfPos.getZ()))) {
-                var state = this.getBlockState(selfPos);
-                if (state.isOf(FactoryBlocks.ITEM_COUNTER) && state.get(DataProviderBlock.FACING) == dir.getOpposite()) {
+                var selfState = this.getBlockState(selfPos);
+                if (selfState.isOf(FactoryBlocks.ITEM_COUNTER) && selfState.get(DataProviderBlock.FACING) == dir.getOpposite()) {
                     DataProvider.sendData(world, selfPos, data);
-                } else if (state.isOf(FactoryBlocks.GAUGE) && state.get(GaugeBlock.ORIENTATION).getFacing() == dir) {
-                    FactoryBlocks.GAUGE.receiveData(world, selfPos, state, -2, data, null, pos, null);
+                } else if (selfState.isOf(FactoryBlocks.GAUGE) && selfState.get(GaugeBlock.ORIENTATION).getFacing() == dir) {
+                    FactoryBlocks.GAUGE.receiveData(world, selfPos, selfState, -2, data, null, originalPos, null);
                 }
             }
         }

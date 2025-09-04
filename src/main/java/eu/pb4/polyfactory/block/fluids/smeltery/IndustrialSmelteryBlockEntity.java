@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.fluids.smeltery;
 
 import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.BlockHeat;
@@ -28,16 +29,13 @@ import it.unimi.dsi.fastutil.floats.FloatList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.advancement.criterion.RecipeCraftedCriterion;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.input.SingleStackRecipeInput;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -282,6 +280,15 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
     @Override
     public void markDirty() {
         super.markDirty();
+        if (this.world == null) {
+            return;
+        }
+        for (var pos : BlockPos.iterateOutwards(this.getPos(), 1, 1, 1)) {
+            if (pos.equals(this.getPos())) {
+                continue;
+            }
+            this.world.updateComparators(pos, this.getCachedState().getBlock());
+        }
     }
 
     @Override
@@ -386,15 +393,16 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
 
         private void updateSmeltingProgress() {
             for (int y = 0; y < 3; y++) {
-                var progress = new float[3];
-                var enabled = new boolean[3];
-                var color = new int[3];
+                var progress = new float[4];
+                var enabled = new boolean[4];
+                var color = new int[4];
                 for (int x = 0; x < 3; x++) {
                     int i = y * 3 + x;
                     progress[x] = (float) IndustrialSmelteryBlockEntity.this.progress[i] / IndustrialSmelteryBlockEntity.this.progressEnd[i];
                     enabled[x] = IndustrialSmelteryBlockEntity.this.progress[i] > -1 && !IndustrialSmelteryBlockEntity.this.getStack(i).isEmpty();
                     color[x] = ColorHelper.lerp(progress[x], 0xFFFFFF, 0xFF2200);
                 }
+                enabled[3] = true;
                 this.setSlot(y * 9 + 4, new GuiElementBuilder(GuiTextures.LEFT_SHIFTED_3_BARS)
                         .hideTooltip()
                         .setCustomModelData(FloatList.of(progress), BooleanList.of(enabled), List.of(), IntList.of(color)));

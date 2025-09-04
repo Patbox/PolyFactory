@@ -139,7 +139,7 @@ class AssetProvider implements DataProvider {
 
     private static void createStencilTexture(Identifier identifier, BufferedImage base, BufferedImage border, BufferedImage stencil, BiConsumer<String,byte[]> assetWriter) {
         if (base.getWidth() != border.getWidth() || border.getWidth() != stencil.getWidth() || base.getHeight() != border.getHeight() || border.getHeight() != stencil.getHeight()) {
-            throw new IllegalArgumentException("Mismatched image width and height for stenccil texture " + identifier);
+            throw new IllegalArgumentException("Mismatched image width and height for stencil texture " + identifier);
         }
 
         var image = new BufferedImage(base.getWidth(), base.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -261,9 +261,9 @@ class AssetProvider implements DataProvider {
         var list = new ArrayList<ItemModel>();
 
         {
-            var offsets = new int[]{-18 * 3, -18 * 2, -18};
+            var offsets = new int[]{-18 * 3, -18 * 2, -18, 0};
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 4; i++) {
                 var builder = RangeDispatchItemModel.builder(new CustomModelDataFloatProperty(i)).scale(15);
                 builder.fallback(new EmptyItemModel());
 
@@ -273,10 +273,10 @@ class AssetProvider implements DataProvider {
                 }
 
                 list.add(new ConditionItemModel(new CustomModelDataFlagProperty(i),
-                        new CompositeItemModel(List.of(
+                        i == 3 ? new BasicItemModel(id("sgui/elements/empty")) : new CompositeItemModel(List.of(
                                 new BasicItemModel(id("sgui/elements/generic_bar_background_offset_" + offsets[i])),
                                 builder.build())
-                        ),
+                                ),
                         new EmptyItemModel()
                 ));
             }
