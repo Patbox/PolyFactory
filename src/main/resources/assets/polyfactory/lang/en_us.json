@@ -209,6 +209,7 @@
   "item.polyfactory.wrench.tooltip.2": "Use [%s] to change selected setting",
   "item.polyfactory.wrench.title": "Configuration: %s",
   "item.polyfactory.wrench.action.facing": "Facing",
+  "item.polyfactory.wrench.action.orientation": "Orientation",
   "item.polyfactory.wrench.action.angle": "Angle",
   "item.polyfactory.wrench.action.strength": "Strength",
   "item.polyfactory.wrench.action.rotation": "Rotation",

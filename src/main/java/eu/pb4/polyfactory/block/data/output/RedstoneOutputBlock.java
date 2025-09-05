@@ -9,7 +9,7 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ValueFormatter;
 import eu.pb4.polyfactory.block.data.DataReceiver;
-import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
+import eu.pb4.polyfactory.block.data.util.DirectionalCabledDataBlock;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverSelectiveSideNode;
 import eu.pb4.polyfactory.nodes.data.DataReceiverNode;
@@ -39,7 +39,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.block.OrientationHelper;
-import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -50,7 +49,7 @@ import java.util.List;
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 import static eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras.bridgeModel;
 
-public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataReceiver, RedstoneConnectable {
+public class RedstoneOutputBlock extends DirectionalCabledDataBlock implements DataReceiver, RedstoneConnectable {
     public static final IntProperty POWER = Properties.POWER;
     public static final BooleanProperty STRONG = BooleanProperty.of("strong");
 
@@ -147,7 +146,7 @@ public class RedstoneOutputBlock extends GenericCabledDataBlock implements DataR
         return this.blockConfigs;
     }
 
-    public static class Model extends GenericCabledDataBlock.Model {
+    public static class Model extends DirectionalCabledDataBlock.Model {
         public static final Identifier OUTPUT_OVERLAY = bridgeModel(id("block/redstone_output_overlay"));
         public static final Identifier INPUT_OVERLAY =  bridgeModel(id("block/redstone_input_overlay"));
         private final ItemDisplayElement overlay;

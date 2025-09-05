@@ -10,13 +10,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-public class BlockObserverBlock extends CabledDataProviderBlock {
+public class BlockObserverBlock extends DirectionalCabledDataProviderBlock {
     public BlockObserverBlock(Settings settings) {
         super(settings);
     }

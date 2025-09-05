@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
 import eu.pb4.polyfactory.block.data.DataReceiver;
-import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
+import eu.pb4.polyfactory.block.data.util.DirectionalCabledDataBlock;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverSelectiveSideNode;
@@ -35,7 +35,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class NixieTubeControllerBlock extends GenericCabledDataBlock implements DataReceiver {
+public class NixieTubeControllerBlock extends DirectionalCabledDataBlock implements DataReceiver {
     public static final BooleanProperty POWERED = Properties.POWERED;
 
     public static final BlockConfig<Boolean> SCROLL_LOOP = BlockConfig.ofBlockEntity("scroll_loop", Codec.BOOL, NixieTubeControllerBlockEntity.class,

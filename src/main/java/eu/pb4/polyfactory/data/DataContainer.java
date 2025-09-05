@@ -2,11 +2,20 @@ package eu.pb4.polyfactory.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.component.ComponentsAccess;
+import net.minecraft.item.Item;
+import net.minecraft.item.tooltip.TooltipAppender;
+import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.screen.ScreenTexts;
+import net.minecraft.text.Text;
+import net.minecraft.text.Texts;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-public interface DataContainer extends Comparable<DataContainer> {
+public interface DataContainer extends Comparable<DataContainer>, TooltipAppender {
     MapCodec<DataContainer> MAP_CODEC = MapCodec.recursive("data_container", x -> DataType.CODEC.dispatchMap("type", DataContainer::type, DataType::codec));
     Codec<DataContainer> CODEC = MAP_CODEC.codec();
 
@@ -63,5 +72,18 @@ public interface DataContainer extends Comparable<DataContainer> {
 
     default int compareTo(DataContainer other) {
         return Long.compare(this.asLong(), other.asLong());
+    }
+
+
+    @Override
+    default void appendTooltip(Item.TooltipContext context, Consumer<Text> textConsumer, TooltipType type, ComponentsAccess components) {
+        textConsumer.accept(
+                Texts.bracketed(
+                        Text.translatable("block.polyfactory.data_memory.tooltip.stored_data").formatted(Formatting.YELLOW)
+                ).formatted(Formatting.DARK_GRAY)
+        );
+        textConsumer.accept(ScreenTexts.space().append(Text.translatable("block.polyfactory.data_memory.tooltip.type",
+                Text.translatable("data_type.polyfactory." + this.type().id())).formatted(Formatting.GRAY)));
+        textConsumer.accept(ScreenTexts.space().append(Text.translatable("block.polyfactory.data_memory.tooltip.value", this.asString()).formatted(Formatting.GRAY)));
     }
 }

@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.block.data;
 
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
+import eu.pb4.polyfactory.block.data.util.DirectionalCabledDataBlock;
 import eu.pb4.polyfactory.item.block.CabledBlockItem;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.BlockStateNameProvider;
@@ -72,10 +72,10 @@ public final class CableBlock extends AbstractCableBlock implements FactoryBlock
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         var state = ctx.getWorld().getBlockState(ctx.getBlockPos());
-        if (state.getBlock() instanceof GenericCabledDataBlock && !state.get(GenericCabledDataBlock.HAS_CABLE)) {
-            return state.with(GenericCabledDataBlock.HAS_CABLE, true);
-        } else if (state.getBlock() instanceof GenericCabledDataBlock && !state.get(GenericCabledDataBlock.HAS_CABLE)) {
-            return state.with(GenericCabledDataBlock.HAS_CABLE, true);
+        if (state.getBlock() instanceof DirectionalCabledDataBlock && !state.get(DirectionalCabledDataBlock.HAS_CABLE)) {
+            return state.with(DirectionalCabledDataBlock.HAS_CABLE, true);
+        } else if (state.getBlock() instanceof DirectionalCabledDataBlock && !state.get(DirectionalCabledDataBlock.HAS_CABLE)) {
+            return state.with(DirectionalCabledDataBlock.HAS_CABLE, true);
         }
 
         return super.getPlacementState(ctx);

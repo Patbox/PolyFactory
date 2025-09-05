@@ -39,7 +39,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
-public abstract class GenericCabledDataBlock extends AbstractCableBlock implements FactoryBlock, ConfigurableBlock, BlockEntityProvider, CableConnectable, StatePropertiesCodecPatcher {
+public abstract class DirectionalCabledDataBlock extends BaseCabledDataBlock implements StatePropertiesCodecPatcher {
     public static final EnumProperty<Direction> FACING = Properties.FACING;
 
     public final BlockConfig<?> facingAction = BlockConfig.of("facing", Properties.FACING, (dir, world, pos, side, state) -> FactoryUtil.asText(dir), WrenchModifyValue.ofDirection(FACING),
@@ -49,7 +49,7 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
                 return state.get(HAS_CABLE) ? state.with(FACING_PROPERTIES.get(oldDir),
                         canConnectTo(world, getColor(world, pos), pos.offset(oldDir), world.getBlockState(pos.offset(oldDir)), oldDir.getOpposite())) : state;
             })).withAlt(WrenchModifyValue.ofAltDirection(FACING));
-    public GenericCabledDataBlock(Settings settings) {
+    public DirectionalCabledDataBlock(Settings settings) {
         super(settings);
     }
 
@@ -64,19 +64,16 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        return this.asItem().getDefaultStack();
+    protected Direction getFacing(BlockState state) {
+        return state.get(FACING);
     }
+
+
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(FACING, HAS_CABLE);
-    }
-
-    @Override
-    public boolean canReplace(BlockState state, ItemPlacementContext context) {
-        return (context.getStack().isOf(FactoryItems.CABLE) && !state.get(HAS_CABLE)) || super.canReplace(state, context);
+        builder.add(FACING);
     }
 
     @Nullable
@@ -96,31 +93,6 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
     }
 
     @Override
-    protected boolean isDirectionBlocked(BlockState state, Direction direction) {
-        return state.get(FACING) == direction || !state.get(HAS_CABLE);
-    }
-
-    @Override
-    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
-        return state.get(FACING) != dir && state.get(HAS_CABLE) && super.canCableConnect(world, cableColor, pos, state, dir);
-    }
-
-    @Override
-    public boolean hasCable(BlockState state) {
-        return state.get(HAS_CABLE);
-    }
-
-    @Override
-    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
-    }
-
-    @Override
-    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
-    }
-
-    @Override
     public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(
                 BlockConfig.CHANNEL,
@@ -132,42 +104,17 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
     public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
-
-    @Override
-    public boolean setColor(BlockState state, World world, BlockPos pos, int color) {
-        return state.get(HAS_CABLE) && super.setColor(state, world, pos, color);
-    }
-
-    @Nullable
-    @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new ChanneledDataBlockEntity(pos, state);
-    }
-
-    protected int getChannel(ServerWorld world, BlockPos pos) {
-        if (world.getBlockEntity(pos) instanceof ChannelContainer container) {
-            return container.channel();
-        }
-        return 0;
-    }
-
     @Override
     public BlockState rotate(BlockState state, BlockRotation rotation) {
         return FactoryUtil.transform(state, rotation::rotate, FACING);
     }
 
-    public static class Model extends BaseCableModel {
-        protected final ItemDisplayElement base;
-
+    public static class Model extends BaseCabledDataBlock.Model {
         protected Model(BlockState state) {
             super(state);
-            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
-            this.base.setScale(new Vector3f(2));
-
-            updateStatePos(state);
-            this.addElement(this.base);
         }
 
+        @Override
         protected void updateStatePos(BlockState state) {
             var dir = state.get(FACING);
             float p = -90;
@@ -183,13 +130,6 @@ public abstract class GenericCabledDataBlock extends AbstractCableBlock implemen
 
             this.base.setYaw(y);
             this.base.setPitch(p);
-        }
-
-        @Override
-        protected void setState(BlockState blockState) {
-            super.setState(blockState);
-            updateStatePos(this.blockState());
-            this.base.tick();
         }
     }
 }

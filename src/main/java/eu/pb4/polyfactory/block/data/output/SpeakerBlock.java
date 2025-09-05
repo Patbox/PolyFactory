@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.block.data.output;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.polyfactory.block.data.DataReceiver;
-import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
+import eu.pb4.polyfactory.block.data.util.DirectionalCabledDataBlock;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.ListData;
 import eu.pb4.polyfactory.data.SoundEventData;
@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class SpeakerBlock extends GenericCabledDataBlock implements DataReceiver {
+public class SpeakerBlock extends DirectionalCabledDataBlock implements DataReceiver {
     public SpeakerBlock(Settings settings) {
         super(settings);
     }
@@ -109,7 +109,7 @@ public class SpeakerBlock extends GenericCabledDataBlock implements DataReceiver
         return new Model(initialBlockState);
     }
 
-    public static class Model extends GenericCabledDataBlock.Model {
+    public static class Model extends DirectionalCabledDataBlock.Model {
         private final ItemDisplayElement soundSource = new ItemDisplayElement();
         protected Model(BlockState state) {
             super(state);

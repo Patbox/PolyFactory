@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.datagen;
 
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.WallWithCableBlock;
-import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
+import eu.pb4.polyfactory.block.data.util.DirectionalCabledDataBlock;
 import eu.pb4.polyfactory.block.fluids.transport.PipeInWallBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
@@ -157,7 +157,7 @@ class LootTables extends FabricBlockLootTableProvider {
                 .pool(LootPool.builder()
                         .conditionally(SurvivesExplosionLootCondition.builder()
                                 .and(BlockStatePropertyLootCondition.builder(block).properties(StatePredicate.Builder.create()
-                                        .exactMatch(GenericCabledDataBlock.HAS_CABLE, true))))
+                                        .exactMatch(DirectionalCabledDataBlock.HAS_CABLE, true))))
                         .with(ItemEntry.builder(FactoryItems.CABLE)
                                 .apply(() -> CopyColorLootFunction.INSTANCE)
                         )

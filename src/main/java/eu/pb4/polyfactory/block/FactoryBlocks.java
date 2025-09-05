@@ -87,7 +87,7 @@ public class FactoryBlocks {
     public static final CableBlock CABLE = register("cable", Block.Settings.copy(Blocks.GLASS), settings -> new CableBlock(settings.breakInstantly().nonOpaque()));
     public static final GatedCableBlock GATED_CABLE = register("gated_cable", Block.Settings.copy(SPLITTER), GatedCableBlock::new);
     public static final Map<Block, WallWithCableBlock> WALL_WITH_CABLE = WallWithCableBlock.MAP;
-    public static final CabledDataProviderBlock ITEM_COUNTER = register("item_counter", Block.Settings.copy(SPLITTER), CabledDataProviderBlock::new);
+    public static final DirectionalCabledDataProviderBlock ITEM_COUNTER = register("item_counter", Block.Settings.copy(SPLITTER), DirectionalCabledDataProviderBlock::new);
 
     public static final RedstoneInputBlock REDSTONE_INPUT = register("redstone_input", Block.Settings.copy(ITEM_COUNTER), RedstoneInputBlock::new);
     public static final RedstoneOutputBlock REDSTONE_OUTPUT = register("redstone_output", Block.Settings.copy(ITEM_COUNTER), RedstoneOutputBlock::new);

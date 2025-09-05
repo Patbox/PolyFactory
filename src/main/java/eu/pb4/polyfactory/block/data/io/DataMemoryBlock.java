@@ -104,31 +104,6 @@ public final class DataMemoryBlock extends DataNetworkBlock implements BlockEnti
         return x;
     }
 
-
-    /*@Override
-    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
-        if (stack.contains(FactoryDataComponents.STORED_DATA)) {
-
-            var decoded = stack.getOrDefault(FactoryDataComponents.STORED_DATA, DataContainer.empty());
-            tooltip.add(
-                    Texts.bracketed(
-                            Text.translatable("block.polyfactory.data_memory.tooltip.stored_data").formatted(Formatting.YELLOW)
-                    ).formatted(Formatting.DARK_GRAY)
-            );
-            tooltip.add(ScreenTexts.space().append(Text.translatable("block.polyfactory.data_memory.tooltip.type",
-                    Text.translatable("data_type.polyfactory." + decoded.type().id())).formatted(Formatting.GRAY)));
-            tooltip.add(ScreenTexts.space().append(Text.translatable("block.polyfactory.data_memory.tooltip.value", decoded.asString()).formatted(Formatting.GRAY)));
-        }
-
-
-        if (stack.getOrDefault(FactoryDataComponents.READ_ONLY, false)) {
-            tooltip.add(
-                    Texts.bracketed(
-                            Text.translatable("block.polyfactory.data_memory.tooltip.read_only").formatted(Formatting.RED)
-                    ).formatted(Formatting.DARK_GRAY));
-        }
-    }
-*/
     // Todo
     @Override
     public void afterBreak(World world, PlayerEntity player1, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {

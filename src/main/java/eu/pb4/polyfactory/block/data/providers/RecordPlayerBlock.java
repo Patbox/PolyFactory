@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.block.data.providers;
 
-import eu.pb4.polyfactory.block.data.util.GenericCabledDataBlock;
+import eu.pb4.polyfactory.block.data.util.DirectionalCabledDataBlock;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class RecordPlayerBlock extends CabledDataProviderBlock {
+public class RecordPlayerBlock extends DirectionalCabledDataProviderBlock {
     public RecordPlayerBlock(Settings settings) {
         super(settings);
     }
@@ -102,7 +102,7 @@ public class RecordPlayerBlock extends CabledDataProviderBlock {
         return new Model(initialBlockState);
     }
 
-    public static final class Model extends GenericCabledDataBlock.Model {
+    public static final class Model extends DirectionalCabledDataBlock.Model {
         private final ItemDisplayElement soundSource = new ItemDisplayElement();
         private boolean isPlaying = false;
         private Model(BlockState state) {

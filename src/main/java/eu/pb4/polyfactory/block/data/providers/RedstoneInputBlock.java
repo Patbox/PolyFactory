@@ -6,7 +6,6 @@ import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock;
 import eu.pb4.polyfactory.data.DataContainer;
-import eu.pb4.polyfactory.data.LongData;
 import eu.pb4.polyfactory.data.RedstoneData;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -25,13 +24,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-public class RedstoneInputBlock extends CabledDataProviderBlock implements RedstoneConnectable {
+public class RedstoneInputBlock extends DirectionalCabledDataProviderBlock implements RedstoneConnectable {
     public static final IntProperty POWER = RedstoneOutputBlock.POWER;
 
     public RedstoneInputBlock(AbstractBlock.Settings settings) {

@@ -49,7 +49,6 @@
     "util.BucketItemAccessor",
     "util.DyeColorMixin",
     "util.DyeItemMixin",
-    "util.ItemStackMixin",
     "util.WallBlockAccessor",
     "wrench.AbstractRedstoneGateBlockMixin",
     "wrench.FacingBlockMixin",

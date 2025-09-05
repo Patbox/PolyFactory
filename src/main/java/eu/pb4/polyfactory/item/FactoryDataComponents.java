@@ -11,6 +11,7 @@ import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.item.configuration.ClipboardData;
 import eu.pb4.polyfactory.item.tool.ImprovedFilterItem;
 import eu.pb4.polymer.core.api.other.PolymerComponent;
+import net.fabricmc.fabric.api.item.v1.ComponentTooltipAppenderRegistry;
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -55,6 +56,8 @@ public class FactoryDataComponents {
 
 
     public static void register() {
+        ComponentTooltipAppenderRegistry.addFirst(FLUID);
+        ComponentTooltipAppenderRegistry.addFirst(STORED_DATA);
 
     }
 

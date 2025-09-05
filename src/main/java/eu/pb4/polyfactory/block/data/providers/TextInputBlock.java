@@ -22,7 +22,6 @@ import net.minecraft.state.property.EnumProperty;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Unit;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -32,7 +31,7 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Objects;
 
-public class TextInputBlock extends CabledDataProviderBlock {
+public class TextInputBlock extends OrientableCabledDataProviderBlock {
     public static final EnumProperty<BasicDataType> MODE = EnumProperty.of("mode", BasicDataType.class);
 
     public TextInputBlock(Settings settings) {
@@ -48,7 +47,7 @@ public class TextInputBlock extends CabledDataProviderBlock {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!player.isSneaking() && state.get(FACING).getOpposite() != hit.getSide()
+        if (!player.isSneaking() && getFacing(state).getOpposite() != hit.getSide()
                 && player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof ChanneledDataBlockEntity be) {
             if (be.checkUnlocked(player)) {
                 new Gui(serverPlayer, be);

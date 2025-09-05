@@ -2,6 +2,8 @@ package eu.pb4.polyfactory.block.data.providers;
 
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.data.DataProvider;
+import eu.pb4.polyfactory.block.data.util.BaseCabledDataBlock;
+import eu.pb4.polyfactory.block.data.util.OrientableCabledDataBlock;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
@@ -9,7 +11,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -18,7 +19,6 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-public class ItemReaderBlock extends CabledDataProviderBlock {
+public class ItemReaderBlock extends OrientableCabledDataProviderBlock {
     public static final BooleanProperty POWERED = Properties.POWERED;
 
     public ItemReaderBlock(Settings settings) {
@@ -76,7 +76,7 @@ public class ItemReaderBlock extends CabledDataProviderBlock {
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
 
-        if (!player.isSneaking() && state.get(FACING).getOpposite() != hit.getSide() && player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof ItemReaderBlockEntity be) {
+        if (!player.isSneaking() && getFacing(state).getOpposite() != hit.getSide() && player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof ItemReaderBlockEntity be) {
             be.openGui(serverPlayer);
             return ActionResult.SUCCESS_SERVER;
         }
@@ -94,42 +94,26 @@ public class ItemReaderBlock extends CabledDataProviderBlock {
         return Blocks.IRON_BLOCK.getDefaultState();
     }
 
-    public class Model extends BaseCableModel {
-        private final ItemDisplayElement base;
+    public class Model extends OrientableCabledDataBlock.Model {
         private final ItemDisplayElement book;
 
         private Model(BlockState state) {
             super(state);
-            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
-            this.base.setScale(new Vector3f(2));
-
             this.book = ItemDisplayElementUtil.createSimple();
             this.book.setScale(new Vector3f(0.5f));
             this.book.setDisplaySize(1, 1);
             this.book.setTranslation(new Vector3f(0, 0, 0.35f));
-
-            updateStatePos(state);
-            this.addElement(this.base);
+            this.book.setYaw(this.base.getYaw());
+            this.book.setPitch(this.base.getPitch());
             this.addElement(this.book);
         }
 
-        private void updateStatePos(BlockState state) {
-            var dir = state.get(FACING);
-            float p = -90;
-            float y = 0;
-
-            if (dir.getAxis() != Direction.Axis.Y) {
-                p = 0;
-                y = dir.getPositiveHorizontalDegrees();
-            } else if (dir == Direction.DOWN) {
-                p = 90;
+        @Override
+        protected void updateStatePos(BlockState state) {
+            if (this.book != null) {
+                this.book.setYaw(this.base.getYaw());
+                this.book.setPitch(this.base.getPitch());
             }
-
-
-            this.base.setYaw(y);
-            this.base.setPitch(p);
-            this.book.setYaw(y);
-            this.book.setPitch(p);
         }
 
         @Override

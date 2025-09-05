@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.configurable;
 import com.mojang.serialization.ListBuilder;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.enums.Orientation;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Property;
@@ -41,6 +42,20 @@ public interface WrenchModifyValue<T> {
         return (dir, next, player, world, pos, side, state) -> {
             var val = next ? side : side.getOpposite();
             return property.getValues().contains(val) ? val : dir;
+        };
+    }
+
+    static WrenchModifyValue<Orientation> ofAltOrientation(EnumProperty<Orientation> property) {
+        return (dir, next, player, world, pos, side, state) -> {
+            var val = next ? side : side.getOpposite();
+            var dir2 = switch (val) {
+                case DOWN -> player.getHorizontalFacing();
+                case UP -> player.getHorizontalFacing().getOpposite();
+                default -> Direction.UP;
+            };
+
+            var orientation = Orientation.byDirections(val, dir2);
+            return property.getValues().contains(orientation) ? orientation : dir;
         };
     }
 
