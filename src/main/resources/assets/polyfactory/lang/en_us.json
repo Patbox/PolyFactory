@@ -96,6 +96,11 @@
   "block.polyfactory.portable_fluid_tank": "Portable Fluid Tank",
   "block.polyfactory.portable_fluid_tank.empty": "Empty Portable Fluid Tank",
   "block.polyfactory.portable_fluid_tank.typed": "Portable Fluid Tank (%s)",
+  "block.polyfactory.chain_drive": "Chain Drive",
+  "block.polyfactory.chain_drive.invalid_angle": "Invalid connection! Angle is too steep!",
+  "block.polyfactory.chain_drive.invalid_too_far": "Invalid connection! Too far!",
+  "block.polyfactory.chain_drive.required_chains": "Cost: %s chains",
+
 
   "item.polyfactory.mod_icon": "Mod Icon",
   "item.polyfactory.fluid_model": "Fluid Model",

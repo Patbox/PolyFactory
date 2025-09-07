@@ -1,3 +1,11 @@
+- Chain Drive:
+  - A new way to transfer kinetic energy.
+  - Can be placed like Axles, facing different axis.
+  - You can connect it with other Chain Drives by clicking them with Iron Chain (one click to select first, other to second).
+  - It requires 2 Iron Chains per block of distance.
+  - Max distance it can connect is 32 blocks. Additionally angle between first and second Chain Drive needs to be lower than 33 degrees.
+  - When broken it will drop used Chains.
+  - Crafted with 4 Wooden Plates, 2 Steel Ingots, 2 Iron Chains and an Axle.
 - Added Gauge:
   - New data output block, used to show progress.
   - While it uses cable system, it can also extract data from other blocks (like Storage Counter).

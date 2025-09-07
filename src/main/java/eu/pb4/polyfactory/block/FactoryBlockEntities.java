@@ -26,6 +26,7 @@ import eu.pb4.polyfactory.block.fluids.transport.FilteredPipeBlockEntity;
 import eu.pb4.polyfactory.block.fluids.transport.PipeBlockEntity;
 import eu.pb4.polyfactory.block.fluids.transport.PumpBlockEntity;
 import eu.pb4.polyfactory.block.fluids.transport.RedstoneValvePipeBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.ChainDriveBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.EjectorBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.FanBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlockEntity;
@@ -71,6 +72,8 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<FanBlockEntity> FAN = register("fan",
              FabricBlockEntityTypeBuilder.create(FanBlockEntity::new, FactoryBlocks.FAN));
+    public static final BlockEntityType<ChainDriveBlockEntity> CHAIN_DRIVE = register("chain_drive",
+            FabricBlockEntityTypeBuilder.create(ChainDriveBlockEntity::new, FactoryBlocks.CHAIN_DRIVE));
     public static final BlockEntityType<EjectorBlockEntity> EJECTOR = register("ejector",
             FabricBlockEntityTypeBuilder.create(EjectorBlockEntity::new, FactoryBlocks.EJECTOR));
     public static final BlockEntityType<HandCrankBlockEntity> HAND_CRANK = register("hand_crank",

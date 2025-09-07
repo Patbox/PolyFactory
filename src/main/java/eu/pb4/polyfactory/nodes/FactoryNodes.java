@@ -48,6 +48,7 @@ public class FactoryNodes {
         addSimpleNodes(universe);
 
         universe.addNodeType(ConveyorNode.TYPE);
+        universe.addNodeType(ChainDriveNode.TYPE);
         universe.addNodeType(AxleWithGearMechanicalNode.TYPE);
         universe.addNodeType(UnconnectedGearMechanicalNode.TYPE);
         universe.addNodeType(UnconnectedFunctionalGearMechanicalNode.TYPE);
