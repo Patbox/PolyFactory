@@ -46,6 +46,8 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MinerBlockEntity extends LockableBlockEntity implements SingleStackInventory, SidedInventory, OwnedBlockEntity {
@@ -208,7 +210,11 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
             stateFront = world.getBlockState(blockPos);
         }
 
-        var entities = world.getEntitiesByClass(Entity.class, new Box(blockPos), Entity::canHit);
+        var centered = pos.toCenterPos();
+
+        var entities = world.getEntitiesByClass(Entity.class, Box.enclosing(pos, blockPos), Entity::canHit);
+        entities.sort(Comparator.comparingDouble(x -> x.getPos().squaredDistanceTo(centered)));
+
         if (!entities.isEmpty()) {
             var speed = Math.abs(RotationUser.getRotation(world, pos).speed()) * MathHelper.RADIANS_PER_DEGREE * 3f;
 
@@ -237,7 +243,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
                     }
                 });
             }
-            player.attack(entities.get(player.getRandom().nextInt(entities.size())));
+            player.attack(entities.getFirst());
             self.lastAttackedTicks = 0;
             return;
         }

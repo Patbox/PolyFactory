@@ -256,6 +256,7 @@ public class RotationData implements GraphEntity<RotationData> {
             }
 
             var speed = this.speed;
+
             if (this.negative) {
                 speed = -speed;
             }
@@ -325,7 +326,7 @@ public class RotationData implements GraphEntity<RotationData> {
 
         this.negative = state.speed == 0 ? this.negative : state.speed < 0;
 
-        var speed = this.speed != 0 ? this.speed * Math.signum(state.speed) : 0;
+        var speed = this.speed != 0 ? this.speed * MathHelper.sign(state.speed) : 0;
 
         if (this.overstressed) {
             for (var entry : graph.getCachedNodes(FunctionalDirectionNode.CACHE)) {
@@ -335,13 +336,8 @@ public class RotationData implements GraphEntity<RotationData> {
             return;
         }
 
-
         var baseDelta = speed * MathHelper.RADIANS_PER_DEGREE * delta;
         float r = (float) ((baseDelta + this.rotationValue) % MathHelper.TAU);
-        if (this.negative) {
-            r = -r;
-        }
-        r = Math.abs(r);
 
         var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_3 - MathHelper.RADIANS_PER_DEGREE * 15) * delta;
 
@@ -404,6 +400,10 @@ public class RotationData implements GraphEntity<RotationData> {
         return state != null ? state : fallback;
     }
 
+    public float speedRadians() {
+        return (float) (this.speed * (this.negative ? -1 : 1) * MathHelper.RADIANS_PER_DEGREE);
+    }
+
     public static class State {
         public static final State EMPTY = new State();
         public static final State SPECIAL = new State();
@@ -456,7 +456,6 @@ public class RotationData implements GraphEntity<RotationData> {
             this.stressCapacity = 0;
             this.stressUsed = 0;
             this.providerCount = 0;
-
         }
     }
 }
