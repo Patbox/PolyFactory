@@ -197,9 +197,7 @@ public class MovingItem implements VirtualElement, StackReference {
             display.setLeftRotation(quaternionf);
             var e = i % 2 == 1;
             display.setTranslation(new Vector3f( (e ? i : -i) * 0.01f, i * 0.03f, (e ? i : -i) * 0.01f).rotate(quaternionf));
-            if (display.isDirty()) {
-                display.startInterpolation();
-            }
+            display.startInterpolationIfDirty();
         }
     }
 

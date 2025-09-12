@@ -99,8 +99,7 @@
   "block.polyfactory.chain_drive": "Chain Drive",
   "block.polyfactory.chain_drive.invalid_angle": "Invalid connection! Angle is too steep!",
   "block.polyfactory.chain_drive.invalid_too_far": "Invalid connection! Too far!",
-  "block.polyfactory.chain_drive.required_chains": "Cost: %s chains",
-
+  "block.polyfactory.chain_drive.required_chains": "Cost: %s %s",
 
   "item.polyfactory.mod_icon": "Mod Icon",
   "item.polyfactory.fluid_model": "Fluid Model",
@@ -168,7 +167,9 @@
   "item.polyfactory.mold.brittle_bottle": "Brittle Bottle Mold",
   "item.polyfactory.mold.brittle_bottle_clay": "Clay Brittle Bottle Mold",
   "item.polyfactory.mold.brittle_bottle_hardened": "Hardened Clay Brittle Bottle Mold",
-
+  "item.polyfactory.mold.chain": "Chain Mold",
+  "item.polyfactory.mold.chain_clay": "Clay Chain Mold",
+  "item.polyfactory.mold.chain_hardened": "Hardened Clay Chain Mold",
   "block.polyfactory.colored_lamp": "Colored Lamp",
   "block.polyfactory.colored_lamp.colored": "%s Lamp",
   "block.polyfactory.colored_lamp.colored.full": "%s Lamp (%s)",

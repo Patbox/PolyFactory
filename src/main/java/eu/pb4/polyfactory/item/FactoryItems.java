@@ -108,6 +108,7 @@ public class FactoryItems {
     public static final Item TREATED_DRIED_KELP = register("treated_dried_kelp", SimplePolymerItem::new);
     public static final Item INTEGRATED_CIRCUIT = register("integrated_circuit", SimplePolymerItem::new);
     public static final Item REDSTONE_CHIP = register("redstone_chip", SimplePolymerItem::new);
+    public static final Item CHAIN_LIFT = register("chain_lift", SimplePolymerItem::new);
 
     public static final Item ITEM_FILTER = register("item_filter", ImprovedFilterItem::new);
 
@@ -200,9 +201,10 @@ public class FactoryItems {
     public static final SpoutMolds BOTTLE_MOLD = SpoutMolds.create("bottle");
     public static final SpoutMolds THROWABLE_BOTTLE_MOLD = SpoutMolds.create("throwable_bottle");
     public static final SpoutMolds BRITTLE_BOTTLE_MOLD = SpoutMolds.create("brittle_bottle");
+    public static final SpoutMolds CHAIN_MOLD = SpoutMolds.create("chain");
 
 
-    public static final List<SpoutMolds> MOLDS = List.of(INGOT_MOLD, NUGGET_MOLD, PIPE_MOLD, BOTTLE_MOLD, THROWABLE_BOTTLE_MOLD, BRITTLE_BOTTLE_MOLD);
+    public static final List<SpoutMolds> MOLDS = List.of(INGOT_MOLD, NUGGET_MOLD, PIPE_MOLD, BOTTLE_MOLD, THROWABLE_BOTTLE_MOLD, BRITTLE_BOTTLE_MOLD, CHAIN_MOLD);
 
     public static void register() {
         FuelRegistryEvents.BUILD.register(((builder, context) -> {

@@ -3,6 +3,8 @@ package eu.pb4.polyfactory.block.mechanical;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.entity.ChainLiftEntity;
+import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.ChainItemDisplayElement;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.AxisWithDirectNode;
@@ -10,6 +12,7 @@ import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
+import eu.pb4.polymer.virtualentity.api.elements.InteractionElement;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -47,6 +50,7 @@ import java.util.*;
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
 public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
+    public static final boolean CLICKABLE_CHAINS = false;
     public ChainDriveBlock(Settings settings) {
         super(settings);
     }
@@ -117,7 +121,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
         player.sendMessage((switch (cost) {
             case -2 -> Text.translatable("block.polyfactory.chain_drive.invalid_too_far");
             case -1 -> Text.translatable("block.polyfactory.chain_drive.invalid_angle");
-            default -> Text.translatable("block.polyfactory.chain_drive.required_chains", cost);
+            default -> Text.translatable("block.polyfactory.chain_drive.required_chains", cost, stack.getName());
         }).withColor(color), true);
 
         for (var x = 0d; x < 1; x += delta) {
@@ -144,6 +148,10 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
 
     @Override
     protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (stack.isOf(FactoryItems.CHAIN_LIFT)) {
+            return ChainLiftEntity.attach(stack, state, world, pos, player, hand, hit);
+        }
+
         if (!stack.isOf(Items.CHAIN) || !(player instanceof ChainDriveHandler handler) || !(world.getBlockEntity(pos) instanceof ChainDriveBlockEntity be)) {
             return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
         }
@@ -270,7 +278,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
             if (tick % 4 != 0) {
                 return;
             }
-            var dist = this.getRotationData().speedRadians() * 4 * 0.4f;
+            var dist = this.getRotationData().speedRadians() * 4 * 0.45f;
             var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_4 - MathHelper.RADIANS_PER_DEGREE * 10);
 
             if (Math.abs(dist) > rotMax) {
@@ -326,9 +334,11 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
                 return;
             }
             var list = new ArrayList<ChainItemDisplayElement>();
+            var interactions = new ArrayList<InteractionElement>();
 
             var offset = otherPos.subtract(this.getPos());
-            var doubleDistance = offset.length() * 2;
+            var distance = offset.length();
+            var doubleDistance = distance * 2;
 
             int i = 0;
             for (var x = 0d; x <= doubleDistance; x += 0.5) {
@@ -340,7 +350,17 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
                 list.add(item);
             }
 
-            var entry = new Entry(list, route);
+            if (CLICKABLE_CHAINS) {
+                for (var x = 0.4d; x < distance; x += 0.8) {
+                    var item = new InteractionElement();
+                    item.setSize(0.8f, 0.8f);
+                    item.setOffset(Vec3d.ZERO.lerp(offset, x / distance).subtract(0, 0.4, 0));
+                    interactions.add(item);
+                    this.addElement(item);
+                }
+            }
+
+            var entry = new Entry(list, interactions, route);
             this.updateChains(entry);
             list.forEach(this::addElement);
 
@@ -354,7 +374,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
             }
         }
 
-        private record Entry(List<ChainItemDisplayElement> displays, Route route) {
+        private record Entry(List<ChainItemDisplayElement> displays, List<InteractionElement> interactions, Route route) {
         }
     }
 
@@ -383,7 +403,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
                 facingRotFrom = new Quaternionf();
             }
 
-            var shift = 0.4f;
+            var shift = 0.45f;
 
             var startPos = new Vec3d(new Vector3f(0, 0, shift).rotate(facingRotFrom));
             var endPos = new Vec3d(new Vector3f(0, 0, -shift).rotate(facingRotFrom));

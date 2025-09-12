@@ -227,14 +227,14 @@ public class PressBlock extends TallItemMachineBlock {
                     b ? RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().up()).rotation() : 0,
                     (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
 
-            if (c && this.piston.isDirty()) {
-                this.piston.startInterpolation();
-                this.pistonItem.startInterpolation();
+            if (c) {
+                this.piston.startInterpolationIfDirty();
+                this.pistonItem.startInterpolationIfDirty();
             }
 
-            if (b && this.gearA.isDirty()) {
-                this.gearA.startInterpolation();
-                this.gearB.startInterpolation();
+            if (b) {
+                this.gearA.startInterpolationIfDirty();
+                this.gearB.startInterpolationIfDirty();
             }
         }
 

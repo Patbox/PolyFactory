@@ -15,6 +15,7 @@
   - Can be placed on walls and floor, with floor allowing to rotate it.
   - You can change its style between Default (white background), red-green and green-red.
   - Crafted with 4 Steel Ingots and single Paper.
+- Added Chain Mold.
 - Steel and Copper Places can now be recycled in Smeltery.
 - Resulting item can now be pulled with from Casting Table and Casting Cauldron (with Hopper or alike).
 - Added Redstone, Progress and List data types.
@@ -22,7 +23,10 @@
 - Item Reader and Text Input blocks are now orientable when placed facing upwards or downwards.
 - Changed implementation of Wall with Cable and Wall with Pipe to be more compatible with other mods.
 - Updated Mold Template textures.
-- Mechanical Miner will now attach the closest entity, instead of random one.
+- Mechanical Miner will now attack the closest entity, instead of random one.
+- Increased durability of Hardened Clay Molds from 16 to 64.
+- Changed Steel Button recipe to 4 Steel Nuggets in a rectangle.
 - Fixed Mechanical Miners not attacking entities that are too close to it.
 - Fixed Industrial Smeltery's progress not showing correctly sometimes.
 - Fixed Stored Data tooltip not showing for Data Memory Block.
+- Fixed rotating elements being jittery when they aren't actually rotating.

@@ -234,13 +234,9 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
                 }
 
                 this.updateAnimation(left, right, this.blockState().get(AXIS));
-                if (this.left.isDirty()) {
-                    this.left.startInterpolation();
-                }
+                this.left.startInterpolationIfDirty();
 
-                if (this.right.isDirty()) {
-                    this.right.startInterpolation();
-                }
+                this.right.startInterpolationIfDirty();
             }
         }
 

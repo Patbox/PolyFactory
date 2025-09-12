@@ -152,9 +152,7 @@ public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements
                 var facing = this.blockState();
 
                 this.updateAnimation(this.getRotation(), facing);
-                if (this.axle.isDirty()) {
-                    this.axle.startInterpolation();
-                }
+                this.axle.startInterpolationIfDirty();
             }
         }
 

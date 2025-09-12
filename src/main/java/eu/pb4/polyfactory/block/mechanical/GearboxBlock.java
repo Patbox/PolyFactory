@@ -134,11 +134,9 @@ public class GearboxBlock extends RotationalNetworkBlock implements FactoryBlock
 
             if (tick % this.getUpdateRate() == 0) {
                 this.updateAnimation(this.getRotation());
-                if (this.xAxle.isDirty()) {
-                    this.xAxle.startInterpolation();
-                    this.yAxle.startInterpolation();
-                    this.zAxle.startInterpolation();
-                }
+                this.xAxle.startInterpolationIfDirty();
+                this.yAxle.startInterpolationIfDirty();
+                this.zAxle.startInterpolationIfDirty();
             }
         }
     }

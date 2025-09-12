@@ -22,7 +22,7 @@ public record SpoutMolds(Identifier name, Item clay, Item hardened, Item mold, T
                 FactoryItems.register(name.withPrefixedPath("mold/").withSuffixedPath("_clay"),
                         (s) -> new SimplePolymerItem(s.maxCount(1))),
                 FactoryItems.register(name.withPrefixedPath("mold/").withSuffixedPath("_hardened"),
-                        (s) -> new SimplePolymerItem(s.maxDamage(16))),
+                        (s) -> new SimplePolymerItem(s.maxDamage(64))),
                 FactoryItems.register(name.withPrefixedPath("mold/"),
                         (s) -> new SimplePolymerItem(s.maxCount(1))),
                 TagKey.of(RegistryKeys.ITEM, name.withPrefixedPath("mold/"))

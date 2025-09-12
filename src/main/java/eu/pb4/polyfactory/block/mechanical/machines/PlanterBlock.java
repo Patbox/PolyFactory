@@ -211,10 +211,8 @@ public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock
         @Override
         protected void onTick() {
             //this.updateAnimation(this.blockState().get(FACING));
-            if (this.output1.isDirty()) {
-                this.output1.startInterpolation();
-                this.output2.startInterpolation();
-            }
+            this.output1.startInterpolationIfDirty();
+            this.output2.startInterpolationIfDirty();
         }
 
         public void setDirection(BlockPos selfPos, BlockPos target) {

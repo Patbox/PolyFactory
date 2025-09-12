@@ -244,9 +244,7 @@ public class PumpBlock extends NetworkBlock implements FactoryBlock, RotationUse
 
             if (tick % this.getUpdateRate() == 0) {
                 this.updateAnimation(this.getRotationData().rotation());
-                if (this.gear.isDirty()) {
-                    this.gear.startInterpolation();
-                }
+                this.gear.startInterpolationIfDirty();
             }
         }
 

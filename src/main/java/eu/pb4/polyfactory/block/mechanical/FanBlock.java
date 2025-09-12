@@ -209,9 +209,7 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
         protected void onTick() {
             if (this.getTick() % 2 == 0) {
                 this.updateAnimation(this.getRotationData().speed());
-                if (this.fan.isDirty()) {
-                    this.fan.startInterpolation();
-                }
+                this.fan.startInterpolationIfDirty();
             }
         }
 

@@ -87,9 +87,11 @@ class RecipesProvider extends FabricRecipeProvider {
                         .criterion("get_iron", InventoryChangedCriterion.Conditions.items(Items.IRON_INGOT))
                         .offerTo(exporter);
 
-                this.createShapeless(RecipeCategory.REDSTONE, FactoryItems.STEEL_BUTTON)
-                        .input(FactoryItems.STEEL_INGOT, 1)
-                        .criterion("get_s", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_BUTTON))
+                this.createShaped(RecipeCategory.REDSTONE, FactoryItems.STEEL_BUTTON)
+                        .pattern("##")
+                        .pattern("##")
+                        .input('#', FactoryItems.STEEL_NUGGET)
+                        .criterion("get_s", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                         .offerTo(exporter);
 
                 CookingRecipeJsonBuilder.createSmelting(
@@ -1424,10 +1426,12 @@ class RecipesProvider extends FabricRecipeProvider {
                 this.spoutMolds(FactoryItemTags.MOLD_SHAPE_BOTTLE, FactoryItems.BOTTLE_MOLD);
                 this.spoutMolds(FactoryItemTags.MOLD_SHAPE_THROWABLE_BOTTLE, FactoryItems.THROWABLE_BOTTLE_MOLD);
                 this.spoutMolds(FactoryItemTags.MOLD_SHAPE_BRITTLE_BOTTLE, FactoryItems.BRITTLE_BOTTLE_MOLD);
+                this.spoutMolds(ConventionalItemTags.CHAINS, FactoryItems.CHAIN_MOLD);
 
                 moldRecipes(FactoryItems.BOTTLE_MOLD, FactoryFluids.GLASS.of(FluidConstants.BLOCK / 2), Items.GLASS_BOTTLE);
                 moldRecipes(FactoryItems.THROWABLE_BOTTLE_MOLD, FactoryFluids.GLASS.of(FluidConstants.BLOCK / 2), FactoryItems.THROWABLE_GLASS_BOTTLE);
                 moldRecipes(FactoryItems.BRITTLE_BOTTLE_MOLD, FactoryFluids.GLASS.of(FluidConstants.BLOCK / 2), FactoryItems.BRITTLE_GLASS_BOTTLE);
+                moldRecipes(FactoryItems.CHAIN_MOLD, FactoryFluids.IRON.of(FluidConstants.NUGGET * 8), Items.CHAIN);
 
                 exporter.accept(recipeKey("casting/glass_pane"), SimpleCastingRecipe.fluid(FactoryFluids.GLASS.of(FluidConstants.BLOCK * 6 / 16), Items.GLASS_PANE, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value(), 40), null);
                 exporter.accept(recipeKey("casting/iron_bars"), SimpleCastingRecipe.fluid(FactoryFluids.IRON.of(FluidConstants.BLOCK * 6 / 16), Items.IRON_BARS, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value(), 40), null);

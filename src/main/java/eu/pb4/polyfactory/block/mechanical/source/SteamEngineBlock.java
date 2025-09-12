@@ -264,11 +264,9 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
                 //    this.whisk.startInterpolation();
                 //}
 
-                if (this.axle.isDirty()) {
-                    this.axle.startInterpolation();
-                    this.rotatingA.startInterpolation();
-                    this.rotatingB.startInterpolation();
-                }
+                this.axle.startInterpolationIfDirty();
+                this.rotatingA.startInterpolationIfDirty();
+                this.rotatingB.startInterpolationIfDirty();
             }
         }
     }

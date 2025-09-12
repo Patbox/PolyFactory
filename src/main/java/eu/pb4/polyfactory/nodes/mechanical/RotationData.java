@@ -266,8 +266,31 @@ public class RotationData implements GraphEntity<RotationData> {
 
             var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_3 - MathHelper.RADIANS_PER_DEGREE * 15) * delta;
 
+            /*final var deg45 = (MathHelper.PI / 8);
+
+            var baseAngle = this.rotationValue % deg45;
+            if (baseAngle < 0) {
+                baseAngle += deg45;
+            }*/
             for (var data : rotationDataList) {
                 var div = speedMap.get(data.getContext().getGraph().getId());
+
+                /*var altAngle = (data.rotationValue * div) % deg45;
+                if (altAngle < 0) {
+                    altAngle += deg45;
+                }
+                if (Math.abs(baseAngle - altAngle) > 2 * MathHelper.RADIANS_PER_DEGREE) {
+                    //System.out.println("PRE: " + (baseAngle - altAngle) * MathHelper.DEGREES_PER_RADIAN);
+                    data.rotationValue -= (altAngle / div);
+                    data.rotationValue += (baseAngle / div);
+                    altAngle = (data.rotationValue * div) % deg45;
+                    if (altAngle < 0) {
+                        altAngle += deg45;
+                    }
+                    //System.out.println("POST: " + (baseAngle - altAngle) * MathHelper.DEGREES_PER_RADIAN);
+                }*/
+
+                //data.rotationValue = (float) ((data.rotationValue + (baseDelta / div * (data.negative ? -1 : 1))) % (MathHelper.TAU * biggest));
                 data.rotationValue = (data.negative ? -r : r) / div;
 
                 if (Math.abs(baseDelta / div) < rotMax) {
@@ -341,7 +364,7 @@ public class RotationData implements GraphEntity<RotationData> {
 
         var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_3 - MathHelper.RADIANS_PER_DEGREE * 15) * delta;
 
-        this.rotationValue = (this.negative ? -r : r);
+        this.rotationValue = r;//(this.negative ? -r : r);
 
         if (Math.abs(baseDelta) < rotMax) {
             this.rotation = this.rotationValue;

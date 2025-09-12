@@ -203,9 +203,7 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
 
             if (tick % this.getUpdateRate() == 0) {
                 this.updateAnimation(rotation, facing);
-                if (this.mainElement.isDirty()) {
-                    this.mainElement.startInterpolation();
-                }
+                this.mainElement.startInterpolationIfDirty();
             }
         }
     }

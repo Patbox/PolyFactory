@@ -199,9 +199,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
             if (this.getTick() % this.getUpdateRate() == 0) {
                 this.updateAnimation(this.getRotation(),
                         this.blockState().get(INPUT_FACING));
-                if (this.stoneWheel.isDirty()) {
-                    this.stoneWheel.startInterpolation();
-                }
+                this.stoneWheel.startInterpolationIfDirty();
             }
         }
     }

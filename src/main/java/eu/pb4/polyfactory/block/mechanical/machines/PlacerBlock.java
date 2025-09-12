@@ -217,9 +217,7 @@ public class PlacerBlock extends RotationalNetworkBlock implements FactoryBlock,
         @Override
         protected void onTick() {
             this.updateAnimation(this.blockState().get(FACING));
-            if (this.item.isDirty()) {
-                this.item.startInterpolation();
-            }
+            this.item.startInterpolationIfDirty();
         }
 
         public void setItem(ItemStack stack) {

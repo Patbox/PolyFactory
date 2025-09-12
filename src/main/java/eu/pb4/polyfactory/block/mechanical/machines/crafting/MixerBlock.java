@@ -193,14 +193,11 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
             this.updateAnimation(b, c,
                     b ? RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().up()).rotation() : 0,
                     (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
-            if (this.whisk.isDirty()) {
-                this.whisk.startInterpolation();
-            }
+            this.whisk.startInterpolationIfDirty();
 
-            if (this.gearA.isDirty()) {
-                this.gearA.startInterpolation();
-                this.gearB.startInterpolation();
-            }
+
+            this.gearA.startInterpolationIfDirty();
+            this.gearB.startInterpolationIfDirty();
         }
 
         public void setFluid(@Nullable FluidInstance<?> type, float position) {

@@ -209,9 +209,7 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
             if (tick % this.getUpdateRate() == 0) {
                 var dir = this.blockState().get(INPUT_FACING);
                 this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().up()).rotation(), dir.rotateYClockwise().getAxis());
-                if (this.axle.isDirty()) {
-                    this.axle.startInterpolation();
-                }
+                this.axle.startInterpolationIfDirty();
             }
         }
 

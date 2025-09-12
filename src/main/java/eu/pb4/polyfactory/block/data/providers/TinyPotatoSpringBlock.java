@@ -213,7 +213,7 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
                 q.rotateAxis(MathHelper.sin(this.animationTimer * 0.5f) * MathHelper.lerp(this.animationTimer / 60f, 0, 0.4f),
                         MathHelper.sin(yaw), 0, MathHelper.cos(yaw));
                 this.tater.setLeftRotation(q);
-                this.tater.startInterpolation();
+                this.tater.startInterpolationIfDirty();
                 this.animationTimer--;
             }
 

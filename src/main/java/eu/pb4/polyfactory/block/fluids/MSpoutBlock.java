@@ -225,10 +225,8 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             if (b) {
                 this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().up()).rotation(),
                         (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
-                if (this.gearA.isDirty()) {
-                    this.gearA.startInterpolation();
-                    this.gearB.startInterpolation();
-                }
+                this.gearA.startInterpolationIfDirty();
+                this.gearB.startInterpolationIfDirty();
             }
         }
 

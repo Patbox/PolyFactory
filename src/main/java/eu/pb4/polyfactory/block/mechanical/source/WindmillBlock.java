@@ -276,14 +276,10 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
                         this.blockState().get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
 
                 for (var i = 0; i < sails.length; i++) {
-                    if (this.sails[i].isDirty()) {
-                        this.sails[i].startInterpolation();
-                    }
+                    this.sails[i].startInterpolationIfDirty();
                 }
 
-                if (this.center.isDirty()) {
-                    this.center.startInterpolation();
-                }
+                this.center.startInterpolationIfDirty();
             }
         }
 

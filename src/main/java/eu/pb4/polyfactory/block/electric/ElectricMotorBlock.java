@@ -175,9 +175,7 @@ public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, Bl
                 var facing = this.blockState().get(FACING);
 
                 this.updateAnimation(this.getRotation(), facing);
-                if (this.axle.isDirty()) {
-                    this.axle.startInterpolation();
-                }
+                this.axle.startInterpolationIfDirty();
             }
         }
 

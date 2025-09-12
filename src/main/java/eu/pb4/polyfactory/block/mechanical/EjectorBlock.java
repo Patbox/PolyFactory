@@ -306,10 +306,8 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
 
         @Override
         protected void onTick() {
-            if (this.plate.isDirty()) {
-                this.plate.startInterpolation();
-                this.link.startInterpolation();
-            }
+            this.plate.startInterpolationIfDirty();
+            this.link.startInterpolationIfDirty();
         }
 
         @Override

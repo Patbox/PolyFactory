@@ -233,9 +233,7 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
                 var facing = this.blockState();
 
                 this.updateAnimation(this.getRotation(), facing);
-                if (this.axle.isDirty()) {
-                    this.axle.startInterpolation();
-                }
+                this.axle.startInterpolationIfDirty();
             }
         }
 
