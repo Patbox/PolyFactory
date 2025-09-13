@@ -7,6 +7,10 @@
         },
         {
             "type": "single",
+            "resource": "polyfactory:entity/chain_lift"
+        },
+        {
+            "type": "single",
             "resource": "polyfactory:icon"
         },
         {

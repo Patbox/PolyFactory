@@ -92,6 +92,7 @@ public class ChainItemDisplayElement extends LodItemDisplayElement {
         element.setViewRange(0.8F);
         element.setItemDisplayContext(ItemDisplayContext.FIXED);
         element.setTeleportDuration(updateRate);
+        element.setInterpolationDuration(updateRate);
         element.setInvisible(true);
         element.setItem(model);
 

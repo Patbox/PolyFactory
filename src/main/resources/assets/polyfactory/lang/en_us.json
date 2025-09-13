@@ -148,6 +148,7 @@
   "item.polyfactory.brittle_potion": "Brittle %s",
   "item.polyfactory.crispy_honey": "Crispy Honey",
   "item.polyfactory.honeyed_apple": "Honeyed Apple",
+  "item.polyfactory.chain_lift": "Chain Lift",
 
   "item.polyfactory.mold.ingot": "Ingot Mold",
   "item.polyfactory.mold.ingot_clay": "Clay Ingot Mold",
@@ -364,6 +365,7 @@
   "fluid_type.minecraft.potion.strong": "Strong %s",
 
   "entity.polyfactory.dynamite": "Dynamite",
+  "entity.polyfactory.chain_lift": "Chain Lift",
   "entity.polyfactory.splash": "Splash of %s",
 
   "effect.polyfactory.sticky.slime": "Sticky (Slime)",

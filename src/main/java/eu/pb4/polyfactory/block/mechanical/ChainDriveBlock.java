@@ -50,6 +50,7 @@ import java.util.*;
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
 public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
+    public static final float RADIUS = (12 - 3f) / 16f;
     public static final boolean CLICKABLE_CHAINS = false;
     public ChainDriveBlock(Settings settings) {
         super(settings);
@@ -230,6 +231,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
     }
 
     public static final class Model extends RotationAwareModel {
+        private static final ItemStack CHAIN = ItemDisplayElementUtil.getModel(id("block/chain_drive_chain"));
         private static final ItemStack CHAIN_1 = ItemDisplayElementUtil.getModel(id("block/chain_drive_chain_1"));
         private static final ItemStack CHAIN_2 = ItemDisplayElementUtil.getModel(id("block/chain_drive_chain_2"));
         private final ItemDisplayElement mainElement;
@@ -278,7 +280,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
             if (tick % 4 != 0) {
                 return;
             }
-            var dist = this.getRotationData().speedRadians() * 4 * 0.45f;
+            var dist = this.getRotationData().speedRadians() * 4 * RADIUS;
             var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_4 - MathHelper.RADIANS_PER_DEGREE * 10);
 
             if (Math.abs(dist) > rotMax) {
@@ -311,7 +313,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
                     item.setOffset(route.endOffset.lerp(route.endPos, x / route.distance - 1));
                     //item.setTranslation(route.endOffset.lerp(route.endPos, x / route.distance - 1).toVector3f());
                 }
-                item.startInterpolationIfDirty();
+                //item.startInterpolationIfDirty();
 
                 item.forceSync();
 
@@ -341,7 +343,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
             var doubleDistance = distance * 2;
 
             int i = 0;
-            for (var x = 0d; x <= doubleDistance; x += 0.5) {
+            for (var x = 0d; x <= doubleDistance; x += 0.5f) {
                 var item = ChainItemDisplayElement.create(i++ % 2 == 0 ? CHAIN_1 : CHAIN_2, 4,
                         1f, 0f);
                 //item.setDisplaySize(0, 0);
@@ -351,10 +353,10 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
             }
 
             if (CLICKABLE_CHAINS) {
-                for (var x = 0.4d; x < distance; x += 0.8) {
+                for (var x = RADIUS / 4; x < distance; x += RADIUS /2 ) {
                     var item = new InteractionElement();
-                    item.setSize(0.8f, 0.8f);
-                    item.setOffset(Vec3d.ZERO.lerp(offset, x / distance).subtract(0, 0.4, 0));
+                    item.setSize(RADIUS / 4, RADIUS / 4);
+                    item.setOffset(Vec3d.ZERO.lerp(offset, x / distance).subtract(0, RADIUS / 8, 0));
                     interactions.add(item);
                     this.addElement(item);
                 }
@@ -403,10 +405,9 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
                 facingRotFrom = new Quaternionf();
             }
 
-            var shift = 0.45f;
 
-            var startPos = new Vec3d(new Vector3f(0, 0, shift).rotate(facingRotFrom));
-            var endPos = new Vec3d(new Vector3f(0, 0, -shift).rotate(facingRotFrom));
+            var startPos = new Vec3d(new Vector3f(0, 0, RADIUS).rotate(facingRotFrom));
+            var endPos = new Vec3d(new Vector3f(0, 0, -RADIUS).rotate(facingRotFrom));
 
             var facingRotTo = selfAxis == targetAxis ? facingRotFrom : switch (targetAxis) {
                 case Y -> Direction.UP.getRotationQuaternion().rotateY((float) Math.atan2(vec.x, vec.z) - MathHelper.HALF_PI);
@@ -418,8 +419,8 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
                 facingRotTo = new Quaternionf();
             }
 
-            var offsetOuterStart = new Vector3f(0, 0, shift).rotate(facingRotTo);
-            var offsetOuterEnd = new Vector3f(0, 0, -shift).rotate(facingRotTo);
+            var offsetOuterStart = new Vector3f(0, 0, RADIUS).rotate(facingRotTo);
+            var offsetOuterEnd = new Vector3f(0, 0, -RADIUS).rotate(facingRotTo);
 
             var startOffset = offset.add(offsetOuterStart.x, offsetOuterStart.y, offsetOuterStart.z);
             var endOffset = offset.add(offsetOuterEnd.x, offsetOuterEnd.y, offsetOuterEnd.z);

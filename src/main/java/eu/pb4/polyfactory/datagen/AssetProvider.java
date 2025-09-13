@@ -5,7 +5,9 @@ import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import eu.pb4.mapcanvas.api.font.DefaultFonts;
 import eu.pb4.mapcanvas.api.utils.CanvasUtils;
+import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.data.output.GaugeBlock;
+import eu.pb4.polyfactory.entity.ChainLiftEntity;
 import eu.pb4.polyfactory.item.FactoryDebugItems;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.SpoutMolds;
@@ -15,6 +17,7 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.ResourceUtils;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
+import eu.pb4.polymer.resourcepack.extras.api.format.atlas.AtlasAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.model.*;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.CustomModelDataFlagProperty;
@@ -26,6 +29,7 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.CustomModelDataTi
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.PotionTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.model.ModelAsset;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.data.DataOutput;
 import net.minecraft.data.DataProvider;
@@ -43,6 +47,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +65,7 @@ class AssetProvider implements DataProvider {
     }
 
     public static void runWriters(BiConsumer<String, byte[]> assetWriter) {
+        var atlas = AtlasAsset.builder();
         ConveyorModels.generateModels(assetWriter);
         UiResourceCreator.generateAssets(assetWriter);
         FactoryModels.COLORED_CABLE.generateModels(assetWriter);
@@ -77,6 +83,17 @@ class AssetProvider implements DataProvider {
         for (var mold : FactoryItems.MOLDS) {
             createMold(assetWriter, mold, moldTexture);
         }
+
+        //try {
+        ////    AtlasAsset.fromJson(Files.readString(FabricLoader.getInstance().getModContainer(ModInit.ID).orElseThrow().findPath("assets/minecraft/atlases/blocks.json").orElseThrow()))
+        //                    .sources().forEach(atlas::add);
+        //} catch (IOException e) {
+        //    e.printStackTrace();
+        //}
+
+        //ChainLiftEntity.MODEL.generateAssets(assetWriter, atlas);
+
+        //assetWriter.accept("assets/minecraft/atlases/blocks.json", atlas.build().toBytes());
     }
 
     private static void createGaugeStyles(BiConsumer<String,byte[]> assetWriter) {

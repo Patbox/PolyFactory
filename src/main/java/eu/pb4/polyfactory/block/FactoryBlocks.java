@@ -75,8 +75,8 @@ public class FactoryBlocks {
     public static final MinerBlock MINER = register("miner", Block.Settings.copy(SPLITTER), MinerBlock::new);
     public static final PlacerBlock PLACER = register("placer", Block.Settings.copy(SPLITTER), PlacerBlock::new);
     public static final PlanterBlock PLANTER = register("planter", Block.Settings.copy(SPLITTER), PlanterBlock::new);
-    public static final AxleBlock AXLE = register("axle", Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD), settings -> new AxleBlock(settings.strength(2.5F).nonOpaque()));
-    public static final ChainDriveBlock CHAIN_DRIVE = register("chain_drive", Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD), settings -> new ChainDriveBlock(settings.strength(2.5F).nonOpaque()));
+    public static final AxleBlock AXLE = register("axle", Block.Settings.copy(Blocks.STRIPPED_OAK_WOOD), settings -> new AxleBlock(settings.strength(2.5F).nonOpaque().suffocates(Blocks::never)));
+    public static final ChainDriveBlock CHAIN_DRIVE = register("chain_drive", Block.Settings.copy(AXLE), ChainDriveBlock::new);
     public static final AxleWithGearBlock AXLE_WITH_GEAR = register("axle_with_gear", Block.Settings.copy(AXLE).sounds(BlockSoundGroup.IRON), AxleWithGearBlock::new);
     public static final AxleWithLargeGearBlock AXLE_WITH_LARGE_GEAR = register("axle_with_large_gear", Block.Settings.copy(AXLE_WITH_GEAR), AxleWithLargeGearBlock::new);
     public static final TurntableBlock TURNTABLE = register("turntable", Block.Settings.copy(AXLE), TurntableBlock::new);
