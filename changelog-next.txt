@@ -26,7 +26,10 @@
 - Mechanical Miner will now attack the closest entity, instead of random one.
 - Increased durability of Hardened Clay Molds from 16 to 64.
 - Changed Steel Button recipe to 4 Steel Nuggets in a rectangle.
+- Lowered damage done by Experience Splashes (XP shoot with Pressure Fluid Gun) to 0.05 * amount (from 1 to 3). It was 0.5 * amount before.
+- Creative Motor can now provide negative speed (aka rotating other way around).
 - Fixed Mechanical Miners not attacking entities that are too close to it.
 - Fixed Industrial Smeltery's progress not showing correctly sometimes.
 - Fixed Stored Data tooltip not showing for Data Memory Block.
 - Fixed rotating elements being jittery when they aren't actually rotating.
+- Fixed Creative Motor UI showing empty tooltips and not coloring numbers.

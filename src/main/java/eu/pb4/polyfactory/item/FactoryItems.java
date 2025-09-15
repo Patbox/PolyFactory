@@ -502,7 +502,7 @@ public class FactoryItems {
             item = new CabledBlockItem((AbstractCableBlock & PolymerBlock) cableBlock, settings);
         } else if (block instanceof PortableFluidTankBlock) {
             item = new PortableFluidTankBlockItem(block, settings);
-        } else if (block instanceof AxleBlock axleBlock) {
+        } else if (block instanceof AxleBlock axleBlock && axleBlock.placesLikeAxle()) {
             item = new AxleItem(axleBlock, settings);
         } else if (block instanceof BlockWithTooltip) {
             item = new TooltippedBlockItem(block, settings);

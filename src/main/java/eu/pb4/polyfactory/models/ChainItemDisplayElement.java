@@ -10,6 +10,7 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntityPositionSyncS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityS2CPacket;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 
@@ -21,9 +22,15 @@ public class ChainItemDisplayElement extends LodItemDisplayElement {
 
     private boolean forceSync = false;
     private boolean forceSyncMid = false;
+    private final Vec3d start;
+    private final Vec3d middle;
+    private final Vec3d end;
 
-    public ChainItemDisplayElement() {
+    private ChainItemDisplayElement(Vec3d start, Vec3d middle, Vec3d end) {
         super();
+        this.start = start;
+        this.middle = middle;
+        this.end = end;
         this.addLodData(DisplayTrackedData.TELEPORTATION_DURATION);
     }
 
@@ -86,8 +93,17 @@ public class ChainItemDisplayElement extends LodItemDisplayElement {
         }
     }
 
-    public static ChainItemDisplayElement create(ItemStack model, int updateRate, float qualityMultiplier, float farQualityDistanceMultiplier) {
-        var element = new ChainItemDisplayElement();
+    @Override
+    protected double getSquaredDistance(ServerPlayNetworkHandler player) {
+        var pos = player.player.getPos();
+        return Math.min(this.middle.squaredDistanceTo(pos), Math.min(
+                this.start.squaredDistanceTo(pos),
+                this.end.squaredDistanceTo(pos)
+        ));
+    }
+
+    public static ChainItemDisplayElement create(ItemStack model, int updateRate, Vec3d start, Vec3d middle, Vec3d end) {
+        var element = new ChainItemDisplayElement(start, middle, end);
         element.setDisplaySize(2.0F, 2.0F);
         element.setViewRange(0.8F);
         element.setItemDisplayContext(ItemDisplayContext.FIXED);
@@ -96,8 +112,8 @@ public class ChainItemDisplayElement extends LodItemDisplayElement {
         element.setInvisible(true);
         element.setItem(model);
 
-        element.nearDistanceSquared = 2500.0F * qualityMultiplier * qualityMultiplier;
-        element.farDistanceSquared = 8100.0F * farQualityDistanceMultiplier * farQualityDistanceMultiplier;
+        element.nearDistanceSquared = 28 * 28;
+        element.farDistanceSquared = 0;
         return element;
     }
 }

@@ -152,10 +152,9 @@ public class UiResourceCreator {
     public static IntFunction<GuiElementBuilder>[] createNumbers(String prefix) {
         var list = new ArrayList<IntFunction<GuiElementBuilder>>();
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 11; i++) {
             list.add(icon32Color("numbers/" + prefix + i));
         }
-
         TEXTURES_NUMBERS.add(prefix);
 
         //noinspection unchecked
@@ -334,9 +333,12 @@ public class UiResourceCreator {
     }
 
     private static void generateNumbers(BiConsumer<String, byte[]> assetWriter, String right) throws IOException {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 11; i++) {
             var image = new CanvasImage(32, 32);
-            int code = 48 + i;
+            int code = switch (i) {
+                case 10 -> '-';
+                default -> 48 + i;
+            };
             var width = DefaultFonts.VANILLA.getGlyphWidth(code, 8 * 3, 0);
             if (right.equals("shadow/")) {
                 DefaultFonts.VANILLA.drawGlyph(image, code, 14 - width / 2 + 3, 5 + 3, 8 * 3, 0, CanvasColor.WHITE_GRAY_LOWEST);

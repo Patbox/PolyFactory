@@ -139,6 +139,11 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
     }
 
     @Override
+    public boolean placesLikeAxle() {
+        return false;
+    }
+
+    @Override
     protected boolean canReplace(BlockState state, ItemPlacementContext context) {
         return false;
     }
@@ -342,10 +347,11 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
             var distance = offset.length();
             var doubleDistance = distance * 2;
 
+            var middle = otherPos.lerp(this.getPos(), 0.5);
+
             int i = 0;
             for (var x = 0d; x <= doubleDistance; x += 0.5f) {
-                var item = ChainItemDisplayElement.create(i++ % 2 == 0 ? CHAIN_1 : CHAIN_2, 4,
-                        1f, 0f);
+                var item = ChainItemDisplayElement.create(i++ % 2 == 0 ? CHAIN_1 : CHAIN_2, 4, this.getPos(), middle, otherPos);
                 //item.setDisplaySize(0, 0);
                 item.setViewRange(0.65f);
                 item.setScale(new Vector3f(2));
@@ -382,7 +388,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
 
     public record Route(Quaternionf rot, Quaternionf rot2,
                         Vec3d startPos, Vec3d endPos, Vec3d startOffset, Vec3d endOffset,
-                        double doubleDistance, double distance) {
+                        double doubleDistance, double distance, Quaternionf facingRotFrom, Quaternionf facingRotTo) {
 
         public static Route create(Direction.Axis selfAxis, BlockPos selfPos, Direction.Axis targetAxis, BlockPos targetPos) {
             return create(selfAxis, Vec3d.of(targetPos.subtract(selfPos)), targetAxis);
@@ -430,7 +436,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
             var rot2 = new Quaternionf().rotateTo(Direction.UP.getUnitVector(), endPos.subtract(endOffset).normalize().toVector3f());
             var l = offset.length();
 
-            return new Route(rot, rot2, startPos, endPos, startOffset, endOffset, l * 2, l);
+            return new Route(rot, rot2, startPos, endPos, startOffset, endOffset, l * 2, l, facingRotFrom, facingRotTo);
         }
     }
 }

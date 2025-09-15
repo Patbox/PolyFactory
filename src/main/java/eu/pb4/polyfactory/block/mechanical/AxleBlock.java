@@ -129,6 +129,10 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, C
         return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
     }
 
+    public boolean placesLikeAxle() {
+        return true;
+    }
+
     public static final class Model extends RotationAwareModel {
         public static final ItemStack ITEM_MODEL = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/axle"));
         public static final ItemStack ITEM_MODEL_SHORT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/axle_short"));

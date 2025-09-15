@@ -27,14 +27,26 @@ public class GuiUtils {
     //}
 
     private static void drawNumberInternal(SlotGuiInterface gui, int position, int value, int size, int color, boolean leadingZero, IntFunction<GuiElementBuilder>[] numbers) {
+        var negative = value < 0;
         for (int i = size - 1; i >= 0; i--)  {
+            if (leadingZero && negative) {
+                gui.setSlot(position, numbers[10].apply(color).hideTooltip());
+                negative = false;
+                continue;
+            }
             if (!leadingZero && value == 0 && i != size -1) {
+                if (negative) {
+                    gui.setSlot(position + i, numbers[10].apply(color).hideTooltip());
+                    negative = false;
+                    continue;
+                }
                 gui.setSlot(position + i, EMPTY);
                 continue;
             }
+
             var number = value % 10;
             value /= 10;
-            gui.setSlot(position + i,  numbers[Math.abs(number)].apply(color));
+            gui.setSlot(position + i,  numbers[Math.abs(number)].apply(color).hideTooltip());
         }
     }
 }

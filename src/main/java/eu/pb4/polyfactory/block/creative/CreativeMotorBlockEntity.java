@@ -59,20 +59,20 @@ public class CreativeMotorBlockEntity extends LockableBlockEntity {
             super(ScreenHandlerType.GENERIC_9X3, player, false);
             this.setTitle(GuiTextures.FILL3.apply(CreativeMotorBlockEntity.this.getName()));
             this.updateNumbers();
-            this.setSlot(1, GuiTextures.MINUS_BUTTON.get().unbreakable().setCallback((clickType) -> {
-                CreativeMotorBlockEntity.this.speed = Math.max(CreativeMotorBlockEntity.this.speed - (clickType.shift ? 10 : 1), 0);
+            this.setSlot(1, GuiTextures.MINUS_BUTTON.get().hideTooltip().unbreakable().setCallback((clickType) -> {
+                CreativeMotorBlockEntity.this.speed = Math.max(CreativeMotorBlockEntity.this.speed - (clickType.shift ? 10 : 1), -RotationConstants.MAX_SPEED * 50);
                 CreativeMotorBlockEntity.this.markDirty();
             }));
-            this.setSlot(7, GuiTextures.PLUS_BUTTON.get().unbreakable().setCallback((clickType) -> {
+            this.setSlot(7, GuiTextures.PLUS_BUTTON.get().hideTooltip().unbreakable().setCallback((clickType) -> {
                 CreativeMotorBlockEntity.this.speed = Math.min(CreativeMotorBlockEntity.this.speed + (clickType.shift ? 10 : 1), RotationConstants.MAX_SPEED * 50);
                 CreativeMotorBlockEntity.this.markDirty();
             }));
 
-            this.setSlot(1 + 9 * 2, GuiTextures.MINUS_BUTTON.get().setCallback((clickType) -> {
+            this.setSlot(1 + 9 * 2, GuiTextures.MINUS_BUTTON.get().hideTooltip().setCallback((clickType) -> {
                 CreativeMotorBlockEntity.this.stress = Math.max(CreativeMotorBlockEntity.this.stress - (clickType.shift ? 10 : 1), -1000);
                 CreativeMotorBlockEntity.this.markDirty();
             }));
-            this.setSlot(7 + 9 * 2, GuiTextures.PLUS_BUTTON.get().setCallback((clickType) -> {
+            this.setSlot(7 + 9 * 2, GuiTextures.PLUS_BUTTON.get().hideTooltip().setCallback((clickType) -> {
                 CreativeMotorBlockEntity.this.stress = Math.min(CreativeMotorBlockEntity.this.stress + (clickType.shift ? 10 : 1), 99999);
                 CreativeMotorBlockEntity.this.markDirty();
             }));

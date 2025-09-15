@@ -44,7 +44,7 @@ public class ExperienceSplashEntity extends SplashEntity<Unit> {
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         if (this.getWorld() instanceof ServerWorld world && this.canDamageEntity(entityHitResult.getEntity())) {
-            entityHitResult.getEntity().damage(world, this.getDamageSources().create(FactoryDamageTypes.EXPERIENCE_SPLASH, this, this.getOwner()), 0.5F * amount);
+            entityHitResult.getEntity().damage(world, this.getDamageSources().create(FactoryDamageTypes.EXPERIENCE_SPLASH, this, this.getOwner()), 0.05F * amount);
         }
         super.onEntityHit(entityHitResult);
     }

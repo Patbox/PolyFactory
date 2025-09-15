@@ -135,6 +135,11 @@ public class AxleWithGearBlock extends AxleBlock implements RotationalConnector,
         return state.get(AXIS);
     }
 
+    @Override
+    public boolean placesLikeAxle() {
+        return false;
+    }
+
     public static final class Model extends RotationAwareModel {
         public static final ItemStack ITEM_MODEL_1 = ItemDisplayElementUtil.getModel( id("block/axle_with_gear_1"));
         public static final ItemStack ITEM_MODEL_2 = ItemDisplayElementUtil.getModel( id("block/axle_with_gear_2"));

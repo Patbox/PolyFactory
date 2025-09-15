@@ -26,12 +26,15 @@ import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.DyeTintSource;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class ModInit implements ModInitializer {
 	public static final String ID = "polyfactory";
@@ -85,6 +88,9 @@ public class ModInit implements ModInitializer {
 		ResourcePackExtras.forDefault().addBridgedModelsFolder(id("block"), id("particle"), id("entity"));
 		ResourcePackExtras.forDefault().addBridgedModelsFolder(id("sgui"), ((identifier, builder) -> {
 			return  new ItemAsset(new BasicItemModel(identifier),  new ItemAsset.Properties(false, true));
+		}));
+		ResourcePackExtras.forDefault().addBridgedModelsFolder(id("sgui/elements/numbers"), ((identifier, builder) -> {
+			return  new ItemAsset(new BasicItemModel(identifier, List.of(new DyeTintSource(0xFFFFFF))), new ItemAsset.Properties(false, true));
 		}));
 		PolymerResourcePackUtils.markAsRequired();
 
