@@ -999,10 +999,10 @@ class RecipesProvider extends FabricRecipeProvider {
                                 3, OutputStack.of(Items.BUNDLE)),
                         GenericPressRecipe.of("mace", CountedIngredient.ofItems(1, Items.HEAVY_CORE),
                                 CountedIngredient.ofItems(1, Items.BREEZE_ROD),
-                                6, OutputStack.of(Items.MACE)),
-                        GenericPressRecipe.of("test_fluid", "", CountedIngredient.ofTag(1, fakeTagList(ItemTags.LEAVES)),
+                                6, OutputStack.of(Items.MACE))
+                        /*GenericPressRecipe.of("test_fluid", "", CountedIngredient.ofTag(1, fakeTagList(ItemTags.LEAVES)),
                                 CountedIngredient.EMPTY,
-                                3, List.of(OutputStack.of(Items.STICK)), List.of(FactoryFluids.WATER.of(FluidConstants.NUGGET)))
+                                3, List.of(OutputStack.of(Items.STICK)), List.of(FactoryFluids.WATER.of(FluidConstants.NUGGET)))*/
                 );
 
                 for (var i = 0; i < 5; i++) {

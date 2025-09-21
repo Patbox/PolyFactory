@@ -568,8 +568,10 @@ public class FactoryUtil {
         };
     }
 
+
+    public static String recipeKeyNamespace = "polyfactory";
     public static RegistryKey<Recipe<?>> recipeKey(String s) {
-        return RegistryKey.of(RegistryKeys.RECIPE, id(s));
+        return RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(recipeKeyNamespace, s));
     }
 
     public static <T extends Enum<T>> T nextEnum(T activeMode, T[] values, boolean next) {
