@@ -1,23 +1,25 @@
 package eu.pb4.polyfactory.item.configuration;
 
-import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JavaOps;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
+import net.minecraft.block.BlockState;
 import net.minecraft.component.type.TooltipDisplayComponent;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.dynamic.Codecs;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -30,20 +32,12 @@ public class ClipboardItem extends SimplePolymerItem {
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> tooltip, TooltipType type) {
-        var data = stack.get(FactoryDataComponents.CLIPBOARD_DATA);
-        if (data != null) {
-            data.addToTooltip(tooltip);
-        }
-    }
-
-    @Override
     public ActionResult use(World world, PlayerEntity user, Hand hand) {
-        var data = user.getStackInHand(hand).get(FactoryDataComponents.CLIPBOARD_DATA);
+        var data = user.getStackInHand(hand).get(FactoryDataComponents.CONFIGURATION_DATA);
 
 
         if (data != null && user.shouldCancelInteraction()) {
-            user.getStackInHand(hand).set(FactoryDataComponents.CLIPBOARD_DATA, null);
+            user.getStackInHand(hand).set(FactoryDataComponents.CONFIGURATION_DATA, null);
             user.playSoundToPlayer(FactorySoundEvents.ITEM_CLIPBOARD_WRITE, SoundCategory.PLAYERS, 1, 1);
             return ActionResult.SUCCESS_SERVER;
         }
@@ -65,15 +59,15 @@ public class ClipboardItem extends SimplePolymerItem {
             return ActionResult.FAIL;
         }
 
-        var data = context.getStack().get(FactoryDataComponents.CLIPBOARD_DATA);
+        var data = context.getStack().get(FactoryDataComponents.CONFIGURATION_DATA);
 
 
         if (data == null || player.shouldCancelInteraction()) {
-            var entries = new ArrayList<ClipboardData.Entry>();
+            var entries = new ArrayList<ConfigurationData.Entry>();
 
             for (var config : blockConfig) {
                 var val = config.value().getValue(context.getWorld(), context.getBlockPos(), context.getSide(), state);
-                entries.add(new ClipboardData.Entry(
+                entries.add(new ConfigurationData.Entry(
                         config.name(),
                         config.formatter().getDisplayValue(val, context.getWorld(), context.getBlockPos(), context.getSide(), state),
                         config.id(),
@@ -81,7 +75,7 @@ public class ClipboardItem extends SimplePolymerItem {
                 ));
             }
 
-            context.getStack().set(FactoryDataComponents.CLIPBOARD_DATA, new ClipboardData(entries));
+            context.getStack().set(FactoryDataComponents.CONFIGURATION_DATA, new ConfigurationData(entries));
             player.playSoundToPlayer(FactorySoundEvents.ITEM_CLIPBOARD_WRITE, SoundCategory.PLAYERS, 1, 1);
             return ActionResult.SUCCESS_SERVER;
         } else {
@@ -111,6 +105,16 @@ public class ClipboardItem extends SimplePolymerItem {
 
     @Override
     public boolean hasGlint(ItemStack stack) {
-        return stack.contains(FactoryDataComponents.CLIPBOARD_DATA);
+        return stack.contains(FactoryDataComponents.CONFIGURATION_DATA);
+    }
+
+    @Override
+    public boolean isPolymerBlockInteraction(BlockState state, ServerPlayerEntity player, Hand hand, ItemStack stack, ServerWorld world, BlockHitResult blockHitResult, ActionResult actionResult) {
+        return true;
+    }
+
+    @Override
+    public boolean isPolymerEntityInteraction(ServerPlayerEntity player, Hand hand, ItemStack stack, ServerWorld world, Entity entity, ActionResult actionResult) {
+        return true;
     }
 }

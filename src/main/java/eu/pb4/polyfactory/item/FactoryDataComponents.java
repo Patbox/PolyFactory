@@ -8,7 +8,7 @@ import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidInteractionMode;
 import eu.pb4.polyfactory.item.component.FluidComponent;
-import eu.pb4.polyfactory.item.configuration.ClipboardData;
+import eu.pb4.polyfactory.item.configuration.ConfigurationData;
 import eu.pb4.polyfactory.item.tool.ImprovedFilterItem;
 import eu.pb4.polymer.core.api.other.PolymerComponent;
 import net.fabricmc.fabric.api.item.v1.ComponentTooltipAppenderRegistry;
@@ -21,6 +21,8 @@ import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.dynamic.Codecs;
 
 import java.util.List;
+
+import static eu.pb4.polyfactory.ModInit.id;
 
 public class FactoryDataComponents {
     private static final Codec<ItemStack> UNCOUNTED_ITEM_STACK_WITH_AIR = ItemStack.UNCOUNTED_CODEC.orElse(ItemStack.EMPTY);
@@ -52,13 +54,14 @@ public class FactoryDataComponents {
     public static final ComponentType<ImprovedFilterItem.Type> ITEM_FILTER_TYPE = register("item_filter/type", ComponentType.<ImprovedFilterItem.Type>builder()
             .codec(StringIdentifiable.createCodec(ImprovedFilterItem.Type::values)).build());
 
-    public static final ComponentType<ClipboardData> CLIPBOARD_DATA = register("clipboard_data", ComponentType.<ClipboardData>builder().codec(ClipboardData.CODEC).build());
+    public static final ComponentType<ConfigurationData> CONFIGURATION_DATA = register("configuration_data", ComponentType.<ConfigurationData>builder().codec(ConfigurationData.CODEC).build());
 
 
     public static void register() {
         ComponentTooltipAppenderRegistry.addFirst(FLUID);
         ComponentTooltipAppenderRegistry.addFirst(STORED_DATA);
-
+        ComponentTooltipAppenderRegistry.addFirst(CONFIGURATION_DATA);
+        Registries.DATA_COMPONENT_TYPE.addAlias(id("clipboard_data"), id("configuration_data"));
     }
 
 

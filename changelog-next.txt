@@ -6,6 +6,15 @@
   - Max distance it can connect is 32 blocks. Additionally angle between first and second Chain Drive needs to be lower than 33 degrees.
   - When broken it will drop used Chains.
   - Crafted with 4 Wooden Plates, 2 Steel Ingots, 2 Iron Chains and an Axle.
+- Added Chain Lift:
+  - A new vehicle type.
+  - It travels on Chains connected via Chain Drives. moving only when chain does.
+  - Can capture entities similar to Minecarts, through allows to capture more types (including non-living ones) as long as they are smaller than 2 blocks.
+  - Players can also ride it by clicking on it. If other mob is currently on it, it will be dropped.
+  - By default, when player rides it, the direction it goes depends on player's facing direction.
+  - When they are powered by Redstone (with block nearby), they will drop currently riding it entity.
+  - Can be configured with Wrench, allowing to disable entity catching and player control.
+  - Crafted with 3 Steel Places, 4 Iron Chains and 1 Steel Ingot.
 - Added Gauge:
   - New data output block, used to show progress.
   - While it uses cable system, it can also extract data from other blocks (like Storage Counter).
@@ -15,6 +24,9 @@
   - Can be placed on walls and floor, with floor allowing to rotate it.
   - You can change its style between Default (white background), red-green and green-red.
   - Crafted with 4 Steel Ingots and single Paper.
+- Wrenches can now be used on entities:
+  - Using Wrench on Boats and Minecarts allows to dismount entities riding them and toggle whatever mobs should be able to enter them.
+  - If these entities have non-default settings, some of them might be saved onto dropped item and later reapplied when placed.
 - Added Chain Mold.
 - Steel and Copper Places can now be recycled in Smeltery.
 - Resulting item can now be pulled with from Casting Table and Casting Cauldron (with Hopper or alike).

@@ -1,10 +1,8 @@
 package eu.pb4.polyfactory.block.base;
 
 import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.polyfactory.block.configurable.ValueFormatter;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
-import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -17,7 +15,6 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

@@ -2,26 +2,36 @@ package eu.pb4.polyfactory.item.configuration;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.component.ComponentsAccess;
+import net.minecraft.item.Item;
+import net.minecraft.item.tooltip.TooltipAppender;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.dynamic.Codecs;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public record ClipboardData(List<Entry> entries) {
-    public static final Codec<ClipboardData> CODEC = Codec.withAlternative(
+public record ConfigurationData(List<Entry> entries) implements TooltipAppender  {
+    public static final Codec<ConfigurationData> CODEC = Codec.withAlternative(
             Entry.CODEC.listOf(),
             Codec.unboundedMap(Codec.STRING, Codecs.BASIC_OBJECT),
             x -> x.entrySet().stream().map(b -> new Entry(b.getKey(), b.getValue())).collect(Collectors.<Entry>toList())
-    ).xmap(ClipboardData::new, ClipboardData::entries);
-    public static final ClipboardData EMPTY = new ClipboardData(List.of());
+    ).xmap(ConfigurationData::new, ConfigurationData::entries);
+    public static final ConfigurationData EMPTY = new ConfigurationData(List.of());
 
-    public void addToTooltip(Consumer<Text> text) {
+    public boolean isEmpty() {
+        return this.entries.isEmpty();
+    }
+
+    @Override
+    public void appendTooltip(Item.TooltipContext context, Consumer<Text> text, TooltipType type, ComponentsAccess components) {
         for (var entry : this.entries) {
             text.accept(Text.literal(" ")
                     .append(entry.name.isPresent() ? entry.name.get() : Text.literal(entry.id))
@@ -30,6 +40,10 @@ public record ClipboardData(List<Entry> entries) {
                     .formatted(Formatting.GRAY)
             );
         }
+    }
+
+    public Map<String, Entry> byId() {
+        return this.entries.stream().collect(Collectors.toMap(Entry::id, Function.identity()));
     }
 
     public record Entry(Optional<Text> name, Optional<Text> valueText, String id, Object value) {

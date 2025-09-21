@@ -1,28 +1,16 @@
 package eu.pb4.polyfactory.block.data.util;
 
 import com.mojang.serialization.*;
-import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlocks;
-import eu.pb4.polyfactory.block.configurable.ConfigValue;
-import eu.pb4.polyfactory.block.data.AbstractCableBlock;
-import eu.pb4.polyfactory.block.data.CableConnectable;
-import eu.pb4.polyfactory.block.data.ChannelContainer;
+import eu.pb4.polyfactory.block.configurable.BlockConfigValue;
 import eu.pb4.polyfactory.block.other.StatePropertiesCodecPatcher;
-import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
-import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
-import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
+import eu.pb4.polyfactory.block.configurable.WrenchModifyBlockValue;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -31,24 +19,20 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
 public abstract class DirectionalCabledDataBlock extends BaseCabledDataBlock implements StatePropertiesCodecPatcher {
     public static final EnumProperty<Direction> FACING = Properties.FACING;
 
-    public final BlockConfig<?> facingAction = BlockConfig.of("facing", Properties.FACING, (dir, world, pos, side, state) -> FactoryUtil.asText(dir), WrenchModifyValue.ofDirection(FACING),
-            ConfigValue.ofPropertyCustom(FACING, (property, value, world, pos, side, state) -> {
+    public final BlockConfig<?> facingAction = BlockConfig.of("facing", Properties.FACING, (dir, world, pos, side, state) -> FactoryUtil.asText(dir), WrenchModifyBlockValue.ofDirection(FACING),
+            BlockConfigValue.ofPropertyCustom(FACING, (property, value, world, pos, side, state) -> {
                 var oldDir = state.get(property);
                 state = state.with(FACING, value).with(FACING_PROPERTIES.get(value), false);
                 return state.get(HAS_CABLE) ? state.with(FACING_PROPERTIES.get(oldDir),
                         canConnectTo(world, getColor(world, pos), pos.offset(oldDir), world.getBlockState(pos.offset(oldDir)), oldDir.getOpposite())) : state;
-            })).withAlt(WrenchModifyValue.ofAltDirection(FACING));
+            })).withAlt(WrenchModifyBlockValue.ofAltDirection(FACING));
     public DirectionalCabledDataBlock(Settings settings) {
         super(settings);
     }

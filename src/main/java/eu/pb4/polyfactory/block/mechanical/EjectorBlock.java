@@ -9,7 +9,7 @@ import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
-import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
+import eu.pb4.polyfactory.block.configurable.WrenchModifyBlockValue;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -68,11 +68,11 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
             BlockConfig.ofBlockEntity("angle", Codec.FLOAT, EjectorBlockEntity.class,
                     (x, world, pos, side, state) -> Text.literal(String.format(Locale.ROOT, "%.0f", x)),
                     EjectorBlockEntity::angle, EjectorBlockEntity::setAngle,
-                    WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 5f : -5f), 10, 65))),
+                    WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 5f : -5f), 10, 65))),
             BlockConfig.ofBlockEntity("strength", Codec.FLOAT, EjectorBlockEntity.class,
                     (x, world, pos, side, state) -> Text.literal(String.format(Locale.ROOT, "%.2f", x)),
                     EjectorBlockEntity::strength, EjectorBlockEntity::setStrength,
-                    WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.25f : -0.25f), 1, 2.5f)))
+                    WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.25f : -0.25f), 1, 2.5f)))
             );
 
 

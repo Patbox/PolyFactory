@@ -7,7 +7,7 @@ import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
-import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
+import eu.pb4.polyfactory.block.configurable.WrenchModifyBlockValue;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
 import eu.pb4.polyfactory.nodes.generic.FunctionalAxisNode;
@@ -37,7 +37,6 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -58,7 +57,7 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
             BlockConfig.FACING_HORIZONTAL,
             BlockConfig.ofBlockEntity("mechanical_crafter.active_mode", MCrafterBlockEntity.ActiveMode.CODEC, MCrafterBlockEntity.class, (activeMode, world, pos, side, state) -> activeMode.asText(),
                     MCrafterBlockEntity::getActiveMode, MCrafterBlockEntity::setActiveMode,
-                    WrenchModifyValue.simple((x, mode) -> FactoryUtil.nextEnum(x, MCrafterBlockEntity.ActiveMode.values(), mode)))
+                    WrenchModifyBlockValue.simple((x, mode) -> FactoryUtil.nextEnum(x, MCrafterBlockEntity.ActiveMode.values(), mode)))
     );
 
     public MCrafterBlock(Settings settings) {

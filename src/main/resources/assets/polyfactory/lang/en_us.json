@@ -194,7 +194,6 @@
 
   "block.polyfactory.tps_provider": "TPS Provider",
 
-
   "item.polyfactory.item_filter": "Item Filter",
   "item.polyfactory.item_filter.empty": "Empty Item Filter",
   "item.polyfactory.item_filter.with": "Item Filter (%s)",
@@ -284,6 +283,9 @@
   "item.polyfactory.wrench.action.mechanical_crafter.active_mode.powered": "Powered",
   "item.polyfactory.wrench.action.mechanical_crafter.active_mode.not_powered": "Not Powered",
 
+  "item.polyfactory.wrench.action.catch_entities": "Entity Catching",
+  "item.polyfactory.wrench.action.player_control": "Player Control",
+  "item.polyfactory.wrench.action.dismount": "Dismount",
 
   "text.polyfactory.direction.up": "Up",
   "text.polyfactory.direction.down": "Down",
@@ -295,6 +297,8 @@
 
   "text.polyfactory.half.bottom": "Bottom",
   "text.polyfactory.half.top": "Top",
+  "text.polyfactory.empty": "Empty",
+  "text.polyfactory.none_wrapped": "<None>",
 
   "text.polyfactory.fluid_component.stored_fluids": "Stored Fluids:",
 

@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.block.configurable;
 
-import com.mojang.serialization.ListBuilder;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.Orientation;
@@ -15,20 +14,20 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.function.BiFunction;
 
-public interface WrenchModifyValue<T> {
+public interface WrenchModifyBlockValue<T> {
     @SuppressWarnings({"unchecked", "rawtypes", "RedundantCast"})
-    static <T extends Comparable<T>> WrenchModifyValue<T> ofProperty(Property<T> property) {
+    static <T extends Comparable<T>> WrenchModifyBlockValue<T> ofProperty(Property<T> property) {
         return (value, next, player, world, pos, side, state) -> {
             var elements = property.getValues();
             return !next ? Util.previous(elements, value) : Util.next(elements, value);
         };
     }
 
-    static <T> WrenchModifyValue<T> simple(BiFunction<T, Boolean, T> transformer) {
+    static <T> WrenchModifyBlockValue<T> simple(BiFunction<T, Boolean, T> transformer) {
         return (value, next, player, world, pos, side, state) -> transformer.apply(value, next);
     }
 
-    static WrenchModifyValue<Direction> ofDirection(EnumProperty<Direction> property) {
+    static WrenchModifyBlockValue<Direction> ofDirection(EnumProperty<Direction> property) {
         var reordered = new ArrayList<Direction>();
         for (var x : FactoryUtil.REORDERED_DIRECTIONS) {
             if (property.getValues().contains(x)) {
@@ -38,14 +37,14 @@ public interface WrenchModifyValue<T> {
         return (dir, next, player, world, pos, side, state) -> reordered.get((reordered.size() + reordered.indexOf(dir) + (next ? 1 : -1)) % reordered.size());
     }
 
-    static WrenchModifyValue<Direction> ofAltDirection(EnumProperty<Direction> property) {
+    static WrenchModifyBlockValue<Direction> ofAltDirection(EnumProperty<Direction> property) {
         return (dir, next, player, world, pos, side, state) -> {
             var val = next ? side : side.getOpposite();
             return property.getValues().contains(val) ? val : dir;
         };
     }
 
-    static WrenchModifyValue<Orientation> ofAltOrientation(EnumProperty<Orientation> property) {
+    static WrenchModifyBlockValue<Orientation> ofAltOrientation(EnumProperty<Orientation> property) {
         return (dir, next, player, world, pos, side, state) -> {
             var val = next ? side : side.getOpposite();
             var dir2 = switch (val) {

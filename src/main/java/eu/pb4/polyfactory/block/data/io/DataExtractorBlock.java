@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.block.data.io;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
-import eu.pb4.polyfactory.block.configurable.ValueFormatter;
+import eu.pb4.polyfactory.block.configurable.BlockValueFormatter;
 import eu.pb4.polyfactory.block.data.InputTransformerBlock;
 import eu.pb4.polyfactory.block.data.InputTransformerBlockEntity;
 import eu.pb4.polyfactory.data.DataContainer;
@@ -25,7 +25,7 @@ import java.util.List;
 public class DataExtractorBlock extends InputTransformerBlock {
     public static final List<BlockConfig<?>> BLOCK_CONFIG = ImmutableList.<BlockConfig<?>>builder()
             .addAll(InputTransformerBlock.BLOCK_CONFIG)
-            .add(BlockConfig.ofBlockEntity("data_extractor.field", Codec.STRING, DataExtractorBlockEntity.class, ValueFormatter.getDefault(),
+            .add(BlockConfig.ofBlockEntity("data_extractor.field", Codec.STRING, DataExtractorBlockEntity.class, BlockValueFormatter.getDefault(),
                     DataExtractorBlockEntity::field, DataExtractorBlockEntity::setField,
                     (value, next, player, world, pos, side, state) -> {
                         if (player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof DataExtractorBlockEntity be) {

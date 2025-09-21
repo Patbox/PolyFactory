@@ -21,8 +21,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
-public record BlockConfig<T>(String id, Text name, Codec<T> codec, ConfigValue<T> value, ValueFormatter<T> formatter,
-                             WrenchModifyValue<T> action, WrenchModifyValue<T> alt) {
+public record BlockConfig<T>(String id, Text name, Codec<T> codec, BlockConfigValue<T> value, BlockValueFormatter<T> formatter,
+                             WrenchModifyBlockValue<T> action, WrenchModifyBlockValue<T> alt) {
     public static final BlockConfig<Direction> FACING = ofDirection(Properties.FACING);
     public static final BlockConfig<Direction.Axis> AXIS = of("axis", Properties.AXIS);
     public static final BlockConfig<Direction.Axis> HORIZONTAL_AXIS = of("axis", Properties.HORIZONTAL_AXIS);
@@ -46,66 +46,66 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, ConfigValue<T
     public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property) {
         return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
                 FactoryUtil.propertyCodec(property),
-                ConfigValue.ofProperty(property),
-                ValueFormatter.getDefault(),
-                WrenchModifyValue.ofProperty(property), WrenchModifyValue.ofProperty(property));
+                BlockConfigValue.ofProperty(property),
+                BlockValueFormatter.getDefault(),
+                WrenchModifyBlockValue.ofProperty(property), WrenchModifyBlockValue.ofProperty(property));
     }
 
-    public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, ValueFormatter<T> textFunction) {
+    public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, BlockValueFormatter<T> textFunction) {
         return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
                 Codec.stringResolver(property::name, x -> property.parse(x).orElse(property.getValues().getFirst())),
-                ConfigValue.ofProperty(property),
+                BlockConfigValue.ofProperty(property),
                 textFunction,
-                WrenchModifyValue.ofProperty(property), WrenchModifyValue.ofProperty(property));
+                WrenchModifyBlockValue.ofProperty(property), WrenchModifyBlockValue.ofProperty(property));
     }
 
     public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, BiFunction<T, Boolean, T> function) {
         return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
                 FactoryUtil.propertyCodec(property),
-                ConfigValue.ofProperty(property),
-                ValueFormatter.getDefault(),
-                WrenchModifyValue.simple(function), WrenchModifyValue.simple(function));
+                BlockConfigValue.ofProperty(property),
+                BlockValueFormatter.getDefault(),
+                WrenchModifyBlockValue.simple(function), WrenchModifyBlockValue.simple(function));
     }
 
-    public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, ValueFormatter<T> textFunction, BiFunction<T, Boolean, T> function) {
+    public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, BlockValueFormatter<T> textFunction, BiFunction<T, Boolean, T> function) {
         return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
                 FactoryUtil.propertyCodec(property),
-                ConfigValue.ofProperty(property),
+                BlockConfigValue.ofProperty(property),
                 textFunction,
-                WrenchModifyValue.simple(function), WrenchModifyValue.simple(function));
+                WrenchModifyBlockValue.simple(function), WrenchModifyBlockValue.simple(function));
     }
 
-    public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, ValueFormatter<T> textFunction, WrenchModifyValue<T> function) {
+    public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, BlockValueFormatter<T> textFunction, WrenchModifyBlockValue<T> function) {
         return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
                 FactoryUtil.propertyCodec(property),
-                ConfigValue.ofProperty(property),
-                textFunction,
-                function, function);
-    }
-
-    public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, ValueFormatter<T> textFunction, BiFunction<T, Boolean, T> function, ConfigValue<T> value) {
-        return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
-                FactoryUtil.propertyCodec(property),
-                value,
-                textFunction,
-                WrenchModifyValue.simple(function), WrenchModifyValue.simple(function));
-    }
-
-    public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, ValueFormatter<T> textFunction, WrenchModifyValue<T> function, ConfigValue<T> value) {
-        return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
-                FactoryUtil.propertyCodec(property),
-                value,
+                BlockConfigValue.ofProperty(property),
                 textFunction,
                 function, function);
     }
 
-    public static <T> BlockConfig<T> of(String id, Codec<T> codec, ConfigValue<T> value, WrenchModifyValue<T> action) {
+    public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, BlockValueFormatter<T> textFunction, BiFunction<T, Boolean, T> function, BlockConfigValue<T> value) {
+        return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
+                FactoryUtil.propertyCodec(property),
+                value,
+                textFunction,
+                WrenchModifyBlockValue.simple(function), WrenchModifyBlockValue.simple(function));
+    }
+
+    public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, BlockValueFormatter<T> textFunction, WrenchModifyBlockValue<T> function, BlockConfigValue<T> value) {
+        return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
+                FactoryUtil.propertyCodec(property),
+                value,
+                textFunction,
+                function, function);
+    }
+
+    public static <T> BlockConfig<T> of(String id, Codec<T> codec, BlockConfigValue<T> value, WrenchModifyBlockValue<T> action) {
         return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id), codec,
                 value,
-                ValueFormatter.getDefault(), action, action);
+                BlockValueFormatter.getDefault(), action, action);
     }
 
-    public static <T> BlockConfig<T> of(String id, Codec<T> codec, ConfigValue<T> value, ValueFormatter<T> formatter, WrenchModifyValue<T> action) {
+    public static <T> BlockConfig<T> of(String id, Codec<T> codec, BlockConfigValue<T> value, BlockValueFormatter<T> formatter, WrenchModifyBlockValue<T> action) {
         return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id), codec,
                 value,
                 formatter, action, action);
@@ -118,14 +118,14 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, ConfigValue<T
     public static BlockConfig<Direction> ofDirection(String id, EnumProperty<Direction> property) {
 
         return of(id, property, (dir, world, pos, side, state) -> FactoryUtil.asText(dir),
-                WrenchModifyValue.ofDirection(property)
-        ).withAlt(WrenchModifyValue.ofAltDirection(property));
+                WrenchModifyBlockValue.ofDirection(property)
+        ).withAlt(WrenchModifyBlockValue.ofAltDirection(property));
     }
 
     public static <T, BE> BlockConfig<T> ofBlockEntity(String id, Codec<T> codec, Class<BE> beClass,
-                                                                           ValueFormatter<T> formatter, Function<BE, T> getter, BiConsumer<BE, T> setter,
-                                                                           WrenchModifyValue<T> action) {
-        return of(id, codec, ConfigValue.ofBlockEntity(beClass, getter, setter), formatter, action);
+                                                       BlockValueFormatter<T> formatter, Function<BE, T> getter, BiConsumer<BE, T> setter,
+                                                       WrenchModifyBlockValue<T> action) {
+        return of(id, codec, BlockConfigValue.ofBlockEntity(beClass, getter, setter), formatter, action);
     }
 
     public static <BE> BlockConfig<Integer> ofChannel(String id, Class<BE> tClass, Function<BE, Integer> get, BiConsumer<BE, Integer> set) {
@@ -144,7 +144,7 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, ConfigValue<T
                 (x, world, pos, side, state) -> Text.literal(String.valueOf(x + displayOffset)),
                 get,
                 set,
-                WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 1 : -1), minInclusive, maxInclusive)));
+                WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 1 : -1), minInclusive, maxInclusive)));
     }
 
     public static <BE> BlockConfig<Integer> ofBlockEntityInt(String id, Class<BE> tClass, int minInclusive, int maxInclusive, IntFunction<String> display, Function<BE, Integer> get, BiConsumer<BE, Integer> set) {
@@ -154,10 +154,10 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, ConfigValue<T
                 (x, world, pos, side, state) -> Text.literal(display.apply(x)),
                 get,
                 set,
-                WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 1 : -1), minInclusive, maxInclusive)));
+                WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 1 : -1), minInclusive, maxInclusive)));
     }
 
-    public BlockConfig<T> withAlt(WrenchModifyValue<T> alt) {
+    public BlockConfig<T> withAlt(WrenchModifyBlockValue<T> alt) {
         return new BlockConfig<T>(this.id, this.name, this.codec, this.value, this.formatter, this.action, alt);
     }
 

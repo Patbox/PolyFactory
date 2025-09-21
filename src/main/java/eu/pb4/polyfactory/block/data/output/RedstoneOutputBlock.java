@@ -7,7 +7,7 @@ import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
-import eu.pb4.polyfactory.block.configurable.ValueFormatter;
+import eu.pb4.polyfactory.block.configurable.BlockValueFormatter;
 import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.block.data.util.DirectionalCabledDataBlock;
 import eu.pb4.polyfactory.data.DataContainer;
@@ -56,7 +56,7 @@ public class RedstoneOutputBlock extends DirectionalCabledDataBlock implements D
     public final List<BlockConfig<?>> blockConfigs = List.of(
             BlockConfig.CHANNEL,
             this.facingAction,
-            BlockConfig.of("redstone.strong", STRONG, ValueFormatter.text(ScreenTexts::onOrOff))
+            BlockConfig.of("redstone.strong", STRONG, BlockValueFormatter.text(ScreenTexts::onOrOff))
     );
 
     public RedstoneOutputBlock(Settings settings) {

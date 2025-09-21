@@ -608,7 +608,17 @@ class RecipesProvider extends FabricRecipeProvider {
                         .input('a', FactoryItems.AXLE)
                         .input('c', Items.CHAIN)
                         .input('s', FactoryItems.STEEL_INGOT)
-                        .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.AXLE))
+                        .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
+                        .offerTo(exporter);
+
+                this.createShaped(RecipeCategory.REDSTONE, FactoryItems.CHAIN_DRIVE, 1)
+                        .pattern("csc")
+                        .pattern("c c")
+                        .pattern("ppp")
+                        .input('c', Items.CHAIN)
+                        .input('s', FactoryItems.STEEL_INGOT)
+                        .input('p', FactoryItems.STEEL_PLATE)
+                        .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                         .offerTo(exporter);
 
                 this.createShaped(RecipeCategory.REDSTONE, FactoryItems.NIXIE_TUBE, 1)

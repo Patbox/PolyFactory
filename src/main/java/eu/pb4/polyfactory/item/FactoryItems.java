@@ -26,10 +26,13 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.configuration.WrenchItem;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
 import net.minecraft.block.Block;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.*;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.*;
@@ -108,7 +111,7 @@ public class FactoryItems {
     public static final Item TREATED_DRIED_KELP = register("treated_dried_kelp", SimplePolymerItem::new);
     public static final Item INTEGRATED_CIRCUIT = register("integrated_circuit", SimplePolymerItem::new);
     public static final Item REDSTONE_CHIP = register("redstone_chip", SimplePolymerItem::new);
-    public static final Item CHAIN_LIFT = register("chain_lift", SimplePolymerItem::new);
+    public static final Item CHAIN_LIFT = register("chain_lift", s -> new SimplePolymerItem(s.maxCount(1)));
 
     public static final Item ITEM_FILTER = register("item_filter", ImprovedFilterItem::new);
 
@@ -227,6 +230,7 @@ public class FactoryItems {
                     entries.add(GEARBOX);
                     entries.add(CLUTCH);
                     entries.add(CHAIN_DRIVE);
+                    entries.add(Items.CHAIN);
                     entries.add(STEEL_GEAR);
                     entries.add(LARGE_STEEL_GEAR);
 
@@ -325,19 +329,24 @@ public class FactoryItems {
                     entries.add(TINY_POTATO_SPRING);
                     entries.add(GOLDEN_TINY_POTATO_SPRING);
 
-                    // Other items
+                    // Tools
                     entries.add(DYNAMITE);
                     entries.add(STICKY_DYNAMITE);
                     entries.add(PRESSURE_FLUID_GUN);
+                    entries.add(CHAIN_LIFT);
                     entries.add(SPRAY_CAN);
+
+                    // Food
+                    entries.add(CRISPY_HONEY);
+                    entries.add(HONEYED_APPLE);
+
+                    // Other Items
                     entries.add(HONEY_BUCKET);
                     entries.add(SLIME_BUCKET);
                     entries.add(EXPERIENCE_BUCKET);
                     entries.add(THROWABLE_GLASS_BOTTLE);
                     entries.add(LINGERING_THROWABLE_GLASS_BOTTLE);
                     entries.add(BRITTLE_GLASS_BOTTLE);
-                    entries.add(CRISPY_HONEY);
-                    entries.add(HONEYED_APPLE);
 
                     // Generic Materials
                     entries.add(SAW_DUST);
@@ -377,6 +386,9 @@ public class FactoryItems {
                     entries.add(ArtificialDyeItem.of(0xFF00FF));
 
                     // Enchantments
+                    addEnchantment(context, entries, FactoryEnchantments.IGNORE_MOVEMENT);
+
+                    //entries.add();
                     //entries.add(EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(, 1)));
 
                     // Creative
@@ -466,8 +478,20 @@ public class FactoryItems {
         }
 
         AttackBlockCallback.EVENT.register(WRENCH::handleBlockAttack);
+        AttackEntityCallback.EVENT.register(WRENCH::handleEntityAttack);
+        UseEntityCallback.EVENT.register(WRENCH::handleEntityUse);
 
         PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(PortableFluidTankBlockItem::createItemAsset);
+    }
+
+    private static void addEnchantment(ItemGroup.DisplayContext context, ItemGroup.Entries entries, RegistryKey<Enchantment> ignoreMovement) {
+        context.lookup().getOrThrow(RegistryKeys.ENCHANTMENT).getOptional(FactoryEnchantments.IGNORE_MOVEMENT).ifPresent(x -> {
+            var item = Items.ENCHANTED_BOOK.getDefaultStack();
+            var b = new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT);
+            b.add(x, 1);
+            item.set(DataComponentTypes.STORED_ENCHANTMENTS, b.build());
+            entries.add(item);
+        });
     }
 
     public static <T extends Item> T register(Identifier id, Function<Item.Settings, T> function) {

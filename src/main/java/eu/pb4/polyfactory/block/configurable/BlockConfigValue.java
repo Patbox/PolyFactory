@@ -6,7 +6,6 @@ import eu.pb4.polymer.virtualentity.api.elements.DisplayElement;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.state.property.Property;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -15,9 +14,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public interface ConfigValue<T> {
-    static <T, B> ConfigValue<T> ofBlockEntity(Class<B> beClass, Function<B, T> getter, BiConsumer<B, T> setter) {
-        return new ConfigValue<T>() {
+public interface BlockConfigValue<T> {
+    static <T, B> BlockConfigValue<T> ofBlockEntity(Class<B> beClass, Function<B, T> getter, BiConsumer<B, T> setter) {
+        return new BlockConfigValue<T>() {
             @Nullable
             @Override
             public T getValue(World world, BlockPos pos, Direction side, BlockState state) {
@@ -44,12 +43,12 @@ public interface ConfigValue<T> {
         };
     }
 
-    static <T extends Comparable<T>> ConfigValue<T> ofProperty(Property<T> property) {
+    static <T extends Comparable<T>> BlockConfigValue<T> ofProperty(Property<T> property) {
         return ofPropertyCustom(property, (propertyx, value, world, pos, side, state) -> state.withIfExists(propertyx, value));
     }
 
-    static <T extends Comparable<T>> ConfigValue<T> ofPropertyCustom(Property<T> property, StateProvider<T> provider) {
-        return new ConfigValue<T>() {
+    static <T extends Comparable<T>> BlockConfigValue<T> ofPropertyCustom(Property<T> property, StateProvider<T> provider) {
+        return new BlockConfigValue<T>() {
             @Nullable
             @Override
             public T getValue(World world, BlockPos pos, Direction side, BlockState state) {

@@ -6,8 +6,8 @@ import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import eu.pb4.polyfactory.block.configurable.ValueFormatter;
-import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
+import eu.pb4.polyfactory.block.configurable.BlockValueFormatter;
+import eu.pb4.polyfactory.block.configurable.WrenchModifyBlockValue;
 import eu.pb4.polyfactory.block.fluids.transport.PipeConnectable;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
@@ -58,9 +58,9 @@ import java.util.Locale;
 public class NozzleBlock extends NetworkBlock implements FactoryBlock, ConfigurableBlock, PipeConnectable, BarrierBasedWaterloggable, BlockEntityProvider, NetworkComponent.Pipe {
     public static final EnumProperty<Direction> FACING = Properties.FACING;
     public static final BlockConfig SPREAD = BlockConfig.ofBlockEntity("spread", Codec.FLOAT, NozzleBlockEntity.class,
-            ValueFormatter.str(x -> String.format(Locale.ROOT,"%.2f", x)),
+            BlockValueFormatter.str(x -> String.format(Locale.ROOT,"%.2f", x)),
             NozzleBlockEntity::extraSpread, NozzleBlockEntity::setExtraSpread,
-            WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.05f : -0.05f), 0f, 0.8f))
+            WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.05f : -0.05f), 0f, 0.8f))
     );
     public NozzleBlock(Settings settings) {
         super(settings);

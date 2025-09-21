@@ -9,8 +9,8 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.mapcanvas.api.font.DefaultFonts;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
-import eu.pb4.polyfactory.block.configurable.ValueFormatter;
-import eu.pb4.polyfactory.block.configurable.WrenchModifyValue;
+import eu.pb4.polyfactory.block.configurable.BlockValueFormatter;
+import eu.pb4.polyfactory.block.configurable.WrenchModifyBlockValue;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.block.data.DataReceiver;
@@ -93,41 +93,41 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
     });
 
     public static final BlockConfig<?> SCALE = BlockConfig.ofBlockEntity("scale", Codec.FLOAT, HologramProjectorBlockEntity.class,
-            ValueFormatter.str(x -> String.format(Locale.ROOT, "%.1f", x)),
+            BlockValueFormatter.str(x -> String.format(Locale.ROOT, "%.1f", x)),
             HologramProjectorBlockEntity::scale, HologramProjectorBlockEntity::setScale,
-            WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.5f : -0.5f), 1, 5))
+            WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.5f : -0.5f), 1, 5))
     );
 
     public static final BlockConfig<?> OFFSET = BlockConfig.ofBlockEntity("offset", Codec.FLOAT, HologramProjectorBlockEntity.class,
-            ValueFormatter.str(x -> String.format(Locale.ROOT,"%.1f", x)),
+            BlockValueFormatter.str(x -> String.format(Locale.ROOT,"%.1f", x)),
             HologramProjectorBlockEntity::offset, HologramProjectorBlockEntity::setOffset,
-            WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.1f : -0.1f), 0.1f, 1.5f))
+            WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.1f : -0.1f), 0.1f, 1.5f))
     );
 
     public static final BlockConfig<?> CHANGE_PITCH = BlockConfig.ofBlockEntity("pitch", Codec.FLOAT, HologramProjectorBlockEntity.class,
-            ValueFormatter.str(x -> Math.round(x * MathHelper.DEGREES_PER_RADIAN) + "°"),
+            BlockValueFormatter.str(x -> Math.round(x * MathHelper.DEGREES_PER_RADIAN) + "°"),
             HologramProjectorBlockEntity::pitch, HologramProjectorBlockEntity::setPitch,
-            WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
+            WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
                     0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
     );
 
     public static final BlockConfig<?> CHANGE_YAW = BlockConfig.ofBlockEntity("yaw", Codec.FLOAT, HologramProjectorBlockEntity.class,
-            ValueFormatter.str(x -> Math.round(x * MathHelper.DEGREES_PER_RADIAN) + "°"),
+            BlockValueFormatter.str(x -> Math.round(x * MathHelper.DEGREES_PER_RADIAN) + "°"),
             HologramProjectorBlockEntity::yaw, HologramProjectorBlockEntity::setYaw,
-            WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
+            WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
                     0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
     );
     public static final BlockConfig<?> CHANGE_ROLL = BlockConfig.ofBlockEntity("roll", Codec.FLOAT, HologramProjectorBlockEntity.class,
-            ValueFormatter.str(x -> Math.round(x * MathHelper.DEGREES_PER_RADIAN) + "°"),
+            BlockValueFormatter.str(x -> Math.round(x * MathHelper.DEGREES_PER_RADIAN) + "°"),
             HologramProjectorBlockEntity::roll, HologramProjectorBlockEntity::setRoll,
-            WrenchModifyValue.simple((x, n) -> FactoryUtil.wrap(x + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
+            WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
                     0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
     );
 
     public static final BlockConfig<?> FORCE_TEXT = BlockConfig.ofBlockEntity("force_text", Codec.BOOL, HologramProjectorBlockEntity.class,
-            ValueFormatter.text(ScreenTexts::onOrOff),
+            BlockValueFormatter.text(ScreenTexts::onOrOff),
             HologramProjectorBlockEntity::forceText, HologramProjectorBlockEntity::setForceText,
-            WrenchModifyValue.simple((x, n) -> !x)
+            WrenchModifyBlockValue.simple((x, n) -> !x)
     );
 
     public HologramProjectorBlock(Settings settings) {
