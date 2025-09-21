@@ -32,10 +32,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
@@ -247,11 +244,11 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
             this.mainElement = LodItemDisplayElement.createSimple(ItemDisplayElementUtil.getModel(state.getBlock().asItem()),
                     this.getUpdateRate(), 0.3f, 0.6f);
             this.mainElement.setViewRange(0.7f);
-            this.updateAnimation(0, state.get(AXIS));
+            this.updateAnimation(0, state.get(AXIS), pos);
             this.addElement(this.mainElement);
         }
 
-        private void updateAnimation(float rotation, Direction.Axis axis) {
+        private void updateAnimation(float rotation, Direction.Axis axis, BlockPos pos) {
             var mat = mat();
             switch (axis) {
                 case X -> mat.rotate(Direction.EAST.getRotationQuaternion());
@@ -259,7 +256,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
             }
 
             mat.rotateY(rotation);
-            mat.scale(2, 2.005f, 2);
+            mat.scale(2, 2.f, 2);
 
             this.mainElement.setTransformation(mat);
         }
@@ -278,7 +275,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
 
             if (tick % this.getUpdateRate() == 0) {
                 this.updateAnimation(this.getRotation(),
-                        this.blockAware().getBlockState().get(AXIS));
+                        this.blockAware().getBlockState().get(AXIS), this.blockPos());
                 this.mainElement.startInterpolationIfDirty();
             }
 

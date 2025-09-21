@@ -1,11 +1,8 @@
 package eu.pb4.polyfactory.block.fluids.smeltery;
 
-import eu.pb4.factorytools.api.block.FactoryBlock;
-import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.fluid.FluidInstance;
-import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
@@ -30,16 +27,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -83,7 +76,7 @@ public class CastingCauldronBlock extends Block implements PolymerBlock, BlockWi
         return super.onUse(state, world, pos, player, hit);
     }
 
-    public ActionResult tryCauldronCasting(ServerWorld world, BlockPos pos, FaucedBlock.FaucedProvider provider) {
+    public ActionResult tryCauldronCasting(ServerWorld world, BlockPos pos, FaucedBlock.FaucedProvider provider, float rate) {
         var recipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.CASTING_CAULDRON, provider.getFluidContainerInput(), world);
         if (recipe.isEmpty()) {
             return ActionResult.FAIL;
@@ -91,7 +84,7 @@ public class CastingCauldronBlock extends Block implements PolymerBlock, BlockWi
 
         world.setBlockState(pos, this.getDefaultState());
         if (world.getBlockEntity(pos) instanceof CastingCauldronBlockEntity be) {
-            be.setup(recipe.get(), provider);
+            be.setup(recipe.get(), provider, rate);
         }
 
         return ActionResult.SUCCESS_SERVER;

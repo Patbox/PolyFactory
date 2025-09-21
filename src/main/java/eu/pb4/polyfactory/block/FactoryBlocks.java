@@ -86,7 +86,7 @@ public class FactoryBlocks {
     public static final ContainerBlock CONTAINER = register("wooden_container", Block.Settings.copy(Blocks.CHEST), settings -> new ContainerBlock(9 * 5, settings.nonOpaque()));
     public static final ItemPackerBlock ITEM_PACKER = register("item_packer", Block.Settings.copy(SPLITTER), ItemPackerBlock::new);
     public static final CableBlock CABLE = register("cable", Block.Settings.copy(Blocks.GLASS), settings -> new CableBlock(settings.breakInstantly().nonOpaque()));
-    public static final GatedCableBlock GATED_CABLE = register("gated_cable", Block.Settings.copy(SPLITTER), GatedCableBlock::new);
+    public static final GatedCableBlock GATED_CABLE = register("gated_cable", Block.Settings.copy(SPLITTER).strength(2.2F).sounds(BlockSoundGroup.STONE), GatedCableBlock::new);
     public static final Map<Block, WallWithCableBlock> WALL_WITH_CABLE = WallWithCableBlock.MAP;
     public static final DirectionalCabledDataProviderBlock ITEM_COUNTER = register("item_counter", Block.Settings.copy(SPLITTER), DirectionalCabledDataProviderBlock::new);
 

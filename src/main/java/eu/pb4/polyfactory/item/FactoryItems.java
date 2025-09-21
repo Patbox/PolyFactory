@@ -289,10 +289,10 @@ public class FactoryItems {
                     entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.GREEN)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     entries.add(ColoredItem.stack(CABLE, 1, DyeColorExtra.getColor(DyeColor.BLUE)), ItemGroup.StackVisibility.PARENT_TAB_ONLY);
                     entries.add(GATED_CABLE);
-                    entries.add(TACHOMETER);
-                    entries.add(STRESSOMETER);
                     entries.add(REDSTONE_OUTPUT);
                     entries.add(REDSTONE_INPUT);
+                    entries.add(TACHOMETER);
+                    entries.add(STRESSOMETER);
                     entries.add(ITEM_COUNTER);
                     entries.add(ITEM_READER);
                     entries.add(BLOCK_OBSERVER);

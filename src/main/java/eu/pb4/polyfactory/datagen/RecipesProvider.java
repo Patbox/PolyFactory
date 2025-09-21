@@ -63,6 +63,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import static eu.pb4.polyfactory.util.FactoryUtil.fakeTagList;
 import static eu.pb4.polyfactory.util.FactoryUtil.recipeKey;
 
 class RecipesProvider extends FabricRecipeProvider {
@@ -152,10 +153,9 @@ class RecipesProvider extends FabricRecipeProvider {
                         .offerTo(exporter);
 
                 this.createShaped(RecipeCategory.REDSTONE, FactoryItems.GATED_CABLE, 1)
-                        .pattern("ris")
+                        .pattern("rsr")
                         .pattern("cxc")
-                        .pattern("sir")
-                        .input('i', FactoryItems.STEEL_PLATE)
+                        .pattern("rsr")
                         .input('s', Items.SMOOTH_STONE_SLAB)
                         .input('x', Items.COPPER_INGOT)
                         .input('r', Items.REDSTONE)
@@ -611,7 +611,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                         .offerTo(exporter);
 
-                this.createShaped(RecipeCategory.REDSTONE, FactoryItems.CHAIN_DRIVE, 1)
+                this.createShaped(RecipeCategory.REDSTONE, FactoryItems.CHAIN_LIFT, 1)
                         .pattern("csc")
                         .pattern("c c")
                         .pattern("ppp")
@@ -966,7 +966,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         GenericPressRecipe.of("purpur_block", Ingredient.ofItems(Items.POPPED_CHORUS_FRUIT), 4, 5f, new ItemStack(Items.PURPUR_BLOCK, 1)),
                         GenericPressRecipe.of("sponge", Ingredient.ofItems(Items.WET_SPONGE), 1, 5f, new ItemStack(Items.SPONGE, 1)),
                         GenericPressRecipe.of("sand", Ingredient.ofItems(Items.SAND), 4, 5f, new ItemStack(Items.SANDSTONE, 1)),
-                        GenericPressRecipe.of("honeycomb", Ingredient.ofItems(Items.HONEYCOMB), 4, 4f, new ItemStack(Items.HONEYCOMB, 1)),
+                        GenericPressRecipe.of("honeycomb", Ingredient.ofItems(Items.HONEYCOMB), 4, 4f, new ItemStack(Items.HONEYCOMB_BLOCK, 1)),
                         GenericPressRecipe.of("snow_block", Ingredient.ofItems(Items.SNOWBALL), 4, 3f, new ItemStack(Items.SNOW_BLOCK, 1)),
                         GenericPressRecipe.of("red_sand", Ingredient.ofItems(Items.RED_SAND), 4, 5f, new ItemStack(Items.RED_SANDSTONE, 1)),
                         GenericPressRecipe.of("dripstone", Ingredient.ofItems(Items.POINTED_DRIPSTONE), 4, 5f, new ItemStack(Items.DRIPSTONE_BLOCK, 1)),
@@ -997,9 +997,12 @@ class RecipesProvider extends FabricRecipeProvider {
                         new RecipeEntry<>(recipeKey("press/spray_can_fill"), new FillSprayCanPressRecipe(12)),
                         GenericPressRecipe.of("bundle", CountedIngredient.ofItems(1, Items.LEATHER), CountedIngredient.ofItems(1, Items.STRING),
                                 3, OutputStack.of(Items.BUNDLE)),
-                        GenericPressRecipe.of("", CountedIngredient.ofItems(1, Items.HEAVY_CORE),
+                        GenericPressRecipe.of("mace", CountedIngredient.ofItems(1, Items.HEAVY_CORE),
                                 CountedIngredient.ofItems(1, Items.BREEZE_ROD),
-                                6, OutputStack.of(Items.MACE))
+                                6, OutputStack.of(Items.MACE)),
+                        GenericPressRecipe.of("test_fluid", "", CountedIngredient.ofTag(1, fakeTagList(ItemTags.LEAVES)),
+                                CountedIngredient.EMPTY,
+                                3, List.of(OutputStack.of(Items.STICK)), List.of(FactoryFluids.WATER.of(FluidConstants.NUGGET)))
                 );
 
                 for (var i = 0; i < 5; i++) {

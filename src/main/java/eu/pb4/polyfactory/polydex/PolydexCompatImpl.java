@@ -287,4 +287,15 @@ public class PolydexCompatImpl {
         }
         return list.toArray(new PolydexStack[0]);
     }
+
+    public static PolydexStack<?>[] createOutput(List<OutputStack> output, List<FluidStack<?>> fluids) {
+        var list = new ArrayList<PolydexStack<?>>(output.size());
+        for (var x : output) {
+            list.add(PolydexStack.of(x.stack().copyWithCount(x.stack().getCount() * x.roll()), x.chance()));
+        }
+        for (var x : fluids) {
+            list.add(new PolydexFluidStack(x.instance(), x.amount(), 1));
+        }
+        return list.toArray(new PolydexStack[0]);
+    }
 }

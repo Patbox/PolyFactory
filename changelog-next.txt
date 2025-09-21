@@ -23,23 +23,40 @@
   - For other signals it will display between 0 and 100, based on double value.
   - Can be placed on walls and floor, with floor allowing to rotate it.
   - You can change its style between Default (white background), red-green and green-red.
+  - You can change its starting hand position between Left, Center and Right.
+  - You can flip its direction progress direction.
   - Crafted with 4 Steel Ingots and single Paper.
 - Wrenches can now be used on entities:
   - Using Wrench on Boats and Minecarts allows to dismount entities riding them and toggle whatever mobs should be able to enter them.
   - If these entities have non-default settings, some of them might be saved onto dropped item and later reapplied when placed.
+- Recipe changes and additions:
+  - Changed Gated Cable recipe to 2 Smooth Stone Slabs, 4 Redstone Dusts, 2 Cables and 1 Copper Ingot.
+  - Changed Steel Button recipe to 4 Steel Nuggets in a rectangle.
+  - Steel and Copper Places can now be recycled in Smeltery.
+  - Fixed Honeycomb Block recipe.
 - Added Chain Mold.
-- Steel and Copper Places can now be recycled in Smeltery.
-- Resulting item can now be pulled with from Casting Table and Casting Cauldron (with Hopper or alike).
+- Resulting item can now be pulled from Casting Table and Casting Cauldron (with Hopper and alike).
+- Fauced can now be powered by redstone to make it activate automatically.
+  - Compared to regular player activation, it will pour fluids 5 times slower. Cooling time will be unchanged.
+  - Using Mechanical Spout should still be preferred way to automate fluid casting recipes.
 - Added Redstone, Progress and List data types.
-- Redstone signal is now sent as its own data type (instead of being a Integer).
+- Redstone signal is now sent as its own data type (instead of being an Integer).
+- Redstone value of data is now interpreted as absolute value (negative values will generate signal, instead of being replaced with zero).
 - Item Reader and Text Input blocks are now orientable when placed facing upwards or downwards.
 - Changed implementation of Wall with Cable and Wall with Pipe to be more compatible with other mods.
-- Updated Mold Template textures.
 - Mechanical Miner will now attack the closest entity, instead of random one.
 - Increased durability of Hardened Clay Molds from 16 to 64.
-- Changed Steel Button recipe to 4 Steel Nuggets in a rectangle.
 - Lowered damage done by Experience Splashes (XP shoot with Pressure Fluid Gun) to 0.05 * amount (from 1 to 3). It was 0.5 * amount before.
+- Blueprint Workbench now uses Crafting Table screen as it's ui base, allowing usage of recipe book.
 - Creative Motor can now provide negative speed (aka rotating other way around).
+- Updated Mold Template textures.
+- Updated texture of Gated Cable and made it change when it's powered.
+- Renamed "Clay [X] Mold" items to "Unfired Clay [X] Mold".
+- Tweaked positioning of items in Creative Tab.
+- Tachometer speed value will now depend on rotation direction.
+- Mechanical Press recipes now support providing fluid output, as long as you place a Fluid Drain next to it.
+  - Such recipes will provide that information in Polydex.
+  - This functionality isn't used by the builtin recipes yet.
 - Fixed Mechanical Miners not attacking entities that are too close to it.
 - Fixed Industrial Smeltery's progress not showing correctly sometimes.
 - Fixed Stored Data tooltip not showing for Data Memory Block.

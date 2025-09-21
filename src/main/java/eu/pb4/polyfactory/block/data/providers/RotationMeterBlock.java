@@ -148,7 +148,8 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
 
         @Override
         protected <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
-            DataProvider.sendData(world, pos, new LongData((long) (RotationUser.getRotation(world, pos).speed() / 360 * 60 * 20)));
+            var rot = RotationUser.getRotation(world, pos);
+            DataProvider.sendData(world, pos, new LongData((long) (rot.speed() / 360 * 60 * 20 * (rot.isNegative() ? -1 : 1))));
         }
     }
 

@@ -44,7 +44,7 @@ public interface DataContainer extends Comparable<DataContainer>, TooltipAppende
     }
 
     default int asRedstoneOutput() {
-        return (int) MathHelper.clamp(asLong(), 0, 15);
+        return (int) MathHelper.clamp(Math.abs(asLong()), 0, 15);
     };
     default char padding() {
         return ' ';

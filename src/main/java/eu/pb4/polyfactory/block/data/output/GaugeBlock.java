@@ -6,6 +6,7 @@ import eu.pb4.factorytools.api.block.QuickWaterloggable;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
+import eu.pb4.polyfactory.block.configurable.BlockValueFormatter;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
@@ -38,7 +39,7 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.Identifier;
+import net.minecraft.text.Text;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -60,19 +61,20 @@ import static eu.pb4.polyfactory.ModInit.id;
 public class GaugeBlock extends DataNetworkBlock implements FactoryBlock, ConfigurableBlock, BlockEntityProvider, CableConnectable, DataReceiver, PolymerTexturedBlock, QuickWaterloggable {
     public static final EnumProperty<Orientation> ORIENTATION = Properties.ORIENTATION;
     public static final EnumProperty<Style> STYLE = EnumProperty.of("style", Style.class);
+    public static final EnumProperty<HandPosition> HAND_POSITION = EnumProperty.of("hand_position", HandPosition.class);
     public static final BooleanProperty REVERSE = FactoryProperties.REVERSE;
-
     private static final BlockConfig<Style> STYLE_CONFIG = BlockConfig.of(STYLE);
+    private static final BlockConfig<HandPosition> HAND_POSITION_CONFIG = BlockConfig.of("hand_position", HAND_POSITION, BlockValueFormatter.text(HandPosition::text));
 
     public GaugeBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false).with(REVERSE, false).with(STYLE, Style.DEFAULT));
+        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false).with(HAND_POSITION, HandPosition.LEFT).with(REVERSE, false).with(STYLE, Style.DEFAULT));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(WATERLOGGED, ORIENTATION, REVERSE, STYLE);
+        builder.add(WATERLOGGED, ORIENTATION, HAND_POSITION, REVERSE, STYLE);
     }
 
     @Override
@@ -134,6 +136,7 @@ public class GaugeBlock extends DataNetworkBlock implements FactoryBlock, Config
         return List.of(
                 BlockConfig.CHANNEL,
                 BlockConfig.REVERSE,
+                HAND_POSITION_CONFIG,
                 STYLE_CONFIG
 
         );
@@ -172,6 +175,8 @@ public class GaugeBlock extends DataNetworkBlock implements FactoryBlock, Config
 
         private float targetAngle = 0;
         private float currentAngle = 0;
+        private float position;
+        private float progress;
 
         protected Model(BlockState state) {
             super();
@@ -181,6 +186,7 @@ public class GaugeBlock extends DataNetworkBlock implements FactoryBlock, Config
             this.hand.setTranslation(this.base.getTranslation());
             this.hand.setInterpolationDuration(1);
             this.hand.setItem(HAND);
+            this.position = state.get(HAND_POSITION).value();
             this.handDirection = state.get(REVERSE) ? 1 : -1;
             this.updateStatePos(state);
             setRotation(0, true);
@@ -213,22 +219,25 @@ public class GaugeBlock extends DataNetworkBlock implements FactoryBlock, Config
         }
 
         public void setRotation(float progress, boolean force) {
-            this.targetAngle = (MathHelper.clamp(progress - 0.5f, -0.5f, 0.5f) * 2 * 125 * MathHelper.RADIANS_PER_DEGREE) * this.handDirection;
+            this.progress = progress;
+            this.targetAngle = this.calculateAngle(progress);
             if (force) {
                 this.currentAngle = this.targetAngle;
                 this.hand.setLeftRotation(new Quaternionf().rotateZ(this.targetAngle));
             }
         }
 
+        private float calculateAngle(float progress) {
+            return (MathHelper.clamp(progress * this.handDirection - this.position, -0.5f, 0.5f) * 2 * 125 * MathHelper.RADIANS_PER_DEGREE);
+        }
+
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 updateStatePos(this.blockState());
-                var handDirection = this.blockState().get(REVERSE) ? 1 : -1;
-                if (this.handDirection != handDirection) {
-                    this.handDirection = handDirection;
-                    this.targetAngle = -this.targetAngle;
-                }
+                this.position = this.blockState().get(HAND_POSITION).value();
+                this.handDirection = this.blockState().get(REVERSE) ? 1 : -1;
+                this.targetAngle = this.calculateAngle(this.progress);
             }
         }
 
@@ -248,6 +257,34 @@ public class GaugeBlock extends DataNetworkBlock implements FactoryBlock, Config
         @Override
         public void provideInitialCachedData(DataContainer lastData) {
             this.setRotation(lastData.asProgress(), true);
+        }
+    }
+
+    public enum HandPosition implements StringIdentifiable {
+        LEFT("left", -0.5f),
+        CENTER("center", 0f),
+        RIGHT("right", 0.5f),
+        ;
+
+        private final String name;
+        private final float value;
+
+        HandPosition(String name, float value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public Text text() {
+            return Text.translatable("text.polyfactory.direction." + this.name);
+        }
+
+        @Override
+        public String asString() {
+            return this.name;
+        }
+
+        public float value() {
+            return this.value;
         }
     }
 

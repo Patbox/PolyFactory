@@ -49,10 +49,6 @@ public class GuiTextures {
     public static final Supplier<GuiElementBuilder> BUTTON_DONE_BLOCKED = icon32("button/done_blocked");
     public static final Supplier<GuiElementBuilder> BUTTON_ITEM_FILTER_TYPE_ONLY = icon32("button/item_filter/type_only");
     public static final Supplier<GuiElementBuilder> BUTTON_ITEM_FILTER_STRICT = icon32("button/item_filter/strict");
-    public static final Supplier<GuiElementBuilder> BUTTON_CRAFTER_MODEL_ALWAYS = icon32("button/crafter/mode_always");
-    public static final Supplier<GuiElementBuilder> BUTTON_CRAFTER_MODEL_FILLED = icon32("button/crafter/mode_filled");
-    public static final Supplier<GuiElementBuilder> BUTTON_CRAFTER_MODEL_POWERED = icon32("button/crafter/mode_powered");
-    public static final Supplier<GuiElementBuilder> BUTTON_CRAFTER_MODEL_NOT_POWERED = icon32("button/crafter/mode_not_powered");
     public static final Supplier<GuiElementBuilder> LOCKED_SLOT = icon32("locked_slot");
 
     public static final Supplier<GuiElementBuilder> NUMBERED_BUTTONS_DISABLED = icon16("numbered_buttons/disabled");
@@ -79,6 +75,7 @@ public class GuiTextures {
     public static final IntFunction<GuiElementBuilder>[] NUMBERS_FLAT = createNumbers("flat/");
     //public static final IntFunction<GuiElementBuilder>[] NUMBERS_SHADOW = createNumbers("shadow/");
     public static final char SPACE_1 = UiResourceCreator.space(1);
+    public static final char BLUEPRINT_WORKSTATION_EXTRA_OFFSET = UiResourceCreator.space(-29 + 8);
     public static final char POLYDEX_OFFSET = UiResourceCreator.space(168);
     public static final char POLYDEX_OFFSET_N = UiResourceCreator.space(-168);
     public static final char MIXER_FLUID_OFFSET = UiResourceCreator.space(28 - 8);
@@ -87,7 +84,6 @@ public class GuiTextures {
     public static final char MECHANICAL_DRAIN_FLUID_OFFSET_N = UiResourceCreator.space(-118 + 8);
     public static final char MECHANICAL_SPOUT_FLUID_OFFSET = UiResourceCreator.space(46 - 8);
     public static final char MECHANICAL_SPOUT_FLUID_OFFSET_N = UiResourceCreator.space(-46 + 8);
-
     public static final char SMELTERY_FLUID_OFFSET = UiResourceCreator.space(99 - 8);
     public static final char SMELTERY_FLUID_OFFSET_N = UiResourceCreator.space(-99 + 8);
     public static final char DRAIN_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(110 + 7);
@@ -99,7 +95,8 @@ public class GuiTextures {
     public static final char MIXER_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-28 + 8 - 7 - 108);
     public static final char SMELTERY_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(91 + 7);
     public static final char SMELTERY_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-91 - 7);
-
+    public static final char PRESS_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(107 - 8);
+    public static final char PRESS_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-107 + 8);
     public static void register() {
         PolydexTextures.register();
         Progress.createHorizontal("generic_bar", 1, 15, false, 0);

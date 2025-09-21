@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.PredicateLimitedSlot;
+import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
@@ -19,11 +20,12 @@ import net.minecraft.block.BlockState;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.CraftingRecipe;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.ServerRecipeManager;
+import net.minecraft.network.packet.s2c.play.CraftFailedResponseS2CPacket;
+import net.minecraft.recipe.*;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.screen.AbstractCraftingScreenHandler;
+import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -32,6 +34,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -41,6 +44,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, BlockEntityExtraListener {
     private final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(9, ItemStack.EMPTY);
@@ -198,15 +202,44 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
         private final BlueprintWorkbenchBlockEntity be;
 
         public Gui(ServerPlayerEntity player, BlueprintWorkbenchBlockEntity be) {
-            super(ScreenHandlerType.GENERIC_9X3, player, false);
+            super(ScreenHandlerType.CRAFTING, player, false);
             this.be = be;
-            this.setTitle(GuiTextures.BLUEPRINT_WORKBENCH.apply(be.getCachedState().getBlock().getName()));
+            this.setTitle(Text.empty().append(Text.literal("" + GuiTextures.BLUEPRINT_WORKSTATION_EXTRA_OFFSET).setStyle(UiResourceCreator.STYLE))
+                    .append(GuiTextures.BLUEPRINT_WORKBENCH.apply(be.getCachedState().getBlock().getName())));
+
+            this.setSlot(0, () -> be.outputPreview.copy());
+
             for (int i = 0; i < 9; i++) {
-                this.setSlotRedirect((i / 3) * 9 + 2 + i % 3, new Slot(be, i, 0, 0));
+                this.setSlotRedirect(i + 1, new Slot(be, i, 0, 0));
             }
-            this.setSlot(9 + 6, () -> be.outputPreview.copy());
-            this.setSlot(9, PolydexCompat.getButton(RecipeType.CRAFTING));
             this.open();
+        }
+
+        @Override
+        public void onCraftRequest(NetworkRecipeId recipeId, boolean shift) {
+            var recipe = this.getPlayer().getServer().getRecipeManager().get(recipeId);
+            if (recipe == null || !(recipe.parent().value() instanceof CraftingRecipe craftingRecipe) || craftingRecipe.getIngredientPlacement().hasNoPlacement()) {
+                return;
+            }
+
+            //noinspection unchecked
+            var post = InputSlotFiller.fill(new InputSlotFiller.Handler<>() {
+                public void populateRecipeFinder(RecipeFinder finder) {
+                    for (int i = 0; i < 9; i++) {
+                        finder.addInput(be.getStack(i));
+                    }
+                }
+
+                public void clear() {}
+
+                public boolean matches(RecipeEntry<CraftingRecipe> entry) {
+                    return entry.value().matches(CraftingRecipeInput.create(3, 3, be.stacks), player.getWorld());
+                }
+            }, 3, 3, this.screenHandler.slots.subList(1, 10), this.screenHandler.slots.subList(1, 10), player.getInventory(), (RecipeEntry<CraftingRecipe>) recipe.parent(), false, false);
+
+            if (post == AbstractRecipeScreenHandler.PostFillAction.PLACE_GHOST_RECIPE) {
+                this.player.networkHandler.sendPacket(new CraftFailedResponseS2CPacket(this.player.currentScreenHandler.syncId, recipe.display().display()));
+            }
         }
 
         @Override

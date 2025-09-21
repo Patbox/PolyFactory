@@ -2,8 +2,10 @@ package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.fluids.DrainBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
+import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
@@ -40,6 +42,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PressBlockEntity extends TallItemMachineBlockEntity {
@@ -162,6 +165,41 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             if (success) {
                 if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
                     Criteria.RECIPE_CRAFTED.trigger(player, self.currentRecipe.id(), List.of(stack.getStack(), stack2.getStack()));
+                }
+
+                var fluids = self.currentRecipe.value().outputFluids(input);
+                if (!fluids.isEmpty()) {
+                    var copy = new ArrayList<>(fluids);
+
+                    for (var dir : Direction.Type.HORIZONTAL) {
+                        if (world.getBlockEntity(pos.offset(dir)) instanceof DrainBlockEntity be) {
+                            for (int i = 0; i < copy.size(); i++) {
+                                var fluid = copy.get(i);
+                                if (fluid.isEmpty()) {
+                                    continue;
+                                }
+                                var leftover = be.insertFluid(fluid.instance(), fluid.amount(), dir.getOpposite());
+                                copy.set(i, fluid.withAmount(leftover));
+                            }
+                        }
+                    }
+
+                    for (var fluid : copy) {
+                        if (fluid.isEmpty()) {
+                            continue;
+                        }
+                        for (int i = 0; i < 5; i++) {
+                            ((ServerWorld) world).spawnParticles(fluid.instance().particle(),
+                                    pos.getX() + 0.5, pos.getY() + 1.05, pos.getZ() + 0.5, 0,
+                                    (Math.random() - 0.5) * 0.2, 0.01, (Math.random() - 0.5) * 0.2, 0.3);
+                        }
+                    }
+
+                    for (var fluid : fluids) {
+                        ((ServerWorld) world).spawnParticles(fluid.instance().particle(),
+                                pos.getX() + 0.5, pos.getY() + 1.05, pos.getZ() + 0.5, 0,
+                                (Math.random() - 0.5) * 0.2, 0, (Math.random() - 0.5) * 0.2, 0.2);
+                    }
                 }
 
                 self.process = -0.6;

@@ -16,10 +16,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -42,6 +39,7 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
     private boolean isCooling;
     private FaucedBlock.FaucedProvider provider = FaucedBlock.FaucedProvider.EMPTY;
     private boolean findRecipe = false;
+    private float rate;
 
     public CastingCauldronBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.CASTING_CAULDRON, pos, state);
@@ -102,6 +100,7 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
             if (coolingTime > 0 && !self.isCooling) {
                 self.isCooling = true;
                 self.process = 0;
+                self.rate = 1;
                 self.markDirty();
                 return;
             }
@@ -125,7 +124,7 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
             self.currentRecipe = null;
             self.markDirty();
         } else {
-            self.process += 1;
+            self.process += self.rate;
 
             markDirty(world, pos, self.getCachedState());
             var fluid = self.currentRecipe.value().fluidInput(input);
@@ -164,7 +163,7 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
             view.putDouble("Progress", this.process);
             view.putBoolean("is_cooling", this.isCooling);
         }
-
+        view.putFloat("rate", this.rate);
         super.writeData(view);
     }
 
@@ -176,6 +175,7 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
             this.isCooling = view.getBoolean("is_cooling", false);
             this.findRecipe = true;
         }
+        this.rate = view.getFloat("rate", 1f);
         super.readData(view);
     }
 
@@ -220,8 +220,9 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
         return 1;
     }
 
-    public void setup(RecipeEntry<CauldronCastingRecipe> recipe, FaucedBlock.FaucedProvider provider) {
+    public void setup(RecipeEntry<CauldronCastingRecipe> recipe, FaucedBlock.FaucedProvider provider, float rate) {
         this.currentRecipe = recipe;
         this.provider = provider;
+        this.rate = rate;
     }
 }

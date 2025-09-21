@@ -6,7 +6,6 @@ import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.FactoryItemTags;
-import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.casting.CastingRecipe;
 import eu.pb4.polyfactory.recipe.input.SingleItemWithFluid;
@@ -19,11 +18,9 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -54,6 +51,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
     private boolean activate = false;
     private boolean isCooling;
     private FaucedBlock.FaucedProvider provider = FaucedBlock.FaucedProvider.EMPTY;
+    private float rate;
 
     public CastingTableBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.CASTING_TABLE, pos, state);
@@ -126,6 +124,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
             if (coolingTime > 0 && !self.isCooling) {
                 self.isCooling = true;
                 self.process = 0;
+                self.rate = 1;
                 self.markDirty();
                 return;
             }
@@ -169,7 +168,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
             self.model.setOutput(self.getStack(1));
             self.markDirty();
         } else {
-            self.process += 1;
+            self.process += self.rate;
 
             markDirty(world, pos, self.getCachedState());
             var fluid = self.currentRecipe.value().fluidInput(input);
@@ -200,6 +199,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
             view.putDouble("Progress", this.process);
             view.putBoolean("is_cooling", this.isCooling);
         }
+        view.putFloat("rate", this.rate);
 
         super.writeData(view);
     }
@@ -212,6 +212,8 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
             this.isCooling = view.getBoolean("is_cooling", false);
             this.activate = true;
         }
+        this.rate = view.getFloat("rate", 1f);
+
         super.readData(view);
     }
 
@@ -261,7 +263,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
         return this.stacks;
     }
 
-    public ActionResult activate(FaucedBlock.FaucedProvider provider) {
+    public ActionResult activate(FaucedBlock.FaucedProvider provider, float rate) {
         if (this.isInputEmpty() && !this.isOutputEmpty()) {
             var input = new SingleItemWithFluid(this.getStack(1), provider.getFluidContainerInput(), (ServerWorld) this.world);
 
@@ -277,6 +279,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
         }
         this.provider = provider;
         this.activate = true;
+        this.rate = rate;
         return ActionResult.SUCCESS_SERVER;
     }
 }

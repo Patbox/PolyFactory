@@ -1,0 +1,6 @@
+{
+	"parent": "polyfactory:block/gated_cable",
+	"textures": {
+		"side": "polyfactory:block/cable/cable_gate_side_on"
+	}
+}

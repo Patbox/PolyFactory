@@ -34,6 +34,7 @@ import net.minecraft.item.ItemUsage;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
@@ -42,8 +43,10 @@ import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
+import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -54,9 +57,47 @@ import java.util.function.BooleanSupplier;
 
 public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedBlock, PipeConnectable {
     public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
+    public static final BooleanProperty POWERED = Properties.POWERED;
 
     public FaucedBlock(Settings settings) {
         super(settings);
+        this.setDefaultState(this.getDefaultState().with(POWERED, false));
+    }
+
+    @Override
+    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (!oldState.isOf(state.getBlock())) {
+            this.updatePowered(world, pos, state);
+        }
+        super.onBlockAdded(state, world, pos, oldState, notify);
+    }
+
+    @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
+        this.updatePowered(world, pos, state);
+        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
+    }
+
+    private void updatePowered(World world, BlockPos pos, BlockState state) {
+        boolean powered = world.isReceivingRedstonePower(pos);
+        if (powered != state.get(POWERED)) {
+            world.setBlockState(pos, state.with(POWERED, powered), 4);
+            if (powered) {
+                world.scheduleBlockTick(pos, this, 1);
+            }
+        }
+    }
+
+
+    @Override
+    protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        super.scheduledTick(state, world, pos, random);
+        if (!state.get(POWERED)) {
+            return;
+        }
+
+        this.activate(pos, state, world, 0.2f);
+        world.scheduleBlockTick(pos, this, 20);
     }
 
     @Nullable
@@ -114,23 +155,31 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        if (player.shouldCancelInteraction()) {
+            return ActionResult.PASS;
+        }
+
+        return this.activate(pos, state, world, 1f);
+    }
+
+    private ActionResult activate(BlockPos pos, BlockState state, World world, float rate) {
         var output = getOutput(state, (ServerWorld) world, pos);
         if (!output.isValid()) {
             return ActionResult.PASS;
         }
 
-        if (!player.shouldCancelInteraction() && world.getBlockEntity(pos.down()) instanceof CastingTableBlockEntity be) {
-            return be.activate(output);
-        } else if (!player.shouldCancelInteraction() && world.getBlockState(pos.down()).isOf(Blocks.CAULDRON)) {
-            return FactoryBlocks.CASTING_CAULDRON.tryCauldronCasting((ServerWorld) world, pos.down(), output);
+        if (world.getBlockEntity(pos.down()) instanceof CastingTableBlockEntity be) {
+            return be.activate(output, rate);
+        } else if (world.getBlockState(pos.down()).isOf(Blocks.CAULDRON)) {
+            return FactoryBlocks.CASTING_CAULDRON.tryCauldronCasting((ServerWorld) world, pos.down(), output, rate);
         }
-        return super.onUse(state, world, pos, player, hit);
+        return ActionResult.PASS;
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
-        builder.add(FACING);
+        builder.add(FACING, POWERED);
     }
 
     @Override

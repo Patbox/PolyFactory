@@ -16,6 +16,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
@@ -34,6 +35,8 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
+
+import static eu.pb4.polyfactory.ModInit.id;
 
 public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, ConfigurableBlock, CableConnectable {
     public static final Property<Direction.Axis> AXIS = Properties.AXIS;
@@ -90,7 +93,7 @@ public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, 
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
+        return Blocks.SMOOTH_STONE.getDefaultState();
     }
 
     @Override
@@ -124,9 +127,12 @@ public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, 
     }
 
     public static final class Model extends RotationAwareModel {
+        public static final ItemStack OFF = ItemDisplayElementUtil.getModel(id("block/gated_cable"));
+        public static final ItemStack ON = ItemDisplayElementUtil.getModel(id("block/gated_cable_on"));
+
         private final ItemDisplayElement main;
         private Model(ServerWorld world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.main = ItemDisplayElementUtil.createSimple(state.get(POWERED) ? ON : OFF);
             this.main.setScale(new Vector3f(2));
             updateStatePos(state);
             this.addElement(this.main);
@@ -154,6 +160,7 @@ public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, 
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
+                this.main.setItem(this.blockState().get(POWERED) ? ON : OFF);
                 updateStatePos(this.blockState());
             }
         }
