@@ -18,9 +18,11 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.BundleContentsComponent;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.BundleItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -34,6 +36,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
@@ -135,7 +138,6 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     @Override
     public long getFillCapacity() {
         if (this.itemStack.getItem() instanceof BundleItem bundleItem) {
-            //var oc = this.itemStack.getOrDefault(DataComponentTypes.BUNDLE_CONTENTS, BundleContentsComponent.DEFAULT).getOccupancy();
             return 64;
         }
 
@@ -203,6 +205,18 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     @Override
     protected void createGui(ServerPlayerEntity playerEntity) {
         new Gui(playerEntity);
+    }
+
+    public int getComparatorOutput() {
+        float progress;
+
+        if (this.itemStack.contains(DataComponentTypes.BUNDLE_CONTENTS)) {
+            progress = this.itemStack.getOrDefault(DataComponentTypes.BUNDLE_CONTENTS, BundleContentsComponent.DEFAULT).getOccupancy().floatValue();
+        } else {
+            progress = this.getFilledAmount() / Math.max(this.getFillCapacity(), 1f);
+        }
+
+        return MathHelper.lerpPositive(MathHelper.clamp(progress, 0, 1), 0, 15);
     }
 
     private class Gui extends SimpleGui {

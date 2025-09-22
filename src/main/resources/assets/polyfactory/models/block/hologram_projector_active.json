@@ -5,7 +5,8 @@
 		"2": "polyfactory:block/lamp/on_cage",
 		"3": "polyfactory:block/hologram_projector_side",
 		"4": "polyfactory:block/hologram_projector_light",
-		"particle": "polyfactory:block/hologram_projector_front"
+		"particle": "polyfactory:block/hologram_projector_front",
+		"missing": "polyfactory:block/empty"
 	},
 	"elements": [
 		{

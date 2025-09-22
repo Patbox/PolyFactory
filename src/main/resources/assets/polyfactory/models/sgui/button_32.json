@@ -1,5 +1,8 @@
 {
   "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "polyfactory:block/empty"
+  },
   "display": {
     "gui": {
       "rotation": [ 0, 0, 0 ],

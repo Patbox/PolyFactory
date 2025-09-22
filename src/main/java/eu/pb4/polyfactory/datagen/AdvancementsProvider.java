@@ -466,6 +466,36 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                         )))
                 .build(exporter, "polyfactory:main/base/tachometer");
 
+        var chainDrive = Advancement.Builder.create()
+                .parent(gear)
+                .display(
+                        FactoryItems.CHAIN_DRIVE,
+                        Text.translatable("advancements.polyfactory.chain_drive.title"),
+                        Text.translatable("advancements.polyfactory.chain_drive.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.CHAIN_DRIVES_CONNECTED))
+                .build(exporter, "polyfactory:main/base/chain_drive");
+
+        var chainLift = Advancement.Builder.create()
+                .parent(chainDrive)
+                .display(
+                        FactoryItems.CHAIN_LIFT,
+                        Text.translatable("advancements.polyfactory.chain_lift.title"),
+                        Text.translatable("advancements.polyfactory.chain_lift.description"),
+                        null,
+                        AdvancementFrame.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .criterion("use", TriggerCriterion.of(FactoryTriggers.CHAIN_LIFT))
+                .build(exporter, "polyfactory:main/base/chain_lift");
+
         // Steel -> Press
 
         var sprayCan = Advancement.Builder.create()

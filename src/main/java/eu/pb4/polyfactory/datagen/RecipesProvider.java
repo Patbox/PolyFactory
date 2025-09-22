@@ -601,13 +601,13 @@ class RecipesProvider extends FabricRecipeProvider {
                         .offerTo(exporter);
 
                 this.createShaped(RecipeCategory.REDSTONE, FactoryItems.CHAIN_DRIVE, 1)
-                        .pattern("wsw")
-                        .pattern("cac")
-                        .pattern("wsw")
+                        .pattern("waw")
+                        .pattern("csc")
+                        .pattern("waw")
                         .input('w', FactoryItems.WOODEN_PLATE)
                         .input('a', FactoryItems.AXLE)
                         .input('c', Items.CHAIN)
-                        .input('s', FactoryItems.STEEL_INGOT)
+                        .input('s', FactoryItems.STEEL_GEAR)
                         .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                         .offerTo(exporter);
 

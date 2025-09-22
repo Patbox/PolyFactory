@@ -43,6 +43,14 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, BlockConfigVa
         return of(property.getName(), property);
     }
 
+    public static <T extends Comparable<T>> BlockConfig<T> of(Property<T> property, BlockValueFormatter<T> textFunction) {
+        return new BlockConfig<T>(property.getName(), Text.translatable("item.polyfactory.wrench.action." + property.getName()),
+                Codec.stringResolver(property::name, x -> property.parse(x).orElse(property.getValues().getFirst())),
+                BlockConfigValue.ofProperty(property),
+                textFunction,
+                WrenchModifyBlockValue.ofProperty(property), WrenchModifyBlockValue.ofProperty(property));
+    }
+
     public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property) {
         return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
                 FactoryUtil.propertyCodec(property),

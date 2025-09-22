@@ -1,8 +1,10 @@
 package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.entity.ChainLiftEntity;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.ChainItemDisplayElement;
@@ -181,6 +183,10 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
         be.addConnection(start, otherAxis, result);
         be2.addConnection(pos, selfAxis, result.copy());
         handler.polyfactory$setCurrentChainStart(null);
+
+        if (player instanceof ServerPlayerEntity serverPlayer) {
+            TriggerCriterion.trigger(serverPlayer, FactoryTriggers.CHAIN_DRIVES_CONNECTED);
+        }
 
         return ActionResult.SUCCESS_SERVER;
     }

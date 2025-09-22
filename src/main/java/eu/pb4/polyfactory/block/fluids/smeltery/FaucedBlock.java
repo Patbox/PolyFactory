@@ -96,7 +96,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
             return;
         }
 
-        this.activate(pos, state, world, 0.2f);
+        this.activate(pos, state, world, 0.33f);
         world.scheduleBlockTick(pos, this, 20);
     }
 

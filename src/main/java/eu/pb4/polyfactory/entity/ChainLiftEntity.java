@@ -1,7 +1,9 @@
 package eu.pb4.polyfactory.entity;
 
 import com.mojang.serialization.Codec;
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.mechanical.ChainDriveBlock;
 import eu.pb4.polyfactory.block.mechanical.ChainDriveBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.RotationConstants;
@@ -185,6 +187,7 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
                 if (passanger.startRiding(this, passanger instanceof AbstractMinecartEntity)) {
                     break;
                 }
+                passanger = null;
             }
         }
 
@@ -319,6 +322,9 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
         if (!this.getPos().equals(pos)) {
             this.setVelocity(pos.subtract(this.getPos()));
             this.setPosition(pos);
+            if (passanger instanceof ServerPlayerEntity serverPlayer) {
+                TriggerCriterion.trigger(serverPlayer, FactoryTriggers.CHAIN_LIFT);
+            }
         } else {
             this.refreshPosition();
         }

@@ -45,4 +45,6 @@ public interface FactoryTriggers {
     Identifier CASTING_MOLD = id("casting_mold");
     Identifier SMELTERY_MELTS = id("smeltery_melts");
     Identifier INDUSTRIAL_SMELTERY_CREATED = id("industrial_smeltery");
+    Identifier CHAIN_DRIVES_CONNECTED = id("chain_drives_connected");
+    Identifier CHAIN_LIFT = id("chain_lift");
 }

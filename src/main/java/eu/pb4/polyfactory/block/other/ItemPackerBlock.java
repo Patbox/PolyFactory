@@ -87,7 +87,7 @@ public class ItemPackerBlock extends Block implements FactoryBlock, BlockEntityP
     @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof ItemPackerBlockEntity be) {
-            return (int) ((be.getFilledAmount() * 15) / Math.max(be.getFillCapacity(), 1));
+            return be.getComparatorOutput();
         }
         return 0;
     }

@@ -7,6 +7,7 @@ import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import net.minecraft.block.Block;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -18,6 +19,8 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
+import java.util.List;
+
 public class FluidModelItem extends Item implements PolymerItem {
     public <T extends Block & PolymerBlock> FluidModelItem(Settings settings) {
         super(settings);
@@ -25,11 +28,6 @@ public class FluidModelItem extends Item implements PolymerItem {
 
     @Override
     public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
-        var x = getFluid(itemStack);
-        if (x != null) {
-            return FactoryModels.FLUID_FLAT_FULL.getRaw(x).getItem();
-        }
-
         return Items.PAPER;
     }
 
@@ -55,7 +53,7 @@ public class FluidModelItem extends Item implements PolymerItem {
         //noinspection unchecked
         var x = (FluidInstance<Object>) getFluid(itemStack);
         if (x != null && x.type().color().isPresent()) {
-            base.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent((x.type().color().get()).getColor(x.data())));
+            base.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), List.of(x.type().color().get().getColor(x.data()))));
         }
 
         return base;

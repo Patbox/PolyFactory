@@ -4,7 +4,8 @@
 	"ambientocclusion": false,
 	"texture_size": [32, 32],
 	"textures": {
-		"2": "polyfactory:block/hand_crank"
+		"2": "polyfactory:block/hand_crank",
+		"particle": "#2"
 	},
 	"elements": [
 		{

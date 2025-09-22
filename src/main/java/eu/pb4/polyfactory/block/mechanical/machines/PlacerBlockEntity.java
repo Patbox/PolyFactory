@@ -225,13 +225,16 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                 var vec = Vec3d.ofCenter(pos).offset(state.get(PlacerBlock.FACING), 0.51);
                 p.setPos(vec.x, vec.y, vec.z);
 
-                var actionResult = world.getBlockState(blockPos).onUse(world, self.getFakePlayer(), blockHitResult);
+                var actionResult = world.getBlockState(blockPos).onUseWithItem(self.stack, world, self.getFakePlayer(), Hand.MAIN_HAND, blockHitResult);
                 if (!actionResult.isAccepted()) {
-                    actionResult = self.stack.useOnBlock(context);
-                    if (!actionResult.isAccepted()) {
-                        actionResult = self.stack.use(world, self.getFakePlayer(), Hand.MAIN_HAND);
+                    actionResult = world.getBlockState(blockPos).onUse(world, self.getFakePlayer(), blockHitResult);
+                        if (!actionResult.isAccepted()) {
+                            actionResult = self.stack.useOnBlock(context);
+                            if (!actionResult.isAccepted()) {
+                                actionResult = self.stack.use(world, self.getFakePlayer(), Hand.MAIN_HAND);
+                            }
+                        }
                     }
-                }
                 if (actionResult instanceof ActionResult.Success success) {
                     var newStack = success.getNewHandStack();
                     if (newStack != null) {

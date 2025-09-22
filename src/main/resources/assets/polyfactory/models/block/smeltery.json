@@ -7,7 +7,7 @@
 		"front": "polyfactory:block/smeltery/industrial/front",
 		"top": "polyfactory:block/smeltery/industrial/top",
 		"back": "polyfactory:block/smeltery/industrial/back",
-		"particle": "polyfactory:block/smelteryindustrial//side"
+		"particle": "polyfactory:block/smeltery/industrial/side"
 	},
 	"elements": [
 		{

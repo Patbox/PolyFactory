@@ -10,7 +10,9 @@ import eu.pb4.polyfactory.block.data.output.GaugeBlock;
 import eu.pb4.polyfactory.entity.ChainLiftEntity;
 import eu.pb4.polyfactory.item.FactoryDebugItems;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.debug.BaseDebugItem;
 import eu.pb4.polyfactory.item.tool.SpoutMolds;
+import eu.pb4.polyfactory.item.util.FluidModelItem;
 import eu.pb4.polyfactory.models.ConveyorModels;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.ui.GuiTextures;
@@ -65,7 +67,6 @@ class AssetProvider implements DataProvider {
     }
 
     public static void runWriters(BiConsumer<String, byte[]> assetWriter) {
-        var atlas = AtlasAsset.builder();
         ConveyorModels.generateModels(assetWriter);
         UiResourceCreator.generateAssets(assetWriter);
         FactoryModels.COLORED_CABLE.generateModels(assetWriter);
@@ -83,17 +84,6 @@ class AssetProvider implements DataProvider {
         for (var mold : FactoryItems.MOLDS) {
             createMold(assetWriter, mold, moldTexture);
         }
-
-        //try {
-        ////    AtlasAsset.fromJson(Files.readString(FabricLoader.getInstance().getModContainer(ModInit.ID).orElseThrow().findPath("assets/minecraft/atlases/blocks.json").orElseThrow()))
-        //                    .sources().forEach(atlas::add);
-        //} catch (IOException e) {
-        //    e.printStackTrace();
-        //}
-
-        //ChainLiftEntity.MODEL.generateAssets(assetWriter, atlas);
-
-        //assetWriter.accept("assets/minecraft/atlases/blocks.json", atlas.build().toBytes());
     }
 
     private static void createGaugeStyles(BiConsumer<String,byte[]> assetWriter) {
@@ -192,7 +182,7 @@ class AssetProvider implements DataProvider {
         };
         for (var item : Registries.ITEM) {
             var id = Registries.ITEM.getId(item);
-            if (!id.getNamespace().equals("polyfactory")) {
+            if (!id.getNamespace().equals("polyfactory") || item instanceof BaseDebugItem || item instanceof FluidModelItem) {
                 continue;
             }
             consumer.accept(id, new ItemAsset(new BasicItemModel(id.withPrefixedPath(item instanceof BlockItem ? "block/" : "item/")), ItemAsset.Properties.DEFAULT));

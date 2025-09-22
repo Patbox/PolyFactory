@@ -24,12 +24,13 @@ import java.util.function.Consumer;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class BaseDebugItem extends Item implements PolymerItem {
-    private static final Identifier MODEL = id("debug_item");
     private final int color;
     private final Text name;
 
     public BaseDebugItem(Settings settings, String name, int color) {
-        super(settings.component(DataComponentTypes.ITEM_NAME, Text.literal("Debug: " + name)).maxCount(1).rarity(Rarity.EPIC));
+        super(settings.component(DataComponentTypes.ITEM_NAME, Text.literal("Debug: " + name)).maxCount(1)
+                .modelId(id("debug_item"))
+                .rarity(Rarity.EPIC));
         this.name = Text.literal("Debug: " + name);
         this.color = color;
     }
@@ -56,12 +57,7 @@ public class BaseDebugItem extends Item implements PolymerItem {
 
     @Override
     public Item getPolymerItem(ItemStack itemStack, PacketContext context) {
-        return Items.WOLF_ARMOR;
-    }
-
-    @Override
-    public @Nullable Identifier getPolymerItemModel(ItemStack stack, PacketContext context) {
-        return MODEL;
+        return Items.TRIAL_KEY;
     }
 
     @Override

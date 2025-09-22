@@ -230,6 +230,7 @@
   "item.polyfactory.wrench.action.locked": "Locked",
   "item.polyfactory.wrench.action.strict": "Strict",
   "item.polyfactory.wrench.action.style": "Style",
+  "item.polyfactory.wrench.action.value_modifier": "Value Modifier",
   "item.polyfactory.wrench.action.half": "Half",
   "item.polyfactory.wrench.action.radius": "Radius",
   "item.polyfactory.wrench.action.reach": "Reach",
@@ -255,6 +256,11 @@
   "item.polyfactory.wrench.action.data_extractor.field": "Extracted Field",
   "item.polyfactory.wrench.action.redstone.strong": "Strongly Powered",
   "item.polyfactory.wrench.action.hand_position": "Hand Position",
+
+  "item.polyfactory.wrench.action.value_modifier.absolute": "Absolute",
+  "item.polyfactory.wrench.action.value_modifier.negated_absolute": "Negated Absolute",
+  "item.polyfactory.wrench.action.value_modifier.unmodified": "Unmodified",
+  "item.polyfactory.wrench.action.value_modifier.negated": "Negated",
 
   "item.polyfactory.wrench.action.mode.arithmetic.integer": "Integer",
   "item.polyfactory.wrench.action.mode.arithmetic.decimal": "Decimal",
@@ -460,6 +466,12 @@
 
   "advancements.polyfactory.tachometer.title": "Measured rotation",
   "advancements.polyfactory.tachometer.description": "Place Tachometer or Stressometer to measure rotation!",
+
+  "advancements.polyfactory.chain_drive.title": "Connected with chains",
+  "advancements.polyfactory.chain_drive.description": "Connect two Chain Drives with Iron Chains!",
+
+  "advancements.polyfactory.chain_lift.title": "On the sky lift!",
+  "advancements.polyfactory.chain_lift.description": "Ride a Chain Lift!",
 
   "advancements.polyfactory.press.title": "Better with Plates",
   "advancements.polyfactory.press.description": "Use Mechanical Press to craft Steel, Copper or Wooden Plate",

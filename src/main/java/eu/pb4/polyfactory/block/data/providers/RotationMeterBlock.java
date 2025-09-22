@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
+import eu.pb4.polyfactory.block.configurable.BlockValueFormatter;
 import eu.pb4.polyfactory.block.data.CableConnectable;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.block.data.DataProvider;
@@ -13,6 +14,7 @@ import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.AxisAndFacingNetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.block.property.ValueModifier;
 import eu.pb4.polyfactory.data.CapacityData;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.LongData;
@@ -130,7 +132,7 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
 
     @Override
     public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(BlockConfig.CHANNEL, BlockConfig.FACING, FIRST_AXIS_ACTION);
+        return List.of(BlockConfig.CHANNEL, BlockConfig.FACING, FIRST_AXIS_CONFIG);
     }
 
     @Nullable
@@ -142,21 +144,36 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
     protected abstract  <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t);
 
     public static final class Speed extends RotationMeterBlock {
+        public static final EnumProperty<ValueModifier> VALUE_MODIFIER = EnumProperty.of("value_modifier", ValueModifier.class, ValueModifier.ABSOLUTE, ValueModifier.UNMODIFIED);
+        private static final BlockConfig<ValueModifier> VALUE_MODIFIER_CONFIG = BlockConfig.of(VALUE_MODIFIER, BlockValueFormatter.text(ValueModifier::text));
+
         public Speed(Settings settings) {
             super(settings);
+            this.setDefaultState(this.getDefaultState().with(VALUE_MODIFIER, ValueModifier.ABSOLUTE));
+        }
+
+        @Override
+        protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+            super.appendProperties(builder);
+            builder.add(VALUE_MODIFIER);
         }
 
         @Override
         protected <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
             var rot = RotationUser.getRotation(world, pos);
-            DataProvider.sendData(world, pos, new LongData((long) (rot.speed() / 360 * 60 * 20 * (rot.isNegative() ? -1 : 1))));
+            DataProvider.sendData(world, pos, new LongData((long) (rot.speed() / 360 * 60 * 20 * state.get(VALUE_MODIFIER).apply(rot.isNegative() ? -1 : 1))));
+        }
+
+        @Override
+        public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+            return List.of(BlockConfig.CHANNEL, BlockConfig.FACING, FIRST_AXIS_CONFIG, VALUE_MODIFIER_CONFIG);
         }
     }
 
     public static final class Stress extends RotationMeterBlock {
         public static final EnumProperty<Type> TYPE = EnumProperty.of("type", Type.class);
 
-        public static final BlockConfig TYPE_ACTION = BlockConfig.of("type", TYPE);
+        public static final BlockConfig<?> TYPE_CONFIG = BlockConfig.of("type", TYPE);
 
         public Stress(Settings settings) {
             super(settings);
@@ -181,7 +198,7 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
 
         @Override
         public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
-            return List.of(BlockConfig.CHANNEL, BlockConfig.FACING, FIRST_AXIS_ACTION, TYPE_ACTION);
+            return List.of(BlockConfig.CHANNEL, BlockConfig.FACING, FIRST_AXIS_CONFIG, TYPE_CONFIG);
         }
 
         public enum Type implements StringIdentifiable {
