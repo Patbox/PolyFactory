@@ -81,7 +81,7 @@ public abstract class TallItemMachineBlock extends RotationalNetworkBlock implem
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
-        if (!world.isClient) {
+        if (!world.isClient()) {
             BlockPos blockPos = pos.up();
             world.setBlockState(blockPos, state.with(PART, Part.TOP), 3);
             world.updateNeighbors(pos, Blocks.AIR);
@@ -108,7 +108,7 @@ public abstract class TallItemMachineBlock extends RotationalNetworkBlock implem
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!world.isClient && !player.isSneaking()) {
+        if (!world.isClient() && !player.isSneaking()) {
             pos = state.get(PART) == Part.MAIN ? pos : pos.down();
 
             if (world.getBlockEntity(pos) instanceof TallItemMachineBlockEntity be) {

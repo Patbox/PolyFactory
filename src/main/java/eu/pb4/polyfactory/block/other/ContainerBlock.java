@@ -142,7 +142,7 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be) {
             return (int) ((be.storage.amount * 15) / be.storage.getCapacity());
         }

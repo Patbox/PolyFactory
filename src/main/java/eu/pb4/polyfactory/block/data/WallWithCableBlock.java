@@ -156,7 +156,7 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
                         newState = newState.with(getProperty(dir), newState.get(getProperty(dir)).cable(true));
                     }
                     if (placer instanceof ServerPlayerEntity serverPlayer && (!hasReceivers || !hasProviders)) {
-                        var net = NetworkComponent.Data.getLogic(serverPlayer.getWorld(), newPos);
+                        var net = NetworkComponent.Data.getLogic(serverPlayer.getEntityWorld(), newPos);
                         if (net.hasReceivers()) {
                             hasReceivers = true;
                         }

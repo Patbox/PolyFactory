@@ -22,7 +22,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerPosition;
+import net.minecraft.entity.EntityPosition;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
@@ -115,7 +115,7 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
                 entity.setHeadYaw(entity.getHeadYaw() + rotate);
 
                 if (entity instanceof ServerPlayerEntity player) {
-                    player.networkHandler.requestTeleport(new PlayerPosition(Vec3d.ZERO, Vec3d.ZERO, rotate, 0), EnumSet.allOf(PositionFlag.class));
+                    player.networkHandler.requestTeleport(new EntityPosition(Vec3d.ZERO, Vec3d.ZERO, rotate, 0), EnumSet.allOf(PositionFlag.class));
                 }
             }
         }

@@ -63,7 +63,7 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         if (world.getBlockEntity(pos) instanceof FilledStateProvider be) {
             return (int) ((be.getFilledAmount() * 15) / be.getFillCapacity());
         }

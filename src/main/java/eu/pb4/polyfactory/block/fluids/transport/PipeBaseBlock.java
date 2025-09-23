@@ -53,7 +53,7 @@ public abstract class PipeBaseBlock extends NetworkBlock implements FactoryBlock
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         if (world.getBlockEntity(pos) instanceof FilledStateProvider be) {
             return (int) ((be.getFilledAmount() * 15) / be.getFillCapacity());
         }

@@ -124,7 +124,7 @@ public interface FluidContainerUtil {
 
         var copy = stack.copy();
         var input = DrainInput.of(copy, ItemStack.EMPTY, container, !(player instanceof FakePlayer));
-        var optional = player.getWorld().getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, player.getWorld());
+        var optional = player.getEntityWorld().getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, player.getEntityWorld());
         if (optional.isEmpty()) {
             return null;
         }

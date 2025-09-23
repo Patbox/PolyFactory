@@ -16,7 +16,7 @@ public record EntityShooterContext(LivingEntity entity) implements ShooterContex
 
     @Override
     public ServerWorld world() {
-        return (ServerWorld) entity.getWorld();
+        return (ServerWorld) entity.getEntityWorld();
     }
 
     @Override

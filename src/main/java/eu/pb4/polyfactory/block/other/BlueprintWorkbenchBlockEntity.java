@@ -124,12 +124,12 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
         }
         var input = CraftingRecipeInput.create(3, 3, list);
 
-        var optional = this.recipe.getFirstMatch(input, player.getWorld());
+        var optional = this.recipe.getFirstMatch(input, player.getEntityWorld());
         if (optional.isEmpty()) {
             return;
         }
         var recipe = optional.get().value();
-        var result = recipe.craft(input, player.getWorld().getRegistryManager());
+        var result = recipe.craft(input, player.getEntityWorld().getRegistryManager());
         if (result.isEmpty()) {
             return;
         }
@@ -217,7 +217,7 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
 
         @Override
         public void onCraftRequest(NetworkRecipeId recipeId, boolean shift) {
-            var recipe = this.getPlayer().getServer().getRecipeManager().get(recipeId);
+            var recipe = this.getPlayer().getEntityWorld().getServer().getRecipeManager().get(recipeId);
             if (recipe == null || !(recipe.parent().value() instanceof CraftingRecipe craftingRecipe) || craftingRecipe.getIngredientPlacement().hasNoPlacement()) {
                 return;
             }
@@ -233,7 +233,7 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
                 public void clear() {}
 
                 public boolean matches(RecipeEntry<CraftingRecipe> entry) {
-                    return entry.value().matches(CraftingRecipeInput.create(3, 3, be.stacks), player.getWorld());
+                    return entry.value().matches(CraftingRecipeInput.create(3, 3, be.stacks), player.getEntityWorld());
                 }
             }, 3, 3, this.screenHandler.slots.subList(1, 10), this.screenHandler.slots.subList(1, 10), player.getInventory(), (RecipeEntry<CraftingRecipe>) recipe.parent(), false, false);
 

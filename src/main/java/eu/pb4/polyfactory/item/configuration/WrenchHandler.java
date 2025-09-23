@@ -94,7 +94,7 @@ public class WrenchHandler {
         } else if (hitResult instanceof BlockHitResult blockHitResult) {
             this.entity = null;
             this.entityActions = List.of();
-            var state = player.getWorld().getBlockState(blockHitResult.getBlockPos());
+            var state = player.getEntityWorld().getBlockState(blockHitResult.getBlockPos());
             if (state == this.state && blockHitResult.getBlockPos().equals(this.pos) && ItemStack.areItemsAndComponentsEqual(stack, this.currentStack)) {
                 if (this.state.getBlock() instanceof ConfigurableBlock configurableBlock && isWrench) {
                     configurableBlock.wrenchTick(player, blockHitResult, this.state);
@@ -151,15 +151,15 @@ public class WrenchHandler {
 
                             t.append(action.name()).append(": ");
 
-                            var value = action.value().getValue(player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
+                            var value = action.value().getValue(player.getEntityWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
                             //noinspection unchecked
-                            var valueFrom = ((BlockValueFormatter<Object>) action.formatter()).getDisplayValue(value, player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
+                            var valueFrom = ((BlockValueFormatter<Object>) action.formatter()).getDisplayValue(value, player.getEntityWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
 
                             if (isWrench) {
                                 b.add(t, Text.empty().append(valueFrom).formatted(Formatting.YELLOW));
                             } else if (diffMap.containsKey(action.id()) && !Objects.equals(diffMap.get(action.id()), value)) {
                                 //noinspection unchecked
-                                var diff = ((BlockValueFormatter<Object>) action.formatter()).getDisplayValue(diffMap.get(action.id()), player.getWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
+                                var diff = ((BlockValueFormatter<Object>) action.formatter()).getDisplayValue(diffMap.get(action.id()), player.getEntityWorld(), blockHitResult.getBlockPos(), blockHitResult.getSide(), state);
                                 b.add(t, Text.empty().append(valueFrom).append(Text.literal(" -> ").formatted(Formatting.GOLD)).append(diff).formatted(Formatting.YELLOW));
                             } else {
                                 b.add(t.formatted(Formatting.GRAY), Text.empty().append(valueFrom).withColor(ColorHelper.scaleRgb(Formatting.YELLOW.getColorValue(), 0.7f)));

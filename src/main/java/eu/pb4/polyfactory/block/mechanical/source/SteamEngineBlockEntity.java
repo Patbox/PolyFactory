@@ -176,9 +176,9 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X2, player, false);
             this.setTitle(GuiTextures.STEAM_ENGINE.apply(SteamEngineBlockEntity.this.getCachedState().getBlock().getName()));
-            this.setSlotRedirect(9 + 3, new FuelSlot(SteamEngineBlockEntity.this, 0, player.getWorld().getFuelRegistry()));
-            this.setSlotRedirect(9 + 4, new FuelSlot(SteamEngineBlockEntity.this, 1, player.getWorld().getFuelRegistry()));
-            this.setSlotRedirect(9 + 5, new FuelSlot(SteamEngineBlockEntity.this, 2, player.getWorld().getFuelRegistry()));
+            this.setSlotRedirect(9 + 3, new FuelSlot(SteamEngineBlockEntity.this, 0, player.getEntityWorld().getFuelRegistry()));
+            this.setSlotRedirect(9 + 4, new FuelSlot(SteamEngineBlockEntity.this, 1, player.getEntityWorld().getFuelRegistry()));
+            this.setSlotRedirect(9 + 5, new FuelSlot(SteamEngineBlockEntity.this, 2, player.getEntityWorld().getFuelRegistry()));
             this.setSlot(4, GuiTextures.FLAME.getCeil(progress()));
             this.active = SteamEngineBlockEntity.this.fuelTicks > 0;
             this.open();

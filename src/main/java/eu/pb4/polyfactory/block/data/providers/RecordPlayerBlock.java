@@ -11,7 +11,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerPosition;
+import net.minecraft.entity.EntityPosition;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.EntityPositionSyncS2CPacket;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -155,7 +155,7 @@ public class RecordPlayerBlock extends DirectionalCabledDataProviderBlock {
                 }
 
                 handler.sendPacket(new EntityPositionSyncS2CPacket(this.soundSource.getEntityId(),
-                        new PlayerPosition(closest.add(0, Math.signum(closest.y - player.y) * (16 * 4 * (1 - volume) + 1), 0), Vec3d.ZERO, 0, 0), false));
+                        new EntityPosition(closest.add(0, Math.signum(closest.y - player.y) * (16 * 4 * (1 - volume) + 1), 0), Vec3d.ZERO, 0, 0), false));
             }
         }
     }

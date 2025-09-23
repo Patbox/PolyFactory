@@ -179,7 +179,7 @@ public class WorkbenchScreenHandler extends AbstractRecipeScreenHandler {
 
                 public boolean matches(RecipeEntry<CraftingRecipe> entry) {
                     return entry.value().matches(CraftingRecipeInput.create(3, 3, recipeInput.getHeldStacks()),
-                            player.getWorld());
+                            player.getEntityWorld());
                 }
             }, 3, 3, list, list, inventory, recipeEntry, craftAll, creative);
         } finally {

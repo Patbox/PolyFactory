@@ -65,7 +65,7 @@ public class WrenchItem extends SimplePolymerItem implements SwitchActionItem {
         if (raycast.getType() == HitResult.Type.BLOCK
                 && !main.getOrDefault(FactoryDataComponents.READ_ONLY, false)
                 && raycast instanceof BlockHitResult result
-                && WrenchHandler.of(player).useBlockAction(player, player.getWorld(), result.getBlockPos(), result.getSide(), true).isAccepted()) {
+                && WrenchHandler.of(player).useBlockAction(player, player.getEntityWorld(), result.getBlockPos(), result.getSide(), true).isAccepted()) {
             player.swingHand(mainHand, true);
         }
         if (raycast.getType() == HitResult.Type.ENTITY

@@ -53,6 +53,7 @@ import net.minecraft.state.property.Property;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
+import net.minecraft.util.collection.Pool;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -167,7 +168,8 @@ public class FactoryUtil {
     }
 
     public static void sendVelocityDelta(ServerPlayerEntity player, Vec3d delta) {
-        player.networkHandler.sendPacket(new ExplosionS2CPacket(new Vec3d(player.getX(), player.getY() - 9999, player.getZ()), Optional.of(delta), ParticleTypes.BUBBLE, Registries.SOUND_EVENT.getEntry(SoundEvents.INTENTIONALLY_EMPTY)));
+        player.networkHandler.sendPacket(new ExplosionS2CPacket(new Vec3d(player.getX(), player.getY() - 9999, player.getZ()), 0, 0, Optional.of(delta),
+                ParticleTypes.BUBBLE, Registries.SOUND_EVENT.getEntry(SoundEvents.INTENTIONALLY_EMPTY), Pool.empty()));
     }
 
     public static float wrap(float value, float min, float max) {
@@ -515,12 +517,12 @@ public class FactoryUtil {
             return stack -> {
                 tryInsertingRegular(inventory, stack);
                 if (!stack.isEmpty()) {
-                    entity.dropStack((ServerWorld) entity.getWorld(), stack);
+                    entity.dropStack((ServerWorld) entity.getEntityWorld(), stack);
                 }
             };
         }
 
-        return (stack) -> entity.dropStack((ServerWorld) entity.getWorld(), stack);
+        return (stack) -> entity.dropStack((ServerWorld) entity.getEntityWorld(), stack);
     }
 
     public static void sendSlotUpdate(Entity entity, Hand hand) {

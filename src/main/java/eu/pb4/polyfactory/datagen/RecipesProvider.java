@@ -606,7 +606,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .pattern("waw")
                         .input('w', FactoryItems.WOODEN_PLATE)
                         .input('a', FactoryItems.AXLE)
-                        .input('c', Items.CHAIN)
+                        .input('c', Items.IRON_CHAIN)
                         .input('s', FactoryItems.STEEL_GEAR)
                         .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
                         .offerTo(exporter);
@@ -615,7 +615,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .pattern("csc")
                         .pattern("c c")
                         .pattern("ppp")
-                        .input('c', Items.CHAIN)
+                        .input('c', Items.IRON_CHAIN)
                         .input('s', FactoryItems.STEEL_INGOT)
                         .input('p', FactoryItems.STEEL_PLATE)
                         .criterion("get_steel", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_INGOT))
@@ -1399,7 +1399,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         SimpleSmelteryRecipe.of("minecraft_iron", Items.DAMAGED_ANVIL, FactoryFluids.IRON.of(FluidConstants.INGOT * (9 * 3 + 4) / 4),FactoryFluidConstants.IRON_INGOT_MELTING * (9 * 3 + 4) * 2 / 4),
                         SimpleSmelteryRecipe.of("minecraft_iron", Items.BUCKET, FactoryFluids.IRON.of(FluidConstants.INGOT * 2) , FactoryFluidConstants.IRON_INGOT_MELTING * 2),
                         SimpleSmelteryRecipe.of("minecraft_iron", Items.CAULDRON, FactoryFluids.IRON.of(FluidConstants.INGOT * 6) , FactoryFluidConstants.IRON_INGOT_MELTING * 6),
-                        SimpleSmelteryRecipe.of("minecraft_iron", Items.CHAIN, FactoryFluids.IRON.of(FluidConstants.INGOT / 2) , FactoryFluidConstants.IRON_INGOT_MELTING),
+                        SimpleSmelteryRecipe.of("minecraft_iron", Items.IRON_CHAIN, FactoryFluids.IRON.of(FluidConstants.INGOT / 2) , FactoryFluidConstants.IRON_INGOT_MELTING),
                         SimpleSmelteryRecipe.of("minecraft_iron", Items.HEAVY_WEIGHTED_PRESSURE_PLATE, FactoryFluids.IRON.of(FluidConstants.INGOT / 2) , FactoryFluidConstants.IRON_INGOT_MELTING),
                         SimpleSmelteryRecipe.of("minecraft_iron", Items.IRON_BARS, FactoryFluids.IRON.of(FluidConstants.INGOT * 6 / 16) , FactoryFluidConstants.IRON_INGOT_MELTING * 6 / 16),
                         SimpleSmelteryRecipe.of("minecraft_iron", Items.IRON_DOOR, FactoryFluids.IRON.of(FluidConstants.INGOT * 1) , FactoryFluidConstants.IRON_INGOT_MELTING),
@@ -1444,7 +1444,8 @@ class RecipesProvider extends FabricRecipeProvider {
                 moldRecipes(FactoryItems.BOTTLE_MOLD, FactoryFluids.GLASS.of(FluidConstants.BLOCK / 2), Items.GLASS_BOTTLE);
                 moldRecipes(FactoryItems.THROWABLE_BOTTLE_MOLD, FactoryFluids.GLASS.of(FluidConstants.BLOCK / 2), FactoryItems.THROWABLE_GLASS_BOTTLE);
                 moldRecipes(FactoryItems.BRITTLE_BOTTLE_MOLD, FactoryFluids.GLASS.of(FluidConstants.BLOCK / 2), FactoryItems.BRITTLE_GLASS_BOTTLE);
-                moldRecipes(FactoryItems.CHAIN_MOLD, FactoryFluids.IRON.of(FluidConstants.NUGGET * 8), Items.CHAIN);
+                moldRecipes(FactoryItems.CHAIN_MOLD, FactoryFluids.IRON.of(FluidConstants.NUGGET * 8), Items.IRON_CHAIN);
+                moldRecipes(FactoryItems.CHAIN_MOLD, FactoryFluids.COPPER.of(FluidConstants.NUGGET * 8), Items.COPPER_CHAINS.unaffected());
 
                 exporter.accept(recipeKey("casting/glass_pane"), SimpleCastingRecipe.fluid(FactoryFluids.GLASS.of(FluidConstants.BLOCK * 6 / 16), Items.GLASS_PANE, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value(), 40), null);
                 exporter.accept(recipeKey("casting/iron_bars"), SimpleCastingRecipe.fluid(FactoryFluids.IRON.of(FluidConstants.BLOCK * 6 / 16), Items.IRON_BARS, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value(), 40), null);

@@ -87,7 +87,7 @@ public class WorkbenchBlock extends Block implements FactoryBlock, BlockEntityPr
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         return world.getBlockEntity(pos) instanceof WorkbenchBlockEntity be ? ScreenHandler.calculateComparatorOutput((Inventory) be) : 0;
     }
 

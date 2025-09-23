@@ -32,7 +32,7 @@ public class SlimeSplashEntity extends SplashEntity<Unit> {
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        if (!this.getWorld().isClient) {
+        if (!this.getEntityWorld().isClient()) {
             Direction direction = blockHitResult.getSide();
             BlockPos targetBlockPos = blockHitResult.getBlockPos();
             BlockPos sidePos = targetBlockPos.offset(direction);
@@ -50,7 +50,7 @@ public class SlimeSplashEntity extends SplashEntity<Unit> {
         if (this.random.nextFloat() < 0.3) {
             var entity = entityHitResult.getEntity();
 
-            if (getWorld() instanceof ServerWorld && entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
+            if (getEntityWorld() instanceof ServerWorld && entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
                 if (livingEntity.isOnFire() && livingEntity.isAlive() && this.canInteractEntity(entity)) {
                     livingEntity.extinguishWithSound();
                 }
@@ -76,15 +76,15 @@ public class SlimeSplashEntity extends SplashEntity<Unit> {
                 return;
             }
 
-            BlockState blockState = this.getWorld().getBlockState(pos);
+            BlockState blockState = this.getEntityWorld().getBlockState(pos);
             if (blockState.isIn(BlockTags.FIRE)) {
-                this.getWorld().breakBlock(pos, false, this);
+                this.getEntityWorld().breakBlock(pos, false, this);
             } else if (AbstractCandleBlock.isLitCandle(blockState)) {
-                AbstractCandleBlock.extinguish(null, blockState, this.getWorld(), pos);
+                AbstractCandleBlock.extinguish(null, blockState, this.getEntityWorld(), pos);
             } else if (CampfireBlock.isLitCampfire(blockState)) {
-                this.getWorld().syncWorldEvent(null, WorldEvents.FIRE_EXTINGUISHED, pos, 0);
-                CampfireBlock.extinguish(this.getOwner(), this.getWorld(), pos, blockState);
-                this.getWorld().setBlockState(pos, blockState.with(CampfireBlock.LIT, false));
+                this.getEntityWorld().syncWorldEvent(null, WorldEvents.FIRE_EXTINGUISHED, pos, 0);
+                CampfireBlock.extinguish(this.getOwner(), this.getEntityWorld(), pos, blockState);
+                this.getEntityWorld().setBlockState(pos, blockState.with(CampfireBlock.LIT, false));
             }
         }
     }

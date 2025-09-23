@@ -230,7 +230,7 @@ public class FactoryItems {
                     entries.add(GEARBOX);
                     entries.add(CLUTCH);
                     entries.add(CHAIN_DRIVE);
-                    entries.add(Items.CHAIN);
+                    entries.add(Items.IRON_CHAIN);
                     entries.add(STEEL_GEAR);
                     entries.add(LARGE_STEEL_GEAR);
 

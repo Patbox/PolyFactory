@@ -85,7 +85,7 @@ public class ItemPackerBlock extends Block implements FactoryBlock, BlockEntityP
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         if (world.getBlockEntity(pos) instanceof ItemPackerBlockEntity be) {
             return be.getComparatorOutput();
         }

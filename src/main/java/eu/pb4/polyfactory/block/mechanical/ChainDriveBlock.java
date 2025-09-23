@@ -104,7 +104,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
 
         var cost = getChainCost(start, target, be2.getCachedState().get(AXIS), be.getCachedState().get(AXIS));
 
-        var stack = player.getMainHandStack().isOf(Items.CHAIN) ? player.getMainHandStack() : player.getOffHandStack();
+        var stack = player.getMainHandStack().isOf(Items.IRON_CHAIN) ? player.getMainHandStack() : player.getOffHandStack();
 
         var hasEnoughChains = player.isCreative() || stack.getCount() >= cost;
 
@@ -157,7 +157,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
             return ChainLiftEntity.attach(stack, state, world, pos, player, hand, hit);
         }
 
-        if (!stack.isOf(Items.CHAIN) || !(player instanceof ChainDriveHandler handler) || !(world.getBlockEntity(pos) instanceof ChainDriveBlockEntity be)) {
+        if (!stack.isOf(Items.IRON_CHAIN) || !(player instanceof ChainDriveHandler handler) || !(world.getBlockEntity(pos) instanceof ChainDriveBlockEntity be)) {
             return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
         }
 

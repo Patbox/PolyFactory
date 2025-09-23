@@ -108,7 +108,7 @@ public class MinerBlock extends RotationalNetworkBlock implements FactoryBlock, 
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         return world.getBlockEntity(pos) instanceof MinerBlockEntity be && be.getStack().isDamageable()
                 ? (int) (16d * be.getStack().getDamage() / be.getStack().getMaxDamage()) : 0;
     }

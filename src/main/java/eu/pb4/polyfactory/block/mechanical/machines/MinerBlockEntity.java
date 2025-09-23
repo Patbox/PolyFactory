@@ -162,7 +162,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
             var profile = this.owner == null ? FactoryUtil.GENERIC_PROFILE : this.owner;
 
             this.player = new MinerPlayer(StackReference.of(this, 0), (ServerWorld) this.world, this.pos,
-                    new GameProfile(profile.getId(), "Miner (" + profile.getName() + ")"));
+                    new GameProfile(profile.id(), "Miner (" + profile.name() + ")"));
             this.player.setPos(this.pos.getX() + 0.5, this.pos.getY() + 0.5f, this.pos.getZ() + 0.5f);
         }
 
@@ -311,7 +311,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
                 self.currentTool.postMine(world, stateFront, blockPos, player);
                 if (bl && bl2) {
                     stateFront.getBlock().afterBreak(world, player, blockPos, stateFront, blockEntity, itemStack2);
-                    if (self.owner != null && world.getPlayerByUuid(self.owner.getId()) instanceof ServerPlayerEntity serverPlayer) {
+                    if (self.owner != null && world.getPlayerByUuid(self.owner.id()) instanceof ServerPlayerEntity serverPlayer) {
                         TriggerCriterion.trigger(serverPlayer, FactoryTriggers.MINER_MINES);
                     }
                 }

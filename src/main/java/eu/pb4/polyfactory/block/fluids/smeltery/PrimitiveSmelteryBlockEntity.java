@@ -278,7 +278,7 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
         public Gui(ServerPlayerEntity player) {
             super(ScreenHandlerType.GENERIC_9X3, player, false);
             this.inputSlot = new Slot(PrimitiveSmelteryBlockEntity.this, 0, 0, 0);
-            this.fuelSlot = new FuelSlot(PrimitiveSmelteryBlockEntity.this, 1, player.getWorld().getFuelRegistry());
+            this.fuelSlot = new FuelSlot(PrimitiveSmelteryBlockEntity.this, 1, player.getEntityWorld().getFuelRegistry());
             this.setSlotRedirect(2, this.inputSlot);
             this.setSlotRedirect(9 * 2 + 2, this.fuelSlot);
 
@@ -361,7 +361,7 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
                     if (!this.insertItem(itemStack2, this.getVirtualSize(), this.getVirtualSize() + 36, true)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (this.player.getWorld().getFuelRegistry().isFuel(itemStack2)) {
+                } else if (this.player.getEntityWorld().getFuelRegistry().isFuel(itemStack2)) {
                     if (!FactoryUtil.insertItemIntoSlots(itemStack2, List.of(this.fuelSlot), false)) {
                         return ItemStack.EMPTY;
                     }

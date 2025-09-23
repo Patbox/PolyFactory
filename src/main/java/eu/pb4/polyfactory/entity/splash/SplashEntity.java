@@ -108,7 +108,7 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     }
 
     protected void spawnDestructionParticles(Vec3d pos) {
-        ((ServerWorld) this.getWorld()).spawnParticles(this.getBaseParticle(), pos.x, pos.y, pos.z,
+        ((ServerWorld) this.getEntityWorld()).spawnParticles(this.getBaseParticle(), pos.x, pos.y, pos.z,
                 5, 0, 0, 0, this.getParticleCollisionSpeed());
     }
 
@@ -182,13 +182,13 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     protected void spawnExistenceParticles() {
         if (forceParticles() && this.age % 2 == 1) {
             var velocity = this.getVelocity();
-            ((ServerWorld) this.getWorld()).spawnParticles(this.getBaseParticle(), this.getX(), this.getY(), this.getZ(),
+            ((ServerWorld) this.getEntityWorld()).spawnParticles(this.getBaseParticle(), this.getX(), this.getY(), this.getZ(),
                     0, velocity.getX(), velocity.getY(), velocity.getZ(), this.getParticleSpeed());
         }
     }
     protected boolean discardInBlock(BlockState state, BlockPos blockPos) {
         if (state.getFluidState().isIn(FluidTags.LAVA)) {
-            ((ServerWorld) this.getWorld()).spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
+            ((ServerWorld) this.getEntityWorld()).spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
                     0, 0, 0, 0, 0);
             this.playExtinguishSound();
         }
@@ -245,18 +245,18 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     }
 
     protected boolean canDamageEntity(Entity entity) {
-        return CommonProtection.canDamageEntity(getWorld(), entity, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
+        return CommonProtection.canDamageEntity(getEntityWorld(), entity, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
     }
 
     protected boolean canInteractEntity(Entity entity) {
-        return CommonProtection.canInteractEntity(getWorld(), entity, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
+        return CommonProtection.canInteractEntity(getEntityWorld(), entity, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
     }
 
     protected boolean canBreakBlock(BlockPos pos) {
-        return CommonProtection.canBreakBlock(getWorld(), pos, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
+        return CommonProtection.canBreakBlock(getEntityWorld(), pos, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
     }
 
     protected boolean canPlaceBlock(BlockPos pos) {
-        return CommonProtection.canPlaceBlock(getWorld(), pos, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
+        return CommonProtection.canPlaceBlock(getEntityWorld(), pos, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
     }
 }

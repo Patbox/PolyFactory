@@ -235,7 +235,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         var be = world.getBlockEntity(pos);
         return be.getClass() == ConveyorBlockEntity.class && !((ConveyorBlockEntity) be).getStack(0).isEmpty() ? 15 : 0;
     }
