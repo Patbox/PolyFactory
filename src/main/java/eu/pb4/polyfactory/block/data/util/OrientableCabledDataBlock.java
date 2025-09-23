@@ -23,6 +23,7 @@ import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public abstract class OrientableCabledDataBlock extends BaseCabledDataBlock implements StatePropertiesCodecPatcher {
     public static final EnumProperty<Orientation> ORIENTATION = Properties.ORIENTATION;
@@ -46,7 +47,7 @@ public abstract class OrientableCabledDataBlock extends BaseCabledDataBlock impl
             if (oldFacing != null) {
                 var dir = Direction.CODEC.decode(ops, oldFacing).getOrThrow().getFirst();
 
-                state = state.with(ORIENTATION, Orientation.byDirections(dir, dir == Direction.UP ? Direction.SOUTH : Direction.UP));
+                state = state.with(ORIENTATION, Objects.requireNonNullElse(Orientation.byDirections(dir, dir.getAxis() == Direction.Axis.Y ? Direction.SOUTH : Direction.UP), Orientation.SOUTH_UP));
             }
 
             var facing = state.get(ORIENTATION).getFacing();

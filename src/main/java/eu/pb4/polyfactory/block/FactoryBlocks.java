@@ -166,8 +166,11 @@ public class FactoryBlocks {
         RegistryEntryAddedCallback.allEntries(Registries.BLOCK, block -> {
             if (block.value() instanceof WallBlock wallBlock) {
                 var id = Registries.BLOCK.getId(wallBlock);
-                register("wall_with_cable/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock).dropsNothing(), settings -> new WallWithCableBlock(settings, wallBlock));
-                register("wall_with_pipe/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock).dropsNothing(), settings -> new PipeInWallBlock(settings, wallBlock));
+                var cableWall = register("wall_with_cable/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock).dropsNothing(), settings -> new WallWithCableBlock(settings, wallBlock));
+                var pipeWall = register("wall_with_pipe/" + id.getNamespace() + "/" + id.getPath(), AbstractBlock.Settings.copy(wallBlock).dropsNothing(), settings -> new PipeInWallBlock(settings, wallBlock));
+
+                FactoryBlockEntities.CABLE.addSupportedBlock(cableWall);
+                FactoryBlockEntities.PIPE.addSupportedBlock(pipeWall);
             }
         });
 

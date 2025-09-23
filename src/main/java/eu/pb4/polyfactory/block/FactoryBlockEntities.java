@@ -142,11 +142,7 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<WirelessRedstoneBlockEntity> WIRELESS_REDSTONE = register("wireless_redstone",
              FabricBlockEntityTypeBuilder.create(WirelessRedstoneBlockEntity::new, FactoryBlocks.WIRELESS_REDSTONE_RECEIVER, FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER));
-    public static final BlockEntityType<CableBlockEntity> CABLE = register("cable",  FabricBlockEntityTypeBuilder.create(CableBlockEntity::new,
-            Util.make(new ArrayList<Block>(), (a) -> {
-                a.add(FactoryBlocks.CABLE);
-                a.addAll(FactoryBlocks.WALL_WITH_CABLE.values());
-            }).toArray(Block[]::new)));
+    public static final BlockEntityType<CableBlockEntity> CABLE = register("cable",  FabricBlockEntityTypeBuilder.create(CableBlockEntity::new, FactoryBlocks.CABLE));
     public static final BlockEntityType<ItemReaderBlockEntity> ITEM_READER = register("item_reader",
              FabricBlockEntityTypeBuilder.create(ItemReaderBlockEntity::new, FactoryBlocks.ITEM_READER));
     public static final BlockEntityType<RecordPlayerBlockEntity> RECORD_PLAYER = register("record_player",
@@ -167,10 +163,7 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container",  FabricBlockEntityTypeBuilder
             .create(ColorableBlockEntity::new, FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP, FactoryBlocks.FIXTURE_LAMP, FactoryBlocks.INVERTED_FIXTURE_LAMP));
 
-    public static final BlockEntityType<PipeBlockEntity> PIPE = register("pipe",  FabricBlockEntityTypeBuilder.create(PipeBlockEntity::new, Util.make(new ArrayList<Block>(), (a) -> {
-        a.add(FactoryBlocks.PIPE);
-        a.addAll(FactoryBlocks.WALL_WITH_PIPE.values());
-    }).toArray(Block[]::new)));
+    public static final BlockEntityType<PipeBlockEntity> PIPE = register("pipe",  FabricBlockEntityTypeBuilder.create(PipeBlockEntity::new, FactoryBlocks.PIPE));
 
     public static final BlockEntityType<FilteredPipeBlockEntity> FILTERED_PIPE = register("filtered_pipe",
             FabricBlockEntityTypeBuilder.create(FilteredPipeBlockEntity::new, FactoryBlocks.FILTERED_PIPE));
