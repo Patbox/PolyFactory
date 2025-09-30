@@ -249,7 +249,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(GrinderBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(GrinderBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             this.setSlot(13, GuiTextures.PROGRESS_VERTICAL.get(progress()));

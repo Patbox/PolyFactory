@@ -225,7 +225,7 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         return world.getBlockEntity(pos) instanceof EjectorBlockEntity be ? (int) (be.progress() * 15) : 0;
     }
 
@@ -235,7 +235,7 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
             return;
         }
 
-        var world = player.getWorld();
+        var world = player.getEntityWorld();
         if (!(world.getBlockEntity(hit.getBlockPos()) instanceof EjectorBlockEntity be)) {
             return;
         }

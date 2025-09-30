@@ -75,10 +75,10 @@ public class StickyStatusEffect extends StatusEffect implements PolymerStatusEff
                 TriggerCriterion.trigger(player, FactoryTriggers.STICKY_WALL_SLIDING);
             }
 
-            if (entity.getWorld().random.nextInt(5) == 0) {
+            if (entity.getEntityWorld().random.nextInt(5) == 0) {
                 entity.playSound(SoundEvents.BLOCK_HONEY_BLOCK_SLIDE, 1.0F, 1.0F);
                 if (!entity.isSilent()) {
-                    entity.getWorld().playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.BLOCK_HONEY_BLOCK_SLIDE, entity.getSoundCategory(), 1.0F, 1.0F);
+                    entity.getEntityWorld().playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.BLOCK_HONEY_BLOCK_SLIDE, entity.getSoundCategory(), 1.0F, 1.0F);
                 }
             }
 

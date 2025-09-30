@@ -3,8 +3,8 @@
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
 	"textures": {
-		"particle": "block/chain",
-		"all": "block/chain"
+		"particle": "block/iron_chain",
+		"all": "block/iron_chain"
 	},
 	"elements": [
 		{

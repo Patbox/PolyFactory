@@ -67,7 +67,7 @@ public record ShootProjectileEntity<T>(EntityCreator<T> entityCreator,
         for (int i = 0; i < this.splashPerTick; i++) {
             var entity = entityCreator.createEntity(world, fluidInstance, amount);
             if (entity instanceof ProjectileEntity projectile) {
-                ((ProjectileEntityAccessor) projectile).setOwner(new LazyEntityReference<>(context.uuid()));
+                ((ProjectileEntityAccessor) projectile).setOwner(LazyEntityReference.ofUUID(context.uuid()));
 
                 if (!context.isEntity()) {
                     ((ProjectileEntityAccessor) projectile).setLeftOwner(true);

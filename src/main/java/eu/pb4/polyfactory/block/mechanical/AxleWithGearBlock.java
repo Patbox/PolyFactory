@@ -17,6 +17,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -82,12 +83,14 @@ public class AxleWithGearBlock extends AxleBlock implements RotationalConnector,
     }
 
     @Override
-    protected boolean canReplace(BlockState state, ItemPlacementContext context) {
-        return false;
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
+        return Blocks.BARRIER.getDefaultState().with(WATERLOGGED, state.get(WATERLOGGED));
     }
 
     @Override
-    public void onPolymerBlockSend(BlockState blockState, BlockPos.Mutable pos, PacketContext.NotNullWithPlayer player) {}
+    protected boolean canReplace(BlockState state, ItemPlacementContext context) {
+        return false;
+    }
 
     @Override
     public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
@@ -162,7 +165,7 @@ public class AxleWithGearBlock extends AxleBlock implements RotationalConnector,
             }
 
             mat.rotateY(rotation);
-            mat.scale(2, 2.005f, 2);
+            mat.scale(2, 2f, 2);
 
             this.mainElement.setTransformation(mat);
         }

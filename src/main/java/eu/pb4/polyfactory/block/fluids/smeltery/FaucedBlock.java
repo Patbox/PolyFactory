@@ -136,7 +136,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
 
         var copy = stack.copy();
         var input = new DrainInput(copy, ItemStack.EMPTY, output.getFluidContainerInput(), !(player instanceof FakePlayer));
-        var optional = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, player.getWorld());
+        var optional = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, player.getEntityWorld());
         if (optional.isEmpty() || !optional.get().value().fluidOutput(input).isEmpty()) {
             return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
         }

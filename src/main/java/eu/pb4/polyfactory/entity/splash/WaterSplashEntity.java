@@ -34,12 +34,12 @@ public class WaterSplashEntity extends SplashEntity<Unit> {
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        if (!this.getWorld().isClient) {
+        if (!this.getEntityWorld().isClient()) {
             Direction direction = blockHitResult.getSide();
             BlockPos targetBlockPos = blockHitResult.getBlockPos();
-            var state = getWorld().getBlockState(targetBlockPos);
+            var state = getEntityWorld().getBlockState(targetBlockPos);
             if (state.getBlock() instanceof FarmlandBlock && random.nextFloat() < 0.1) {
-                getWorld().setBlockState(targetBlockPos, state.with(FarmlandBlock.MOISTURE, FarmlandBlock.MAX_MOISTURE));
+                getEntityWorld().setBlockState(targetBlockPos, state.with(FarmlandBlock.MOISTURE, FarmlandBlock.MAX_MOISTURE));
             }
 
             BlockPos sidePos = targetBlockPos.offset(direction);
@@ -57,7 +57,7 @@ public class WaterSplashEntity extends SplashEntity<Unit> {
         if (this.random.nextFloat() < 0.3) {
             var entity = entityHitResult.getEntity();
 
-            if (getWorld() instanceof ServerWorld world && entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
+            if (getEntityWorld() instanceof ServerWorld world && entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
                 if (livingEntity.hurtByWater() && this.canDamageEntity(entity)) {
                     livingEntity.damage(world, this.getDamageSources().indirectMagic(this, this.getOwner()), 1F);
                 }
@@ -89,15 +89,15 @@ public class WaterSplashEntity extends SplashEntity<Unit> {
                 return;
             }
 
-            BlockState blockState = this.getWorld().getBlockState(pos);
+            BlockState blockState = this.getEntityWorld().getBlockState(pos);
             if (blockState.isIn(BlockTags.FIRE)) {
-                this.getWorld().breakBlock(pos, false, this);
+                this.getEntityWorld().breakBlock(pos, false, this);
             } else if (AbstractCandleBlock.isLitCandle(blockState)) {
-                AbstractCandleBlock.extinguish(null, blockState, this.getWorld(), pos);
+                AbstractCandleBlock.extinguish(null, blockState, this.getEntityWorld(), pos);
             } else if (CampfireBlock.isLitCampfire(blockState)) {
-                this.getWorld().syncWorldEvent(null, WorldEvents.FIRE_EXTINGUISHED, pos, 0);
-                CampfireBlock.extinguish(this.getOwner(), this.getWorld(), pos, blockState);
-                this.getWorld().setBlockState(pos, blockState.with(CampfireBlock.LIT, false));
+                this.getEntityWorld().syncWorldEvent(null, WorldEvents.FIRE_EXTINGUISHED, pos, 0);
+                CampfireBlock.extinguish(this.getOwner(), this.getEntityWorld(), pos, blockState);
+                this.getEntityWorld().setBlockState(pos, blockState.with(CampfireBlock.LIT, false));
             }
         }
     }

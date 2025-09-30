@@ -162,7 +162,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
             var profile = this.owner == null ? FactoryUtil.GENERIC_PROFILE : this.owner;
 
             this.player = new MinerPlayer(StackReference.of(this, 0), (ServerWorld) this.world, this.pos,
-                    new GameProfile(profile.getId(), "Miner (" + profile.getName() + ")"));
+                    new GameProfile(profile.id(), "Miner (" + profile.name() + ")"));
             this.player.setPos(this.pos.getX() + 0.5, this.pos.getY() + 0.5f, this.pos.getZ() + 0.5f);
         }
 
@@ -213,7 +213,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         var centered = pos.toCenterPos();
 
         var entities = world.getEntitiesByClass(Entity.class, Box.enclosing(pos, blockPos), Entity::canHit);
-        entities.sort(Comparator.comparingDouble(x -> x.getPos().squaredDistanceTo(centered)));
+        entities.sort(Comparator.comparingDouble(x -> x.getEntityPos().squaredDistanceTo(centered)));
 
         if (!entities.isEmpty()) {
             var speed = Math.abs(RotationUser.getRotation(world, pos).speed()) * MathHelper.RADIANS_PER_DEGREE * 3f;
@@ -311,7 +311,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
                 self.currentTool.postMine(world, stateFront, blockPos, player);
                 if (bl && bl2) {
                     stateFront.getBlock().afterBreak(world, player, blockPos, stateFront, blockEntity, itemStack2);
-                    if (self.owner != null && world.getPlayerByUuid(self.owner.getId()) instanceof ServerPlayerEntity serverPlayer) {
+                    if (self.owner != null && world.getPlayerByUuid(self.owner.id()) instanceof ServerPlayerEntity serverPlayer) {
                         TriggerCriterion.trigger(serverPlayer, FactoryTriggers.MINER_MINES);
                     }
                 }
@@ -352,7 +352,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(MinerBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(MinerBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();

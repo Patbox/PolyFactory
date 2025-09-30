@@ -37,13 +37,13 @@ public class ExperienceSplashEntity extends SplashEntity<Unit> {
 
     @Override
     protected void onBlockHit(BlockHitResult context) {
-        var entity = new ExperienceOrbEntity(this.getWorld(), context.getPos().x, context.getPos().y, context.getPos().z, this.amount);
-        this.getWorld().spawnEntity(entity);
+        var entity = new ExperienceOrbEntity(this.getEntityWorld(), context.getPos().x, context.getPos().y, context.getPos().z, this.amount);
+        this.getEntityWorld().spawnEntity(entity);
         super.onBlockHit(context);
     }
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (this.getWorld() instanceof ServerWorld world && this.canDamageEntity(entityHitResult.getEntity())) {
+        if (this.getEntityWorld() instanceof ServerWorld world && this.canDamageEntity(entityHitResult.getEntity())) {
             entityHitResult.getEntity().damage(world, this.getDamageSources().create(FactoryDamageTypes.EXPERIENCE_SPLASH, this, this.getOwner()), 0.05F * amount);
         }
         super.onEntityHit(entityHitResult);
@@ -51,8 +51,8 @@ public class ExperienceSplashEntity extends SplashEntity<Unit> {
 
     @Override
     protected void onNaturalDiscard() {
-        var entity = new ExperienceOrbEntity(this.getWorld(), this.getPos().x, this.getPos().y, this.getPos().z, this.amount);
-        this.getWorld().spawnEntity(entity);
+        var entity = new ExperienceOrbEntity(this.getEntityWorld(), this.getEntityPos().x, this.getEntityPos().y, this.getEntityPos().z, this.amount);
+        this.getEntityWorld().spawnEntity(entity);
         super.onNaturalDiscard();
     }
 

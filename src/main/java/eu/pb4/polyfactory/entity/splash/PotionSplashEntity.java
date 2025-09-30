@@ -53,7 +53,7 @@ public class PotionSplashEntity extends SplashEntity<PotionContentsComponent> {
     }
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (this.getWorld() instanceof ServerWorld world && this.random.nextFloat() < 0.8 && (entityHitResult.getEntity() instanceof LivingEntity livingEntity)) {
+        if (this.getEntityWorld() instanceof ServerWorld world && this.random.nextFloat() < 0.8 && (entityHitResult.getEntity() instanceof LivingEntity livingEntity)) {
             for (var effect : this.effectInstances) {
                 if (!this.canInteractEntity(livingEntity) && effect.getEffectType().value().isBeneficial()) {
                     continue;

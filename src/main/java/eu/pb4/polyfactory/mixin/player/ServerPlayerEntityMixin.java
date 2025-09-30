@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntity implements LastFanEffectedTickConsumer, ChainDriveBlock.ChainDriveHandler {
-    @Shadow public abstract ServerWorld getWorld();
+    @Shadow public abstract ServerWorld getEntityWorld();
 
     @Unique
     private BlockPos chainStart;
@@ -42,14 +42,14 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements La
             return;
         }
 
-        if (!this.getMainHandStack().isOf(Items.CHAIN) && !this.getOffHandStack().isOf(Items.CHAIN)) {
+        if (!this.getMainHandStack().isOf(Items.IRON_CHAIN) && !this.getOffHandStack().isOf(Items.IRON_CHAIN)) {
             this.chainStart = null;
             return;
         }
 
         var raycast = this.raycast(this.getBlockInteractionRange(), 0, false);
         if (raycast instanceof BlockHitResult result) {
-            ChainDriveBlock.showPreview((ServerPlayerEntity) (Object) this, this.getWorld(), this.chainStart, result.getBlockPos());
+            ChainDriveBlock.showPreview((ServerPlayerEntity) (Object) this, this.getEntityWorld(), this.chainStart, result.getBlockPos());
         }
     }
 

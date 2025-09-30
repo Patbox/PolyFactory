@@ -168,7 +168,7 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
 
     @Override
     public UUID uuid() {
-        return this.owner != null ? this.owner.getId() : Util.NIL_UUID;
+        return this.owner != null ? this.owner.id() : Util.NIL_UUID;
     }
 
     @Override

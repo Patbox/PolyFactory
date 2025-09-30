@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.models;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
-import net.minecraft.entity.player.PlayerPosition;
+import net.minecraft.entity.EntityPosition;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.listener.ClientPlayPacketListener;
@@ -51,7 +51,7 @@ public class ChainItemDisplayElement extends LodItemDisplayElement {
 
         if (!pos.equals(this.lastSyncedPos)) {
             if (this.lastSyncedPos == null || this.forceSync) {
-                nearPacket = new EntityPositionSyncS2CPacket(this.getEntityId(), new PlayerPosition(pos, Vec3d.ZERO, this.getYaw(), this.getPitch()), false);
+                nearPacket = new EntityPositionSyncS2CPacket(this.getEntityId(), new EntityPosition(pos, Vec3d.ZERO, this.getYaw(), this.getPitch()), false);
                 this.forceSync = false;
             } else {
                 nearPacket = VirtualEntityUtils.createMovePacket(this.getEntityId(), this.lastSyncedPos, pos, this.isRotationDirty(), this.getYaw(), this.getPitch());
@@ -64,7 +64,7 @@ public class ChainItemDisplayElement extends LodItemDisplayElement {
 
         if (this.farDistanceSquared != 0 && !pos.equals(this.lastSyncedPosMid) && (updateTick++) % 10 == 0) {
             if (this.lastSyncedPosMid == null || this.forceSyncMid) {
-                mediumPacket = new EntityPositionSyncS2CPacket(this.getEntityId(), new PlayerPosition(pos, Vec3d.ZERO, this.getYaw(), this.getPitch()), false);
+                mediumPacket = new EntityPositionSyncS2CPacket(this.getEntityId(), new EntityPosition(pos, Vec3d.ZERO, this.getYaw(), this.getPitch()), false);
                 this.forceSyncMid = false;
             } else {
                 mediumPacket = VirtualEntityUtils.createMovePacket(this.getEntityId(), this.lastSyncedPosMid, pos, this.isRotationDirty(), this.getYaw(), this.getPitch());
@@ -95,7 +95,7 @@ public class ChainItemDisplayElement extends LodItemDisplayElement {
 
     @Override
     protected double getSquaredDistance(ServerPlayNetworkHandler player) {
-        var pos = player.player.getPos();
+        var pos = player.player.getEntityPos();
         return Math.min(this.middle.squaredDistanceTo(pos), Math.min(
                 this.start.squaredDistanceTo(pos),
                 this.end.squaredDistanceTo(pos)

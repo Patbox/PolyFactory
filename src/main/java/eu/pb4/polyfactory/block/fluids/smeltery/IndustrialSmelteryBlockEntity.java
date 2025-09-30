@@ -358,7 +358,7 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                 for (int y = 0; y < 5; y++) {
                     this.setSlot(9 * y + 5 + x, fluid);
                 }
-                var slot = new FuelSlot(IndustrialSmelteryBlockEntity.this, 9 + x, player.getWorld().getFuelRegistry());
+                var slot = new FuelSlot(IndustrialSmelteryBlockEntity.this, 9 + x, player.getEntityWorld().getFuelRegistry());
 
                 this.setSlotRedirect(9 * 4 + 1 + x, slot);
                 this.fuelSlots.add(slot);
@@ -418,7 +418,7 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(IndustrialSmelteryBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(IndustrialSmelteryBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
 
@@ -449,7 +449,7 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                     if (!this.insertItem(itemStack2, this.getVirtualSize(), this.getVirtualSize() + 36, true)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (this.player.getWorld().getFuelRegistry().isFuel(itemStack2)) {
+                } else if (this.player.getEntityWorld().getFuelRegistry().isFuel(itemStack2)) {
                     if (!FactoryUtil.insertItemIntoSlots(itemStack2, this.fuelSlots, false)) {
                         return ItemStack.EMPTY;
                     }

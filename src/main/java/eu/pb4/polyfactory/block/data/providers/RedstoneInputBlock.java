@@ -60,7 +60,7 @@ public class RedstoneInputBlock extends DirectionalCabledDataProviderBlock imple
 
     @Override
     protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
-        if (!world.isClient) {
+        if (!world.isClient()) {
             var power = state.get(POWER);
             var dir = state.get(FACING);
             var input = clamp(world.getEmittedRedstonePower(pos.offset(dir), dir));

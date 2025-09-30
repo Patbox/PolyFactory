@@ -426,7 +426,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
         this.markDirty();
     }
 
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         if (state.get(MDrainBlock.PART) == TallItemMachineBlock.Part.TOP) {
             return ScreenHandler.calculateComparatorOutput((Inventory) this);
         }
@@ -491,7 +491,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(MDrainBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(MDrainBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             if (MDrainBlockEntity.this.fluidContainer.updateId() != this.lastFluidUpdate && delayTick < 0) {

@@ -108,7 +108,7 @@ public class PlacerBlock extends RotationalNetworkBlock implements FactoryBlock,
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         return world.getBlockEntity(pos) instanceof PlacerBlockEntity be && be.getStack().isDamageable()
                 ? (int) (16d * be.getStack().getCount() / be.getStack().getMaxCount()) : 0;
     }

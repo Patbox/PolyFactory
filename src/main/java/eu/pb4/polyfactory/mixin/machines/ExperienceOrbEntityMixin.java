@@ -44,7 +44,7 @@ public abstract class ExperienceOrbEntityMixin extends Entity {
 
     @Inject(method = "expensiveUpdate", at = @At("HEAD"))
     private void findDrains(CallbackInfo ci) {
-        if (this.drainTarget != null && this.getWorld().getBlockEntity(this.drainTarget) instanceof DrainBlockEntity be
+        if (this.drainTarget != null && this.getEntityWorld().getBlockEntity(this.drainTarget) instanceof DrainBlockEntity be
                 && be.catalyst().isIn(FactoryItemTags.XP_CONVERSION_CATALYST)) {
             return;
         }
@@ -53,7 +53,7 @@ public abstract class ExperienceOrbEntityMixin extends Entity {
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
                 for (int y = -1; y <= 0; y++) {
-                    if (this.getWorld().getBlockEntity(mut.set(this.getBlockPos()).move(x, y, z)) instanceof DrainBlockEntity be
+                    if (this.getEntityWorld().getBlockEntity(mut.set(this.getBlockPos()).move(x, y, z)) instanceof DrainBlockEntity be
                             && be.catalyst().isIn(FactoryItemTags.XP_CONVERSION_CATALYST)) {
                         this.drainTarget = mut;
                         this.target = null;

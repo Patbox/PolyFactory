@@ -16,10 +16,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.InteractionElement;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -104,7 +101,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
 
         var cost = getChainCost(start, target, be2.getCachedState().get(AXIS), be.getCachedState().get(AXIS));
 
-        var stack = player.getMainHandStack().isOf(Items.CHAIN) ? player.getMainHandStack() : player.getOffHandStack();
+        var stack = player.getMainHandStack().isOf(Items.IRON_CHAIN) ? player.getMainHandStack() : player.getOffHandStack();
 
         var hasEnoughChains = player.isCreative() || stack.getCount() >= cost;
 
@@ -148,7 +145,8 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
     }
 
     @Override
-    public void onPolymerBlockSend(BlockState blockState, BlockPos.Mutable pos, PacketContext.NotNullWithPlayer player) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
+        return Blocks.BARRIER.getDefaultState().with(WATERLOGGED, state.get(WATERLOGGED));
     }
 
     @Override
@@ -157,7 +155,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
             return ChainLiftEntity.attach(stack, state, world, pos, player, hand, hit);
         }
 
-        if (!stack.isOf(Items.CHAIN) || !(player instanceof ChainDriveHandler handler) || !(world.getBlockEntity(pos) instanceof ChainDriveBlockEntity be)) {
+        if (!stack.isOf(Items.IRON_CHAIN) || !(player instanceof ChainDriveHandler handler) || !(world.getBlockEntity(pos) instanceof ChainDriveBlockEntity be)) {
             return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
         }
 
@@ -262,7 +260,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
             }
 
             mat.rotateY(rotation);
-            mat.scale(2, 2.f, 2);
+            mat.scale(2, 2f, 2);
 
             this.mainElement.setTransformation(mat);
         }

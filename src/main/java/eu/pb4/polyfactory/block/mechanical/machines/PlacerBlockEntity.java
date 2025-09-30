@@ -244,7 +244,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                 ItemScatterer.spawn(world, pos, p.getInventory());
             }
 
-            if (self.owner != null && world.getPlayerByUuid(self.owner.getId()) instanceof ServerPlayerEntity serverPlayer) {
+            if (self.owner != null && world.getPlayerByUuid(self.owner.id()) instanceof ServerPlayerEntity serverPlayer) {
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.PLACER_PLACES);
             }
             self.markDirty();
@@ -275,7 +275,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
             var profile = this.owner == null ? FactoryUtil.GENERIC_PROFILE : this.owner;
 
             this.player = new FactoryPlayer(StackReference.of(this, 0), (ServerWorld) this.world, this.pos,
-                    new GameProfile(profile.getId(), "Placer (" + profile.getName() + ")")) {
+                    new GameProfile(profile.id(), "Placer (" + profile.name() + ")")) {
                 @Override
                 public double getEyeY() {
                     return getY();
@@ -310,7 +310,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(PlacerBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(PlacerBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();

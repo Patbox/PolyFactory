@@ -203,7 +203,7 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
 
         @Override
         protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 boolean bl = state.get(POWERED);
                 if (bl != world.isReceivingRedstonePower(pos)) {
                     if (bl) {

@@ -101,7 +101,7 @@ public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         return world.getBlockEntity(pos) instanceof PlanterBlockEntity be ? ScreenHandler.calculateComparatorOutput((Inventory) be) : 0;
     }
 

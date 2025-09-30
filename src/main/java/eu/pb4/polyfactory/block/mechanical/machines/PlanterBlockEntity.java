@@ -184,7 +184,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
             stack.decrement(1);
             world.playSound(null, pos, placableState.getSoundGroup().getPlaceSound(), SoundCategory.BLOCKS, 0.5f, 1.0f);
             world.emitGameEvent(GameEvent.BLOCK_PLACE, place, GameEvent.Emitter.of(placableState));
-            if (self.owner != null && world.getPlayerByUuid(self.owner.getId()) instanceof ServerPlayerEntity serverPlayer) {
+            if (self.owner != null && world.getPlayerByUuid(self.owner.id()) instanceof ServerPlayerEntity serverPlayer) {
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.PLANTER_PLANTS);
             }
             self.markDirty();
@@ -236,7 +236,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(PlanterBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(PlanterBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();

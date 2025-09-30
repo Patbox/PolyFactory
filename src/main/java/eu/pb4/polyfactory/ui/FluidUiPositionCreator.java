@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.chars.Char2IntMap;
 import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.minecraft.text.Style;
+import net.minecraft.text.StyleSpriteSource;
 import net.minecraft.util.Identifier;
 
 import java.nio.charset.StandardCharsets;
@@ -39,7 +40,7 @@ public class FluidUiPositionCreator {
         this.height = height;
         this.offsetY = offsetY;
         this.textureHeight = Math.min(height, 16);
-        this.style = Style.EMPTY.withColor(0xFFFFFF).withFont(this.id);
+        this.style = Style.EMPTY.withColor(0xFFFFFF).withFont(new StyleSpriteSource.Font(this.id));
     }
 
     public char[] registerTextures(Identifier identifier) {

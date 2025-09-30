@@ -84,15 +84,15 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
     }
 
     public void tick() {
-        if (!(this.getWorld() instanceof ServerWorld world)) {
+        if (!(this.getEntityWorld() instanceof ServerWorld world)) {
             return;
         }
         super.tick();
         this.updateRotation();
 
         if (this.stickToBlock != null) {
-            var state = this.getWorld().getBlockState(this.stickToBlock);
-            if (state.getCollisionShape(this.getWorld(), this.stickToBlock).isEmpty()) {
+            var state = this.getEntityWorld().getBlockState(this.stickToBlock);
+            if (state.getCollisionShape(this.getEntityWorld(), this.stickToBlock).isEmpty()) {
                 this.stickToBlock = null;
             }
         }
@@ -133,14 +133,14 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
         this.fuse = i;
         if (i <= 0) {
             this.discard();
-            if (!this.getWorld().isClient) {
+            if (!this.getEntityWorld().isClient()) {
                 this.explode();
             }
         } else {
             if (this.particlePos == null) {
                 this.particlePos = new Vec3d(this.getX(), this.getY() + getHeight(), this.getZ());
             }
-            this.particlePos = this.particlePos.lerp(this.getPos().add(0, getHeight(), 0),  1 / 5f);
+            this.particlePos = this.particlePos.lerp(this.getEntityPos().add(0, getHeight(), 0),  1 / 5f);
 
             this.updateWaterState();
             world.spawnParticles(ParticleTypes.SMOKE, this.particlePos.x, this.particlePos.y, this.particlePos.z, 0, 0.0, 0.0, 0.0, 0);
@@ -148,7 +148,7 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
     }
 
     private void explode() {
-        this.getWorld().createExplosion(this, this.getX(), this.getBodyY(0.5), this.getZ(), 2.6F, World.ExplosionSourceType.TNT);
+        this.getEntityWorld().createExplosion(this, this.getX(), this.getBodyY(0.5), this.getZ(), 2.6F, World.ExplosionSourceType.TNT);
     }
 
     @Override

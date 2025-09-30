@@ -109,7 +109,7 @@ public abstract class SidedLampBlock extends Block implements FactoryBlock, Bloc
     @Override
     protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
         super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
-        if (!world.isClient) {
+        if (!world.isClient()) {
             boolean bl = state.get(LIT);
             if (bl != world.isEmittingRedstonePower(pos.offset(state.get(FACING).getOpposite()), state.get(FACING).getOpposite())) {
                 if (bl) {

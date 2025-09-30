@@ -79,7 +79,7 @@ public class WindmillSailItem extends Item implements SimpleColoredItem {
                     be.addSail(count, context.getStack());
 
                     if (context.getPlayer() instanceof ServerPlayerEntity player) {
-                        be.updateRotationalData(RotationData.State.SPECIAL, state, player.getWorld(), context.getBlockPos());
+                        be.updateRotationalData(RotationData.State.SPECIAL, state, player.getEntityWorld(), context.getBlockPos());
                         if (RotationData.State.SPECIAL.finalSpeed() > 0) {
                             TriggerCriterion.trigger(player, FactoryTriggers.CONSTRUCT_WORKING_WINDMILL);
                         }

@@ -53,7 +53,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         if (world.getBlockEntity(pos) instanceof Inventory inventory) {
             return ScreenHandler.calculateComparatorOutput(inventory);
         }

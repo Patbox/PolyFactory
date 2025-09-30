@@ -24,9 +24,9 @@ public class LavaSplashEntity extends SplashEntity<Unit> {
     }
     @Override
     protected void onBlockHit(BlockHitResult context) {
-        if (!this.getWorld().isClient && this.random.nextFloat() < 0.3 && this.canBreakBlock(context.getBlockPos())) {
+        if (!this.getEntityWorld().isClient() && this.random.nextFloat() < 0.3 && this.canBreakBlock(context.getBlockPos())) {
             var blockPos = context.getBlockPos();
-            var world = this.getWorld();
+            var world = this.getEntityWorld();
             var blockState = world.getBlockState(blockPos);
             if (!CampfireBlock.canBeLit(blockState) && !CandleBlock.canBeLit(blockState) && !CandleCakeBlock.canBeLit(blockState)) {
                 BlockPos blockPos2 = blockPos.offset(context.getSide());
@@ -45,7 +45,7 @@ public class LavaSplashEntity extends SplashEntity<Unit> {
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         if (this.random.nextFloat() < 0.3) {
-            if (this.getWorld() instanceof ServerWorld world && entityHitResult.getEntity() instanceof LivingEntity livingEntity && this.canDamageEntity(livingEntity)) {
+            if (this.getEntityWorld() instanceof ServerWorld world && entityHitResult.getEntity() instanceof LivingEntity livingEntity && this.canDamageEntity(livingEntity)) {
                 livingEntity.setOnFireFor(4);
                 livingEntity.damage(world, this.getDamageSources().create(DamageTypes.LAVA, this, this.getOwner()), 4F);
             }
@@ -56,14 +56,14 @@ public class LavaSplashEntity extends SplashEntity<Unit> {
     @Override
     protected boolean discardInBlock(BlockState state, BlockPos blockPos) {
         if (state.getFluidState().isIn(FluidTags.WATER)) {
-            ((ServerWorld) this.getWorld()).spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
+            ((ServerWorld) this.getEntityWorld()).spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
                     0, 0, 0, 0, 0);
             this.playExtinguishSound();
         } else if (state.isOf(Blocks.POWDER_SNOW)) {
-            ((ServerWorld) this.getWorld()).spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
+            ((ServerWorld) this.getEntityWorld()).spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
                     0, 0, 0, 0, 0);
             this.playExtinguishSound();
-            this.getWorld().setBlockState(blockPos, Blocks.AIR.getDefaultState());
+            this.getEntityWorld().setBlockState(blockPos, Blocks.AIR.getDefaultState());
             return true;
         }
 

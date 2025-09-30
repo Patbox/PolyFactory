@@ -109,7 +109,7 @@ public class TextInputBlock extends OrientableCabledDataProviderBlock {
         @Override
         public void onTick() {
             if (this.blockEntity.isRemoved()
-                    || player.getPos().squaredDistanceTo(Vec3d.ofCenter(this.blockEntity.getPos())) > (18 * 18)) {
+                    || player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(this.blockEntity.getPos())) > (18 * 18)) {
                 this.close();
                 return;
             }

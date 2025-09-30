@@ -57,9 +57,9 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         if (world.getBlockEntity(pos) instanceof MDrainBlockEntity be) {
-            return be.getComparatorOutput(state, world, pos);
+            return be.getComparatorOutput(state, world, pos, direction);
         }
         return 0;
     }

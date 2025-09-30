@@ -75,7 +75,6 @@
   "item.polyfactory.wrench": "Chiave Inglese",
   "item.polyfactory.wrench.tooltip.1": "Usa [%s] per cambiare blocco",
   "item.polyfactory.wrench.tooltip.2": "Usa [%s] per cambiare la configurazione",
-  "item.polyfactory.wrench.title": "Azioni della Chiave Inglese: %s",
   "item.polyfactory.wrench.action.facing": "Direzione",
   "item.polyfactory.wrench.action.axis": "Asse",
   "item.polyfactory.wrench.action.mode": "Modalità",

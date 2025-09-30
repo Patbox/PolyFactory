@@ -52,7 +52,7 @@ public class MinecartWithBlocksEntity extends AbstractMinecartEntity implements 
 
     @Override
     public void tick() {
-        this.blocks.setWorld((ServerWorld) this.getWorld());
+        this.blocks.setWorld((ServerWorld) this.getEntityWorld());
         super.tick();
         this.blocks.setOverridePos(this.blocks.getCurrentPos().lerp(this.holder.getPos().add(0, 2, 0), 0.25));
         //this.blocks.setQuaternion(new Quaternionf().rotateY(this.getYaw() * MathHelper.RADIANS_PER_DEGREE));
