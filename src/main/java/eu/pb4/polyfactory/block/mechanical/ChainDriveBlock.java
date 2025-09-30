@@ -16,10 +16,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.InteractionElement;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -148,7 +145,8 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
     }
 
     @Override
-    public void onPolymerBlockSend(BlockState blockState, BlockPos.Mutable pos, PacketContext.NotNullWithPlayer player) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
+        return Blocks.BARRIER.getDefaultState().with(WATERLOGGED, state.get(WATERLOGGED));
     }
 
     @Override
@@ -262,7 +260,7 @@ public class ChainDriveBlock extends AxleBlock implements BlockEntityProvider {
             }
 
             mat.rotateY(rotation);
-            mat.scale(2, 2.f, 2);
+            mat.scale(2, 2f, 2);
 
             this.mainElement.setTransformation(mat);
         }

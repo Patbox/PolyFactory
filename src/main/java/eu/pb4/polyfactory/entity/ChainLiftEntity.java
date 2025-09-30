@@ -141,7 +141,7 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
 
     @Override
     public Vec3d updatePassengerForDismount(LivingEntity passenger) {
-        return this.getPos();
+        return this.getEntityPos();
     }
 
     @Override
@@ -166,7 +166,7 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
             return;
         }
         if (this.attachedPos == null) {
-            this.attachedPos = this.getPos().add(0, this.getType().getHeight(), 0);
+            this.attachedPos = this.getEntityPos().add(0, this.getType().getHeight(), 0);
         }
 
         var passanger = this.getFirstPassenger();
@@ -179,7 +179,7 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
 
             passanger = null;
         } else if (passanger == null && this.canCatchEntities) {
-            var pos = this.getPos();
+            var pos = this.getEntityPos();
             var box = new Box(pos.x - 0.4, pos.y, pos.z - 0.4, pos.x + 0.4, pos.y + 1, pos.z + 0.4);
             var ents = world.getOtherEntities(this, box, this::canPickupEntity);
             for (var ent : ents) {
@@ -191,7 +191,7 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
             }
         }
 
-        Vec3d pos = this.getPos(), attachedPos = this.attachedPos;
+        Vec3d pos = this.getEntityPos(), attachedPos = this.attachedPos;
         var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_4 - MathHelper.RADIANS_PER_DEGREE * 10) / ChainDriveBlock.RADIUS;
 
         var moveSpeed = Math.clamp(RotationUser.getRotation(world, this.sourcePos).speedRadians(), -rotMax, rotMax);
@@ -214,8 +214,8 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
             pos = centeredChainDrive.subtract(0, this.getType().getHeight(), 0).add(new Vec3d(new Vector3f(0, 0, ChainDriveBlock.RADIUS + 0.1f).rotate(facingRotFrom)));
             attachedPos = centeredChainDrive.add(offset);
 
-            var moved = this.checkMove(world, this.getPos(), pos);
-            pos = this.getPos().lerp(pos, moved);
+            var moved = this.checkMove(world, this.getEntityPos(), pos);
+            pos = this.getEntityPos().lerp(pos, moved);
             attachedPos = this.attachedPos.lerp(attachedPos, moved);
 
             bounced = moved != 1f;
@@ -244,8 +244,8 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
             this.timeInCenter = 0;
             attachedPos = centeredChainDrive.add(route.startPos().lerp(route.startOffset(), this.progress / route.distance()));
             pos = attachedPos.subtract(0, this.getType().getHeight(), 0);
-            var moved = this.checkMove(world, this.getPos(), pos);
-            pos = this.getPos().lerp(pos, moved);
+            var moved = this.checkMove(world, this.getEntityPos(), pos);
+            pos = this.getEntityPos().lerp(pos, moved);
             attachedPos = this.attachedPos.lerp(attachedPos, moved);
 
             bounced = moved != 1f;
@@ -319,8 +319,8 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
             this.attachedPos = attachedPos;
         }
 
-        if (!this.getPos().equals(pos)) {
-            this.setVelocity(pos.subtract(this.getPos()));
+        if (!this.getEntityPos().equals(pos)) {
+            this.setVelocity(pos.subtract(this.getEntityPos()));
             this.setPosition(pos);
             if (passanger instanceof ServerPlayerEntity serverPlayer) {
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.CHAIN_LIFT);
@@ -345,7 +345,7 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
                             return false;
                         }
 
-                        if (chainLift.getPos().equals(finalNewPos)) {
+                        if (chainLift.getEntityPos().equals(finalNewPos)) {
                             return this.getId() < chainLift.getId();
                         } else if (this.targetPos != null && this.targetPos.equals(chainLift.targetPos)) {
                             return this.progress < chainLift.progress;

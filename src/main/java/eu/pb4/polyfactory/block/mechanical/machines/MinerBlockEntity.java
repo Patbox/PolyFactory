@@ -213,7 +213,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         var centered = pos.toCenterPos();
 
         var entities = world.getEntitiesByClass(Entity.class, Box.enclosing(pos, blockPos), Entity::canHit);
-        entities.sort(Comparator.comparingDouble(x -> x.getPos().squaredDistanceTo(centered)));
+        entities.sort(Comparator.comparingDouble(x -> x.getEntityPos().squaredDistanceTo(centered)));
 
         if (!entities.isEmpty()) {
             var speed = Math.abs(RotationUser.getRotation(world, pos).speed()) * MathHelper.RADIANS_PER_DEGREE * 3f;
@@ -352,7 +352,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(MinerBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(MinerBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();

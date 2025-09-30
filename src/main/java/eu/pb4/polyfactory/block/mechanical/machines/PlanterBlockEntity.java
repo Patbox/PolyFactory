@@ -236,7 +236,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(PlanterBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(PlanterBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();

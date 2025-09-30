@@ -192,7 +192,7 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(SteamEngineBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(SteamEngineBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
 

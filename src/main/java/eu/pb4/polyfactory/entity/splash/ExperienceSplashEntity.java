@@ -51,7 +51,7 @@ public class ExperienceSplashEntity extends SplashEntity<Unit> {
 
     @Override
     protected void onNaturalDiscard() {
-        var entity = new ExperienceOrbEntity(this.getEntityWorld(), this.getPos().x, this.getPos().y, this.getPos().z, this.amount);
+        var entity = new ExperienceOrbEntity(this.getEntityWorld(), this.getEntityPos().x, this.getEntityPos().y, this.getEntityPos().z, this.amount);
         this.getEntityWorld().spawnEntity(entity);
         super.onNaturalDiscard();
     }

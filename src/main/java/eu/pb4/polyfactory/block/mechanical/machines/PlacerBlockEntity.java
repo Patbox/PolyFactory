@@ -310,7 +310,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(PlacerBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(PlacerBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();

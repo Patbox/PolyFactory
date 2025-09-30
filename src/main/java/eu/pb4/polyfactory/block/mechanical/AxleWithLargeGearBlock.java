@@ -74,7 +74,7 @@ public class AxleWithLargeGearBlock extends AxleWithGearBlock {
 
             mat.rotateY(rotation);
             mat.pushMatrix();
-            mat.scale(2, 2.005f, 2);
+            mat.scale(2, 2f, 2);
             this.mainElement.setTransformation(mat);
             mat.popMatrix();
             mat.rotateY(!this.offset ? MathHelper.HALF_PI / 8 : 0);

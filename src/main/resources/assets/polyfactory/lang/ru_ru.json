@@ -107,7 +107,6 @@
   "item.polyfactory.wrench.tooltip.1": "Используйте [%s] для изменения блока",
   "item.polyfactory.wrench.tooltip.1.alt": "Используйте [%s] для изменения значения настроек блока в зависимости от контекста",
   "item.polyfactory.wrench.tooltip.2": "Используйте [%s] для изменения текущей настройки",
-  "item.polyfactory.wrench.title": "Действия гаечного ключа: %s",
   "item.polyfactory.wrench.action.facing": "Направление",
   "item.polyfactory.wrench.action.rotation": "Поворот",
   "item.polyfactory.wrench.action.pitch": "Тангаж",

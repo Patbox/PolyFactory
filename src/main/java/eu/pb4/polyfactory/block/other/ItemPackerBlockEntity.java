@@ -234,7 +234,7 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
 
         @Override
         public void onTick() {
-            if (ItemPackerBlockEntity.this.isRemoved() || player.getPos().squaredDistanceTo(Vec3d.ofCenter(ItemPackerBlockEntity.this.pos)) > (18 * 18)) {
+            if (ItemPackerBlockEntity.this.isRemoved() || player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(ItemPackerBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();

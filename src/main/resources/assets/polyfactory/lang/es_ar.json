@@ -69,7 +69,6 @@
   "item.polyfactory.item_filter.with": "Filtro de objetos (%s)",
   "item.polyfactory.wrench.tooltip.1": "Usa [%s] para cambiar el bloque",
   "item.polyfactory.wrench.tooltip.2": "Usa [%s] para cambiar la opción actual",
-  "item.polyfactory.wrench.title": "Acciones de llave inglesa %s",
   "item.polyfactory.wrench.action.facing": "Mirando",
   "item.polyfactory.wrench.action.axis": "Eje",
   "item.polyfactory.wrench.action.mode": "Modo",

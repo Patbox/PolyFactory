@@ -481,7 +481,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(MixerBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(MixerBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             if (MixerBlockEntity.this.fluidContainer.updateId() != this.lastFluidUpdate && delayTick < 0) {

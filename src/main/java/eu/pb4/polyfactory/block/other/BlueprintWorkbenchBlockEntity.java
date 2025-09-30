@@ -244,7 +244,7 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
 
         @Override
         public void onTick() {
-            if (this.be.isRemoved() || player.getPos().squaredDistanceTo(Vec3d.ofCenter(this.be.pos)) > (18 * 18)) {
+            if (this.be.isRemoved() || player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(this.be.pos)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();

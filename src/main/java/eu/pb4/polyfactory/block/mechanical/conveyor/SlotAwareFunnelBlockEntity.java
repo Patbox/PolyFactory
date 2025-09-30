@@ -122,7 +122,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
 
         @Override
         public void onTick() {
-            if (this.be.isRemoved() || player.getPos().squaredDistanceTo(Vec3d.ofCenter(this.be.pos)) > (18 * 18)) {
+            if (this.be.isRemoved() || player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(this.be.pos)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();
@@ -204,7 +204,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
         @Override
         public void onTick() {
             if (this.gui.be.isRemoved()
-                    || player.getPos().squaredDistanceTo(Vec3d.ofCenter(this.gui.be.getPos())) > (18 * 18)) {
+                    || player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(this.gui.be.getPos())) > (18 * 18)) {
                 this.close();
                 return;
             }

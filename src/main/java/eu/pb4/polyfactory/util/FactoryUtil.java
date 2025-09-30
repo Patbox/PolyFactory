@@ -103,6 +103,13 @@ public class FactoryUtil {
         default -> x.asString().toUpperCase(Locale.ROOT);
     } + "_TRAPDOOR_WATERLOGGED")));
 
+
+    public static final Map<Direction.Axis, BlockState> LIGHTNING_ROD_REGULAR = Util.mapEnum(Direction.Axis.class,
+            x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf( "LIGHTNING_ROD_" + x.name())));
+
+    public static final Map<Direction.Axis, BlockState> LIGHTNING_ROD_WATERLOGGED = Util.mapEnum(Direction.Axis.class,
+            x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf( "LIGHTNING_ROD_" + x.name() + "_WATERLOGGED")));
+
     private static final List<Runnable> RUN_NEXT_TICK = new ArrayList<>();
 
     public static Item requestModelBase(ModelRenderType type) {

@@ -172,7 +172,7 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(ItemReaderBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(ItemReaderBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();

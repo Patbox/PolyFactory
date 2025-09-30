@@ -95,7 +95,7 @@ public class ChainItemDisplayElement extends LodItemDisplayElement {
 
     @Override
     protected double getSquaredDistance(ServerPlayNetworkHandler player) {
-        var pos = player.player.getPos();
+        var pos = player.player.getEntityPos();
         return Math.min(this.middle.squaredDistanceTo(pos), Math.min(
                 this.start.squaredDistanceTo(pos),
                 this.end.squaredDistanceTo(pos)

@@ -166,7 +166,6 @@
   "item.polyfactory.wrench.tooltip.1": "Użyj [%s] aby zmienić blok",
   "item.polyfactory.wrench.tooltip.1.alt": "Użyj [%s] aby zmienić wartość ustawienia bloku w zależności od kontekstu",
   "item.polyfactory.wrench.tooltip.2": "Użyj [%s] aby zmienić bieżące ustawienie",
-  "item.polyfactory.wrench.title": "Akcje klucza na: %s",
   "item.polyfactory.wrench.action.facing": "Kierunek",
   "item.polyfactory.wrench.action.angle": "Kąt",
   "item.polyfactory.wrench.action.strength": "Moc",

@@ -140,7 +140,7 @@ public class DynamiteEntity extends ProjectileEntity implements PolymerEntity {
             if (this.particlePos == null) {
                 this.particlePos = new Vec3d(this.getX(), this.getY() + getHeight(), this.getZ());
             }
-            this.particlePos = this.particlePos.lerp(this.getPos().add(0, getHeight(), 0),  1 / 5f);
+            this.particlePos = this.particlePos.lerp(this.getEntityPos().add(0, getHeight(), 0),  1 / 5f);
 
             this.updateWaterState();
             world.spawnParticles(ParticleTypes.SMOKE, this.particlePos.x, this.particlePos.y, this.particlePos.z, 0, 0.0, 0.0, 0.0, 0);

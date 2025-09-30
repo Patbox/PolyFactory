@@ -351,7 +351,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
 
         @Override
         public void onTick() {
-            if (player.getPos().squaredDistanceTo(Vec3d.ofCenter(PressBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(PressBlockEntity.this.pos)) > (18 * 18)) {
                 this.close();
             }
             this.setSlot(13, GuiTextures.PROGRESS_VERTICAL.get(progress()));

@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.block.QuickWaterloggable;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
@@ -10,6 +11,7 @@ import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polymer.blocks.api.PolymerTexturedBlock;
 import eu.pb4.polymer.common.impl.CommonImplUtils;
 import eu.pb4.polymer.core.impl.networking.PolymerServerProtocol;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -44,7 +46,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, ConfigurableBlock, BarrierBasedWaterloggable {
+public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, ConfigurableBlock, QuickWaterloggable, PolymerTexturedBlock {
     public static final Property<Direction.Axis> AXIS = Properties.AXIS;
     public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
 
@@ -86,31 +88,13 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, C
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return Blocks.LIGHTNING_ROD.getDefaultState().with(Properties.FACING, Direction.from(state.get(AXIS), Direction.AxisDirection.POSITIVE))
-                .getCollisionShape(world, pos, context);
-    }
-
-    @Override
     public BlockState rotate(BlockState state, BlockRotation rotation) {
        return FactoryUtil.rotateAxis(state, AXIS, rotation);
     }
 
     @Override
-    public void onPolymerBlockSend(BlockState blockState, BlockPos.Mutable pos, PacketContext.NotNullWithPlayer context) {
-        var player = context.getPlayer();
-        if (pos.getSquaredDistanceFromCenter(player.getX(), player.getY(), player.getZ()) < 16 * 16) {
-            player.networkHandler.sendPacket(new BlockUpdateS2CPacket(pos.toImmutable(), Blocks.LIGHTNING_ROD.getDefaultState()
-                    .with(Properties.FACING, Direction.from(blockState.get(AXIS), Direction.AxisDirection.POSITIVE))
-                    .with(LightningRodBlock.POWERED, true).with(WATERLOGGED, blockState.get(WATERLOGGED))));
-            //noinspection UnstableApiUsage
-            PolymerServerProtocol.sendBlockUpdate(player.networkHandler, pos, blockState);
-        }
-    }
-
-    @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState().with(WATERLOGGED, state.get(WATERLOGGED));
+        return (state.get(WATERLOGGED) ? FactoryUtil.LIGHTNING_ROD_WATERLOGGED : FactoryUtil.LIGHTNING_ROD_REGULAR).get(state.get(AXIS));
     }
 
     @Override
@@ -137,9 +121,6 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, C
         public static final ItemStack ITEM_MODEL = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/axle"));
         public static final ItemStack ITEM_MODEL_SHORT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/axle_short"));
         private final ItemDisplayElement mainElement;
-        private final Set<ServerPlayNetworkHandler> viewingClose = new ObjectOpenCustomHashSet<>(CommonImplUtils.IDENTITY_HASH);
-        private final List<ServerPlayNetworkHandler> sentRod = new ArrayList<>();
-        private final List<ServerPlayNetworkHandler> sentBarrier = new ArrayList<>();
         private Model(ServerWorld world, BlockState state) {
             this.mainElement = LodItemDisplayElement.createSimple(ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
             this.mainElement.setViewRange(0.7f);
@@ -157,55 +138,14 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, C
 
             mat.rotateY(rotation);
 
-            mat.scale(2, 2.005f, 2);
+            mat.scale(2, 2f, 2);
             this.mainElement.setTransformation(mat);
-        }
-
-        @Override
-        public boolean stopWatching(ServerPlayNetworkHandler player) {
-            if (super.stopWatching(player)) {
-                this.viewingClose.remove(player);
-                return true;
-            }
-            return false;
         }
 
         @Override
         protected void onTick() {
             if (!this.blockAware().isPartOfTheWorld()) {
                 return;
-            }
-
-            var rodState = Blocks.LIGHTNING_ROD.getDefaultState()
-                    .with(Properties.FACING, Direction.from(this.blockAware().getBlockState().get(AXIS),
-                            Direction.AxisDirection.POSITIVE)).with(LightningRodBlock.POWERED, true).with(WATERLOGGED, this.blockAware().getBlockState().get(WATERLOGGED));
-            var pos = this.blockAware().getBlockPos();
-            var state = this.blockAware().getBlockState();
-            for (var player : this.sentRod) {
-                player.sendPacket(new BlockUpdateS2CPacket(pos, rodState));
-                //noinspection UnstableApiUsage
-                PolymerServerProtocol.sendBlockUpdate(player, pos, state);
-            }
-            this.sentRod.clear();
-            for (var player : this.sentBarrier) {
-                player.sendPacket(new BlockUpdateS2CPacket(pos, Blocks.BARRIER.getDefaultState().with(WATERLOGGED, this.blockAware().getBlockState().get(WATERLOGGED))));
-                //noinspection UnstableApiUsage
-                PolymerServerProtocol.sendBlockUpdate(player, pos, state);
-            }
-            this.sentBarrier.clear();
-
-            for (var player : this.getWatchingPlayers()) {
-                var d = this.squaredDistance(player);
-
-                if (d < 16 * 16) {
-                    if (!this.viewingClose.contains(player)) {
-                        this.sentRod.add(player);
-                        this.viewingClose.add(player);
-                    }
-                } else if (this.viewingClose.contains(player)) {
-                    this.sentBarrier.add(player);
-                    this.viewingClose.remove(player);
-                }
             }
 
             var tick = this.blockAware().getWorld().getTime();

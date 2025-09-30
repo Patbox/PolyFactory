@@ -91,7 +91,7 @@ public class PortableFluidTankBlockItem extends FactoryBlockItem {
     @Override
     public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
         super.inventoryTick(stack, world, entity, slot);
-        FluidContainerUtil.tick(FluidContainerFromComponent.of(stack), (ServerWorld) world, entity.getPos().add(0, entity.getY() / 2, 0), 0,
+        FluidContainerUtil.tick(FluidContainerFromComponent.of(stack), (ServerWorld) world, entity.getEntityPos().add(0, entity.getY() / 2, 0), 0,
                 FactoryUtil.getItemConsumer(entity));
     }
 
