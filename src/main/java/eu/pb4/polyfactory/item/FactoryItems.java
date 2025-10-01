@@ -50,6 +50,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static eu.pb4.polyfactory.ModInit.id;
+
 public class FactoryItems {
     // Util
     public static final Item MOD_ICON = register("mod_icon", SimplePolymerItem::new);
@@ -99,7 +101,6 @@ public class FactoryItems {
     public static final Item STEEL_BLOCK = register(FactoryBlocks.STEEL_BLOCK);
     public static final Item STEEL_PLATE = register("steel_plate", SimplePolymerItem::new);
     public static final Item COPPER_PLATE = register("copper_plate", SimplePolymerItem::new);
-    public static final Item COPPER_NUGGET = register("copper_nugget", SimplePolymerItem::new);
     public static final Item BRITTLE_GLASS_BOTTLE = register("brittle_glass_bottle", SimplePolymerItem::new);
     public static final Item BRITTLE_POTION = register("brittle_potion", settings -> new BrittlePotionItem(settings.component(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT).component(DataComponentTypes.CONSUMABLE, ConsumableComponents.drink().finishSound(SoundEvents.ITEM_OMINOUS_BOTTLE_DISPOSE).build()).maxCount(1)));
     public static final Item THROWABLE_GLASS_BOTTLE = register("throwable_glass_bottle", SimplePolymerItem::new);
@@ -215,6 +216,8 @@ public class FactoryItems {
             builder.add(WOODEN_PLATE, (int) (context.baseSmeltTime() * 0.6));
             builder.add(COAL_DUST, (int) (context.baseSmeltTime() * 0.8));
         }));
+
+        Registries.ITEM.addAlias(id("copper_nugget"), Identifier.of("copper_nugget"));
 
 
         PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.of(ModInit.ID, "a_group"), ItemGroup.create(ItemGroup.Row.BOTTOM, -1)
@@ -361,7 +364,6 @@ public class FactoryItems {
                     entries.add(STEEL_NUGGET);
                     entries.add(STEEL_BLOCK);
                     entries.add(STEEL_PLATE);
-                    entries.add(COPPER_NUGGET);
                     entries.add(COPPER_PLATE);
                     entries.add(WOODEN_PLATE);
                     entries.add(TREATED_DRIED_KELP);

@@ -44,7 +44,6 @@ public class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
         ;
 
         this.getOrCreateTagBuilder(ConventionalItemTags.NUGGETS)
-                .add(FactoryItems.COPPER_NUGGET)
                 .add(FactoryItems.STEEL_NUGGET)
         ;
         this.getOrCreateTagBuilder(ConventionalItemTags.INGOTS)

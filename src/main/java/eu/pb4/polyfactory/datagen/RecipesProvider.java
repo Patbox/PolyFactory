@@ -949,7 +949,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 offerBlasting(List.of(FactoryItems.CRUSHED_RAW_COPPER), RecipeCategory.MISC, Items.COPPER_INGOT, 0.5F, 100, "copper_ingot");
                 offerBlasting(List.of(FactoryItems.CRUSHED_RAW_GOLD), RecipeCategory.MISC, Items.GOLD_INGOT, 0.7F, 100, "gold_ingot");
 
-                offerReversibleCompactingRecipesWithCompactingRecipeGroup(RecipeCategory.MISC, FactoryItems.COPPER_NUGGET, RecipeCategory.MISC, Items.COPPER_INGOT, "copper_ingot_from_nugget", null);
+                offerReversibleCompactingRecipesWithCompactingRecipeGroup(RecipeCategory.MISC, Items.COPPER_NUGGET, RecipeCategory.MISC, Items.COPPER_INGOT, "copper_ingot_from_nugget", null);
                 offerReversibleCompactingRecipesWithCompactingRecipeGroup(RecipeCategory.MISC, FactoryItems.STEEL_NUGGET, RecipeCategory.MISC, FactoryItems.STEEL_INGOT, "steel_ingot_from_nugget", null);
 
                 for (var entry : HoneycombItem.UNWAXED_TO_WAXED_BLOCKS.get().entrySet()) {
@@ -1374,7 +1374,7 @@ class RecipesProvider extends FabricRecipeProvider {
                             new Pair<>(FactoryFluids.LAVA.of(3000), OutputStack.of(Items.FLINT, 0.15f, 1)),
                             new Pair<>(FactoryFluids.IRON.of(FluidConstants.NUGGET), OutputStack.of(Items.IRON_NUGGET, 0.9f, 1)),
                             new Pair<>(FactoryFluids.GOLD.of(FluidConstants.NUGGET), OutputStack.of(Items.GOLD_NUGGET, 0.9f, 1)),
-                            new Pair<>(FactoryFluids.COPPER.of(FluidConstants.NUGGET), OutputStack.of(FactoryItems.COPPER_NUGGET, 0.9f, 1)),
+                            new Pair<>(FactoryFluids.COPPER.of(FluidConstants.NUGGET), OutputStack.of(Items.COPPER_NUGGET, 0.9f, 1)),
                             new Pair<>(FactoryFluids.STEEL.of(FluidConstants.NUGGET), OutputStack.of(FactoryItems.STEEL_NUGGET, 0.9f, 1))
                     )) {
                         destructiveItemCreatingFluidInteraction(exporter, FactoryRegistries.FLUID_TYPES.getId(i).getPath() + "_" + FactoryRegistries.FLUID_TYPES.getId(s.getLeft().type()).getPath(),
@@ -1410,7 +1410,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 smelteryOreSet(FactoryFluids.GOLD, FactoryFluidConstants.GOLD_INGOT_MELTING, ItemTags.GOLD_ORES, Items.RAW_GOLD, Items.RAW_GOLD_BLOCK,
                         FactoryItems.CRUSHED_RAW_GOLD, Items.GOLD_INGOT, Items.GOLD_NUGGET, Items.GOLD_BLOCK, null);
                 smelteryOreSet(FactoryFluids.COPPER, FactoryFluidConstants.COPPER_INGOT_MELTING, ItemTags.COPPER_ORES, Items.RAW_COPPER, Items.RAW_COPPER_BLOCK,
-                        FactoryItems.CRUSHED_RAW_COPPER, Items.COPPER_INGOT, FactoryItems.COPPER_NUGGET, Items.COPPER_BLOCK, FactoryItems.COPPER_PLATE);
+                        FactoryItems.CRUSHED_RAW_COPPER, Items.COPPER_INGOT, Items.COPPER_NUGGET, Items.COPPER_BLOCK, FactoryItems.COPPER_PLATE);
 
 
                 of(exporter,
