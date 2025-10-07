@@ -109,14 +109,14 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
             }
             var rot = RotationUser.getRotation(world, pos);
             var speed = Math.min(rot.speed(), 1028f) * mult;
-            if (speed != 0) {
+            if (speed != 0 && !(entity instanceof ServerPlayerEntity)) {
                 var rotate = (float) (rot.isNegative() ? speed : -speed);
                 entity.setYaw(entity.getYaw() + rotate);
                 entity.setHeadYaw(entity.getHeadYaw() + rotate);
 
-                if (entity instanceof ServerPlayerEntity player) {
-                    player.networkHandler.requestTeleport(new EntityPosition(Vec3d.ZERO, Vec3d.ZERO, rotate, 0), EnumSet.allOf(PositionFlag.class));
-                }
+                //if (entity instanceof ServerPlayerEntity player) {
+                //    player.networkHandler.requestTeleport(new EntityPosition(Vec3d.ZERO, Vec3d.ZERO, rotate, 0), EnumSet.allOf(PositionFlag.class));
+                //}
             }
         }
     }

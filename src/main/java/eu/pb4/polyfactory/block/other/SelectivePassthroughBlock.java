@@ -72,11 +72,19 @@ public class SelectivePassthroughBlock extends Block implements FactoryBlock, Ba
     }
 
     @Override
+    protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity, EntityCollisionHandler handler, boolean bl) {
+        if (entity.getType().isIn(FactoryEntityTags.GRID_PASSABLE)) {
+            entity.getDataTracker().set(EntityTrackedData.SILENT, entity.isSilent(), true);
+        }
+        super.onEntityCollision(state, world, pos, entity, handler, bl);
+    }
+
+
+    @Deprecated(forRemoval = true)
     protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity, EntityCollisionHandler handler) {
         if (entity.getType().isIn(FactoryEntityTags.GRID_PASSABLE)) {
             entity.getDataTracker().set(EntityTrackedData.SILENT, entity.isSilent(), true);
         }
-        super.onEntityCollision(state, world, pos, entity, handler);
     }
 
     @Override
