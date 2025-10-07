@@ -1,5 +1,6 @@
 - Updated to 1.21.10:
   - There was slight breakage in Vanilla, which wouldn't crash but break some blocks collision effects.
   - This version will still be compatible with 1.21.9 with correct behaviour!
+  - Through it is not quarantined in the future.
 - Removed custom Copper Nugget (vanilla has it now). Old items will migrate to vanilla one.
 - Disabled the turntable rotation effect for players, as it bugged out.
