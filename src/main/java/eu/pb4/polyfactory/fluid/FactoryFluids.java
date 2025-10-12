@@ -173,6 +173,10 @@ public class FactoryFluids {
         FluidBehaviours.addItemToFluidLink(FactoryItems.HONEY_BUCKET, HONEY.defaultInstance());
         FluidBehaviours.addItemToFluidLink(Items.HONEY_BLOCK, HONEY.defaultInstance());
         FluidBehaviours.addItemToFluidLink(Items.HONEY_BOTTLE, HONEY.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(Items.IRON_INGOT, IRON.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(Items.GOLD_INGOT, GOLD.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(Items.COPPER_INGOT, COPPER.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(FactoryItems.STEEL_INGOT, STEEL.defaultInstance());
 
         Function<ItemStack, FluidInstance<?>> potionFunction = (stack) -> {
             var x = stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
