@@ -1,1 +1,3 @@
+- Portable Fluid Tank can now be filled with a Fauced
 - Using Iron/Gold/Copper/Steel Ingot on Filtered Pipe will set its filter to corresponding fluid.
+- Improved look of some items on shelves.

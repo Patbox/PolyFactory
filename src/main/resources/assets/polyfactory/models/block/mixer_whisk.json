@@ -103,6 +103,9 @@
 		},
 		"fixed": {
 			"scale": [0.5, 0.5, 0.5]
+		},
+		"on_shelf": {
+			"rotation": [ 0, 180, 0 ]
 		}
 	},
 	"groups": [

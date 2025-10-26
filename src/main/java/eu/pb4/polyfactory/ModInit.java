@@ -89,6 +89,7 @@ public class ModInit implements ModInitializer {
 		ResourcePackExtras.forDefault().addBridgedModelsFolder(id("sgui"), ((identifier, builder) -> {
 			return  new ItemAsset(new BasicItemModel(identifier),  new ItemAsset.Properties(false, true));
 		}));
+		
 		ResourcePackExtras.forDefault().addBridgedModelsFolder(id("sgui/elements/numbers"), ((identifier, builder) -> {
 			return  new ItemAsset(new BasicItemModel(identifier, List.of(new DyeTintSource(0xFFFFFF))), new ItemAsset.Properties(false, true));
 		}));

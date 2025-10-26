@@ -4,6 +4,8 @@ import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.fluids.FluidOutput;
+import eu.pb4.polyfactory.block.fluids.PortableFluidTankBlock;
+import eu.pb4.polyfactory.block.fluids.PortableFluidTankBlockEntity;
 import eu.pb4.polyfactory.block.fluids.transport.PipeConnectable;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;
@@ -168,10 +170,14 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
             return ActionResult.PASS;
         }
 
-        if (world.getBlockEntity(pos.down()) instanceof CastingTableBlockEntity be) {
+        var downBe = world.getBlockEntity(pos.down());
+        var downState = world.getBlockState(pos.down());
+        if (downBe instanceof CastingTableBlockEntity be) {
             return be.activate(output, rate);
-        } else if (world.getBlockState(pos.down()).isOf(Blocks.CAULDRON)) {
+        } else if (downState.isOf(Blocks.CAULDRON)) {
             return FactoryBlocks.CASTING_CAULDRON.tryCauldronCasting((ServerWorld) world, pos.down(), output, rate);
+        } else if (downBe instanceof PortableFluidTankBlockEntity be && downState.get(PortableFluidTankBlock.FACING) == Direction.UP) {
+            return be.activate(output, rate);
         }
         return ActionResult.PASS;
     }
@@ -255,8 +261,8 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         }
 
         @Override
-        public void extract(FluidStack<?> fluid) {
-            output.extractFluid(fluid.instance(), fluid.amount(), direction, true);
+        public void extract(FluidInstance<?> fluid, long amount) {
+            output.extractFluid(fluid, amount, direction, true);
         }
 
         @Override
@@ -284,10 +290,10 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         }
 
         @Override
-        public void extract(FluidStack<?> fluid) {
+        public void extract(FluidInstance<?> fluid, long amount) {
             var output = getOutput();
             if (output != null) {
-                output.extractFluid(fluid.instance(), fluid.amount(), direction, true);
+                output.extractFluid(fluid, amount, direction, true);
             }
         }
 
@@ -311,7 +317,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         }
 
         @Override
-        public void extract(FluidStack<?> fluidStacks) {
+        public void extract(FluidInstance<?> fluid, long amount) {
 
         }
 
@@ -335,7 +341,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
             }
 
             @Override
-            public void extract(FluidStack<?> fluidStacks) {
+            public void extract(FluidInstance<?> fluid, long amount) {
 
             }
 
@@ -354,7 +360,10 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
 
         boolean isValid();
 
-        void extract(FluidStack<?> fluidStacks);
+        default void extract(FluidStack<?> fluidStacks) {
+            this.extract(fluidStacks.instance(), fluidStacks.amount());
+        }
+        void extract(FluidInstance<?> fluid, long amount);
 
         void setActiveFluid(@Nullable FluidInstance<?> fluid);
 
