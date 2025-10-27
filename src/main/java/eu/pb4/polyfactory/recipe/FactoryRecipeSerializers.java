@@ -10,6 +10,8 @@ import eu.pb4.polyfactory.recipe.drain.PotionRemoveDrainRecipe;
 import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
 import eu.pb4.polyfactory.recipe.fluid.RemovingFluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.fluid.SimpleFluidInteractionRecipe;
+import eu.pb4.polyfactory.recipe.grinding.SimpleGrindingRecipe;
+import eu.pb4.polyfactory.recipe.grinding.StrippingGrindingRecipe;
 import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
 import eu.pb4.polyfactory.recipe.spout.*;
 import eu.pb4.polyfactory.recipe.mixing.*;
@@ -25,8 +27,11 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.Codecs;
 
+import static eu.pb4.polyfactory.ModInit.id;
+
 public class FactoryRecipeSerializers {
-    public static final LazyRecipeSerializer<GrindingRecipe> GRINDING = register("grinding", GrindingRecipe.CODEC);
+    public static final LazyRecipeSerializer<SimpleGrindingRecipe> GRINDING_SIMPLE = register("grinding/simple", SimpleGrindingRecipe.CODEC);
+    public static final LazyRecipeSerializer<StrippingGrindingRecipe> GRINDING_STRIPPING = register("grinding/stripping", StrippingGrindingRecipe.CODEC);
     public static final LazyRecipeSerializer<GenericPressRecipe> PRESS_GENERIC = register("press/generic", GenericPressRecipe.CODEC);
     public static final LazyRecipeSerializer<ColoringMixingRecipe> MIXING_COLORING = register("mixing/coloring", ColoringMixingRecipe.CODEC);
 
@@ -62,7 +67,7 @@ public class FactoryRecipeSerializers {
     public static final LazyRecipeSerializer<RemovingFluidInteractionRecipe> FLUID_INTERACTION_REMOVING = register("fluid_interaction/removing", RemovingFluidInteractionRecipe.CODEC);
 
     public static void register() {
-
+        Registries.RECIPE_SERIALIZER.addAlias(id("grinding"), id("grinding/simple"));
     }
 
     public static <T extends RecipeSerializer<?>> T register(String path, T recipeSerializer) {

@@ -20,11 +20,9 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.FurnaceOutputSlot;
 import net.minecraft.screen.slot.Slot;
@@ -122,7 +120,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
             self.state = INCORRECT_ITEMS_TEXT;
             return;
         }
-        var input = new GrindingInput(self.stacks.get(0));
+        var input = new GrindingInput(self.stacks.getFirst().copy());
         if (self.currentItem == null || !stack.isOf(self.currentItem)) {
             self.process = 0;
             self.speedScale = 0;
@@ -138,23 +136,15 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
         self.active = true;
         assert self.currentRecipe != null;
 
-        if (self.process >= self.currentRecipe.value().grindTime()) {
+        if (self.process >= self.currentRecipe.value().grindTime(input)) {
             // Check space
             {
-                var items = new ArrayList<ItemStack>();
-
-                for (var out : self.currentRecipe.value().output()) {
-                    for (int a = 0; a < out.roll(); a++) {
-                        items.add(out.stack().copy());
-                    }
-                }
-
                 var inv = new SimpleInventory(3);
                 for (int i = 0; i < 3; i++) {
                     inv.setStack(i, self.getStack(i + 1).copy());
                 }
 
-                for (var item : items) {
+                for (var item : self.currentRecipe.value().output(input, world.getRegistryManager(), null)) {
                     FactoryUtil.tryInsertingInv(inv, item, null);
 
                     if (!item.isEmpty()) {
@@ -173,19 +163,17 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
             self.process = 0;
             stack.decrement(1);
 
-            for (var out : self.currentRecipe.value().output()) {
-                for (int a = 0; a < out.roll(); a++) {
-                    if (world.random.nextFloat() < out.chance()) {
-                        FactoryUtil.insertBetween(self, 1, 4, out.stack().copy());
-                    }
-                }
+            ;
+
+            for (var out : self.currentRecipe.value().output(input, world.getRegistryManager(), world.random)) {
+                FactoryUtil.insertBetween(self, 1, 4, out.copy());
             }
 
             self.markDirty();
         } else {
-            var d = Math.max(self.currentRecipe.value().optimalSpeed() - self.currentRecipe.value().minimumSpeed(), 1);
+            var d = Math.max(self.currentRecipe.value().optimalSpeed(input) - self.currentRecipe.value().minimumSpeed(input), 1);
             var rot = RotationUser.getRotation((ServerWorld) world, pos);
-            var speed = Math.min(Math.max(Math.abs(rot.speed()) - self.currentRecipe.value().minimumSpeed(), 0), d) / d / 20;
+            var speed = Math.min(Math.max(Math.abs(rot.speed()) - self.currentRecipe.value().minimumSpeed(input), 0), d) / d / 20;
             self.speedScale = speed;
             if (speed > 0) {
                 if (world.getTime() % MathHelper.clamp(Math.round(1 / speed), 2, 5) == 0) {
@@ -213,10 +201,12 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
 
     public double getStress() {
         if (this.active) {
+            var input = new GrindingInput(this.stacks.getFirst());
+
             return this.currentRecipe != null ?
-                    MathHelper.clamp(this.currentRecipe.value().optimalSpeed() * 0.7 * this.speedScale,
-                            this.currentRecipe.value().minimumSpeed() * 0.7,
-                            this.currentRecipe.value().optimalSpeed() * 0.7
+                    MathHelper.clamp(this.currentRecipe.value().optimalSpeed(input) * 0.7 * this.speedScale,
+                            this.currentRecipe.value().minimumSpeed(input) * 0.7,
+                            this.currentRecipe.value().optimalSpeed(input) * 0.7
                     ) : 1;
         }
         return 0;
@@ -243,7 +233,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
 
         private float progress() {
             return GrinderBlockEntity.this.currentRecipe != null
-                    ? (float) MathHelper.clamp(GrinderBlockEntity.this.process / GrinderBlockEntity.this.currentRecipe.value().grindTime(), 0, 1)
+                    ? (float) MathHelper.clamp(GrinderBlockEntity.this.process / GrinderBlockEntity.this.currentRecipe.value().grindTime(new GrindingInput(GrinderBlockEntity.this.stacks.getFirst())), 0, 1)
                     : 0;
         }
 

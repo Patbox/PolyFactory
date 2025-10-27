@@ -19,13 +19,12 @@ import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.polydex.pages.*;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
-import eu.pb4.polyfactory.recipe.ColoringCraftingRecipe;
-import eu.pb4.polyfactory.recipe.CraftingWithLeftoverRecipe;
-import eu.pb4.polyfactory.recipe.GrindingRecipe;
+import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.factorytools.api.recipe.OutputStack;
-import eu.pb4.polyfactory.recipe.ShapelessNbtCopyRecipe;
 import eu.pb4.polyfactory.recipe.casting.SimpleCastingRecipe;
 import eu.pb4.polyfactory.recipe.casting.SimpleCauldronCastingRecipe;
+import eu.pb4.polyfactory.recipe.grinding.SimpleGrindingRecipe;
+import eu.pb4.polyfactory.recipe.grinding.StrippingGrindingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.TransformMixingRecipe;
 import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
 import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
@@ -73,7 +72,8 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(GenericMixingRecipe.class, GenericMixerRecipePage::new);
         PolydexPage.registerRecipeViewer(TransformMixingRecipe.class, TransformMixerRecipePage::new);
         PolydexPage.registerRecipeViewer(BrewingMixingRecipe.class, BrewingMixerRecipePage::new);
-        PolydexPage.registerRecipeViewer(GrindingRecipe.class, GrindingRecipePage::new);
+        PolydexPage.registerRecipeViewer(SimpleGrindingRecipe.class, SimpleGrindingRecipePage::new);
+        PolydexPage.registerRecipeViewer(StrippingGrindingRecipe.class, StrippingGrindingRecipePage::new);
         PolydexPage.registerRecipeViewer(ColoringCraftingRecipe.class, ColoringCraftingRecipePage::new);
         //noinspection unchecked
         PolydexPage.registerRecipeViewer(ShapelessNbtCopyRecipe.class, (x) -> new ShapelessCraftingRecipePage((RecipeEntry<ShapelessRecipe>) (Object) x));
