@@ -161,7 +161,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         if (this.player == null) {
             var profile = this.owner == null ? FactoryUtil.GENERIC_PROFILE : this.owner;
 
-            this.player = new MinerPlayer(StackReference.of(this, 0), (ServerWorld) this.world, this.pos,
+            this.player = new MinerPlayer(StackReference.of(this::getStack, this::setStack), (ServerWorld) this.world, this.pos,
                     new GameProfile(profile.id(), "Miner (" + profile.name() + ")"));
             this.player.setPos(this.pos.getX() + 0.5, this.pos.getY() + 0.5f, this.pos.getZ() + 0.5f);
         }
@@ -365,7 +365,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         }
 
         public void setLastAttackedTicks(int tick) {
-            this.lastAttackedTicks = tick;
+            this.ticksSinceLastAttack = tick;
         }
     }
 }

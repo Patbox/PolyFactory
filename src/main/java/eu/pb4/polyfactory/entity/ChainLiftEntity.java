@@ -43,6 +43,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -83,7 +84,7 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
     private boolean canCatchEntities = true;
     private boolean playerControllable = true;
 
-    private static final TrackedData<Quaternionf> ROTATION = DataTracker.registerData(ChainLiftEntity.class, TrackedDataHandlerRegistry.QUATERNION_F);
+    private static final TrackedData<Quaternionfc> ROTATION = DataTracker.registerData(ChainLiftEntity.class, TrackedDataHandlerRegistry.QUATERNION_F);
 
     public ChainLiftEntity(EntityType<?> entityType, World world) {
         super(entityType, world);

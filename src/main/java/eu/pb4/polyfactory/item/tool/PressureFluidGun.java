@@ -152,7 +152,7 @@ public class PressureFluidGun extends Item implements PolymerItem {
             for (int i = 0; i < player.getInventory().getMainStacks().size(); i++) {
                 var fluid = player.getInventory().getStack(i).getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
                 if (!fluid.isEmpty()) {
-                    stacks.add(FluidContainerFromComponent.of(StackReference.of(player.getInventory(), i)));
+                    stacks.add(FluidContainerFromComponent.of(player.getInventory().getStackReference(i)));
                 }
             }
         }

@@ -137,7 +137,7 @@ public interface FluidContainerUtil {
         for (var fluid : recipe.fluidOutput(input)) {
             container.insert(fluid, false);
         }
-        player.playSoundToPlayer(recipe.soundEvent().value(), SoundCategory.BLOCKS, 0.5f, 1f);
+        FactoryUtil.playSoundToPlayer(player,recipe.soundEvent().value(), SoundCategory.BLOCKS, 0.5f, 1f);
         return itemOut;
     }
 

@@ -376,11 +376,11 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
                 var locked = MCrafterBlockEntity.this.lockedSlots.get(slot);
                 if (locked) {
                     MCrafterBlockEntity.this.lockedSlots.set(slot, false);
-                    player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.4f, 1);
+                    FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.4f, 1);
                     return true;
                 } else if (MCrafterBlockEntity.this.getStack(slot).isEmpty() && this.getPlayer().currentScreenHandler.getCursorStack().isEmpty()) {
                     MCrafterBlockEntity.this.lockedSlots.set(slot, true);
-                    player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.4f, 0.75f);
+                    FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.4f, 0.75f);
                     return true;
                 }
             }

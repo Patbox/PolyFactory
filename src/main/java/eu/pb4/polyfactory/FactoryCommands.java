@@ -9,6 +9,8 @@ import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polymer.virtualentity.impl.HolderHolder;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.command.permission.LeveledPermissionPredicate;
+import net.minecraft.command.permission.PermissionChecks;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
@@ -34,7 +36,7 @@ public class FactoryCommands {
                 //.executes(FactoryCommands::about)
                 .then(literal("wiki").executes(FactoryCommands::wiki))
                 .then(literal("debug")
-                        .requires((x) -> x.hasPermissionLevel(3))
+                        .requires(CommandManager.requirePermissionLevel(CommandManager.GAMEMASTERS_CHECK))
                         .then(literal("list_models").executes(FactoryCommands::listModels))
                         .then(literal("enable_lod")
                                 .then(argument("enable", BoolArgumentType.bool())

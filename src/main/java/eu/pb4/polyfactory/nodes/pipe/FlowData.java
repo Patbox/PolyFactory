@@ -6,6 +6,7 @@ import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.*;
 import com.kneelawk.graphlib.api.util.LinkPos;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.mixin.SimpleBlockGraphAccessor;
 import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
 import eu.pb4.polyfactory.nodes.DirectionNode;
@@ -39,7 +40,7 @@ public class FlowData implements GraphEntity<FlowData> {
             arr[dir.ordinal()] = preference;
         }
     });
-    public static final Codec<FlowData> CODEC = Codec.unit(FlowData::new);
+    public static final Codec<FlowData> CODEC = MapCodec.unit(FlowData::new).codec();
     public static final GraphEntityType<FlowData> TYPE = GraphEntityType.of(id("flow_data"), CODEC, FlowData::new, FlowData::split);
     public static FlowData EMPTY = new FlowData() {
         @Override

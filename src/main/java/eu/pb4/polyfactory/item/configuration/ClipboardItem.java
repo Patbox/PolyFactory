@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.type.TooltipDisplayComponent;
@@ -38,7 +39,7 @@ public class ClipboardItem extends SimplePolymerItem {
 
         if (data != null && user.shouldCancelInteraction()) {
             user.getStackInHand(hand).set(FactoryDataComponents.CONFIGURATION_DATA, null);
-            user.playSoundToPlayer(FactorySoundEvents.ITEM_CLIPBOARD_WRITE, SoundCategory.PLAYERS, 1, 1);
+            FactoryUtil.playSoundToPlayer(user, FactorySoundEvents.ITEM_CLIPBOARD_WRITE, SoundCategory.PLAYERS, 1, 1);
             return ActionResult.SUCCESS_SERVER;
         }
 
@@ -76,7 +77,7 @@ public class ClipboardItem extends SimplePolymerItem {
             }
 
             context.getStack().set(FactoryDataComponents.CONFIGURATION_DATA, new ConfigurationData(entries));
-            player.playSoundToPlayer(FactorySoundEvents.ITEM_CLIPBOARD_WRITE, SoundCategory.PLAYERS, 1, 1);
+            FactoryUtil.playSoundToPlayer(player,FactorySoundEvents.ITEM_CLIPBOARD_WRITE, SoundCategory.PLAYERS, 1, 1);
             return ActionResult.SUCCESS_SERVER;
         } else {
             var success = false;
@@ -95,7 +96,7 @@ public class ClipboardItem extends SimplePolymerItem {
             }
 
             if (success) {
-                player.playSoundToPlayer(FactorySoundEvents.ITEM_CLIPBOARD_APPLY, SoundCategory.PLAYERS, 1, 1);
+                FactoryUtil.playSoundToPlayer(player,FactorySoundEvents.ITEM_CLIPBOARD_APPLY, SoundCategory.PLAYERS, 1, 1);
                 return ActionResult.SUCCESS_SERVER;
             } else  {
                 return ActionResult.FAIL;

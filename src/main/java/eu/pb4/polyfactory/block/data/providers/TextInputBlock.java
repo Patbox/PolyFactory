@@ -5,6 +5,7 @@ import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.data.BasicDataType;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
 import it.unimi.dsi.fastutil.objects.ReferenceSortedSets;
 import net.minecraft.block.Block;
@@ -66,7 +67,7 @@ public class TextInputBlock extends OrientableCabledDataProviderBlock {
             this.setTitle(GuiTextures.TEXT_INPUT.apply(blockEntity.getDisplayName()));
             this.updateDone();
             this.setSlot(2, GuiTextures.BUTTON_CLOSE.get().setName(ScreenTexts.BACK).setCallback(x -> {
-                player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
+                FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
                 this.close();
             }));
             this.open();
@@ -85,7 +86,7 @@ public class TextInputBlock extends OrientableCabledDataProviderBlock {
             var data = this.blockEntity.getCachedState().get(MODE).parse(this.getInput());
             if (data != null) {
                 this.setSlot(1, GuiTextures.BUTTON_DONE.get().setName(ScreenTexts.DONE).setCallback(x -> {
-                    player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
+                    FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
                     DataProvider.sendData(blockEntity.getWorld(), blockEntity.getPos(), data);
                     this.close();
                 }));

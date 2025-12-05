@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polyfactory.util.inventory.MinimalInventory;
 import eu.pb4.polyfactory.util.storage.FilteredRedirectedSlottedStorage;
@@ -112,7 +113,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
                     public ClickCallback getGuiCallback() {
                         return (i1, clickType, slotActionType, slotGuiInterface) -> {
                             new SetSlotGui(player, Gui.this, index);
-                            player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
+                            FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
                         };
                     }
                 });
@@ -149,7 +150,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
             this.setDefaultInputValue(gui.be.slotTargets[slot] == -1 ? "" : String.valueOf(gui.be.slotTargets[slot]));
             this.updateDone();
             this.setSlot(2, GuiTextures.BUTTON_CLOSE.get().setName(ScreenTexts.BACK).setCallback(x -> {
-                player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
+                FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
                 this.close(true);
                 this.gui.open();
             }));
@@ -179,7 +180,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
             if (targetSlot > -2 && targetSlot < 100) {
                 int finalTargetSlot = targetSlot;
                 this.setSlot(1, GuiTextures.BUTTON_DONE.get().setName(ScreenTexts.DONE).setCallback(x -> {
-                    player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
+                    FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
                     this.gui.be.slotTargets[this.slot] = finalTargetSlot;
                     this.close(true);
                     this.gui.open();

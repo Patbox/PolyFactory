@@ -31,6 +31,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 
 import java.util.function.Function;
 
@@ -44,9 +45,9 @@ public class FactoryFluids {
                     .build());
     public static final FluidType<Unit> LAVA = register(Identifier.ofVanilla("lava"),
             FluidType.of().density(1000).fluid(Fluids.LAVA).brightness(15).heat(BlockHeat.LAVA)
-                    .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
+                    .flowSpeedMultiplier(((world, data) -> world != null && world.getEnvironmentAttributes().getAttributeValue(EnvironmentAttributes.FAST_LAVA_GAMEPLAY) ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
-                    .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
+                    .maxFlow(((world, data) -> world != null && world.getEnvironmentAttributes().getAttributeValue(EnvironmentAttributes.FAST_LAVA_GAMEPLAY) ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     public static final FluidType<Unit> MILK = register(Identifier.ofVanilla("milk"),
             FluidType.of().density(200).flowSpeedMultiplier(0.95)
@@ -63,31 +64,31 @@ public class FactoryFluids {
     public static final FluidType<Unit> IRON = register(Identifier.ofVanilla("iron"),
             FluidType.of().density(1005).brightness(15).heat(BlockHeat.LAVA)
                     .solidTexture(id("block/fluid/iron_solid"))
-                    .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
+                    .flowSpeedMultiplier(((world, data) -> world != null && world.getEnvironmentAttributes().getAttributeValue(EnvironmentAttributes.FAST_LAVA_GAMEPLAY) ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
-                    .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
+                    .maxFlow(((world, data) -> world != null && world.getEnvironmentAttributes().getAttributeValue(EnvironmentAttributes.FAST_LAVA_GAMEPLAY) ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
 
     public static final FluidType<Unit> STEEL = register(id("steel"),
             FluidType.of().density(1007).brightness(15).heat(BlockHeat.LAVA)
                     .solidTexture(id("block/fluid/steel_solid"))
-                    .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
+                    .flowSpeedMultiplier(((world, data) -> world != null && world.getEnvironmentAttributes().getAttributeValue(EnvironmentAttributes.FAST_LAVA_GAMEPLAY) ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
-                    .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
+                    .maxFlow(((world, data) -> world != null && world.getEnvironmentAttributes().getAttributeValue(EnvironmentAttributes.FAST_LAVA_GAMEPLAY) ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
 
 
     public static final FluidType<Unit> GOLD = register(Identifier.ofVanilla("gold"),
             FluidType.of().density(1010).brightness(15).heat(BlockHeat.LAVA)
                     .solidTexture(id("block/fluid/gold_solid"))
-                    .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
+                    .flowSpeedMultiplier(((world, data) -> world != null && world.getEnvironmentAttributes().getAttributeValue(EnvironmentAttributes.FAST_LAVA_GAMEPLAY) ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
-                    .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
+                    .maxFlow(((world, data) -> world != null && world.getEnvironmentAttributes().getAttributeValue(EnvironmentAttributes.FAST_LAVA_GAMEPLAY) ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
 
     public static final FluidType<Unit> COPPER = register(Identifier.ofVanilla("copper"),
             FluidType.of().density(1000).brightness(15).heat(BlockHeat.LAVA)
                     .solidTexture(id("block/fluid/copper_solid"))
-                    .flowSpeedMultiplier(((world, data) -> world != null && world.getDimension().ultrawarm() ? 1 : 0.5))
+                    .flowSpeedMultiplier(((world, data) -> world != null && world.getEnvironmentAttributes().getAttributeValue(EnvironmentAttributes.FAST_LAVA_GAMEPLAY) ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
-                    .maxFlow(((world, data) -> world != null && world.getDimension().ultrawarm() ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
+                    .maxFlow(((world, data) -> world != null && world.getEnvironmentAttributes().getAttributeValue(EnvironmentAttributes.FAST_LAVA_GAMEPLAY) ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
     public static final FluidType<Unit> EXPERIENCE = register(Identifier.ofVanilla("experience"),
             FluidType.of().density(50).flowSpeedMultiplier(1.3).maxFlow(FluidConstants.BOTTLE * 2).brightness(14).heat(BlockHeat.EXPERIENCE)
                     .shootingBehavior(new ShootProjectileEntity<>((world, fluid, amount) -> {

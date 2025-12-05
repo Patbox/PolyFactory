@@ -152,7 +152,7 @@ public class FanBlockEntity extends BlockEntity {
                     }
                 }
             } else {
-                entity.velocityModified = true;
+                entity.knockedBack = true;
             }
         }
     }

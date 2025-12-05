@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.PredicateLimitedSlot;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
@@ -145,7 +146,7 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
             player.giveOrDropStack(stack);
         }
 
-        player.playSoundToPlayer(SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.5f, 1);
+        FactoryUtil.playSoundToPlayer(player,SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.5f, 1);
         TriggerCriterion.trigger(player, FactoryTriggers.CRAFT_WITH_BLUEPRINT_WORKBENCH);
         player.swingHand(Hand.MAIN_HAND, true);
     }

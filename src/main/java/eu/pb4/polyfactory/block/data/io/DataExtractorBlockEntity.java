@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.DataType;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
 import it.unimi.dsi.fastutil.objects.ReferenceSortedSets;
@@ -80,7 +81,7 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
             this.setDefaultInputValue(blockEntity.field);
             this.updateDone();
             this.setSlot(2, GuiTextures.BUTTON_CLOSE.get().setName(ScreenTexts.BACK).setCallback(x -> {
-                player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
+                FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
                 this.close();
             }));
             this.open();
@@ -98,7 +99,7 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
 
         private void updateDone() {
             this.setSlot(1, GuiTextures.BUTTON_DONE.get().setName(ScreenTexts.DONE).setCallback(x -> {
-                player.playSoundToPlayer(SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
+                FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
                 this.blockEntity.setField(this.getInput());
                 var b = ((DataExtractorBlock) this.blockEntity.getCachedState().getBlock());
                 b.sendData(this.blockEntity.world, this.blockEntity.getCachedState().get(DataExtractorBlock.FACING_OUTPUT), this.blockEntity.getPos(), this.blockEntity.lastInput());

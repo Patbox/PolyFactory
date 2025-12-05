@@ -14,6 +14,7 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
 import eu.pb4.sidebars.api.Sidebar;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
@@ -313,7 +314,7 @@ public class WrenchHandler {
                 if (action.value().setValue(newValue, world, pos, side, state)) {
                     this.pos = null;
                     TriggerCriterion.trigger(player, FactoryTriggers.WRENCH);
-                    player.playSoundToPlayer(FactorySoundEvents.ITEM_WRENCH_USE, SoundCategory.PLAYERS, 0.3f, player.getRandom().nextFloat() * 0.1f + 0.95f);
+                    FactoryUtil.playSoundToPlayer(player,FactorySoundEvents.ITEM_WRENCH_USE, SoundCategory.PLAYERS, 0.3f, player.getRandom().nextFloat() * 0.1f + 0.95f);
                     return ActionResult.SUCCESS_SERVER;
                 }
                 return ActionResult.CONSUME;
@@ -356,7 +357,7 @@ public class WrenchHandler {
 
         if (foundCurrent) {
             this.currentAction.put(state.getBlock(), player.isSneaking() ? previousAction : nextAction);
-            player.playSoundToPlayer(FactorySoundEvents.ITEM_WRENCH_SWITCH, SoundCategory.PLAYERS, 0.3f, 1f);
+            FactoryUtil.playSoundToPlayer(player,FactorySoundEvents.ITEM_WRENCH_SWITCH, SoundCategory.PLAYERS, 0.3f, 1f);
             this.pos = null;
         }
     }
@@ -382,7 +383,7 @@ public class WrenchHandler {
                 if (action.value().setValue(newValue, entity, pos)) {
                     this.entity = null;
                     TriggerCriterion.trigger(player, FactoryTriggers.WRENCH);
-                    player.playSoundToPlayer(FactorySoundEvents.ITEM_WRENCH_USE, SoundCategory.PLAYERS, 0.3f, player.getRandom().nextFloat() * 0.1f + 0.95f);
+                    FactoryUtil.playSoundToPlayer(player,FactorySoundEvents.ITEM_WRENCH_USE, SoundCategory.PLAYERS, 0.3f, player.getRandom().nextFloat() * 0.1f + 0.95f);
                     return ActionResult.SUCCESS_SERVER;
                 }
                 return ActionResult.FAIL;
@@ -424,7 +425,7 @@ public class WrenchHandler {
 
         if (foundCurrent) {
             this.currentAction.put(entity.getType(), player.isSneaking() ? previousAction : nextAction);
-            player.playSoundToPlayer(FactorySoundEvents.ITEM_WRENCH_SWITCH, SoundCategory.PLAYERS, 0.3f, 1f);
+            FactoryUtil.playSoundToPlayer(player,FactorySoundEvents.ITEM_WRENCH_SWITCH, SoundCategory.PLAYERS, 0.3f, 1f);
             this.entity = null;
         }
     }

@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.item.tool;
 
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.SimpleColoredItem;
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
@@ -40,8 +41,8 @@ public class WirelessRedstoneTransmitterItem extends Item implements SimpleColor
 
         if (x != null && world instanceof ServerWorld serverWorld) {
             WirelessRedstoneBlock.send(serverWorld, user.getBlockPos(), 20, x.getFirst(), x.getSecond());
-            user.playSoundToPlayer(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1.5f);
-            user.playSoundToPlayer(SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_OFF, SoundCategory.PLAYERS, 1f, 1.4f);
+            FactoryUtil.playSoundToPlayer(user, SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1.5f);
+            FactoryUtil.playSoundToPlayer(user, SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_OFF, SoundCategory.PLAYERS, 1f, 1.4f);
             return ActionResult.SUCCESS_SERVER;
         }
 

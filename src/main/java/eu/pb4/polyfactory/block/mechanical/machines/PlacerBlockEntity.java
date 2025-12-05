@@ -274,7 +274,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         if (this.player == null) {
             var profile = this.owner == null ? FactoryUtil.GENERIC_PROFILE : this.owner;
 
-            this.player = new FactoryPlayer(StackReference.of(this, 0), (ServerWorld) this.world, this.pos,
+            this.player = new FactoryPlayer(StackReference.of(this::getStack, this::setStack), (ServerWorld) this.world, this.pos,
                     new GameProfile(profile.id(), "Placer (" + profile.name() + ")")) {
                 @Override
                 public double getEyeY() {
