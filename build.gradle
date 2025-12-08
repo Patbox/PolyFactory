@@ -88,9 +88,9 @@ dependencies {
 	modImplementation include('eu.pb4:common-protection-api:1.0.0')
 	modImplementation include('eu.pb4:sidebar-api:0.5.1+1.21.1')
 	modImplementation include('eu.pb4:sgui:1.11.0+1.21.9')
-	modImplementation include('eu.pb4:factorytools:0.8.2+1.21.10')
+	modImplementation include('eu.pb4:factorytools:0.9.0+1.21.11')
 	//modImplementation include('com.kneelawk.graphlib:graphlib-core-fabric:2.0.3-beta.1+1.21.5')
-	modImplementation include('com.kneelawk.graphlib:graphlib-core-fabric:2.0.3-beta.0.patbox.test+1.21.9')
+	modImplementation include('com.kneelawk.graphlib:graphlib-core-fabric:2.0.3-beta.0.patbox+1.21.11')
 
 	// Temp hack to allow development
 	//modImplementation include('com.kneelawk:graphlib:1.99.99+1.20.local')
