@@ -44,7 +44,7 @@ public interface BlockConfigValue<T> {
     }
 
     static <T extends Comparable<T>> BlockConfigValue<T> ofProperty(Property<T> property) {
-        return ofPropertyCustom(property, (propertyx, value, world, pos, side, state) -> state.withIfExists(propertyx, value));
+        return ofPropertyCustom(property, (StateProvider<T>) (propertyx, value, world, pos, side, state) -> state.withIfExists(propertyx, value));
     }
 
     static <T extends Comparable<T>> BlockConfigValue<T> ofPropertyCustom(Property<T> property, StateProvider<T> provider) {
