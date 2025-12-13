@@ -69,7 +69,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
     @Override
     public void readData(ReadView view) {
-        this.stack = view.read("tool", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        this.stack = view.read("stack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         this.process = view.getDouble("progress", 0);
         view.read("owner", NbtCompound.CODEC).ifPresent(x -> this.owner = LegacyNbtHelper.toGameProfile(x));
 
