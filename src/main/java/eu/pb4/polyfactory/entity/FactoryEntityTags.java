@@ -1,13 +1,13 @@
 package eu.pb4.polyfactory.entity;
 
 import eu.pb4.polyfactory.ModInit;
-import net.minecraft.entity.EntityType;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
 
 public class FactoryEntityTags {
     public static final TagKey<EntityType<?>> GRID_PASSABLE = of("grid_passable");
 
     private static TagKey<EntityType<?>> of(String path) {
-        return TagKey.of(RegistryKeys.ENTITY_TYPE, ModInit.id(path));
+        return TagKey.create(Registries.ENTITY_TYPE, ModInit.id(path));
     }}

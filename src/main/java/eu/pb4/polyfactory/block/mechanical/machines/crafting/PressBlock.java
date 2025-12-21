@@ -10,57 +10,54 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
-import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
+import eu.pb4.polyfactory.util.movingitem.MovingItemContainerHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 public class PressBlock extends TallItemMachineBlock {
-    public PressBlock(Settings settings) {
+    public PressBlock(Properties settings) {
         super(settings);
         Model.MODEL_PISTON.isEmpty();
     }
 
     @Override
-    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
-        if (self.getBlockState().get(INPUT_FACING) == pushDirection || self.getBlockState().get(PART) == Part.TOP) {
+    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainerHolder conveyor) {
+        if (self.getBlockState().getValue(INPUT_FACING) == pushDirection || self.getBlockState().getValue(PART) == Part.TOP) {
             return false;
         }
 
         var be = (PressBlockEntity) self.getBlockEntity();
 
-        if (self.getBlockState().get(INPUT_FACING).getOpposite() != pushDirection) {
-            var stack = be.getStack(1);
+        if (self.getBlockState().getValue(INPUT_FACING).getOpposite() != pushDirection) {
+            var stack = be.getItem(1);
             if (stack.isEmpty()) {
-                be.setStack(1, conveyor.pullAndDestroy().get());
+                be.setItem(1, conveyor.pullAndDestroy().get());
                 return true;
             }
 
             var container = conveyor.getContainer();
 
-            if (ItemStack.areItemsAndComponentsEqual(container.get(), stack)) {
-                var i = Math.min(container.get().getCount(), stack.getMaxCount() - stack.getCount());
-                stack.increment(i);
-                container.get().decrement(i);
+            if (ItemStack.isSameItemSameComponents(container.get(), stack)) {
+                var i = Math.min(container.get().getCount(), stack.getMaxStackSize() - stack.getCount());
+                stack.grow(i);
+                container.get().shrink(i);
             }
 
             if (container.get().isEmpty()) {
@@ -78,12 +75,12 @@ public class PressBlock extends TallItemMachineBlock {
             var targetStack = container.getContainer().get();
             var sourceStack = conveyor.getContainer().get();
 
-            if (ItemStack.areItemsAndComponentsEqual(container.getContainer().get(), conveyor.getContainer().get())) {
+            if (ItemStack.isSameItemSameComponents(container.getContainer().get(), conveyor.getContainer().get())) {
                 var count = Math.min(targetStack.getCount() + sourceStack.getCount(), container.getMaxStackCount(sourceStack));
                 if (count != targetStack.getCount()) {
                     var dec = count - targetStack.getCount();
-                    targetStack.increment(dec);
-                    sourceStack.decrement(dec);
+                    targetStack.grow(dec);
+                    sourceStack.shrink(dec);
                 }
 
                 if (sourceStack.isEmpty()) {
@@ -96,9 +93,9 @@ public class PressBlock extends TallItemMachineBlock {
     }
 
     @Override
-    public void getItemFrom(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
-        var inputDir = self.getBlockState().get(INPUT_FACING);
-        if (!conveyor.isContainerEmpty() || pushDirection == inputDir || inputDir.getOpposite() != relative || self.getBlockState().get(PART) == Part.TOP) {
+    public void getItemFrom(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainerHolder conveyor) {
+        var inputDir = self.getBlockState().getValue(INPUT_FACING);
+        if (!conveyor.isContainerEmpty() || pushDirection == inputDir || inputDir.getOpposite() != relative || self.getBlockState().getValue(PART) == Part.TOP) {
             return;
         }
 
@@ -116,7 +113,7 @@ public class PressBlock extends TallItemMachineBlock {
         if (stack.getCount() == amount) {
             conveyor.pushAndAttach(out.pullAndRemove());
         } else {
-            stack.decrement(amount);
+            stack.shrink(amount);
             conveyor.setMovementPosition(pushDirection == inputDir.getOpposite() ? 0 : 0.5);
             conveyor.pushNew(stack.copyWithCount(amount));
         }
@@ -124,8 +121,8 @@ public class PressBlock extends TallItemMachineBlock {
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world instanceof ServerWorld && type == FactoryBlockEntities.PRESS ? PressBlockEntity::ticker : null;
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+        return world instanceof ServerLevel && type == FactoryBlockEntities.PRESS ? PressBlockEntity::ticker : null;
     }
 
     @Override
@@ -134,13 +131,13 @@ public class PressBlock extends TallItemMachineBlock {
     }
 
     @Override
-    protected ElementHolder createModel(ServerWorld serverWorld, BlockPos pos, BlockState initialBlockState) {
+    protected ElementHolder createModel(ServerLevel serverWorld, BlockPos pos, BlockState initialBlockState) {
         return new Model(serverWorld, initialBlockState);
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.ANVIL.getDefaultState();
+        return Blocks.ANVIL.defaultBlockState();
     }
 
     public static final class Model extends RotationAwareModel {
@@ -156,7 +153,7 @@ public class PressBlock extends TallItemMachineBlock {
 
         private float value;
 
-        private Model(ServerWorld world, BlockState state) {
+        private Model(ServerLevel world, BlockState state) {
             this.main = ItemDisplayElementUtil.createSimple(FactoryItems.PRESS);
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
@@ -170,8 +167,8 @@ public class PressBlock extends TallItemMachineBlock {
             this.gearB.setViewRange(0.4f);
 
             updateStatePos(state);
-            var dir = state.get(INPUT_FACING);
-            this.updateAnimation(true, true, 0, (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
+            var dir = state.getValue(INPUT_FACING);
+            this.updateAnimation(true, true, 0, (dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
             this.addElement(this.piston);
             this.addElement(this.pistonItem);
             this.addElement(this.main);
@@ -180,13 +177,13 @@ public class PressBlock extends TallItemMachineBlock {
         }
 
         private void updateStatePos(BlockState state) {
-            var direction = state.get(INPUT_FACING);
+            var direction = state.getValue(INPUT_FACING);
 
-            this.main.setYaw(direction.getPositiveHorizontalDegrees());
-            this.pistonItem.setYaw(direction.getPositiveHorizontalDegrees());
-            this.piston.setYaw(direction.getPositiveHorizontalDegrees());
-            this.gearA.setYaw(direction.getPositiveHorizontalDegrees());
-            this.gearB.setYaw(direction.getPositiveHorizontalDegrees());
+            this.main.setYaw(direction.toYRot());
+            this.pistonItem.setYaw(direction.toYRot());
+            this.piston.setYaw(direction.toYRot());
+            this.gearA.setYaw(direction.toYRot());
+            this.gearB.setYaw(direction.toYRot());
         }
 
         private void updateAnimation(boolean b, boolean c, float rotation, boolean negative) {
@@ -194,7 +191,7 @@ public class PressBlock extends TallItemMachineBlock {
             mat.translate(0, 0.5f, 0);
             if (b) {
                 mat.pushMatrix();
-                mat.rotateY(negative ? MathHelper.HALF_PI : -MathHelper.HALF_PI);
+                mat.rotateY(negative ? Mth.HALF_PI : -Mth.HALF_PI);
                 mat.translate(0, 0.5f, 0.40f);
                 mat.rotateZ(rotation);
                 this.gearA.setTransformation(mat);
@@ -210,7 +207,7 @@ public class PressBlock extends TallItemMachineBlock {
                 this.piston.setTransformation(mat);
                 mat.translate(0, -0.25f, 0);
                 mat.scale(0.2f);
-                mat.rotateX(MathHelper.HALF_PI);
+                mat.rotateX(Mth.HALF_PI);
                 this.pistonItem.setTransformation(mat);
             }
         }
@@ -220,12 +217,12 @@ public class PressBlock extends TallItemMachineBlock {
             var tick = this.getTick();
             var b = tick % this.getUpdateRate() == 0;
             var c = tick % 2 == 0;
-            var dir = this.blockState().get(INPUT_FACING);
+            var dir = this.blockState().getValue(INPUT_FACING);
 
 
             this.updateAnimation(b, c,
-                    b ? RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().up()).rotation() : 0,
-                    (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
+                    b ? RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().above()).rotation() : 0,
+                    (dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
 
             if (c) {
                 this.piston.startInterpolationIfDirty();

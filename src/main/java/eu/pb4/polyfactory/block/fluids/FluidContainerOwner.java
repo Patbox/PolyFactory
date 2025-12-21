@@ -3,8 +3,8 @@ package eu.pb4.polyfactory.block.fluids;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
 public interface FluidContainerOwner extends FilledStateProvider {
@@ -14,10 +14,10 @@ public interface FluidContainerOwner extends FilledStateProvider {
     @Nullable
     FluidContainer getMainFluidContainer();
     @Override
-    default Text getFilledStateText() {
+    default Component getFilledStateText() {
         var main = getMainFluidContainer();
         return main != null ?
-                Text.translatable("text.polyfactory.x_out_of_y", FactoryUtil.fluidTextGeneric(main.stored()), FactoryUtil.fluidTextGeneric(main.capacity()))
+                Component.translatable("text.polyfactory.x_out_of_y", FactoryUtil.fluidTextGeneric(main.stored()), FactoryUtil.fluidTextGeneric(main.capacity()))
                 : null;
     }
 

@@ -1,14 +1,14 @@
 package eu.pb4.polyfactory.block;
 
 import eu.pb4.polyfactory.other.FactoryBiomeTags;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.CampfireBlock;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 public final class BlockHeat {
     public static final float LAVA = 0.85f;
@@ -25,7 +25,7 @@ public final class BlockHeat {
     public static final float BIOME_REALLY_COLD = -0.15f;
     public static final float BIOME_COLD = -0.08f;
 
-    public static float get(World world, BlockPos pos) {
+    public static float get(Level world, BlockPos pos) {
         var x = forBlockState(world.getBlockState(pos));
         var y = forBiome(world.getBiome(pos));
 
@@ -43,33 +43,33 @@ public final class BlockHeat {
 
     }
 
-    public static float getReceived(World world, BlockPos pos) {
-        return get(world, pos.down());
+    public static float getReceived(Level world, BlockPos pos) {
+        return get(world, pos.below());
     }
     public static float forBlockState(BlockState state) {
-        if (state.isIn(BlockTags.CAMPFIRES) && state.get(CampfireBlock.LIT)) {
+        if (state.is(BlockTags.CAMPFIRES) && state.getValue(CampfireBlock.LIT)) {
             return CAMPFIRE;
-        } else if (state.isOf(Blocks.MAGMA_BLOCK)) {
+        } else if (state.is(Blocks.MAGMA_BLOCK)) {
             return MAGMA;
-        }  else if (state.isIn(BlockTags.FIRE)) {
+        }  else if (state.is(BlockTags.FIRE)) {
             return FIRE;
-        } else if (state.isOf(Blocks.LAVA)) {
+        } else if (state.is(Blocks.LAVA)) {
             return LAVA;
-        } else if (state.isOf(Blocks.TORCH)) {
+        } else if (state.is(Blocks.TORCH)) {
             return TORCH;
         } else {
             return NEUTRAL;
         }
     }
 
-    public static float forBiome(RegistryEntry<Biome> biome) {
-        if (biome.isIn(FactoryBiomeTags.TEMPERATURE_REALLY_HOT)) {
+    public static float forBiome(Holder<Biome> biome) {
+        if (biome.is(FactoryBiomeTags.TEMPERATURE_REALLY_HOT)) {
             return BIOME_REALLY_HOT;
-        } else if (biome.isIn(FactoryBiomeTags.TEMPERATURE_REALLY_COLD)) {
+        } else if (biome.is(FactoryBiomeTags.TEMPERATURE_REALLY_COLD)) {
             return BIOME_REALLY_COLD;
-        } else if (biome.isIn(FactoryBiomeTags.TEMPERATURE_HOT)) {
+        } else if (biome.is(FactoryBiomeTags.TEMPERATURE_HOT)) {
             return BIOME_HOT;
-        } else if (biome.isIn(FactoryBiomeTags.TEMPERATURE_COLD)) {
+        } else if (biome.is(FactoryBiomeTags.TEMPERATURE_COLD)) {
             return BIOME_COLD;
         } else {
             return NEUTRAL;

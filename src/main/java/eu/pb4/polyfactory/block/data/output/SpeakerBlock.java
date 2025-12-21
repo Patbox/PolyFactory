@@ -12,42 +12,42 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.enums.NoteBlockInstrument;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.phys.Vec3;
 
 public class SpeakerBlock extends DirectionalCabledDataBlock implements DataReceiver {
-    public SpeakerBlock(Settings settings) {
+    public SpeakerBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    public Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new SpeakerNode(state.get(FACING), getDirections(state), getChannel(world, pos)));
+    public Collection<BlockNode> createDataNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return List.of(new SpeakerNode(state.getValue(FACING), getDirections(state), getChannel(world, pos)));
     }
 
     @Override
-    public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
+    public boolean receiveData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
         if (data.isEmpty()) {
             return false;
         }
 
         final var x = BlockAwareAttachment.get(world, selfPos);
-        if (x == null || !(x.holder() instanceof Model model)) {
+        if (x == null || !(x.holder() instanceof eu.pb4.polyfactory.block.data.output.SpeakerBlock.Model model)) {
             return false;
         }
         if (data instanceof ListData listData) {
@@ -57,8 +57,8 @@ public class SpeakerBlock extends DirectionalCabledDataBlock implements DataRece
         }
     }
 
-    private boolean playNote(DataContainer data, Model model, BlockPos selfPos, BlockState selfState, ServerWorld world)  {
-        var soundEvent = Registries.SOUND_EVENT.getEntry(SoundEvents.INTENTIONALLY_EMPTY);
+    private boolean playNote(DataContainer data, eu.pb4.polyfactory.block.data.output.SpeakerBlock.Model model, BlockPos selfPos, BlockState selfState, ServerLevel world)  {
+        var soundEvent = BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.EMPTY);
         var volume = 1f;
         var pitch = 1f;
         var seed = 0L;
@@ -73,7 +73,7 @@ public class SpeakerBlock extends DirectionalCabledDataBlock implements DataRece
             if (parts.length != 0) {
                 try {
                     var instrument = NoteBlockInstrument.valueOf(parts[0].toUpperCase(Locale.ROOT));
-                    soundEvent = instrument.getSound();
+                    soundEvent = instrument.getSoundEvent();
                     notFound = false;
                     if (parts.length >= 2) {
                         try {
@@ -98,15 +98,15 @@ public class SpeakerBlock extends DirectionalCabledDataBlock implements DataRece
 
         model.playSound(soundEvent, Math.min(volume, 1.5f), pitch, seed);
 
-        var facing = Vec3d.ofCenter(selfPos).offset(selfState.get(FACING), 0.6);
-        world.spawnParticles(ParticleTypes.NOTE, facing.x, facing.y, facing.z, 0, pitch / 24, 0, 0, 1);
+        var facing = Vec3.atCenterOf(selfPos).relative(selfState.getValue(FACING), 0.6);
+        world.sendParticles(ParticleTypes.NOTE, facing.x, facing.y, facing.z, 0, pitch / 24, 0, 0, 1);
 
         return true;
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(initialBlockState);
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
+        return new eu.pb4.polyfactory.block.data.output.SpeakerBlock.Model(initialBlockState);
     }
 
     public static class Model extends DirectionalCabledDataBlock.Model {
@@ -122,12 +122,12 @@ public class SpeakerBlock extends DirectionalCabledDataBlock implements DataRece
         protected void updateStatePos(BlockState state) {
             super.updateStatePos(state);
             if (this.soundSource != null) {
-                this.soundSource.setOffset(state.get(FACING).getDoubleVector().multiply(0.5));
+                this.soundSource.setOffset(state.getValue(FACING).getUnitVec3().scale(0.5));
             }
         }
 
-        public void playSound(RegistryEntry<SoundEvent> sound, float volume, float pitch, long seed) {
-            this.sendPacket(VirtualEntityUtils.createPlaySoundFromEntityPacket(this.soundSource.getEntityId(), sound, SoundCategory.RECORDS, volume, pitch, seed));
+        public void playSound(Holder<SoundEvent> sound, float volume, float pitch, long seed) {
+            this.sendPacket(VirtualEntityUtils.createPlaySoundFromEntityPacket(this.soundSource.getEntityId(), sound, SoundSource.RECORDS, volume, pitch, seed));
         }
     }
 }

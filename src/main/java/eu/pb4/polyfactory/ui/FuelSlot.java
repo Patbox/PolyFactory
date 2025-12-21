@@ -1,28 +1,28 @@
 package eu.pb4.polyfactory.ui;
 
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.FuelRegistry;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.entity.FuelValues;
 
 public class FuelSlot extends Slot {
-    private final FuelRegistry fuelRegistry;
+    private final FuelValues fuelRegistry;
 
-    public FuelSlot(Inventory inventory, int index, FuelRegistry fuelRegistry) {
+    public FuelSlot(Container inventory, int index, FuelValues fuelRegistry) {
         super(inventory, index, index, 0);
         this.fuelRegistry = fuelRegistry;
     }
 
-    public boolean canInsert(ItemStack stack) {
+    public boolean mayPlace(ItemStack stack) {
         return fuelRegistry.isFuel(stack) || isBucket(stack);
     }
 
-    public int getMaxItemCount(ItemStack stack) {
-        return isBucket(stack) ? 1 : super.getMaxItemCount(stack);
+    public int getMaxStackSize(ItemStack stack) {
+        return isBucket(stack) ? 1 : super.getMaxStackSize(stack);
     }
 
     public static boolean isBucket(ItemStack stack) {
-        return stack.isOf(Items.BUCKET);
+        return stack.is(Items.BUCKET);
     }
 }

@@ -1,9 +1,9 @@
 package eu.pb4.polyfactory.item.util;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Hand;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 
 public interface SwitchActionItem {
-    boolean onSwitchAction(ServerPlayerEntity player, ItemStack main, Hand mainHand);
+    boolean onSwitchAction(ServerPlayer player, ItemStack main, InteractionHand mainHand);
 }

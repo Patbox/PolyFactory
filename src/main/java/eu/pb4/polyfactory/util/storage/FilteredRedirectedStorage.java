@@ -6,9 +6,9 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.TransferVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -17,13 +17,13 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class FilteredRedirectedStorage<T extends TransferVariant<?>> implements Storage<T>, RedirectingStorage {
-    private final Supplier<World> world;
+    private final Supplier<Level> world;
     private final Supplier<BlockPos> pos;
     private final Supplier<Direction> direction;
     private final BlockApiLookup<Storage<T>, Direction> lookup;
     private final Predicate<T> predicate;
 
-    public FilteredRedirectedStorage(BlockApiLookup<Storage<T>, @Nullable Direction> lookup, Supplier<World> world, Supplier<BlockPos> pos, Supplier<Direction> direction, Predicate<T> predicate) {
+    public FilteredRedirectedStorage(BlockApiLookup<Storage<T>, @Nullable Direction> lookup, Supplier<Level> world, Supplier<BlockPos> pos, Supplier<Direction> direction, Predicate<T> predicate) {
         this.lookup = lookup;
         this.world = world;
         this.pos = pos;
@@ -34,7 +34,7 @@ public class FilteredRedirectedStorage<T extends TransferVariant<?>> implements 
     @Nullable
     public Storage<T> getTargetStorage() {
         var dir = direction.get();
-        var storage = this.lookup.find(world.get(), pos.get().offset(dir), dir.getOpposite());
+        var storage = this.lookup.find(world.get(), pos.get().relative(dir), dir.getOpposite());
 
         return storage instanceof RedirectingStorage ? null : storage;
     }

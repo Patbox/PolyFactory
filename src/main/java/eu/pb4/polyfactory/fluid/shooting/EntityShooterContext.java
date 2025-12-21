@@ -1,42 +1,41 @@
 package eu.pb4.polyfactory.fluid.shooting;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-
 import java.util.UUID;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 
 public record EntityShooterContext(LivingEntity entity) implements ShooterContext {
     @Override
-    public Random random() {
+    public RandomSource random() {
         return entity.getRandom();
     }
 
     @Override
-    public ServerWorld world() {
-        return (ServerWorld) entity.getEntityWorld();
+    public ServerLevel world() {
+        return (ServerLevel) entity.level();
     }
 
     @Override
     public UUID uuid() {
-        return entity.getUuid();
+        return entity.getUUID();
     }
 
     @Override
-    public Vec3d position() {
-        return entity.getEyePos().add(entity.getMovement()).subtract(0, 0.1, 0).add(rotation().multiply(0.5));
+    public Vec3 position() {
+        return entity.getEyePosition().add(entity.getKnownMovement()).subtract(0, 0.1, 0).add(rotation().scale(0.5));
     }
 
     @Override
-    public Vec3d rotation() {
-        return entity.getRotationVecClient();
+    public Vec3 rotation() {
+        return entity.getForward();
     }
 
     @Override
-    public SoundCategory soundCategory() {
-        return entity.getSoundCategory();
+    public SoundSource soundCategory() {
+        return entity.getSoundSource();
     }
 
     @Override

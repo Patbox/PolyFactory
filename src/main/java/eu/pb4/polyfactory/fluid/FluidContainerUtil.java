@@ -1,11 +1,9 @@
 package eu.pb4.polyfactory.fluid;
 
-import eu.pb4.factorytools.api.advancement.TriggerCriterion;
-import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.item.tool.UniversalFluidContainerItem;
-import eu.pb4.polyfactory.mixin.ServerRecipeManagerAccessor;
+import eu.pb4.polyfactory.mixin.RecipeManagerAccessor;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.DrainInput;
 import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
@@ -14,23 +12,19 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.ChatFormatting;
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -38,14 +32,14 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public interface FluidContainerUtil {
-    static void tick(FluidContainer container, ServerWorld world, BlockPos pos, float temperature, Consumer<ItemStack> stack) {
-        tick(container, world, Vec3d.ofCenter(pos), temperature, stack);
+    static void tick(FluidContainer container, ServerLevel world, BlockPos pos, float temperature, Consumer<ItemStack> stack) {
+        tick(container, world, Vec3.atCenterOf(pos), temperature, stack);
     }
-    static void tick(FluidContainer container, ServerWorld world, Vec3d pos, float temperature, Consumer<ItemStack> stackConsumer) {
+    static void tick(FluidContainer container, ServerLevel world, Vec3 pos, float temperature, Consumer<ItemStack> stackConsumer) {
         var input = FluidContainerInput.of(container, temperature);
         var random = world.random;
-        var list = new ArrayList<Pair<RegistryKey<Recipe<?>>, List<ItemStack>>>();
-        for (var entry : ((ServerRecipeManagerAccessor) world.getRecipeManager()).getPreparedRecipes().getAll(FactoryRecipeTypes.FLUID_INTERACTION)) {
+        var list = new ArrayList<Tuple<ResourceKey<Recipe<?>>, List<ItemStack>>>();
+        for (var entry : ((RecipeManagerAccessor) world.recipeAccess()).getRecipes().byType(FactoryRecipeTypes.FLUID_INTERACTION)) {
             var recipe = entry.value();
             if (!entry.value().matches(input, world)) {
                 continue;
@@ -53,16 +47,16 @@ public interface FluidContainerUtil {
             if (recipe.particleChance(input) < random.nextFloat()) {
                 var particle = recipe.particle(input, random);
                 if (particle != null) {
-                    world.spawnParticles(particle, pos.getX(), pos.getY(), pos.getZ(), 0, 0.1, 0.1, 0.1, 0.1);
+                    world.sendParticles(particle, pos.x(), pos.y(), pos.z(), 0, 0.1, 0.1, 0.1, 0.1);
                 }
                 var sound = recipe.soundEvent(input, random);
                 if (sound != null) {
-                    world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), sound, SoundCategory.BLOCKS, 1, 1);
+                    world.playSound(null, pos.x(), pos.y(), pos.z(), sound, SoundSource.BLOCKS, 1, 1);
                 }
             }
-            var inputFluids = recipe.fluidInput(input, world.getRegistryManager());
-            var outputFluids = recipe.fluidOutput(input, world.getRegistryManager());
-            var outputItems = recipe.itemOutput(input, world.getRegistryManager());
+            var inputFluids = recipe.fluidInput(input, world.registryAccess());
+            var outputFluids = recipe.fluidOutput(input, world.registryAccess());
+            var outputItems = recipe.itemOutput(input, world.registryAccess());
 
             var item = new ArrayList<ItemStack>();
             for (var i = 0; i < recipe.maxApplyPerTick(); i++) {
@@ -89,17 +83,17 @@ public interface FluidContainerUtil {
                 }
             }
 
-            list.add(new Pair<>(entry.id(), item));
+            list.add(new Tuple<>(entry.id(), item));
         }
 
-        if (!list.isEmpty() && FactoryUtil.getClosestPlayer(world, BlockPos.ofFloored(pos), 16) instanceof ServerPlayerEntity serverPlayer) {
+        if (!list.isEmpty() && FactoryUtil.getClosestPlayer(world, BlockPos.containing(pos), 16) instanceof ServerPlayer serverPlayer) {
             for (var entry : list) {
-                Criteria.RECIPE_CRAFTED.trigger(serverPlayer, entry.getLeft(), entry.getRight());
+                CriteriaTriggers.RECIPE_CRAFTED.trigger(serverPlayer, entry.getA(), entry.getB());
             }
         }
     }
 
-    static ItemStack interactWith(FluidContainer container, ServerPlayerEntity player, ItemStack stack) {
+    static ItemStack interactWith(FluidContainer container, ServerPlayer player, ItemStack stack) {
         if (stack.getItem() instanceof UniversalFluidContainerItem item) {
             var mode = stack.getOrDefault(FactoryDataComponents.FLUID_INTERACTION_MODE, FluidInteractionMode.EXTRACT);
             var fluids = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
@@ -124,20 +118,20 @@ public interface FluidContainerUtil {
 
         var copy = stack.copy();
         var input = DrainInput.of(copy, ItemStack.EMPTY, container, !(player instanceof FakePlayer));
-        var optional = player.getEntityWorld().getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, player.getEntityWorld());
+        var optional = player.level().recipeAccess().getRecipeFor(FactoryRecipeTypes.DRAIN, input, player.level());
         if (optional.isEmpty()) {
             return null;
         }
         var recipe = optional.get().value();
-        var itemOut = recipe.craft(input, player.getRegistryManager());
+        var itemOut = recipe.assemble(input, player.registryAccess());
         for (var fluid : recipe.fluidInput(input)) {
             container.extract(fluid, false);
         }
-        stack.decrementUnlessCreative(1, player);
+        stack.consume(1, player);
         for (var fluid : recipe.fluidOutput(input)) {
             container.insert(fluid, false);
         }
-        FactoryUtil.playSoundToPlayer(player,recipe.soundEvent().value(), SoundCategory.BLOCKS, 0.5f, 1f);
+        FactoryUtil.playSoundToPlayer(player,recipe.soundEvent().value(), SoundSource.BLOCKS, 0.5f, 1f);
         return itemOut;
     }
 
@@ -149,20 +143,20 @@ public interface FluidContainerUtil {
             @Override
             public ClickCallback getGuiCallback() {
                 return interactable ? (index, type, action, gui) -> {
-                    var handler = gui.getPlayer().currentScreenHandler;
-                    var out = interactWith(container, gui.getPlayer(), handler.getCursorStack());
+                    var handler = gui.getPlayer().containerMenu;
+                    var out = interactWith(container, gui.getPlayer(), handler.getCarried());
                     if (out == null) {
                         return;
                     }
-                    if (handler.getCursorStack().isEmpty()) {
-                        handler.setCursorStack(out);
+                    if (handler.getCarried().isEmpty()) {
+                        handler.setCarried(out);
                     } else if (!out.isEmpty()) {
                         if (gui.getPlayer().isCreative()) {
                             if (!gui.getPlayer().getInventory().contains(out)) {
-                                gui.getPlayer().getInventory().insertStack(out);
+                                gui.getPlayer().getInventory().add(out);
                             }
                         } else {
-                            gui.getPlayer().getInventory().offerOrDrop(out);
+                            gui.getPlayer().getInventory().placeItemBackInInventory(out);
                         }
                     }
                 } : GuiElementInterface.EMPTY_CALLBACK;
@@ -171,10 +165,10 @@ public interface FluidContainerUtil {
             @Override
             public ItemStack getItemStack() {
                 var b = GuiTextures.EMPTY_BUILDER.get()
-                        .setName(Text.empty().append(FactoryUtil.fluidTextGeneric(container.stored())).append(" / ").append(FactoryUtil.fluidTextGeneric(container.capacity())));
+                        .setName(Component.empty().append(FactoryUtil.fluidTextGeneric(container.stored())).append(" / ").append(FactoryUtil.fluidTextGeneric(container.capacity())));
 
                 container.forEachReversed((type, amount) -> {
-                    b.addLoreLine(type.toLabeledAmount(amount).setStyle(Style.EMPTY.withColor(Formatting.GRAY).withItalic(false)));
+                    b.addLoreLine(type.toLabeledAmount(amount).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY).withItalic(false)));
                 });
                 return b.asStack();
             }

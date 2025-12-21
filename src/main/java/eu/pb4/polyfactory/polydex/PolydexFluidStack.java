@@ -5,9 +5,9 @@ import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 
 public class PolydexFluidStack implements PolydexStack<FluidInstance<?>> {
     private final FluidInstance<?> fluid;
@@ -41,7 +41,7 @@ public class PolydexFluidStack implements PolydexStack<FluidInstance<?>> {
         return this.amount != 0;
     }
 
-    public Text getName() {
+    public Component getName() {
         return this.fluid.getName();
     }
 
@@ -50,12 +50,12 @@ public class PolydexFluidStack implements PolydexStack<FluidInstance<?>> {
         return (Class<FluidInstance<?>>) this.fluid.getClass();
     }
 
-    public ItemStack toItemStack(ServerPlayerEntity player) {
+    public ItemStack toItemStack(ServerPlayer player) {
         return GuiElementBuilder.from(FactoryModels.FLUID_FLAT_FULL.get(this.fluid)).hideDefaultTooltip().setName(this.fluid.getName()).asStack();
     }
 
     @Override
-    public ItemStack toDisplayItemStack(ServerPlayerEntity player) {
+    public ItemStack toDisplayItemStack(ServerPlayer player) {
         if (this.amount == 0) {
             return toItemStack(player);
         }

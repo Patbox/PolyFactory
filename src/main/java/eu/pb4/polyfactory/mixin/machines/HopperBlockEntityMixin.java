@@ -6,20 +6,18 @@ import eu.pb4.polyfactory.models.HopperModel;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.block.entity.LootableContainerBlockEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -29,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(HopperBlockEntity.class)
-public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntity implements FilteredBlockEntity, CustomBlockEntityCalls {
+public abstract class HopperBlockEntityMixin extends RandomizableContainerBlockEntity implements FilteredBlockEntity, CustomBlockEntityCalls {
     @Unique
     private ItemStack filterStack = ItemStack.EMPTY;
     @Unique
@@ -42,20 +40,20 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
         super(blockEntityType, blockPos, blockState);
     }
 
-    @Inject(method = "writeData", at = @At("TAIL"))
-    private void writeFilterNbt(WriteView view, CallbackInfo ci) {
+    @Inject(method = "saveAdditional", at = @At("TAIL"))
+    private void writeFilterNbt(ValueOutput view, CallbackInfo ci) {
         if (!this.filterStack.isEmpty()) {
-            view.put("polyfactory:filter", ItemStack.CODEC, this.filterStack);
+            view.store("polyfactory:filter", ItemStack.CODEC, this.filterStack);
         }
     }
 
-    @Inject(method = "readData", at = @At("TAIL"))
-    private void readFilterNbt(ReadView view, CallbackInfo ci) {
+    @Inject(method = "loadAdditional", at = @At("TAIL"))
+    private void readFilterNbt(ValueInput view, CallbackInfo ci) {
         polyfactory$setFilter(view.read("polyfactory:filter", ItemStack.OPTIONAL_CODEC).orElse(view.read("polydex:filter", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY)));
     }
 
-    @Inject(method = "transfer(Lnet/minecraft/inventory/Inventory;Lnet/minecraft/inventory/Inventory;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/math/Direction;)Lnet/minecraft/item/ItemStack;", at = @At("HEAD"), cancellable = true)
-    private static void cancelUnfiltered(Inventory from, Inventory to, ItemStack stack, Direction side, CallbackInfoReturnable<ItemStack> cir) {
+    @Inject(method = "addItem(Lnet/minecraft/world/Container;Lnet/minecraft/world/Container;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/core/Direction;)Lnet/minecraft/world/item/ItemStack;", at = @At("HEAD"), cancellable = true)
+    private static void cancelUnfiltered(Container from, Container to, ItemStack stack, Direction side, CallbackInfoReturnable<ItemStack> cir) {
         if (to instanceof FilteredBlockEntity filteredHopper) {
             if (!filteredHopper.polyfactory$matchesFilter(stack)) {
                 cir.setReturnValue(stack);
@@ -63,8 +61,8 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
         }
     }
 
-    @Inject(method = "canExtract", at = @At("HEAD"), cancellable = true)
-    private static void cancelUnfiltered2(Inventory hopperInventory, Inventory fromInventory, ItemStack stack, int slot, Direction facing, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "canTakeItemFromContainer", at = @At("HEAD"), cancellable = true)
+    private static void cancelUnfiltered2(Container hopperInventory, Container fromInventory, ItemStack stack, int slot, Direction facing, CallbackInfoReturnable<Boolean> cir) {
         if (hopperInventory instanceof FilteredBlockEntity filteredHopper) {
             if (!filteredHopper.polyfactory$matchesFilter(stack)) {
                 cir.setReturnValue(false);
@@ -72,8 +70,8 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
         }
     }
 
-    @Inject(method = "serverTick", at = @At("HEAD"))
-    private static void setupModel(World world, BlockPos pos, BlockState state, HopperBlockEntity blockEntity, CallbackInfo ci) {
+    @Inject(method = "pushItemsTick", at = @At("HEAD"))
+    private static void setupModel(Level world, BlockPos pos, BlockState state, HopperBlockEntity blockEntity, CallbackInfo ci) {
         var self = (HopperBlockEntityMixin) (Object) blockEntity;
         if (self.model == null && !self.filterStack.isEmpty()) {
             self.createModel();
@@ -114,17 +112,17 @@ public abstract class HopperBlockEntityMixin extends LootableContainerBlockEntit
             this.model.setFilter(this.filter);
             this.model.tick();
         }
-        this.markDirty();
+        this.setChanged();
     }
 
     @Unique
     private void createModel() {
-        if (!(this.world instanceof ServerWorld serverWorld)) {
+        if (!(this.level instanceof ServerLevel serverWorld)) {
             return;
         }
-        var model = new HopperModel(this.getCachedState());
+        var model = new HopperModel(this.getBlockState());
         model.setFilter(this.filter);
-        ChunkAttachment.of(model, serverWorld, this.pos);
+        ChunkAttachment.of(model, serverWorld, this.worldPosition);
         this.model = model;
     }
 

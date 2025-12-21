@@ -12,20 +12,20 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentsAccess;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 public class PortableFluidTankBlockEntity extends BlockEntity implements FluidInputOutput.ContainerBased, BlockEntityExtraListener {
@@ -50,22 +50,22 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         this.container.writeData(view, "fluid");
     }
 
     @Override
-    protected void readData(ReadView view) {
-        super.readData(view);
+    protected void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
         this.container.readData(view, "fluid");
         if (this.model != null) {
             this.model.setFluid(this.container);
         }
     }
     @Override
-    public void readComponents(ComponentsAccess components) {
-        super.readComponents(components);
+    public void applyImplicitComponents(DataComponentGetter components) {
+        super.applyImplicitComponents(components);
         var f = components.get(FactoryDataComponents.FLUID);
         if (f != null) {
             this.container.clear();
@@ -74,19 +74,19 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
     }
 
     @Override
-    protected void addComponents(ComponentMap.Builder componentMapBuilder) {
-        super.addComponents(componentMapBuilder);
-        componentMapBuilder.add(FactoryDataComponents.FLUID, FluidComponent.copyFrom(this.container));
+    protected void collectImplicitComponents(DataComponentMap.Builder componentMapBuilder) {
+        super.collectImplicitComponents(componentMapBuilder);
+        componentMapBuilder.set(FactoryDataComponents.FLUID, FluidComponent.copyFrom(this.container));
     }
 
     @Override
-    public void removeFromCopiedStackData(WriteView view) {
-        super.removeFromCopiedStackData(view);
-        view.remove("fluid");
+    public void removeComponentsFromTag(ValueOutput view) {
+        super.removeComponentsFromTag(view);
+        view.discard("fluid");
     }
     @Override
     public FluidContainer getFluidContainer(Direction direction) {
-        return this.getCachedState().get(PortableFluidTankBlock.FACING) == direction ? this.container : null;
+        return this.getBlockState().getValue(PortableFluidTankBlock.FACING) == direction ? this.container : null;
     }
 
     @Override
@@ -95,14 +95,14 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
     }
 
     private void onFluidChanged() {
-        this.markDirty();
+        this.setChanged();
         if (this.model != null) {
             this.model.setFluid(this.container);
         }
     }
 
-    public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
-        if (!(t instanceof PortableFluidTankBlockEntity self) || (!(world instanceof ServerWorld serverWorld))) {
+    public static <T extends BlockEntity> void tick(Level world, BlockPos pos, BlockState state, T t) {
+        if (!(t instanceof PortableFluidTankBlockEntity self) || (!(world instanceof ServerLevel serverWorld))) {
             return;
         }
 
@@ -124,41 +124,41 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
             self.faucedProvider.extract(self.faucedFluid, amount);
             self.container.insert(self.faucedFluid, amount, false);
 
-            ((ServerWorld) world).spawnParticles(self.faucedFluid.particle(),
-                    pos.getX() + 0.5 + self.faucedProvider.direction().getOffsetX() / 32f,
+            ((ServerLevel) world).sendParticles(self.faucedFluid.particle(),
+                    pos.getX() + 0.5 + self.faucedProvider.direction().getStepX() / 32f,
                     pos.getY() + 1 + 4 / 16f,
-                    pos.getZ() + 0.5 + self.faucedProvider.direction().getOffsetZ() / 32f,
+                    pos.getZ() + 0.5 + self.faucedProvider.direction().getStepZ() / 32f,
                     0,
                     0, -1, 0, 0.1);
             return;
         }
 
         self.blockTemperature = BlockHeat.getReceived(world, pos) + self.container.fluidTemperature();
-        FluidContainerUtil.tick(self.container, (ServerWorld) world, pos, self.blockTemperature, self::dropItem);
+        FluidContainerUtil.tick(self.container, (ServerLevel) world, pos, self.blockTemperature, self::dropItem);
     }
 
     private void dropItem(ItemStack stack) {
-        ItemScatterer.spawn(world, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, stack);
+        Containers.dropItemStack(level, this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 0.5, this.worldPosition.getZ() + 0.5, stack);
     }
 
     @Override
-    public void onListenerUpdate(WorldChunk chunk) {
-        var x = BlockAwareAttachment.get(chunk, pos);
+    public void onListenerUpdate(LevelChunk chunk) {
+        var x = BlockAwareAttachment.get(chunk, worldPosition);
         if (x != null && x.holder() instanceof PortableFluidTankBlock.Model model) {
             this.model = model;
             this.model.setFluid(this.container);
         }
     }
 
-    public ActionResult activate(FaucedBlock.FaucedProvider provider, float rate) {
+    public InteractionResult activate(FaucedBlock.FaucedProvider provider, float rate) {
         if (!provider.isValid() || this.container.isFull() || provider.getFluidContainerInput().isEmpty()) {
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
         }
         if (this.faucedActivate && provider == this.faucedProvider) {
             this.faucedActivate = false;
             this.faucedProvider.setActiveFluid(null);
             this.faucedProvider = FaucedBlock.FaucedProvider.EMPTY;
-            return ActionResult.SUCCESS_SERVER;
+            return InteractionResult.SUCCESS_SERVER;
         }
 
         this.faucedProvider = provider;
@@ -173,6 +173,6 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
             }
         }
 
-        return ActionResult.SUCCESS_SERVER;
+        return InteractionResult.SUCCESS_SERVER;
     }
 }

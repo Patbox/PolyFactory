@@ -7,14 +7,12 @@ import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import net.minecraft.core.Direction;
 
 public record SmallGearNode(Direction.Axis axis) implements BlockNode {
     public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("small_gear"), Direction.Axis.CODEC.xmap(SmallGearNode::new, SmallGearNode::axis));
@@ -29,8 +27,8 @@ public record SmallGearNode(Direction.Axis axis) implements BlockNode {
         var list = new ArrayList<HalfLink>();
         for (var dir : Direction.values()) {
             if (dir.getAxis() != axis) {
-                FactoryNodes.findNodes(self, self.getBlockPos().offset(dir), (self2, other) -> other.getNode() instanceof SmallGearNode).forEach(list::add);
-                FactoryNodes.findNodes(self, self.getBlockPos().offset(dir).offset(dir.rotateClockwise(axis)), (self2, other) -> other.getNode() instanceof LargeGearNode).forEach(list::add);
+                FactoryNodes.findNodes(self, self.getBlockPos().relative(dir), (self2, other) -> other.getNode() instanceof SmallGearNode).forEach(list::add);
+                FactoryNodes.findNodes(self, self.getBlockPos().relative(dir).relative(dir.getClockWise(axis)), (self2, other) -> other.getNode() instanceof LargeGearNode).forEach(list::add);
             }
         }
 

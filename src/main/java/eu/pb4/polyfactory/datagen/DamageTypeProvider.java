@@ -4,23 +4,22 @@ import eu.pb4.polyfactory.other.FactoryDamageTypes;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricCodecDataProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.minecraft.entity.damage.DamageType;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.DamageTypeTags;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.damagesource.DamageType;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 public class DamageTypeProvider extends FabricCodecDataProvider<DamageType> {
-    protected DamageTypeProvider(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
-        super(dataOutput, registriesFuture, RegistryKeys.DAMAGE_TYPE, DamageType.CODEC);
+    protected DamageTypeProvider(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+        super(dataOutput, registriesFuture, Registries.DAMAGE_TYPE, DamageType.DIRECT_CODEC);
     }
 
     @Override
-    protected void configure(BiConsumer<Identifier, DamageType> provider, RegistryWrapper.WrapperLookup lookup) {
-        provider.accept(FactoryDamageTypes.EXPERIENCE_SPLASH.getValue(), new DamageType("polyfactory.experience_bolt", 0.1f));
+    protected void configure(BiConsumer<Identifier, DamageType> provider, HolderLookup.Provider lookup) {
+        provider.accept(FactoryDamageTypes.EXPERIENCE_SPLASH.identifier(), new DamageType("polyfactory.experience_bolt", 0.1f));
 
     }
 
@@ -30,12 +29,12 @@ public class DamageTypeProvider extends FabricCodecDataProvider<DamageType> {
     }
 
     public static class Tags extends FabricTagProvider<DamageType> {
-        public Tags(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
-            super(output, RegistryKeys.DAMAGE_TYPE, registriesFuture);
+        public Tags(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+            super(output, Registries.DAMAGE_TYPE, registriesFuture);
         }
 
         @Override
-        protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
+        protected void addTags(HolderLookup.Provider wrapperLookup) {
             this.builder(DamageTypeTags.BYPASSES_COOLDOWN)
                     .addOptional(FactoryDamageTypes.EXPERIENCE_SPLASH);
             this.builder(DamageTypeTags.BYPASSES_ARMOR)

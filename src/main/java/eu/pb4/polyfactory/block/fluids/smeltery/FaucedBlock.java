@@ -24,31 +24,31 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.TrapdoorBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsage;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.Util;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUtils;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.TrapDoorBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -58,154 +58,154 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedBlock, PipeConnectable {
-    public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
-    public static final BooleanProperty POWERED = Properties.POWERED;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
-    public FaucedBlock(Settings settings) {
+    public FaucedBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(POWERED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(POWERED, false));
     }
 
     @Override
-    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        if (!oldState.isOf(state.getBlock())) {
+    protected void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (!oldState.is(state.getBlock())) {
             this.updatePowered(world, pos, state);
         }
-        super.onBlockAdded(state, world, pos, oldState, notify);
+        super.onPlace(state, world, pos, oldState, notify);
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, @Nullable Orientation wireOrientation, boolean notify) {
         this.updatePowered(world, pos, state);
-        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
+        super.neighborChanged(state, world, pos, sourceBlock, wireOrientation, notify);
     }
 
-    private void updatePowered(World world, BlockPos pos, BlockState state) {
-        boolean powered = world.isReceivingRedstonePower(pos);
-        if (powered != state.get(POWERED)) {
-            world.setBlockState(pos, state.with(POWERED, powered), 4);
+    private void updatePowered(Level world, BlockPos pos, BlockState state) {
+        boolean powered = world.hasNeighborSignal(pos);
+        if (powered != state.getValue(POWERED)) {
+            world.setBlock(pos, state.setValue(POWERED, powered), 4);
             if (powered) {
-                world.scheduleBlockTick(pos, this, 1);
+                world.scheduleTick(pos, this, 1);
             }
         }
     }
 
 
     @Override
-    protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        super.scheduledTick(state, world, pos, random);
-        if (!state.get(POWERED)) {
+    protected void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+        super.tick(state, world, pos, random);
+        if (!state.getValue(POWERED)) {
             return;
         }
 
         this.activate(pos, state, world, 0.33f);
-        world.scheduleBlockTick(pos, this, 20);
+        world.scheduleTick(pos, this, 20);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         Direction dir;
-        if (ctx.getSide().getAxis() != Direction.Axis.Y) {
-            dir = ctx.getSide();
+        if (ctx.getClickedFace().getAxis() != Direction.Axis.Y) {
+            dir = ctx.getClickedFace();
         } else {
-            dir = ctx.getHorizontalPlayerFacing().getOpposite();
+            dir = ctx.getHorizontalDirection().getOpposite();
         }
 
-        return super.getPlacementState(ctx).with(FACING, dir);
+        return super.getStateForPlacement(ctx).setValue(FACING, dir);
     }
 
-    public static FaucedProvider getOutput(BlockState state, ServerWorld world, BlockPos pos) {
-        var sourcePos = pos.offset(state.get(FACING).getOpposite());
+    public static FaucedProvider getOutput(BlockState state, ServerLevel world, BlockPos pos) {
+        var sourcePos = pos.relative(state.getValue(FACING).getOpposite());
         var source = world.getBlockState(sourcePos);
         var model = (Model) (BlockAwareAttachment.get(world, pos) instanceof BlockAwareAttachment attachment ? attachment.holder() : null);
         if (source.getBlock() instanceof FluidOutput.Getter) {
-            return new DynamicProvider(model, state, pos, world, sourcePos, state.get(FACING));
+            return new DynamicProvider(model, state, pos, world, sourcePos, state.getValue(FACING));
         } else if (world.getBlockEntity(sourcePos) instanceof BlockEntity be && be instanceof FluidOutput output1) {
-            return new SimpleProvider(model, state, pos, world, be::isRemoved, output1, state.get(FACING));
+            return new SimpleProvider(model, state, pos, world, be::isRemoved, output1, state.getValue(FACING));
         } else {
-            return new ModelOnlyProvider(model, state.get(FACING));
+            return new ModelOnlyProvider(model, state.getValue(FACING));
         }
     }
 
     @Override
-    protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World worldx, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        var world = (ServerWorld) worldx;
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level worldx, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        var world = (ServerLevel) worldx;
         var output = getOutput(state, world, pos);
         if (!output.isValid()) {
-            return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+            return super.useItemOn(stack, state, world, pos, player, hand, hit);
         }
 
         var copy = stack.copy();
         var input = new DrainInput(copy, ItemStack.EMPTY, output.getFluidContainerInput(), !(player instanceof FakePlayer));
-        var optional = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, player.getEntityWorld());
+        var optional = world.recipeAccess().getRecipeFor(FactoryRecipeTypes.DRAIN, input, player.level());
         if (optional.isEmpty() || !optional.get().value().fluidOutput(input).isEmpty()) {
-            return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+            return super.useItemOn(stack, state, world, pos, player, hand, hit);
         }
 
         var recipe = optional.get().value();
-        var itemOut = recipe.craft(input, player.getRegistryManager());
+        var itemOut = recipe.assemble(input, player.registryAccess());
         for (var fluid : recipe.fluidInput(input)) {
             output.extract(fluid);
         }
-        ItemUsage.exchangeStack(stack, player, itemOut, false);
+        ItemUtils.createFilledResult(stack, player, itemOut, false);
 
-        FactoryUtil.playSoundToPlayer(player, recipe.soundEvent().value(), SoundCategory.BLOCKS, 0.5f, 1f);
+        FactoryUtil.playSoundToPlayer(player, recipe.soundEvent().value(), SoundSource.BLOCKS, 0.5f, 1f);
 
-        return ActionResult.SUCCESS_SERVER;
+        return InteractionResult.SUCCESS_SERVER;
     }
 
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (player.shouldCancelInteraction()) {
-            return ActionResult.PASS;
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (player.isSecondaryUseActive()) {
+            return InteractionResult.PASS;
         }
 
         return this.activate(pos, state, world, 1f);
     }
 
-    private ActionResult activate(BlockPos pos, BlockState state, World world, float rate) {
-        var output = getOutput(state, (ServerWorld) world, pos);
+    private InteractionResult activate(BlockPos pos, BlockState state, Level world, float rate) {
+        var output = getOutput(state, (ServerLevel) world, pos);
         if (!output.isValid()) {
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         }
 
-        var downBe = world.getBlockEntity(pos.down());
-        var downState = world.getBlockState(pos.down());
+        var downBe = world.getBlockEntity(pos.below());
+        var downState = world.getBlockState(pos.below());
         if (downBe instanceof CastingTableBlockEntity be) {
             return be.activate(output, rate);
-        } else if (downState.isOf(Blocks.CAULDRON)) {
-            return FactoryBlocks.CASTING_CAULDRON.tryCauldronCasting((ServerWorld) world, pos.down(), output, rate);
-        } else if (downBe instanceof PortableFluidTankBlockEntity be && downState.get(PortableFluidTankBlock.FACING) == Direction.UP) {
+        } else if (downState.is(Blocks.CAULDRON)) {
+            return FactoryBlocks.CASTING_CAULDRON.tryCauldronCasting((ServerLevel) world, pos.below(), output, rate);
+        } else if (downBe instanceof PortableFluidTankBlockEntity be && downState.getValue(PortableFluidTankBlock.FACING) == Direction.UP) {
             return be.activate(output, rate);
         }
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING, POWERED);
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(world, initialBlockState);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState blockState, PacketContext packetContext) {
-        return FactoryUtil.TRAPDOOR_REGULAR.get(blockState.get(FACING));
+        return FactoryUtil.TRAPDOOR_REGULAR.get(blockState.getValue(FACING));
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.COPPER_TRAPDOOR.getDefaultState().with(TrapdoorBlock.FACING, state.get(FACING)).with(TrapdoorBlock.OPEN, true);
+        return Blocks.COPPER_TRAPDOOR.defaultBlockState().setValue(TrapDoorBlock.FACING, state.getValue(FACING)).setValue(TrapDoorBlock.OPEN, true);
     }
 
     @Override
-    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
-        return state.get(FACING) == dir.getOpposite();
+    public boolean canPipeConnect(LevelReader world, BlockPos pos, BlockState state, Direction dir) {
+        return state.getValue(FACING) == dir.getOpposite();
     }
 
     public static final class Model extends RotationAwareModel {
@@ -213,7 +213,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         private final ItemDisplayElement fluid;
         private FluidInstance<?> fluidType;
 
-        private Model(ServerWorld world, BlockState state) {
+        private Model(ServerLevel world, BlockState state) {
             this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0, -5 / 16f));
@@ -227,9 +227,9 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         }
 
         private void updateStatePos(BlockState state) {
-            var direction = state.get(FACING);
-            this.main.setYaw(direction.getPositiveHorizontalDegrees());
-            this.fluid.setYaw(direction.getPositiveHorizontalDegrees());
+            var direction = state.getValue(FACING);
+            this.main.setYaw(direction.toYRot());
+            this.fluid.setYaw(direction.toYRot());
         }
 
         @Override
@@ -249,7 +249,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         }
     }
 
-    public record SimpleProvider(FaucedBlock.Model model, BlockState selfState, BlockPos faucedPos, ServerWorld world, BooleanSupplier removed, FluidOutput output, Direction direction) implements FaucedProvider {
+    public record SimpleProvider(FaucedBlock.Model model, BlockState selfState, BlockPos faucedPos, ServerLevel world, BooleanSupplier removed, FluidOutput output, Direction direction) implements FaucedProvider {
         @Override
         public FluidContainerInput getFluidContainerInput() {
             return output.getFluidContainerInput(direction);
@@ -273,7 +273,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         }
     }
 
-    public record DynamicProvider(FaucedBlock.Model model, BlockState selfState, BlockPos faucedPos, ServerWorld world, BlockPos sourcePos, Direction direction) implements FaucedProvider {
+    public record DynamicProvider(FaucedBlock.Model model, BlockState selfState, BlockPos faucedPos, ServerLevel world, BlockPos sourcePos, Direction direction) implements FaucedProvider {
         private FluidOutput getOutput() {
             return world.getBlockState(sourcePos).getBlock() instanceof FluidOutput.Getter getter ? getter.getFluidOutput(world, sourcePos, direction) : null;
         }

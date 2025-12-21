@@ -6,13 +6,11 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import eu.pb4.polyfactory.item.ArtificialDyeItem;
 import eu.pb4.polyfactory.item.FactoryItems;
-import net.minecraft.inventory.RecipeInputInventory;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.ArmorDyeRecipe;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.ArmorDyeRecipe;
+import net.minecraft.world.item.crafting.CraftingInput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -22,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ArmorDyeRecipe.class)
 public class ArmorDyeRecipeMixin {
     @SuppressWarnings("MixinAnnotationTarget")
-    @WrapOperation(method = "matches(Lnet/minecraft/recipe/input/CraftingRecipeInput;Lnet/minecraft/world/World;)Z",
+    @WrapOperation(method = "matches(Lnet/minecraft/world/item/crafting/CraftingInput;Lnet/minecraft/world/level/Level;)Z",
             constant = @Constant(classValue = DyeItem.class)
     )
     private boolean matchArtificialDye(Object obj, Operation<Boolean> original) {
@@ -30,11 +28,11 @@ public class ArmorDyeRecipeMixin {
     }
 
     @WrapOperation(
-            method = "craft(Lnet/minecraft/recipe/input/CraftingRecipeInput;Lnet/minecraft/registry/RegistryWrapper$WrapperLookup;)Lnet/minecraft/item/ItemStack;",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isEmpty()Z", ordinal = 0)
+            method = "assemble(Lnet/minecraft/world/item/crafting/CraftingInput;Lnet/minecraft/core/HolderLookup$Provider;)Lnet/minecraft/world/item/ItemStack;",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z", ordinal = 0)
     )
     private boolean captureArtificialDyes(ItemStack stack, Operation<Boolean> original) {
-        if (stack.isOf(FactoryItems.ARTIFICIAL_DYE)) {
+        if (stack.is(FactoryItems.ARTIFICIAL_DYE)) {
             ArtificialDyeItem.CURRENT_DYES.get().add(stack);
             return true;
         }
@@ -43,7 +41,7 @@ public class ArmorDyeRecipeMixin {
     }
 
     @ModifyExpressionValue(
-            method = "craft(Lnet/minecraft/recipe/input/CraftingRecipeInput;Lnet/minecraft/registry/RegistryWrapper$WrapperLookup;)Lnet/minecraft/item/ItemStack;",
+            method = "assemble(Lnet/minecraft/world/item/crafting/CraftingInput;Lnet/minecraft/core/HolderLookup$Provider;)Lnet/minecraft/world/item/ItemStack;",
             at = @At(value = "INVOKE", target = "Ljava/util/List;isEmpty()Z")
     )
     private boolean markNotEmpty(boolean value) {
@@ -55,10 +53,10 @@ public class ArmorDyeRecipeMixin {
     }
 
     @Inject(
-            method = "craft(Lnet/minecraft/recipe/input/CraftingRecipeInput;Lnet/minecraft/registry/RegistryWrapper$WrapperLookup;)Lnet/minecraft/item/ItemStack;",
+            method = "assemble(Lnet/minecraft/world/item/crafting/CraftingInput;Lnet/minecraft/core/HolderLookup$Provider;)Lnet/minecraft/world/item/ItemStack;",
             at = @At("RETURN")
     )
-    private void clearArtificialList(CraftingRecipeInput recipeInputInventory, RegistryWrapper.WrapperLookup wrapperLookup, CallbackInfoReturnable<ItemStack> cir) {
+    private void clearArtificialList(CraftingInput recipeInputInventory, HolderLookup.Provider wrapperLookup, CallbackInfoReturnable<ItemStack> cir) {
         ArtificialDyeItem.CURRENT_DYES.get().clear();
     }
 }

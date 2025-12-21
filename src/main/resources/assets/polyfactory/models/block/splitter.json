@@ -1,4 +1,5 @@
 {
+	"format_version": "1.21.6",
 	"credit": "Made with Blockbench",
 	"parent": "minecraft:block/block",
 	"ambientocclusion": false,
@@ -7,7 +8,6 @@
 		"1": "polyfactory:block/splitter_side_2",
 		"6": "polyfactory:block/splitter_side",
 		"7": "polyfactory:block/splitter_botom",
-		"missing": "polyfactory:block/empty",
 		"particle": "polyfactory:block/splitter_top"
 	},
 	"elements": [
@@ -19,7 +19,6 @@
 				"east": {"uv": [12, 5, 16, 16], "texture": "#1"},
 				"south": {"uv": [0, 5, 4, 16], "texture": "#1"},
 				"west": {"uv": [12, 5, 16, 16], "texture": "#1"},
-				"up": {"uv": [0, 1, 4, 5], "texture": "#missing"},
 				"down": {"uv": [0, 0, 4, 4], "texture": "#7"}
 			}
 		},
@@ -31,7 +30,6 @@
 				"east": {"uv": [12, 5, 16, 16], "texture": "#1"},
 				"south": {"uv": [0, 5, 4, 16], "texture": "#1"},
 				"west": {"uv": [12, 5, 16, 16], "texture": "#1"},
-				"up": {"uv": [12, 0, 16, 4], "texture": "#7"},
 				"down": {"uv": [12, 12, 16, 16], "texture": "#7"}
 			}
 		},
@@ -43,7 +41,6 @@
 				"east": {"uv": [0, 5, 4, 16], "texture": "#1"},
 				"south": {"uv": [12, 5, 16, 16], "texture": "#1"},
 				"west": {"uv": [0, 5, 4, 16], "texture": "#1"},
-				"up": {"uv": [12, 12, 16, 16], "texture": "#7"},
 				"down": {"uv": [12, 0, 16, 4], "texture": "#7"}
 			}
 		},
@@ -55,7 +52,6 @@
 				"east": {"uv": [0, 5, 4, 16], "texture": "#1"},
 				"south": {"uv": [12, 5, 16, 16], "texture": "#1"},
 				"west": {"uv": [0, 5, 4, 16], "texture": "#1"},
-				"up": {"uv": [12, 12, 16, 16], "texture": "#7"},
 				"down": {"uv": [0, 12, 4, 16], "texture": "#7"}
 			}
 		},
@@ -86,7 +82,7 @@
 			"scale": [0.4, 0.4, 0.4]
 		},
 		"firstperson_lefthand": {
-			"rotation": [0, 225, 0],
+			"rotation": [0, -135, 0],
 			"scale": [0.4, 0.4, 0.4]
 		},
 		"ground": {
@@ -94,7 +90,7 @@
 			"scale": [0.25, 0.25, 0.25]
 		},
 		"gui": {
-			"rotation": [30, 225, 0],
+			"rotation": [30, -135, 0],
 			"scale": [0.625, 0.625, 0.625]
 		},
 		"head": {
@@ -103,9 +99,6 @@
 		},
 		"fixed": {
 			"scale": [0.5, 0.5, 0.5]
-		},
-		"on_shelf": {
-			"rotation": [ 0, 180, 0 ]
 		}
 	}
 }

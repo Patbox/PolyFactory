@@ -1,12 +1,12 @@
 package eu.pb4.polyfactory.block.mechanical;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 public class RotationConstants {
-    public static final float MAX_ROTATION_PER_TICK_1 = MathHelper.PI / 1f - MathHelper.EPSILON;
-    public static final float MAX_ROTATION_PER_TICK_2 = MathHelper.PI / 2f - MathHelper.EPSILON;
-    public static final float MAX_ROTATION_PER_TICK_3 = MathHelper.PI / 3f - MathHelper.EPSILON;
-    public static final float MAX_ROTATION_PER_TICK_4 = MathHelper.PI / 4f - MathHelper.EPSILON;
+    public static final float MAX_ROTATION_PER_TICK_1 = Mth.PI / 1f - Mth.EPSILON;
+    public static final float MAX_ROTATION_PER_TICK_2 = Mth.PI / 2f - Mth.EPSILON;
+    public static final float MAX_ROTATION_PER_TICK_3 = Mth.PI / 3f - Mth.EPSILON;
+    public static final float MAX_ROTATION_PER_TICK_4 = Mth.PI / 4f - Mth.EPSILON;
     public static final float MAX_SPEED = 180;
 
     public static final int VISUAL_UPDATE_RATE = 3;

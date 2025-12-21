@@ -2,18 +2,17 @@ package eu.pb4.polyfactory.block.mechanical;
 
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
 
 public abstract class RotationalNetworkBlock extends NetworkBlock implements NetworkComponent.Rotational {
-    protected RotationalNetworkBlock(Settings settings) {
+    protected RotationalNetworkBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    protected void updateNetworkAt(WorldView world, BlockPos pos) {
+    protected void updateNetworkAt(LevelReader world, BlockPos pos) {
         NetworkComponent.Rotational.updateRotationalAt(world, pos);
     }
 

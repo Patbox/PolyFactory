@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.util;
 
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public interface DebugTextProvider {
-    Text getDebugText();
+    Component getDebugText();
 }

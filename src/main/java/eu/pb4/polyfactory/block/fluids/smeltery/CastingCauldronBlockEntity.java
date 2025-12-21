@@ -9,32 +9,32 @@ import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.casting.CauldronCastingRecipe;
 import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
+import eu.pb4.polyfactory.util.inventory.SingleStackContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
-import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
-public class CastingCauldronBlockEntity extends LockableBlockEntity implements SingleStackInventory {
+public class CastingCauldronBlockEntity extends LockableBlockEntity implements SingleStackContainer {
 
     protected ItemStack stack = ItemStack.EMPTY;
     protected double process = 0;
     @Nullable
-    protected RecipeEntry<CauldronCastingRecipe> currentRecipe = null;
+    protected RecipeHolder<CauldronCastingRecipe> currentRecipe = null;
     private CastingCauldronBlock.Model model;
     private boolean isCooling;
     private FaucedBlock.FaucedProvider provider = FaucedBlock.FaucedProvider.EMPTY;
@@ -45,7 +45,7 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
         super(FactoryBlockEntities.CASTING_CAULDRON, pos, state);
     }
 
-    public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
+    public static <T extends BlockEntity> void ticker(Level world, BlockPos pos, BlockState state, T t) {
         var self = (CastingCauldronBlockEntity) t;
 
         if (self.model == null) {
@@ -56,29 +56,29 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
         var input = self.asInput();
 
         if (self.provider == FaucedBlock.FaucedProvider.EMPTY) {
-            if (world.getBlockState(pos.up()).isOf(FactoryBlocks.FAUCED)) {
-                self.provider = FaucedBlock.getOutput(world.getBlockState(pos.up()), (ServerWorld) world, pos.up());
+            if (world.getBlockState(pos.above()).is(FactoryBlocks.FAUCED)) {
+                self.provider = FaucedBlock.getOutput(world.getBlockState(pos.above()), (ServerLevel) world, pos.above());
             } else {
                 if (self.stack.isEmpty()) {
-                    world.setBlockState(pos, Blocks.CAULDRON.getDefaultState());
+                    world.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
                 }
                 return;
             }
         }
 
         if (self.findRecipe) {
-            self.currentRecipe = ((ServerWorld) world).getRecipeManager().getFirstMatch(FactoryRecipeTypes.CASTING_CAULDRON, input, world).orElse(null);
+            self.currentRecipe = ((ServerLevel) world).recipeAccess().getRecipeFor(FactoryRecipeTypes.CASTING_CAULDRON, input, world).orElse(null);
         }
 
         if (self.currentRecipe == null && self.stack.isEmpty()) {
-            world.setBlockState(pos, Blocks.CAULDRON.getDefaultState());
+            world.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
             return;
         } else if (self.currentRecipe == null || !self.provider.isValid() || !self.currentRecipe.value().matches(input, world)) {
             self.currentRecipe = null;
             self.provider.setActiveFluid(null);
             self.provider = FaucedBlock.FaucedProvider.EMPTY;
             if (self.stack.isEmpty()) {
-                world.setBlockState(pos, Blocks.CAULDRON.getDefaultState());
+                world.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
             }
             return;
         }
@@ -101,40 +101,40 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
                 self.isCooling = true;
                 self.process = 0;
                 self.rate = 1;
-                self.markDirty();
+                self.setChanged();
                 return;
             }
 
-            var output = self.currentRecipe.value().craft(input, world.getRegistryManager());
+            var output = self.currentRecipe.value().assemble(input, world.registryAccess());
             self.setStack(output);
 
-            if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity serverPlayer) {
+            if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayer serverPlayer) {
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.CASTING_METAL);
-                Criteria.RECIPE_CRAFTED.trigger(serverPlayer, self.currentRecipe.id(), List.of());
+                CriteriaTriggers.RECIPE_CRAFTED.trigger(serverPlayer, self.currentRecipe.id(), List.of());
             }
 
             self.provider.extract(self.currentRecipe.value().fluidInput(input));
 
-            world.playSound(null, pos, self.currentRecipe.value().soundEvent().value(), SoundCategory.BLOCKS);
+            world.playSound(null, pos, self.currentRecipe.value().soundEvent().value(), SoundSource.BLOCKS);
             self.process = 0;
             self.isCooling = false;
             self.model.setProgress(false, 0, null);
             self.model.setOutput(self.getStack());
             self.findRecipe = false;
             self.currentRecipe = null;
-            self.markDirty();
+            self.setChanged();
         } else {
             self.process += self.rate;
 
-            markDirty(world, pos, self.getCachedState());
+            setChanged(world, pos, self.getBlockState());
             var fluid = self.currentRecipe.value().fluidInput(input);
 
             var progress = self.process / time;
             if (!self.isCooling) {
-                ((ServerWorld) world).spawnParticles(fluid.instance().particle(),
-                        pos.getX() + 0.5 + self.provider.direction().getOffsetX() / 16f,
+                ((ServerLevel) world).sendParticles(fluid.instance().particle(),
+                        pos.getX() + 0.5 + self.provider.direction().getStepX() / 16f,
                         pos.getY() + 1 + 4 / 16f,
-                        pos.getZ() + 0.5 + self.provider.direction().getOffsetZ() / 16f,
+                        pos.getZ() + 0.5 + self.provider.direction().getStepZ() / 16f,
                         0,
                         0, -1, 0, 0.1);
                 self.provider.setActiveFluid(fluid.instance());
@@ -149,34 +149,34 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
     }
 
     @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        super.onBlockReplaced(pos, oldState);
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        super.preRemoveSideEffects(pos, oldState);
         if (this.provider != null) {
             this.provider.setActiveFluid(null);
         }
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        view.put("stack", ItemStack.OPTIONAL_CODEC, this.stack);
+    protected void saveAdditional(ValueOutput view) {
+        view.store("stack", ItemStack.OPTIONAL_CODEC, this.stack);
         if (this.currentRecipe != null || this.findRecipe) {
             view.putDouble("Progress", this.process);
             view.putBoolean("is_cooling", this.isCooling);
         }
         view.putFloat("rate", this.rate);
-        super.writeData(view);
+        super.saveAdditional(view);
     }
 
     @Override
-    public void readData(ReadView view) {
+    public void loadAdditional(ValueInput view) {
         this.stack = view.read("stack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
-        if (view.getDouble("Progress", Double.POSITIVE_INFINITY) != Double.POSITIVE_INFINITY) {
-            this.process = view.getDouble("Progress", 0);
-            this.isCooling = view.getBoolean("is_cooling", false);
+        if (view.getDoubleOr("Progress", Double.POSITIVE_INFINITY) != Double.POSITIVE_INFINITY) {
+            this.process = view.getDoubleOr("Progress", 0);
+            this.isCooling = view.getBooleanOr("is_cooling", false);
             this.findRecipe = true;
         }
-        this.rate = view.getFloat("rate", 1f);
-        super.readData(view);
+        this.rate = view.getFloatOr("rate", 1f);
+        super.loadAdditional(view);
     }
 
     @Override
@@ -187,21 +187,21 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
     @Override
     public void setStack(ItemStack stack) {
         this.stack = stack;
-        this.markDirty();
+        this.setChanged();
     }
 
     @Override
-    public int[] getAvailableSlots(Direction side) {
+    public int[] getSlotsForFace(Direction side) {
         return new int[] { 0 };
     }
 
     @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
         return false;
     }
 
     @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
         return true;
     }
 
@@ -211,16 +211,16 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
     }
 
     @Override
-    public int getMaxCountPerStack() {
+    public int getMaxStackSize() {
         return 1;
     }
 
     @Override
-    public int getMaxCount(ItemStack stack) {
+    public int getMaxStackSize(ItemStack stack) {
         return 1;
     }
 
-    public void setup(RecipeEntry<CauldronCastingRecipe> recipe, FaucedBlock.FaucedProvider provider, float rate) {
+    public void setup(RecipeHolder<CauldronCastingRecipe> recipe, FaucedBlock.FaucedProvider provider, float rate) {
         this.currentRecipe = recipe;
         this.provider = provider;
         this.rate = rate;

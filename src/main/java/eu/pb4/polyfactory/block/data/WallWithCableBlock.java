@@ -17,54 +17,54 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.WallBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.enums.WallShape;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootWorldContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Property;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.WallBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.properties.WallSide;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.storage.loot.LootParams;
 
 public class WallWithCableBlock extends AbstracterCableBlock implements BlockStateNameProvider, StatePropertiesCodecPatcher, XInWallBlock {
     public static final Map<Block, WallWithCableBlock> MAP = new IdentityHashMap<>();
 
-    public static final BooleanProperty UP_WALL = BooleanProperty.of("up_wall");
-    public static final EnumProperty<Side> EAST_SHAPE = EnumProperty.of("east", Side.class);
-    public static final EnumProperty<Side> NORTH_SHAPE = EnumProperty.of("north", Side.class);
-    public static final EnumProperty<Side> SOUTH_SHAPE = EnumProperty.of("south", Side.class);
-    public static final EnumProperty<Side> WEST_SHAPE = EnumProperty.of("west", Side.class);
+    public static final BooleanProperty UP_WALL = BooleanProperty.create("up_wall");
+    public static final EnumProperty<Side> EAST_SHAPE = EnumProperty.create("east", Side.class);
+    public static final EnumProperty<Side> NORTH_SHAPE = EnumProperty.create("north", Side.class);
+    public static final EnumProperty<Side> SOUTH_SHAPE = EnumProperty.create("south", Side.class);
+    public static final EnumProperty<Side> WEST_SHAPE = EnumProperty.create("west", Side.class);
 
     @SuppressWarnings("rawtypes")
     private static final List<Pair> SELF_TO_BACKING = List.of(
-            new Pair<>(EAST_SHAPE, WallBlock.EAST_WALL_SHAPE, x -> x == Side.WALL ? WallShape.TALL : WallShape.NONE, x -> x == WallShape.NONE ? Side.NONE : Side.WALL),
-            new Pair<>(WEST_SHAPE, WallBlock.WEST_WALL_SHAPE, x -> x == Side.WALL ? WallShape.TALL : WallShape.NONE, x -> x == WallShape.NONE ? Side.NONE : Side.WALL),
-            new Pair<>(SOUTH_SHAPE, WallBlock.SOUTH_WALL_SHAPE, x -> x == Side.WALL ? WallShape.TALL : WallShape.NONE, x -> x == WallShape.NONE ? Side.NONE : Side.WALL),
-            new Pair<>(NORTH_SHAPE, WallBlock.NORTH_WALL_SHAPE, x -> x == Side.WALL ? WallShape.TALL : WallShape.NONE, x -> x == WallShape.NONE ? Side.NONE : Side.WALL),
+            new Pair<>(EAST_SHAPE, WallBlock.EAST, x -> x == Side.WALL ? WallSide.TALL : WallSide.NONE, x -> x == WallSide.NONE ? Side.NONE : Side.WALL),
+            new Pair<>(WEST_SHAPE, WallBlock.WEST, x -> x == Side.WALL ? WallSide.TALL : WallSide.NONE, x -> x == WallSide.NONE ? Side.NONE : Side.WALL),
+            new Pair<>(SOUTH_SHAPE, WallBlock.SOUTH, x -> x == Side.WALL ? WallSide.TALL : WallSide.NONE, x -> x == WallSide.NONE ? Side.NONE : Side.WALL),
+            new Pair<>(NORTH_SHAPE, WallBlock.NORTH, x -> x == Side.WALL ? WallSide.TALL : WallSide.NONE, x -> x == WallSide.NONE ? Side.NONE : Side.WALL),
             new Pair<>(UP_WALL, WallBlock.UP, Function.identity(), Function.identity())
     );
     private final WallBlock backing;
@@ -76,24 +76,24 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
             return null;
         }
 
-        var state = block.getDefaultState();
+        var state = block.defaultBlockState();
         for (var prop : SELF_TO_BACKING) {
             //noinspection unchecked,rawtypes
-            state = state.with(prop.self, (Comparable) prop.backingToSelf.apply(source.get(prop.backing)));
+            state = state.setValue(prop.self, (Comparable) prop.backingToSelf.apply(source.getValue(prop.backing)));
         }
         return state;
     }
 
-    public WallWithCableBlock(Settings settings, WallBlock wallBlock) {
+    public WallWithCableBlock(Properties settings, WallBlock wallBlock) {
         super(settings);
         this.backing = wallBlock;
-        this.setDefaultState(this.getDefaultState());
+        this.registerDefaultState(this.defaultBlockState());
         MAP.put(wallBlock, this);
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        return this.backing.getDefaultState().getPickStack(world, pos, includeData);
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
+        return this.backing.defaultBlockState().getCloneItemStack(world, pos, includeData);
     }
 
     @Override
@@ -108,22 +108,22 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
 
     @Override
     protected boolean checkModelDirection(BlockState state, Direction direction) {
-        return direction.getAxis() != Direction.Axis.Y && state.get(getProperty(direction)) == Side.CABLE;
+        return direction.getAxis() != Direction.Axis.Y && state.getValue(getProperty(direction)) == Side.CABLE;
     }
 
-    public boolean setColor(BlockState state, World world, BlockPos pos, int color) {
+    public boolean setColor(BlockState state, Level world, BlockPos pos, int color) {
         color = FactoryItems.CABLE.downSampleColor(color);
         if (world.getBlockEntity(pos) instanceof ColorProvider provider && provider.getColor() != color) {
             provider.setColor(color);
             var newState = state;
-            for (var dir : Direction.Type.HORIZONTAL) {
-                var newPos = pos.offset(dir);
+            for (var dir : Direction.Plane.HORIZONTAL) {
+                var newPos = pos.relative(dir);
                 var block = world.getBlockState(newPos);
                 var prop = getProperty(dir);
-                newState = newState.with(prop, newState.get(prop).cable(canConnectTo(world, provider.getColor(), newPos, block, dir.getOpposite())));
+                newState = newState.setValue(prop, newState.getValue(prop).cable(canConnectTo(world, provider.getColor(), newPos, block, dir.getOpposite())));
             }
             if (state != newState) {
-                world.setBlockState(pos, newState);
+                world.setBlockAndUpdate(pos, newState);
             }
             return true;
         }
@@ -142,21 +142,21 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
     }
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         var hasReceivers = false;
         var hasProviders = false;
-        super.onPlaced(world, pos, state, placer, itemStack);
+        super.setPlacedBy(world, pos, state, placer, itemStack);
         if (world.getBlockEntity(pos) instanceof ColorProvider be) {
             var newState = state;
             for (var dir : Direction.values()) {
-                var newPos = pos.offset(dir);
+                var newPos = pos.relative(dir);
                 var block = world.getBlockState(newPos);
                 if (canConnectTo(world, be.getColor(), newPos, block, dir.getOpposite())) {
                     if (dir.getAxis() != Direction.Axis.Y) {
-                        newState = newState.with(getProperty(dir), newState.get(getProperty(dir)).cable(true));
+                        newState = newState.setValue(getProperty(dir), newState.getValue(getProperty(dir)).cable(true));
                     }
-                    if (placer instanceof ServerPlayerEntity serverPlayer && (!hasReceivers || !hasProviders)) {
-                        var net = NetworkComponent.Data.getLogic(serverPlayer.getEntityWorld(), newPos);
+                    if (placer instanceof ServerPlayer serverPlayer && (!hasReceivers || !hasProviders)) {
+                        var net = NetworkComponent.Data.getLogic(serverPlayer.level(), newPos);
                         if (net.hasReceivers()) {
                             hasReceivers = true;
                         }
@@ -169,11 +169,11 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
             }
 
             if (state != newState) {
-                world.setBlockState(pos, newState);
+                world.setBlockAndUpdate(pos, newState);
             }
         }
         if (hasReceivers && hasProviders) {
-            TriggerCriterion.trigger((ServerPlayerEntity) placer, FactoryTriggers.CABLE_CONNECT);
+            TriggerCriterion.trigger((ServerPlayer) placer, FactoryTriggers.CABLE_CONNECT);
         }
 
     }
@@ -181,107 +181,107 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        var x = this.backing.getPlacementState(ctx);
-        var state = this.getDefaultState();
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var x = this.backing.getStateForPlacement(ctx);
+        var state = this.defaultBlockState();
         for (var prop : SELF_TO_BACKING) {
             assert x != null;
             //noinspection unchecked,rawtypes
-            state = state.with(prop.self, (Comparable) prop.backingToSelf.apply(x.get(prop.backing)));
+            state = state.setValue(prop.self, (Comparable) prop.backingToSelf.apply(x.getValue(prop.backing)));
         }
 
         return state;
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
-        var x = ((WallBlockAccessor) this.backing).callGetStateForNeighborUpdate(this.getPolymerBlockState(state, null), world, tickView, pos, direction, neighborPos, neighborState, random);
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+        var x = ((WallBlockAccessor) this.backing).callUpdateShape(this.getPolymerBlockState(state, null), world, tickView, pos, direction, neighborPos, neighborState, random);
         for (var prop : SELF_TO_BACKING) {
             assert x != null;
             //noinspection unchecked,rawtypes
-            var val = (Comparable) prop.backingToSelf.apply(x.get(prop.backing));
+            var val = (Comparable) prop.backingToSelf.apply(x.getValue(prop.backing));
             //noinspection unchecked
-            state = state.with(prop.self, val);
+            state = state.setValue(prop.self, val);
         }
 
         if (world.getBlockEntity(pos) instanceof ColorProvider be) {
-            for (var dir : Direction.Type.HORIZONTAL) {
+            for (var dir : Direction.Plane.HORIZONTAL) {
                 var prop = getProperty(dir);
-                var nextPos = pos.offset(dir);
+                var nextPos = pos.relative(dir);
                 var val = canConnectTo(world, be.getColor(), nextPos, world.getBlockState(nextPos), dir.getOpposite());
-                state = state.with(prop, state.get(prop).cable(val));
+                state = state.setValue(prop, state.getValue(prop).cable(val));
             }
         }
 
 
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+        return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(EAST_SHAPE, NORTH_SHAPE, SOUTH_SHAPE, WEST_SHAPE, UP_WALL);
     }
 
-    protected boolean isTransparent(BlockState state, BlockView world, BlockPos pos) {
+    protected boolean isTransparent(BlockState state, BlockGetter world, BlockPos pos) {
         return true;
     }
 
-    protected boolean canPathfindThrough(BlockState state, NavigationType type) {
+    protected boolean isPathfindable(BlockState state, PathComputationType type) {
         return false;
     }
 
     @Override
-    protected float calcBlockBreakingDelta(BlockState state, PlayerEntity player, BlockView world, BlockPos pos) {
-        return this.getPolymerBlockState(state, null).calcBlockBreakingDelta(player, world, pos);
+    protected float getDestroyProgress(BlockState state, Player player, BlockGetter world, BlockPos pos) {
+        return this.getPolymerBlockState(state, null).getDestroyProgress(player, world, pos);
     }
 
     @Override
-    protected List<ItemStack> getDroppedStacks(BlockState state, LootWorldContext.Builder builder) {
+    protected List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         var list = new ArrayList<ItemStack>();
-        list.addAll(this.getPolymerBlockState(state, null).getDroppedStacks(builder));
-        list.addAll(FactoryBlocks.CABLE.getDefaultState().getDroppedStacks(builder));
+        list.addAll(this.getPolymerBlockState(state, null).getDrops(builder));
+        list.addAll(FactoryBlocks.CABLE.defaultBlockState().getDrops(builder));
         return list;
     }
 
 
     @Override
     public BlockState convertToBacking(BlockState state) {
-        var backing = this.backing.getDefaultState();
+        var backing = this.backing.defaultBlockState();
         for (var x : SELF_TO_BACKING) {
             //noinspection unchecked,rawtypes
-            backing = backing.with(x.backing, (Comparable) x.selfToBacking.apply(state.get(x.self)));
+            backing = backing.setValue(x.backing, (Comparable) x.selfToBacking.apply(state.getValue(x.self)));
         }
         return backing;
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new CableBlockEntity(pos, state);
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         var converted = this.convertToBacking(initialBlockState);
         var elementHolder = BlockWithElementHolder.get(converted) instanceof BlockWithElementHolder holder ? holder.createElementHolder(world, pos, converted) : null;
         return new Model(initialBlockState, elementHolder, this::convertToBacking);
     }
 
     @Override
-    public MutableText getName() {
-        return Text.translatable("block.polyfactory.wall_with_cable", this.backing.getName());
+    public MutableComponent getName() {
+        return Component.translatable("block.polyfactory.wall_with_cable", this.backing.getName());
     }
 
     @Override
-    public Text getName(ServerWorld world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
+    public Component getName(ServerLevel world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
         if (blockEntity instanceof ColorProvider be && !be.isDefaultColor()) {
             if (!DyeColorExtra.hasLang(be.getColor())) {
-                return Text.translatable("block.polyfactory.wall_with_cable.colored.full",
+                return Component.translatable("block.polyfactory.wall_with_cable.colored.full",
                         this.backing.getName(),
                         ColoredItem.getColorName(be.getColor()), ColoredItem.getHexName(be.getColor()));
             } else {
-                return Text.translatable("block.polyfactory.wall_with_cable.colored", this.backing.getName(), ColoredItem.getColorName(be.getColor()));
+                return Component.translatable("block.polyfactory.wall_with_cable.colored", this.backing.getName(), ColoredItem.getColorName(be.getColor()));
             }
         }
         return this.getName();
@@ -296,11 +296,11 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
     public MapCodec<BlockState> modifyPropertiesCodec(MapCodec<BlockState> codec) {
         return StatePropertiesCodecPatcher.modifier(codec, (state, ops, input) -> {
 
-            for (var dir : Direction.Type.HORIZONTAL) {
-                var wall = input.get(dir.asString() + "_wall");
-                var cable = input.get(dir.asString());
+            for (var dir : Direction.Plane.HORIZONTAL) {
+                var wall = input.get(dir.getSerializedName() + "_wall");
+                var cable = input.get(dir.getSerializedName());
                 if (wall != null && cable != null) {
-                    state = state.with(getProperty(dir), Side.NONE.wall(ops.getStringValue(wall).getOrThrow().equals("true"))
+                    state = state.setValue(getProperty(dir), Side.NONE.wall(ops.getStringValue(wall).getOrThrow().equals("true"))
                             .cable(ops.getStringValue(cable).getOrThrow().equals("true")));
                 }
             }
@@ -341,7 +341,7 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
 
     private record Pair<A extends Comparable<A>, B extends Comparable<B>>(Property<A> self, Property<B> backing, Function<A, B> selfToBacking, Function<B, A> backingToSelf) { }
 
-    public enum Side implements StringIdentifiable {
+    public enum Side implements StringRepresentable {
         NONE("none"),
         WALL("wall"),
         CABLE("cable");
@@ -353,7 +353,7 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
         }
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return this.name;
         }
 

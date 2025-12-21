@@ -2,57 +2,56 @@ package eu.pb4.polyfactory.entity.splash;
 
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.other.FactoryDamageTypes;
-import net.minecraft.block.*;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Unit;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 
 public class ExperienceSplashEntity extends SplashEntity<Unit> {
     private int amount = 1;
 
-    public ExperienceSplashEntity(EntityType<? extends ProjectileEntity> entityType, World world) {
+    public ExperienceSplashEntity(EntityType<? extends Projectile> entityType, Level world) {
         super(entityType, world, FactoryFluids.EXPERIENCE);
     }
 
     @Override
-    protected void writeCustomData(WriteView view) {
-        super.writeCustomData(view);
+    protected void addAdditionalSaveData(ValueOutput view) {
+        super.addAdditionalSaveData(view);
         view.putInt("xp", this.amount);
     }
 
     @Override
-    protected void readCustomData(ReadView view) {
-        super.readCustomData(view);
-        this.amount = view.getInt("xp", 1);
+    protected void readAdditionalSaveData(ValueInput view) {
+        super.readAdditionalSaveData(view);
+        this.amount = view.getIntOr("xp", 1);
     }
 
     @Override
-    protected void onBlockHit(BlockHitResult context) {
-        var entity = new ExperienceOrbEntity(this.getEntityWorld(), context.getPos().x, context.getPos().y, context.getPos().z, this.amount);
-        this.getEntityWorld().spawnEntity(entity);
-        super.onBlockHit(context);
+    protected void onHitBlock(BlockHitResult context) {
+        var entity = new ExperienceOrb(this.level(), context.getLocation().x, context.getLocation().y, context.getLocation().z, this.amount);
+        this.level().addFreshEntity(entity);
+        super.onHitBlock(context);
     }
     @Override
-    protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (this.getEntityWorld() instanceof ServerWorld world && this.canDamageEntity(entityHitResult.getEntity())) {
-            entityHitResult.getEntity().damage(world, this.getDamageSources().create(FactoryDamageTypes.EXPERIENCE_SPLASH, this, this.getOwner()), 0.05F * amount);
+    protected void onHitEntity(EntityHitResult entityHitResult) {
+        if (this.level() instanceof ServerLevel world && this.canDamageEntity(entityHitResult.getEntity())) {
+            entityHitResult.getEntity().hurtServer(world, this.damageSources().source(FactoryDamageTypes.EXPERIENCE_SPLASH, this, this.getOwner()), 0.05F * amount);
         }
-        super.onEntityHit(entityHitResult);
+        super.onHitEntity(entityHitResult);
     }
 
     @Override
     protected void onNaturalDiscard() {
-        var entity = new ExperienceOrbEntity(this.getEntityWorld(), this.getEntityPos().x, this.getEntityPos().y, this.getEntityPos().z, this.amount);
-        this.getEntityWorld().spawnEntity(entity);
+        var entity = new ExperienceOrb(this.level(), this.position().x, this.position().y, this.position().z, this.amount);
+        this.level().addFreshEntity(entity);
         super.onNaturalDiscard();
     }
 

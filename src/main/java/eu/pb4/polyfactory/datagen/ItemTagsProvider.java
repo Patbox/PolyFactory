@@ -6,24 +6,24 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.minecraft.data.tag.ProvidedTagBuilder;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.tags.TagAppender;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
 public class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
-    public ItemTagsProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture, @Nullable FabricTagProvider.BlockTagProvider blockTagProvider) {
+    public ItemTagsProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture, @Nullable FabricTagProvider.BlockTagProvider blockTagProvider) {
         super(output, registriesFuture, blockTagProvider);
     }
 
     @Override
-    protected void configure(RegistryWrapper.WrapperLookup arg) {
+    protected void addTags(HolderLookup.Provider arg) {
         this.getOrCreateTagBuilder(FactoryItemTags.ALLOWED_IN_MINER)
                 .addOptionalTag(ConventionalItemTags.TOOLS)
                 .add(FactoryItems.STEEL_GEAR)
@@ -63,9 +63,9 @@ public class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
         ;
 
         var x = this.getOrCreateTagBuilder(FactoryItemTags.ROOT_ADVANCEMENT);
-        for (var item : Registries.ITEM.getIds()) {
+        for (var item : BuiltInRegistries.ITEM.keySet()) {
             if (item.getNamespace().equals(ModInit.ID)) {
-                x.add(Registries.ITEM.get(item));
+                x.add(BuiltInRegistries.ITEM.getValue(item));
             }
         }
 
@@ -125,7 +125,7 @@ public class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
     }
 
 
-    public ProvidedTagBuilder<Item, Item> getOrCreateTagBuilder(TagKey<Item> tag) {
+    public TagAppender<Item, Item> getOrCreateTagBuilder(TagKey<Item> tag) {
         return super.valueLookupBuilder(tag);
     }
 }

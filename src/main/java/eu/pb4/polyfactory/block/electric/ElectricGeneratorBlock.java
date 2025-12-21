@@ -17,35 +17,34 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements FactoryBlock, CableConnectable, RotationUser, EnergyUser  {
-    public ElectricGeneratorBlock(Settings settings) {
+    public ElectricGeneratorBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    protected void updateNetworkAt(WorldView world, BlockPos pos) {
+    protected void updateNetworkAt(LevelReader world, BlockPos pos) {
         Rotational.updateRotationalAt(world, pos);
         Energy.updateEnergyAt(world, pos);
     }
@@ -56,64 +55,64 @@ public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements
     }
 
     @Override
-    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerLevel world, BlockPos pos) {
         modifier.stress(15);
     }
 
     @Override
-    public void updateEnergyData(EnergyData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+    public void updateEnergyData(EnergyData.State modifier, BlockState state, ServerLevel world, BlockPos pos) {
         var speed = RotationUser.getRotation(world, pos).speed();
 
         modifier.provide((long) (speed * 15));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
+        return Blocks.IRON_BLOCK.defaultBlockState();
     }
 
     @Override
-    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerLevel world, BlockPos pos) {
         return List.of(new FunctionalAxisNode(getAxis(state)));
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!player.isSneaking() && hit.getSide() != state.get(FACING) && player.isCreative() && world.getBlockEntity(pos) instanceof ElectricMotorBlockEntity be && player instanceof ServerPlayerEntity serverPlayer) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!player.isShiftKeyDown() && hit.getDirection() != state.getValue(FACING) && player.isCreative() && world.getBlockEntity(pos) instanceof ElectricMotorBlockEntity be && player instanceof ServerPlayer serverPlayer) {
             be.openGui(serverPlayer);
-            return ActionResult.SUCCESS_SERVER;
+            return InteractionResult.SUCCESS_SERVER;
         }
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public Collection<BlockNode> createEnergyNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new FunctionalDirectionNode(state.get(FACING)));
+    public Collection<BlockNode> createEnergyNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return List.of(new FunctionalDirectionNode(state.getValue(FACING)));
     }
 
     @Override
-    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
-        return state.get(FACING) == dir;
+    public boolean canCableConnect(LevelReader world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+        return state.getValue(FACING) == dir;
     }
 
     public static final class Model extends RotationAwareModel {
@@ -134,8 +133,8 @@ public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements
         private void updateAnimation(float speed, BlockState state) {
             var mat = mat();
             switch (getAxis(state)) {
-                case X -> mat.rotate(Direction.EAST.getRotationQuaternion());
-                case Z -> mat.rotate(Direction.SOUTH.getRotationQuaternion());
+                case X -> mat.rotate(Direction.EAST.getRotation());
+                case Z -> mat.rotate(Direction.SOUTH.getRotation());
             }
 
             mat.rotateY(speed);
@@ -146,7 +145,7 @@ public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements
 
         @Override
         protected void onTick() {
-            var tick = this.getAttachment().getWorld().getTime();
+            var tick = this.getAttachment().getWorld().getGameTime();
 
             if (tick % this.getUpdateRate() == 0) {
                 var facing = this.blockState();
@@ -158,8 +157,8 @@ public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements
 
         private void updateStatePos(BlockState state) {
             var mat = mat();
-            mat.rotate(state.get(FIRST_AXIS) ? MathHelper.HALF_PI : 0, state.get(FACING).getUnitVector());
-            mat.rotate(state.get(FACING).getRotationQuaternion());
+            mat.rotate(state.getValue(FIRST_AXIS) ? Mth.HALF_PI : 0, state.getValue(FACING).step());
+            mat.rotate(state.getValue(FACING).getRotation());
             mat.scale(2f);
             this.base.setTransformation(mat);
         }

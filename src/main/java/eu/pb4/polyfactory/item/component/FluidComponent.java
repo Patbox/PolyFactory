@@ -9,19 +9,18 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
-import net.minecraft.component.ComponentsAccess;
-import net.minecraft.item.Item;
-import net.minecraft.item.tooltip.TooltipAppender;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 
-public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidInstance<?>> fluids, long stored, long capacity) implements TooltipAppender {
+public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidInstance<?>> fluids, long stored, long capacity) implements TooltipProvider {
     public static final FluidComponent DEFAULT = new FluidComponent(Object2LongMaps.emptyMap(), List.of(), 0, -1);
     public static final Codec<FluidComponent> SIMPLE_CODEC = FluidStack.CODEC.listOf().xmap(FluidComponent::fromStacks, FluidComponent::toStacks);
     public static final Codec<FluidComponent> CODEC =  Codec.withAlternative(RecordCodecBuilder.create(instance -> instance.group(
@@ -135,13 +134,13 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
     }
 
     @Override
-    public void appendTooltip(Item.TooltipContext context, Consumer<Text> tooltip, TooltipType type, ComponentsAccess components) {
+    public void addToTooltip(Item.TooltipContext context, Consumer<Component> tooltip, TooltipFlag type, DataComponentGetter components) {
         for (var fluid : fluids) {
-            tooltip.accept(Text.literal(" ").append(fluid.toLabeledAmount(this.map.getOrDefault(fluid, 0))).formatted(Formatting.GRAY));
+            tooltip.accept(Component.literal(" ").append(fluid.toLabeledAmount(this.map.getOrDefault(fluid, 0))).withStyle(ChatFormatting.GRAY));
         }
 
         if (this.capacity != -1) {
-            tooltip.accept(Text.translatable("text.polyfactory.x_out_of_y", FactoryUtil.fluidTextGeneric(this.stored), FactoryUtil.fluidTextGeneric(this.capacity)).formatted(Formatting.YELLOW));
+            tooltip.accept(Component.translatable("text.polyfactory.x_out_of_y", FactoryUtil.fluidTextGeneric(this.stored), FactoryUtil.fluidTextGeneric(this.capacity)).withStyle(ChatFormatting.YELLOW));
         }
     }
 

@@ -19,35 +19,34 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.ItemScatterer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -57,122 +56,122 @@ import java.util.List;
 
 import static eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras.bridgeModel;
 
-public class WindmillBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, ConfigurableBlock, BlockEntityProvider, BarrierBasedWaterloggable {
+public class WindmillBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, ConfigurableBlock, EntityBlock, BarrierBasedWaterloggable {
     public static final int MAX_SAILS = 8;
-    public static final BooleanProperty BIG = BooleanProperty.of("deco_big");
-    public static final IntProperty SAIL_COUNT = IntProperty.of("sails", 1, MAX_SAILS);
-    public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
+    public static final BooleanProperty BIG = BooleanProperty.create("deco_big");
+    public static final IntegerProperty SAIL_COUNT = IntegerProperty.create("sails", 1, MAX_SAILS);
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public WindmillBlock(Settings settings) {
+    public WindmillBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(SAIL_COUNT, 4).with(BIG, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(SAIL_COUNT, 4).setValue(BIG, false));
         Model.MODEL.getItem();
-        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false));
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING).add(SAIL_COUNT).add(BIG);
         builder.add(WATERLOGGED);
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         tickWater(state, world, tickView, pos);
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+        return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
         if (world.getBlockEntity(pos) instanceof WindmillBlockEntity be) {
-            return be.getSails().isEmpty() ? FactoryItems.WINDMILL_SAIL.getDefaultStack() : be.getSails().get(0).copyWithCount(1);
+            return be.getSails().isEmpty() ? FactoryItems.WINDMILL_SAIL.getDefaultInstance() : be.getSails().get(0).copyWithCount(1);
         }
-        return FactoryItems.WINDMILL_SAIL.getDefaultStack();
+        return FactoryItems.WINDMILL_SAIL.getDefaultInstance();
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getSide().getOpposite()));
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return waterLog(ctx, this.defaultBlockState().setValue(FACING, ctx.getClickedFace().getOpposite()));
     }
 
     @Override
-    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new FunctionalDirectionNode(state.get(FACING)));
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return List.of(new FunctionalDirectionNode(state.getValue(FACING)));
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return FactoryUtil.transform(state, rotation::rotate, FACING);
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return FactoryUtil.transform(state, mirror::apply, FACING);
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        return FactoryUtil.transform(state, mirror::mirror, FACING);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
 
     @Override
-    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(world, initialBlockState);
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new WindmillBlockEntity(pos, state);
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.OAK_PLANKS.getDefaultState();
+        return Blocks.OAK_PLANKS.defaultBlockState();
     }
 
     @Override
-    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerLevel world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof WindmillBlockEntity blockEntity) {
             blockEntity.updateRotationalData(modifier, state, world, pos);
         }
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(BlockConfig.FACING_HORIZONTAL);
     }
 
     public final class Model extends RotationAwareModel {
-        public static final ItemStack MODEL = Util.make(new ItemStack(Items.LEATHER_HORSE_ARMOR), x -> x.set(DataComponentTypes.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/windmill_sail"))));
-        public static final ItemStack MODEL_FLIP = Util.make(new ItemStack(Items.LEATHER_HORSE_ARMOR), x -> x.set(DataComponentTypes.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/windmill_sail_flip"))));
+        public static final ItemStack MODEL = Util.make(new ItemStack(Items.LEATHER_HORSE_ARMOR), x -> x.set(DataComponents.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/windmill_sail"))));
+        public static final ItemStack MODEL_FLIP = Util.make(new ItemStack(Items.LEATHER_HORSE_ARMOR), x -> x.set(DataComponents.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/windmill_sail_flip"))));
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement center;
         private boolean big;
         private ItemDisplayElement[] sails;
         private WindmillBlockEntity blockEntity;
 
-        private Model(ServerWorld world, BlockState state) {
-            this.big = state.get(BIG);
-            this.updateSails(state.get(SAIL_COUNT), state.get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
+        private Model(ServerLevel world, BlockState state) {
+            this.big = state.getValue(BIG);
+            this.updateSails(state.getValue(SAIL_COUNT), state.getValue(FACING).getAxisDirection() == Direction.AxisDirection.NEGATIVE);
 
             this.center = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, this.getUpdateRate());
             this.center.setDisplaySize(3, 3);
             this.addElement(this.center);
-            this.updateAnimation(0, state.get(WindmillBlock.FACING), state.get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
+            this.updateAnimation(0, state.getValue(WindmillBlock.FACING), state.getValue(FACING).getAxisDirection() == Direction.AxisDirection.NEGATIVE);
         }
 
         private void updateSails(int count, boolean reverse) {
@@ -229,17 +228,17 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
                 color = this.blockEntity.getSailColor(i);
             }
 
-            c.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), IntList.of(color)));
+            c.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), IntList.of(color)));
             return c;
         }
 
         private void updateAnimation(float speed, Direction direction, boolean reverse) {
-            this.center.setYaw(direction.getPositiveHorizontalDegrees() - 90);
+            this.center.setYaw(direction.toYRot() - 90);
             mat.identity();
             mat.rotateX(reverse ? speed : -speed);
 
             mat.pushMatrix();
-            mat.rotateZ(-MathHelper.HALF_PI);
+            mat.rotateZ(-Mth.HALF_PI);
             mat.scale(2);
             if (this.big) {
                 mat.scale(2);
@@ -249,9 +248,9 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
             //var tmp = Math.max(sails.length / 2, 1);
             for (var i = 0; i < sails.length; i++) {
                 mat.pushMatrix();
-                mat.rotateX((MathHelper.TAU / sails.length) * i);
-                mat.rotateY(-MathHelper.HALF_PI);
-                this.sails[i].setYaw(direction.getPositiveHorizontalDegrees() - 90);
+                mat.rotateX((Mth.TWO_PI / sails.length) * i);
+                mat.rotateY(-Mth.HALF_PI);
+                this.sails[i].setYaw(direction.toYRot() - 90);
                 mat.translate(0, 0, 0.008f * i);
                 if (this.big) {
                     mat.scale(2);
@@ -263,7 +262,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
 
         @Override
         protected void onTick() {
-            var tick = this.getAttachment().getWorld().getTime();
+            var tick = this.getAttachment().getWorld().getGameTime();
             if (this.blockEntity == null) {
                 this.blockEntity = this.getAttachment().getWorld().getBlockEntity(this.blockPos()) instanceof WindmillBlockEntity be ? be : null;
                 this.updateSailsBe();
@@ -272,8 +271,8 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
 
             if (tick % this.getUpdateRate() == 0) {
                 this.updateAnimation(this.getRotation(),
-                        this.blockState().get(WindmillBlock.FACING),
-                        this.blockState().get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
+                        this.blockState().getValue(WindmillBlock.FACING),
+                        this.blockState().getValue(FACING).getAxisDirection() == Direction.AxisDirection.NEGATIVE);
 
                 for (var i = 0; i < sails.length; i++) {
                     this.sails[i].startInterpolationIfDirty();
@@ -287,12 +286,12 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 var state = this.blockState();
-                this.big = state.get(BIG);
+                this.big = state.getValue(BIG);
                 this.updateSailsBe();
 
                 this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos()).rotation(),
-                        this.blockState().get(WindmillBlock.FACING),
-                        this.blockState().get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
+                        this.blockState().getValue(WindmillBlock.FACING),
+                        this.blockState().getValue(FACING).getAxisDirection() == Direction.AxisDirection.NEGATIVE);
                 for (var i = 0; i < this.sails.length; i++) {
                     this.sails[i].setInterpolationDuration(0);
                     this.sails[i].tick();
@@ -303,7 +302,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
 
         public void updateSailsBe() {
             var state = this.blockState();
-            this.updateSails(state.get(SAIL_COUNT), state.get(FACING).getDirection() == Direction.AxisDirection.NEGATIVE);
+            this.updateSails(state.getValue(SAIL_COUNT), state.getValue(FACING).getAxisDirection() == Direction.AxisDirection.NEGATIVE);
         }
     }
 }

@@ -10,39 +10,39 @@ import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 
-public abstract class BaseCabledDataBlock extends AbstractCableBlock implements FactoryBlock, ConfigurableBlock, BlockEntityProvider, CableConnectable {
-    public BaseCabledDataBlock(Settings settings) {
+public abstract class BaseCabledDataBlock extends AbstractCableBlock implements FactoryBlock, ConfigurableBlock, EntityBlock, CableConnectable {
+    public BaseCabledDataBlock(Properties settings) {
         super(settings);
     }
     
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(HAS_CABLE);
     }
 
     @Override
-    public boolean canReplace(BlockState state, ItemPlacementContext context) {
-        return (context.getStack().isOf(FactoryItems.CABLE) && !state.get(HAS_CABLE)) || super.canReplace(state, context);
+    public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
+        return (context.getItemInHand().is(FactoryItems.CABLE) && !state.getValue(HAS_CABLE)) || super.canBeReplaced(state, context);
     }
     
     
@@ -50,51 +50,51 @@ public abstract class BaseCabledDataBlock extends AbstractCableBlock implements 
 
     @Override
     protected boolean isDirectionBlocked(BlockState state, Direction direction) {
-        return getFacing(state) == direction || !state.get(HAS_CABLE);
+        return getFacing(state) == direction || !state.getValue(HAS_CABLE);
     }
 
     @Override
-    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
-        return getFacing(state) != dir && state.get(HAS_CABLE) && super.canCableConnect(world, cableColor, pos, state, dir);
+    public boolean canCableConnect(LevelReader world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+        return getFacing(state) != dir && state.getValue(HAS_CABLE) && super.canCableConnect(world, cableColor, pos, state, dir);
     }
 
     @Override
     public boolean hasCable(BlockState state) {
-        return state.get(HAS_CABLE);
+        return state.getValue(HAS_CABLE);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
+        return Blocks.IRON_BLOCK.defaultBlockState();
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(
                 BlockConfig.CHANNEL
         );
     }
 
     @Override
-    public abstract @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState);
+    public abstract @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState);
 
     @Override
-    public boolean setColor(BlockState state, World world, BlockPos pos, int color) {
-        return state.get(HAS_CABLE) && super.setColor(state, world, pos, color);
+    public boolean setColor(BlockState state, Level world, BlockPos pos, int color) {
+        return state.getValue(HAS_CABLE) && super.setColor(state, world, pos, color);
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ChanneledDataBlockEntity(pos, state);
     }
 
-    protected int getChannel(ServerWorld world, BlockPos pos) {
+    protected int getChannel(ServerLevel world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof ChannelContainer container) {
             return container.channel();
         }

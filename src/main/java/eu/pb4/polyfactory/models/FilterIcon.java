@@ -5,12 +5,12 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.item.ItemDisplayContext;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.world.item.ItemDisplayContext;
 
 public class FilterIcon {
     private final List<ItemDisplayElement> elements = new ArrayList<>();

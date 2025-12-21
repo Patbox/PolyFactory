@@ -2,7 +2,6 @@ package eu.pb4.polyfactory.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.nbt.NbtCompound;
 
 public record LongData(long value) implements DataContainer {
     public static MapCodec<LongData> TYPE_CODEC = Codec.LONG.xmap(LongData::new, LongData::value).fieldOf("value");

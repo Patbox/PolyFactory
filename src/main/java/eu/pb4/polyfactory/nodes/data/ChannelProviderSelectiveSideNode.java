@@ -13,11 +13,6 @@ import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.generic.FunctionalNode;
 import eu.pb4.polyfactory.nodes.generic.SelectiveSideNode;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import net.minecraft.core.Direction;
 
 
 public record ChannelProviderSelectiveSideNode(EnumSet<Direction> directions, int channel) implements FunctionalNode, DirectionCheckingNode, DataProviderNode {
@@ -43,7 +39,7 @@ public record ChannelProviderSelectiveSideNode(EnumSet<Direction> directions, in
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
         var list = new ArrayList<HalfLink>();
         for (var dir : directions) {
-            FactoryNodes.findNodes(self, self.getBlockPos().offset(dir)).forEach(list::add);
+            FactoryNodes.findNodes(self, self.getBlockPos().relative(dir)).forEach(list::add);
         }
 
         return list;

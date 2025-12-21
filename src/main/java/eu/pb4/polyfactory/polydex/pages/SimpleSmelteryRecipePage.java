@@ -2,13 +2,12 @@ package eu.pb4.polyfactory.polydex.pages;
 
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeEntry;
-
 import java.util.List;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
 
 public class SimpleSmelteryRecipePage extends SmelteryRecipePage<SimpleSmelteryRecipe> {
-    public SimpleSmelteryRecipePage(RecipeEntry<SimpleSmelteryRecipe> recipe) {
+    public SimpleSmelteryRecipePage(RecipeHolder<SimpleSmelteryRecipe> recipe) {
         super(recipe);
     }
 

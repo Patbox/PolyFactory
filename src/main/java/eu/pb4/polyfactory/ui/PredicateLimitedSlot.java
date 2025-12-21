@@ -1,23 +1,20 @@
 package eu.pb4.polyfactory.ui;
 
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.screen.slot.Slot;
-
 import java.util.function.Predicate;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class PredicateLimitedSlot extends Slot {
     private final Predicate<ItemStack> predicate;
 
-    public PredicateLimitedSlot(Inventory inventory, int index, Predicate<ItemStack> predicate) {
+    public PredicateLimitedSlot(Container inventory, int index, Predicate<ItemStack> predicate) {
         super(inventory, index, index, 0);
         this.predicate = predicate;
     }
 
     @Override
-    public boolean canInsert(ItemStack stack) {
+    public boolean mayPlace(ItemStack stack) {
         return predicate.test(stack);
     }
 }

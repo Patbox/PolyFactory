@@ -10,16 +10,15 @@ import eu.pb4.polyfactory.recipe.input.MixingInput;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.Registries;
-import net.minecraft.world.World;
-
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 import java.util.List;
 
 public record ColoringMixingRecipe(String group, Item input, int maxCount, double time,
@@ -28,7 +27,7 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
                                    float maxTemperature) implements MixingRecipe {
     public static final MapCodec<ColoringMixingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.STRING.optionalFieldOf("group", "").forGetter(ColoringMixingRecipe::group),
-                    Registries.ITEM.getCodec().fieldOf("input").forGetter(ColoringMixingRecipe::input),
+                    BuiltInRegistries.ITEM.byNameCodec().fieldOf("input").forGetter(ColoringMixingRecipe::input),
                     Codec.INT.optionalFieldOf("max_count", 12).forGetter(ColoringMixingRecipe::maxCount),
                     Codec.DOUBLE.fieldOf("time").forGetter(ColoringMixingRecipe::time),
                     Codec.DOUBLE.optionalFieldOf("minimum_speed", 1d).forGetter(ColoringMixingRecipe::minimumSpeed),
@@ -39,17 +38,17 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
     );
 
 
-    public static RecipeEntry<ColoringMixingRecipe> of(String id, Item item, double mixingTime, double minimumSpeed, double optimalSpeed) {
-        return new RecipeEntry<>(RegistryKey.of(RegistryKeys.RECIPE, FactoryUtil.id("mixing/" + id)), new ColoringMixingRecipe("", item, 12, mixingTime, minimumSpeed, optimalSpeed, -1, 2));
+    public static RecipeHolder<ColoringMixingRecipe> of(String id, Item item, double mixingTime, double minimumSpeed, double optimalSpeed) {
+        return new RecipeHolder<>(ResourceKey.create(Registries.RECIPE, FactoryUtil.id("mixing/" + id)), new ColoringMixingRecipe("", item, 12, mixingTime, minimumSpeed, optimalSpeed, -1, 2));
     }
 
-    public static RecipeEntry<ColoringMixingRecipe> of(String id, Item item, int count, double mixingTime, double minimumSpeed, double optimalSpeed) {
-        return new RecipeEntry<>(RegistryKey.of(RegistryKeys.RECIPE, FactoryUtil.id("mixing/" + id)), new ColoringMixingRecipe("", item, count, mixingTime, minimumSpeed, optimalSpeed, -1, 2));
+    public static RecipeHolder<ColoringMixingRecipe> of(String id, Item item, int count, double mixingTime, double minimumSpeed, double optimalSpeed) {
+        return new RecipeHolder<>(ResourceKey.create(Registries.RECIPE, FactoryUtil.id("mixing/" + id)), new ColoringMixingRecipe("", item, count, mixingTime, minimumSpeed, optimalSpeed, -1, 2));
     }
 
 
     @Override
-    public boolean matches(MixingInput inventory, World world) {
+    public boolean matches(MixingInput inventory, Level world) {
         if (!inventory.fluids().isEmpty()) {
             return false;
         }
@@ -57,14 +56,14 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
         int count = 0;
 
         for (int i = 0; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            var stack = inventory.getStackInSlot(i);
-            if (stack.isIn(ConventionalItemTags.DYES)) {
+            var stack = inventory.getItem(i);
+            if (stack.is(ConventionalItemTags.DYES)) {
                 if (hasDye) {
                     return false;
                 }
 
                 hasDye = true;
-            } else if (stack.isOf(this.input)) {
+            } else if (stack.is(this.input)) {
                 count++;
             } else if (!stack.isEmpty()) {
                 return false;
@@ -74,15 +73,15 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
     }
 
     @Override
-    public ItemStack craft(MixingInput inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack assemble(MixingInput inventory, HolderLookup.Provider registryManager) {
         int color = -1;
         int count = 0;
 
         for (int i = 0; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            var stack = inventory.getStackInSlot(i);
-            if (stack.isIn(ConventionalItemTags.DYES)) {
+            var stack = inventory.getItem(i);
+            if (stack.is(ConventionalItemTags.DYES)) {
                 color = DyeColorExtra.getColor(stack);
-            } else if (stack.isOf(this.input)) {
+            } else if (stack.is(this.input)) {
                 count++;
             }
         }
@@ -101,23 +100,23 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
     }
 
     @Override
-    public void applyRecipeUse(MixerBlockEntity inventory, World world) {
+    public void applyRecipeUse(MixerBlockEntity inventory, Level world) {
         boolean hasDye = false;
         int count = this.maxCount;
 
         for (int i = 0; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            var stack = inventory.getStack(i);
-            if (stack.isIn(ConventionalItemTags.DYES) && !hasDye) {
+            var stack = inventory.getItem(i);
+            if (stack.is(ConventionalItemTags.DYES) && !hasDye) {
                 hasDye = true;
-                stack.decrement(1);
-            } else if (stack.isOf(this.input) && count != 0) {
+                stack.shrink(1);
+            } else if (stack.is(this.input) && count != 0) {
                 var removable = Math.min(count, stack.getCount());
                 count -= removable;
-                stack.decrement(count);
+                stack.shrink(count);
             }
 
             if (stack.isEmpty() && stack != ItemStack.EMPTY) {
-                inventory.setStack(i, ItemStack.EMPTY);
+                inventory.setItem(i, ItemStack.EMPTY);
             }
         }
     }

@@ -3,10 +3,10 @@ package eu.pb4.polyfactory.entity.configurable;
 import com.mojang.serialization.JavaOps;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.configuration.ConfigurationData;
-import net.minecraft.entity.Entity;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Unit;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public interface ConfigurableEntity<E extends Entity> {
-    List<EntityConfig<?, E>> getEntityConfiguration(@Nullable ServerPlayerEntity player, @Nullable Vec3d targetPos);
+    List<EntityConfig<?, E>> getEntityConfiguration(@Nullable ServerPlayer player, @Nullable Vec3 targetPos);
 
-    default void wrenchTick(ServerPlayerEntity player, Vec3d targetPos) {}
+    default void wrenchTick(ServerPlayer player, Vec3 targetPos) {}
 
     default void writeMinimalConfigurationToStack(Consumer<EntityConfig<?, E>> consumer) {}
 
@@ -55,10 +55,10 @@ public interface ConfigurableEntity<E extends Entity> {
                 return;
             }
 
-            var val = config.value().getValue(entity, Vec3d.ZERO);
+            var val = config.value().getValue(entity, Vec3.ZERO);
             entries.add(new ConfigurationData.Entry(
                     config.name(),
-                    config.formatter().getDisplayValue(val, entity, Vec3d.ZERO),
+                    config.formatter().getDisplayValue(val, entity, Vec3.ZERO),
                     config.id(),
                     config.codec().encodeStart(JavaOps.INSTANCE, val).getOrThrow()
             ));

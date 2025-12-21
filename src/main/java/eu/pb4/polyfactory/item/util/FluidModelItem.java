@@ -5,24 +5,21 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.core.api.item.PolymerItem;
-import net.minecraft.block.Block;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.level.block.Block;
 
 public class FluidModelItem extends Item implements PolymerItem {
-    public <T extends Block & PolymerBlock> FluidModelItem(Settings settings) {
+    public <T extends Block & PolymerBlock> FluidModelItem(Properties settings) {
         super(settings);
     }
 
@@ -36,7 +33,7 @@ public class FluidModelItem extends Item implements PolymerItem {
         var x = getFluid(itemStack);
         if (x != null) {
             //noinspection DataFlowIssue
-            return FactoryModels.FLUID_FLAT_FULL.getRaw(x).get(DataComponentTypes.ITEM_MODEL);
+            return FactoryModels.FLUID_FLAT_FULL.getRaw(x).get(DataComponents.ITEM_MODEL);
         }
 
         return FactoryModels.PLACEHOLDER;
@@ -47,13 +44,13 @@ public class FluidModelItem extends Item implements PolymerItem {
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, PacketContext context) {
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context) {
         var base = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, context);
 
         //noinspection unchecked
         var x = (FluidInstance<Object>) getFluid(itemStack);
         if (x != null && x.type().color().isPresent()) {
-            base.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), List.of(x.type().color().get().getColor(x.data()))));
+            base.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), List.of(x.type().color().get().getColor(x.data()))));
         }
 
         return base;

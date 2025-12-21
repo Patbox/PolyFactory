@@ -1,9 +1,8 @@
 package eu.pb4.polyfactory.util.filter;
 
 import eu.pb4.polyfactory.item.tool.AbstractFilterItem;
-import net.minecraft.item.ItemStack;
-
 import java.util.List;
+import net.minecraft.world.item.ItemStack;
 
 public record FilterData(ItemFilter filter, List<ItemStack> icon, boolean prevent) {
 

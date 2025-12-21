@@ -17,49 +17,49 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectable, BlockEntityProvider {
+public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectable, EntityBlock {
     public static final EnumProperty<ConnectablePart> PART_X = FactoryProperties.CONNECTABLE_PART_X;
     public static final EnumProperty<ConnectablePart> PART_Y = FactoryProperties.CONNECTABLE_PART_Y;
     public static final EnumProperty<ConnectablePart> PART_Z = FactoryProperties.CONNECTABLE_PART_Z;
-    public FluidTankBlock(Settings settings) {
+    public FluidTankBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(PART_X, ConnectablePart.SINGLE).with(PART_Y, ConnectablePart.SINGLE).with(PART_Z, ConnectablePart.SINGLE));
+        this.registerDefaultState(this.defaultBlockState().setValue(PART_X, ConnectablePart.SINGLE).setValue(PART_Y, ConnectablePart.SINGLE).setValue(PART_Z, ConnectablePart.SINGLE));
     }
 
     @Override
-    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canPipeConnect(LevelReader world, BlockPos pos, BlockState state, Direction dir) {
         return true;
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState state) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
         if (world.getBlockEntity(pos) instanceof FilledStateProvider be) {
             return (int) ((be.getFilledAmount() * 15) / be.getFillCapacity());
         }
@@ -68,10 +68,10 @@ public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectab
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        var x = getBlockStateAt(ctx.getWorld(), ctx.getBlockPos());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var x = getBlockStateAt(ctx.getLevel(), ctx.getClickedPos());
 
-        if (ctx.getPlayer() instanceof ServerPlayerEntity player && (!x.get(PART_X).single() || !x.get(PART_Y).single() || !x.get(PART_Z).single())) {
+        if (ctx.getPlayer() instanceof ServerPlayer player && (!x.getValue(PART_X).single() || !x.getValue(PART_Y).single() || !x.getValue(PART_Z).single())) {
             TriggerCriterion.trigger(player, FactoryTriggers.FLUID_TANK_CONNECT);
         }
 
@@ -79,78 +79,78 @@ public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectab
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         return getBlockStateAt(world, pos);
     }
 
-    private BlockState getBlockStateAt(WorldView world, BlockPos pos) {
+    private BlockState getBlockStateAt(LevelReader world, BlockPos pos) {
         var x = ConnectablePart.SINGLE;
         var y = ConnectablePart.SINGLE;
         var z = ConnectablePart.SINGLE;
-        if (world.getBlockState(pos.down()).isOf(this)) {
+        if (world.getBlockState(pos.below()).is(this)) {
             y = ConnectablePart.POSITIVE;
         }
 
-        if (world.getBlockState(pos.up()).isOf(this)) {
+        if (world.getBlockState(pos.above()).is(this)) {
             y = y == ConnectablePart.POSITIVE ? ConnectablePart.MIDDLE : ConnectablePart.NEGATIVE;
         }
 
-        if (world.getBlockState(pos.north()).isOf(this)) {
+        if (world.getBlockState(pos.north()).is(this)) {
             z = ConnectablePart.POSITIVE;
         }
 
-        if (world.getBlockState(pos.south()).isOf(this)) {
+        if (world.getBlockState(pos.south()).is(this)) {
             z = z == ConnectablePart.POSITIVE ? ConnectablePart.MIDDLE : ConnectablePart.NEGATIVE;
         }
 
-        if (world.getBlockState(pos.west()).isOf(this)) {
+        if (world.getBlockState(pos.west()).is(this)) {
             x = ConnectablePart.POSITIVE;
         }
 
-        if (world.getBlockState(pos.east()).isOf(this)) {
+        if (world.getBlockState(pos.east()).is(this)) {
             x = x == ConnectablePart.POSITIVE ? ConnectablePart.MIDDLE : ConnectablePart.NEGATIVE;
         }
 
 
-        return this.getDefaultState().with(PART_X, x).with(PART_Y, y).with(PART_Z, z);
+        return this.defaultBlockState().setValue(PART_X, x).setValue(PART_Y, y).setValue(PART_Z, z);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(PART_X, PART_Y, PART_Z);
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new FluidTankBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return FluidTankBlockEntity::tick;
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.COPPER_BLOCK.getDefaultState();
+        return Blocks.COPPER_BLOCK.defaultBlockState();
     }
 
 
@@ -162,7 +162,7 @@ public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectab
             this.main = ItemDisplayElementUtil.createSimple(FactoryModels.BLOCK_FLUID_TANK.get(state));
             this.main.setScale(new Vector3f(2f));
             this.main.setYaw(180);
-            this.fluid = new SidedMultiFluidViewModel(this, state.get(PART_X), state.get(PART_Z));
+            this.fluid = new SidedMultiFluidViewModel(this, state.getValue(PART_X), state.getValue(PART_Z));
             this.addElement(this.main);
         }
 
@@ -171,7 +171,7 @@ public class FluidTankBlock extends Block implements FactoryBlock, PipeConnectab
             super.notifyUpdate(updateType);
             if (updateType == BlockAwareAttachment.BLOCK_STATE_UPDATE) {
                 var state = this.blockState();
-                this.fluid.update(state.get(PART_X), state.get(PART_Z));
+                this.fluid.update(state.getValue(PART_X), state.getValue(PART_Z));
                 this.main.setItem(FactoryModels.BLOCK_FLUID_TANK.get(state));
             }
         }

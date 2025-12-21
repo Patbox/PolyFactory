@@ -3,9 +3,9 @@ package eu.pb4.polyfactory.block.creative;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.fluids.DrainBlockEntity;
 import eu.pb4.polyfactory.fluid.FluidInstance;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class CreativeDrainBlockEntity extends DrainBlockEntity {
     public CreativeDrainBlockEntity(BlockPos pos, BlockState state) {

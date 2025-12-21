@@ -4,13 +4,12 @@ import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.property.ConnectablePart;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.util.Identifier;
-
 import java.nio.charset.StandardCharsets;
 import java.util.function.BiConsumer;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
@@ -53,7 +52,7 @@ public class MultiElementConnectedModel {
                 for (var z : ConnectablePart.values()) {
                     var i = index(x, y, z);
                     if (this.models[i] == null) {
-                        this.models[i] = ItemDisplayElementUtil.getModel(base.withSuffixedPath("/" + x.asString() + "_" + y.asString() + "_" + z.asString()));
+                        this.models[i] = ItemDisplayElementUtil.getModel(base.withSuffix("/" + x.getSerializedName() + "_" + y.getSerializedName() + "_" + z.getSerializedName()));
                     }
                 }
             }
@@ -64,12 +63,12 @@ public class MultiElementConnectedModel {
         for (var x : ConnectablePart.values()) {
             for (var y : ConnectablePart.values()) {
                 for (var z : ConnectablePart.values()) {
-                    var north = this.side.withSuffixedPath("_" + x.negate().asString() + "_" + y.asString());
-                    var south = this.side.withSuffixedPath("_" + x.asString() + "_" + y.asString());
-                    var west = this.side.withSuffixedPath("_" + z.asString() + "_" + y.asString());
-                    var east = this.side.withSuffixedPath("_" + z.negate().asString() + "_" + y.asString());
-                    var up = y.middle() || y.negative() ? EMPTY : this.bottom.withSuffixedPath("_" + x.asString() + "_" + z.negate().asString());;
-                    var down = y.middle() || y.positive() ? EMPTY : this.bottom.withSuffixedPath("_" + x.asString() + "_" + z.asString());;
+                    var north = this.side.withSuffix("_" + x.negate().getSerializedName() + "_" + y.getSerializedName());
+                    var south = this.side.withSuffix("_" + x.getSerializedName() + "_" + y.getSerializedName());
+                    var west = this.side.withSuffix("_" + z.getSerializedName() + "_" + y.getSerializedName());
+                    var east = this.side.withSuffix("_" + z.negate().getSerializedName() + "_" + y.getSerializedName());
+                    var up = y.middle() || y.negative() ? EMPTY : this.bottom.withSuffix("_" + x.getSerializedName() + "_" + z.negate().getSerializedName());;
+                    var down = y.middle() || y.positive() ? EMPTY : this.bottom.withSuffix("_" + x.getSerializedName() + "_" + z.getSerializedName());;
 
                     if (x.middle()) {
                         west = EMPTY;
@@ -89,7 +88,7 @@ public class MultiElementConnectedModel {
                         south = EMPTY;
                     }
 
-                    dataWriter.accept(AssetPaths.model(base.withSuffixedPath("/" + x.asString() + "_" + y.asString() + "_" + z.asString() + ".json")), MODEL_JSON
+                    dataWriter.accept(AssetPaths.model(base.withSuffix("/" + x.getSerializedName() + "_" + y.getSerializedName() + "_" + z.getSerializedName() + ".json")), MODEL_JSON
                             .replace("|PARENT|", this.parent.toString())
                             .replace("|NORTH|", north.toString())
                             .replace("|SOUTH|", south.toString())
@@ -105,9 +104,9 @@ public class MultiElementConnectedModel {
     }
 
     public ItemStack get(BlockState state) {
-        var x = state.get(PART_X);
-        var y = state.get(PART_Y);
-        var z = state.get(PART_Z);
+        var x = state.getValue(PART_X);
+        var y = state.getValue(PART_Y);
+        var z = state.getValue(PART_Z);
         return get(x, y, z);
     }
 

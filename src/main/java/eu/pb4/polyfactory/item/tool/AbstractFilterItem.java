@@ -2,28 +2,28 @@ package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 
 public abstract class AbstractFilterItem extends SimplePolymerItem {
-    public AbstractFilterItem(Settings settings) {
+    public AbstractFilterItem(Properties settings) {
         super(settings);
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity user, Hand hand) {
-        var stack = user.getStackInHand(hand);
-        if (user instanceof ServerPlayerEntity player) {
+    public InteractionResult use(Level world, Player user, InteractionHand hand) {
+        var stack = user.getItemInHand(hand);
+        if (user instanceof ServerPlayer player) {
             this.openConfiguration(player, stack);
         }
-        return ActionResult.SUCCESS_SERVER;
+        return InteractionResult.SUCCESS_SERVER;
     }
-    public abstract void openConfiguration(ServerPlayerEntity player, ItemStack stack);
+    public abstract void openConfiguration(ServerPlayer player, ItemStack stack);
 
 
     public abstract boolean isFilterSet(ItemStack stack);

@@ -3,17 +3,15 @@ package eu.pb4.polyfactory.block.data.output;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.data.DataContainer;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.enums.BlockHalf;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
     private int scrollSpeed = 0;
@@ -27,17 +25,17 @@ public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
     }
 
     @Override
-    public void readData(ReadView view) {
-        super.readData(view);
-        this.scrollSpeed = view.getInt("scroll_speed", 0);
-        this.scrollLoop = view.getBoolean("scroll_loop", false);
-        this.scrollPoint = view.getInt("scroll_point", 0);
-        this.text = view.getString("text", "");
+    public void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
+        this.scrollSpeed = view.getIntOr("scroll_speed", 0);
+        this.scrollLoop = view.getBooleanOr("scroll_loop", false);
+        this.scrollPoint = view.getIntOr("scroll_point", 0);
+        this.text = view.getStringOr("text", "");
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         view.putInt("scroll_speed", this.scrollSpeed);
         view.putInt("scroll_point", this.scrollPoint);
         view.putBoolean("scroll_loop", this.scrollLoop);
@@ -46,8 +44,8 @@ public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
 
     public boolean receiveData(DataContainer data) {
         this.setCachedData(data);
-        var dir = this.getCachedState().get(NixieTubeControllerBlock.FACING);
-        if (this.world.getBlockEntity(this.pos.offset(dir)) instanceof NixieTubeBlockEntity nixieTube && canConnect(nixieTube, dir)) {
+        var dir = this.getBlockState().getValue(NixieTubeControllerBlock.FACING);
+        if (this.level.getBlockEntity(this.worldPosition.relative(dir)) instanceof NixieTubeBlockEntity nixieTube && canConnect(nixieTube, dir)) {
             var length = nixieTube.connectionSize() * 2;
             var string = data.asString();
 
@@ -62,17 +60,17 @@ public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
                     string = string.substring(0, Math.min(length, string.length()));
                 }
                 if (string.length() < length && this.scrollLoop) {
-                    string = string.repeat(Math.max(2, MathHelper.ceilDiv(length, string.length())));
+                    string = string.repeat(Math.max(2, Mth.positiveCeilDiv(length, string.length())));
                 }
             }
 
             this.scrollPoint = 0;
             this.text = string;
             nixieTube.pushText(string, data.padding());
-            if (this.getCachedState().get(NixieTubeControllerBlock.POWERED)) {
-                this.world.setBlockState(pos, this.getCachedState().with(NixieTubeControllerBlock.POWERED, false));
+            if (this.getBlockState().getValue(NixieTubeControllerBlock.POWERED)) {
+                this.level.setBlockAndUpdate(worldPosition, this.getBlockState().setValue(NixieTubeControllerBlock.POWERED, false));
             }
-            this.markDirty();
+            this.setChanged();
         }
 
         return true;
@@ -80,26 +78,26 @@ public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
 
     private static boolean canConnect(NixieTubeBlockEntity nixieTube, Direction dir) {
         if (dir.getAxis() == Direction.Axis.Y) {
-            return (nixieTube.getCachedState().get(NixieTubeBlock.HALF) == BlockHalf.TOP) == (dir.getDirection() == Direction.AxisDirection.NEGATIVE);
+            return (nixieTube.getBlockState().getValue(NixieTubeBlock.HALF) == Half.TOP) == (dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE);
         } else {
-            return nixieTube.getCachedState().get(NixieTubeBlock.AXIS) == dir.getAxis();
+            return nixieTube.getBlockState().getValue(NixieTubeBlock.AXIS) == dir.getAxis();
         }
     }
 
-    public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
+    public static <T extends BlockEntity> void tick(Level world, BlockPos pos, BlockState state, T t) {
         var self = (NixieTubeControllerBlockEntity) t;
 
         if (self.scrollSpeed != 0 && self.tick % self.scrollSpeed == 0) {
             self.tick++;
             var data = self.getCachedData();
-            var dir = state.get(NixieTubeControllerBlock.FACING);
+            var dir = state.getValue(NixieTubeControllerBlock.FACING);
 
-            if (data != null && world.getBlockEntity(pos.offset(dir)) instanceof NixieTubeBlockEntity nixieTube && canConnect(nixieTube, dir)) {
+            if (data != null && world.getBlockEntity(pos.relative(dir)) instanceof NixieTubeBlockEntity nixieTube && canConnect(nixieTube, dir)) {
                 var length = nixieTube.connectionSize() * 2;
                 var string = data.asString();
                 if ((string.length() < length && !self.scrollLoop) || string.isEmpty()) {
-                    if (!state.get(NixieTubeControllerBlock.POWERED)) {
-                        world.setBlockState(pos, state.with(NixieTubeControllerBlock.POWERED, true));
+                    if (!state.getValue(NixieTubeControllerBlock.POWERED)) {
+                        world.setBlockAndUpdate(pos, state.setValue(NixieTubeControllerBlock.POWERED, true));
                     }
 
                     return;
@@ -122,20 +120,20 @@ public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
                 }
 
                 if (string.length() - self.scrollPoint < length && self.scrollLoop) {
-                    string = string.repeat(Math.max(2, MathHelper.ceilDiv(length, string.length())));
+                    string = string.repeat(Math.max(2, Mth.positiveCeilDiv(length, string.length())));
                 }
 
-                if ((self.scrollLoop || (string.length() - self.scrollPoint >= length)) && state.get(NixieTubeControllerBlock.POWERED)) {
-                    world.setBlockState(pos, state.with(NixieTubeControllerBlock.POWERED, false));
-                } else if (!self.scrollLoop && (string.length() - self.scrollPoint < length) && !state.get(NixieTubeControllerBlock.POWERED)) {
-                    world.setBlockState(pos, state.with(NixieTubeControllerBlock.POWERED, true));
+                if ((self.scrollLoop || (string.length() - self.scrollPoint >= length)) && state.getValue(NixieTubeControllerBlock.POWERED)) {
+                    world.setBlockAndUpdate(pos, state.setValue(NixieTubeControllerBlock.POWERED, false));
+                } else if (!self.scrollLoop && (string.length() - self.scrollPoint < length) && !state.getValue(NixieTubeControllerBlock.POWERED)) {
+                    world.setBlockAndUpdate(pos, state.setValue(NixieTubeControllerBlock.POWERED, true));
                 }
 
                 self.text = string.substring(Math.min(self.scrollPoint, string.length()), Math.min(self.scrollPoint + length, string.length()));
                 nixieTube.pushText(self.text, data.padding());
                 self.scrollPoint++;
 
-                self.markDirty();
+                self.setChanged();
             }
         } else {
             self.tick++;
@@ -152,11 +150,11 @@ public class NixieTubeControllerBlockEntity extends ChanneledDataBlockEntity {
 
     public void setScrollLoop(boolean scrollLoop) {
         this.scrollLoop = scrollLoop;
-        this.markDirty();
+        this.setChanged();
     }
 
     public void setScrollSpeed(int scrollSpeed) {
         this.scrollSpeed = scrollSpeed;
-        this.markDirty();
+        this.setChanged();
     }
 }

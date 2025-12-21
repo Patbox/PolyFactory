@@ -12,35 +12,6 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.entity.decoration.DisplayEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Pair;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -50,10 +21,38 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Display;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 
 public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithTooltip {
-    public static EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
+    public static EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     private static final Set<Vec3i> SUGGESTED_STEEL = Set.of(
         new Vec3i(-1, 0, 1),
@@ -61,64 +60,64 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithT
         new Vec3i(0, 1, 0)
     );
 
-    public SmelteryCoreBlock(Settings settings) {
+    public SmelteryCoreBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return super.getPlacementState(ctx).with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return super.getStateForPlacement(ctx).setValue(FACING, ctx.getHorizontalDirection().getOpposite());
     }
 
     @Override
-    protected ActionResult onUse(BlockState state, World worldx, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (state.get(FACING) != hit.getSide()) {
-            return ActionResult.PASS;
+    protected InteractionResult useWithoutItem(BlockState state, Level worldx, BlockPos pos, Player player, BlockHitResult hit) {
+        if (state.getValue(FACING) != hit.getDirection()) {
+            return InteractionResult.PASS;
         }
 
-        var world = (ServerWorld) worldx;
-        var center = pos.offset(state.get(FACING).getOpposite());
+        var world = (ServerLevel) worldx;
+        var center = pos.relative(state.getValue(FACING).getOpposite());
         if (FactoryBlocks.SMELTERY.placeSmeltery(world, center)) {
-            world.playSound(null, center, SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS);
-            if (player instanceof ServerPlayerEntity serverPlayer) {
+            world.playSound(null, center, SoundEvents.ANVIL_USE, SoundSource.BLOCKS);
+            if (player instanceof ServerPlayer serverPlayer) {
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.INDUSTRIAL_SMELTERY_CREATED);
             }
-            return ActionResult.SUCCESS_SERVER;
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        world.playSound(null, center, SoundEvents.ITEM_SHIELD_BLOCK.value(), SoundCategory.BLOCKS);
+        world.playSound(null, center, SoundEvents.SHIELD_BLOCK.value(), SoundSource.BLOCKS);
         var currentBlocks = new HashMap<Vec3i, BlockState>();
 
         int bricks = 0;
         int steel = 0;
 
-        for (var blockPos : BlockPos.iterate(center.add(-1, -1, -1), center.add(1, 1, 1))) {
+        for (var blockPos : BlockPos.betweenClosed(center.offset(-1, -1, -1), center.offset(1, 1, 1))) {
             if (pos.equals(blockPos)) {
                 continue;
             }
 
             var current = world.getBlockState(blockPos);
-            if (current.isOf(Blocks.DEEPSLATE_BRICKS)) bricks++;
-            else if (current.isOf(FactoryBlocks.STEEL_BLOCK)) steel++;
+            if (current.is(Blocks.DEEPSLATE_BRICKS)) bricks++;
+            else if (current.is(FactoryBlocks.STEEL_BLOCK)) steel++;
             currentBlocks.put(blockPos.subtract(center), current);
         }
-        var highlight = new HashMap<Vec3i, Pair<BlockState, Boolean>>();
+        var highlight = new HashMap<Vec3i, Tuple<BlockState, Boolean>>();
 
         if (steel < IndustrialSmelteryBlock.STEEL_BLOCKS) {
             for (var sug : SUGGESTED_STEEL) {
                 var current = currentBlocks.get(sug);
-                if (!current.isOf(FactoryBlocks.STEEL_BLOCK) && (bricks > IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS || !current.isOf(Blocks.DEEPSLATE_BRICKS))) {
-                    if (current.isOf(Blocks.DEEPSLATE_BRICKS)) {
+                if (!current.is(FactoryBlocks.STEEL_BLOCK) && (bricks > IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS || !current.is(Blocks.DEEPSLATE_BRICKS))) {
+                    if (current.is(Blocks.DEEPSLATE_BRICKS)) {
                         bricks--;
                     }
-                    highlight.put(sug, new Pair<>(FactoryBlocks.STEEL_BLOCK.getDefaultState(), !current.isAir()));
+                    highlight.put(sug, new Tuple<>(FactoryBlocks.STEEL_BLOCK.defaultBlockState(), !current.isAir()));
                     steel++;
                     if (steel >= IndustrialSmelteryBlock.STEEL_BLOCKS) {
                         break;
@@ -133,11 +132,11 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithT
                     }
 
                     var current = currentBlocks.get(key);
-                    if (!current.isOf(FactoryBlocks.STEEL_BLOCK) && (bricks > IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS || !current.isOf(Blocks.DEEPSLATE_BRICKS))) {
-                        if (current.isOf(Blocks.DEEPSLATE_BRICKS)) {
+                    if (!current.is(FactoryBlocks.STEEL_BLOCK) && (bricks > IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS || !current.is(Blocks.DEEPSLATE_BRICKS))) {
+                        if (current.is(Blocks.DEEPSLATE_BRICKS)) {
                             bricks--;
                         }
-                        highlight.put(key, new Pair<>(FactoryBlocks.STEEL_BLOCK.getDefaultState(), !current.isAir()));
+                        highlight.put(key, new Tuple<>(FactoryBlocks.STEEL_BLOCK.defaultBlockState(), !current.isAir()));
                         steel++;
                         if (steel >= IndustrialSmelteryBlock.STEEL_BLOCKS) {
                             break;
@@ -153,10 +152,10 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithT
                     continue;
                 }
                 var current = currentBlocks.get(key);
-                if ((steel > IndustrialSmelteryBlock.STEEL_BLOCKS || !current.isOf(FactoryBlocks.STEEL_BLOCK)) && (!current.isOf(Blocks.DEEPSLATE_BRICKS))) {
-                    highlight.put(key, new Pair<>(Blocks.DEEPSLATE_BRICKS.getDefaultState(), !current.isAir()));
+                if ((steel > IndustrialSmelteryBlock.STEEL_BLOCKS || !current.is(FactoryBlocks.STEEL_BLOCK)) && (!current.is(Blocks.DEEPSLATE_BRICKS))) {
+                    highlight.put(key, new Tuple<>(Blocks.DEEPSLATE_BRICKS.defaultBlockState(), !current.isAir()));
                     bricks++;
-                    if (current.isOf(FactoryBlocks.STEEL_BLOCK)) {
+                    if (current.is(FactoryBlocks.STEEL_BLOCK)) {
                         steel--;
                     }
                     if (bricks >= IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS) {
@@ -167,8 +166,8 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithT
             if (bricks < IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS) {
                 for (var key : SUGGESTED_STEEL) {
                     var current = currentBlocks.get(key);
-                    if (!current.isOf(Blocks.DEEPSLATE_BRICKS)) {
-                        highlight.put(key, new Pair<>(Blocks.DEEPSLATE_BRICKS.getDefaultState(), !current.isAir()));
+                    if (!current.is(Blocks.DEEPSLATE_BRICKS)) {
+                        highlight.put(key, new Tuple<>(Blocks.DEEPSLATE_BRICKS.defaultBlockState(), !current.isAir()));
                         bricks++;
                         if (bricks >= IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS) {
                             break;
@@ -185,8 +184,8 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithT
                 continue;
             }
 
-            if (!x.isOf(Blocks.DEEPSLATE_BRICKS) && !x.isOf(FactoryBlocks.STEEL_BLOCK) && !highlight.containsKey(key)) {
-                highlight.put(key, new Pair<>(Blocks.DEEPSLATE_BRICKS.getDefaultState(), !x.isAir()));
+            if (!x.is(Blocks.DEEPSLATE_BRICKS) && !x.is(FactoryBlocks.STEEL_BLOCK) && !highlight.containsKey(key)) {
+                highlight.put(key, new Tuple<>(Blocks.DEEPSLATE_BRICKS.defaultBlockState(), !x.isAir()));
             }
         }
 
@@ -196,35 +195,35 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithT
             model1.setHighlight(highlight);
         }
 
-        return ActionResult.SUCCESS_SERVER;
+        return InteractionResult.SUCCESS_SERVER;
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState blockState, PacketContext packetContext) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.DEEPSLATE_BRICKS.getDefaultState();
+        return Blocks.DEEPSLATE_BRICKS.defaultBlockState();
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, Item.TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
-        textConsumer.accept(Text.translatable(getTranslationKey() + ".tooltip.1").formatted(Formatting.GRAY));
-        textConsumer.accept(Text.translatable(getTranslationKey() + ".tooltip.2", IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS, IndustrialSmelteryBlock.STEEL_BLOCKS).formatted(Formatting.GRAY));
-        textConsumer.accept(Text.translatable(getTranslationKey() + ".tooltip.3").formatted(Formatting.GRAY));
-        textConsumer.accept(Text.translatable(getTranslationKey() + ".tooltip.4").formatted(Formatting.GRAY));
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> textConsumer, TooltipFlag type) {
+        textConsumer.accept(Component.translatable(getDescriptionId() + ".tooltip.1").withStyle(ChatFormatting.GRAY));
+        textConsumer.accept(Component.translatable(getDescriptionId() + ".tooltip.2", IndustrialSmelteryBlock.DEEPSLATE_BRICK_BLOCKS, IndustrialSmelteryBlock.STEEL_BLOCKS).withStyle(ChatFormatting.GRAY));
+        textConsumer.accept(Component.translatable(getDescriptionId() + ".tooltip.3").withStyle(ChatFormatting.GRAY));
+        textConsumer.accept(Component.translatable(getDescriptionId() + ".tooltip.4").withStyle(ChatFormatting.GRAY));
     }
 
     public static final class Model extends BlockModel {
@@ -240,13 +239,13 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithT
         }
 
         private void updateStatePos(BlockState state) {
-            var dir = state.get(FACING);
+            var dir = state.getValue(FACING);
             float p = -90;
             float y = 0;
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.getPositiveHorizontalDegrees();
+                y = dir.toYRot();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             }
@@ -273,7 +272,7 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithT
             super.tick();
         }
 
-        public void setHighlight(HashMap<Vec3i, Pair<BlockState, Boolean>> highlight) {
+        public void setHighlight(HashMap<Vec3i, Tuple<BlockState, Boolean>> highlight) {
             if (!this.highlights.isEmpty()) {
                 return;
             }
@@ -281,20 +280,20 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithT
             this.highlightTimer = 60;
 
             highlight.forEach((key, pair) -> {
-                if (pair.getLeft().isAir() && !pair.getRight()) {
+                if (pair.getA().isAir() && !pair.getB()) {
                     return;
                 }
                 var element = ItemDisplayElementUtil.createSimple();
-                if (pair.getLeft().isAir()) {
-                    element.setItem(Items.BARRIER.getDefaultStack());
+                if (pair.getA().isAir()) {
+                    element.setItem(Items.BARRIER.getDefaultInstance());
                     element.setScale(new Vector3f(0.5f));
-                    element.setBillboardMode(DisplayEntity.BillboardMode.CENTER);
+                    element.setBillboardMode(Display.BillboardConstraints.CENTER);
                 } else {
-                    element.setItem(pair.getLeft().getBlock().asItem().getDefaultStack());
+                    element.setItem(pair.getA().getBlock().asItem().getDefaultInstance());
                 }
                 element.setGlowing(true);
-                element.setGlowColorOverride(pair.getRight() ? 0xFF0000 : 0xFFFFFF);
-                element.setOffset(Vec3d.of(key).offset(this.blockState().get(FACING).getOpposite(), 1));
+                element.setGlowColorOverride(pair.getB() ? 0xFF0000 : 0xFFFFFF);
+                element.setOffset(Vec3.atLowerCornerOf(key).relative(this.blockState().getValue(FACING).getOpposite(), 1));
                 this.highlights.add(element);
                 this.addElement(element);
             });

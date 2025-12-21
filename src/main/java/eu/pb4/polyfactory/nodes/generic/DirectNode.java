@@ -8,13 +8,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.AxisNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.core.BlockPos;
 
 public record DirectNode(List<BlockPos> connection) implements BlockNode {
     public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("direct"), RecordCodecBuilder.<DirectNode>create(instance -> instance.group(

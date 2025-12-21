@@ -4,11 +4,10 @@ import eu.pb4.polyfactory.datagen.ItemTagsProvider;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
@@ -19,13 +18,13 @@ public record SpoutMolds(Identifier name, Item clay, Item hardened, Item mold, T
 
     public static SpoutMolds create(Identifier name) {
         return new SpoutMolds(name,
-                FactoryItems.register(name.withPrefixedPath("mold/").withSuffixedPath("_clay"),
-                        (s) -> new SimplePolymerItem(s.maxCount(1))),
-                FactoryItems.register(name.withPrefixedPath("mold/").withSuffixedPath("_hardened"),
-                        (s) -> new SimplePolymerItem(s.maxDamage(64))),
-                FactoryItems.register(name.withPrefixedPath("mold/"),
-                        (s) -> new SimplePolymerItem(s.maxCount(1))),
-                TagKey.of(RegistryKeys.ITEM, name.withPrefixedPath("mold/"))
+                FactoryItems.register(name.withPrefix("mold/").withSuffix("_clay"),
+                        (s) -> new SimplePolymerItem(s.stacksTo(1))),
+                FactoryItems.register(name.withPrefix("mold/").withSuffix("_hardened"),
+                        (s) -> new SimplePolymerItem(s.durability(64))),
+                FactoryItems.register(name.withPrefix("mold/"),
+                        (s) -> new SimplePolymerItem(s.stacksTo(1))),
+                TagKey.create(Registries.ITEM, name.withPrefix("mold/"))
         );
     }
 

@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.models;
 
 import eu.pb4.polyfactory.models.fluid.FluidModel;
 import eu.pb4.polyfactory.models.fluid.SpoutFluidModel;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 
 import static eu.pb4.polyfactory.ModInit.id;

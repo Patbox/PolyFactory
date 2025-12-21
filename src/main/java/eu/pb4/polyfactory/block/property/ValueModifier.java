@@ -1,9 +1,9 @@
 package eu.pb4.polyfactory.block.property;
 
-import net.minecraft.text.Text;
-import net.minecraft.util.StringIdentifiable;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringRepresentable;
 
-public enum ValueModifier implements StringIdentifiable {
+public enum ValueModifier implements StringRepresentable {
     ABSOLUTE("absolute", Math::abs),
     NEGATED_ABSOLUTE("negated_absolute", x -> -Math.abs(x)),
     UNMODIFIED("unmodified", x -> x),
@@ -18,12 +18,12 @@ public enum ValueModifier implements StringIdentifiable {
         this.function = function;
     }
 
-    public Text text() {
-        return Text.translatable("item.polyfactory.wrench.action.value_modifier." + this.name);
+    public Component text() {
+        return Component.translatable("item.polyfactory.wrench.action.value_modifier." + this.name);
     }
 
     @Override
-    public String asString() {
+    public String getSerializedName() {
         return this.name;
     }
 

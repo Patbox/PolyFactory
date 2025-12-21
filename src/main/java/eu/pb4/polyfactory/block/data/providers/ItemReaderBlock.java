@@ -6,64 +6,63 @@ import eu.pb4.polyfactory.block.data.util.BaseCabledDataBlock;
 import eu.pb4.polyfactory.block.data.util.OrientableCabledDataBlock;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.block.WireOrientation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 public class ItemReaderBlock extends OrientableCabledDataProviderBlock {
-    public static final BooleanProperty POWERED = Properties.POWERED;
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
-    public ItemReaderBlock(Settings settings) {
+    public ItemReaderBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(POWERED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(POWERED, false));
     }
 
     @Override
-    public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
-        return super.getPlacementState(ctx).with(POWERED, ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos()));
+    public @Nullable BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return super.getStateForPlacement(ctx).setValue(POWERED, ctx.getLevel().hasNeighborSignal(ctx.getClickedPos()));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(POWERED);
     }
 
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ItemReaderBlockEntity(pos, state);
     }
 
     @Override
-    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        world.updateComparators(pos, this);
-        super.onStateReplaced(state, world, pos, moved);
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
+        world.updateNeighbourForOutputSignal(pos, this);
+        super.affectNeighborsAfterRemoval(state, world, pos, moved);
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
-        if (!world.isClient()) {
-            boolean powered = state.get(POWERED);
-            if (powered != world.isReceivingRedstonePower(pos)) {
-                world.setBlockState(pos, state.with(POWERED, !powered), Block.NOTIFY_LISTENERS);
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, @Nullable Orientation wireOrientation, boolean notify) {
+        if (!world.isClientSide()) {
+            boolean powered = state.getValue(POWERED);
+            if (powered != world.hasNeighborSignal(pos)) {
+                world.setBlock(pos, state.setValue(POWERED, !powered), Block.UPDATE_CLIENTS);
 
                 if (!powered && world.getBlockEntity(pos) instanceof ItemReaderBlockEntity be) {
                     DataProvider.sendData(world, pos, be.nextPage());
@@ -74,24 +73,24 @@ public class ItemReaderBlock extends OrientableCabledDataProviderBlock {
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
 
-        if (!player.isSneaking() && getFacing(state).getOpposite() != hit.getSide() && player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof ItemReaderBlockEntity be) {
+        if (!player.isShiftKeyDown() && getFacing(state).getOpposite() != hit.getDirection() && player instanceof ServerPlayer serverPlayer && world.getBlockEntity(pos) instanceof ItemReaderBlockEntity be) {
             be.openGui(serverPlayer);
-            return ActionResult.SUCCESS_SERVER;
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(initialBlockState);
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
+        return new eu.pb4.polyfactory.block.data.providers.ItemReaderBlock.Model(initialBlockState);
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
+        return Blocks.IRON_BLOCK.defaultBlockState();
     }
 
     public class Model extends OrientableCabledDataBlock.Model {

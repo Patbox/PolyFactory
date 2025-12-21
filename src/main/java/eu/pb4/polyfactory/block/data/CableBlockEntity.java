@@ -6,16 +6,14 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentsAccess;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 public class CableBlockEntity extends BlockEntity implements BlockEntityExtraListener, ColorProvider {
@@ -28,15 +26,15 @@ public class CableBlockEntity extends BlockEntity implements BlockEntityExtraLis
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         view.putInt("color", this.color);
     }
 
     @Override
-    public void readData(ReadView view) {
-        super.readData(view);
-        setColor(view.getInt("color", this.color));
+    public void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
+        setColor(view.getIntOr("color", this.color));
     }
 
     @Override
@@ -46,7 +44,7 @@ public class CableBlockEntity extends BlockEntity implements BlockEntityExtraLis
             if (this.model != null) {
                 this.model.setColor(color);
             }
-            this.markDirty();
+            this.setChanged();
         }
     }
 
@@ -61,8 +59,8 @@ public class CableBlockEntity extends BlockEntity implements BlockEntityExtraLis
     }
 
     @Override
-    public void onListenerUpdate(WorldChunk chunk) {
-        this.model = (AbstractCableBlock.BaseCableModel) BlockBoundAttachment.get(chunk, this.getPos()).holder();
+    public void onListenerUpdate(LevelChunk chunk) {
+        this.model = (AbstractCableBlock.BaseCableModel) BlockBoundAttachment.get(chunk, this.getBlockPos()).holder();
         this.model.setColor(this.color);
     }
 
@@ -72,22 +70,22 @@ public class CableBlockEntity extends BlockEntity implements BlockEntityExtraLis
     }
 
     @Override
-    public void removeFromCopiedStackData(WriteView view) {
-        super.removeFromCopiedStackData(view);
-        view.remove("color");
+    public void removeComponentsFromTag(ValueOutput view) {
+        super.removeComponentsFromTag(view);
+        view.discard("color");
     }
 
     @Override
-    protected void addComponents(ComponentMap.Builder componentMapBuilder) {
-        super.addComponents(componentMapBuilder);
+    protected void collectImplicitComponents(DataComponentMap.Builder componentMapBuilder) {
+        super.collectImplicitComponents(componentMapBuilder);
         if (this.color != -2) {
-            componentMapBuilder.add(FactoryDataComponents.COLOR, this.color);
+            componentMapBuilder.set(FactoryDataComponents.COLOR, this.color);
         }
     }
 
     @Override
-    protected void readComponents(ComponentsAccess components) {
-        super.readComponents(components);
+    protected void applyImplicitComponents(DataComponentGetter components) {
+        super.applyImplicitComponents(components);
         setColor(components.getOrDefault(FactoryDataComponents.COLOR, AbstractCableBlock.DEFAULT_COLOR));
     }
 }

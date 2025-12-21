@@ -7,15 +7,18 @@ import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.minecraft.block.*;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.GrowingPlantBlock;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import java.util.function.Supplier;
 
 public final class FluidWorldPullInteraction {
@@ -23,9 +26,9 @@ public final class FluidWorldPullInteraction {
     private final BlockState[] pullState = new BlockState[pullOverflow.length];
 
     private final FluidContainer container;
-    private final Supplier<ServerWorld> world;
+    private final Supplier<ServerLevel> world;
     private final Supplier<BlockPos> pos;
-    public FluidWorldPullInteraction(FluidContainer container, Supplier<ServerWorld> world, Supplier<BlockPos> pos) {
+    public FluidWorldPullInteraction(FluidContainer container, Supplier<ServerLevel> world, Supplier<BlockPos> pos) {
         this.container = container;
         this.world = world;
         this.pos = pos;
@@ -36,7 +39,7 @@ public final class FluidWorldPullInteraction {
         var world = this.world();
         var container = this.container();
 
-        var mut = pos.mutableCopy().move(direction);
+        var mut = pos.mutable().move(direction);
         var pulledBlockState = world.getBlockState(mut);
 
         var currentFluid = container.topFluid();
@@ -72,11 +75,11 @@ public final class FluidWorldPullInteraction {
                 Fluid flowingFluid = null;
                 FluidInstance<?> fluidType = null;
 
-                if (pulledBlockState.getFluidState().isIn(FluidTags.WATER)) {
+                if (pulledBlockState.getFluidState().is(FluidTags.WATER)) {
                     fluidType = FactoryFluids.WATER.defaultInstance();
                     stillFluid = Fluids.WATER;
                     flowingFluid = Fluids.FLOWING_WATER;
-                } else if (pulledBlockState.getFluidState().isIn(FluidTags.LAVA)) {
+                } else if (pulledBlockState.getFluidState().is(FluidTags.LAVA)) {
                     fluidType = FactoryFluids.LAVA.defaultInstance();
                     stillFluid = Fluids.LAVA;
                     flowingFluid = Fluids.FLOWING_LAVA;
@@ -89,26 +92,26 @@ public final class FluidWorldPullInteraction {
                     this.setPullOverflow(direction, this.getPullOverflow(direction) + amount);
 
                     if (this.getPullOverflow(direction) >= FluidConstants.BLOCK) {
-                        var mut2 = mut.mutableCopy();
+                        var mut2 = mut.mutable();
                         BlockState currentState = pulledBlockState;
                         while (true) {
-                            if (currentState.getFluidState().isOf(stillFluid) || currentState.getFluidState().isOf(flowingFluid)) {
+                            if (currentState.getFluidState().is(stillFluid) || currentState.getFluidState().is(flowingFluid)) {
                                 mut2.set(mut);
                                 var nextState = world.getBlockState(mut2.move(Direction.UP));
 
-                                if (nextState.getFluidState().isOf(stillFluid) || nextState.getFluidState().isOf(flowingFluid)) {
+                                if (nextState.getFluidState().is(stillFluid) || nextState.getFluidState().is(flowingFluid)) {
                                     mut.set(mut2);
                                     currentState = nextState;
                                     continue;
-                                } else if (currentState.getFluidState().isOf(flowingFluid)) {
-                                    int level = currentState.getFluidState().getLevel();
+                                } else if (currentState.getFluidState().is(flowingFluid)) {
+                                    int level = currentState.getFluidState().getAmount();
                                     boolean found = false;
                                     mut2.set(mut);
-                                    for (var testDir : Direction.Type.HORIZONTAL) {
+                                    for (var testDir : Direction.Plane.HORIZONTAL) {
                                         nextState = world.getBlockState(mut2.move(testDir));
-                                        if ((nextState.getFluidState().isOf(stillFluid) || nextState.getFluidState().isOf(flowingFluid)) && level < nextState.getFluidState().getLevel()) {
+                                        if ((nextState.getFluidState().is(stillFluid) || nextState.getFluidState().is(flowingFluid)) && level < nextState.getFluidState().getAmount()) {
                                             mut.set(mut2);
-                                            level = nextState.getFluidState().getLevel();
+                                            level = nextState.getFluidState().getAmount();
                                             currentState = nextState;
                                             found = true;
                                         }
@@ -123,17 +126,17 @@ public final class FluidWorldPullInteraction {
                             break;
                         }
 
-                        if (currentState.getFluidState().isStill()) {
+                        if (currentState.getFluidState().isSource()) {
                             var insert = false;
-                            if (currentState.getBlock() instanceof Waterloggable && fluidType.type() == FactoryFluids.WATER) {
-                                world.setBlockState(mut, currentState.with(Properties.WATERLOGGED, false));
+                            if (currentState.getBlock() instanceof SimpleWaterloggedBlock && fluidType.type() == FactoryFluids.WATER) {
+                                world.setBlockAndUpdate(mut, currentState.setValue(BlockStateProperties.WATERLOGGED, false));
                                 insert = true;
-                            } else if (currentState.getBlock() instanceof FluidBlock) {
-                                world.setBlockState(mut, Blocks.AIR.getDefaultState());
+                            } else if (currentState.getBlock() instanceof LiquidBlock) {
+                                world.setBlockAndUpdate(mut, Blocks.AIR.defaultBlockState());
                                 insert = true;
-                            } else if (currentState.isReplaceable() || currentState.getBlock() instanceof AbstractPlantPartBlock) {
-                                world.breakBlock(mut, true);
-                                world.setBlockState(mut, Blocks.AIR.getDefaultState());
+                            } else if (currentState.canBeReplaced() || currentState.getBlock() instanceof GrowingPlantBlock) {
+                                world.destroyBlock(mut, true);
+                                world.setBlockAndUpdate(mut, Blocks.AIR.defaultBlockState());
                                 insert = true;
                             }
                             if (insert) {
@@ -147,14 +150,14 @@ public final class FluidWorldPullInteraction {
             }
 
             var extract = FluidBehaviours.BLOCK_STATE_TO_FLUID_EXTRACT.get(pulledBlockState);
-            if (extract != null && container.canInsert(extract.getLeft(), true)) {
-                var maxFlow = extract.getLeft().instance().getMaxFlow(world);
-                var amount = Math.min(Math.min((long) (strength * maxFlow * extract.getLeft().instance().getFlowSpeedMultiplier(world)),
+            if (extract != null && container.canInsert(extract.getA(), true)) {
+                var maxFlow = extract.getA().instance().getMaxFlow(world);
+                var amount = Math.min(Math.min((long) (strength * maxFlow * extract.getA().instance().getFlowSpeedMultiplier(world)),
                         maxFlow), container.empty());
                 this.setPullOverflow(direction, this.getPullOverflow(direction) + amount);
-                if (this.getPullOverflow(direction) >= extract.getLeft().amount()) {
-                    world.setBlockState(mut, extract.getRight());
-                    container.insert(extract.getLeft(), false);
+                if (this.getPullOverflow(direction) >= extract.getA().amount()) {
+                    world.setBlockAndUpdate(mut, extract.getB());
+                    container.insert(extract.getA(), false);
                     this.setPullOverflow(direction, 0);
                 }
             }
@@ -181,7 +184,7 @@ public final class FluidWorldPullInteraction {
         this.pullState[direction.ordinal()] = state;
     }
 
-    public ServerWorld world() {
+    public ServerLevel world() {
         return this.world.get();
     }
 

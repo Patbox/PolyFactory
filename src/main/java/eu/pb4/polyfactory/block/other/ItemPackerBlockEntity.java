@@ -8,7 +8,7 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.PredicateLimitedSlot;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
+import eu.pb4.polyfactory.util.inventory.SingleStackContainer;
 import eu.pb4.polyfactory.util.storage.WrappingStorage;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
@@ -17,34 +17,30 @@ import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.BundleContentsComponent;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BundleItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Containers;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BundleItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.BundleContents;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockEntityExtraListener, FilledStateProvider, SingleStackInventory {
+public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockEntityExtraListener, FilledStateProvider, SingleStackContainer {
     static {
         ItemStorage.SIDED.registerForBlockEntity((self, dir) -> {
-            var facing = self.getCachedState().get(ItemPackerBlock.FACING);
+            var facing = self.getBlockState().getValue(ItemPackerBlock.FACING);
 
             if (dir != null && facing.getAxis() == dir.getAxis()) {
                 return self.inventoryStorage;
@@ -69,16 +65,16 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         if (!this.itemStack.isEmpty()) {
-            view.put("item", ItemStack.OPTIONAL_CODEC, this.itemStack);
+            view.store("item", ItemStack.OPTIONAL_CODEC, this.itemStack);
         }
     }
 
     @Override
-    public void readData(ReadView view) {
-        super.readData(view);
+    public void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
         setStack(view.read("item", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY));
     }
 
@@ -91,7 +87,7 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     public void setStack(ItemStack stack) {
         this.itemStack = stack;
         this.cachedItemStorage = null;
-        this.markDirty();
+        this.setChanged();
         if (this.model != null) {
             this.model.setDisplay(this.itemStack);
         }
@@ -99,26 +95,26 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
 
 
     @Override
-    public void onListenerUpdate(WorldChunk chunk) {
-        this.model = BlockBoundAttachment.get(chunk, this.pos).holder() instanceof ItemPackerBlock.Model model ? model : null;
+    public void onListenerUpdate(LevelChunk chunk) {
+        this.model = BlockBoundAttachment.get(chunk, this.worldPosition).holder() instanceof ItemPackerBlock.Model model ? model : null;
         if (this.model != null) {
             this.model.setDisplay(this.itemStack);
         }
     }
 
     @Override
-    public @Nullable Text getFilledStateText() {
+    public @Nullable Component getFilledStateText() {
         if (this.itemStack.isEmpty()) {
-            return ScreenTexts.EMPTY;
+            return CommonComponents.EMPTY;
         }
 
-        return Text.translatable("text.polyfactory.x_out_of_y", this.getFilledAmount(), this.getFillCapacity());
+        return Component.translatable("text.polyfactory.x_out_of_y", this.getFilledAmount(), this.getFillCapacity());
     }
 
     @Override
     public long getFilledAmount() {
         if (this.itemStack.getItem() instanceof BundleItem bundleItem) {
-            var oc = this.itemStack.getOrDefault(DataComponentTypes.BUNDLE_CONTENTS, BundleContentsComponent.DEFAULT).getOccupancy();
+            var oc = this.itemStack.getOrDefault(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY).weight();
             return oc.getNumerator() * 64L / oc.getDenominator();
         }
 
@@ -155,13 +151,13 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     }
 
     @Override
-    public int getMaxCount(ItemStack stack) {
+    public int getMaxStackSize(ItemStack stack) {
         return 1;
     }
 
     @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        if (dir != null && this.getCachedState().get(ItemPackerBlock.FACING).getAxis() == dir.getAxis()) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
+        if (dir != null && this.getBlockState().getValue(ItemPackerBlock.FACING).getAxis() == dir.getAxis()) {
             return ItemStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack)) != null;
         }
 
@@ -169,13 +165,13 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     }
 
     @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return dir != null && this.getCachedState().get(ItemPackerBlock.FACING).getAxis() == dir.getAxis();
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
+        return dir != null && this.getBlockState().getValue(ItemPackerBlock.FACING).getAxis() == dir.getAxis();
     }
 
     @Override
-    public int[] getAvailableSlots(Direction side) {
-        return this.getCachedState().get(ItemPackerBlock.FACING).getAxis() == side.getAxis() ? SingleStackInventory.super.getAvailableSlots(side) : new int[0];
+    public int[] getSlotsForFace(Direction side) {
+        return this.getBlockState().getValue(ItemPackerBlock.FACING).getAxis() == side.getAxis() ? SingleStackContainer.super.getSlotsForFace(side) : new int[0];
     }
 
     private Storage<ItemVariant> getItemStorage() {
@@ -189,40 +185,40 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     }
 
     private void runAdvancement() {
-        if (this.world != null && FactoryUtil.getClosestPlayer(this.world, this.pos, 16) instanceof ServerPlayerEntity player) {
+        if (this.level != null && FactoryUtil.getClosestPlayer(this.level, this.worldPosition, 16) instanceof ServerPlayer player) {
             TriggerCriterion.trigger(player, FactoryTriggers.ITEM_PACKER_ACCESSES);
         }
     }
 
     @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        super.onBlockReplaced(pos, oldState);
-        if (this.world != null) {
-            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, this.getStack());
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        super.preRemoveSideEffects(pos, oldState);
+        if (this.level != null) {
+            Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, this.getStack());
         }
     }
 
     @Override
-    protected void createGui(ServerPlayerEntity playerEntity) {
+    protected void createGui(ServerPlayer playerEntity) {
         new Gui(playerEntity);
     }
 
     public int getComparatorOutput() {
         float progress;
 
-        if (this.itemStack.contains(DataComponentTypes.BUNDLE_CONTENTS)) {
-            progress = this.itemStack.getOrDefault(DataComponentTypes.BUNDLE_CONTENTS, BundleContentsComponent.DEFAULT).getOccupancy().floatValue();
+        if (this.itemStack.has(DataComponents.BUNDLE_CONTENTS)) {
+            progress = this.itemStack.getOrDefault(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY).weight().floatValue();
         } else {
             progress = this.getFilledAmount() / Math.max(this.getFillCapacity(), 1f);
         }
 
-        return MathHelper.lerpPositive(MathHelper.clamp(progress, 0, 1), 0, 15);
+        return Mth.lerpDiscrete(Mth.clamp(progress, 0, 1), 0, 15);
     }
 
     private class Gui extends SimpleGui {
-        public Gui(ServerPlayerEntity player) {
-            super(ScreenHandlerType.HOPPER, player, false);
-            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(ItemPackerBlockEntity.this.getCachedState().getBlock().getName()));
+        public Gui(ServerPlayer player) {
+            super(MenuType.HOPPER, player, false);
+            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(ItemPackerBlockEntity.this.getBlockState().getBlock().getName()));
             this.setSlotRedirect(2, new PredicateLimitedSlot(ItemPackerBlockEntity.this, 0, stack -> ItemStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack)) != null));
             this.open();
         }
@@ -234,7 +230,7 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
 
         @Override
         public void onTick() {
-            if (ItemPackerBlockEntity.this.isRemoved() || player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(ItemPackerBlockEntity.this.pos)) > (18 * 18)) {
+            if (ItemPackerBlockEntity.this.isRemoved() || player.position().distanceToSqr(Vec3.atCenterOf(ItemPackerBlockEntity.this.worldPosition)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();

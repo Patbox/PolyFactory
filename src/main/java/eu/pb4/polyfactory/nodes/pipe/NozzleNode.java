@@ -7,10 +7,10 @@ import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import net.minecraft.core.Direction;
 
 public record NozzleNode(Direction direction) implements DirectionNode {
     public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("nozzle"), Direction.CODEC.xmap(NozzleNode::new, NozzleNode::direction));
@@ -22,7 +22,7 @@ public record NozzleNode(Direction direction) implements DirectionNode {
 
     @Override
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
-        return FactoryNodes.findNodes(self, self.getBlockPos().offset(this.direction)).toList();
+        return FactoryNodes.findNodes(self, self.getBlockPos().relative(this.direction)).toList();
     }
 
     @Override

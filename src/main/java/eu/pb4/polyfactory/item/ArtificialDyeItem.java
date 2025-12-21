@@ -5,32 +5,31 @@ import eu.pb4.factorytools.api.item.FireworkStarColoredItem;
 import eu.pb4.polyfactory.util.SimpleColoredItem;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.SignChangingItem;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.ARGB;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SignApplicator;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
 
-public class ArtificialDyeItem extends Item implements SignChangingItem, SimpleColoredItem, ColoredItem {
+public class ArtificialDyeItem extends Item implements SignApplicator, SimpleColoredItem, ColoredItem {
     public static final ThreadLocal<List<ItemStack>> CURRENT_DYES = ThreadLocal.withInitial(ArrayList::new);
 
-    public ArtificialDyeItem(Settings settings) {
+    public ArtificialDyeItem(Properties settings) {
         super(settings);
     }
 
@@ -52,21 +51,21 @@ public class ArtificialDyeItem extends Item implements SignChangingItem, SimpleC
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, displayComponent, tooltip, type);
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> tooltip, TooltipFlag type) {
+        super.appendHoverText(stack, context, displayComponent, tooltip, type);
         if (ColoredItem.hasColor(stack)) {
-            tooltip.accept(Text.translatable("item.color", ColoredItem.getHexName(ColoredItem.getColor(stack))).formatted(Formatting.GRAY));
+            tooltip.accept(Component.translatable("item.color", ColoredItem.getHexName(ColoredItem.getColor(stack))).withStyle(ChatFormatting.GRAY));
         }
     }
 
     @Override
-    public boolean useOnSign(World world, SignBlockEntity signBlockEntity, boolean front, PlayerEntity player) {
-        if (signBlockEntity.changeText((text) -> {
-            var itemInHand = player.getStackInHand(Hand.MAIN_HAND).isOf(FactoryItems.ARTIFICIAL_DYE) ? player.getMainHandStack() : player.getOffHandStack();
+    public boolean tryApplyToSign(Level world, SignBlockEntity signBlockEntity, boolean front, Player player) {
+        if (signBlockEntity.updateText((text) -> {
+            var itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND).is(FactoryItems.ARTIFICIAL_DYE) ? player.getMainHandItem() : player.getOffhandItem();
             var color = ColoredItem.getColor(itemInHand);
             {
                 var current = text.getMessage(0, false).getStyle().getColor();
-                if (current != null && current.getRgb() == color) {
+                if (current != null && current.getValue() == color) {
                     return text;
                 }
             }
@@ -81,9 +80,9 @@ public class ArtificialDyeItem extends Item implements SignChangingItem, SimpleC
                     var rgb = DyeColorExtra.getColor(possibleColor);
 
                     var possibleDistance = Math.sqrt(
-                            Math.abs(ColorHelper.getRed(rgb) - ColorHelper.getRed(color)) +
-                                    Math.abs(ColorHelper.getGreen(rgb) - ColorHelper.getGreen(color)) +
-                                    Math.abs(ColorHelper.getBlue(rgb) - ColorHelper.getBlue(color))
+                            Math.abs(ARGB.red(rgb) - ARGB.red(color)) +
+                                    Math.abs(ARGB.green(rgb) - ARGB.green(color)) +
+                                    Math.abs(ARGB.blue(rgb) - ARGB.blue(color))
                     );
 
                     if (possibleDistance < distance) {
@@ -94,12 +93,12 @@ public class ArtificialDyeItem extends Item implements SignChangingItem, SimpleC
 
             }
             for (int i = 0; i < 4; i++) {
-                text = text.withMessage(i, text.getMessage(i, false).copy().styled(x -> x.withColor(color)));
+                text = text.setMessage(i, text.getMessage(i, false).copy().withStyle(x -> x.withColor(color)));
             }
 
-            return text.withColor(dyeColor);
+            return text.setColor(dyeColor);
         }, front)) {
-            world.playSound(null, signBlockEntity.getPos(), SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            world.playSound(null, signBlockEntity.getBlockPos(), SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
             return true;
         } else {
             return false;

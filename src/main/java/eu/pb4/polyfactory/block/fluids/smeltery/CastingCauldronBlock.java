@@ -12,107 +12,110 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.*;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-public class CastingCauldronBlock extends Block implements PolymerBlock, BlockWithElementHolder, BlockEntityProvider {
-    public CastingCauldronBlock(Settings settings) {
+public class CastingCauldronBlock extends Block implements PolymerBlock, BlockWithElementHolder, EntityBlock {
+    public CastingCauldronBlock(Properties settings) {
         super(settings);
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new CastingCauldronBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return super.getPlacementState(ctx);
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return super.getStateForPlacement(ctx);
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world instanceof ServerWorld && type == FactoryBlockEntities.CASTING_CAULDRON ? CastingCauldronBlockEntity::ticker : null;
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+        return world instanceof ServerLevel && type == FactoryBlockEntities.CASTING_CAULDRON ? CastingCauldronBlockEntity::ticker : null;
     }
 
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!player.shouldCancelInteraction() && world.getBlockEntity(pos) instanceof CastingCauldronBlockEntity be) {
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!player.isSecondaryUseActive() && world.getBlockEntity(pos) instanceof CastingCauldronBlockEntity be) {
             if (!be.getStack().isEmpty()) {
-                if (player.getMainHandStack().isEmpty()) {
-                    player.equipStack(EquipmentSlot.MAINHAND, be.getStack(1));
+                if (player.getMainHandItem().isEmpty()) {
+                    player.setItemSlot(EquipmentSlot.MAINHAND, be.getItem(1));
                 } else {
-                    player.giveOrDropStack(be.getStack(1));
+                    player.handleExtraItemsCreatedOnUse(be.getItem(1));
                 }
                 be.setStack(ItemStack.EMPTY);
-                world.setBlockState(pos, Blocks.CAULDRON.getDefaultState());
-                return ActionResult.SUCCESS_SERVER;
+                world.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
+                return InteractionResult.SUCCESS_SERVER;
             }
         }
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 
-    public ActionResult tryCauldronCasting(ServerWorld world, BlockPos pos, FaucedBlock.FaucedProvider provider, float rate) {
-        var recipe = world.getRecipeManager().getFirstMatch(FactoryRecipeTypes.CASTING_CAULDRON, provider.getFluidContainerInput(), world);
+    public InteractionResult tryCauldronCasting(ServerLevel world, BlockPos pos, FaucedBlock.FaucedProvider provider, float rate) {
+        var recipe = world.recipeAccess().getRecipeFor(FactoryRecipeTypes.CASTING_CAULDRON, provider.getFluidContainerInput(), world);
         if (recipe.isEmpty()) {
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
         }
 
-        world.setBlockState(pos, this.getDefaultState());
+        world.setBlockAndUpdate(pos, this.defaultBlockState());
         if (world.getBlockEntity(pos) instanceof CastingCauldronBlockEntity be) {
             be.setup(recipe.get(), provider, rate);
         }
 
-        return ActionResult.SUCCESS_SERVER;
+        return InteractionResult.SUCCESS_SERVER;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(world, initialBlockState);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState blockState, PacketContext packetContext) {
-        return Blocks.CAULDRON.getDefaultState();
+        return Blocks.CAULDRON.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.CAULDRON.getDefaultState();
+        return Blocks.CAULDRON.defaultBlockState();
     }
 
     @Override
-    protected ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        return Items.CAULDRON.getDefaultStack();
+    protected ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
+        return Items.CAULDRON.getDefaultInstance();
     }
 
     public static final class Model extends RotationAwareModel {
@@ -122,16 +125,16 @@ public class CastingCauldronBlock extends Block implements PolymerBlock, BlockWi
         private FluidInstance<?> castingFluid;
         private boolean isCooling;
 
-        private Model(ServerWorld world, BlockState state) {
+        private Model(ServerLevel world, BlockState state) {
             this.fluid = LodItemDisplayElement.createSimple();
             this.fluid.setViewRange(0.4f);
             this.fluid.setScale(new Vector3f(12 / 16f));
-            this.fluid.setOffset(new Vec3d(0, - (1 / 16f / 16f), 0));
+            this.fluid.setOffset(new Vec3(0, - (1 / 16f / 16f), 0));
             this.output = LodItemDisplayElement.createSimple();
             this.output.setItemDisplayContext(ItemDisplayContext.NONE);
             this.output.setViewRange(0.6f);
             this.output.setScale(new Vector3f(12 / 16f));
-            this.output.setOffset(new Vec3d(0, 2 / 16f, 0));
+            this.output.setOffset(new Vec3(0, 2 / 16f, 0));
 
 
             updateStatePos(state);
@@ -159,10 +162,10 @@ public class CastingCauldronBlock extends Block implements PolymerBlock, BlockWi
                 this.fluid.setTranslation(new Vector3f(0, -0.5f, 0));
             } else {
                 var isSolid = process > 0.5 && isCooling;
-                var value = MathHelper.clamp((float) (isSolid ? ((process - 0.50f) / 0.50f) : (1 - (process) / 0.50f)), 0, 1);
-                var color = isCooling ? ColorHelper.fromFloats(1, 1f, 0.6f + value * 0.4f, 0.5f + value * 0.5f) : 0xFFFFFF;
+                var value = Mth.clamp((float) (isSolid ? ((process - 0.50f) / 0.50f) : (1 - (process) / 0.50f)), 0, 1);
+                var color = isCooling ? ARGB.colorFromFloat(1, 1f, 0.6f + value * 0.4f, 0.5f + value * 0.5f) : 0xFFFFFF;
                 this.fluid.setItem(FactoryModels.FLUID_FLAT_FULL_SPOUT.get(castingFluid, color, isSolid));
-                this.fluid.setTranslation(new Vector3f(0, (float) ((isCooling ? 1 : MathHelper.clamp(process, 0, 1)) - 0.5) * 12 / 16f + 2 / 16f, 0));
+                this.fluid.setTranslation(new Vector3f(0, (float) ((isCooling ? 1 : Mth.clamp(process, 0, 1)) - 0.5) * 12 / 16f + 2 / 16f, 0));
             }
             if (process > this.progress && !isCooling) {
                 this.fluid.startInterpolationIfDirty();
@@ -175,7 +178,7 @@ public class CastingCauldronBlock extends Block implements PolymerBlock, BlockWi
         }
 
         public void setOutput(ItemStack stack) {
-            if (ItemStack.areItemsAndComponentsEqual(stack, this.output.getItem())) return;
+            if (ItemStack.isSameItemSameComponents(stack, this.output.getItem())) return;
             this.output.setItem(stack.copyWithCount(1));
             this.output.tick();
         }

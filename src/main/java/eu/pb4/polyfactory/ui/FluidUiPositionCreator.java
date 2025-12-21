@@ -8,10 +8,9 @@ import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import it.unimi.dsi.fastutil.chars.Char2IntMap;
 import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
-import net.minecraft.text.Style;
-import net.minecraft.text.StyleSpriteSource;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.network.chat.FontDescription;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.Identifier;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -40,15 +39,15 @@ public class FluidUiPositionCreator {
         this.height = height;
         this.offsetY = offsetY;
         this.textureHeight = Math.min(height, 16);
-        this.style = Style.EMPTY.withColor(0xFFFFFF).withFont(new StyleSpriteSource.Font(this.id));
+        this.style = Style.EMPTY.withColor(0xFFFFFF).withFont(new FontDescription.Resource(this.id));
     }
 
     public char[] registerTextures(Identifier identifier) {
-        identifier = identifier.withPrefixedPath("gen/fluids_" + width + "/").withSuffixedPath("/");
+        identifier = identifier.withPrefix("gen/fluids_" + width + "/").withSuffix("/");
         var chars = new char[this.height];
 
         for (int i = 0; i < height; i++) {
-            chars[i] = singleChar(identifier.withSuffixedPath("" + (i % textureHeight)), 13 - height + i - offsetY, 1);
+            chars[i] = singleChar(identifier.withSuffix("" + (i % textureHeight)), 13 - height + i - offsetY, 1);
         }
         return chars;
     }
@@ -66,8 +65,8 @@ public class FluidUiPositionCreator {
     }
 
     public void setup(Map<FluidType<?>, char[]> textures) {
-        for (var fluid : FactoryRegistries.FLUID_TYPES.getIds()) {
-            textures.put(FactoryRegistries.FLUID_TYPES.get(fluid), this.registerTextures(fluid));
+        for (var fluid : FactoryRegistries.FLUID_TYPES.keySet()) {
+            textures.put(FactoryRegistries.FLUID_TYPES.getValue(fluid), this.registerTextures(fluid));
         }
 
         RegistryEntryAddedCallback.event(FactoryRegistries.FLUID_TYPES).register((rawId, id, object) -> {

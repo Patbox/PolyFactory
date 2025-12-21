@@ -3,23 +3,21 @@ package eu.pb4.polyfactory.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.event.GameEvent;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 
-public record GameEventData(GameEvent event, Vec3d pos, double distance) implements DataContainer {
-    private static final MapCodec<Vec3d> FLAT_VEC = RecordCodecBuilder.mapCodec(ins -> ins.group(
-            Codec.DOUBLE.fieldOf("pos_x").forGetter(Vec3d::getX),
-            Codec.DOUBLE.fieldOf("pos_y").forGetter(Vec3d::getY),
-            Codec.DOUBLE.fieldOf("pos_z").forGetter(Vec3d::getZ)
-    ).apply(ins, Vec3d::new));
+public record GameEventData(GameEvent event, Vec3 pos, double distance) implements DataContainer {
+    private static final MapCodec<Vec3> FLAT_VEC = RecordCodecBuilder.mapCodec(ins -> ins.group(
+            Codec.DOUBLE.fieldOf("pos_x").forGetter(Vec3::x),
+            Codec.DOUBLE.fieldOf("pos_y").forGetter(Vec3::y),
+            Codec.DOUBLE.fieldOf("pos_z").forGetter(Vec3::z)
+    ).apply(ins, Vec3::new));
 
     public static MapCodec<GameEventData> TYPE_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                    Registries.GAME_EVENT.getCodec().fieldOf("event").forGetter(GameEventData::event),
+                    BuiltInRegistries.GAME_EVENT.byNameCodec().fieldOf("event").forGetter(GameEventData::event),
                     FLAT_VEC.forGetter(GameEventData::pos),
                     Codec.DOUBLE.fieldOf("distance").forGetter(GameEventData::distance)
             ).apply(instance, GameEventData::new)
@@ -32,7 +30,7 @@ public record GameEventData(GameEvent event, Vec3d pos, double distance) impleme
 
     @Override
     public String asString() {
-        return Registries.GAME_EVENT.getId(event).toString();
+        return BuiltInRegistries.GAME_EVENT.getKey(event).toString();
     }
 
     @Override

@@ -7,8 +7,7 @@ import eu.pb4.polyfactory.util.ResourceUtils;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.resources.Identifier;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -30,8 +29,8 @@ public class FluidUiTextureCreator {
         this.textures.add(Pair.of(id, object.texture()));
     }
     public void setup() {
-        for (var fluid : FactoryRegistries.FLUID_TYPES.getIds()) {
-            this.registerTextures(fluid, Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.get(fluid)));
+        for (var fluid : FactoryRegistries.FLUID_TYPES.keySet()) {
+            this.registerTextures(fluid, Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.getValue(fluid)));
         }
         RegistryEntryAddedCallback.event(FactoryRegistries.FLUID_TYPES).register((rawId, id, object) -> {
             this.registerTextures(id, object);
@@ -51,7 +50,7 @@ public class FluidUiTextureCreator {
 
     private void generateSplitTextures(BiConsumer<String,byte[]> assetWriter, Identifier id, Identifier texture) throws IOException {
         var image = ResourceUtils.getTexture(texture);
-        var file = id.withPrefixedPath("gen/fluids_" + width + "/").withSuffixedPath("/");
+        var file = id.withPrefix("gen/fluids_" + width + "/").withSuffix("/");
 
         var scale = image.getWidth() / 16;
 
@@ -67,7 +66,7 @@ public class FluidUiTextureCreator {
 
             ImageIO.write(out, "png", bytes);
 
-            assetWriter.accept(AssetPaths.texture(file.withSuffixedPath(i + ".png")), bytes.toByteArray());
+            assetWriter.accept(AssetPaths.texture(file.withSuffix(i + ".png")), bytes.toByteArray());
         }
     }
 }

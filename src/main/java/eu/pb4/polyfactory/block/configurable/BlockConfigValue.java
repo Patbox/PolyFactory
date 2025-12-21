@@ -4,22 +4,22 @@ import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.DisplayElement;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
-import net.minecraft.block.BlockState;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 
 public interface BlockConfigValue<T> {
     static <T, B> BlockConfigValue<T> ofBlockEntity(Class<B> beClass, Function<B, T> getter, BiConsumer<B, T> setter) {
         return new BlockConfigValue<T>() {
             @Nullable
             @Override
-            public T getValue(World world, BlockPos pos, Direction side, BlockState state) {
+            public T getValue(Level world, BlockPos pos, Direction side, BlockState state) {
                 var be = world.getBlockEntity(pos);
 
                 if (be != null && beClass.isAssignableFrom(be.getClass())) {
@@ -30,7 +30,7 @@ public interface BlockConfigValue<T> {
             }
 
             @Override
-            public boolean setValue(T value, World world, BlockPos pos, Direction side, BlockState state) {
+            public boolean setValue(T value, Level world, BlockPos pos, Direction side, BlockState state) {
                 var be = world.getBlockEntity(pos);
 
                 if (be != null && beClass.isAssignableFrom(be.getClass())) {
@@ -44,19 +44,19 @@ public interface BlockConfigValue<T> {
     }
 
     static <T extends Comparable<T>> BlockConfigValue<T> ofProperty(Property<T> property) {
-        return ofPropertyCustom(property, (StateProvider<T>) (propertyx, value, world, pos, side, state) -> state.withIfExists(propertyx, value));
+        return ofPropertyCustom(property, (StateProvider<T>) (propertyx, value, world, pos, side, state) -> state.trySetValue(propertyx, value));
     }
 
     static <T extends Comparable<T>> BlockConfigValue<T> ofPropertyCustom(Property<T> property, StateProvider<T> provider) {
         return new BlockConfigValue<T>() {
             @Nullable
             @Override
-            public T getValue(World world, BlockPos pos, Direction side, BlockState state) {
-                return state.get(property, null);
+            public T getValue(Level world, BlockPos pos, Direction side, BlockState state) {
+                return state.getValueOrElse(property, null);
             }
 
             @Override
-            public boolean setValue(T value, World world, BlockPos pos, Direction side, BlockState state) {
+            public boolean setValue(T value, Level world, BlockPos pos, Direction side, BlockState state) {
                 var newState = provider.getModifiedState(property, value, world, pos, side, state);
 
                 if (newState == state) {
@@ -77,7 +77,7 @@ public interface BlockConfigValue<T> {
                                 displayElement.tick();
                             }
                         }
-                        world.setBlockState(pos, newState);
+                        world.setBlockAndUpdate(pos, newState);
                         for (var el : holder.holder().getElements()) {
                             if (el instanceof DisplayElement displayElement) {
                                 displayElement.setTeleportDuration(map.getInt(displayElement));
@@ -88,18 +88,18 @@ public interface BlockConfigValue<T> {
                         return true;
                     }
                 }
-                world.setBlockState(pos, newState);
+                world.setBlockAndUpdate(pos, newState);
                 return true;
             }
         };
     }
 
     @Nullable
-    T getValue(World world, BlockPos pos, Direction side, BlockState state);
-    boolean setValue(T value, World world, BlockPos pos, Direction side, BlockState state);
+    T getValue(Level world, BlockPos pos, Direction side, BlockState state);
+    boolean setValue(T value, Level world, BlockPos pos, Direction side, BlockState state);
 
 
     interface StateProvider<T extends  Comparable<T>> {
-        BlockState getModifiedState(Property<T> property, T value, World world, BlockPos pos, Direction side, BlockState state);
+        BlockState getModifiedState(Property<T> property, T value, Level world, BlockPos pos, Direction side, BlockState state);
     }
 }

@@ -16,53 +16,53 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeConnectable, BlockEntityProvider, BarrierBasedWaterloggable, ConfigurableBlock {
-    public static final EnumProperty<Direction> FACING = Properties.FACING;
-    public PortableFluidTankBlock(Settings settings) {
+public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeConnectable, EntityBlock, BarrierBasedWaterloggable, ConfigurableBlock {
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
+    public PortableFluidTankBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false));
         PortableFluidTankBlock.Model.BASE_MODEL.isEmpty();
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState state) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
         if (world.getBlockEntity(pos) instanceof FilledStateProvider be) {
             return (int) ((be.getFilledAmount() * 15) / be.getFillCapacity());
         }
@@ -70,72 +70,72 @@ public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeC
     }
 
     @Override
-    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
-        return state.get(FACING) == dir;
+    public boolean canPipeConnect(LevelReader world, BlockPos pos, BlockState state, Direction dir) {
+        return state.getValue(FACING) == dir;
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        var sidePos = ctx.getBlockPos().offset(ctx.getSide(), -1);
-        var state = ctx.getWorld().getBlockState(sidePos);
-        if (state.getBlock() instanceof PipeConnectable connectable && connectable.canPipeConnect(ctx.getWorld(), sidePos, state, ctx.getSide())) {
-            return this.getDefaultState().with(FACING, ctx.getSide().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var sidePos = ctx.getClickedPos().relative(ctx.getClickedFace(), -1);
+        var state = ctx.getLevel().getBlockState(sidePos);
+        if (state.getBlock() instanceof PipeConnectable connectable && connectable.canPipeConnect(ctx.getLevel(), sidePos, state, ctx.getClickedFace())) {
+            return this.defaultBlockState().setValue(FACING, ctx.getClickedFace().getOpposite());
         }
-        return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getSide()));
+        return waterLog(ctx, this.defaultBlockState().setValue(FACING, ctx.getClickedFace()));
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         tickWater(state, world, tickView, pos);
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+        return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(WATERLOGGED, FACING);
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new PortableFluidTankBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return PortableFluidTankBlockEntity::tick;
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return FactoryUtil.transform(state, rotation::rotate, FACING);
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return FactoryUtil.transform(state, mirror::apply, FACING);
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        return FactoryUtil.transform(state, mirror::mirror, FACING);
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.COPPER_BLOCK.getDefaultState();
+        return Blocks.COPPER_BLOCK.defaultBlockState();
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(BlockConfig.FACING);
     }
 
@@ -146,21 +146,21 @@ public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeC
         private final SimpleMultiFluidViewModel fluid = new SimpleMultiFluidViewModel(this, FactoryModels.FLUID_PORTABLE_FLUID_TANK_VERTICAL, 16);
 
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.get(WATERLOGGED) ? WATERLOGGED_MODEL : BASE_MODEL);
+            this.main = ItemDisplayElementUtil.createSimple(state.getValue(WATERLOGGED) ? WATERLOGGED_MODEL : BASE_MODEL);
             this.main.setScale(new Vector3f(2f));
-            this.main.setRightRotation(new Quaternionf().rotateX(MathHelper.HALF_PI));
+            this.main.setRightRotation(new Quaternionf().rotateX(Mth.HALF_PI));
             updateStatePos(state);
             this.addElement(this.main);
         }
 
         private void updateStatePos(BlockState state) {
-            var dir = state.get(FACING);
+            var dir = state.getValue(FACING);
             float p = 0;
             float y = 0;
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.getPositiveHorizontalDegrees();
+                y = dir.toYRot();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             } else {
@@ -187,7 +187,7 @@ public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeC
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             super.notifyUpdate(updateType);
             if (updateType == BlockAwareAttachment.BLOCK_STATE_UPDATE) {
-                this.main.setItem(this.blockState().get(WATERLOGGED) ? WATERLOGGED_MODEL : BASE_MODEL);
+                this.main.setItem(this.blockState().getValue(WATERLOGGED) ? WATERLOGGED_MODEL : BASE_MODEL);
                 updateStatePos(this.blockState());
             }
         }

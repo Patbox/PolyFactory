@@ -4,51 +4,51 @@ import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 public abstract class AxisAndFacingBlock extends Block implements ConfigurableBlock, FactoryBlock {
-    public static final EnumProperty<Direction> FACING = Properties.FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
     public static final BooleanProperty FIRST_AXIS = FactoryProperties.FIRST_AXIS;
-    public static final BlockConfig<?> FIRST_AXIS_CONFIG = BlockConfig.of("axis", FIRST_AXIS, (value, world, pos, side, state) -> Text.literal(getAxis(state).asString()));
+    public static final BlockConfig<?> FIRST_AXIS_CONFIG = BlockConfig.of("axis", FIRST_AXIS, (value, world, pos, side, state) -> Component.literal(getAxis(state).getSerializedName()));
 
-    public AxisAndFacingBlock(Settings settings) {
+    public AxisAndFacingBlock(Properties settings) {
         super(settings);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        var facing = ctx.getPlayerLookDirection().getOpposite();
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var facing = ctx.getNearestLookingDirection().getOpposite();
 
-        var axis = ctx.getSide().getAxis();
+        var axis = ctx.getClickedFace().getAxis();
         if (axis == facing.getAxis()) {
             axis = getAxis(facing, false);
         }
 
-        return this.getDefaultState().with(FACING, facing).with(FIRST_AXIS, (getAxis(facing, true) == axis) != ctx.getPlayer().isSneaking());
+        return this.defaultBlockState().setValue(FACING, facing).setValue(FIRST_AXIS, (getAxis(facing, true) == axis) != ctx.getPlayer().isShiftKeyDown());
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
         builder.add(FIRST_AXIS);
     }
 
     public static Direction.Axis getAxis(BlockState state) {
-        return getAxis(state.get(FACING), state.get(FIRST_AXIS));
+        return getAxis(state.getValue(FACING), state.getValue(FIRST_AXIS));
     }
 
     public static Direction.Axis getAxis(Direction facing, boolean first) {
@@ -60,7 +60,7 @@ public abstract class AxisAndFacingBlock extends Block implements ConfigurableBl
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(BlockConfig.FACING, FIRST_AXIS_CONFIG);
     }
 }

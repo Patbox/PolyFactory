@@ -2,56 +2,52 @@ package eu.pb4.polyfactory.item.debug;
 
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.Items;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Rarity;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.context.UseOnContext;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class BaseDebugItem extends Item implements PolymerItem {
     private final int color;
-    private final Text name;
+    private final Component name;
 
-    public BaseDebugItem(Settings settings, String name, int color) {
-        super(settings.component(DataComponentTypes.ITEM_NAME, Text.literal("Debug: " + name)).maxCount(1)
+    public BaseDebugItem(Properties settings, String name, int color) {
+        super(settings.component(DataComponents.ITEM_NAME, Component.literal("Debug: " + name)).stacksTo(1)
                 .modelId(id("debug_item"))
                 .rarity(Rarity.EPIC));
-        this.name = Text.literal("Debug: " + name);
+        this.name = Component.literal("Debug: " + name);
         this.color = color;
     }
 
-    public static BaseDebugItem onBlockInteract(Settings settings, String name, int color, Consumer<ItemUsageContext> consumer) {
+    public static BaseDebugItem onBlockInteract(Properties settings, String name, int color, Consumer<UseOnContext> consumer) {
         return new BaseDebugItem(settings, name, color) {
             @Override
-            public ActionResult useOnBlock(ItemUsageContext context) {
+            public InteractionResult useOn(UseOnContext context) {
                 consumer.accept(context);
-                return ActionResult.SUCCESS_SERVER;
+                return InteractionResult.SUCCESS_SERVER;
             }
         };
     }
 
     @Override
-    public Text getName(ItemStack stack) {
+    public Component getName(ItemStack stack) {
         return this.name;
     }
 
     @Override
-    public boolean hasGlint(ItemStack stack) {
+    public boolean isFoil(ItemStack stack) {
         return true;
     }
 
@@ -62,6 +58,6 @@ public class BaseDebugItem extends Item implements PolymerItem {
 
     @Override
     public void modifyBasePolymerItemStack(ItemStack out, ItemStack stack, PacketContext context) {
-        out.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), IntList.of(this.color)));
+        out.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), IntList.of(this.color)));
     }
 }

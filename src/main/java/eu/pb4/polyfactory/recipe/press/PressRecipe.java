@@ -5,19 +5,18 @@ import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.MixingInput;
 import eu.pb4.polyfactory.recipe.input.PressInput;
-import net.minecraft.recipe.IngredientPlacement;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.book.RecipeBookCategories;
-import net.minecraft.recipe.book.RecipeBookCategory;
-import net.minecraft.world.World;
-
 import java.util.List;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategories;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 
 public interface PressRecipe extends Recipe<PressInput> {
     double minimumSpeed();
 
-    void applyRecipeUse(PressBlockEntity inventory, World world);
+    void applyRecipeUse(PressBlockEntity inventory, Level world);
 
     default List<FluidStack<?>> outputFluids(PressInput input) {
         return List.of();
@@ -29,17 +28,17 @@ public interface PressRecipe extends Recipe<PressInput> {
     }
 
     @Override
-    default RecipeBookCategory getRecipeBookCategory() {
+    default RecipeBookCategory recipeBookCategory() {
         return RecipeBookCategories.CAMPFIRE;
     }
 
     @Override
-    default boolean isIgnoredInRecipeBook() {
+    default boolean isSpecial() {
         return true;
     }
 
     @Override
-    default IngredientPlacement getIngredientPlacement() {
-        return IngredientPlacement.NONE;
+    default PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
     }
 }

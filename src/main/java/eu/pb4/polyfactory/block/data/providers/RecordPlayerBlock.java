@@ -4,102 +4,102 @@ import eu.pb4.polyfactory.block.data.util.DirectionalCabledDataBlock;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.EntityPosition;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.EntityPositionSyncS2CPacket;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.state.StateManager;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class RecordPlayerBlock extends DirectionalCabledDataProviderBlock {
-    public RecordPlayerBlock(Settings settings) {
+    public RecordPlayerBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
     }
 
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new RecordPlayerBlockEntity(pos, state);
     }
 
     @Override
-    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        world.updateComparators(pos, this);
-        super.onStateReplaced(state, world, pos, moved);
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
+        world.updateNeighbourForOutputSignal(pos, this);
+        super.affectNeighborsAfterRemoval(state, world, pos, moved);
     }
 
     @Override
-    protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (state.get(FACING).getOpposite() != hit.getSide() && world.getBlockEntity(pos) instanceof RecordPlayerBlockEntity be) {
-            if (be.getStack().isEmpty() && stack.contains(DataComponentTypes.JUKEBOX_PLAYABLE)) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (state.getValue(FACING).getOpposite() != hit.getDirection() && world.getBlockEntity(pos) instanceof RecordPlayerBlockEntity be) {
+            if (be.getStack().isEmpty() && stack.has(DataComponents.JUKEBOX_PLAYABLE)) {
                 be.setStack(stack.copyWithCount(1));
-                stack.decrementUnlessCreative(1, player);
-                return ActionResult.SUCCESS_SERVER;
+                stack.consume(1, player);
+                return InteractionResult.SUCCESS_SERVER;
             } else if (!be.getStack().isEmpty()) {
                 var newStack = be.getStack().copy();
                 be.setStack(ItemStack.EMPTY);
                 if (stack.isEmpty()) {
-                    player.setStackInHand(hand, newStack);
+                    player.setItemInHand(hand, newStack);
                 } else {
-                    player.giveOrDropStack(newStack);
+                    player.handleExtraItemsCreatedOnUse(newStack);
                 }
-                return ActionResult.SUCCESS_SERVER;
+                return InteractionResult.SUCCESS_SERVER;
             }
         }
 
-        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+        return super.useItemOn(stack, state, world, pos, player, hand, hit);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!player.isSneaking() && state.get(FACING).getOpposite() != hit.getSide() && world.getBlockEntity(pos) instanceof RecordPlayerBlockEntity be) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!player.isShiftKeyDown() && state.getValue(FACING).getOpposite() != hit.getDirection() && world.getBlockEntity(pos) instanceof RecordPlayerBlockEntity be) {
             var stack = be.getStack().copy();
             if (stack.isEmpty()) {
-                return ActionResult.FAIL;
+                return InteractionResult.FAIL;
             }
             be.setStack(ItemStack.EMPTY);
-            if (player.getMainHandStack().isEmpty()) {
-                player.setStackInHand(Hand.MAIN_HAND, stack);
+            if (player.getMainHandItem().isEmpty()) {
+                player.setItemInHand(InteractionHand.MAIN_HAND, stack);
             } else {
-                player.giveOrDropStack(stack);
+                player.handleExtraItemsCreatedOnUse(stack);
             }
-            return ActionResult.SUCCESS_SERVER;
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return RecordPlayerBlockEntity::ticker;
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(initialBlockState);
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
+        return new eu.pb4.polyfactory.block.data.providers.RecordPlayerBlock.Model(initialBlockState);
     }
 
     public static final class Model extends DirectionalCabledDataBlock.Model {
@@ -107,7 +107,7 @@ public class RecordPlayerBlock extends DirectionalCabledDataProviderBlock {
         private boolean isPlaying = false;
         private Model(BlockState state) {
             super(state);
-            this.soundSource.setOffset(new Vec3d(0, Integer.MAX_VALUE, 0));
+            this.soundSource.setOffset(new Vec3(0, Integer.MAX_VALUE, 0));
             this.soundSource.setInvisible(true);
             //this.soundSource.setBillboardMode(DisplayEntity.BillboardMode.CENTER);
             //this.soundSource.setItem(Items.MUSIC_DISC_5.getDefaultStack());
@@ -123,19 +123,19 @@ public class RecordPlayerBlock extends DirectionalCabledDataProviderBlock {
             this.addElement(this.soundSource);
         }
 
-        public void playSoundIfActive(RegistryEntry<SoundEvent> event) {
-            this.sendPacket(VirtualEntityUtils.createPlaySoundFromEntityPacket(this.soundSource.getEntityId(), event, SoundCategory.RECORDS, 4F + 1 / 16f, 1, 0));
+        public void playSoundIfActive(Holder<SoundEvent> event) {
+            this.sendPacket(VirtualEntityUtils.createPlaySoundFromEntityPacket(this.soundSource.getEntityId(), event, SoundSource.RECORDS, 4F + 1 / 16f, 1, 0));
         }
 
 
-        public void updatePosition(List<Vec3d> speakers, float volume) {
+        public void updatePosition(List<Vec3> speakers, float volume) {
             if (!this.isPlaying) {
                 return;
             }
             for (var handler : this.getWatchingPlayers()) {
 
-                var player = handler.player.getEyePos();
-                Vec3d closest = this.soundSource.getCurrentPos();
+                var player = handler.player.getEyePosition();
+                Vec3 closest = this.soundSource.getCurrentPos();
                 //double x = 0, y = 0, z = 0, weight = 0;
                 if (volume > 0.01) {
                     var distance = Double.MAX_VALUE;
@@ -145,7 +145,7 @@ public class RecordPlayerBlock extends DirectionalCabledDataProviderBlock {
                         y += (speaker.y - player.y) / d;
                         z += (speaker.z - player.z) / d;
                         weight += 1 / d;*/
-                        var d = player.squaredDistanceTo(speaker);
+                        var d = player.distanceToSqr(speaker);
                         if (d < distance) {
                             distance = d;
                             closest = speaker;
@@ -154,8 +154,8 @@ public class RecordPlayerBlock extends DirectionalCabledDataProviderBlock {
                     //closest = player.add(x / weight, y / weight, z / weight);
                 }
 
-                handler.sendPacket(new EntityPositionSyncS2CPacket(this.soundSource.getEntityId(),
-                        new EntityPosition(closest.add(0, Math.signum(closest.y - player.y) * (16 * 4 * (1 - volume) + 1), 0), Vec3d.ZERO, 0, 0), false));
+                handler.send(new ClientboundEntityPositionSyncPacket(this.soundSource.getEntityId(),
+                        new PositionMoveRotation(closest.add(0, Math.signum(closest.y - player.y) * (16 * 4 * (1 - volume) + 1), 0), Vec3.ZERO, 0, 0), false));
             }
         }
     }

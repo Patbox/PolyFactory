@@ -4,9 +4,9 @@ import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.item.FactoryItems;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.DyeColor;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.ItemStack;
 
 public interface DyeColorExtra {
     Int2ObjectMap<DyeColor> BY_COLOR = new Int2ObjectOpenHashMap<>();
@@ -22,10 +22,10 @@ public interface DyeColorExtra {
     }
 
     static int getColor(ItemStack stack) {
-        if (stack.isOf(FactoryItems.ARTIFICIAL_DYE)) {
+        if (stack.is(FactoryItems.ARTIFICIAL_DYE)) {
             return ColoredItem.getColor(stack);
         }
 
-        return stack.getItem() instanceof DyeItem dyeItem ? getColor(dyeItem.getColor()) : -1;
+        return stack.getItem() instanceof DyeItem dyeItem ? getColor(dyeItem.getDyeColor()) : -1;
     }
 }

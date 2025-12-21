@@ -8,40 +8,40 @@ import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.WrenchModifyBlockValue;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 public abstract class DirectionalCabledDataBlock extends BaseCabledDataBlock implements StatePropertiesCodecPatcher {
-    public static final EnumProperty<Direction> FACING = Properties.FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 
-    public final BlockConfig<?> facingAction = BlockConfig.of("facing", Properties.FACING, (dir, world, pos, side, state) -> FactoryUtil.asText(dir), WrenchModifyBlockValue.ofDirection(FACING),
+    public final BlockConfig<?> facingAction = BlockConfig.of("facing", BlockStateProperties.FACING, (dir, world, pos, side, state) -> FactoryUtil.asText(dir), WrenchModifyBlockValue.ofDirection(FACING),
             BlockConfigValue.ofPropertyCustom(FACING, (property, value, world, pos, side, state) -> {
-                var oldDir = state.get(property);
-                state = state.with(FACING, value).with(FACING_PROPERTIES.get(value), false);
-                return state.get(HAS_CABLE) ? state.with(FACING_PROPERTIES.get(oldDir),
-                        canConnectTo(world, getColor(world, pos), pos.offset(oldDir), world.getBlockState(pos.offset(oldDir)), oldDir.getOpposite())) : state;
+                var oldDir = state.getValue(property);
+                state = state.setValue(FACING, value).setValue(FACING_PROPERTIES.get(value), false);
+                return state.getValue(HAS_CABLE) ? state.setValue(FACING_PROPERTIES.get(oldDir),
+                        canConnectTo(world, getColor(world, pos), pos.relative(oldDir), world.getBlockState(pos.relative(oldDir)), oldDir.getOpposite())) : state;
             })).withAlt(WrenchModifyBlockValue.ofAltDirection(FACING));
-    public DirectionalCabledDataBlock(Settings settings) {
+    public DirectionalCabledDataBlock(Properties settings) {
         super(settings);
     }
 
     public MapCodec<BlockState> modifyPropertiesCodec(MapCodec<BlockState> codec) {
         return StatePropertiesCodecPatcher.modifier(codec, (state, ops, input) -> {
-            var facing = state.get(FACING);
-            if (input.get(facing.getOpposite().asString()) == null) {
-                return state.with(FACING_PROPERTIES.get(facing.getOpposite()), true);
+            var facing = state.getValue(FACING);
+            if (input.get(facing.getOpposite().getSerializedName()) == null) {
+                return state.setValue(FACING_PROPERTIES.get(facing.getOpposite()), true);
             }
             return state;
         });
@@ -49,35 +49,35 @@ public abstract class DirectionalCabledDataBlock extends BaseCabledDataBlock imp
 
     @Override
     protected Direction getFacing(BlockState state) {
-        return state.get(FACING);
+        return state.getValue(FACING);
     }
 
 
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        var state = ctx.getWorld().getBlockState(ctx.getBlockPos());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var state = ctx.getLevel().getBlockState(ctx.getClickedPos());
 
-        var delta = ctx.getHitPos().subtract(ctx.getBlockPos().getX() + 0.5, ctx.getBlockPos().getY() + 0.5, ctx.getBlockPos().getZ() + 0.5);
+        var delta = ctx.getClickLocation().subtract(ctx.getClickedPos().getX() + 0.5, ctx.getClickedPos().getY() + 0.5, ctx.getClickedPos().getZ() + 0.5);
 
-        return super.getPlacementState(ctx).with(FACING, state.isOf(FactoryBlocks.CABLE)
-                        && delta.getX() < 4 / 16f && delta.getX() > -4 / 16f
-                        && delta.getY() < 4 / 16f && delta.getY() > -4 / 16f
-                        && delta.getZ() < 4 / 16f && delta.getZ() > -4 / 16f
-                        ? ctx.getSide() : ctx.getPlayerLookDirection())
-                .with(HAS_CABLE, state.isOf(FactoryBlocks.CABLE))
-                .with(FACING_PROPERTIES.get(ctx.getPlayerLookDirection()), false);
+        return super.getStateForPlacement(ctx).setValue(FACING, state.is(FactoryBlocks.CABLE)
+                        && delta.x() < 4 / 16f && delta.x() > -4 / 16f
+                        && delta.y() < 4 / 16f && delta.y() > -4 / 16f
+                        && delta.z() < 4 / 16f && delta.z() > -4 / 16f
+                        ? ctx.getClickedFace() : ctx.getNearestLookingDirection())
+                .setValue(HAS_CABLE, state.is(FactoryBlocks.CABLE))
+                .setValue(FACING_PROPERTIES.get(ctx.getNearestLookingDirection()), false);
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(
                 BlockConfig.CHANNEL,
                 this.facingAction
@@ -85,11 +85,11 @@ public abstract class DirectionalCabledDataBlock extends BaseCabledDataBlock imp
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(initialBlockState);
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
+        return new eu.pb4.polyfactory.block.data.util.DirectionalCabledDataBlock.Model(initialBlockState);
     }
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return FactoryUtil.transform(state, rotation::rotate, FACING);
     }
 
@@ -100,13 +100,13 @@ public abstract class DirectionalCabledDataBlock extends BaseCabledDataBlock imp
 
         @Override
         protected void updateStatePos(BlockState state) {
-            var dir = state.get(FACING);
+            var dir = state.getValue(FACING);
             float p = -90;
             float y = 0;
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.getPositiveHorizontalDegrees();
+                y = dir.toYRot();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             }

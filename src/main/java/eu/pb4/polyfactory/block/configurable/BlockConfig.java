@@ -5,29 +5,28 @@ import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.nodes.data.DataStorage;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.enums.BlockHalf;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.Property;
 
-public record BlockConfig<T>(String id, Text name, Codec<T> codec, BlockConfigValue<T> value, BlockValueFormatter<T> formatter,
+public record BlockConfig<T>(String id, Component name, Codec<T> codec, BlockConfigValue<T> value, BlockValueFormatter<T> formatter,
                              WrenchModifyBlockValue<T> action, WrenchModifyBlockValue<T> alt) {
-    public static final BlockConfig<Direction> FACING = ofDirection(Properties.FACING);
-    public static final BlockConfig<Direction.Axis> AXIS = of("axis", Properties.AXIS);
-    public static final BlockConfig<Direction.Axis> HORIZONTAL_AXIS = of("axis", Properties.HORIZONTAL_AXIS);
-    public static final BlockConfig<Direction> FACING_HORIZONTAL = ofDirection("facing", Properties.HORIZONTAL_FACING);
-    public static final BlockConfig<BlockHalf> HALF = of("half", Properties.BLOCK_HALF, (t, world, pos, side, state) -> Text.translatable("text.polyfactory.half." + t.asString()));
+    public static final BlockConfig<Direction> FACING = ofDirection(BlockStateProperties.FACING);
+    public static final BlockConfig<Direction.Axis> AXIS = of("axis", BlockStateProperties.AXIS);
+    public static final BlockConfig<Direction.Axis> HORIZONTAL_AXIS = of("axis", BlockStateProperties.HORIZONTAL_AXIS);
+    public static final BlockConfig<Direction> FACING_HORIZONTAL = ofDirection("facing", BlockStateProperties.HORIZONTAL_FACING);
+    public static final BlockConfig<Half> HALF = of("half", BlockStateProperties.HALF, (t, world, pos, side, state) -> Component.translatable("text.polyfactory.half." + t.getSerializedName()));
     public static final BlockConfig<Integer> CHANNEL = ofChannel("channel", ChannelContainer.class,
             ChannelContainer::channel, ChannelContainer::setChannel
     );
@@ -35,24 +34,24 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, BlockConfigVa
     public static final BlockConfig<Integer> CHANNEL_WITH_DISABLED = ofChannelWithDisabled("channel", ChannelContainer.class,
             ChannelContainer::channel, ChannelContainer::setChannel
     );
-    public static final BlockConfig<Direction> FACING_HOPPER = ofDirection("rotation", Properties.HOPPER_FACING);
-    public static final BlockConfig<Boolean> INVERTED = of("inverted", Properties.INVERTED);
-    public static final BlockConfig<Boolean> REVERSE = BlockConfig.of("reverse", FactoryProperties.REVERSE, (on, world, pos, side, state) -> ScreenTexts.onOrOff(on));
+    public static final BlockConfig<Direction> FACING_HOPPER = ofDirection("rotation", BlockStateProperties.FACING_HOPPER);
+    public static final BlockConfig<Boolean> INVERTED = of("inverted", BlockStateProperties.INVERTED);
+    public static final BlockConfig<Boolean> REVERSE = BlockConfig.of("reverse", FactoryProperties.REVERSE, (on, world, pos, side, state) -> CommonComponents.optionStatus(on));
 
     public static <T extends Comparable<T>> BlockConfig<T> of(Property<T> property) {
         return of(property.getName(), property);
     }
 
     public static <T extends Comparable<T>> BlockConfig<T> of(Property<T> property, BlockValueFormatter<T> textFunction) {
-        return new BlockConfig<T>(property.getName(), Text.translatable("item.polyfactory.wrench.action." + property.getName()),
-                Codec.stringResolver(property::name, x -> property.parse(x).orElse(property.getValues().getFirst())),
+        return new BlockConfig<T>(property.getName(), Component.translatable("item.polyfactory.wrench.action." + property.getName()),
+                Codec.stringResolver(property::getName, x -> property.getValue(x).orElse(property.getPossibleValues().getFirst())),
                 BlockConfigValue.ofProperty(property),
                 textFunction,
                 WrenchModifyBlockValue.ofProperty(property), WrenchModifyBlockValue.ofProperty(property));
     }
 
     public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property) {
-        return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
+        return new BlockConfig<T>(id, Component.translatable("item.polyfactory.wrench.action." + id),
                 FactoryUtil.propertyCodec(property),
                 BlockConfigValue.ofProperty(property),
                 BlockValueFormatter.getDefault(),
@@ -60,15 +59,15 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, BlockConfigVa
     }
 
     public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, BlockValueFormatter<T> textFunction) {
-        return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
-                Codec.stringResolver(property::name, x -> property.parse(x).orElse(property.getValues().getFirst())),
+        return new BlockConfig<T>(id, Component.translatable("item.polyfactory.wrench.action." + id),
+                Codec.stringResolver(property::getName, x -> property.getValue(x).orElse(property.getPossibleValues().getFirst())),
                 BlockConfigValue.ofProperty(property),
                 textFunction,
                 WrenchModifyBlockValue.ofProperty(property), WrenchModifyBlockValue.ofProperty(property));
     }
 
     public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, BiFunction<T, Boolean, T> function) {
-        return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
+        return new BlockConfig<T>(id, Component.translatable("item.polyfactory.wrench.action." + id),
                 FactoryUtil.propertyCodec(property),
                 BlockConfigValue.ofProperty(property),
                 BlockValueFormatter.getDefault(),
@@ -76,7 +75,7 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, BlockConfigVa
     }
 
     public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, BlockValueFormatter<T> textFunction, BiFunction<T, Boolean, T> function) {
-        return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
+        return new BlockConfig<T>(id, Component.translatable("item.polyfactory.wrench.action." + id),
                 FactoryUtil.propertyCodec(property),
                 BlockConfigValue.ofProperty(property),
                 textFunction,
@@ -84,7 +83,7 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, BlockConfigVa
     }
 
     public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, BlockValueFormatter<T> textFunction, WrenchModifyBlockValue<T> function) {
-        return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
+        return new BlockConfig<T>(id, Component.translatable("item.polyfactory.wrench.action." + id),
                 FactoryUtil.propertyCodec(property),
                 BlockConfigValue.ofProperty(property),
                 textFunction,
@@ -92,7 +91,7 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, BlockConfigVa
     }
 
     public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, BlockValueFormatter<T> textFunction, BiFunction<T, Boolean, T> function, BlockConfigValue<T> value) {
-        return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
+        return new BlockConfig<T>(id, Component.translatable("item.polyfactory.wrench.action." + id),
                 FactoryUtil.propertyCodec(property),
                 value,
                 textFunction,
@@ -100,7 +99,7 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, BlockConfigVa
     }
 
     public static <T extends Comparable<T>> BlockConfig<T> of(String id, Property<T> property, BlockValueFormatter<T> textFunction, WrenchModifyBlockValue<T> function, BlockConfigValue<T> value) {
-        return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id),
+        return new BlockConfig<T>(id, Component.translatable("item.polyfactory.wrench.action." + id),
                 FactoryUtil.propertyCodec(property),
                 value,
                 textFunction,
@@ -108,13 +107,13 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, BlockConfigVa
     }
 
     public static <T> BlockConfig<T> of(String id, Codec<T> codec, BlockConfigValue<T> value, WrenchModifyBlockValue<T> action) {
-        return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id), codec,
+        return new BlockConfig<T>(id, Component.translatable("item.polyfactory.wrench.action." + id), codec,
                 value,
                 BlockValueFormatter.getDefault(), action, action);
     }
 
     public static <T> BlockConfig<T> of(String id, Codec<T> codec, BlockConfigValue<T> value, BlockValueFormatter<T> formatter, WrenchModifyBlockValue<T> action) {
-        return new BlockConfig<T>(id, Text.translatable("item.polyfactory.wrench.action." + id), codec,
+        return new BlockConfig<T>(id, Component.translatable("item.polyfactory.wrench.action." + id), codec,
                 value,
                 formatter, action, action);
     }
@@ -149,7 +148,7 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, BlockConfigVa
         return ofBlockEntity(id,
                 Codec.INT,
                 tClass,
-                (x, world, pos, side, state) -> Text.literal(String.valueOf(x + displayOffset)),
+                (x, world, pos, side, state) -> Component.literal(String.valueOf(x + displayOffset)),
                 get,
                 set,
                 WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 1 : -1), minInclusive, maxInclusive)));
@@ -159,7 +158,7 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, BlockConfigVa
         return ofBlockEntity(id,
                 Codec.INT,
                 tClass,
-                (x, world, pos, side, state) -> Text.literal(display.apply(x)),
+                (x, world, pos, side, state) -> Component.literal(display.apply(x)),
                 get,
                 set,
                 WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 1 : -1), minInclusive, maxInclusive)));
@@ -169,7 +168,7 @@ public record BlockConfig<T>(String id, Text name, Codec<T> codec, BlockConfigVa
         return new BlockConfig<T>(this.id, this.name, this.codec, this.value, this.formatter, this.action, alt);
     }
 
-    public Text getDisplayValue(World world, BlockPos blockPos, Direction side, BlockState state) {
+    public Component getDisplayValue(Level world, BlockPos blockPos, Direction side, BlockState state) {
         return this.formatter.getDisplayValue(this.value.getValue(world, blockPos, side, state), world, blockPos, side, state);
     }
 }

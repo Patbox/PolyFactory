@@ -2,11 +2,9 @@ package eu.pb4.polyfactory.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.registry.Registries;
-import net.minecraft.state.property.Property;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.NotNull;
 
 public record BlockStateData(BlockState state) implements DataContainer {
@@ -23,7 +21,7 @@ public record BlockStateData(BlockState state) implements DataContainer {
 
     @Override
     public long asLong() {
-        return state.isAir() ? 0 : state.getBlock().getStateManager().getStates().indexOf(state) + 1;
+        return state.isAir() ? 0 : state.getBlock().getStateDefinition().getPossibleStates().indexOf(state) + 1;
     }
 
     @Override
@@ -39,11 +37,11 @@ public record BlockStateData(BlockState state) implements DataContainer {
     @Override
     public DataContainer extract(String field) {
         if (field.equals("type")) {
-            return new StringData(Registries.BLOCK.getId(this.state.getBlock()));
+            return new StringData(BuiltInRegistries.BLOCK.getKey(this.state.getBlock()));
         }
         if (field.startsWith("property:")) {
-            var property = this.state.getBlock().getStateManager().getProperty(field.substring("property:".length()));
-            var value = this.state.get(property);
+            var property = this.state.getBlock().getStateDefinition().getProperty(field.substring("property:".length()));
+            var value = this.state.getValue(property);
             if (value instanceof Boolean bool) {
                 return BoolData.of(bool);
             } else if (value instanceof Integer integer) {
@@ -51,7 +49,7 @@ public record BlockStateData(BlockState state) implements DataContainer {
             }
 
             //noinspection unchecked
-            return new StringData(((Property) property).name(value));
+            return new StringData(((Property) property).getName(value));
         }
 
         return DataContainer.super.extract(field);

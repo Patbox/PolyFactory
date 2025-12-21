@@ -14,34 +14,36 @@ import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.PredicateLimitedSlot;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
+import eu.pb4.polyfactory.util.inventory.SingleStackContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.inventory.SidedInventory;
-import net.minecraft.inventory.StackReference;
-import net.minecraft.item.AutomaticItemPlacementContext;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.*;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.DirectionalPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
-public class PlacerBlockEntity extends LockableBlockEntity implements SingleStackInventory, SidedInventory, OwnedBlockEntity {
+public class PlacerBlockEntity extends LockableBlockEntity implements SingleStackContainer, WorldlyContainer, OwnedBlockEntity {
     private ItemStack stack = ItemStack.EMPTY;
     protected GameProfile owner = null;
     protected double process = 0;
@@ -55,26 +57,26 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
     }
 
     @Override
-    protected void writeData(WriteView view) {
+    protected void saveAdditional(ValueOutput view) {
         if (!this.stack.isEmpty()) {
-            view.put("stack", ItemStack.OPTIONAL_CODEC, this.stack);
+            view.store("stack", ItemStack.OPTIONAL_CODEC, this.stack);
         }
         view.putDouble("progress", this.process);
         if (this.owner != null) {
-            view.put("owner", NbtCompound.CODEC, LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+            view.store("owner", CompoundTag.CODEC, LegacyNbtHelper.writeGameProfile(new CompoundTag(), this.owner));
         }
         view.putInt("reach", this.reach);
-        super.writeData(view);
+        super.saveAdditional(view);
     }
 
     @Override
-    public void readData(ReadView view) {
+    public void loadAdditional(ValueInput view) {
         this.stack = view.read("stack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
-        this.process = view.getDouble("progress", 0);
-        view.read("owner", NbtCompound.CODEC).ifPresent(x -> this.owner = LegacyNbtHelper.toGameProfile(x));
+        this.process = view.getDoubleOr("progress", 0);
+        view.read("owner", CompoundTag.CODEC).ifPresent(x -> this.owner = LegacyNbtHelper.toGameProfile(x));
 
-        this.reach = view.getInt("reach", 1);
-        super.readData(view);
+        this.reach = view.getIntOr("reach", 1);
+        super.loadAdditional(view);
     }
 
     @Override
@@ -88,20 +90,20 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         if (this.model != null) {
             this.model.setItem(stack.copyWithCount(1));
         }
-        this.markDirty();
+        this.setChanged();
     }
 
     @Override
-    public int getMaxCountPerStack() {
+    public int getMaxStackSize() {
         return 64;
     }
 
     @Override
-    protected void createGui(ServerPlayerEntity playerEntity) {
+    protected void createGui(ServerPlayer playerEntity) {
         new Gui(playerEntity);
     }
 
-    public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
+    public static <T extends BlockEntity> void ticker(Level world, BlockPos pos, BlockState state, T t) {
         var self = (PlacerBlockEntity) t;
 
         if (self.model == null) {
@@ -110,7 +112,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         }
 
 
-        var usable = self.stack.isIn(FactoryItemTags.PLACER_USABLE);
+        var usable = self.stack.is(FactoryItemTags.PLACER_USABLE);
 
         if (self.stack.isEmpty() || (!(self.stack.getItem() instanceof BlockItem) && !usable)) {
             self.stress = 0;
@@ -121,8 +123,8 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         BlockPos blockPos = pos;
         int reach = self.reach;
         while (reach-- > 0) {
-            blockPos = blockPos.offset(state.get(PlacerBlock.FACING));
-            if (!world.getBlockState(blockPos).isAir() || !world.getBlockState(blockPos.offset(state.get(PlacerBlock.FACING))).isAir()) {
+            blockPos = blockPos.relative(state.getValue(PlacerBlock.FACING));
+            if (!world.getBlockState(blockPos).isAir() || !world.getBlockState(blockPos.relative(state.getValue(PlacerBlock.FACING))).isAir()) {
                 break;
             }
         }
@@ -134,25 +136,25 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
             return;
         }
 
-        var dir = state.get(PlacerBlock.FACING);
-        var speed = Math.abs(RotationUser.getRotation((ServerWorld) world, pos).speed()) * MathHelper.RADIANS_PER_DEGREE * 2.5f;
+        var dir = state.getValue(PlacerBlock.FACING);
+        var speed = Math.abs(RotationUser.getRotation((ServerLevel) world, pos).speed()) * Mth.DEG_TO_RAD * 2.5f;
 
 
-        var entities = world.getEntitiesByClass(Entity.class, new Box(blockPos), Entity::canHit);
+        var entities = world.getEntitiesOfClass(Entity.class, new AABB(blockPos), Entity::isPickable);
 
-        var blockHitResult = new BlockHitResult(Vec3d.ofCenter(blockPos).offset(dir, 0.5), dir.getOpposite(), blockPos, true);
+        var blockHitResult = new BlockHitResult(Vec3.atCenterOf(blockPos).relative(dir, 0.5), dir.getOpposite(), blockPos, true);
 
         var context = usable
-                ? new ItemUsageContext(world, self.getFakePlayer(), Hand.MAIN_HAND, self.stack, blockHitResult)
-                : new AutomaticItemPlacementContext(world, blockPos, state.get(PlacerBlock.FACING), self.stack, dir.getOpposite()) {
+                ? new UseOnContext(world, self.getFakePlayer(), InteractionHand.MAIN_HAND, self.stack, blockHitResult)
+                : new DirectionalPlaceContext(world, blockPos, state.getValue(PlacerBlock.FACING), self.stack, dir.getOpposite()) {
             @Override
-            public boolean canReplaceExisting() {
+            public boolean replacingClickedOnBlock() {
                 return true;
             }
         };
 
 
-        if (!entities.isEmpty() && context instanceof AutomaticItemPlacementContext ctx && !ctx.canPlace()) {
+        if (!entities.isEmpty() && context instanceof DirectionalPlaceContext ctx && !ctx.canPlace()) {
             self.model.setItem(ItemStack.EMPTY);
             self.stress = 0;
             return;
@@ -160,7 +162,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
             self.model.setItem(self.stack.copyWithCount(1));
         }
         self.stress = self.stack.getItem() instanceof BlockItem blockItem
-                ? (float) Math.min(Math.max(8, Math.log(blockItem.getBlock().getHardness()) / Math.log(1.1)), 18)
+                ? (float) Math.min(Math.max(8, Math.log(blockItem.getBlock().defaultDestroyTime()) / Math.log(1.1)), 18)
                 : 12
         ;
 
@@ -179,24 +181,24 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
             if (!entities.isEmpty()) {
                 var p = self.getFakePlayer();
                 if (dir == Direction.UP) {
-                    p.setYaw(0);
-                    p.setPitch(-90);
+                    p.setYRot(0);
+                    p.setXRot(-90);
                 } else if (dir == Direction.DOWN) {
-                    p.setYaw(0);
-                    p.setPitch(90);
+                    p.setYRot(0);
+                    p.setXRot(90);
                 } else {
-                    p.setYaw(dir.getPositiveHorizontalDegrees());
-                    p.setPitch(0);
+                    p.setYRot(dir.toYRot());
+                    p.setXRot(0);
                 }
 
-                var vec = Vec3d.ofCenter(pos).offset(state.get(PlacerBlock.FACING), 0.51);
-                p.setPos(vec.x, vec.y, vec.z);
+                var vec = Vec3.atCenterOf(pos).relative(state.getValue(PlacerBlock.FACING), 0.51);
+                p.setPosRaw(vec.x, vec.y, vec.z);
 
                 for (var entity : entities) {
-                    var s = entity.interact(p, Hand.MAIN_HAND);
-                    ItemScatterer.spawn(world, pos, p.getInventory());
+                    var s = entity.interact(p, InteractionHand.MAIN_HAND);
+                    Containers.dropContents(world, pos, p.getInventory());
 
-                    if (s.isAccepted()) {
+                    if (s.consumesAction()) {
                         skip = true;
                         break;
                     }
@@ -204,7 +206,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                 }
             }
 
-            if (!skip && self.stack.getItem() instanceof BlockItem blockItem && context instanceof AutomaticItemPlacementContext ctx) {
+            if (!skip && self.stack.getItem() instanceof BlockItem blockItem && context instanceof DirectionalPlaceContext ctx) {
                 blockItem.place(ctx);
                 if (world.getBlockEntity(blockPos) instanceof OwnedBlockEntity ownedBlockEntity) {
                     ownedBlockEntity.setOwner(self.owner);
@@ -212,42 +214,42 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
             } else if (!skip) {
                 var p = self.getFakePlayer();
                 if (dir == Direction.UP) {
-                    p.setYaw(0);
-                    p.setPitch(-90);
+                    p.setYRot(0);
+                    p.setXRot(-90);
                 } else if (dir == Direction.DOWN) {
-                    p.setYaw(0);
-                    p.setPitch(90);
+                    p.setYRot(0);
+                    p.setXRot(90);
                 } else {
-                    p.setYaw(dir.getPositiveHorizontalDegrees());
-                    p.setPitch(0);
+                    p.setYRot(dir.toYRot());
+                    p.setXRot(0);
                 }
 
-                var vec = Vec3d.ofCenter(pos).offset(state.get(PlacerBlock.FACING), 0.51);
-                p.setPos(vec.x, vec.y, vec.z);
+                var vec = Vec3.atCenterOf(pos).relative(state.getValue(PlacerBlock.FACING), 0.51);
+                p.setPosRaw(vec.x, vec.y, vec.z);
 
-                var actionResult = world.getBlockState(blockPos).onUseWithItem(self.stack, world, self.getFakePlayer(), Hand.MAIN_HAND, blockHitResult);
-                if (!actionResult.isAccepted()) {
-                    actionResult = world.getBlockState(blockPos).onUse(world, self.getFakePlayer(), blockHitResult);
-                        if (!actionResult.isAccepted()) {
-                            actionResult = self.stack.useOnBlock(context);
-                            if (!actionResult.isAccepted()) {
-                                actionResult = self.stack.use(world, self.getFakePlayer(), Hand.MAIN_HAND);
+                var actionResult = world.getBlockState(blockPos).useItemOn(self.stack, world, self.getFakePlayer(), InteractionHand.MAIN_HAND, blockHitResult);
+                if (!actionResult.consumesAction()) {
+                    actionResult = world.getBlockState(blockPos).useWithoutItem(world, self.getFakePlayer(), blockHitResult);
+                        if (!actionResult.consumesAction()) {
+                            actionResult = self.stack.useOn(context);
+                            if (!actionResult.consumesAction()) {
+                                actionResult = self.stack.use(world, self.getFakePlayer(), InteractionHand.MAIN_HAND);
                             }
                         }
                     }
-                if (actionResult instanceof ActionResult.Success success) {
-                    var newStack = success.getNewHandStack();
+                if (actionResult instanceof InteractionResult.Success success) {
+                    var newStack = success.heldItemTransformedTo();
                     if (newStack != null) {
                         self.setStack(newStack);
                     }
                 }
-                ItemScatterer.spawn(world, pos, p.getInventory());
+                Containers.dropContents(world, pos, p.getInventory());
             }
 
-            if (self.owner != null && world.getPlayerByUuid(self.owner.id()) instanceof ServerPlayerEntity serverPlayer) {
+            if (self.owner != null && world.getPlayerByUUID(self.owner.id()) instanceof ServerPlayer serverPlayer) {
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.PLACER_PLACES);
             }
-            self.markDirty();
+            self.setChanged();
         }
         self.model.rotate((float) self.process);
     }
@@ -262,7 +264,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
     public void setReach(int reach) {
         this.reach = reach;
-        this.markDirty();
+        this.setChanged();
     }
 
     @Override
@@ -274,16 +276,16 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         if (this.player == null) {
             var profile = this.owner == null ? FactoryUtil.GENERIC_PROFILE : this.owner;
 
-            this.player = new FactoryPlayer(StackReference.of(this::getStack, this::setStack), (ServerWorld) this.world, this.pos,
+            this.player = new FactoryPlayer(SlotAccess.of(this::getStack, this::setStack), (ServerLevel) this.level, this.worldPosition,
                     new GameProfile(profile.id(), "Placer (" + profile.name() + ")")) {
                 @Override
                 public double getEyeY() {
                     return getY();
                 }
             };
-            var vec = Vec3d.ofCenter(this.pos).offset(this.getCachedState().get(PlacerBlock.FACING), 0.51);
+            var vec = Vec3.atCenterOf(this.worldPosition).relative(this.getBlockState().getValue(PlacerBlock.FACING), 0.51);
 
-            this.player.setPos(vec.x, vec.y, vec.z);
+            this.player.setPosRaw(vec.x, vec.y, vec.z);
         }
 
         return this.player;
@@ -292,14 +294,14 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
     @Override
     public void setOwner(GameProfile profile) {
         this.owner = profile;
-        this.markDirty();
+        this.setChanged();
     }
 
     private class Gui extends SimpleGui {
-        public Gui(ServerPlayerEntity player) {
-            super(ScreenHandlerType.HOPPER, player, false);
-            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(PlacerBlockEntity.this.getCachedState().getBlock().getName()));
-            this.setSlotRedirect(2, new PredicateLimitedSlot(PlacerBlockEntity.this, 0, s -> s.getItem() instanceof BlockItem || s.isIn(FactoryItemTags.PLACER_USABLE)));
+        public Gui(ServerPlayer player) {
+            super(MenuType.HOPPER, player, false);
+            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(PlacerBlockEntity.this.getBlockState().getBlock().getName()));
+            this.setSlotRedirect(2, new PredicateLimitedSlot(PlacerBlockEntity.this, 0, s -> s.getItem() instanceof BlockItem || s.is(FactoryItemTags.PLACER_USABLE)));
             this.open();
         }
 
@@ -310,7 +312,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
         @Override
         public void onTick() {
-            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(PlacerBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.position().distanceToSqr(Vec3.atCenterOf(PlacerBlockEntity.this.worldPosition)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();

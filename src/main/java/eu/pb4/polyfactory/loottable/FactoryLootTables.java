@@ -2,13 +2,11 @@ package eu.pb4.polyfactory.loottable;
 
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
-import net.minecraft.block.Block;
-import net.minecraft.loot.function.LootFunction;
-import net.minecraft.loot.function.LootFunctionType;
-import net.minecraft.loot.provider.number.LootNumberProviderType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import net.minecraft.world.level.storage.loot.providers.number.LootNumberProviderType;
 
 public class FactoryLootTables {
     public static void register() {
@@ -20,10 +18,10 @@ public class FactoryLootTables {
 
 
     public static <T extends LootNumberProviderType> T register(String path, T item) {
-        return Registry.register(Registries.LOOT_NUMBER_PROVIDER_TYPE, Identifier.of(ModInit.ID, path), item);
+        return Registry.register(BuiltInRegistries.LOOT_NUMBER_PROVIDER_TYPE, Identifier.fromNamespaceAndPath(ModInit.ID, path), item);
     }
 
-    public static <T extends LootFunctionType<?>> T register(String path, T item) {
-        return Registry.register(Registries.LOOT_FUNCTION_TYPE, Identifier.of(ModInit.ID, path), item);
+    public static <T extends LootItemFunctionType<?>> T register(String path, T item) {
+        return Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE, Identifier.fromNamespaceAndPath(ModInit.ID, path), item);
     }
 }

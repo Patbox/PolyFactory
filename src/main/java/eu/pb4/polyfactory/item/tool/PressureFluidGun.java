@@ -11,54 +11,49 @@ import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.PolymerItem;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ChargedProjectilesComponent;
-import net.minecraft.component.type.ConsumableComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.StackReference;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.consume.UseAction;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.network.packet.s2c.play.EntityEquipmentUpdateS2CPacket;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.ChargedProjectiles;
+import net.minecraft.world.level.Level;
 
 public class PressureFluidGun extends Item implements PolymerItem {
-    public PressureFluidGun(Settings settings) {
+    public PressureFluidGun(Properties settings) {
         super(settings);
     }
 
     public static boolean isUsable(ItemStack stack) {
-        return stack.getDamage() < stack.getMaxDamage() - 1;
+        return stack.getDamageValue() < stack.getMaxDamage() - 1;
     }
 
 
     @Override
-    public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
+    public void inventoryTick(ItemStack stack, ServerLevel world, Entity entity, @Nullable EquipmentSlot slot) {
         super.inventoryTick(stack, world, entity, slot);
-        if (entity instanceof LivingEntity livingEntity && livingEntity.getActiveItem() != stack) {
-            onStoppedUsing(stack, world, livingEntity, 0);
+        if (entity instanceof LivingEntity livingEntity && livingEntity.getUseItem() != stack) {
+            releaseUsing(stack, world, livingEntity, 0);
         }
     }
 
     @Override
-    public boolean onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
+    public boolean releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
         //noinspection unchecked
         var fluid = (FluidInstance<Object>) stack.get(FactoryDataComponents.CURRENT_FLUID);
         if (fluid != null) {
@@ -69,7 +64,7 @@ public class PressureFluidGun extends Item implements PolymerItem {
     }
 
     @Override
-    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
+    public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
         //noinspection unchecked
         var fluid = (FluidInstance<Object>) stack.get(FactoryDataComponents.CURRENT_FLUID);
         if (fluid == null) {
@@ -88,12 +83,12 @@ public class PressureFluidGun extends Item implements PolymerItem {
             if (fluid.shootingBehavior().canShoot(ctx, fluid, container)) {
                 fluid.shootingBehavior().continueShooting(ctx, fluid, -remainingUseTicks, container);
                 if (remainingUseTicks % 20 == 0) {
-                    stack.damage(1, user, user.getActiveHand() == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
+                    stack.hurtAndBreak(1, user, user.getUsedItemHand() == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
                 }
 
-                var vec = ctx.rotation().multiply(user.isOnGround() ? -0.002 : -0.05);
+                var vec = ctx.rotation().scale(user.onGround() ? -0.002 : -0.05);
                 FactoryUtil.addSafeVelocity(user, vec);
-                if (user instanceof ServerPlayerEntity player) {
+                if (user instanceof ServerPlayer player) {
                     FactoryUtil.sendVelocityDelta(player, vec);
                 }
                 return;
@@ -104,15 +99,15 @@ public class PressureFluidGun extends Item implements PolymerItem {
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity user, Hand hand) {
-        var stack = user.getStackInHand(hand);
-        if (stack.contains(FactoryDataComponents.CURRENT_FLUID)) {
-            return ActionResult.CONSUME;
+    public InteractionResult use(Level world, Player user, InteractionHand hand) {
+        var stack = user.getItemInHand(hand);
+        if (stack.has(FactoryDataComponents.CURRENT_FLUID)) {
+            return InteractionResult.CONSUME;
         }
 
         var containers = findFluidContainer(user);
         if (containers.isEmpty() || !isUsable(stack)) {
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
         }
 
         var ctx = new EntityShooterContext(user);
@@ -122,37 +117,37 @@ public class PressureFluidGun extends Item implements PolymerItem {
             for (var f : ((List<FluidInstance<Object>>) (Object) container.fluids())) {
                 if (f.shootingBehavior().canShoot(ctx, f, container)) {
                     stack.set(FactoryDataComponents.CURRENT_FLUID, f);
-                    user.setCurrentHand(hand);
+                    user.startUsingItem(hand);
                     f.shootingBehavior().startShooting(ctx, f, container);
-                    var vec = ctx.rotation().multiply(user.isOnGround() ? -0.01 : -0.07);
+                    var vec = ctx.rotation().scale(user.onGround() ? -0.01 : -0.07);
                     FactoryUtil.addSafeVelocity(user, vec);
-                    if (user instanceof ServerPlayerEntity player) {
+                    if (user instanceof ServerPlayer player) {
                         FactoryUtil.sendVelocityDelta(player, vec);
                         FluidShootsCriterion.triggerFluidLauncher(player, stack, f);
                     }
-                    return ActionResult.CONSUME;
+                    return InteractionResult.CONSUME;
                 }
             }
         }
 
-        return ActionResult.FAIL;
+        return InteractionResult.FAIL;
     }
 
     private List<FluidContainer> findFluidContainer(LivingEntity user) {
         var stacks = new ArrayList<FluidContainer>();
         for (var eq : EquipmentSlot.values()) {
-            var stack = user.getEquippedStack(eq);
+            var stack = user.getItemBySlot(eq);
             var fluid = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
             if (!fluid.isEmpty()) {
-                stacks.add(FluidContainerFromComponent.of(StackReference.of(user, eq)));
+                stacks.add(FluidContainerFromComponent.of(SlotAccess.forEquipmentSlot(user, eq)));
             }
         }
 
-        if (user instanceof PlayerEntity player) {
-            for (int i = 0; i < player.getInventory().getMainStacks().size(); i++) {
-                var fluid = player.getInventory().getStack(i).getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
+        if (user instanceof Player player) {
+            for (int i = 0; i < player.getInventory().getNonEquipmentItems().size(); i++) {
+                var fluid = player.getInventory().getItem(i).getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
                 if (!fluid.isEmpty()) {
-                    stacks.add(FluidContainerFromComponent.of(player.getInventory().getStackReference(i)));
+                    stacks.add(FluidContainerFromComponent.of(player.getInventory().getSlot(i)));
                 }
             }
         }
@@ -161,10 +156,10 @@ public class PressureFluidGun extends Item implements PolymerItem {
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, PacketContext context) {
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context) {
         var out = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, context);
         if (this.useCrossbowModel(itemStack)) {
-            out.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.of(Items.ARROW.getDefaultStack()));
+            out.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.of(Items.ARROW.getDefaultInstance()));
             /*out.set(DataComponentTypes.ATTRIBUTE_MODIFIERS, out.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT)
                     .with(
                             EntityAttributes.GENERIC_ATTACK_SPEED,
@@ -174,7 +169,7 @@ public class PressureFluidGun extends Item implements PolymerItem {
             );*/
         }
         //out.set(DataComponentTypes.CONSUMABLE, new ConsumableComponent(99999f, UseAction.BOW, Registries.SOUND_EVENT.getEntry(SoundEvents.INTENTIONALLY_EMPTY), false, List.of()));
-        out.set(DataComponentTypes.DAMAGE, itemStack.get(DataComponentTypes.DAMAGE));
+        out.set(DataComponents.DAMAGE, itemStack.get(DataComponents.DAMAGE));
         return out;
     }
 
@@ -188,10 +183,10 @@ public class PressureFluidGun extends Item implements PolymerItem {
     }
 
     private boolean useCrossbowModel(ItemStack itemStack) {
-        return useActiveModel(itemStack) && PacketContext.get().getEncodedPacket() instanceof EntityEquipmentUpdateS2CPacket;
+        return useActiveModel(itemStack) && PacketContext.get().getEncodedPacket() instanceof ClientboundSetEquipmentPacket;
     }
 
     private boolean useActiveModel(ItemStack itemStack) {
-        return itemStack.contains(FactoryDataComponents.CURRENT_FLUID);
+        return itemStack.has(FactoryDataComponents.CURRENT_FLUID);
     }
 }

@@ -10,24 +10,24 @@ import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.models.fluid.TopFluidViewModel;
-import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
+import eu.pb4.polyfactory.util.movingitem.MovingItemContainerHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -35,14 +35,14 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable {
-    public MDrainBlock(Settings settings) {
+    public MDrainBlock(Properties settings) {
         super(settings);
         Model.AXLE_MODEL.isEmpty();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.ANVIL.getDefaultState();
+        return Blocks.ANVIL.defaultBlockState();
     }
 
 
@@ -52,12 +52,12 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState state) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
         if (world.getBlockEntity(pos) instanceof MDrainBlockEntity be) {
             return be.getComparatorOutput(state, world, pos, direction);
         }
@@ -66,19 +66,19 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world instanceof ServerWorld && type == FactoryBlockEntities.MECHANICAL_DRAIN ? MDrainBlockEntity::ticker : null;
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+        return world instanceof ServerLevel && type == FactoryBlockEntities.MECHANICAL_DRAIN ? MDrainBlockEntity::ticker : null;
     }
 
 
     @Override
-    protected ElementHolder createModel(ServerWorld serverWorld, BlockPos pos, BlockState initialBlockState) {
+    protected ElementHolder createModel(ServerLevel serverWorld, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
     @Override
-    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
-        if (self.getBlockState().get(INPUT_FACING).getOpposite() != pushDirection || self.getBlockState().get(PART) == Part.TOP) {
+    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainerHolder conveyor) {
+        if (self.getBlockState().getValue(INPUT_FACING).getOpposite() != pushDirection || self.getBlockState().getValue(PART) == Part.TOP) {
             return false;
         }
 
@@ -94,12 +94,12 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
                 var targetStack = container.getContainer().get();
                 var sourceStack = conveyor.getContainer().get();
 
-                if (ItemStack.areItemsAndComponentsEqual(container.getContainer().get(), conveyor.getContainer().get())) {
+                if (ItemStack.isSameItemSameComponents(container.getContainer().get(), conveyor.getContainer().get())) {
                     var count = Math.min(targetStack.getCount() + sourceStack.getCount(), container.getMaxStackCount(sourceStack));
                     if (count != targetStack.getCount()) {
                         var dec = count - targetStack.getCount();
-                        targetStack.increment(dec);
-                        sourceStack.decrement(dec);
+                        targetStack.grow(dec);
+                        sourceStack.shrink(dec);
                         if (sourceStack.isEmpty()) {
                             conveyor.clearContainer();
                         }
@@ -113,9 +113,9 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
     }
 
     @Override
-    public void getItemFrom(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
-        var inputDir = self.getBlockState().get(INPUT_FACING);
-        if (!conveyor.isContainerEmpty() || pushDirection == inputDir || inputDir.getOpposite() != relative || self.getBlockState().get(PART) == Part.TOP) {
+    public void getItemFrom(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainerHolder conveyor) {
+        var inputDir = self.getBlockState().getValue(INPUT_FACING);
+        if (!conveyor.isContainerEmpty() || pushDirection == inputDir || inputDir.getOpposite() != relative || self.getBlockState().getValue(PART) == Part.TOP) {
             return;
         }
 
@@ -133,15 +133,15 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
         if (stack.getCount() == amount) {
             conveyor.pushAndAttach(out.pullAndRemove());
         } else {
-            stack.decrement(amount);
+            stack.shrink(amount);
             conveyor.setMovementPosition(pushDirection == inputDir.getOpposite() ? 0 : 0.5);
             conveyor.pushNew(stack.copyWithCount(amount));
         }
     }
 
     @Override
-    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
-        return state.get(PART) == Part.MAIN;
+    public boolean canPipeConnect(LevelReader world, BlockPos pos, BlockState state, Direction dir) {
+        return state.getValue(PART) == Part.MAIN;
     }
 
 
@@ -167,27 +167,27 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
             this.catalyst.setViewRange(0.4f);
 
             this.axle = LodItemDisplayElement.createSimple(AXLE_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
-            this.axle.setOffset(new Vec3d(0, 1, 0));
+            this.axle.setOffset(new Vec3(0, 1, 0));
             this.axle.setViewRange(0.6f);
             this.updateStatePos(state);
-            var dir = state.get(INPUT_FACING);
-            this.updateAnimation(0, dir.rotateYClockwise().getAxis());
+            var dir = state.getValue(INPUT_FACING);
+            this.updateAnimation(0, dir.getClockWise().getAxis());
             this.addElement(this.main);
             this.addElement(this.axle);
             this.addElement(this.catalyst);
         }
 
         private void updateStatePos(BlockState state) {
-            var direction = state.get(INPUT_FACING);
+            var direction = state.getValue(INPUT_FACING);
 
-            this.main.setYaw(direction.getPositiveHorizontalDegrees());
+            this.main.setYaw(direction.toYRot());
         }
 
         private void updateAnimation(float rotation, Direction.Axis axis) {
             var mat = mat();
             switch (axis) {
-                case X -> mat.rotate(Direction.EAST.getRotationQuaternion());
-                case Z -> mat.rotate(Direction.SOUTH.getRotationQuaternion());
+                case X -> mat.rotate(Direction.EAST.getRotation());
+                case Z -> mat.rotate(Direction.SOUTH.getRotation());
             }
 
             mat.rotateY(rotation);
@@ -205,10 +205,10 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
 
         @Override
         protected void onTick() {
-            var tick = this.getAttachment().getWorld().getTime();
+            var tick = this.getAttachment().getWorld().getGameTime();
             if (tick % this.getUpdateRate() == 0) {
-                var dir = this.blockState().get(INPUT_FACING);
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().up()).rotation(), dir.rotateYClockwise().getAxis());
+                var dir = this.blockState().getValue(INPUT_FACING);
+                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().above()).rotation(), dir.getClockWise().getAxis());
                 this.axle.startInterpolationIfDirty();
             }
         }
@@ -218,9 +218,9 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
         }
 
         public void rotate(float speed) {
-            this.rotation += speed * MathHelper.RADIANS_PER_DEGREE * 2;
-            if (this.rotation > MathHelper.TAU) {
-                this.rotation -= MathHelper.TAU;
+            this.rotation += speed * Mth.DEG_TO_RAD * 2;
+            if (this.rotation > Mth.TWO_PI) {
+                this.rotation -= Mth.TWO_PI;
             }
         }
 

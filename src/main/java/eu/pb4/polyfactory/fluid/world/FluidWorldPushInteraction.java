@@ -4,24 +4,23 @@ import eu.pb4.polyfactory.block.fluids.FluidInput;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidContainer;
-import net.minecraft.block.*;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.level.block.state.BlockState;
 import java.util.function.Supplier;
 
 public final class FluidWorldPushInteraction {
     private final double[] pushOverflow = new double[Direction.values().length];
     private final int[] particleCounter = {1, 3, 5, 6, 8, 4};
     private final FluidContainer container;
-    private final Supplier<ServerWorld> world;
+    private final Supplier<ServerLevel> world;
     private final Supplier<BlockPos> pos;
     private final BlockState[] pushState = new BlockState[pushOverflow.length];
     private long maxPush = 0;
 
-    public FluidWorldPushInteraction(FluidContainer container, Supplier<ServerWorld> world, Supplier<BlockPos> pos) {
+    public FluidWorldPushInteraction(FluidContainer container, Supplier<ServerLevel> world, Supplier<BlockPos> pos) {
         this.container = container;
         this.world = world;
         this.pos = pos;
@@ -32,7 +31,7 @@ public final class FluidWorldPushInteraction {
         var pos = this.pos();
         var world = this.world();
         var container = this.container();
-        var mut = this.pos().mutableCopy().move(direction);
+        var mut = this.pos().mutable().move(direction);
         var pushedBlockState = world.getBlockState(mut);
         FluidInput fluidInput = null;
         if (pushedBlockState.getBlock() instanceof FluidInput.Getter getter) {
@@ -62,24 +61,24 @@ public final class FluidWorldPushInteraction {
 
         if (pushedBlockState.isAir() && fluid != null && fluid.type() == FactoryFluids.EXPERIENCE && container.get(fluid) >= FluidBehaviours.EXPERIENCE_ORB_TO_FLUID && world.random.nextBoolean()) {
             var max = (int) Math.min(container.get(fluid) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID, 30);
-            var amount = max <= 1 ? 1 : world.random.nextBetween(1, max);
+            var amount = max <= 1 ? 1 : world.random.nextIntBetweenInclusive(1, max);
             container.extract(fluid, amount * FluidBehaviours.EXPERIENCE_ORB_TO_FLUID, false);
-            var x = new ExperienceOrbEntity(world, pos.getX() + 0.5 + direction.getOffsetX() * 0.7,
-                    pos.getY() + 0.5 + direction.getOffsetY() * 0.7,
-                    pos.getZ() + 0.5 + direction.getOffsetZ() * 0.7, amount);
-            world.spawnEntity(x);
+            var x = new ExperienceOrb(world, pos.getX() + 0.5 + direction.getStepX() * 0.7,
+                    pos.getY() + 0.5 + direction.getStepY() * 0.7,
+                    pos.getZ() + 0.5 + direction.getStepZ() * 0.7, amount);
+            world.addFreshEntity(x);
         }
 
         if (pushedBlockState.isAir() && (this.particleCounter(direction) % 3) == 0) {
             if (fluid != null) {
                 var particle = fluid.particle();
                 if (particle != null) {
-                    world.spawnParticles(particle,
-                            pos.getX() + 0.5 + direction.getOffsetX() * 0.55,
-                            pos.getY() + 0.5 + direction.getOffsetY() * 0.55,
-                            pos.getZ() + 0.5 + direction.getOffsetZ() * 0.55,
+                    world.sendParticles(particle,
+                            pos.getX() + 0.5 + direction.getStepX() * 0.55,
+                            pos.getY() + 0.5 + direction.getStepY() * 0.55,
+                            pos.getZ() + 0.5 + direction.getStepZ() * 0.55,
                             0,
-                            direction.getOffsetX() * 0.1, direction.getOffsetY() * 0.1, direction.getOffsetZ() * 0.1, 0.4
+                            direction.getStepX() * 0.1, direction.getStepY() * 0.1, direction.getStepZ() * 0.1, 0.4
                     );
                 }
             }
@@ -89,14 +88,14 @@ public final class FluidWorldPushInteraction {
             var possibilities = FluidBehaviours.BLOCK_STATE_TO_FLUID_INSERT.get(pushedBlockState);
             if (possibilities != null) {
                 for (var insert : possibilities) {
-                    if (insert != null && container.canExtract(insert.getLeft(), true)) {
-                        var maxFlow = insert.getLeft().instance().getMaxFlow(world);
-                        var amount = Math.min(Math.min((long) (strength * maxFlow * insert.getLeft().instance().getFlowSpeedMultiplier(world)),
+                    if (insert != null && container.canExtract(insert.getA(), true)) {
+                        var maxFlow = insert.getA().instance().getMaxFlow(world);
+                        var amount = Math.min(Math.min((long) (strength * maxFlow * insert.getA().instance().getFlowSpeedMultiplier(world)),
                                 maxFlow), this.maxPush());
                         this.setPushOverflow(direction, this.getPushOverflow(direction) + amount);
-                        if (this.getPushOverflow(direction) >= insert.getLeft().amount()) {
-                            world.setBlockState(mut, insert.getRight());
-                            container.extract(insert.getLeft(), false);
+                        if (this.getPushOverflow(direction) >= insert.getA().amount()) {
+                            world.setBlockAndUpdate(mut, insert.getB());
+                            container.extract(insert.getA(), false);
                             this.setPushOverflow(direction, 0);
                             break;
                         }
@@ -141,7 +140,7 @@ public final class FluidWorldPushInteraction {
         return this.particleCounter[direction.ordinal()]++;
     }
 
-    public ServerWorld world() {
+    public ServerLevel world() {
         return this.world.get();
     }
 

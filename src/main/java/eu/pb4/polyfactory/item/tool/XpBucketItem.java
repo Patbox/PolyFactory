@@ -1,32 +1,31 @@
 package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemUsage;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.Items;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.item.ItemUtils;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.UseOnContext;
 
 public class XpBucketItem extends SimplePolymerItem {
-    public XpBucketItem(Settings settings) {
+    public XpBucketItem(Properties settings) {
         super(settings);
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
+    public InteractionResult useOn(UseOnContext context) {
         for (int i = 0; i < 3; i++) {
-            int xp = 3 + context.getWorld().random.nextInt(5) + context.getWorld().random.nextInt(5);
-            ExperienceOrbEntity.spawn((ServerWorld)context.getWorld(), context.getHitPos(), xp);
+            int xp = 3 + context.getLevel().random.nextInt(5) + context.getLevel().random.nextInt(5);
+            ExperienceOrb.award((ServerLevel)context.getLevel(), context.getClickLocation(), xp);
         }
 
         if (context.getPlayer() != null) {
-            context.getPlayer().setStackInHand(context.getHand(), ItemUsage.exchangeStack(context.getStack(), context.getPlayer(), Items.BUCKET.getDefaultStack()));
+            context.getPlayer().setItemInHand(context.getHand(), ItemUtils.createFilledResult(context.getItemInHand(), context.getPlayer(), Items.BUCKET.getDefaultInstance()));
         } else {
-            context.getStack().decrement(1);
+            context.getItemInHand().shrink(1);
         }
 
-        return ActionResult.SUCCESS_SERVER;
+        return InteractionResult.SUCCESS_SERVER;
     }
 }

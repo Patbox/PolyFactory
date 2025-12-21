@@ -1,20 +1,20 @@
 package eu.pb4.polyfactory.mixin.util;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(BlockItem.class)
 public interface BlockItemAccessor {
     @Invoker
-    static void callCopyComponentsToBlockEntity(World world, BlockPos pos, ItemStack stack) {
+    static void callUpdateBlockEntityComponents(Level world, BlockPos pos, ItemStack stack) {
         throw new UnsupportedOperationException();
     }
 
     @Invoker
-    BlockState callPlaceFromNbt(BlockPos pos, World world, ItemStack stack, BlockState state);
+    BlockState callUpdateBlockStateFromTag(BlockPos pos, Level world, ItemStack stack, BlockState state);
 }

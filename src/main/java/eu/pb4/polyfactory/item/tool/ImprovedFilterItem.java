@@ -11,59 +11,55 @@ import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.gui.GuiInterface;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemStackSet;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.StringIdentifiable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackLinkedSet;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 
 public class ImprovedFilterItem extends AbstractFilterItem {
-    public ImprovedFilterItem(Settings settings) {
+    public ImprovedFilterItem(Properties settings) {
         super(settings.component(FactoryDataComponents.ITEM_FILTER_TYPE, Type.WHITELIST).component(FactoryDataComponents.ITEM_FILTER_MATCH, Match.STRICT));
     }
 
     @Override
-    public void openConfiguration(ServerPlayerEntity player, ItemStack stack) {
+    public void openConfiguration(ServerPlayer player, ItemStack stack) {
         new Gui(player, stack);
     }
 
     @Override
-    public Text getName(ItemStack stack) {
+    public Component getName(ItemStack stack) {
         var stacks = getStacks(stack);
         if (stacks.isEmpty()) {
-            return Text.translatable(this.getTranslationKey() + ".empty" );
+            return Component.translatable(this.getDescriptionId() + ".empty" );
         }
 
-        return Text.translatable(this.getTranslationKey() + ".with", stacks.size() == 1
-                ? stacks.getFirst().getName()
-                : Text.empty().append(stacks.getFirst().getName()).append(" ").append(Text.translatable("item.container.more_items", stacks.size() - 1))
+        return Component.translatable(this.getDescriptionId() + ".with", stacks.size() == 1
+                ? stacks.getFirst().getHoverName()
+                : Component.empty().append(stacks.getFirst().getHoverName()).append(" ").append(Component.translatable("item.container.more_items", stacks.size() - 1))
                 );
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, displayComponent, tooltip, type);
-        tooltip.accept(stack.getOrDefault(FactoryDataComponents.ITEM_FILTER_MATCH, Match.STRICT).asName().formatted(Formatting.YELLOW));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> tooltip, TooltipFlag type) {
+        super.appendHoverText(stack, context, displayComponent, tooltip, type);
+        tooltip.accept(stack.getOrDefault(FactoryDataComponents.ITEM_FILTER_MATCH, Match.STRICT).asName().withStyle(ChatFormatting.YELLOW));
         tooltip.accept(stack.getOrDefault(FactoryDataComponents.ITEM_FILTER_TYPE, Type.WHITELIST).asTooltip());
 
         for (var filtered : getStacks(stack)) {
-            tooltip.accept(Text.literal(" ").append(filtered.getName()).formatted(Formatting.GRAY));
+            tooltip.accept(Component.literal(" ").append(filtered.getHoverName()).withStyle(ChatFormatting.GRAY));
         }
     }
 
@@ -95,10 +91,10 @@ public class ImprovedFilterItem extends AbstractFilterItem {
 
     private static class Gui extends SimpleGui {
         private final ItemStack stack;
-        public Gui(ServerPlayerEntity player, ItemStack stack) {
-            super(ScreenHandlerType.GENERIC_9X3, player, false);
+        public Gui(ServerPlayer player, ItemStack stack) {
+            super(MenuType.GENERIC_9x3, player, false);
             this.stack = stack;
-            this.setTitle(GuiTextures.ITEM_FILTER.apply(Text.translatable(stack.getItem().getTranslationKey())));
+            this.setTitle(GuiTextures.ITEM_FILTER.apply(Component.translatable(stack.getItem().getDescriptionId())));
 
             for (int x = 0; x < 3; x++) {
                 for (int y = 0; y < 3; y++) {
@@ -109,7 +105,7 @@ public class ImprovedFilterItem extends AbstractFilterItem {
                             var strict = stack.get(FactoryDataComponents.ITEM_FILTER_MATCH) == Match.STRICT;
                             var stacks = getStacks(stack);
                             if (i < stacks.size()) {
-                                return strict ? stacks.get(i).copy() : stacks.get(i).getItem().getDefaultStack();
+                                return strict ? stacks.get(i).copy() : stacks.get(i).getItem().getDefaultInstance();
                             }
                             return ItemStack.EMPTY;
                         }
@@ -128,7 +124,7 @@ public class ImprovedFilterItem extends AbstractFilterItem {
             this.open();
         }
 
-        private <T extends Enum<T>> GuiElementInterface createButton(ComponentType<T> type, T[] values, Function<T, GuiElementBuilder> builderFunction) {
+        private <T extends Enum<T>> GuiElementInterface createButton(DataComponentType<T> type, T[] values, Function<T, GuiElementBuilder> builderFunction) {
             return new GuiElementInterface() {
                 @Override
                 public ItemStack getItemStack() {
@@ -147,18 +143,18 @@ public class ImprovedFilterItem extends AbstractFilterItem {
 
         private void onSetSlot(int i, ClickType type) {
             var stacks = new ArrayList<>(getStacks(stack));
-            if (this.screenHandler.getCursorStack().isEmpty()) {
+            if (this.screenHandler.getCarried().isEmpty()) {
                 if (i < stacks.size()) {
                     stacks.remove(i);
                 } else {
                     return;
                 }
             } else if (i < stacks.size()) {
-                stacks.set(i, this.screenHandler.getCursorStack().copyWithCount(1));
+                stacks.set(i, this.screenHandler.getCarried().copyWithCount(1));
             } else {
-                stacks.add(this.screenHandler.getCursorStack().copyWithCount(1));
+                stacks.add(this.screenHandler.getCarried().copyWithCount(1));
             }
-            var dedupe = ItemStackSet.create();
+            var dedupe = ItemStackLinkedSet.createTypeAndComponentsSet();
             dedupe.addAll(stacks);
             stacks.clear();
             stacks.addAll(dedupe);
@@ -168,14 +164,14 @@ public class ImprovedFilterItem extends AbstractFilterItem {
         }
 
         @Override
-        public boolean onAnyClick(int index, ClickType type, SlotActionType action) {
+        public boolean onAnyClick(int index, ClickType type, net.minecraft.world.inventory.ClickType action) {
             if (index == -999 || index == -1) {
                 return true;
             }
             var stacks = new ArrayList<>(getStacks(stack));
             if (stacks.size() < 9 && type.shift && index > this.getVirtualSize()) {
-                stacks.add(this.screenHandler.getSlot(index).getStack().copyWithCount(1));
-                var dedupe = ItemStackSet.create();
+                stacks.add(this.screenHandler.getSlot(index).getItem().copyWithCount(1));
+                var dedupe = ItemStackLinkedSet.createTypeAndComponentsSet();
                 dedupe.addAll(stacks);
                 stacks.clear();
                 stacks.addAll(dedupe);
@@ -183,8 +179,8 @@ public class ImprovedFilterItem extends AbstractFilterItem {
                 GuiUtils.playClickSound(player);
             }
 
-            if (this.screenHandler.getSlot(index).getStack() == stack) {
-                GuiHelpers.sendSlotUpdate(player, this.screenHandler.syncId, index, stack, 0);
+            if (this.screenHandler.getSlot(index).getItem() == stack) {
+                GuiHelpers.sendSlotUpdate(player, this.screenHandler.containerId, index, stack, 0);
                 return false;
             }
 
@@ -192,7 +188,7 @@ public class ImprovedFilterItem extends AbstractFilterItem {
         }
     }
 
-    public enum Match implements StringIdentifiable {
+    public enum Match implements StringRepresentable {
         STRICT("strict", GuiTextures.BUTTON_ITEM_FILTER_STRICT),
         TYPE_ONLY("type_only", GuiTextures.BUTTON_ITEM_FILTER_TYPE_ONLY);
 
@@ -205,57 +201,57 @@ public class ImprovedFilterItem extends AbstractFilterItem {
         }
 
         public GuiElementBuilder createButton() {
-            return this.button.get().setName(asName()).addLoreLine(this.asDescription().formatted(Formatting.GRAY));
+            return this.button.get().setName(asName()).addLoreLine(this.asDescription().withStyle(ChatFormatting.GRAY));
         }
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return this.name;
         }
 
-        public MutableText asName() {
-            return Text.translatable("item.polyfactory.item_filter.match." + this.name);
+        public MutableComponent asName() {
+            return Component.translatable("item.polyfactory.item_filter.match." + this.name);
         }
 
-        public MutableText asDescription() {
-            return Text.translatable("item.polyfactory.item_filter.match." + this.name + ".desc");
+        public MutableComponent asDescription() {
+            return Component.translatable("item.polyfactory.item_filter.match." + this.name + ".desc");
         }
     }
 
-    public enum Type implements StringIdentifiable {
-        WHITELIST("whitelist", Formatting.GREEN, GuiTextures.BUTTON_DONE),
-        BLACKLIST("blacklist", Formatting.RED, GuiTextures.BUTTON_CLOSE);
+    public enum Type implements StringRepresentable {
+        WHITELIST("whitelist", ChatFormatting.GREEN, GuiTextures.BUTTON_DONE),
+        BLACKLIST("blacklist", ChatFormatting.RED, GuiTextures.BUTTON_CLOSE);
 
         private final String name;
-        private final Formatting formatting;
+        private final ChatFormatting formatting;
         private final Supplier<GuiElementBuilder> button;
 
-        Type(String name, Formatting formatting, Supplier<GuiElementBuilder> button) {
+        Type(String name, ChatFormatting formatting, Supplier<GuiElementBuilder> button) {
             this.name = name;
             this.formatting = formatting;
             this.button = button;
         }
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return this.name;
         }
 
 
         public GuiElementBuilder createButton() {
-            return this.button.get().setName(asName()).addLoreLine(this.asDescription().formatted(Formatting.GRAY));
+            return this.button.get().setName(asName()).addLoreLine(this.asDescription().withStyle(ChatFormatting.GRAY));
         }
 
-        public MutableText asName() {
-            return Text.translatable("item.polyfactory.item_filter.type." + this.name);
+        public MutableComponent asName() {
+            return Component.translatable("item.polyfactory.item_filter.type." + this.name);
         }
 
-        public MutableText asDescription() {
-            return Text.translatable("item.polyfactory.item_filter.type." + this.name + ".desc");
+        public MutableComponent asDescription() {
+            return Component.translatable("item.polyfactory.item_filter.type." + this.name + ".desc");
         }
 
-        public MutableText asTooltip() {
-            return Text.translatable("item.polyfactory.item_filter.type." + this.name + ".tooltip").formatted(this.formatting);
+        public MutableComponent asTooltip() {
+            return Component.translatable("item.polyfactory.item_filter.type." + this.name + ".tooltip").withStyle(this.formatting);
         }
     }
 }

@@ -1,10 +1,10 @@
 package eu.pb4.polyfactory.other;
 
 import eu.pb4.polymer.core.api.other.PolymerSoundEvent;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.sound.SoundEvent;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.sounds.SoundEvent;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
@@ -20,25 +20,25 @@ public interface FactorySoundEvents {
     SoundEvent ITEM_BUCKET_FILL_SLIME = of("item.bucket.fill_slime");
     SoundEvent ITEM_BUCKET_EMPTY_HONEY = of("item.bucket.empty_honey");
     SoundEvent ITEM_BUCKET_FILL_HONEY = of("item.bucket.fill_honey");
-    RegistryEntry<SoundEvent> FLUID_SHOOT_WATER = ofEntry("fluid.shoot.water");
-    RegistryEntry<SoundEvent> FLUID_SHOOT_MILK = ofEntry("fluid.shoot.milk");
-    RegistryEntry<SoundEvent> FLUID_SHOOT_POTION = ofEntry("fluid.shoot.potion");
-    RegistryEntry<SoundEvent> FLUID_SHOOT_SLIME = ofEntry("fluid.shoot.slime");
-    RegistryEntry<SoundEvent> FLUID_SHOOT_HONEY = ofEntry("fluid.shoot.honey");
-    RegistryEntry<SoundEvent> FLUID_SHOOT_LAVA = ofEntry("fluid.shoot.lava");
-    RegistryEntry<SoundEvent> FLUID_SHOOT_EXPERIENCE = ofEntry("fluid.shoot.experience");
+    Holder<SoundEvent> FLUID_SHOOT_WATER = ofEntry("fluid.shoot.water");
+    Holder<SoundEvent> FLUID_SHOOT_MILK = ofEntry("fluid.shoot.milk");
+    Holder<SoundEvent> FLUID_SHOOT_POTION = ofEntry("fluid.shoot.potion");
+    Holder<SoundEvent> FLUID_SHOOT_SLIME = ofEntry("fluid.shoot.slime");
+    Holder<SoundEvent> FLUID_SHOOT_HONEY = ofEntry("fluid.shoot.honey");
+    Holder<SoundEvent> FLUID_SHOOT_LAVA = ofEntry("fluid.shoot.lava");
+    Holder<SoundEvent> FLUID_SHOOT_EXPERIENCE = ofEntry("fluid.shoot.experience");
     SoundEvent ITEM_CLIPBOARD_WRITE = of("item.clipboard.write");
     SoundEvent ITEM_CLIPBOARD_APPLY = of("item.clipboard.apply");
-    RegistryEntry<SoundEvent> BLOCK_SPOUT_METAL_COOLED = ofEntry("block.spout.metal_cooled");
+    Holder<SoundEvent> BLOCK_SPOUT_METAL_COOLED = ofEntry("block.spout.metal_cooled");
 
     static SoundEvent of(String path) {
-        var obj = SoundEvent.of(id(path));
+        var obj = SoundEvent.createVariableRangeEvent(id(path));
         PolymerSoundEvent.registerOverlay(obj);
-        return Registry.register(Registries.SOUND_EVENT, obj.id(), obj);
+        return Registry.register(BuiltInRegistries.SOUND_EVENT, obj.location(), obj);
     }
-    static RegistryEntry<SoundEvent> ofEntry(String path) {
-        var obj = SoundEvent.of(id(path));
+    static Holder<SoundEvent> ofEntry(String path) {
+        var obj = SoundEvent.createVariableRangeEvent(id(path));
         PolymerSoundEvent.registerOverlay(obj);
-        return Registry.registerReference(Registries.SOUND_EVENT, obj.id(), obj);
+        return Registry.registerForHolder(BuiltInRegistries.SOUND_EVENT, obj.location(), obj);
     }
 }

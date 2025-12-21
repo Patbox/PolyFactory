@@ -1,17 +1,15 @@
 package eu.pb4.polyfactory.util.inventory;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.RecipeInputInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeFinder;
-import net.minecraft.recipe.RecipeMatcher;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.StackedItemContents;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
 
-public record WrappingInputRecipeInput(Inventory source, int start, int size, int width, int height) implements RecipeInputInventory {
-    public static RecipeInputInventory of(Inventory source, int start, int size, int width, int height) {
+public record WrappingInputRecipeInput(Container source, int start, int size, int width, int height) implements CraftingContainer {
+    public static CraftingContainer of(Container source, int start, int size, int width, int height) {
         return new WrappingInputRecipeInput(source, start, size, width, height);
     }
 
@@ -26,19 +24,24 @@ public record WrappingInputRecipeInput(Inventory source, int start, int size, in
     }
 
     @Override
-    public List<ItemStack> getHeldStacks() {
+    public List<ItemStack> getItems() {
         var stacks = new ArrayList<ItemStack>(size);
         for (int i = 0; i < size; i++) {
-            stacks.add(this.getStack(i));
+            stacks.add(this.getItem(i));
         }
 
         return stacks;
     }
 
     @Override
+    public int getContainerSize() {
+        return this.size;
+    }
+
+    @Override
     public boolean isEmpty() {
         for (var i = 0; i < size; i++) {
-            if (!this.getStack(i).isEmpty()) {
+            if (!this.getItem(i).isEmpty()) {
                 return false;
             }
         }
@@ -46,48 +49,48 @@ public record WrappingInputRecipeInput(Inventory source, int start, int size, in
     }
 
     @Override
-    public ItemStack getStack(int slot) {
-        return slot < size ? this.source.getStack(slot + start) : ItemStack.EMPTY;
+    public ItemStack getItem(int slot) {
+        return slot < size ? this.source.getItem(slot + start) : ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack removeStack(int slot, int amount) {
-        return slot < size ? this.source.removeStack(slot + start, amount) : ItemStack.EMPTY;
+    public ItemStack removeItem(int slot, int amount) {
+        return slot < size ? this.source.removeItem(slot + start, amount) : ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack removeStack(int slot) {
-        return slot < size ? this.source.removeStack(slot + start) : ItemStack.EMPTY;
+    public ItemStack removeItemNoUpdate(int slot) {
+        return slot < size ? this.source.removeItemNoUpdate(slot + start) : ItemStack.EMPTY;
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         if(slot < size) {
-            this.source.setStack(slot + start, stack);
+            this.source.setItem(slot + start, stack);
         };
     }
 
     @Override
-    public void markDirty() {
-        this.source.markDirty();
+    public void setChanged() {
+        this.source.setChanged();
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity player) {
-        return this.source.canPlayerUse(player);
+    public boolean stillValid(Player player) {
+        return this.source.stillValid(player);
     }
 
     @Override
-    public void clear() {
+    public void clearContent() {
         for (int i = 0; i < this.size; i++) {
-            this.setStack(i, ItemStack.EMPTY);
+            this.setItem(i, ItemStack.EMPTY);
         }
     }
 
     @Override
-    public void provideRecipeInputs(RecipeFinder finder) {
+    public void fillStackedContents(StackedItemContents finder) {
         for (int i = 0; i < this.size; i++) {
-            finder.addInput(this.getStack(i));
+            finder.accountStack(this.getItem(i));
         }
     }
 }

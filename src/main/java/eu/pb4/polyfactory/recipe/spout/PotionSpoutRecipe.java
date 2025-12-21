@@ -7,38 +7,37 @@ import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.input.SingleItemWithFluid;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potions;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.world.World;
-
 import java.util.List;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 
-public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, RegistryEntry<SoundEvent> soundEvent, double time) implements SpoutRecipe {
+public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, Holder<SoundEvent> soundEvent, double time) implements SpoutRecipe {
     public static final MapCodec<PotionSpoutRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Ingredient.CODEC.fieldOf("item").forGetter(PotionSpoutRecipe::item),
                     Codec.LONG.fieldOf("amount").forGetter(PotionSpoutRecipe::amount),
-                    ItemStack.UNCOUNTED_CODEC.fieldOf("result").forGetter(PotionSpoutRecipe::output),
-                    SoundEvent.ENTRY_CODEC.fieldOf("sound").forGetter(PotionSpoutRecipe::soundEvent),
+                    ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(PotionSpoutRecipe::output),
+                    SoundEvent.CODEC.fieldOf("sound").forGetter(PotionSpoutRecipe::soundEvent),
                     Codec.DOUBLE.fieldOf("time").forGetter(PotionSpoutRecipe::time)
             ).apply(x, PotionSpoutRecipe::new)
     );
 
     public static PotionSpoutRecipe of(Item item, long amount, Item result, SoundEvent sound) {
-        return new PotionSpoutRecipe(Ingredient.ofItems(item), amount, result.getDefaultStack(), Registries.SOUND_EVENT.getEntry(sound),
+        return new PotionSpoutRecipe(Ingredient.of(item), amount, result.getDefaultInstance(), BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound),
                 SpoutRecipe.getTime(FactoryFluids.POTION.defaultInstance(), amount));
     }
 
     @Override
-    public boolean matches(SingleItemWithFluid input, World world) {
+    public boolean matches(SingleItemWithFluid input, Level world) {
         if (!item.test(input.stack())) {
             return false;
         }
@@ -53,13 +52,13 @@ public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, 
     }
 
     @Override
-    public ItemStack craft(SingleItemWithFluid input, RegistryWrapper.WrapperLookup lookup) {
+    public ItemStack assemble(SingleItemWithFluid input, HolderLookup.Provider lookup) {
         for (var key : input.fluids()) {
             if ((key.type() == FactoryFluids.POTION || key.type() == FactoryFluids.WATER) && input.getFluid(key) >= amount) {
                 var stack = this.output.copy();
-                stack.set(DataComponentTypes.POTION_CONTENTS, key.type() == FactoryFluids.POTION
-                        ? (PotionContentsComponent) key.data()
-                        : PotionContentsComponent.DEFAULT.with(Potions.WATER));
+                stack.set(DataComponents.POTION_CONTENTS, key.type() == FactoryFluids.POTION
+                        ? (PotionContents) key.data()
+                        : PotionContents.EMPTY.withPotion(Potions.WATER));
                 return stack;
             }
         }

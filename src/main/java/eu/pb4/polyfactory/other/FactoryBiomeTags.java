@@ -1,10 +1,10 @@
 package eu.pb4.polyfactory.other;
 
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.world.biome.Biome;
-
 import static eu.pb4.polyfactory.ModInit.id;
+
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.biome.Biome;
 
 public interface FactoryBiomeTags {
 
@@ -18,6 +18,6 @@ public interface FactoryBiomeTags {
 
 
     static TagKey<Biome> of(String path) {
-        return TagKey.of(RegistryKeys.BIOME, id(path));
+        return TagKey.create(Registries.BIOME, id(path));
     }
 }

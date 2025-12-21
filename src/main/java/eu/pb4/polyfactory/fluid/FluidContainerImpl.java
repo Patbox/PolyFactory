@@ -5,10 +5,9 @@ import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.nbt.*;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -172,24 +171,24 @@ public class FluidContainerImpl implements FluidContainer {
         return this.fluidTemperature;
     }
 
-    public void writeData(WriteView view, String key) {
-        var out = view.getList(key);
+    public void writeData(ValueOutput view, String key) {
+        var out = view.childrenList(key);
         storedFluids.forEach((a, b) -> {
-            var x = out.add();
-            x.put(FluidInstance.MAP_CODEC, a);
+            var x = out.addChild();
+            x.store(FluidInstance.MAP_CODEC, a);
             x.putLong("amount", b);
         });
     }
 
-    public void readData(ReadView view, String fluidKey) {
-        var nbt = view.getListReadView(fluidKey);
+    public void readData(ValueInput view, String fluidKey) {
+        var nbt = view.childrenListOrEmpty(fluidKey);
         this.storedFluids.clear();
         this.fluids.clear();
         this.stored = 0;
         for (var t : nbt) {
             var type = t.read(FluidInstance.MAP_CODEC);
             if (type.isPresent()) {
-                var value = t.getLong("amount", 0);
+                var value = t.getLongOr("amount", 0);
                 if (value != 0) {
                     this.storedFluids.put(type.get(), value);
                     this.stored += value;

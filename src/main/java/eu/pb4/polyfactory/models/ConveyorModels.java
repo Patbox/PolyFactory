@@ -9,12 +9,9 @@ import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
@@ -102,7 +99,7 @@ public class ConveyorModels {
     }
 
     private static void createFast(ItemStack stack, String prefix, String suffix) {
-        stack.set(DataComponentTypes.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/" + prefix + "conveyor" + suffix + "_fast")));
+        stack.set(DataComponents.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/" + prefix + "conveyor" + suffix + "_fast")));
     }
 
     public static void generateModels(BiConsumer<String, byte[]> dataWriter) {

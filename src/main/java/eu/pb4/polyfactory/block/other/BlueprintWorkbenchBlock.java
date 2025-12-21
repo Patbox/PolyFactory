@@ -6,53 +6,53 @@ import eu.pb4.polymer.virtualentity.api.elements.InteractionElement;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.SimpleEntityElement;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 public class BlueprintWorkbenchBlock extends WorkbenchBlock {
 
-    public BlueprintWorkbenchBlock(Settings settings) {
+    public BlueprintWorkbenchBlock(Properties settings) {
         super(settings);
     }
 
-    private static void clickForCrafting(ServerPlayerEntity player, BlockPos blockPos) {
-        if (!player.isSneaking() && player.getEntityWorld().getBlockEntity(blockPos) instanceof BlueprintWorkbenchBlockEntity be) {
+    private static void clickForCrafting(ServerPlayer player, BlockPos blockPos) {
+        if (!player.isShiftKeyDown() && player.level().getBlockEntity(blockPos) instanceof BlueprintWorkbenchBlockEntity be) {
             be.clickForCrafting(player);
         }
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!player.isSneaking() && world.getBlockEntity(pos) instanceof BlueprintWorkbenchBlockEntity be) {
-            be.openGui((ServerPlayerEntity) player);
-            return ActionResult.SUCCESS_SERVER;
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!player.isShiftKeyDown() && world.getBlockEntity(pos) instanceof BlueprintWorkbenchBlockEntity be) {
+            be.openGui((ServerPlayer) player);
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new BlueprintWorkbenchBlockEntity(pos, state);
     }
 
     @Override
-    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(initialBlockState);
+    public ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
+        return new eu.pb4.polyfactory.block.other.BlueprintWorkbenchBlock.Model(initialBlockState);
     }
 
     public static class Model extends WorkbenchBlock.Model {
@@ -63,15 +63,15 @@ public class BlueprintWorkbenchBlock extends WorkbenchBlock {
             super(state);
 
             this.result = new SimpleEntityElement(EntityType.ITEM);
-            this.result.setOffset(new Vec3d(0, 0.5, 0));
+            this.result.setOffset(new Vec3(0, 0.5, 0));
             this.clickable = new InteractionElement(new VirtualElement.InteractionHandler() {
                 @Override
-                public void interact(ServerPlayerEntity player, Hand hand) {
+                public void interact(ServerPlayer player, InteractionHand hand) {
                     BlueprintWorkbenchBlock.clickForCrafting(player, blockPos());
                 }
             });
             clickable.setSize(0.4f, 0.55f);
-            clickable.setOffset(new Vec3d(0, 0.5, 0));
+            clickable.setOffset(new Vec3(0, 0.5, 0));
         }
 
         @Override
@@ -85,7 +85,7 @@ public class BlueprintWorkbenchBlock extends WorkbenchBlock {
             this.removeElement(this.result);
             this.removeElement(this.clickable);
             if (!stack.isEmpty()) {
-                this.result.getDataTracker().set(ItemEntityAccessor.getSTACK(), stack.copy());
+                this.result.getDataTracker().set(ItemEntityAccessor.getDATA_ITEM(), stack.copy());
                 this.addElement(this.result);
                 this.addElement(this.clickable);
             }

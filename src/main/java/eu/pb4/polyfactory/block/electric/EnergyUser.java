@@ -3,14 +3,14 @@ package eu.pb4.polyfactory.block.electric;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.electric.EnergyData;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
 
 public interface EnergyUser extends NetworkComponent.Energy {
-    void updateEnergyData(EnergyData.State modifier, BlockState state, ServerWorld world, BlockPos pos);
+    void updateEnergyData(EnergyData.State modifier, BlockState state, ServerLevel world, BlockPos pos);
 
-    static EnergyData getEnergy(ServerWorld world, BlockPos pos) {
+    static EnergyData getEnergy(ServerLevel world, BlockPos pos) {
         {
             var o = FactoryNodes.ENERGY.getGraphWorld(world).getNodesAt(pos).findFirst();
             if (o.isPresent()) {

@@ -3,13 +3,12 @@ package eu.pb4.polyfactory.block.property;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.util.TriState;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Properties;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.Direction;
-
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import java.util.Map;
 
 public interface FactoryProperties {
@@ -20,17 +19,17 @@ public interface FactoryProperties {
     LazyEnumProperty<TriState> TRI_STATE_UP = LazyEnumProperty.of("up", TriState.class);
     LazyEnumProperty<TriState> TRI_STATE_DOWN = LazyEnumProperty.of("down", TriState.class);
 
-    EnumProperty<ConnectablePart> CONNECTABLE_PART_X = EnumProperty.of("part_x", ConnectablePart.class);
-    EnumProperty<ConnectablePart> CONNECTABLE_PART_Y = EnumProperty.of("part_y", ConnectablePart.class);
-    EnumProperty<ConnectablePart> CONNECTABLE_PART_Z = EnumProperty.of("part_z", ConnectablePart.class);
+    EnumProperty<ConnectablePart> CONNECTABLE_PART_X = EnumProperty.create("part_x", ConnectablePart.class);
+    EnumProperty<ConnectablePart> CONNECTABLE_PART_Y = EnumProperty.create("part_y", ConnectablePart.class);
+    EnumProperty<ConnectablePart> CONNECTABLE_PART_Z = EnumProperty.create("part_z", ConnectablePart.class);
 
     Map<Direction, BooleanProperty> DIRECTIONS = ImmutableMap.copyOf((Map) Util.make(Maps.newEnumMap(Direction.class), (directions) -> {
-        directions.put(Direction.NORTH, Properties.NORTH);
-        directions.put(Direction.EAST, Properties.EAST);
-        directions.put(Direction.SOUTH, Properties.SOUTH);
-        directions.put(Direction.WEST, Properties.WEST);
-        directions.put(Direction.UP, Properties.UP);
-        directions.put(Direction.DOWN, Properties.DOWN);
+        directions.put(Direction.NORTH, BlockStateProperties.NORTH);
+        directions.put(Direction.EAST, BlockStateProperties.EAST);
+        directions.put(Direction.SOUTH, BlockStateProperties.SOUTH);
+        directions.put(Direction.WEST, BlockStateProperties.WEST);
+        directions.put(Direction.UP, BlockStateProperties.UP);
+        directions.put(Direction.DOWN, BlockStateProperties.DOWN);
     }));
 
     Map<Direction, LazyEnumProperty<TriState>> TRI_STATE_DIRECTIONS = ImmutableMap.copyOf((Map) Util.make(Maps.newEnumMap(Direction.class), (directions) -> {
@@ -43,14 +42,14 @@ public interface FactoryProperties {
     }));
 
 
-    BooleanProperty FIRST_AXIS = BooleanProperty.of("first_axis");
-    BooleanProperty READ_ONLY = BooleanProperty.of("read_only");
-    BooleanProperty ACTIVE = BooleanProperty.of("active");
-    IntProperty FRONT = IntProperty.of("front", 0, 3);
-    BooleanProperty POSITIVE_CONNECTED = BooleanProperty.of("positive_connected");
-    BooleanProperty NEGATIVE_CONNECTED = BooleanProperty.of("negative_connected");
-    EnumProperty<Direction> HORIZONTAL_DIRECTION = EnumProperty.of("direction", Direction.class, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
-    BooleanProperty LOCKED = BooleanProperty.of("locked");
-    BooleanProperty REVERSE = BooleanProperty.of("reverse");
+    BooleanProperty FIRST_AXIS = BooleanProperty.create("first_axis");
+    BooleanProperty READ_ONLY = BooleanProperty.create("read_only");
+    BooleanProperty ACTIVE = BooleanProperty.create("active");
+    IntegerProperty FRONT = IntegerProperty.create("front", 0, 3);
+    BooleanProperty POSITIVE_CONNECTED = BooleanProperty.create("positive_connected");
+    BooleanProperty NEGATIVE_CONNECTED = BooleanProperty.create("negative_connected");
+    EnumProperty<Direction> HORIZONTAL_DIRECTION = EnumProperty.create("direction", Direction.class, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
+    BooleanProperty LOCKED = BooleanProperty.create("locked");
+    BooleanProperty REVERSE = BooleanProperty.create("reverse");
 
 }

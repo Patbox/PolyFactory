@@ -2,7 +2,6 @@ package eu.pb4.polyfactory.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.NotNull;
 
 public record DoubleData(double value) implements DataContainer {

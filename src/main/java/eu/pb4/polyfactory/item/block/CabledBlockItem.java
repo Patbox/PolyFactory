@@ -8,26 +8,24 @@ import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemPlacementContext;
-
-
 import java.util.List;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class CabledBlockItem extends FactoryBlockItem {
-    public <T extends Block & PolymerBlock> CabledBlockItem(T block, Settings settings) {
+    public <T extends Block & PolymerBlock> CabledBlockItem(T block, Properties settings) {
         super(block, settings);
     }
 
     @Override
-    protected boolean place(ItemPlacementContext context, BlockState state) {
+    protected boolean placeBlock(BlockPlaceContext context, BlockState state) {
         var color = -2;
-        if (context.getWorld().getBlockState(context.getBlockPos()).isOf(FactoryBlocks.CABLE)) {
-            color = AbstractCableBlock.getColor(context.getWorld(), context.getBlockPos());
+        if (context.getLevel().getBlockState(context.getClickedPos()).is(FactoryBlocks.CABLE)) {
+            color = AbstractCableBlock.getColor(context.getLevel(), context.getClickedPos());
         }
-        var x = super.place(context, state);
-        if (color != -2 && x && context.getWorld().getBlockEntity(context.getBlockPos()) instanceof ColorProvider provider) {
+        var x = super.placeBlock(context, state);
+        if (color != -2 && x && context.getLevel().getBlockEntity(context.getClickedPos()) instanceof ColorProvider provider) {
             provider.setColor(color);
         }
         return x;

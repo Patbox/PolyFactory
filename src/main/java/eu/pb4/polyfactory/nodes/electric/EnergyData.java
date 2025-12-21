@@ -8,9 +8,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.block.electric.EnergyUser;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +17,7 @@ import static eu.pb4.polyfactory.ModInit.id;
 public class EnergyData implements GraphEntity<EnergyData> {
     public static EnergyData EMPTY = new EnergyData() {
         @Override
-        public void update(ServerWorld world, BlockGraph graph) {}
+        public void update(ServerLevel world, BlockGraph graph) {}
     };
 
     public static final GraphEntityType<EnergyData> TYPE = GraphEntityType.of(id("energy_info"), MapCodec.unit(EnergyData::new).codec(), EnergyData::new,  EnergyData::split);
@@ -40,8 +38,8 @@ public class EnergyData implements GraphEntity<EnergyData> {
         return stressCapacity;
     }
 
-    public void update(ServerWorld world, BlockGraph graph) {
-        var currentTick = world.getServer().getTicks();
+    public void update(ServerLevel world, BlockGraph graph) {
+        var currentTick = world.getServer().getTickCount();
         if (this.lastTick == currentTick) {
             return;
         }

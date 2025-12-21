@@ -6,36 +6,30 @@ import eu.pb4.polyfactory.entity.splash.*;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectCategory;
-import net.minecraft.particle.BlockStateParticleEffect;
-import net.minecraft.particle.ItemStackParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.level.block.Blocks;
 
 public class FactoryEffects {
-    public static final RegistryEntry<StatusEffect> STICKY_SLIME = register("sticky/slime",
-            new StickyStatusEffect("slime", StatusEffectCategory.HARMFUL,0x73c262,
-                    new BlockStateParticleEffect(ParticleTypes.BLOCK_CRUMBLE, Blocks.SLIME_BLOCK.getDefaultState())));
+    public static final Holder<MobEffect> STICKY_SLIME = register("sticky/slime",
+            new StickyStatusEffect("slime", MobEffectCategory.HARMFUL,0x73c262,
+                    new BlockParticleOption(ParticleTypes.BLOCK_CRUMBLE, Blocks.SLIME_BLOCK.defaultBlockState())));
 
-    public static final RegistryEntry<StatusEffect> STICKY_HONEY = register("sticky/honey",
-            new StickyStatusEffect("honey", StatusEffectCategory.HARMFUL,0xfaab1c,
-                    new BlockStateParticleEffect(ParticleTypes.BLOCK_CRUMBLE, Blocks.HONEY_BLOCK.getDefaultState())));
+    public static final Holder<MobEffect> STICKY_HONEY = register("sticky/honey",
+            new StickyStatusEffect("honey", MobEffectCategory.HARMFUL,0xfaab1c,
+                    new BlockParticleOption(ParticleTypes.BLOCK_CRUMBLE, Blocks.HONEY_BLOCK.defaultBlockState())));
     public static void register() {
 
     }
 
-    public static RegistryEntry<StatusEffect> register(String path, StatusEffect effect) {
-        var id = Identifier.of(ModInit.ID, path);
-        return Registry.registerReference(Registries.STATUS_EFFECT, id, effect);
+    public static Holder<MobEffect> register(String path, MobEffect effect) {
+        var id = Identifier.fromNamespaceAndPath(ModInit.ID, path);
+        return Registry.registerForHolder(BuiltInRegistries.MOB_EFFECT, id, effect);
     }
 }

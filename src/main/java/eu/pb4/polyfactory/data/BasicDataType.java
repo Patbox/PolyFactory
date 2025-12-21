@@ -1,14 +1,13 @@
 package eu.pb4.polyfactory.data;
 
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.StringIdentifiable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringRepresentable;
 
-public enum BasicDataType implements StringIdentifiable {
+public enum BasicDataType implements StringRepresentable {
     INTEGER("integer", x -> new LongData(Long.parseLong(x)),
             (a, b) -> new LongData(a.asLong() + b.asLong()),
             (a, b) -> new LongData(a.asLong() - b.asLong()),
@@ -40,7 +39,7 @@ public enum BasicDataType implements StringIdentifiable {
 
     private final String name;
     private final Function<String, DataContainer> parser;
-    private final Text text;
+    private final Component text;
     private final BiFunction<DataContainer, DataContainer, DataContainer> add;
     private final BiFunction<DataContainer, DataContainer, DataContainer> subtract;
     private final BiFunction<DataContainer, DataContainer, DataContainer> multiply;
@@ -56,7 +55,7 @@ public enum BasicDataType implements StringIdentifiable {
     ) {
         this.name = name;
         this.parser = parser;
-        this.text = Text.translatable("item.polyfactory.wrench.action.mode.arithmetic." + name);
+        this.text = Component.translatable("item.polyfactory.wrench.action.mode.arithmetic." + name);
         this.add = add;
         this.subtract = subtract;
         this.multiply = multiply;
@@ -94,11 +93,11 @@ public enum BasicDataType implements StringIdentifiable {
     }
 
     @Override
-    public String asString() {
+    public String getSerializedName() {
         return this.name;
     }
 
-    public Text text() {
+    public Component text() {
         return this.text;
     }
 }

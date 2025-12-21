@@ -4,12 +4,10 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HopperBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.HopperBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -21,7 +19,7 @@ public class HopperModel extends BlockModel {
         this.model = ItemDisplayElementUtil.createSimple(GenericParts.FILTER_MESH);
         this.model.setScale(new Vector3f(2));
         this.model.setTranslation(new Vector3f(0, 15 / 16f, 0));
-        this.icon.setTransformation(mat().translate(0, 0.5f, 0.37f).rotateX(MathHelper.HALF_PI * 0.3f).scale(0.25f, 0.25f, 0.005f));
+        this.icon.setTransformation(mat().translate(0, 0.5f, 0.37f).rotateX(Mth.HALF_PI * 0.3f).scale(0.25f, 0.25f, 0.005f));
         this.addElement(this.model);
         this.updateRotation(cachedState);
     }
@@ -31,12 +29,12 @@ public class HopperModel extends BlockModel {
     }
 
     public void updateRotation(BlockState state) {
-        var facing = state.get(HopperBlock.FACING);
+        var facing = state.getValue(HopperBlock.FACING);
 
         if (facing == Direction.DOWN) {
             this.icon.setYaw(0);
         }
-        this.icon.setYaw(facing.getPositiveHorizontalDegrees());
+        this.icon.setYaw(facing.toYRot());
 
         this.tick();
     }

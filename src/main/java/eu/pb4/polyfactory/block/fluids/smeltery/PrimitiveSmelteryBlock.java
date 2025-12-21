@@ -12,30 +12,31 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.SidedInventory;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.WorldlyContainerHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -44,79 +45,79 @@ import java.util.ArrayList;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class PrimitiveSmelteryBlock extends MultiBlock implements FactoryBlock, BlockEntityProvider, InventoryProvider, FluidOutput.Getter, PipeConnectable {
-    public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
-    public static final BooleanProperty LIT = Properties.LIT;
+public class PrimitiveSmelteryBlock extends MultiBlock implements FactoryBlock, EntityBlock, WorldlyContainerHolder, FluidOutput.Getter, PipeConnectable {
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
 
-    public PrimitiveSmelteryBlock(Settings settings) {
+    public PrimitiveSmelteryBlock(Properties settings) {
         super(1, 2, 1, settings);
-        this.setDefaultState(this.getDefaultState().with(LIT, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(LIT, false));
     }
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING, LIT);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!player.isSneaking() && world.getBlockEntity(getCenter(state, pos)) instanceof PrimitiveSmelteryBlockEntity be) {
-            be.openGui((ServerPlayerEntity) player);
-            return ActionResult.SUCCESS_SERVER;
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!player.isShiftKeyDown() && world.getBlockEntity(getCenter(state, pos)) instanceof PrimitiveSmelteryBlockEntity be) {
+            be.openGui((ServerPlayer) player);
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return this.defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return isCenter(initialBlockState) ? new Model(initialBlockState) : null;
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return isCenter(state) ? new PrimitiveSmelteryBlockEntity(pos, state) : null;
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return isCenter(state) ? PrimitiveSmelteryBlockEntity::tick : null;
     }
 
     @Override
-    public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
+    public WorldlyContainer getContainer(BlockState state, LevelAccessor world, BlockPos pos) {
         var center = this.getCenter(state, pos);
         var be = world.getBlockEntity(center);
 
-        return be instanceof SidedInventory inv ? inv : null;
+        return be instanceof WorldlyContainer inv ? inv : null;
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.BRICKS.getDefaultState();
+        return Blocks.BRICKS.defaultBlockState();
     }
 
     @Override
-    public FluidOutput getFluidOutput(ServerWorld world, BlockPos pos, Direction direction) {
+    public FluidOutput getFluidOutput(ServerLevel world, BlockPos pos, Direction direction) {
         return (FluidOutput) world.getBlockEntity(getCenter(world.getBlockState(pos), pos));
     }
 
     @Override
-    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canPipeConnect(LevelReader world, BlockPos pos, BlockState state, Direction dir) {
         return true;
     }
 
@@ -132,7 +133,7 @@ public class PrimitiveSmelteryBlock extends MultiBlock implements FactoryBlock, 
         private final ItemDisplayElement main;
 
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.get(PrimitiveSmelteryBlock.LIT) ? LIT : REGULAR);
+            this.main = ItemDisplayElementUtil.createSimple(state.getValue(PrimitiveSmelteryBlock.LIT) ? LIT : REGULAR);
             this.main.setScale(new Vector3f(2f));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.main.setDisplaySize(3, 3);
@@ -141,13 +142,13 @@ public class PrimitiveSmelteryBlock extends MultiBlock implements FactoryBlock, 
         }
 
         private void updateStatePos(BlockState state) {
-            var dir = state.get(FACING);
+            var dir = state.getValue(FACING);
             float p = -90;
             float y = 0;
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.getPositiveHorizontalDegrees();
+                y = dir.toYRot();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             }
@@ -159,7 +160,7 @@ public class PrimitiveSmelteryBlock extends MultiBlock implements FactoryBlock, 
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.main.setItem(this.blockState().get(PrimitiveSmelteryBlock.LIT) ? LIT : REGULAR);
+                this.main.setItem(this.blockState().getValue(PrimitiveSmelteryBlock.LIT) ? LIT : REGULAR);
                 updateStatePos(this.blockState());
                 this.tick();
             }

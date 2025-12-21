@@ -6,11 +6,11 @@ import com.kneelawk.graphlib.api.graph.user.BlockNodeType;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.core.Direction;
 
 public record UnconnectedNode() implements DirectionCheckingNode {
     public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("unconnected"), UnconnectedNode::new);

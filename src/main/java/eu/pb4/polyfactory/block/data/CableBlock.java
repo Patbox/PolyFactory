@@ -9,58 +9,58 @@ import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.WallBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.WallBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.BlockHitResult;
 
 public final class CableBlock extends AbstractCableBlock implements FactoryBlock, BlockStateNameProvider {
 
-    public CableBlock(Settings settings) {
+    public CableBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    public boolean canReplace(BlockState state, ItemPlacementContext context) {
-        return (context.getStack().getItem() instanceof CabledBlockItem) || super.canReplace(state, context);
+    public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
+        return (context.getItemInHand().getItem() instanceof CabledBlockItem) || super.canBeReplaced(state, context);
     }
 
     @Override
-    protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof WallBlock wallBlock) {
             var convert = WallWithCableBlock.MAP.get(wallBlock);
             if (convert != null) {
-                stack.decrementUnlessCreative(1, player);
-                var convertState = Objects.requireNonNull(convert.getPlacementState(new ItemPlacementContext(world, player, hand, stack, hit)))
-                        .with(WallWithCableBlock.NORTH_SHAPE, WallWithCableBlock.Side.NONE.cable(state.get(NORTH)))
-                        .with(WallWithCableBlock.SOUTH_SHAPE, WallWithCableBlock.Side.NONE.cable(state.get(SOUTH)))
-                        .with(WallWithCableBlock.WEST_SHAPE, WallWithCableBlock.Side.NONE.cable(state.get(WEST)))
-                        .with(WallWithCableBlock.EAST_SHAPE, WallWithCableBlock.Side.NONE.cable(state.get(EAST)));
+                stack.consume(1, player);
+                var convertState = Objects.requireNonNull(convert.getStateForPlacement(new BlockPlaceContext(world, player, hand, stack, hit)))
+                        .setValue(WallWithCableBlock.NORTH_SHAPE, WallWithCableBlock.Side.NONE.cable(state.getValue(NORTH)))
+                        .setValue(WallWithCableBlock.SOUTH_SHAPE, WallWithCableBlock.Side.NONE.cable(state.getValue(SOUTH)))
+                        .setValue(WallWithCableBlock.WEST_SHAPE, WallWithCableBlock.Side.NONE.cable(state.getValue(WEST)))
+                        .setValue(WallWithCableBlock.EAST_SHAPE, WallWithCableBlock.Side.NONE.cable(state.getValue(EAST)));
 
-                world.setBlockState(pos, convertState);
-                return ActionResult.SUCCESS_SERVER;
+                world.setBlockAndUpdate(pos, convertState);
+                return InteractionResult.SUCCESS_SERVER;
             }
         }
 
-        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+        return super.useItemOn(stack, state, world, pos, player, hand, hit);
     }
 
     @Override
@@ -70,40 +70,40 @@ public final class CableBlock extends AbstractCableBlock implements FactoryBlock
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        var state = ctx.getWorld().getBlockState(ctx.getBlockPos());
-        if (state.getBlock() instanceof DirectionalCabledDataBlock && !state.get(DirectionalCabledDataBlock.HAS_CABLE)) {
-            return state.with(DirectionalCabledDataBlock.HAS_CABLE, true);
-        } else if (state.getBlock() instanceof DirectionalCabledDataBlock && !state.get(DirectionalCabledDataBlock.HAS_CABLE)) {
-            return state.with(DirectionalCabledDataBlock.HAS_CABLE, true);
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var state = ctx.getLevel().getBlockState(ctx.getClickedPos());
+        if (state.getBlock() instanceof DirectionalCabledDataBlock && !state.getValue(DirectionalCabledDataBlock.HAS_CABLE)) {
+            return state.setValue(DirectionalCabledDataBlock.HAS_CABLE, true);
+        } else if (state.getBlock() instanceof DirectionalCabledDataBlock && !state.getValue(DirectionalCabledDataBlock.HAS_CABLE)) {
+            return state.setValue(DirectionalCabledDataBlock.HAS_CABLE, true);
         }
 
-        return super.getPlacementState(ctx);
+        return super.getStateForPlacement(ctx);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.STRUCTURE_VOID.getDefaultState();
+        return Blocks.STRUCTURE_VOID.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
-    public Text getName(ServerWorld world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
+    public Component getName(ServerLevel world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
         if (this == FactoryBlocks.CABLE && blockEntity instanceof ColorProvider be && !be.isDefaultColor()) {
             if (!DyeColorExtra.hasLang(be.getColor())) {
-                return Text.translatable("block.polyfactory.cable.colored.full",
+                return Component.translatable("block.polyfactory.cable.colored.full",
                         ColoredItem.getColorName(be.getColor()), ColoredItem.getHexName(be.getColor()));
             } else {
-                return Text.translatable("block.polyfactory.cable.colored", ColoredItem.getColorName(be.getColor()));
+                return Component.translatable("block.polyfactory.cable.colored", ColoredItem.getColorName(be.getColor()));
             }
         }
         return this.getName();
@@ -112,12 +112,12 @@ public final class CableBlock extends AbstractCableBlock implements FactoryBlock
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new CableBlockEntity(pos, state);
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new BaseCableModel(initialBlockState);
     }
 }

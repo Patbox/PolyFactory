@@ -12,118 +12,118 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.redstone.Orientation;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, ConfigurableBlock, CableConnectable {
-    public static final Property<Direction.Axis> AXIS = Properties.AXIS;
-    public static final BooleanProperty POWERED = Properties.POWERED;
-    public static final BooleanProperty INVERTED = Properties.INVERTED;
+    public static final Property<Direction.Axis> AXIS = BlockStateProperties.AXIS;
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
 
-    public GatedCableBlock(Settings settings) {
+    public GatedCableBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(POWERED, false).with(INVERTED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(POWERED, false).setValue(INVERTED, false));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(AXIS, POWERED, INVERTED);
     }
 
 
     @Override
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        if (!oldState.isOf(state.getBlock())) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (!oldState.is(state.getBlock())) {
             this.updatePowered(world, pos, state);
         }
-        super.onBlockAdded(state,world,pos, oldState, notify);
+        super.onPlace(state,world,pos, oldState, notify);
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, @Nullable Orientation wireOrientation, boolean notify) {
         this.updatePowered(world, pos, state);
-        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
+        super.neighborChanged(state, world, pos, sourceBlock, wireOrientation, notify);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return super.getPlacementState(ctx).with(AXIS, ctx.getPlayerLookDirection().getAxis());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return super.getStateForPlacement(ctx).setValue(AXIS, ctx.getNearestLookingDirection().getAxis());
     }
 
-    private void updatePowered(World world, BlockPos pos, BlockState state) {
-        boolean powered = world.isReceivingRedstonePower(pos);
-        if (powered != state.get(POWERED)) {
-            world.setBlockState(pos, state.with(POWERED, powered), 4);
+    private void updatePowered(Level world, BlockPos pos, BlockState state) {
+        boolean powered = world.hasNeighborSignal(pos);
+        if (powered != state.getValue(POWERED)) {
+            world.setBlock(pos, state.setValue(POWERED, powered), 4);
         }
     }
 
     @Override
-    public Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return state.get(POWERED) == state.get(INVERTED) ? List.of(new SimpleAxisNode(state.get(AXIS))) : List.of();
+    public Collection<BlockNode> createDataNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return state.getValue(POWERED) == state.getValue(INVERTED) ? List.of(new SimpleAxisNode(state.getValue(AXIS))) : List.of();
     }
 
     @Override
-    public Collection<BlockNode> createEnergyNodes(BlockState state, ServerWorld world, BlockPos pos) {
+    public Collection<BlockNode> createEnergyNodes(BlockState state, ServerLevel world, BlockPos pos) {
         return createDataNodes(state, world, pos);
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.SMOOTH_STONE.getDefaultState();
+        return Blocks.SMOOTH_STONE.defaultBlockState();
     }
 
     @Override
-    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(world, initialBlockState);
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return FactoryUtil.rotateAxis(state, AXIS, rotation);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(BlockConfig.AXIS, BlockConfig.INVERTED);
     }
 
     @Override
-    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
-        return dir.getAxis() == state.get(AXIS);
+    public boolean canCableConnect(LevelReader world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+        return dir.getAxis() == state.getValue(AXIS);
     }
 
     public static final class Model extends RotationAwareModel {
@@ -131,15 +131,15 @@ public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, 
         public static final ItemStack ON = ItemDisplayElementUtil.getModel(id("block/gated_cable_on"));
 
         private final ItemDisplayElement main;
-        private Model(ServerWorld world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.get(POWERED) ? ON : OFF);
+        private Model(ServerLevel world, BlockState state) {
+            this.main = ItemDisplayElementUtil.createSimple(state.getValue(POWERED) ? ON : OFF);
             this.main.setScale(new Vector3f(2));
             updateStatePos(state);
             this.addElement(this.main);
         }
 
         private void updateStatePos(BlockState state) {
-            var dir = state.get(AXIS);
+            var dir = state.getValue(AXIS);
             float p = 0;
             float y = 0;
 
@@ -160,7 +160,7 @@ public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, 
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.main.setItem(this.blockState().get(POWERED) ? ON : OFF);
+                this.main.setItem(this.blockState().getValue(POWERED) ? ON : OFF);
                 updateStatePos(this.blockState());
             }
         }

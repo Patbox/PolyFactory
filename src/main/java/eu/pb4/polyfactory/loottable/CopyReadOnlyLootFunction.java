@@ -6,25 +6,25 @@ import eu.pb4.polyfactory.block.data.io.DataMemoryBlock;
 import eu.pb4.polyfactory.block.data.util.DataCache;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.util.OptionalDirection;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContext;
-import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.loot.function.LootFunction;
-import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
-public class CopyReadOnlyLootFunction implements LootFunction {
-    public static final LootFunction INSTANCE = new CopyReadOnlyLootFunction();
-    public static final LootFunctionType TYPE = new LootFunctionType(MapCodec.unit(INSTANCE));
+public class CopyReadOnlyLootFunction implements LootItemFunction {
+    public static final LootItemFunction INSTANCE = new CopyReadOnlyLootFunction();
+    public static final LootItemFunctionType TYPE = new LootItemFunctionType(MapCodec.unit(INSTANCE));
 
     @Override
-    public LootFunctionType getType() {
+    public LootItemFunctionType getType() {
         return TYPE;
     }
 
     @Override
     public ItemStack apply(ItemStack stack, LootContext lootContext) {
-        if (lootContext.hasParameter(LootContextParameters.BLOCK_STATE)) {
-            var readOnly = lootContext.get(LootContextParameters.BLOCK_STATE).getOrEmpty(DataMemoryBlock.FACING_INPUT);
+        if (lootContext.hasParameter(LootContextParams.BLOCK_STATE)) {
+            var readOnly = lootContext.getOptionalParameter(LootContextParams.BLOCK_STATE).getOptionalValue(DataMemoryBlock.FACING_INPUT);
             readOnly.ifPresent(aBoolean -> stack.set(FactoryDataComponents.READ_ONLY, aBoolean == OptionalDirection.NONE));
         }
 

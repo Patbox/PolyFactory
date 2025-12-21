@@ -1,9 +1,9 @@
 package eu.pb4.polyfactory.block;
 
 import eu.pb4.polyfactory.ModInit;
-import net.minecraft.block.Block;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 
 public class FactoryBlockTags {
     public static final TagKey<Block> CONVEYORS = of("conveyors");
@@ -18,6 +18,6 @@ public class FactoryBlockTags {
     public static final TagKey<Block> UNCONNECTABLE = of("unconnectable");
 
     private static TagKey<Block> of(String path) {
-        return TagKey.of(RegistryKeys.BLOCK, ModInit.id(path));
+        return TagKey.create(Registries.BLOCK, ModInit.id(path));
     }
 }

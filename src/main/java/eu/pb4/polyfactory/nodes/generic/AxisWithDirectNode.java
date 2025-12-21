@@ -8,13 +8,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.AxisNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 
 public record AxisWithDirectNode(Direction.Axis axis, List<BlockPos> connection) implements AxisNode {
     public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("axis_with_direct"), RecordCodecBuilder.<AxisWithDirectNode>create(instance -> instance.group(
@@ -30,8 +30,8 @@ public record AxisWithDirectNode(Direction.Axis axis, List<BlockPos> connection)
     @Override
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
         var list = new ArrayList<HalfLink>();
-        FactoryNodes.findNodes(self, self.getBlockPos().offset(this.axis,1)).forEach(list::add);
-        FactoryNodes.findNodes(self, self.getBlockPos().offset(this.axis,-1)).forEach(list::add);
+        FactoryNodes.findNodes(self, self.getBlockPos().relative(this.axis,1)).forEach(list::add);
+        FactoryNodes.findNodes(self, self.getBlockPos().relative(this.axis,-1)).forEach(list::add);
         for (var con : connection) {
             FactoryNodes.findNodes(self, con, (x, y) -> y.getNode() instanceof AxisWithDirectNode).forEach(list::add);
         }

@@ -4,11 +4,11 @@ import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.input.RecipeInput;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeInput;
 
 public record FluidContainerInput(Object2LongMap<FluidInstance<?>> fluidsAmount, List<FluidInstance<?>> fluids, long stored, long capacity, float temperature) implements RecipeInput {
     public static final FluidContainerInput EMPTY = new FluidContainerInput(Object2LongMaps.emptyMap(), List.of(), 0, 0, 0);
@@ -25,7 +25,7 @@ public record FluidContainerInput(Object2LongMap<FluidInstance<?>> fluidsAmount,
     }
 
     @Override
-    public ItemStack getStackInSlot(int slot) {
+    public ItemStack getItem(int slot) {
         return ItemStack.EMPTY;
     }
 

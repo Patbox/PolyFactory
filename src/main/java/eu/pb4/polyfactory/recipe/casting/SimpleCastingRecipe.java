@@ -9,56 +9,55 @@ import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.input.SingleItemWithFluid;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.world.World;
-
 import java.util.Optional;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 
 public record SimpleCastingRecipe(Optional<CountedIngredient> item, FluidStack<?> fluidInput,
-                                  ItemStack output, boolean copyComponents, int itemDamage, RegistryEntry<SoundEvent> soundEvent,
+                                  ItemStack output, boolean copyComponents, int itemDamage, Holder<SoundEvent> soundEvent,
                                   double time, double coolingTime) implements CastingRecipe {
     public static final MapCodec<SimpleCastingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     CountedIngredient.CODEC.optionalFieldOf("item").forGetter(SimpleCastingRecipe::item),
                     FluidStack.CODEC.fieldOf("fluid_input").forGetter(SimpleCastingRecipe::fluidInput),
-                    ItemStack.UNCOUNTED_CODEC.fieldOf("result").forGetter(SimpleCastingRecipe::output),
+                    ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(SimpleCastingRecipe::output),
                     Codec.BOOL.optionalFieldOf("copy_components", false).forGetter(SimpleCastingRecipe::copyComponents),
                     Codec.INT.optionalFieldOf("item_damage", 0).forGetter(SimpleCastingRecipe::itemDamage),
-                    SoundEvent.ENTRY_CODEC.optionalFieldOf("sound", FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED).forGetter(SimpleCastingRecipe::soundEvent),
+                    SoundEvent.CODEC.optionalFieldOf("sound", FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED).forGetter(SimpleCastingRecipe::soundEvent),
                     Codec.DOUBLE.fieldOf("time").forGetter(SimpleCastingRecipe::time),
                     Codec.DOUBLE.fieldOf("cooling_ticks").forGetter(SimpleCastingRecipe::coolingTime)
             ).apply(x, SimpleCastingRecipe::new)
     );
 
     public static SimpleCastingRecipe fluid(FluidStack<?> stack, Item out, SoundEvent sound, int coolingTime) {
-        return new SimpleCastingRecipe(Optional.empty(), stack, out.getDefaultStack(), false, 0,
-                Registries.SOUND_EVENT.getEntry(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
+        return new SimpleCastingRecipe(Optional.empty(), stack, out.getDefaultInstance(), false, 0,
+                BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
     }
 
     public static SimpleCastingRecipe toItem(Item item, FluidStack<?> stack, Item out, SoundEvent sound, int coolingTime) {
-        return new SimpleCastingRecipe(Optional.of(CountedIngredient.ofItems(1, item)), stack, out.getDefaultStack(), false, 0,
-                Registries.SOUND_EVENT.getEntry(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
+        return new SimpleCastingRecipe(Optional.of(CountedIngredient.ofItems(1, item)), stack, out.getDefaultInstance(), false, 0,
+                BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
     }
 
     public static SimpleCastingRecipe toItem(TagKey<Item> item, FluidStack<?> stack, Item out, SoundEvent sound, int coolingTime) {
-        return new SimpleCastingRecipe(Optional.of(CountedIngredient.fromTag(1, FactoryUtil.fakeTagList(item))), stack, out.getDefaultStack(), false, 0,
-                Registries.SOUND_EVENT.getEntry(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
+        return new SimpleCastingRecipe(Optional.of(CountedIngredient.fromTag(1, FactoryUtil.fakeTagList(item))), stack, out.getDefaultInstance(), false, 0,
+                BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
     }
 
     public static SimpleCastingRecipe templateDamaged(TagKey<Item> template, FluidStack<?> stack, Item out, SoundEvent sound, double coolingTicks) {
-        return new SimpleCastingRecipe(Optional.of(CountedIngredient.fromTag(0, FactoryUtil.fakeTagList(template))), stack, out.getDefaultStack(), false, 1,
-                Registries.SOUND_EVENT.getEntry(sound), CastingRecipe.getTime(stack.instance(), stack.amount()),coolingTicks);
+        return new SimpleCastingRecipe(Optional.of(CountedIngredient.fromTag(0, FactoryUtil.fakeTagList(template))), stack, out.getDefaultInstance(), false, 1,
+                BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), CastingRecipe.getTime(stack.instance(), stack.amount()),coolingTicks);
     }
 
     public static SimpleCastingRecipe templateDamaged(Item template, FluidStack<?> stack, Item out, SoundEvent sound, double coolingTicks) {
-        return new SimpleCastingRecipe(Optional.of(CountedIngredient.ofItems(0, template)), stack, out.getDefaultStack(), false, 1,
-                Registries.SOUND_EVENT.getEntry(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTicks);
+        return new SimpleCastingRecipe(Optional.of(CountedIngredient.ofItems(0, template)), stack, out.getDefaultInstance(), false, 1,
+                BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTicks);
     }
 
     @Override
@@ -77,7 +76,7 @@ public record SimpleCastingRecipe(Optional<CountedIngredient> item, FluidStack<?
     }
 
     @Override
-    public boolean matches(SingleItemWithFluid input, World world) {
+    public boolean matches(SingleItemWithFluid input, Level world) {
         if ((item.isPresent() && !item.get().test(input.stack())) || (item.isEmpty() && !input.stack().isEmpty())) {
             return false;
         }
@@ -91,10 +90,10 @@ public record SimpleCastingRecipe(Optional<CountedIngredient> item, FluidStack<?
     }
 
     @Override
-    public ItemStack craft(SingleItemWithFluid input, RegistryWrapper.WrapperLookup lookup) {
+    public ItemStack assemble(SingleItemWithFluid input, HolderLookup.Provider lookup) {
         var out = output.copy();
         if (this.copyComponents) {
-            out.applyChanges(input.stack().getComponentChanges());
+            out.applyComponentsAndValidate(input.stack().getComponentsPatch());
         }
 
         return out;

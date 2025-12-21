@@ -16,33 +16,33 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public abstract class InputTransformerBlock extends DataNetworkBlock implements BlockEntityProvider, FactoryBlock, CableConnectable, DataProvider, DataReceiver, ConfigurableBlock {
-    public static final EnumProperty<Direction> FACING_INPUT = EnumProperty.of("facing_input", Direction.class);
-    public static final EnumProperty<Direction> FACING_OUTPUT = EnumProperty.of("facing_output", Direction.class);
+public abstract class InputTransformerBlock extends DataNetworkBlock implements EntityBlock, FactoryBlock, CableConnectable, DataProvider, DataReceiver, ConfigurableBlock {
+    public static final EnumProperty<Direction> FACING_INPUT = EnumProperty.create("facing_input", Direction.class);
+    public static final EnumProperty<Direction> FACING_OUTPUT = EnumProperty.create("facing_output", Direction.class);
 
      protected static final List<BlockConfig<?>> BLOCK_CONFIG = List.of(
             BlockConfig.ofDirection(FACING_INPUT),
@@ -53,49 +53,49 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
                     InputTransformerBlockEntity::outputChannel, InputTransformerBlockEntity::setOutputChannel)
     );
 
-    public InputTransformerBlock(Settings settings) {
+    public InputTransformerBlock(Properties settings) {
         super(settings);
     }
     
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        var facing = ctx.getPlayerLookDirection().getOpposite();
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var facing = ctx.getNearestLookingDirection().getOpposite();
 
-        return this.getDefaultState().with(FACING_OUTPUT, facing.getOpposite())
-                .with(FACING_INPUT, facing);
+        return this.defaultBlockState().setValue(FACING_OUTPUT, facing.getOpposite())
+                .setValue(FACING_INPUT, facing);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING_INPUT, FACING_OUTPUT);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
+        return Blocks.IRON_BLOCK.defaultBlockState();
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new InputTransformerBlockEntity(pos, state);
     }
 
     @Override
-    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
-        return state.get(FACING_INPUT) == dir
-                || state.get(FACING_OUTPUT) == dir;
+    public boolean canCableConnect(LevelReader world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+        return state.getValue(FACING_INPUT) == dir
+                || state.getValue(FACING_OUTPUT) == dir;
     }
 
     @Override
-    public @Nullable DataContainer provideData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataProviderNode node) {
+    public @Nullable DataContainer provideData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataProviderNode node) {
         if (world.getBlockEntity(selfPos) instanceof InputTransformerBlockEntity be) {
             return be.lastOutput();
         }
@@ -104,17 +104,17 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
     }
 
     @Override
-    public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
+    public boolean receiveData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
         if (node instanceof ChannelReceiverDirectionNode direction && world.getBlockEntity(selfPos) instanceof InputTransformerBlockEntity be) {
             DataContainer input = be.lastInput();
             boolean matchingData = false;
-            if (direction.direction() == selfState.get(FACING_INPUT) && channel == be.inputChannel()) {
+            if (direction.direction() == selfState.getValue(FACING_INPUT) && channel == be.inputChannel()) {
                 input = be.setLastInput(data);
                 matchingData = true;
             }
 
             if (matchingData) {
-                sendData(world, selfState.get(FACING_OUTPUT), selfPos, this.transformData(input, world, selfPos, selfState, be));
+                sendData(world, selfState.getValue(FACING_OUTPUT), selfPos, this.transformData(input, world, selfPos, selfState, be));
                 return true;
             }
         }
@@ -122,10 +122,10 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
         return false;
     }
 
-    protected abstract DataContainer transformData(DataContainer input, ServerWorld world, BlockPos selfPos, BlockState selfState, InputTransformerBlockEntity be);
+    protected abstract DataContainer transformData(DataContainer input, ServerLevel world, BlockPos selfPos, BlockState selfState, InputTransformerBlockEntity be);
 
-    public int sendData(WorldAccess world, Direction direction, BlockPos selfPos, DataContainer data) {
-        if (data != null && world instanceof ServerWorld serverWorld && world.getBlockEntity(selfPos) instanceof InputTransformerBlockEntity be) {
+    public int sendData(LevelAccessor world, Direction direction, BlockPos selfPos, DataContainer data) {
+        if (data != null && world instanceof ServerLevel serverWorld && world.getBlockEntity(selfPos) instanceof InputTransformerBlockEntity be) {
             be.setLastOutput(data);
             return Data.getLogic(serverWorld, selfPos,
                     x -> x.getNode() instanceof ChannelProviderDirectionNode p && p.channel() == be.outputChannel() && p.direction() == direction)
@@ -135,23 +135,23 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
     }
 
     @Override
-    public Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos) {
+    public Collection<BlockNode> createDataNodes(BlockState state, ServerLevel world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof InputTransformerBlockEntity be) {
             return List.of(
-                    new ChannelReceiverDirectionNode(state.get(FACING_INPUT), be.inputChannel()),
-                    new ChannelProviderDirectionNode(state.get(FACING_OUTPUT), be.outputChannel())
+                    new ChannelReceiverDirectionNode(state.getValue(FACING_INPUT), be.inputChannel()),
+                    new ChannelProviderDirectionNode(state.getValue(FACING_OUTPUT), be.outputChannel())
             );
         }
         return List.of();
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return BLOCK_CONFIG;
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
@@ -177,13 +177,13 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
         }
 
         private void updateStatePos(BlockState state, EnumProperty<Direction> property, ItemDisplayElement element) {
-            var dir = state.get(property);
+            var dir = state.getValue(property);
             float p = -90;
             float y = 0;
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.getPositiveHorizontalDegrees();
+                y = dir.toYRot();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             }

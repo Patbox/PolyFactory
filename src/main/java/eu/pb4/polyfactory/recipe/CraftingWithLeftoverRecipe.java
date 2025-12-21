@@ -2,18 +2,24 @@ package eu.pb4.polyfactory.recipe;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancement.Advancement;
-import net.minecraft.advancement.AdvancementEntry;
-import net.minecraft.data.recipe.RecipeExporter;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.*;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.recipe.display.RecipeDisplay;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.world.World;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -35,10 +41,10 @@ public record CraftingWithLeftoverRecipe<T extends CraftingRecipe>(RecipeSeriali
         return new CraftingWithLeftoverRecipe<>(FactoryRecipeSerializers.CRAFTING_SHAPELESS_LEFTOVER, recipe, List.of(leftovers));
     }
 
-    public static RecipeExporter asExporter(RecipeExporter exporter, Ingredient... leftover) {
-        return new RecipeExporter() {
+    public static RecipeOutput asExporter(RecipeOutput exporter, Ingredient... leftover) {
+        return new RecipeOutput() {
             @Override
-            public void accept(RegistryKey<Recipe<?>> key, Recipe<?> recipe, @Nullable AdvancementEntry advancement) {
+            public void accept(ResourceKey<Recipe<?>> key, Recipe<?> recipe, @Nullable AdvancementHolder advancement) {
                 if (recipe instanceof ShapedRecipe shapedRecipe) {
                     exporter.accept(key, of(shapedRecipe, leftover), advancement);
                 } else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
@@ -47,34 +53,34 @@ public record CraftingWithLeftoverRecipe<T extends CraftingRecipe>(RecipeSeriali
             }
 
             @Override
-            public Advancement.Builder getAdvancementBuilder() {
-                return exporter.getAdvancementBuilder();
+            public Advancement.Builder advancement() {
+                return exporter.advancement();
             }
 
             @Override
-            public void addRootAdvancement() {
-                exporter.addRootAdvancement();
+            public void includeRootAdvancement() {
+                exporter.includeRootAdvancement();
             }
         };
     }
 
     @Override
-    public boolean matches(CraftingRecipeInput input, World world) {
+    public boolean matches(CraftingInput input, Level world) {
         return this.backingRecipe.matches(input, world);
     }
 
     @Override
-    public ItemStack craft(CraftingRecipeInput input, RegistryWrapper.WrapperLookup registries) {
-        return this.backingRecipe.craft(input, registries);
+    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+        return this.backingRecipe.assemble(input, registries);
     }
 
     @Override
-    public DefaultedList<ItemStack> getRecipeRemainders(CraftingRecipeInput input) {
-        var remainders = this.backingRecipe.getRecipeRemainders(input  );
+    public NonNullList<ItemStack> getRemainingItems(CraftingInput input) {
+        var remainders = this.backingRecipe.getRemainingItems(input  );
         for (var i = 0; i < input.size(); i++) {
             for (var ing : this.leftovers) {
-                if (ing.test(input.getStackInSlot(i))) {
-                    remainders.set(i, input.getStackInSlot(i).copyWithCount(1));
+                if (ing.test(input.getItem(i))) {
+                    remainders.set(i, input.getItem(i).copyWithCount(1));
                 }
             }
         }
@@ -88,22 +94,22 @@ public record CraftingWithLeftoverRecipe<T extends CraftingRecipe>(RecipeSeriali
     }
 
     @Override
-    public IngredientPlacement getIngredientPlacement() {
-        return this.backingRecipe.getIngredientPlacement();
+    public PlacementInfo placementInfo() {
+        return this.backingRecipe.placementInfo();
     }
 
     @Override
-    public CraftingRecipeCategory getCategory() {
-        return this.backingRecipe.getCategory();
+    public CraftingBookCategory category() {
+        return this.backingRecipe.category();
     }
 
     @Override
-    public String getGroup() {
-        return this.backingRecipe.getGroup();
+    public String group() {
+        return this.backingRecipe.group();
     }
 
     @Override
-    public List<RecipeDisplay> getDisplays() {
-        return this.backingRecipe.getDisplays();
+    public List<RecipeDisplay> display() {
+        return this.backingRecipe.display();
     }
 }

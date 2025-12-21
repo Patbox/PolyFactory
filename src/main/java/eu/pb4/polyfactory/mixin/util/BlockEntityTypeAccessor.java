@@ -1,19 +1,19 @@
 package eu.pb4.polyfactory.mixin.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntityType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.Set;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 @Mixin(BlockEntityType.class)
 public interface BlockEntityTypeAccessor {
-    @Accessor("blocks")
+    @Accessor("validBlocks")
     Set<Block> polyfactory$getBlocks();
 
     @Mutable
-    @Accessor("blocks")
+    @Accessor("validBlocks")
     void polyfactory$setBlocks(Set<Block> blocks);
 }

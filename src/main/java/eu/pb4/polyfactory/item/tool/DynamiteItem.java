@@ -1,48 +1,48 @@
 package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Position;
+import net.minecraft.core.dispenser.ProjectileDispenseBehavior;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileItem;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.phys.Vec3;
 import eu.pb4.polyfactory.entity.DynamiteEntity;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
-import net.minecraft.block.DispenserBlock;
-import net.minecraft.block.dispenser.ProjectileDispenserBehavior;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ProjectileItem;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Position;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 
 public class DynamiteItem extends SimplePolymerItem implements ProjectileItem {
 
-    public DynamiteItem(Item.Settings settings) {
+    public DynamiteItem(Item.Properties settings) {
         super(settings);
-        DispenserBlock.registerBehavior(this, new ProjectileDispenserBehavior(this));
+        DispenserBlock.registerBehavior(this, new ProjectileDispenseBehavior(this));
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity user, Hand hand) {
-        var stack = user.getStackInHand(hand);
+    public InteractionResult use(Level world, Player user, InteractionHand hand) {
+        var stack = user.getItemInHand(hand);
 
-        DynamiteEntity.spawn(user.getRotationVector(), user.getEyePos(), world, stack.copyWithCount(1), user);
+        DynamiteEntity.spawn(user.getLookAngle(), user.getEyePosition(), world, stack.copyWithCount(1), user);
 
-        world.playSound(null, user.getX(), user.getEyeY(), user.getZ(), FactorySoundEvents.ENTITY_DYNAMITE_THROW, user.getSoundCategory(), 0.5F,
+        world.playSound(null, user.getX(), user.getEyeY(), user.getZ(), FactorySoundEvents.ENTITY_DYNAMITE_THROW, user.getSoundSource(), 0.5F,
                 0.4F / (world.getRandom().nextFloat() * 0.4F + 1F));
 
 
         if (!user.isCreative()) {
-            stack.decrement(1);
+            stack.shrink(1);
         }
 
-        return ActionResult.SUCCESS_SERVER;
+        return InteractionResult.SUCCESS_SERVER;
     }
 
     @Override
-    public ProjectileEntity createEntity(World world, Position pos, ItemStack stack, Direction direction) {
-        return DynamiteEntity.create(Vec3d.of(direction.getVector()), pos, world, stack.copyWithCount(1), null);
+    public Projectile asProjectile(Level world, Position pos, ItemStack stack, Direction direction) {
+        return DynamiteEntity.create(Vec3.atLowerCornerOf(direction.getUnitVec3i()), pos, world, stack.copyWithCount(1), null);
     }
 }

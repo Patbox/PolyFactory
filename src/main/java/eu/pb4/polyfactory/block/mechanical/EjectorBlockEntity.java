@@ -4,17 +4,15 @@ import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 public class EjectorBlockEntity extends BlockEntity implements BlockEntityExtraListener {
@@ -33,15 +31,15 @@ public class EjectorBlockEntity extends BlockEntity implements BlockEntityExtraL
         super(FactoryBlockEntities.EJECTOR, pos, state);
     }
 
-    public static <T extends BlockEntity> void tick(World worldx, BlockPos pos, BlockState state, T t) {
-        if (!(worldx instanceof ServerWorld world) || !(t instanceof EjectorBlockEntity be) || be.ignoredTick + 10 > world.getTime()) {
+    public static <T extends BlockEntity> void tick(Level worldx, BlockPos pos, BlockState state, T t) {
+        if (!(worldx instanceof ServerLevel world) || !(t instanceof EjectorBlockEntity be) || be.ignoredTick + 10 > world.getGameTime()) {
             return;
         }
         var speed = RotationUser.getRotation(world, pos).speed();
         be.setProgress((float) (be.progress + speed / (be.strength * be.strength * 60)));
     }
 
-    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerLevel world, BlockPos pos) {
         if (this.progress < 1) {
             modifier.stress(this.strength * 1.2);
         }
@@ -49,8 +47,8 @@ public class EjectorBlockEntity extends BlockEntity implements BlockEntityExtraL
 
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         view.putFloat("angle", this.angle);
         view.putFloat("strength", this.strength);
         view.putFloat("progress", this.progress);
@@ -58,16 +56,16 @@ public class EjectorBlockEntity extends BlockEntity implements BlockEntityExtraL
 
 
     @Override
-    protected void readData(ReadView view) {
-        super.readData(view);
-        this.angle = view.getFloat("angle", 45);
-        this.strength = view.getFloat("strength", 2);
-        this.progress = view.getFloat("process", 0);
+    protected void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
+        this.angle = view.getFloatOr("angle", 45);
+        this.strength = view.getFloatOr("strength", 2);
+        this.progress = view.getFloatOr("process", 0);
     }
 
     public void setAngle(float angle) {
         this.angle = angle;
-        this.markDirty();
+        this.setChanged();
     }
 
     public float angle() {
@@ -86,19 +84,19 @@ public class EjectorBlockEntity extends BlockEntity implements BlockEntityExtraL
         var old = this.strength;
         this.strength = strength;
         setProgress(this.progress * old / strength);
-        this.markDirty();
+        this.setChanged();
     }
 
     @Override
-    public void onListenerUpdate(WorldChunk worldChunk) {
-        this.model = (EjectorBlock.Model) BlockAwareAttachment.get(worldChunk, pos).holder();
+    public void onListenerUpdate(LevelChunk worldChunk) {
+        this.model = (EjectorBlock.Model) BlockAwareAttachment.get(worldChunk, worldPosition).holder();
     }
 
     public void setProgress(float progress) {
         this.progress = Math.min(progress, 1);
-        this.markDirty();
+        this.setChanged();
         if (this.model != null) {
-            this.model.updateProgress((1 - this.progress) * (60 - this.angle * 0.4f) * MathHelper.RADIANS_PER_DEGREE);
+            this.model.updateProgress((1 - this.progress) * (60 - this.angle * 0.4f) * Mth.DEG_TO_RAD);
             this.model.tick();
         }
     }

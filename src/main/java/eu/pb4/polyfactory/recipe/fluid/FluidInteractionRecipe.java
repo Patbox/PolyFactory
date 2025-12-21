@@ -5,30 +5,29 @@ import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.recipe.IngredientPlacement;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.book.RecipeBookCategories;
-import net.minecraft.recipe.book.RecipeBookCategory;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategories;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
+import net.minecraft.world.item.crafting.RecipeType;
 
 public interface FluidInteractionRecipe extends Recipe<FluidContainerInput> {
-    List<FluidInputStack> fluidInput(FluidContainerInput input, RegistryWrapper.WrapperLookup lookup);
-    List<FluidStack<?>> fluidOutput(FluidContainerInput input, RegistryWrapper.WrapperLookup lookup);
-    List<OutputStack> itemOutput(FluidContainerInput input, RegistryWrapper.WrapperLookup lookup);
+    List<FluidInputStack> fluidInput(FluidContainerInput input, HolderLookup.Provider lookup);
+    List<FluidStack<?>> fluidOutput(FluidContainerInput input, HolderLookup.Provider lookup);
+    List<OutputStack> itemOutput(FluidContainerInput input, HolderLookup.Provider lookup);
     @Nullable
-    ParticleEffect particle(FluidContainerInput input, Random random);
+    ParticleOptions particle(FluidContainerInput input, RandomSource random);
 
-    @Nullable RegistryEntry<SoundEvent> soundEvent(FluidContainerInput input, Random random);
+    @Nullable Holder<SoundEvent> soundEvent(FluidContainerInput input, RandomSource random);
 
     int maxApplyPerTick();
 
@@ -40,22 +39,22 @@ public interface FluidInteractionRecipe extends Recipe<FluidContainerInput> {
     }
 
     @Override
-    default ItemStack craft(FluidContainerInput input, RegistryWrapper.WrapperLookup lookup) {
+    default ItemStack assemble(FluidContainerInput input, HolderLookup.Provider lookup) {
         return ItemStack.EMPTY;
     };
 
     @Override
-    default RecipeBookCategory getRecipeBookCategory() {
+    default RecipeBookCategory recipeBookCategory() {
         return RecipeBookCategories.CAMPFIRE;
     }
 
     @Override
-    default boolean isIgnoredInRecipeBook() {
+    default boolean isSpecial() {
         return true;
     }
 
     @Override
-    default IngredientPlacement getIngredientPlacement() {
-        return IngredientPlacement.NONE;
+    default PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
     }
 }

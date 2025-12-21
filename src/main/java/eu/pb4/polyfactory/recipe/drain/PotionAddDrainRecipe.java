@@ -8,42 +8,41 @@ import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.spout.SpoutRecipe;
 import eu.pb4.polyfactory.recipe.input.DrainInput;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potions;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.world.World;
-
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 
-public record PotionAddDrainRecipe(Ingredient item, Optional<Ingredient> catalyst, long amount, ItemStack output, RegistryEntry<SoundEvent> soundEvent,
+public record PotionAddDrainRecipe(Ingredient item, Optional<Ingredient> catalyst, long amount, ItemStack output, Holder<SoundEvent> soundEvent,
                                    boolean requirePlayer, double time) implements DrainRecipe {
     public static final MapCodec<PotionAddDrainRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Ingredient.CODEC.fieldOf("item").forGetter(PotionAddDrainRecipe::item),
                     Ingredient.CODEC.optionalFieldOf("catalyst").forGetter(PotionAddDrainRecipe::catalyst),
                     Codec.LONG.fieldOf("amount").forGetter(PotionAddDrainRecipe::amount),
-                    ItemStack.UNCOUNTED_CODEC.fieldOf("result").forGetter(PotionAddDrainRecipe::output),
-                    SoundEvent.ENTRY_CODEC.fieldOf("sound").forGetter(PotionAddDrainRecipe::soundEvent),
+                    ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(PotionAddDrainRecipe::output),
+                    SoundEvent.CODEC.fieldOf("sound").forGetter(PotionAddDrainRecipe::soundEvent),
                     Codec.BOOL.optionalFieldOf("require_player", false).forGetter(PotionAddDrainRecipe::requirePlayer),
                     Codec.DOUBLE.fieldOf("time").forGetter(PotionAddDrainRecipe::time)
             ).apply(x, PotionAddDrainRecipe::new)
     );
 
     public static PotionAddDrainRecipe of(Item item, long amount, Item result, SoundEvent sound) {
-        return new PotionAddDrainRecipe(Ingredient.ofItems(item), Optional.empty(), amount, result.getDefaultStack(), Registries.SOUND_EVENT.getEntry(sound),
+        return new PotionAddDrainRecipe(Ingredient.of(item), Optional.empty(), amount, result.getDefaultInstance(), BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound),
                 false, SpoutRecipe.getTime(FactoryFluids.POTION.defaultInstance(), amount));
     }
 
     @Override
-    public boolean matches(DrainInput input, World world) {
+    public boolean matches(DrainInput input, Level world) {
         return (!requirePlayer || input.isPlayer())
                 && item.test(input.stack())
                 && (catalyst.isEmpty() || catalyst.get().test(input.catalyst()))
@@ -51,7 +50,7 @@ public record PotionAddDrainRecipe(Ingredient item, Optional<Ingredient> catalys
     }
 
     @Override
-    public ItemStack craft(DrainInput input, RegistryWrapper.WrapperLookup lookup) {
+    public ItemStack assemble(DrainInput input, HolderLookup.Provider lookup) {
         return output.copy();
     }
 
@@ -62,7 +61,7 @@ public record PotionAddDrainRecipe(Ingredient item, Optional<Ingredient> catalys
 
     @Override
     public List<FluidStack<?>> fluidOutput(DrainInput input) {
-        var potion = input.stack().getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
+        var potion = input.stack().getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
 
         if (potion.potion().isPresent() && potion.potion().get() == Potions.WATER) {
             return List.of(FactoryFluids.WATER.defaultInstance().stackOf(this.amount));

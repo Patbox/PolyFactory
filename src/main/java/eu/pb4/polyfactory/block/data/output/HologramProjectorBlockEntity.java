@@ -5,13 +5,11 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity implements BlockEntityExtraListener {
     private HologramProjectorBlock.Model model;
@@ -28,8 +26,8 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         view.putFloat("scale", scale);
         view.putFloat("offset", offset);
         view.putFloat("pitch", pitch);
@@ -39,14 +37,14 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
     }
 
     @Override
-    public void readData(ReadView view) {
-        super.readData(view);
-        this.scale = view.getFloat("scale", 1);
-        this.offset = view.getFloat("offset", 0.5f);
-        this.pitch = view.getFloat("pitch", 0);
-        this.yaw = view.getFloat("yaw", 0);
-        this.roll = view.getFloat("roll", view.getFloat("rotation_display", 0));
-        this.forceText = view.getBoolean("force_text", false);
+    public void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
+        this.scale = view.getFloatOr("scale", 1);
+        this.offset = view.getFloatOr("offset", 0.5f);
+        this.pitch = view.getFloatOr("pitch", 0);
+        this.yaw = view.getFloatOr("yaw", 0);
+        this.roll = view.getFloatOr("roll", view.getFloatOr("rotation_display", 0));
+        this.forceText = view.getBooleanOr("force_text", false);
     }
 
     @Override
@@ -65,7 +63,7 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
         if (this.model != null) {
             this.model.setTransform(scale, offset, pitch, yaw, roll, forceText);
         }
-        this.markDirty();
+        this.setChanged();
     }
 
     public boolean forceText() {
@@ -80,7 +78,7 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
         if (this.model != null) {
             this.model.setTransform(scale, offset, pitch, yaw, roll, forceText);
         }
-        this.markDirty();
+        this.setChanged();
     }
 
     public float scale() {
@@ -95,7 +93,7 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
         if (this.model != null) {
             this.model.setTransform(scale, offset, pitch, yaw, roll, forceText);
         }
-        this.markDirty();
+        this.setChanged();
     }
 
     public float offset() {
@@ -114,7 +112,7 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
         if (this.model != null) {
             this.model.setTransform(scale, offset, pitch, yaw, roll, forceText);
         }
-        this.markDirty();
+        this.setChanged();
     }
 
     public float yaw() {
@@ -129,7 +127,7 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
         if (this.model != null) {
             this.model.setTransform(scale, offset, pitch, yaw, roll, forceText);
         }
-        this.markDirty();
+        this.setChanged();
     }
 
     public float roll() {
@@ -144,13 +142,13 @@ public class HologramProjectorBlockEntity extends ChanneledDataBlockEntity imple
         if (this.model != null) {
             this.model.setTransform(scale, offset, pitch, yaw, roll, forceText);
         }
-        this.markDirty();
+        this.setChanged();
     }
 
 
     @Override
-    public void onListenerUpdate(WorldChunk chunk) {
-        this.model = (HologramProjectorBlock.Model) BlockAwareAttachment.get(chunk, this.pos).holder();
+    public void onListenerUpdate(LevelChunk chunk) {
+        this.model = (HologramProjectorBlock.Model) BlockAwareAttachment.get(chunk, this.worldPosition).holder();
         this.model.setTransform(scale, offset, pitch, yaw, roll, forceText);
         this.model.setData(this.lastData);
     }

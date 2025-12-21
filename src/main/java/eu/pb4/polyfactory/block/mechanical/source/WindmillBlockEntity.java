@@ -6,41 +6,37 @@ import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.other.FactoryBiomeTags;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class WindmillBlockEntity extends BlockEntity {
     private static final double LOG_BASE = Math.log(2);
-    private final DefaultedList<ItemStack> sails = DefaultedList.of();
+    private final NonNullList<ItemStack> sails = NonNullList.create();
     private int sample = Integer.MIN_VALUE;
 
     public WindmillBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.WINDMILL, pos, state);
-        for (int i = 0; i < state.get(WindmillBlock.SAIL_COUNT); i++) {
+        for (int i = 0; i < state.getValue(WindmillBlock.SAIL_COUNT); i++) {
             sails.add(new ItemStack(FactoryItems.WINDMILL_SAIL));
         }
     }
 
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
-        var list = view.getListAppender("Sails", ItemStack.OPTIONAL_CODEC);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
+        var list = view.list("Sails", ItemStack.OPTIONAL_CODEC);
         for (var sail : this.sails) {
             list.add(sail);
         }
@@ -48,25 +44,25 @@ public class WindmillBlockEntity extends BlockEntity {
 
 
     @Override
-    public void readData(ReadView view) {
-        super.readData(view);
+    public void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
         this.sails.clear();
-        for (var sail : view.getTypedListView("Sails", ItemStack.OPTIONAL_CODEC)) {
+        for (var sail : view.listOrEmpty("Sails", ItemStack.OPTIONAL_CODEC)) {
             this.sails.add(sail);
         }
     }
 
     public boolean addSail(int i, ItemStack stack) {
-        if (stack.isOf(FactoryItems.WINDMILL_SAIL)) {
+        if (stack.is(FactoryItems.WINDMILL_SAIL)) {
             if (i < this.sails.size()) {
                 this.sails.set(i, stack.copyWithCount(1));
             } else {
                 this.sails.add(stack.copyWithCount(1));
             }
-            stack.decrement(1);
-            this.markDirty();
+            stack.shrink(1);
+            this.setChanged();
 
-            var model = BlockBoundAttachment.get(this.world, this.pos);
+            var model = BlockBoundAttachment.get(this.level, this.worldPosition);
 
             if (model != null) {
                 ((WindmillBlock.Model) model.holder()).updateSailsBe();
@@ -81,38 +77,38 @@ public class WindmillBlockEntity extends BlockEntity {
         if (i < this.sails.size()) {
             var sail = this.sails.get(i);
 
-            if (sail.contains(DataComponentTypes.DYED_COLOR)) {
+            if (sail.has(DataComponents.DYED_COLOR)) {
                 //noinspection DataFlowIssue
-                return sail.get(DataComponentTypes.DYED_COLOR).rgb();
+                return sail.get(DataComponents.DYED_COLOR).rgb();
             }
         }
 
         return 0xFFFFFF;
     }
 
-    public DefaultedList<ItemStack> getSails() {
+    public NonNullList<ItemStack> getSails() {
         return this.sails;
     }
 
     // https://www.desmos.com/calculator/u7cstq97vr
-    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {
-        if (state.get(WindmillBlock.WATERLOGGED)) {
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerLevel serverWorld, BlockPos pos) {
+        if (state.getValue(WindmillBlock.WATERLOGGED)) {
             return;
         }
 
         var baseHeight = this.sample;
         if (baseHeight == Integer.MIN_VALUE) {
-            baseHeight = serverWorld.getChunkManager().getChunkGenerator()
-                    .getHeightOnGround(pos.getX(), pos.getZ(), Heightmap.Type.MOTION_BLOCKING, serverWorld, serverWorld.getChunkManager().getNoiseConfig());
+            baseHeight = serverWorld.getChunkSource().getGenerator()
+                    .getFirstFreeHeight(pos.getX(), pos.getZ(), Heightmap.Types.MOTION_BLOCKING, serverWorld, serverWorld.getChunkSource().randomState());
             this.sample = baseHeight;
         }
-        var sails = state.get(WindmillBlock.SAIL_COUNT);
+        var sails = state.getValue(WindmillBlock.SAIL_COUNT);
 
         double x;
 
-        if (serverWorld.getRegistryKey().equals(World.NETHER)) {
+        if (serverWorld.dimension().equals(Level.NETHER)) {
             x = 32 - Math.abs(pos.getY() - 64) / 2d;
-        } else if (serverWorld.getRegistryKey().equals(World.END)) {
+        } else if (serverWorld.dimension().equals(Level.END)) {
             x = 5;
         } else {
             x = pos.getY() - baseHeight - 2;
@@ -129,11 +125,11 @@ public class WindmillBlockEntity extends BlockEntity {
         }
 
         var biome = serverWorld.getBiome(pos);
-        if (biome.isIn(FactoryBiomeTags.WINDMILL_HIGH_SPEED_BONUS)) {
+        if (biome.is(FactoryBiomeTags.WINDMILL_HIGH_SPEED_BONUS)) {
             speed *= 1.35;
-        } else if (biome.isIn(FactoryBiomeTags.WINDMILL_MIDDLE_SPEED_BONUS)) {
+        } else if (biome.is(FactoryBiomeTags.WINDMILL_MIDDLE_SPEED_BONUS)) {
             speed *= 1.2;
-        } else if (biome.isIn(FactoryBiomeTags.WINDMILL_LOW_SPEED_BONUS)) {
+        } else if (biome.is(FactoryBiomeTags.WINDMILL_LOW_SPEED_BONUS)) {
             speed *= 1.08;
         }
 
@@ -141,14 +137,14 @@ public class WindmillBlockEntity extends BlockEntity {
             speed *= 1.1;
         }
 
-        modifier.provide(speed, MathHelper.clamp(speed * 0.15 * sails * 1.2, 0.5, 18), false);
+        modifier.provide(speed, Mth.clamp(speed * 0.15 * sails * 1.2, 0.5, 18), false);
     }
 
     @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        super.onBlockReplaced(pos, oldState);
-        if (this.world != null) {
-            ItemScatterer.spawn(world, pos, this.getSails());
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        super.preRemoveSideEffects(pos, oldState);
+        if (this.level != null) {
+            Containers.dropContents(level, pos, this.getSails());
         }
     }
 }

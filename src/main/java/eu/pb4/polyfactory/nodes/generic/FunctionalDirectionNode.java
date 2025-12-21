@@ -9,13 +9,11 @@ import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import net.minecraft.core.Direction;
 
 
 public record FunctionalDirectionNode(Direction direction) implements FunctionalNode, DirectionNode {
@@ -28,7 +26,7 @@ public record FunctionalDirectionNode(Direction direction) implements Functional
 
     @Override
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
-        return self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.direction))
+        return self.getGraphWorld().getNodesAt(self.getBlockPos().relative(this.direction))
                 .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).toList();
     }
     @Override

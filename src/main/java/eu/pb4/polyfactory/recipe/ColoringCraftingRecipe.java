@@ -10,69 +10,70 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.RegistryGetterCodec;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.*;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.recipe.display.RecipeDisplay;
-import net.minecraft.recipe.display.ShapelessCraftingRecipeDisplay;
-import net.minecraft.recipe.display.SlotDisplay;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryEntryLookup;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.world.World;
-
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
+import net.minecraft.world.level.Level;
 import java.util.ArrayList;
 import java.util.List;
 
 public record ColoringCraftingRecipe(String group, Item input, Ingredient dye, int maxCount) implements CraftingRecipe {
     public static final MapCodec<ColoringCraftingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.STRING.optionalFieldOf("group", "").forGetter(ColoringCraftingRecipe::group),
-                    Registries.ITEM.getCodec().fieldOf("input").forGetter(ColoringCraftingRecipe::input),
+                    BuiltInRegistries.ITEM.byNameCodec().fieldOf("input").forGetter(ColoringCraftingRecipe::input),
                     Ingredient.CODEC.fieldOf("dyes").forGetter(ColoringCraftingRecipe::dye),
                     Codec.INT.optionalFieldOf("max_count", 8).forGetter(ColoringCraftingRecipe::maxCount)
             ).apply(x, ColoringCraftingRecipe::new)
     );
 
 
-    public static RecipeEntry<ColoringCraftingRecipe> of(RegistryWrapper.Impl<Item> itemWrap, String id, Item item) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("crafting/" + id), new ColoringCraftingRecipe("polyfactory:crafting/" + id, item, defaultDyes(itemWrap), 8));
+    public static RecipeHolder<ColoringCraftingRecipe> of(HolderLookup.RegistryLookup<Item> itemWrap, String id, Item item) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("crafting/" + id), new ColoringCraftingRecipe("polyfactory:crafting/" + id, item, defaultDyes(itemWrap), 8));
     }
 
-    public static RecipeEntry<ColoringCraftingRecipe> of(RegistryWrapper.Impl<Item> itemWrap, String id, Item item, int count) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("crafting/" + id), new ColoringCraftingRecipe("polyfactory:crafting/" + id, item, defaultDyes(itemWrap), count));
+    public static RecipeHolder<ColoringCraftingRecipe> of(HolderLookup.RegistryLookup<Item> itemWrap, String id, Item item, int count) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("crafting/" + id), new ColoringCraftingRecipe("polyfactory:crafting/" + id, item, defaultDyes(itemWrap), count));
     }
 
-    private static Ingredient defaultDyes(RegistryEntryLookup<Item> itemWrap) {
-        return Ingredient.ofTag(itemWrap.getOrThrow(ConventionalItemTags.DYES));
+    private static Ingredient defaultDyes(HolderGetter<Item> itemWrap) {
+        return Ingredient.of(itemWrap.getOrThrow(ConventionalItemTags.DYES));
     }
 
     @Override
-    public String getGroup() {
+    public String group() {
         return this.group;
     }
 
     @Override
-    public CraftingRecipeCategory getCategory() {
-        return CraftingRecipeCategory.MISC;
+    public CraftingBookCategory category() {
+        return CraftingBookCategory.MISC;
     }
 
     @Override
-    public boolean matches(CraftingRecipeInput inventory, World world) {
+    public boolean matches(CraftingInput inventory, Level world) {
         boolean hasDye = false;
         int count = 0;
-        for (var stack : inventory.getStacks()) {
-            if (stack.isIn(ConventionalItemTags.DYES)) {
+        for (var stack : inventory.items()) {
+            if (stack.is(ConventionalItemTags.DYES)) {
                 if (hasDye) {
                     return false;
                 }
 
                 hasDye = true;
-            } else if (stack.isOf(this.input)) {
+            } else if (stack.is(this.input)) {
                 count++;
             } else if (!stack.isEmpty()) {
                 return false;
@@ -82,15 +83,15 @@ public record ColoringCraftingRecipe(String group, Item input, Ingredient dye, i
     }
 
     @Override
-    public ItemStack craft(CraftingRecipeInput inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack assemble(CraftingInput inventory, HolderLookup.Provider registryManager) {
         int color = -1;
         int count = 0;
         ItemStack og = ItemStack.EMPTY;
 
-        for (var stack : inventory.getStacks()) {
-            if (stack.isIn(ConventionalItemTags.DYES)) {
+        for (var stack : inventory.items()) {
+            if (stack.is(ConventionalItemTags.DYES)) {
                 color = DyeColorExtra.getColor(stack);
-            } else if (stack.isOf(this.input)) {
+            } else if (stack.is(this.input)) {
                 count++;
                 og = stack;
             }
@@ -99,7 +100,7 @@ public record ColoringCraftingRecipe(String group, Item input, Ingredient dye, i
         var out = ColoredItem.stackCrafting(this.input, count, color);
         if (this.maxCount == 1) {
             var c = out.get(FactoryDataComponents.COLOR);
-            out.applyChanges(og.getComponentChanges());
+            out.applyComponentsAndValidate(og.getComponentsPatch());
             out.set(FactoryDataComponents.COLOR, c);
         }
         return out;
@@ -111,23 +112,23 @@ public record ColoringCraftingRecipe(String group, Item input, Ingredient dye, i
     }
 
     @Override
-    public List<RecipeDisplay> getDisplays() {
+    public List<RecipeDisplay> display() {
         var list = new ArrayList<RecipeDisplay>();
 
         var anyColorBase = new ArrayList<SlotDisplay>();
-        for (var dye : this.dye.getMatchingItems().toList()) {
-            anyColorBase.add(new SlotDisplay.StackSlotDisplay(ColoredItem.stackCrafting(this.input, 1, DyeColorExtra.getColor(dye.value().getDefaultStack()))));
+        for (var dye : this.dye.items().toList()) {
+            anyColorBase.add(new SlotDisplay.ItemStackSlotDisplay(ColoredItem.stackCrafting(this.input, 1, DyeColorExtra.getColor(dye.value().getDefaultInstance()))));
         }
 
         for (int count : this.maxCount != 1 ? new int[] {1, this.maxCount} : new int[] { 1 } ) {
-            for (var dye : this.dye.getMatchingItems().toList()) {
+            for (var dye : this.dye.items().toList()) {
                 var t = new ArrayList<SlotDisplay>();
                 t.add(new SlotDisplay.ItemSlotDisplay(dye));
                 for (int i = 0; i < count; i++) {
-                    t.add(new SlotDisplay.CompositeSlotDisplay(anyColorBase));
+                    t.add(new SlotDisplay.Composite(anyColorBase));
                 }
                 list.add(new ShapelessCraftingRecipeDisplay(t,
-                        new SlotDisplay.StackSlotDisplay(ColoredItem.stackCrafting(this.input, count, DyeColorExtra.getColor(dye.value().getDefaultStack()))),
+                        new SlotDisplay.ItemStackSlotDisplay(ColoredItem.stackCrafting(this.input, count, DyeColorExtra.getColor(dye.value().getDefaultInstance()))),
                         new SlotDisplay.ItemSlotDisplay(Items.CRAFTING_TABLE)));
             }
         }
@@ -137,7 +138,7 @@ public record ColoringCraftingRecipe(String group, Item input, Ingredient dye, i
     }
 
     @Override
-    public IngredientPlacement getIngredientPlacement() {
-        return IngredientPlacement.forShapeless(List.of(Ingredient.ofItem(this.input), this.dye));
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.create(List.of(Ingredient.of(this.input), this.dye));
     }
 }

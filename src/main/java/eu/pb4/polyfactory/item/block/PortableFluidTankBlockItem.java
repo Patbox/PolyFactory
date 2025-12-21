@@ -18,24 +18,6 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.model.*;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.select.CustomModelDataStringProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.CustomModelDataTintSource;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.block.Block;
-import net.minecraft.block.DispenserBlock;
-import net.minecraft.block.dispenser.BlockPlacementDispenserBehavior;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -43,21 +25,36 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.dispenser.ShulkerBoxDispenseBehavior;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DispenserBlock;
 
 public class PortableFluidTankBlockItem extends FactoryBlockItem {
-    public <T extends Block & PolymerBlock> PortableFluidTankBlockItem(T block, Settings settings) {
+    public <T extends Block & PolymerBlock> PortableFluidTankBlockItem(T block, Properties settings) {
         super(block, settings);
-        DispenserBlock.registerBehavior(this, new BlockPlacementDispenserBehavior());
+        DispenserBlock.registerBehavior(this, new ShulkerBoxDispenseBehavior());
     }
 
     public static void createItemAsset(ResourcePackBuilder builder) {
-        var id = Registries.ITEM.getId(FactoryItems.PORTABLE_FLUID_TANK);
+        var id = BuiltInRegistries.ITEM.getKey(FactoryItems.PORTABLE_FLUID_TANK);
         var list = new ArrayList<SelectItemModel.Case<String>>();
 
-        for (var fluidType : FactoryRegistries.FLUID_TYPES.getIds()) {
+        for (var fluidType : FactoryRegistries.FLUID_TYPES.keySet()) {
             ItemModel model;
             var modelId = FactoryModels.FLUID_PORTABLE_FLUID_TANK_ITEM.getModelId(fluidType);
-            if (FactoryRegistries.FLUID_TYPES.get(fluidType).color().isPresent()) {
+            if (FactoryRegistries.FLUID_TYPES.getValue(fluidType).color().isPresent()) {
                 model = new BasicItemModel(modelId, List.of(new CustomModelDataTintSource(0, -1)));
             } else {
                 model = new BasicItemModel(modelId);
@@ -66,7 +63,7 @@ public class PortableFluidTankBlockItem extends FactoryBlockItem {
             list.add(new SelectItemModel.Case<>(List.of(fluidType.toString()), model));
         }
 
-        builder.addData(AssetPaths.itemAsset(id), new ItemAsset(new CompositeItemModel(List.of(new BasicItemModel(id.withPrefixedPath("block/")),
+        builder.addData(AssetPaths.itemAsset(id), new ItemAsset(new CompositeItemModel(List.of(new BasicItemModel(id.withPrefix("block/")),
                 new SelectItemModel<>(
                         new SelectItemModel.Switch<>(new CustomModelDataStringProperty(0), list),
                         Optional.of(EmptyItemModel.INSTANCE)
@@ -80,52 +77,52 @@ public class PortableFluidTankBlockItem extends FactoryBlockItem {
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        if (context.getPlayer() != null && context.getPlayer().getStackInHand(context.getHand() == Hand.MAIN_HAND ? Hand.OFF_HAND : Hand.MAIN_HAND).isOf(FactoryItems.PRESSURE_FLUID_GUN)) {
-            return ActionResult.PASS;
+    public InteractionResult useOn(UseOnContext context) {
+        if (context.getPlayer() != null && context.getPlayer().getItemInHand(context.getHand() == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND).is(FactoryItems.PRESSURE_FLUID_GUN)) {
+            return InteractionResult.PASS;
         }
-        return super.useOnBlock(context);
+        return super.useOn(context);
     }
 
 
     @Override
-    public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
+    public void inventoryTick(ItemStack stack, ServerLevel world, Entity entity, @Nullable EquipmentSlot slot) {
         super.inventoryTick(stack, world, entity, slot);
-        FluidContainerUtil.tick(FluidContainerFromComponent.of(stack), (ServerWorld) world, entity.getEntityPos().add(0, entity.getY() / 2, 0), 0,
+        FluidContainerUtil.tick(FluidContainerFromComponent.of(stack), (ServerLevel) world, entity.position().add(0, entity.getY() / 2, 0), 0,
                 FactoryUtil.getItemConsumer(entity));
     }
 
     @Override
-    public Text getName(ItemStack stack) {
+    public Component getName(ItemStack stack) {
         var container = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
         if (container.isEmpty()) {
-            return Text.translatable(this.getTranslationKey() + ".empty");
+            return Component.translatable(this.getDescriptionId() + ".empty");
         } else if (container.fluids().size() == 1) {
-            return Text.translatable(this.getTranslationKey() + ".typed", container.fluids().getFirst().getName());
+            return Component.translatable(this.getDescriptionId() + ".typed", container.fluids().getFirst().getName());
         }
 
         return super.getName(stack);
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, PacketContext context) {
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context) {
         var base = super.getPolymerItemStack(itemStack, tooltipType, context);
-        if (itemStack.contains(FactoryDataComponents.FLUID)) {
+        if (itemStack.has(FactoryDataComponents.FLUID)) {
             var fluids = itemStack.get(FactoryDataComponents.FLUID);
             if (fluids != null && fluids.capacity() != -1) {
-                base.set(DataComponentTypes.MAX_DAMAGE, (int) (fluids.capacity() / 100));
-                base.set(DataComponentTypes.DAMAGE, (int) ((fluids.capacity() - fluids.stored()) / 100));
+                base.set(DataComponents.MAX_DAMAGE, (int) (fluids.capacity() / 100));
+                base.set(DataComponents.DAMAGE, (int) ((fluids.capacity() - fluids.stored()) / 100));
             }
 
             var x = (FluidInstance<Object>) getMainFluid(itemStack);
             if (x != null && x.type().color().isPresent()) {
-                base.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(),
-                        List.of(FactoryRegistries.FLUID_TYPES.getId(x.type()).toString()), IntList.of(x.type().color().get().getColor(x.data()))));
+                base.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(),
+                        List.of(FactoryRegistries.FLUID_TYPES.getKey(x.type()).toString()), IntList.of(x.type().color().get().getColor(x.data()))));
             } else if (x != null) {
-                base.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(),
-                        List.of(FactoryRegistries.FLUID_TYPES.getId(x.type()).toString()), IntList.of()));
+                base.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(),
+                        List.of(FactoryRegistries.FLUID_TYPES.getKey(x.type()).toString()), IntList.of()));
             } else {
-                base.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(),
+                base.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(),
                         List.of(), IntList.of()));
             }
         }

@@ -1,18 +1,18 @@
 package eu.pb4.polyfactory.polydex;
 
-import net.minecraft.text.Text;
-
 import static eu.pb4.polyfactory.ui.UiResourceCreator.polydexBackground;
+
+import net.minecraft.network.chat.Component;
 
 
 public class PolydexTextures {
-    public static final Text GRINDER;
-    public static final Text PRESS;
-    public static final Text PRESS_FLUID;
-    public static final Text MIXER;
-    public static final Text DRAIN;
-    public static final Text SPOUT;
-    public static final Text SMELTERY;
+    public static final Component GRINDER;
+    public static final Component PRESS;
+    public static final Component PRESS_FLUID;
+    public static final Component MIXER;
+    public static final Component DRAIN;
+    public static final Component SPOUT;
+    public static final Component SMELTERY;
 
     public static void register() {
 
@@ -23,12 +23,12 @@ public class PolydexTextures {
         var t1 = polydexBackground("1");
         var t2 = polydexBackground("2");
         var t3 = polydexBackground("3");
-        PRESS = t0.getLeft();
-        MIXER = t0.getRight();
-        GRINDER = t1.getLeft();
-        SMELTERY = t1.getRight();
-        DRAIN = t2.getLeft();
-        SPOUT = t2.getRight();
-        PRESS_FLUID = t3.getLeft();
+        PRESS = t0.getA();
+        MIXER = t0.getB();
+        GRINDER = t1.getA();
+        SMELTERY = t1.getB();
+        DRAIN = t2.getA();
+        SPOUT = t2.getB();
+        PRESS_FLUID = t3.getA();
     }
 }

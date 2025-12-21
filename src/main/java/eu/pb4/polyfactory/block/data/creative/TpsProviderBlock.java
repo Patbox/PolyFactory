@@ -6,27 +6,27 @@ import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.DoubleData;
 import eu.pb4.polyfactory.nodes.data.DataProviderNode;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.TimeHelper;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.TimeUtil;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class TpsProviderBlock extends DataProviderBlock {
-    public TpsProviderBlock(Settings settings) {
+    public TpsProviderBlock(Properties settings) {
         super(settings, false);
     }
 
     @Override
-    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        world.scheduleBlockTick(pos, this, 40);
+    protected void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+        world.scheduleTick(pos, this, 40);
     }
 
     @Override
-    protected void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        DataProvider.sendData(world, pos, new DoubleData(Math.min((double) TimeHelper.SECOND_IN_NANOS / world.getServer().getAverageNanosPerTick(), world.getServer().getTickManager().getTickRate())));
-        world.scheduleBlockTick(pos, this, 40);
+    protected void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+        DataProvider.sendData(world, pos, new DoubleData(Math.min((double) TimeUtil.NANOSECONDS_PER_SECOND / world.getServer().getAverageTickTimeNanos(), world.getServer().tickRateManager().tickrate())));
+        world.scheduleTick(pos, this, 40);
     }
 }

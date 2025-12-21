@@ -2,20 +2,19 @@ package eu.pb4.polyfactory.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.component.ComponentsAccess;
-import net.minecraft.item.Item;
-import net.minecraft.item.tooltip.TooltipAppender;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-import net.minecraft.text.Texts;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 
-public interface DataContainer extends Comparable<DataContainer>, TooltipAppender {
+public interface DataContainer extends Comparable<DataContainer>, TooltipProvider {
     MapCodec<DataContainer> MAP_CODEC = MapCodec.recursive("data_container", x -> DataType.CODEC.dispatchMap("type", DataContainer::type, DataType::codec));
     Codec<DataContainer> CODEC = MAP_CODEC.codec();
 
@@ -44,7 +43,7 @@ public interface DataContainer extends Comparable<DataContainer>, TooltipAppende
     }
 
     default int asRedstoneOutput() {
-        return (int) MathHelper.clamp(Math.abs(asLong()), 0, 15);
+        return (int) Mth.clamp(Math.abs(asLong()), 0, 15);
     };
     default char padding() {
         return ' ';
@@ -76,14 +75,14 @@ public interface DataContainer extends Comparable<DataContainer>, TooltipAppende
 
 
     @Override
-    default void appendTooltip(Item.TooltipContext context, Consumer<Text> textConsumer, TooltipType type, ComponentsAccess components) {
+    default void addToTooltip(Item.TooltipContext context, Consumer<Component> textConsumer, TooltipFlag type, DataComponentGetter components) {
         textConsumer.accept(
-                Texts.bracketed(
-                        Text.translatable("block.polyfactory.data_memory.tooltip.stored_data").formatted(Formatting.YELLOW)
-                ).formatted(Formatting.DARK_GRAY)
+                ComponentUtils.wrapInSquareBrackets(
+                        Component.translatable("block.polyfactory.data_memory.tooltip.stored_data").withStyle(ChatFormatting.YELLOW)
+                ).withStyle(ChatFormatting.DARK_GRAY)
         );
-        textConsumer.accept(ScreenTexts.space().append(Text.translatable("block.polyfactory.data_memory.tooltip.type",
-                Text.translatable("data_type.polyfactory." + this.type().id())).formatted(Formatting.GRAY)));
-        textConsumer.accept(ScreenTexts.space().append(Text.translatable("block.polyfactory.data_memory.tooltip.value", this.asString()).formatted(Formatting.GRAY)));
+        textConsumer.accept(CommonComponents.space().append(Component.translatable("block.polyfactory.data_memory.tooltip.type",
+                Component.translatable("data_type.polyfactory." + this.type().id())).withStyle(ChatFormatting.GRAY)));
+        textConsumer.accept(CommonComponents.space().append(Component.translatable("block.polyfactory.data_memory.tooltip.value", this.asString()).withStyle(ChatFormatting.GRAY)));
     }
 }

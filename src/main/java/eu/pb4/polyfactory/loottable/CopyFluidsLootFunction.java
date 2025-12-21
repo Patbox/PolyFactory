@@ -4,25 +4,25 @@ import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.block.fluids.FluidContainerOwner;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContext;
-import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.loot.function.LootFunction;
-import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
-public class CopyFluidsLootFunction implements LootFunction {
-    public static final LootFunction INSTANCE = new CopyFluidsLootFunction();
-    public static final LootFunctionType TYPE = new LootFunctionType(MapCodec.unit(INSTANCE));
+public class CopyFluidsLootFunction implements LootItemFunction {
+    public static final LootItemFunction INSTANCE = new CopyFluidsLootFunction();
+    public static final LootItemFunctionType TYPE = new LootItemFunctionType(MapCodec.unit(INSTANCE));
 
     @Override
-    public LootFunctionType getType() {
+    public LootItemFunctionType getType() {
         return TYPE;
     }
 
     @Override
     public ItemStack apply(ItemStack stack, LootContext lootContext) {
-        if (lootContext.hasParameter(LootContextParameters.BLOCK_ENTITY)) {
-            if (lootContext.get(LootContextParameters.BLOCK_ENTITY) instanceof FluidContainerOwner container) {
+        if (lootContext.hasParameter(LootContextParams.BLOCK_ENTITY)) {
+            if (lootContext.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof FluidContainerOwner container) {
                 var main = container.getMainFluidContainer();
                 if (main != null){
                     stack.set(FactoryDataComponents.FLUID, FluidComponent.copyFrom(main));

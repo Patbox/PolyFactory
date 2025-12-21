@@ -5,13 +5,11 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.StringData;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class DoubleInputTransformerBlockEntity extends LockableBlockEntity {
     protected DataContainer lastInput1 = DataContainer.empty();
@@ -30,7 +28,7 @@ public class DoubleInputTransformerBlockEntity extends LockableBlockEntity {
     }
 
     public void setForceText(boolean forceText) {
-        this.markDirty();
+        this.setChanged();
     }
 
     public DataContainer lastInput1() {
@@ -39,7 +37,7 @@ public class DoubleInputTransformerBlockEntity extends LockableBlockEntity {
 
     public DataContainer setLastInput1(DataContainer lastInput1) {
         this.lastInput1 = lastInput1;
-        this.markDirty();
+        this.setChanged();
         return lastInput1;
     }
 
@@ -49,7 +47,7 @@ public class DoubleInputTransformerBlockEntity extends LockableBlockEntity {
 
     public DataContainer setLastInput2(DataContainer lastInput2) {
         this.lastInput2 = lastInput2;
-        this.markDirty();
+        this.setChanged();
         return lastInput2;
     }
 
@@ -59,16 +57,16 @@ public class DoubleInputTransformerBlockEntity extends LockableBlockEntity {
 
     public DataContainer setLastOutput(DataContainer lastOutput) {
         this.lastOutput = lastOutput;
-        this.markDirty();
+        this.setChanged();
         return lastOutput;
     }
 
     @Override
-    public void readData(ReadView view) {
-        super.readData(view);
-        this.channelInput1 = view.getInt("input_channel_1", 0);
-        this.channelInput2 = view.getInt("input_channel_2", 0);
-        this.channelOutput = view.getInt("output_channel", 0);
+    public void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
+        this.channelInput1 = view.getIntOr("input_channel_1", 0);
+        this.channelInput2 = view.getIntOr("input_channel_2", 0);
+        this.channelOutput = view.getIntOr("output_channel", 0);
 
         this.lastInput1 = view.read("input_data_1", DataContainer.CODEC).orElse(DataContainer.empty());
         this.lastInput2 = view.read("input_data_2", DataContainer.CODEC).orElse(DataContainer.empty());
@@ -76,15 +74,15 @@ public class DoubleInputTransformerBlockEntity extends LockableBlockEntity {
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         view.putInt("input_channel_1", this.channelInput1);
         view.putInt("input_channel_2", this.channelInput2);
         view.putInt("output_channel", this.channelOutput);
 
-        view.put("input_data_1", DataContainer.CODEC, this.lastInput1);
-        view.put("input_data_2", DataContainer.CODEC, this.lastInput2);
-        view.put("output_data", DataContainer.CODEC, this.lastOutput);
+        view.store("input_data_1", DataContainer.CODEC, this.lastInput1);
+        view.store("input_data_2", DataContainer.CODEC, this.lastInput2);
+        view.store("output_data", DataContainer.CODEC, this.lastOutput);
     }
 
     public int inputChannel1() {
@@ -101,25 +99,25 @@ public class DoubleInputTransformerBlockEntity extends LockableBlockEntity {
 
     public void setInputChannel1(int channel) {
         this.channelInput1 = channel;
-        if (this.hasWorld()) {
-            NetworkComponent.Data.updateDataAt(this.world, this.pos);
-            this.markDirty();
+        if (this.hasLevel()) {
+            NetworkComponent.Data.updateDataAt(this.level, this.worldPosition);
+            this.setChanged();
         }
     }
 
     public void setInputChannel2(int channel) {
         this.channelInput2 = channel;
-        if (this.hasWorld()) {
-            NetworkComponent.Data.updateDataAt(this.world, this.pos);
-            this.markDirty();
+        if (this.hasLevel()) {
+            NetworkComponent.Data.updateDataAt(this.level, this.worldPosition);
+            this.setChanged();
         }
     }
 
     public void setOutputChannel(int channel) {
         this.channelOutput = channel;
-        if (this.hasWorld()) {
-            NetworkComponent.Data.updateDataAt(this.world, this.pos);
-            this.markDirty();
+        if (this.hasLevel()) {
+            NetworkComponent.Data.updateDataAt(this.level, this.worldPosition);
+            this.setChanged();
         }
     }
 }

@@ -24,38 +24,42 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
-import net.minecraft.world.poi.PointOfInterestStorage;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.ai.village.poi.PoiManager;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -63,28 +67,28 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.List;
 
 
-public class WirelessRedstoneBlock extends Block implements FactoryBlock, RedstoneConnectable, BlockEntityProvider, ConfigurableBlock, SneakBypassingBlock, BarrierBasedWaterloggable {
-    public static EnumProperty<Direction> FACING = Properties.FACING;
-    public static BooleanProperty POWERED = Properties.POWERED;
-    public WirelessRedstoneBlock(Settings settings) {
+public class WirelessRedstoneBlock extends Block implements FactoryBlock, RedstoneConnectable, EntityBlock, ConfigurableBlock, SneakBypassingBlock, BarrierBasedWaterloggable {
+    public static EnumProperty<Direction> FACING = BlockStateProperties.FACING;
+    public static BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public WirelessRedstoneBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false).with(POWERED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false).setValue(POWERED, false));
     }
 
-    public static void send(ServerWorld world, BlockPos pos, int ticks, ItemStack key1, ItemStack key2) {
-        world.getPointOfInterestStorage().getInCircle(x -> x.matchesKey(FactoryPoi.WIRELESS_REDSTONE_RECEIVED),
-                pos, 64, PointOfInterestStorage.OccupationStatus.ANY).forEach(poi -> {
+    public static void send(ServerLevel world, BlockPos pos, int ticks, ItemStack key1, ItemStack key2) {
+        world.getPoiManager().getInRange(x -> x.is(FactoryPoi.WIRELESS_REDSTONE_RECEIVED),
+                pos, 64, PoiManager.Occupancy.ANY).forEach(poi -> {
                     var state = world.getBlockState(poi.getPos());
-                    if (state.isOf(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER)
+                    if (state.is(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER)
                             && world.getBlockEntity(poi.getPos()) instanceof WirelessRedstoneBlockEntity be && be.matches(key1, key2)) {
-                        world.setBlockState(poi.getPos(), state.with(POWERED, true));
+                        world.setBlockAndUpdate(poi.getPos(), state.setValue(POWERED, true));
                         if (ticks > 0) {
-                            world.scheduleBlockTick(poi.getPos(), state.getBlock(), ticks);
+                            world.scheduleTick(poi.getPos(), state.getBlock(), ticks);
                         }
                         world.playSound(null, poi.getPos().getX() + 0.5, poi.getPos().getY() + 0.5, poi.getPos().getZ() + 0.5,
-                                FactorySoundEvents.BLOCK_REMOTE_REDSTONE_ON, SoundCategory.BLOCKS, 1, 1);
+                                FactorySoundEvents.BLOCK_REMOTE_REDSTONE_ON, SoundSource.BLOCKS, 1, 1);
 
-                        if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
+                        if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayer player) {
                             TriggerCriterion.trigger(player, FactoryTriggers.WIRELESS_REDSTONE);
                         }
                     }
@@ -92,128 +96,128 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING);
         builder.add(POWERED);
         builder.add(WATERLOGGED);
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         tickWater(state, world, tickView, pos);
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+        return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         if (world.getBlockEntity(pos) instanceof WirelessRedstoneBlockEntity be) {
-            if (!player.isSneaking() && hit.getSide() == state.get(FACING).getOpposite()) {
-                return be.updateKey(player, hit, player.getMainHandStack()) ? ActionResult.SUCCESS_SERVER : ActionResult.FAIL;
+            if (!player.isShiftKeyDown() && hit.getDirection() == state.getValue(FACING).getOpposite()) {
+                return be.updateKey(player, hit, player.getMainHandItem()) ? InteractionResult.SUCCESS_SERVER : InteractionResult.FAIL;
             }
 
-            if (player.isSneaking() && player.getMainHandStack().isOf(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
-                player.getMainHandStack().set(FactoryDataComponents.REMOTE_KEYS, new Pair<>(be.key1(), be.key2()));
-                player.getItemCooldownManager().set(player.getStackInHand(Hand.MAIN_HAND), 5);
-                return ActionResult.SUCCESS_SERVER;
+            if (player.isShiftKeyDown() && player.getMainHandItem().is(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
+                player.getMainHandItem().set(FactoryDataComponents.REMOTE_KEYS, new Pair<>(be.key1(), be.key2()));
+                player.getCooldowns().addCooldown(player.getItemInHand(InteractionHand.MAIN_HAND), 5);
+                return InteractionResult.SUCCESS_SERVER;
             }
         }
 
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getSide().getOpposite()));
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return waterLog(ctx, this.defaultBlockState().setValue(FACING, ctx.getClickedFace().getOpposite()));
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return FactoryUtil.transform(state, rotation::rotate, FACING);
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return FactoryUtil.transform(state, mirror::apply, FACING);
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        return FactoryUtil.transform(state, mirror::mirror, FACING);
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
+        return Blocks.IRON_BLOCK.defaultBlockState();
     }
 
     @Override
     public boolean canRedstoneConnect(BlockState state, @Nullable Direction dir) {
-        return state.get(FACING).getOpposite() == dir;
+        return state.getValue(FACING).getOpposite() == dir;
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new WirelessRedstoneBlockEntity(pos, state);
     }
 
     @Override
-    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(world, pos, initialBlockState);
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(BlockConfig.FACING);
     }
 
     public static final class Receiver extends WirelessRedstoneBlock {
-        public Receiver(Settings settings) {
+        public Receiver(Properties settings) {
             super(settings);
         }
 
         @Override
-        public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-            if (state.get(POWERED)) {
-                world.setBlockState(pos, state.with(POWERED, false));
+        public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+            if (state.getValue(POWERED)) {
+                world.setBlockAndUpdate(pos, state.setValue(POWERED, false));
                 world.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ(),
-                        FactorySoundEvents.BLOCK_REMOTE_REDSTONE_OFF, SoundCategory.BLOCKS, 1, 1);
+                        FactorySoundEvents.BLOCK_REMOTE_REDSTONE_OFF, SoundSource.BLOCKS, 1, 1);
             }
 
-            super.scheduledTick(state, world, pos, random);
+            super.tick(state, world, pos, random);
         }
 
         @Override
-        public boolean emitsRedstonePower(BlockState state) {
+        public boolean isSignalSource(BlockState state) {
             return true;
         }
 
         @Override
-        public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-            return state.get(POWERED) && direction != state.get(FACING) ? 15 : 0;
+        public int getSignal(BlockState state, BlockGetter world, BlockPos pos, Direction direction) {
+            return state.getValue(POWERED) && direction != state.getValue(FACING) ? 15 : 0;
         }
     }
 
     public static final class Transmitter extends WirelessRedstoneBlock {
-        public Transmitter(Settings settings) {
+        public Transmitter(Properties settings) {
             super(settings);
         }
 
         @Override
-        protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
-            if (!world.isClient()) {
-                boolean bl = state.get(POWERED);
-                if (bl != world.isReceivingRedstonePower(pos)) {
+        protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, @Nullable Orientation wireOrientation, boolean notify) {
+            if (!world.isClientSide()) {
+                boolean bl = state.getValue(POWERED);
+                if (bl != world.hasNeighborSignal(pos)) {
                     if (bl) {
-                        world.scheduleBlockTick(pos, this, 4);
+                        world.scheduleTick(pos, this, 4);
                     } else {
-                        world.setBlockState(pos, state.cycle(POWERED), Block.NOTIFY_LISTENERS);
+                        world.setBlock(pos, state.cycle(POWERED), Block.UPDATE_CLIENTS);
                         if (world.getBlockEntity(pos) instanceof WirelessRedstoneBlockEntity be) {
-                            WirelessRedstoneBlock.send((ServerWorld) world, pos, 20, be.key1(), be.key2());
+                            WirelessRedstoneBlock.send((ServerLevel) world, pos, 20, be.key1(), be.key2());
                             world.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ(),
-                                    FactorySoundEvents.BLOCK_REMOTE_REDSTONE_ON, SoundCategory.BLOCKS, 1, 1);
+                                    FactorySoundEvents.BLOCK_REMOTE_REDSTONE_ON, SoundSource.BLOCKS, 1, 1);
                         }
                     }
                 }
@@ -221,11 +225,11 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
         }
 
         @Override
-        public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-            if (state.get(POWERED) && !world.isEmittingRedstonePower(pos.offset(state.get(FACING)), state.get(FACING))) {
-                world.setBlockState(pos, state.cycle(POWERED), Block.NOTIFY_LISTENERS);
+        public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+            if (state.getValue(POWERED) && !world.hasSignal(pos.relative(state.getValue(FACING)), state.getValue(FACING))) {
+                world.setBlock(pos, state.cycle(POWERED), Block.UPDATE_CLIENTS);
                 world.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ(),
-                        FactorySoundEvents.BLOCK_REMOTE_REDSTONE_OFF, SoundCategory.BLOCKS, 1, 1);
+                        FactorySoundEvents.BLOCK_REMOTE_REDSTONE_OFF, SoundSource.BLOCKS, 1, 1);
             }
         }
 
@@ -237,7 +241,7 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
         private final ItemDisplayElement key1;
         private final ItemDisplayElement key2;
 
-        private Model(ServerWorld world, BlockPos pos, BlockState state) {
+        private Model(ServerLevel world, BlockPos pos, BlockState state) {
             this.main = ItemDisplayElementUtil.createSimple(WirelessRedstoneBlock.this.asItem());
             this.main.setScale(new Vector3f(2));
 
@@ -270,11 +274,11 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
         }
 
         private ItemStack createOverlay(BlockState state) {
-            var model = state.isOf(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER) ? RedstoneOutputBlock.Model.OUTPUT_OVERLAY
+            var model = state.is(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER) ? RedstoneOutputBlock.Model.OUTPUT_OVERLAY
                     : RedstoneOutputBlock.Model.INPUT_OVERLAY;
             var stack = new ItemStack(Items.PAPER);
-            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), IntList.of(RedstoneWireBlock.getWireColor(state.get(POWERED) ? 15 : 0))));
-            stack.set(DataComponentTypes.ITEM_MODEL, model);
+            stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), IntList.of(RedStoneWireBlock.getColorForPower(state.getValue(POWERED) ? 15 : 0))));
+            stack.set(DataComponents.ITEM_MODEL, model);
             return stack;
         }
 
@@ -287,13 +291,13 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
         }
 
         private void updateStatePos(BlockState state) {
-            var dir = state.get(FACING);
+            var dir = state.getValue(FACING);
             float p = -90;
             float y = 0;
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.getPositiveHorizontalDegrees();
+                y = dir.toYRot();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             }

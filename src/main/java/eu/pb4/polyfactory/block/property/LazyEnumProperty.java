@@ -3,11 +3,10 @@ package eu.pb4.polyfactory.block.property;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import net.minecraft.state.property.Property;
-
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import net.minecraft.world.level.block.state.properties.Property;
 
 public class LazyEnumProperty<T extends Enum<T>> extends Property<T> {
     private final List<T> values;
@@ -30,23 +29,27 @@ public class LazyEnumProperty<T extends Enum<T>> extends Property<T> {
 
     }
 
-    public List<T> getValues() {
+    @Override
+    public List<T> getPossibleValues() {
         return this.values;
     }
 
-    public Optional<T> parse(String name) {
+    @Override
+    public Optional<T> getValue(String name) {
         return Optional.ofNullable(this.byName.get(name));
     }
 
     @Override
-    public int ordinal(T value) {
+    public int getInternalIndex(T value) {
         return this.values.indexOf(value);
     }
 
-    public String name(T enum_) {
+    @Override
+    public String getName(T enum_) {
         return this.toName.get(enum_);
     }
 
+    @Override
     public boolean equals(Object object) {
         if (this == object) {
             return true;
@@ -61,8 +64,9 @@ public class LazyEnumProperty<T extends Enum<T>> extends Property<T> {
         }
     }
 
-    public int computeHashCode() {
-        int i = super.computeHashCode();
+    @Override
+    public int generateHashCode() {
+        int i = super.generateHashCode();
         i = 31 * i + this.values.hashCode();
         i = 31 * i + this.byName.hashCode();
         return i;

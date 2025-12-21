@@ -13,16 +13,15 @@ import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.input.MixingInput;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.world.World;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 
 public record TransformMixingRecipe(String group, Ingredient base, List<CountedIngredient> input,
                                     Optional<List<FluidInputStack>> fluidInputs,
@@ -34,7 +33,7 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
                     Ingredient.CODEC.fieldOf("base").forGetter(TransformMixingRecipe::base),
                     CountedIngredient.LIST_CODEC.fieldOf("input").forGetter(TransformMixingRecipe::input),
                     FluidInputStack.CODEC.listOf().optionalFieldOf("fluid_input").forGetter(TransformMixingRecipe::fluidInputs),
-                    ItemStack.UNCOUNTED_CODEC.fieldOf("output").forGetter(TransformMixingRecipe::output),
+                    ItemStack.SINGLE_ITEM_CODEC.fieldOf("output").forGetter(TransformMixingRecipe::output),
                     FluidStack.CODEC.listOf().fieldOf("output_fluid").forGetter(TransformMixingRecipe::fluidOutput),
                     Codec.DOUBLE.fieldOf("time").forGetter(TransformMixingRecipe::time),
                     Codec.DOUBLE.optionalFieldOf("minimum_speed", 1d).forGetter(TransformMixingRecipe::minimumSpeed),
@@ -44,38 +43,38 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
             ).apply(x, TransformMixingRecipe::new)
     );
 
-    public static RecipeEntry<TransformMixingRecipe> ofCounted(String string, Ingredient base, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe("", base, ingredient,
+    public static RecipeHolder<TransformMixingRecipe> ofCounted(String string, Ingredient base, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe("", base, ingredient,
                 Optional.of(List.of()),
                 output, List.of(), mixingTime, minimumSpeed, optimalSpeed, -0.1f, Float.POSITIVE_INFINITY));
     }
 
-    public static RecipeEntry<TransformMixingRecipe> ofCounted(String string, Ingredient base, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStack output) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe("", base, ingredient,
+    public static RecipeHolder<TransformMixingRecipe> ofCounted(String string, Ingredient base, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStack output) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe("", base, ingredient,
                 Optional.of(List.of()),
                 output, List.of(), mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
     }
 
-    public static RecipeEntry<TransformMixingRecipe> ofCounted(String string, String group, Ingredient base, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe(group, base, ingredient,
+    public static RecipeHolder<TransformMixingRecipe> ofCounted(String string, String group, Ingredient base, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe(group, base, ingredient,
                 Optional.of(List.of()),
                 output,List.of(), mixingTime, minimumSpeed, optimalSpeed, -0.1f, Float.POSITIVE_INFINITY));
     }
 
-    public static RecipeEntry<TransformMixingRecipe> ofCounted(String string, String group, Ingredient base, List<CountedIngredient> ingredient, List<FluidInputStack> fluids, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStack output) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe(group, base, ingredient,
+    public static RecipeHolder<TransformMixingRecipe> ofCounted(String string, String group, Ingredient base, List<CountedIngredient> ingredient, List<FluidInputStack> fluids, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStack output) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe(group, base, ingredient,
                 Optional.ofNullable(fluids),
                 output, List.of(), mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
     }
 
-    public static RecipeEntry<TransformMixingRecipe> ofCounted(String string, String group, Ingredient base, List<CountedIngredient> ingredient, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStack output, List<FluidStack<?>> fluidOutput) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe(group, base, ingredient,
+    public static RecipeHolder<TransformMixingRecipe> ofCounted(String string, String group, Ingredient base, List<CountedIngredient> ingredient, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStack output, List<FluidStack<?>> fluidOutput) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe(group, base, ingredient,
                 Optional.ofNullable(fluidInput),
                 output, fluidOutput, mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
     }
 
-    public static RecipeEntry<TransformMixingRecipe> ofCounted(String string, String group, Ingredient base, List<CountedIngredient> ingredient, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, float maxTemperature, ItemStack output, List<FluidStack<?>> fluidOutput) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe(group, base, ingredient,
+    public static RecipeHolder<TransformMixingRecipe> ofCounted(String string, String group, Ingredient base, List<CountedIngredient> ingredient, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, float maxTemperature, ItemStack output, List<FluidStack<?>> fluidOutput) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe(group, base, ingredient,
                 Optional.ofNullable(fluidInput),
                 output, fluidOutput, mixingTime, minimumSpeed, optimalSpeed, minTemperature, maxTemperature));
     }
@@ -84,31 +83,31 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
         return () -> Iterators.transform(this.input.iterator(), (a) -> a.leftOver().copy());
     }
 
-    public static RecipeEntry<TransformMixingRecipe> of(String string, Ingredient base, List<Ingredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
+    public static RecipeHolder<TransformMixingRecipe> of(String string, Ingredient base, List<Ingredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
         List<CountedIngredient> list = new ArrayList<>();
         for (Ingredient x : ingredient) {
             CountedIngredient countedIngredient = new CountedIngredient(Optional.of(x), ItemComponentPredicate.EMPTY, 1, CountedIngredient.tryGettingLeftover(x));
             list.add(countedIngredient);
         }
-        return new RecipeEntry<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe("", base, list, Optional.of(List.of()), output, List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe("", base, list, Optional.of(List.of()), output, List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
     }
 
-    public static RecipeEntry<TransformMixingRecipe> of(String string, String group, Ingredient base, List<Ingredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
+    public static RecipeHolder<TransformMixingRecipe> of(String string, String group, Ingredient base, List<Ingredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStack output) {
         List<CountedIngredient> list = new ArrayList<>();
         for (Ingredient x : ingredient) {
             CountedIngredient countedIngredient = new CountedIngredient(Optional.of(x), ItemComponentPredicate.EMPTY, 1, CountedIngredient.tryGettingLeftover(x));
             list.add(countedIngredient);
         }
-        return new RecipeEntry<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe(group, base, list, Optional.of(List.of()), output, List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new TransformMixingRecipe(group, base, list, Optional.of(List.of()), output, List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
     }
 
     @Override
-    public String getGroup() {
+    public String group() {
         return this.group;
     }
 
     @Override
-    public boolean matches(MixingInput inventory, World world) {
+    public boolean matches(MixingInput inventory, Level world) {
         if (this.fluidInputs.isPresent()) {
             for (var fluid : this.fluidInputs.get()) {
                 if (inventory.getFluid(fluid.instance()) < fluid.required()) {
@@ -119,7 +118,7 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
 
         var noBase = true;
         for (int i = MixerBlockEntity.INPUT_FIRST; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            var stack = inventory.getStackInSlot(i);
+            var stack = inventory.getItem(i);
             if (this.base.test(stack) && stack.getItem() != this.output.getItem()) {
                 noBase = false;
                 break;
@@ -134,7 +133,7 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
             var map = new Object2IntArrayMap<CountedIngredient>();
 
             for (int i = MixerBlockEntity.INPUT_FIRST; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-                var stack = inventory.getStackInSlot(i);
+                var stack = inventory.getItem(i);
                 if (stack.isEmpty() || this.base.test(stack)) {
                     continue;
                 }
@@ -167,7 +166,7 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
         return true;
     }
 
-    public void applyRecipeUse(MixerBlockEntity inventory, World world) {
+    public void applyRecipeUse(MixerBlockEntity inventory, Level world) {
         var list = new ArrayList<>(this.input);
 
         var container = inventory.getFluidContainer();
@@ -178,11 +177,11 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
         }
 
         for (int i = MixerBlockEntity.INPUT_FIRST; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            var stack = inventory.getStack(i);
+            var stack = inventory.getItem(i);
             if (this.base.test(stack) && stack.getItem() != this.output.getItem()) {
-                stack.decrement(1);
+                stack.shrink(1);
                 if (stack.isEmpty()) {
-                    inventory.setStack(i, ItemStack.EMPTY);
+                    inventory.setItem(i, ItemStack.EMPTY);
                 }
                 break;
             }
@@ -195,20 +194,20 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
             }
 
             for (int i = MixerBlockEntity.INPUT_FIRST; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-                var stack = inventory.getStack(i);
+                var stack = inventory.getItem(i);
                 if (stack.isEmpty()) {
                     continue;
                 }
 
                 if (ig.test(stack)) {
                     if (stack.getCount() >= count) {
-                        stack.decrement(count);
-                        inventory.setStack(i, stack);
+                        stack.shrink(count);
+                        inventory.setItem(i, stack);
                         break;
                     } else {
                         count -= stack.getCount();
                         stack.setCount(0);
-                        inventory.setStack(i, ItemStack.EMPTY);
+                        inventory.setItem(i, ItemStack.EMPTY);
                     }
                 }
             }
@@ -223,12 +222,12 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
     }
 
     @Override
-    public ItemStack craft(MixingInput inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack assemble(MixingInput inventory, HolderLookup.Provider registryManager) {
         for (int i = MixerBlockEntity.INPUT_FIRST; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            var stack = inventory.getStackInSlot(i);
+            var stack = inventory.getItem(i);
             if (this.base.test(stack) && stack.getItem() != this.output.getItem()) {
                 var output = this.output.copyWithCount(1);
-                output.applyChanges(stack.getComponentChanges());
+                output.applyComponentsAndValidate(stack.getComponentsPatch());
                 return output;
             }
         }

@@ -24,41 +24,39 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.TagLimitedSlot;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
+import eu.pb4.polyfactory.util.movingitem.SimpleMovingItemContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentsAccess;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.FurnaceOutputSlot;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.FurnaceResultSlot;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
@@ -72,28 +70,28 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
     public static final long FLUID_CAPACITY = FluidType.BLOCK_AMOUNT;
     private static final int[] OUTPUT_SLOTS = {1};
     private static final int[] INPUT_SLOTS = {0};
-    private final SimpleContainer[] containers = new SimpleContainer[]{
-            new SimpleContainer(0, this::addMoving, this::removeMoving),
-            new SimpleContainer(1, this::addMoving, this::removeMoving),
-            new SimpleContainer()
+    private final SimpleMovingItemContainer[] containers = new SimpleMovingItemContainer[]{
+            new SimpleMovingItemContainer(0, this::addMoving, this::removeMoving),
+            new SimpleMovingItemContainer(1, this::addMoving, this::removeMoving),
+            new SimpleMovingItemContainer()
     };
     protected double process = 0;
     protected double speedScale = 0;
     @Nullable
-    protected RecipeEntry<DrainRecipe> currentRecipe = null;
+    protected RecipeHolder<DrainRecipe> currentRecipe = null;
     private boolean active;
     private MDrainBlock.Model model;
     private boolean inventoryChanged = false;
-    private final FluidContainerImpl fluidContainer = new FluidContainerImpl(FLUID_CAPACITY, this::markDirty);
+    private final FluidContainerImpl fluidContainer = new FluidContainerImpl(FLUID_CAPACITY, this::setChanged);
     private float visualProgress;
 
     public MDrainBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.MECHANICAL_DRAIN, pos, state);
     }
 
-    public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
+    public static <T extends BlockEntity> void ticker(Level world, BlockPos pos, BlockState state, T t) {
         var self = (MDrainBlockEntity) t;
-        var serverWorld = (ServerWorld) world;
+        var serverWorld = (ServerLevel) world;
 
         if (self.model == null) {
             self.model = (MDrainBlock.Model) BlockBoundAttachment.get(world, pos).holder();
@@ -105,7 +103,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
         self.state = null;
         var temp = BlockHeat.getReceived(world, pos) + self.fluidContainer.fluidTemperature();
 
-        FluidContainerUtil.tick(self.fluidContainer, (ServerWorld) world, pos, temp, self::addToOutputOrDrop);
+        FluidContainerUtil.tick(self.fluidContainer, (ServerLevel) world, pos, temp, self::addToOutputOrDrop);
         self.model.setFluid(self.fluidContainer.topFluid(), self.fluidContainer.getFilledPercentage());
 
         if (self.isInputEmpty()) {
@@ -130,7 +128,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             self.state = INCORRECT_ITEMS_TEXT;
             return;
         }
-        var inputStack = self.getStack(INPUT_FIRST);
+        var inputStack = self.getItem(INPUT_FIRST);
 
         var input = self.asInput();
 
@@ -139,7 +137,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             self.visualProgress = 0;
             self.updateInputPosition();
             self.speedScale = 0;
-            self.currentRecipe = serverWorld.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, world).orElse(null);
+            self.currentRecipe = serverWorld.recipeAccess().getRecipeFor(FactoryRecipeTypes.DRAIN, input, world).orElse(null);
 
             if (self.currentRecipe == null) {
                 self.active = false;
@@ -155,28 +153,28 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
         self.active = true;
         self.model.setActive(true);
-        var rot = RotationUser.getRotation(world, pos.up());
+        var rot = RotationUser.getRotation(world, pos.above());
         var fullSpeed = rot.speed();
         self.model.rotate((float) fullSpeed);
         self.model.tick();
 
         if (self.process >= self.currentRecipe.value().time(input)) {
-            var itemOut = self.currentRecipe.value().craft(input, world.getRegistryManager());
-            var currentOutput = self.getStack(OUTPUT_FIRST);
+            var itemOut = self.currentRecipe.value().assemble(input, world.registryAccess());
+            var currentOutput = self.getItem(OUTPUT_FIRST);
             if (currentOutput.isEmpty()) {
-                self.setStack(OUTPUT_FIRST, itemOut);
-            } else if (ItemStack.areItemsAndComponentsEqual(itemOut, currentOutput) && currentOutput.getCount() + itemOut.getCount() < itemOut.getMaxCount()) {
-                currentOutput.increment(itemOut.getCount());
+                self.setItem(OUTPUT_FIRST, itemOut);
+            } else if (ItemStack.isSameItemSameComponents(itemOut, currentOutput) && currentOutput.getCount() + itemOut.getCount() < itemOut.getMaxStackSize()) {
+                currentOutput.grow(itemOut.getCount());
             } else {
                 return;
             }
-            if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity serverPlayer) {
-                Criteria.RECIPE_CRAFTED.trigger(serverPlayer, self.currentRecipe.id(), List.of(inputStack.copy(), self.catalyst()));
+            if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayer serverPlayer) {
+                CriteriaTriggers.RECIPE_CRAFTED.trigger(serverPlayer, self.currentRecipe.id(), List.of(inputStack.copy(), self.catalyst()));
             }
 
-            inputStack.decrement(self.currentRecipe.value().decreasedInputItemAmount(input));
+            inputStack.shrink(self.currentRecipe.value().decreasedInputItemAmount(input));
             if (inputStack.isEmpty()) {
-                self.setStack(INPUT_FIRST, ItemStack.EMPTY);
+                self.setItem(INPUT_FIRST, ItemStack.EMPTY);
             }
             for (var fluid : self.currentRecipe.value().fluidInput(input)) {
                 self.fluidContainer.extract(fluid, false);
@@ -184,11 +182,11 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             for (var fluid : self.currentRecipe.value().fluidOutput(input)) {
                 self.fluidContainer.insert(fluid, false);
             }
-            world.playSound(null, pos, self.currentRecipe.value().soundEvent().value(), SoundCategory.BLOCKS);
+            world.playSound(null, pos, self.currentRecipe.value().soundEvent().value(), SoundSource.BLOCKS);
             self.process = 0;
             self.visualProgress = 0;
             self.updateInputPosition();
-            self.markDirty();
+            self.setChanged();
         } else {
             var strength = fullSpeed / 50 / 20;
             var speed = Math.min(Math.abs(strength) * 1, 1);
@@ -196,12 +194,12 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             if (speed > 0) {
                 self.process += speed;
                 self.visualProgress = (float) (self.process / self.currentRecipe.value().time(input));
-                markDirty(world, pos, self.getCachedState());
+                setChanged(world, pos, self.getBlockState());
                 var ppos = self.containers[0].getPos();
-                var fluid = Util.getRandomOrEmpty(self.currentRecipe.value().fluidOutput(input), world.random);
+                var fluid = Util.getRandomSafe(self.currentRecipe.value().fluidOutput(input), world.random);
 
                 if (fluid.isPresent() && ppos != null) {
-                    ((ServerWorld) world).spawnParticles(fluid.get().instance().particle(),
+                    ((ServerLevel) world).sendParticles(fluid.get().instance().particle(),
                             ppos.x, ppos.y, ppos.z, 0,
                             0, -1, 0, 0.1);
                 }
@@ -214,7 +212,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
     }
 
     private DrainInput asInput() {
-        return DrainInput.of(this.getStack(0).copy(), this.catalyst(), this.fluidContainer, false);
+        return DrainInput.of(this.getItem(0).copy(), this.catalyst(), this.fluidContainer, false);
     }
 
     private void updateInputPosition() {
@@ -228,17 +226,17 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
         if (!c.isContainerEmpty()) {
             assert c.getContainer() != null;
             var container = c.getContainer();
-            Vec3d base = Vec3d.ofCenter(this.pos);
+            Vec3 base = Vec3.atCenterOf(this.worldPosition);
             Quaternionf rot;
-            var dir = this.getCachedState().get(MDrainBlock.INPUT_FACING);
+            var dir = this.getBlockState().getValue(MDrainBlock.INPUT_FACING);
             if (id == INPUT_FIRST) {
-                base = base.add(0, 0.50, 0).offset(dir, -(this.visualProgress - 0.5) * (8 / 16f)).offset(dir.rotateYClockwise(), -4 / 16f);
-                rot = Direction.UP.getRotationQuaternion()
-                        .rotateY(-dir.rotateYClockwise().getPositiveHorizontalDegrees() * MathHelper.RADIANS_PER_DEGREE)
-                        .rotateX(MathHelper.PI * 3 / 4);
+                base = base.add(0, 0.50, 0).relative(dir, -(this.visualProgress - 0.5) * (8 / 16f)).relative(dir.getClockWise(), -4 / 16f);
+                rot = Direction.UP.getRotation()
+                        .rotateY(-dir.getClockWise().toYRot() * Mth.DEG_TO_RAD)
+                        .rotateX(Mth.PI * 3 / 4);
             } else {
-                base = base.add(0, 0.45, 0).offset(dir, -0.3);
-                rot = dir.getOpposite().getRotationQuaternion();
+                base = base.add(0, 0.45, 0).relative(dir, -0.3);
+                rot = dir.getOpposite().getRotation();
             }
 
             container.setPos(base);
@@ -248,25 +246,25 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
     }
 
     @Override
-    protected void writeData(WriteView view) {
+    protected void saveAdditional(ValueOutput view) {
         this.writeInventoryView(view);
         view.putDouble("Progress", this.process);
         this.fluidContainer.writeData(view, "fluid");
-        super.writeData(view);
+        super.saveAdditional(view);
     }
 
     @Override
-    public void readData(ReadView view) {
+    public void loadAdditional(ValueInput view) {
         this.readInventoryView(view);
-        this.process = view.getDouble("Progress", 0);
+        this.process = view.getDoubleOr("Progress", 0);
         this.fluidContainer.readData(view, "fluid");
         this.inventoryChanged = true;
-        super.readData(view);
+        super.loadAdditional(view);
     }
 
     @Override
-    protected void readComponents(ComponentsAccess components) {
-        super.readComponents(components);
+    protected void applyImplicitComponents(DataComponentGetter components) {
+        super.applyImplicitComponents(components);
         var f = components.get(FactoryDataComponents.FLUID);
         if (f != null) {
             this.fluidContainer.clear();
@@ -275,101 +273,101 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
     }
 
     @Override
-    protected void addComponents(ComponentMap.Builder componentMapBuilder) {
-        super.addComponents(componentMapBuilder);
-        componentMapBuilder.add(FactoryDataComponents.FLUID, FluidComponent.copyFrom(this.fluidContainer));
+    protected void collectImplicitComponents(DataComponentMap.Builder componentMapBuilder) {
+        super.collectImplicitComponents(componentMapBuilder);
+        componentMapBuilder.set(FactoryDataComponents.FLUID, FluidComponent.copyFrom(this.fluidContainer));
     }
 
     @Override
-    public void removeFromCopiedStackData(WriteView view) {
-        super.removeFromCopiedStackData(view);
-        view.remove("fluid");
+    public void removeComponentsFromTag(ValueOutput view) {
+        super.removeComponentsFromTag(view);
+        view.discard("fluid");
     }
 
     @Override
-    public int[] getAvailableSlots(Direction side) {
-        var facing = this.getCachedState().get(MDrainBlock.INPUT_FACING);
+    public int[] getSlotsForFace(Direction side) {
+        var facing = this.getBlockState().getValue(MDrainBlock.INPUT_FACING);
         return facing.getOpposite() == side || side == Direction.DOWN ? OUTPUT_SLOTS : INPUT_SLOTS;
     }
 
     @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
         return slot != OUTPUT_FIRST;
     }
 
     @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
         return slot == OUTPUT_FIRST;
     }
 
-    public void createGui(ServerPlayerEntity player) {
+    public void createGui(ServerPlayer player) {
         new Gui(player);
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
-        super.setStack(slot, stack);
+    public void setItem(int slot, ItemStack stack) {
+        super.setItem(slot, stack);
         if (slot == CATALYST_FIRST) {
             this.model.setCatalyst(stack);
         }
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        var stack = player.getStackInHand(Hand.MAIN_HAND);
-        if ((stack.isEmpty() || (ItemStack.areItemsAndComponentsEqual(stack, this.catalyst()) && stack.getCount() < stack.getMaxCount()))
-                && hit.getSide() == Direction.UP && !this.catalyst().isEmpty()) {
+    public InteractionResult onUse(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+        if ((stack.isEmpty() || (ItemStack.isSameItemSameComponents(stack, this.catalyst()) && stack.getCount() < stack.getMaxStackSize()))
+                && hit.getDirection() == Direction.UP && !this.catalyst().isEmpty()) {
             if (stack.isEmpty()) {
-                player.setStackInHand(Hand.MAIN_HAND, this.catalyst());
+                player.setItemInHand(InteractionHand.MAIN_HAND, this.catalyst());
             } else {
-                stack.increment(1);
+                stack.grow(1);
             }
             this.setCatalyst(ItemStack.EMPTY);
-            return ActionResult.SUCCESS_SERVER;
-        } else if (stack.isIn(FactoryItemTags.DRAIN_CATALYST) && hit.getSide() == Direction.UP && this.catalyst().isEmpty()) {
+            return InteractionResult.SUCCESS_SERVER;
+        } else if (stack.is(FactoryItemTags.DRAIN_CATALYST) && hit.getDirection() == Direction.UP && this.catalyst().isEmpty()) {
             this.setCatalyst(stack.copyWithCount(1));
-            stack.decrementUnlessCreative(1, player);
-            return ActionResult.SUCCESS_SERVER;
+            stack.consume(1, player);
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        if (world instanceof ServerWorld serverWorld) {
+        if (world instanceof ServerLevel serverWorld) {
             var container = this.getFluidContainer();
             var copy = stack.copy();
             var input = DrainInput.of(copy, this.catalyst(), container, !(player instanceof FakePlayer));
-            var optional = serverWorld.getRecipeManager().getFirstMatch(FactoryRecipeTypes.DRAIN, input, world);
+            var optional = serverWorld.recipeAccess().getRecipeFor(FactoryRecipeTypes.DRAIN, input, world);
             if (optional.isEmpty()) {
                 return super.onUse(state, world, pos, player, hit);
             }
-            if (player instanceof ServerPlayerEntity serverPlayer) {
-                Criteria.RECIPE_CRAFTED.trigger(serverPlayer, optional.get().id(), List.of(stack.copy(), this.catalyst()));
+            if (player instanceof ServerPlayer serverPlayer) {
+                CriteriaTriggers.RECIPE_CRAFTED.trigger(serverPlayer, optional.get().id(), List.of(stack.copy(), this.catalyst()));
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.DRAIN_USE);
             }
 
             var recipe = optional.get().value();
-            var itemOut = recipe.craft(input, player.getRegistryManager());
+            var itemOut = recipe.assemble(input, player.registryAccess());
             for (var fluid : recipe.fluidInput(input)) {
                 container.extract(fluid, false);
             }
-            player.setStackInHand(Hand.MAIN_HAND, FactoryUtil.exchangeStack(stack, recipe.decreasedInputItemAmount(input), player, itemOut));
+            player.setItemInHand(InteractionHand.MAIN_HAND, FactoryUtil.exchangeStack(stack, recipe.decreasedInputItemAmount(input), player, itemOut));
             for (var fluid : recipe.fluidOutput(input)) {
                 container.insert(fluid, false);
             }
-            world.playSound(null, pos, recipe.soundEvent().value(), SoundCategory.BLOCKS);
+            world.playSound(null, pos, recipe.soundEvent().value(), SoundSource.BLOCKS);
         }
-        return ActionResult.SUCCESS_SERVER;
+        return InteractionResult.SUCCESS_SERVER;
     }
 
     private void addToOutputOrDrop(ItemStack stack) {
-        FactoryUtil.insertBetween(this, OUTPUT_FIRST, this.size(), stack);
+        FactoryUtil.insertBetween(this, OUTPUT_FIRST, this.getContainerSize(), stack);
         if (!stack.isEmpty()) {
-            assert this.world != null;
-            ItemScatterer.spawn(this.world, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, stack);
+            assert this.level != null;
+            Containers.dropItemStack(this.level, this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 0.5, this.worldPosition.getZ() + 0.5, stack);
         }
     }
 
     private boolean isInputEmpty() {
         for (int i = 0; i < OUTPUT_FIRST; i++) {
-            if (!this.getStack(i).isEmpty()) {
+            if (!this.getItem(i).isEmpty()) {
                 return false;
             }
         }
@@ -384,13 +382,13 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
     }
 
     @Override
-    public void markDirty() {
-        super.markDirty();
+    public void setChanged() {
+        super.setChanged();
         this.inventoryChanged = true;
     }
 
     @Override
-    public SimpleContainer[] getContainers() {
+    public SimpleMovingItemContainer[] getContainers() {
         return this.containers;
     }
 
@@ -415,20 +413,20 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
 
     public ItemStack catalyst() {
-        return this.getStack(CATALYST_FIRST);
+        return this.getItem(CATALYST_FIRST);
     }
 
     public void setCatalyst(ItemStack catalyst) {
-        this.setStack(CATALYST_FIRST, catalyst);
+        this.setItem(CATALYST_FIRST, catalyst);
         if (this.model != null) {
             this.model.setCatalyst(catalyst);
         }
-        this.markDirty();
+        this.setChanged();
     }
 
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
-        if (state.get(MDrainBlock.PART) == TallItemMachineBlock.Part.TOP) {
-            return ScreenHandler.calculateComparatorOutput((Inventory) this);
+    public int getComparatorOutput(BlockState state, Level world, BlockPos pos, Direction direction) {
+        if (state.getValue(MDrainBlock.PART) == TallItemMachineBlock.Part.TOP) {
+            return AbstractContainerMenu.getRedstoneSignalFromContainer((Container) this);
         }
         return (int) ((this.fluidContainer.stored() * 15) / this.fluidContainer.capacity());
     }
@@ -437,8 +435,8 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
         private int lastFluidUpdate = -1;
         private int delayTick = -1;
 
-        public Gui(ServerPlayerEntity player) {
-            super(ScreenHandlerType.GENERIC_9X3, player, false);
+        public Gui(ServerPlayer player) {
+            super(MenuType.GENERIC_9x3, player, false);
             this.updateTitleAndFluid();
             this.setSlot(9, PolydexCompat.getButton(FactoryRecipeTypes.DRAIN));
             var fluidSlot = FluidContainerUtil.guiElement(fluidContainer, true);
@@ -451,15 +449,15 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             this.setSlot(6 + 2 * 9, fluidSlot);
 
             this.setSlotRedirect(2, new Slot(MDrainBlockEntity.this, 0, 0, 0));
-            this.setSlotRedirect(9 + 5, new FurnaceOutputSlot(player, MDrainBlockEntity.this, 1, 1, 0));
+            this.setSlotRedirect(9 + 5, new FurnaceResultSlot(player, MDrainBlockEntity.this, 1, 1, 0));
             this.setSlotRedirect(9 * 2 + 2, new TagLimitedSlot(MDrainBlockEntity.this, 2, FactoryItemTags.DRAIN_CATALYST) {
                 @Override
-                public int getMaxItemCount() {
+                public int getMaxStackSize() {
                     return 1;
                 }
 
                 @Override
-                public int getMaxItemCount(ItemStack stack) {
+                public int getMaxStackSize(ItemStack stack) {
                     return 1;
                 }
             });
@@ -469,11 +467,11 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
         private void updateTitleAndFluid() {
             var text = GuiTextures.MECHANICAL_DRAIN.apply(
-                    Text.empty()
-                            .append(Text.literal(GuiTextures.MECHANICAL_DRAIN_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
+                    Component.empty()
+                            .append(Component.literal(GuiTextures.MECHANICAL_DRAIN_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
                             .append(FluidTextures.MIXER.render(MDrainBlockEntity.this.fluidContainer::provideRender))
-                            .append(Text.literal(GuiTextures.MECHANICAL_DRAIN_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
-                            .append(MDrainBlockEntity.this.getCachedState().getBlock().getName())
+                            .append(Component.literal(GuiTextures.MECHANICAL_DRAIN_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
+                            .append(MDrainBlockEntity.this.getBlockState().getBlock().getName())
             );
 
 
@@ -491,7 +489,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
         @Override
         public void onTick() {
-            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(MDrainBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.position().distanceToSqr(Vec3.atCenterOf(MDrainBlockEntity.this.worldPosition)) > (18 * 18)) {
                 this.close();
             }
             if (MDrainBlockEntity.this.fluidContainer.updateId() != this.lastFluidUpdate && delayTick < 0) {

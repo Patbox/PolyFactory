@@ -6,7 +6,7 @@ import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 

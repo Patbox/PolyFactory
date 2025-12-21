@@ -12,17 +12,15 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.recipe.*;
 import eu.pb4.polyfactory.recipe.input.PressInput;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.world.World;
-
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.Level;
 
 public record GenericPressRecipe(String group, CountedIngredient inputA, CountedIngredient inputB, List<OutputStack> output, double minimumSpeed, List<FluidStack<?>> outputFluids) implements PressRecipe {
     public static final MapCodec<GenericPressRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
@@ -35,62 +33,62 @@ public record GenericPressRecipe(String group, CountedIngredient inputA, Counted
             ).apply(x, GenericPressRecipe::new)
     );
 
-    public static RecipeEntry<GenericPressRecipe> of(String string, CountedIngredient inputA, CountedIngredient inputB, double minimumSpeed, OutputStack... outputs) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", inputA, inputB, List.of(outputs), minimumSpeed, List.of()));
+    public static RecipeHolder<GenericPressRecipe> of(String string, CountedIngredient inputA, CountedIngredient inputB, double minimumSpeed, OutputStack... outputs) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", inputA, inputB, List.of(outputs), minimumSpeed, List.of()));
     }
 
-    public static RecipeEntry<GenericPressRecipe> of(String string, String group, CountedIngredient inputA, CountedIngredient inputB, double minimumSpeed, OutputStack... outputs) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe(group, inputA, inputB, List.of(outputs), minimumSpeed, List.of()));
+    public static RecipeHolder<GenericPressRecipe> of(String string, String group, CountedIngredient inputA, CountedIngredient inputB, double minimumSpeed, OutputStack... outputs) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe(group, inputA, inputB, List.of(outputs), minimumSpeed, List.of()));
     }
 
-    public static RecipeEntry<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, OutputStack... outputs) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY),
+    public static RecipeHolder<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, OutputStack... outputs) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY),
                 CountedIngredient.EMPTY, List.of(outputs), minimumSpeed, List.of()));
     }
 
-    public static RecipeEntry<GenericPressRecipe> of(String string, String group, CountedIngredient inputA, CountedIngredient inputB, double minimumSpeed, List<OutputStack> outputs, List<FluidStack<?>> outputFluids) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe(group, inputA, inputB, outputs, minimumSpeed, outputFluids));
+    public static RecipeHolder<GenericPressRecipe> of(String string, String group, CountedIngredient inputA, CountedIngredient inputB, double minimumSpeed, List<OutputStack> outputs, List<FluidStack<?>> outputFluids) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe(group, inputA, inputB, outputs, minimumSpeed, outputFluids));
     }
 
-    public static RecipeEntry<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, List<OutputStack> outputs, List<FluidStack<?>> outputFluids) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY),
+    public static RecipeHolder<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, List<OutputStack> outputs, List<FluidStack<?>> outputFluids) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY),
                 CountedIngredient.EMPTY,outputs, minimumSpeed, outputFluids));
     }
 
-    public static RecipeEntry<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, ItemStack output) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY),
+    public static RecipeHolder<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, ItemStack output) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY),
                 CountedIngredient.EMPTY, List.of(new OutputStack(output, 1, 1)),  minimumSpeed, List.of()));
     }
 
-    public static RecipeEntry<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, ItemConvertible output) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY), CountedIngredient.EMPTY,
-                List.of(new OutputStack(output.asItem().getDefaultStack(), 1, 1)), minimumSpeed, List.of()));
+    public static RecipeHolder<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, ItemLike output) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY), CountedIngredient.EMPTY,
+                List.of(new OutputStack(output.asItem().getDefaultInstance(), 1, 1)), minimumSpeed, List.of()));
     }
 
     @Override
-    public boolean matches(PressInput inventory, World world) {
+    public boolean matches(PressInput inventory, Level world) {
         var input = inventory.input();
         var template = inventory.pattern();
         return this.inputA.test(input) && this.inputB.test(template);
     }
 
     @Override
-    public void applyRecipeUse(PressBlockEntity inventory, World world) {
-        var stack = inventory.getStack(PressBlockEntity.INPUT_SLOT);
-        stack.decrement(this.inputA.count());
+    public void applyRecipeUse(PressBlockEntity inventory, Level world) {
+        var stack = inventory.getItem(PressBlockEntity.INPUT_SLOT);
+        stack.shrink(this.inputA.count());
         if (stack.isEmpty()) {
-            inventory.setStack(PressBlockEntity.INPUT_SLOT, ItemStack.EMPTY);
+            inventory.setItem(PressBlockEntity.INPUT_SLOT, ItemStack.EMPTY);
         }
 
-        stack = inventory.getStack(PressBlockEntity.INPUT_2_SLOT);
-        stack.decrement(this.inputB.count());
+        stack = inventory.getItem(PressBlockEntity.INPUT_2_SLOT);
+        stack.shrink(this.inputB.count());
         if (stack.isEmpty()) {
-            inventory.setStack(PressBlockEntity.INPUT_2_SLOT, ItemStack.EMPTY);
+            inventory.setItem(PressBlockEntity.INPUT_2_SLOT, ItemStack.EMPTY);
         }
     }
 
     @Override
-    public ItemStack craft(PressInput input, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack assemble(PressInput input, HolderLookup.Provider registryManager) {
         for (var out : output) {
             if (Math.random() <= out.chance()) {
                 return out.stack().copy();
@@ -106,7 +104,7 @@ public record GenericPressRecipe(String group, CountedIngredient inputA, Counted
     }
 
     @Override
-    public String getGroup() {
+    public String group() {
         return this.group;
     }
 

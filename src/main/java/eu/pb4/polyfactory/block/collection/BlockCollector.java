@@ -1,34 +1,33 @@
 package eu.pb4.polyfactory.block.collection;
 
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.piston.PistonBehavior;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
 import java.util.HashSet;
 import java.util.Set;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.PushReaction;
 
 public class BlockCollector {
-    public static Result collect(ServerWorld world, BlockPos start) {
+    public static Result collect(ServerLevel world, BlockPos start) {
         var set = new HashSet<BlockPos>();
-        var startMut = start.mutableCopy();
-        var endMut = start.mutableCopy();
-        var mut = start.mutableCopy();
+        var startMut = start.mutable();
+        var endMut = start.mutable();
+        var mut = start.mutable();
 
         collectRecursive(world, world.getBlockState(mut), set, startMut, endMut, mut);
 
         return new Result(endMut.getX() - startMut.getX(), endMut.getY() - startMut.getY(), endMut.getZ() - startMut.getZ(), set);
     }
 
-    private static void collectRecursive(ServerWorld world, BlockState state, HashSet<BlockPos> set, BlockPos.Mutable startMut, BlockPos.Mutable endMut, BlockPos.Mutable mut) {
-        if (set.contains(mut) || state.getPistonBehavior() == PistonBehavior.BLOCK || state.getBlock() instanceof BlockEntityProvider) {
+    private static void collectRecursive(ServerLevel world, BlockState state, HashSet<BlockPos> set, BlockPos.MutableBlockPos startMut, BlockPos.MutableBlockPos endMut, BlockPos.MutableBlockPos mut) {
+        if (set.contains(mut) || state.getPistonPushReaction() == PushReaction.BLOCK || state.getBlock() instanceof EntityBlock) {
             return;
         }
 
-        set.add(mut.toImmutable());
+        set.add(mut.immutable());
         startMut.set(
                 Math.min(startMut.getX(), mut.getX()),
                 Math.min(startMut.getY(), mut.getY()),
@@ -40,11 +39,11 @@ public class BlockCollector {
                 Math.max(startMut.getZ(), mut.getZ())
         );
 
-        boolean sticky = state.isOf(Blocks.SLIME_BLOCK) || state.isOf(Blocks.HONEY_BLOCK);
+        boolean sticky = state.is(Blocks.SLIME_BLOCK) || state.is(Blocks.HONEY_BLOCK);
 
         for (var dir : Direction.values()) {
             var nextState = world.getBlockState(mut.move(dir));
-            if (sticky || nextState.isOf(Blocks.SLIME_BLOCK) || nextState.isOf(Blocks.HONEY_BLOCK)) {
+            if (sticky || nextState.is(Blocks.SLIME_BLOCK) || nextState.is(Blocks.HONEY_BLOCK)) {
                 collectRecursive(world, nextState, set, startMut, endMut, mut);
             }
             mut.move(dir, -1);

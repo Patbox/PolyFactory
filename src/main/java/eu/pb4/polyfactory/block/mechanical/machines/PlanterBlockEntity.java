@@ -11,43 +11,38 @@ import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.item.FactoryItemTags;
-import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.TagLimitedSlot;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
-import eu.pb4.polyfactory.util.inventory.SingleStackInventory;
+import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.SidedInventory;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.IntStream;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
-public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, BlockEntityExtraListener, OwnedBlockEntity {
+public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSidedContainer, BlockEntityExtraListener, OwnedBlockEntity {
     private static final int[] SLOTS = IntStream.range(0, 9).toArray();
-    private final DefaultedList<ItemStack> items = DefaultedList.ofSize(9, ItemStack.EMPTY);
+    private final NonNullList<ItemStack> items = NonNullList.withSize(9, ItemStack.EMPTY);
     protected GameProfile owner = null;
     protected double process = 0;
     private float stress = 0;
@@ -59,30 +54,30 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        Inventories.writeData(view, this.items);
+    protected void saveAdditional(ValueOutput view) {
+        ContainerHelper.saveAllItems(view, this.items);
         view.putDouble("progress", this.process);
         if (this.owner != null) {
-            view.put("owner", NbtCompound.CODEC, LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+            view.store("owner", CompoundTag.CODEC, LegacyNbtHelper.writeGameProfile(new CompoundTag(), this.owner));
         }
         view.putInt("radius", this.radius);
-        super.writeData(view);
+        super.saveAdditional(view);
     }
 
     @Override
-    public void readData(ReadView view) {
-        if (!view.getReadView("stack").getString("id", "").isEmpty() && view.getListReadView("Items").isEmpty()) {
-            this.setStack(0, view.read("stack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY));
+    public void loadAdditional(ValueInput view) {
+        if (!view.childOrEmpty("stack").getStringOr("id", "").isEmpty() && view.childrenListOrEmpty("Items").isEmpty()) {
+            this.setItem(0, view.read("stack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY));
         } else {
-            Inventories.readData(view, this.items);
+            ContainerHelper.loadAllItems(view, this.items);
         }
 
-        this.process = view.getDouble("progress", 0);
-        view.read("owner", NbtCompound.CODEC).ifPresent(x -> this.owner = LegacyNbtHelper.toGameProfile(x));
+        this.process = view.getDoubleOr("progress", 0);
+        view.read("owner", CompoundTag.CODEC).ifPresent(x -> this.owner = LegacyNbtHelper.toGameProfile(x));
 
-        this.radius = view.getInt("radius", 1);
+        this.radius = view.getIntOr("radius", 1);
 
-        super.readData(view);
+        super.loadAdditional(view);
     }
 
     @Override
@@ -93,30 +88,30 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
     @Override
     public void setOwner(GameProfile profile) {
         this.owner = profile;
-        this.markDirty();
+        this.setChanged();
     }
 
     @Override
-    public int[] getAvailableSlots(Direction side) {
+    public int[] getSlotsForFace(Direction side) {
         return SLOTS;
     }
 
     @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return stack.isIn(FactoryItemTags.ALLOWED_IN_PLANTER);
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
+        return stack.is(FactoryItemTags.ALLOWED_IN_PLANTER);
     }
 
     @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
         return true;
     }
 
     @Override
-    protected void createGui(ServerPlayerEntity playerEntity) {
+    protected void createGui(ServerPlayer playerEntity) {
         new Gui(playerEntity);
     }
 
-    public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
+    public static <T extends BlockEntity> void ticker(Level world, BlockPos pos, BlockState state, T t) {
         var self = (PlanterBlockEntity) t;
 
         if (self.isEmpty()) {
@@ -138,18 +133,18 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
             return;
         }
 
-        var placableState = blockItem.getBlock().getDefaultState();
+        var placableState = blockItem.getBlock().defaultBlockState();
 
-        var speed = Math.abs(RotationUser.getRotation((ServerWorld) world, pos).speed()) * MathHelper.RADIANS_PER_DEGREE * 2.5f;
+        var speed = Math.abs(RotationUser.getRotation((ServerLevel) world, pos).speed()) * Mth.DEG_TO_RAD * 2.5f;
 
         BlockPos place = null;
         for (var y = 0; y < 2; y++) {
-            for (var mut : BlockPos.iterateInSquare(pos.down(y), self.radius, Direction.NORTH, Direction.WEST)) {
+            for (var mut : BlockPos.spiralAround(pos.below(y), self.radius, Direction.NORTH, Direction.WEST)) {
                 var targetState = world.getBlockState(mut);
-                if ((targetState.isAir() || (targetState.isReplaceable() && targetState.getFluidState().isEmpty()))
-                        && placableState.canPlaceAt(world, mut)
+                if ((targetState.isAir() || (targetState.canBeReplaced() && targetState.getFluidState().isEmpty()))
+                        && placableState.canSurvive(world, mut)
                         && CommonProtection.canPlaceBlock(world, mut, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner, null)) {
-                    place = mut.toImmutable();
+                    place = mut.immutable();
                     break;
                 }
             }
@@ -180,20 +175,20 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
         if (self.process >= 1) {
             self.process = 0;
             self.stress = 0;
-            world.setBlockState(place, placableState);
-            stack.decrement(1);
-            world.playSound(null, pos, placableState.getSoundGroup().getPlaceSound(), SoundCategory.BLOCKS, 0.5f, 1.0f);
-            world.emitGameEvent(GameEvent.BLOCK_PLACE, place, GameEvent.Emitter.of(placableState));
-            if (self.owner != null && world.getPlayerByUuid(self.owner.id()) instanceof ServerPlayerEntity serverPlayer) {
+            world.setBlockAndUpdate(place, placableState);
+            stack.shrink(1);
+            world.playSound(null, pos, placableState.getSoundType().getPlaceSound(), SoundSource.BLOCKS, 0.5f, 1.0f);
+            world.gameEvent(GameEvent.BLOCK_PLACE, place, GameEvent.Context.of(placableState));
+            if (self.owner != null && world.getPlayerByUUID(self.owner.id()) instanceof ServerPlayer serverPlayer) {
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.PLANTER_PLANTS);
             }
-            self.markDirty();
+            self.setChanged();
         }
     }
 
     @Override
-    public void markRemoved() {
-        super.markRemoved();
+    public void setRemoved() {
+        super.setRemoved();
     }
 
     public float getStress() {
@@ -201,8 +196,8 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
     }
 
     @Override
-    public void onListenerUpdate(WorldChunk chunk) {
-        this.model = (PlanterBlock.Model) BlockBoundAttachment.get(chunk, this.pos).holder();
+    public void onListenerUpdate(LevelChunk chunk) {
+        this.model = (PlanterBlock.Model) BlockBoundAttachment.get(chunk, this.worldPosition).holder();
     }
 
     public int radius() {
@@ -211,18 +206,18 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
 
     public void setRadius(int radius) {
         this.radius = radius;
-        this.markDirty();
+        this.setChanged();
     }
 
     @Override
-    public DefaultedList<ItemStack> getStacks() {
+    public NonNullList<ItemStack> getStacks() {
         return this.items;
     }
 
     private class Gui extends SimpleGui {
-        public Gui(ServerPlayerEntity player) {
-            super(ScreenHandlerType.GENERIC_3X3, player, false);
-            this.setTitle(PlanterBlockEntity.this.getCachedState().getBlock().getName());
+        public Gui(ServerPlayer player) {
+            super(MenuType.GENERIC_3x3, player, false);
+            this.setTitle(PlanterBlockEntity.this.getBlockState().getBlock().getName());
             for (int i = 0; i < 9; i++) {
                 this.setSlotRedirect(i, new TagLimitedSlot(PlanterBlockEntity.this, i, FactoryItemTags.ALLOWED_IN_PLANTER));
             }
@@ -236,7 +231,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
 
         @Override
         public void onTick() {
-            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(PlanterBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.position().distanceToSqr(Vec3.atCenterOf(PlanterBlockEntity.this.worldPosition)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();

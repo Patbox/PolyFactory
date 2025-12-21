@@ -4,41 +4,40 @@ import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.other.PolymerStatusEffect;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.AttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectCategory;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.phys.Vec3;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class StickyStatusEffect extends StatusEffect implements PolymerStatusEffect {
+public class StickyStatusEffect extends MobEffect implements PolymerStatusEffect {
     //private final Multimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> wallEffects;
-    public StickyStatusEffect(String type, StatusEffectCategory category, int color, ParticleEffect particleEffect) {
+    public StickyStatusEffect(String type, MobEffectCategory category, int color, ParticleOptions particleEffect) {
         super(category, color, particleEffect);
         var attributeId = id("sticky/" + type);
-        this.addAttributeModifier(EntityAttributes.MOVEMENT_SPEED, attributeId, -0.2, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-        this.addAttributeModifier(EntityAttributes.ATTACK_SPEED, attributeId, -0.15, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-        this.addAttributeModifier(EntityAttributes.BLOCK_BREAK_SPEED, attributeId, -0.15, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        this.addAttributeModifier(Attributes.MOVEMENT_SPEED, attributeId, -0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        this.addAttributeModifier(Attributes.ATTACK_SPEED, attributeId, -0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        this.addAttributeModifier(Attributes.BLOCK_BREAK_SPEED, attributeId, -0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
     }
 
 
     @Override
-    public boolean applyUpdateEffect(ServerWorld world, LivingEntity entity, int amplifier) {
-        if (entity.isSubmergedInWater()) {
+    public boolean applyEffectTick(ServerLevel world, LivingEntity entity, int amplifier) {
+        if (entity.isUnderWater()) {
             return false;
         }
 
-        var box = entity.getBoundingBox().expand(0.01, -0.1, 0.01);
+        var box = entity.getBoundingBox().inflate(0.01, -0.1, 0.01);
         boolean active = false;
         for (var voxelShape : world.getBlockCollisions(entity, box)) {
             if (!voxelShape.isEmpty()) {
@@ -52,37 +51,37 @@ public class StickyStatusEffect extends StatusEffect implements PolymerStatusEff
         //    player.sendMessage(Text.literal("Active: " + active + " | " + (entity.getMovement().getY() < 0 ? "-" : "+") + ((int) y) + "." + ((int) ((y - ((int) y)) * 100))), true);
         //}
 
-        return super.applyUpdateEffect(world, entity, amplifier);
+        return super.applyEffectTick(world, entity, amplifier);
     }
 
     @Override
-    public boolean canApplyUpdateEffect(int duration, int amplifier) {
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return true;
     }
 
     private void updateSlidingVelocity(Entity entity) {
-        Vec3d vec3d = entity instanceof ServerPlayerEntity player ? player.getMovement() : entity.getVelocity();
+        Vec3 vec3d = entity instanceof ServerPlayer player ? player.getKnownMovement() : entity.getDeltaMovement();
         if (vec3d.y < 0) {
             var y = speedModifier(-0.04);
-            entity.setVelocity(new Vec3d(vec3d.x, y, vec3d.z));
+            entity.setDeltaMovement(new Vec3(vec3d.x, y, vec3d.z));
 
-            if (entity instanceof ServerPlayerEntity player) {
+            if (entity instanceof ServerPlayer player) {
                 if (vec3d.y < y) {
-                    player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(entity.getId(), entity.getVelocity()));
+                    player.connection.send(new ClientboundSetEntityMotionPacket(entity.getId(), entity.getDeltaMovement()));
                 } else {
-                    FactoryUtil.sendVelocityDelta(player, new Vec3d(0, y - vec3d.y + entity.getFinalGravity(), 0));
+                    FactoryUtil.sendVelocityDelta(player, new Vec3(0, y - vec3d.y + entity.getGravity(), 0));
                 }
                 TriggerCriterion.trigger(player, FactoryTriggers.STICKY_WALL_SLIDING);
             }
 
-            if (entity.getEntityWorld().random.nextInt(5) == 0) {
-                entity.playSound(SoundEvents.BLOCK_HONEY_BLOCK_SLIDE, 1.0F, 1.0F);
+            if (entity.level().random.nextInt(5) == 0) {
+                entity.playSound(SoundEvents.HONEY_BLOCK_SLIDE, 1.0F, 1.0F);
                 if (!entity.isSilent()) {
-                    entity.getEntityWorld().playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.BLOCK_HONEY_BLOCK_SLIDE, entity.getSoundCategory(), 1.0F, 1.0F);
+                    entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.HONEY_BLOCK_SLIDE, entity.getSoundSource(), 1.0F, 1.0F);
                 }
             }
 
-            entity.onLanding();
+            entity.resetFallDistance();
         }
     }
 
@@ -95,7 +94,7 @@ public class StickyStatusEffect extends StatusEffect implements PolymerStatusEff
     }
 
     @Override
-    public void onRemoved(AttributeContainer attributeContainer) {
-        super.onRemoved(attributeContainer);
+    public void removeAttributeModifiers(AttributeMap attributeContainer) {
+        super.removeAttributeModifiers(attributeContainer);
     }
 }

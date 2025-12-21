@@ -5,21 +5,19 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.BlockTags;
-
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.Blocks;
 import java.util.concurrent.CompletableFuture;
 
 class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
-    public BlockTagsProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+    public BlockTagsProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
         super(output, registriesFuture);
     }
 
     @Override
-    protected void configure(RegistryWrapper.WrapperLookup arg) {
+    protected void addTags(HolderLookup.Provider arg) {
         this.builder(FactoryBlockTags.SPRAY_CAN_COLORABLE)
                 .addOptionalTag(BlockTags.WOOL)
                 .addOptionalTag(BlockTags.WOOL_CARPETS)
@@ -77,7 +75,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.STEEL_BLOCK)
                 ;
 
-        this.valueLookupBuilder(BlockTags.PICKAXE_MINEABLE)
+        this.valueLookupBuilder(BlockTags.MINEABLE_WITH_PICKAXE)
                 .addOptionalTag(FactoryBlockTags.CONVEYORS)
                 .add(FactoryBlocks.FAN,
                         FactoryBlocks.NIXIE_TUBE,
@@ -165,7 +163,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
 
         ;
 
-        this.valueLookupBuilder(BlockTags.AXE_MINEABLE)
+        this.valueLookupBuilder(BlockTags.MINEABLE_WITH_AXE)
                 .add(FactoryBlocks.WINDMILL)
                 .add(FactoryBlocks.AXLE)
                 .add(FactoryBlocks.AXLE_WITH_GEAR)
@@ -184,8 +182,8 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
 
         var conc = this.valueLookupBuilder(FactoryBlockTags.CONCRETE);
 
-        for (var block : Registries.BLOCK) {
-            var id = Registries.BLOCK.getId(block);
+        for (var block : BuiltInRegistries.BLOCK) {
+            var id = BuiltInRegistries.BLOCK.getKey(block);
 
             if (id.getPath().endsWith("_concrete")) {
                 conc.add(block);

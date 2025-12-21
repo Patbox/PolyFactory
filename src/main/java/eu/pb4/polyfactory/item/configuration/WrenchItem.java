@@ -4,123 +4,121 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.item.util.SwitchActionItem;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-
 import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class WrenchItem extends SimplePolymerItem implements SwitchActionItem {
-    public WrenchItem(Settings settings) {
+    public WrenchItem(Properties settings) {
         super(settings);
     }
 
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> tooltip, TooltipType type) {
-        tooltip.accept(Text.translatable("item.polyfactory.wrench.tooltip.1", Text.keybind("key.use")).formatted(Formatting.GRAY));
-        tooltip.accept(Text.translatable("item.polyfactory.wrench.tooltip.1.alt", Text.keybind("key.swapOffhand")).formatted(Formatting.GRAY));
-        tooltip.accept(Text.translatable("item.polyfactory.wrench.tooltip.2", Text.keybind("key.attack")).formatted(Formatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> tooltip, TooltipFlag type) {
+        tooltip.accept(Component.translatable("item.polyfactory.wrench.tooltip.1", Component.keybind("key.use")).withStyle(ChatFormatting.GRAY));
+        tooltip.accept(Component.translatable("item.polyfactory.wrench.tooltip.1.alt", Component.keybind("key.swapOffhand")).withStyle(ChatFormatting.GRAY));
+        tooltip.accept(Component.translatable("item.polyfactory.wrench.tooltip.2", Component.keybind("key.attack")).withStyle(ChatFormatting.GRAY));
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        if (context.getPlayer() instanceof ServerPlayerEntity player && !context.getStack().getOrDefault(FactoryDataComponents.READ_ONLY, false)) {
-            return WrenchHandler.of(player).useBlockAction(player, context.getWorld(), context.getBlockPos(), context.getSide(), false);
+    public InteractionResult useOn(UseOnContext context) {
+        if (context.getPlayer() instanceof ServerPlayer player && !context.getItemInHand().getOrDefault(FactoryDataComponents.READ_ONLY, false)) {
+            return WrenchHandler.of(player).useBlockAction(player, context.getLevel(), context.getClickedPos(), context.getClickedFace(), false);
         }
-        return ActionResult.FAIL;
+        return InteractionResult.FAIL;
     }
 
-    public ActionResult handleBlockAttack(PlayerEntity player, World world, Hand hand, BlockPos pos, Direction direction) {
-        if (player.getStackInHand(hand).isOf(this) && player instanceof ServerPlayerEntity player1
-                && !player.getStackInHand(hand).getOrDefault(FactoryDataComponents.READ_ONLY, false)) {
+    public InteractionResult handleBlockAttack(Player player, Level world, InteractionHand hand, BlockPos pos, Direction direction) {
+        if (player.getItemInHand(hand).is(this) && player instanceof ServerPlayer player1
+                && !player.getItemInHand(hand).getOrDefault(FactoryDataComponents.READ_ONLY, false)) {
             WrenchHandler.of(player1).attackBlockAction(player1, world, pos, direction);
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
         }
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public boolean onSwitchAction(ServerPlayerEntity player, ItemStack main, Hand mainHand) {
+    public boolean onSwitchAction(ServerPlayer player, ItemStack main, InteractionHand mainHand) {
         var raycast = WrenchHandler.getTarget(player);
 
         if (raycast.getType() == HitResult.Type.BLOCK
                 && !main.getOrDefault(FactoryDataComponents.READ_ONLY, false)
                 && raycast instanceof BlockHitResult result
-                && WrenchHandler.of(player).useBlockAction(player, player.getEntityWorld(), result.getBlockPos(), result.getSide(), true).isAccepted()) {
-            player.swingHand(mainHand, true);
+                && WrenchHandler.of(player).useBlockAction(player, player.level(), result.getBlockPos(), result.getDirection(), true).consumesAction()) {
+            player.swing(mainHand, true);
         }
         if (raycast.getType() == HitResult.Type.ENTITY
                 && !main.getOrDefault(FactoryDataComponents.READ_ONLY, false)
                 && raycast instanceof EntityHitResult result
-                && WrenchHandler.of(player).useEntityAction(player, result.getEntity(), result.getPos(), true).isAccepted()) {
-            player.swingHand(mainHand, true);
+                && WrenchHandler.of(player).useEntityAction(player, result.getEntity(), result.getLocation(), true).consumesAction()) {
+            player.swing(mainHand, true);
         }
 
         return true;
     }
 
-    public ActionResult handleEntityAttack(PlayerEntity player, World world, Hand hand, Entity entity, EntityHitResult entityHitResult) {
-        if (player.getStackInHand(hand).isOf(this) && player instanceof ServerPlayerEntity player1
-                && !player.getStackInHand(hand).getOrDefault(FactoryDataComponents.READ_ONLY, false)) {
-            WrenchHandler.of(player1).attackEntityAction(player1, entity, entityHitResult != null ? entityHitResult.getPos() : Vec3d.ZERO);
-            return ActionResult.FAIL;
+    public InteractionResult handleEntityAttack(Player player, Level world, InteractionHand hand, Entity entity, EntityHitResult entityHitResult) {
+        if (player.getItemInHand(hand).is(this) && player instanceof ServerPlayer player1
+                && !player.getItemInHand(hand).getOrDefault(FactoryDataComponents.READ_ONLY, false)) {
+            WrenchHandler.of(player1).attackEntityAction(player1, entity, entityHitResult != null ? entityHitResult.getLocation() : Vec3.ZERO);
+            return InteractionResult.FAIL;
         }
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
-    public ActionResult handleEntityUse(PlayerEntity player, World world, Hand hand, Entity entity, EntityHitResult entityHitResult) {
-        var stack = player.getStackInHand(hand);
-        if (!stack.isOf(this)) {
+    public InteractionResult handleEntityUse(Player player, Level world, InteractionHand hand, Entity entity, EntityHitResult entityHitResult) {
+        var stack = player.getItemInHand(hand);
+        if (!stack.is(this)) {
 
-            stack = hand == Hand.MAIN_HAND ? player.getOffHandStack() : player.getMainHandStack();
-            if (stack.isOf(this)) {
-                return ActionResult.FAIL;
+            stack = hand == InteractionHand.MAIN_HAND ? player.getOffhandItem() : player.getMainHandItem();
+            if (stack.is(this)) {
+                return InteractionResult.FAIL;
             }
 
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         }
 
-        if (!stack.isEmpty() && player instanceof ServerPlayerEntity player1
+        if (!stack.isEmpty() && player instanceof ServerPlayer player1
                 && !stack.getOrDefault(FactoryDataComponents.READ_ONLY, false)) {
             if (entityHitResult == null) {
-                return ActionResult.FAIL;
+                return InteractionResult.FAIL;
             }
 
-            var res = WrenchHandler.of(player1).useEntityAction(player1, entity, entityHitResult.getPos(), false);
-            if (res instanceof ActionResult.Success success && success.swingSource() == ActionResult.SwingSource.SERVER) {
-                player.swingHand(hand, true);
+            var res = WrenchHandler.of(player1).useEntityAction(player1, entity, entityHitResult.getLocation(), false);
+            if (res instanceof InteractionResult.Success success && success.swingSource() == InteractionResult.SwingSource.SERVER) {
+                player.swing(hand, true);
             }
             return res;
         }
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public boolean isPolymerBlockInteraction(BlockState state, ServerPlayerEntity player, Hand hand, ItemStack stack, ServerWorld world, BlockHitResult blockHitResult, ActionResult actionResult) {
+    public boolean isPolymerBlockInteraction(BlockState state, ServerPlayer player, InteractionHand hand, ItemStack stack, ServerLevel world, BlockHitResult blockHitResult, InteractionResult actionResult) {
         return true;
     }
 
     @Override
-    public boolean isPolymerEntityInteraction(ServerPlayerEntity player, Hand hand, ItemStack stack, ServerWorld world, Entity entity, ActionResult actionResult) {
+    public boolean isPolymerEntityInteraction(ServerPlayer player, InteractionHand hand, ItemStack stack, ServerLevel world, Entity entity, InteractionResult actionResult) {
         return true;
     }
 }

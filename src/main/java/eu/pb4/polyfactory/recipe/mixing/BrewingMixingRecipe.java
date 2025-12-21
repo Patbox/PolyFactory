@@ -5,22 +5,15 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.fluid.FluidInstance;
-import eu.pb4.polyfactory.fluid.FluidStack;
-import eu.pb4.polyfactory.mixin.BrewingRecipeRegistryAccessor;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.input.MixingInput;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
-import net.minecraft.recipe.BrewingRecipeRegistry;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-
 import java.util.List;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 
 public record BrewingMixingRecipe(String group,
                                   Ingredient ingredient,
@@ -51,12 +44,12 @@ public record BrewingMixingRecipe(String group,
         return List.of();
     }
     @Override
-    public String getGroup() {
+    public String group() {
         return this.group;
     }
 
     @Override
-    public boolean matches(MixingInput inventory, World world) {
+    public boolean matches(MixingInput inventory, Level world) {
         if (inventory.getFluid(this.from) < this.minimumResult) {
             return false;
         }
@@ -71,16 +64,16 @@ public record BrewingMixingRecipe(String group,
         return false;
     }
 
-    public void applyRecipeUse(MixerBlockEntity inventory, World world) {
-        var amount = MathHelper.clamp(inventory.getFluidContainer().get(this.from), this.minimumResult, this.maxResult);
+    public void applyRecipeUse(MixerBlockEntity inventory, Level world) {
+        var amount = Mth.clamp(inventory.getFluidContainer().get(this.from), this.minimumResult, this.maxResult);
         inventory.getFluidContainer().extract(this.from, amount, false);
         inventory.getFluidContainer().insert(this.to, amount, false);
         for (var i = MixerBlockEntity.INPUT_FIRST; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            var stack = inventory.getStack(i);
+            var stack = inventory.getItem(i);
             if (this.ingredient.test(stack)) {
-                stack.decrement(1);
+                stack.shrink(1);
                 if (stack.isEmpty()) {
-                    inventory.setStack(i, ItemStack.EMPTY);
+                    inventory.setItem(i, ItemStack.EMPTY);
                 }
                 break;
             }
@@ -113,7 +106,7 @@ public record BrewingMixingRecipe(String group,
     }
 
     @Override
-    public ItemStack craft(MixingInput inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack assemble(MixingInput inventory, HolderLookup.Provider registryManager) {
         return ItemStack.EMPTY;
     }
 

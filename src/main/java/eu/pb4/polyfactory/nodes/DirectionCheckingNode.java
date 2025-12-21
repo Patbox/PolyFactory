@@ -4,7 +4,7 @@ import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.nodes.pipe.FlowNode;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
 import org.jetbrains.annotations.NotNull;
 
 public interface DirectionCheckingNode extends BlockNode, FlowNode {
@@ -19,7 +19,7 @@ public interface DirectionCheckingNode extends BlockNode, FlowNode {
     @Override
     default boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
         var d = other.other().getBlockPos().subtract(self.getBlockPos());
-        var dir = Direction.fromVector(d.getX(), d.getY(), d.getZ(), Direction.UP);
+        var dir = Direction.getNearest(d.getX(), d.getY(), d.getZ(), Direction.UP);
 
         return canConnectDir(dir);
     }

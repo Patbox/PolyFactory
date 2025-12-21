@@ -14,88 +14,88 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.enums.BlockHalf;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.decoration.Brightness;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.Items;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.util.Brightness;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
 
-public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityProvider, ConfigurableBlock, BarrierBasedWaterloggable {
-    public static Property<Direction.Axis> AXIS = Properties.HORIZONTAL_AXIS;
+public class NixieTubeBlock extends Block implements FactoryBlock, EntityBlock, ConfigurableBlock, BarrierBasedWaterloggable {
+    public static Property<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
     public static BooleanProperty POSITIVE_CONNECTED = FactoryProperties.POSITIVE_CONNECTED;
     public static BooleanProperty NEGATIVE_CONNECTED = FactoryProperties.NEGATIVE_CONNECTED;
-    public static EnumProperty<BlockHalf> HALF = Properties.BLOCK_HALF;
+    public static EnumProperty<Half> HALF = BlockStateProperties.HALF;
 
     public static final BlockConfig AXIS_ACTION = BlockConfig.of("axis", AXIS);
 
 
-    public NixieTubeBlock(Settings settings) {
+    public NixieTubeBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(AXIS, HALF, POSITIVE_CONNECTED, NEGATIVE_CONNECTED, WATERLOGGED);
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(AXIS_ACTION, BlockConfig.HALF);
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!player.canModifyBlocks()) {
-            return ActionResult.PASS;
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!player.mayBuild()) {
+            return InteractionResult.PASS;
         }
-        var stack = player.getStackInHand(Hand.MAIN_HAND);
+        var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
 
-        if (stack.isOf(Items.NAME_TAG)) {
-            var name = stack.contains(DataComponentTypes.CUSTOM_NAME) ? stack.getName().getString() : "";
+        if (stack.is(Items.NAME_TAG)) {
+            var name = stack.has(DataComponents.CUSTOM_NAME) ? stack.getHoverName().getString() : "";
 
             if (world.getBlockEntity(pos) instanceof NixieTubeBlockEntity be) {
                 be.pushText(name, ' ');
-                return ActionResult.SUCCESS_SERVER;
+                return InteractionResult.SUCCESS_SERVER;
             }
         }
 
@@ -106,60 +106,60 @@ public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityPr
                 if (be.setColor(color)) {
                     be.updateTextDisplay();
                     if (!player.isCreative()) {
-                        stack.decrement(1);
+                        stack.shrink(1);
                     }
-                    return ActionResult.SUCCESS_SERVER;
+                    return InteractionResult.SUCCESS_SERVER;
                 }
             }
         }
 
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterLog(ctx, this.getDefaultState().with(POSITIVE_CONNECTED, false).with(NEGATIVE_CONNECTED, false).with(AXIS, ctx.getHorizontalPlayerFacing().rotateYClockwise().getAxis()).with(HALF,
-                ((ctx.getSide().getAxis() == Direction.Axis.Y && ctx.getSide() == Direction.DOWN) || (ctx.getSide().getAxis() != Direction.Axis.Y && ctx.getHitPos().y - ctx.getBlockPos().getY() > 0.5)) ? BlockHalf.TOP : BlockHalf.BOTTOM));
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return waterLog(ctx, this.defaultBlockState().setValue(POSITIVE_CONNECTED, false).setValue(NEGATIVE_CONNECTED, false).setValue(AXIS, ctx.getHorizontalDirection().getClockWise().getAxis()).setValue(HALF,
+                ((ctx.getClickedFace().getAxis() == Direction.Axis.Y && ctx.getClickedFace() == Direction.DOWN) || (ctx.getClickedFace().getAxis() != Direction.Axis.Y && ctx.getClickLocation().y - ctx.getClickedPos().getY() > 0.5)) ? Half.TOP : Half.BOTTOM));
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         tickWater(state, world, tickView, pos);
-        if (state.get(AXIS) != direction.getAxis()) {
+        if (state.getValue(AXIS) != direction.getAxis()) {
             return state;
         }
 
-        return state.with(direction.getDirection() == Direction.AxisDirection.POSITIVE ? POSITIVE_CONNECTED : NEGATIVE_CONNECTED, neighborState.isOf(FactoryBlocks.NIXIE_TUBE) && neighborState.get(AXIS) == state.get(AXIS) && neighborState.get(HALF) == state.get(HALF));
+        return state.setValue(direction.getAxisDirection() == Direction.AxisDirection.POSITIVE ? POSITIVE_CONNECTED : NEGATIVE_CONNECTED, neighborState.is(FactoryBlocks.NIXIE_TUBE) && neighborState.getValue(AXIS) == state.getValue(AXIS) && neighborState.getValue(HALF) == state.getValue(HALF));
     }
 
     @Override
-    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        super.onBlockAdded(state, world, pos, oldState, notify);
-        if (oldState.isOf(this) && world.getBlockEntity(pos) instanceof NixieTubeBlockEntity be) {
+    protected void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+        super.onPlace(state, world, pos, oldState, notify);
+        if (oldState.is(this) && world.getBlockEntity(pos) instanceof NixieTubeBlockEntity be) {
             be.updatePositions(world, pos, state);
         }
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
-        return state.with(AXIS, rotation.rotate(Direction.get(Direction.AxisDirection.POSITIVE, state.get(AXIS))).getAxis());
+    public BlockState rotate(BlockState state, Rotation rotation) {
+        return state.setValue(AXIS, rotation.rotate(Direction.get(Direction.AxisDirection.POSITIVE, state.getValue(AXIS))).getAxis());
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(world, pos, initialBlockState);
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new NixieTubeBlockEntity(pos, state);
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.GLASS.getDefaultState();
+        return Blocks.GLASS.defaultBlockState();
     }
 
     public static final class Model extends BlockModel {
@@ -173,7 +173,7 @@ public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityPr
         private char negativeSecond = ' ';
         private int color;
 
-        private Model(ServerWorld world, BlockPos pos, BlockState state) {
+        private Model(ServerLevel world, BlockPos pos, BlockState state) {
             //this.world = world;
             //this.pos = pos;
             this.mainElement = new ItemDisplayElement(FactoryItems.NIXIE_TUBE);
@@ -243,8 +243,8 @@ public class NixieTubeBlock extends Block implements FactoryBlock, BlockEntityPr
             }
         }
 
-        private Text asText(String text) {
-            return Text.literal(text).setStyle(Style.EMPTY.withColor(this.color));
+        private Component asText(String text) {
+            return Component.literal(text).setStyle(Style.EMPTY.withColor(this.color));
         }
 
 
@@ -267,7 +267,7 @@ for (int i = 0; i < 4; i += 2) {
         }*/
 
         @Override
-        public boolean startWatching(ServerPlayNetworkHandler player) {
+        public boolean startWatching(ServerGamePacketListenerImpl player) {
             return super.startWatching(player);
         }
 
@@ -279,14 +279,14 @@ for (int i = 0; i < 4; i += 2) {
         }
 
         private void updateFacing(BlockState facing) {
-            var rot = Direction.get(Direction.AxisDirection.POSITIVE, facing.get(AXIS)).rotateYClockwise().getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
-            var up = facing.get(HALF) == BlockHalf.TOP;
+            var rot = Direction.get(Direction.AxisDirection.POSITIVE, facing.getValue(AXIS)).getClockWise().getRotation().mul(Direction.NORTH.getRotation());
+            var up = facing.getValue(HALF) == Half.TOP;
             mat.clear();
             mat.rotate(rot);
             mat.pushMatrix();
-            mat.rotateY(MathHelper.PI);
+            mat.rotateY(Mth.PI);
             if (up) {
-                mat.rotateZ(MathHelper.PI);
+                mat.rotateZ(Mth.PI);
             }
             mat.scale(2f);
             this.mainElement.setTransformation(mat);
@@ -297,14 +297,14 @@ for (int i = 0; i < 4; i += 2) {
             mat.pushMatrix();
             mat.translate(-3.5f / 16f, yPos, 0);
             mat.scale(1.7f);
-            mat.rotateY(MathHelper.PI);
+            mat.rotateY(Mth.PI);
             this.display[0].setTransformation(mat);
             mat.popMatrix();
 
             mat.pushMatrix();
             mat.translate(4.5f / 16f, yPos, 0);
             mat.scale(1.7f);
-            mat.rotateY(MathHelper.PI);
+            mat.rotateY(Mth.PI);
             this.display[2].setTransformation(mat);
             mat.popMatrix();
 

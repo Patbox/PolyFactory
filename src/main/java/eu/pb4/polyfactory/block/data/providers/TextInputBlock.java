@@ -8,66 +8,65 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
 import it.unimi.dsi.fastutil.objects.ReferenceSortedSets;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-
 import java.util.List;
 import java.util.Objects;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class TextInputBlock extends OrientableCabledDataProviderBlock {
-    public static final EnumProperty<BasicDataType> MODE = EnumProperty.of("mode", BasicDataType.class);
+    public static final EnumProperty<BasicDataType> MODE = EnumProperty.create("mode", BasicDataType.class);
 
-    public TextInputBlock(Settings settings) {
+    public TextInputBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(MODE, BasicDataType.STRING));
+        this.registerDefaultState(this.defaultBlockState().setValue(MODE, BasicDataType.STRING));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(MODE);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!player.isSneaking() && getFacing(state).getOpposite() != hit.getSide()
-                && player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof ChanneledDataBlockEntity be) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!player.isShiftKeyDown() && getFacing(state).getOpposite() != hit.getDirection()
+                && player instanceof ServerPlayer serverPlayer && world.getBlockEntity(pos) instanceof ChanneledDataBlockEntity be) {
             if (be.checkUnlocked(player)) {
                 new Gui(serverPlayer, be);
             }
-            return ActionResult.SUCCESS_SERVER;
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
     private static class Gui extends AnvilInputGui {
         private final ChanneledDataBlockEntity blockEntity;
 
-        public Gui(ServerPlayerEntity player, ChanneledDataBlockEntity blockEntity) {
+        public Gui(ServerPlayer player, ChanneledDataBlockEntity blockEntity) {
             super(player, false);
             this.blockEntity = blockEntity;
             this.setTitle(GuiTextures.TEXT_INPUT.apply(blockEntity.getDisplayName()));
             this.updateDone();
-            this.setSlot(2, GuiTextures.BUTTON_CLOSE.get().setName(ScreenTexts.BACK).setCallback(x -> {
-                FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
+            this.setSlot(2, GuiTextures.BUTTON_CLOSE.get().setName(CommonComponents.GUI_BACK).setCallback(x -> {
+                FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
                 this.close();
             }));
             this.open();
@@ -78,20 +77,20 @@ public class TextInputBlock extends OrientableCabledDataProviderBlock {
             super.onInput(input);
             this.updateDone();
             if (this.screenHandler != null) {
-                this.screenHandler.setReceivedStack(2, ItemStack.EMPTY);
+                this.screenHandler.setRemoteSlot(2, ItemStack.EMPTY);
             }
         }
 
         private void updateDone() {
-            var data = this.blockEntity.getCachedState().get(MODE).parse(this.getInput());
+            var data = this.blockEntity.getBlockState().getValue(MODE).parse(this.getInput());
             if (data != null) {
-                this.setSlot(1, GuiTextures.BUTTON_DONE.get().setName(ScreenTexts.DONE).setCallback(x -> {
-                    FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
-                    DataProvider.sendData(blockEntity.getWorld(), blockEntity.getPos(), data);
+                this.setSlot(1, GuiTextures.BUTTON_DONE.get().setName(CommonComponents.GUI_DONE).setCallback(x -> {
+                    FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
+                    DataProvider.sendData(blockEntity.getLevel(), blockEntity.getBlockPos(), data);
                     this.close();
                 }));
             } else {
-                this.setSlot(1, GuiTextures.BUTTON_DONE_BLOCKED.get().setName(Text.empty().append(ScreenTexts.DONE).formatted(Formatting.GRAY)));
+                this.setSlot(1, GuiTextures.BUTTON_DONE_BLOCKED.get().setName(Component.empty().append(CommonComponents.GUI_DONE).withStyle(ChatFormatting.GRAY)));
             }
         }
 
@@ -102,15 +101,15 @@ public class TextInputBlock extends OrientableCabledDataProviderBlock {
                 updateDone();
             }
             var itemStack = GuiTextures.EMPTY.getItemStack().copy();
-            itemStack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(input));
-            itemStack.set(DataComponentTypes.TOOLTIP_DISPLAY, new TooltipDisplayComponent(true, ReferenceSortedSets.emptySet()));
+            itemStack.set(DataComponents.CUSTOM_NAME, Component.literal(input));
+            itemStack.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, ReferenceSortedSets.emptySet()));
             this.setSlot(0, itemStack, Objects.requireNonNull(this.getSlot(0)).getGuiCallback());
         }
 
         @Override
         public void onTick() {
             if (this.blockEntity.isRemoved()
-                    || player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(this.blockEntity.getPos())) > (18 * 18)) {
+                    || player.position().distanceToSqr(Vec3.atCenterOf(this.blockEntity.getBlockPos())) > (18 * 18)) {
                 this.close();
                 return;
             }
@@ -119,7 +118,7 @@ public class TextInputBlock extends OrientableCabledDataProviderBlock {
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(
                 BlockConfig.CHANNEL,
                 this.facingAction,

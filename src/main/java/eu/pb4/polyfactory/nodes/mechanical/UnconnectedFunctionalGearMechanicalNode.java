@@ -7,11 +7,11 @@ import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
 import eu.pb4.polyfactory.nodes.generic.FunctionalNode;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.core.Direction;
 
 public record UnconnectedFunctionalGearMechanicalNode() implements DirectionCheckingNode, GearMechanicalNode, FunctionalNode {
     public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("unconnected_functional_gear"), UnconnectedFunctionalGearMechanicalNode::new);

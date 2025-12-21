@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.block.other;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface FilteredBlockEntity {
     ItemStack polyfactory$getFilter();

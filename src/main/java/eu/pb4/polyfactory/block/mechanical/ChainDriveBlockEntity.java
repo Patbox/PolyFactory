@@ -6,15 +6,6 @@ import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -22,6 +13,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class ChainDriveBlockEntity extends BlockEntity implements BlockEntityExtraListener {
     private final Map<BlockPos, Entry> connectedBlockPos = new HashMap<>();
@@ -46,13 +46,13 @@ public class ChainDriveBlockEntity extends BlockEntity implements BlockEntityExt
     }
 
     @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        super.onBlockReplaced(pos, oldState);
-        if (this.world != null) {
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        super.preRemoveSideEffects(pos, oldState);
+        if (this.level != null) {
             for (var connection : List.copyOf(this.connectedBlockPos.values())) {
-                if (this.world.getBlockEntity(connection.pos) instanceof ChainDriveBlockEntity be) {
+                if (this.level.getBlockEntity(connection.pos) instanceof ChainDriveBlockEntity be) {
                     be.removeConnection(pos);
-                    ItemScatterer.spawn(this.world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, connection.stack);
+                    Containers.dropItemStack(this.level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, connection.stack);
                 }
             }
             this.connectedBlockPos.clear();
@@ -62,8 +62,8 @@ public class ChainDriveBlockEntity extends BlockEntity implements BlockEntityExt
     public void removeConnection(BlockPos pos) {
         this.connectedBlockPos.remove(pos);
         this.routes.remove(pos);
-        NetworkComponent.Rotational.updateRotationalAt(this.world, this.getPos());
-        this.markDirty();
+        NetworkComponent.Rotational.updateRotationalAt(this.level, this.getBlockPos());
+        this.setChanged();
         if (this.model != null) {
             this.model.removeConnection(pos);
         }
@@ -74,14 +74,14 @@ public class ChainDriveBlockEntity extends BlockEntity implements BlockEntityExt
     }
 
     private boolean addConnection(Entry entry) {
-        if (this.connectedBlockPos.containsKey(entry.pos) || entry.pos.equals(this.getPos())) {
+        if (this.connectedBlockPos.containsKey(entry.pos) || entry.pos.equals(this.getBlockPos())) {
             return false;
         }
         this.connectedBlockPos.put(entry.pos, entry);
         var route = this.updateRoute(entry);
         this.connectedBlockPos.put(entry.pos, entry);
-        NetworkComponent.Rotational.updateRotationalAt(this.world, this.getPos());
-        this.markDirty();
+        NetworkComponent.Rotational.updateRotationalAt(this.level, this.getBlockPos());
+        this.setChanged();
         if (this.model != null) {
             this.model.addConnection(entry.pos, route);
         }
@@ -89,19 +89,19 @@ public class ChainDriveBlockEntity extends BlockEntity implements BlockEntityExt
     }
 
     private ChainDriveBlock.Route updateRoute(Entry entry) {
-        var route = ChainDriveBlock.Route.create(this.getCachedState().get(ChainDriveBlock.AXIS), this.getPos(), entry.axis, entry.pos);
+        var route = ChainDriveBlock.Route.create(this.getBlockState().getValue(ChainDriveBlock.AXIS), this.getBlockPos(), entry.axis, entry.pos);
         this.routes.put(entry.pos, route);
         return route;
     }
 
     public void updateAxis(BlockPos pos, Direction.Axis axis) {
-        if (pos.equals(this.getPos()) && this.model != null) {
+        if (pos.equals(this.getBlockPos()) && this.model != null) {
             for (var val : List.copyOf(this.connectedBlockPos.values())) {
                 if (ChainDriveBlock.getChainCost(pos, val.pos, axis, val.axis) < 0) {
                     this.removeConnection(val.pos);
-                    if (this.world.getBlockEntity(val.pos) instanceof ChainDriveBlockEntity be) {
+                    if (this.level.getBlockEntity(val.pos) instanceof ChainDriveBlockEntity be) {
                         be.removeConnection(pos);
-                        ItemScatterer.spawn(this.world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, val.stack);
+                        Containers.dropItemStack(this.level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, val.stack);
                     }
                 }
             }
@@ -116,7 +116,7 @@ public class ChainDriveBlockEntity extends BlockEntity implements BlockEntityExt
             return;
         }
         entry = new Entry(pos, axis, entry.stack);
-        this.connectedBlockPos.put(pos.toImmutable(), entry);
+        this.connectedBlockPos.put(pos.immutable(), entry);
         var route = this.updateRoute(entry);
         if (this.model != null) {
             this.model.removeConnection(pos);
@@ -125,28 +125,28 @@ public class ChainDriveBlockEntity extends BlockEntity implements BlockEntityExt
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
-        view.put("connection", Entry.COLLECTION_CODEC, this.connectedBlockPos.values());
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
+        view.store("connection", Entry.COLLECTION_CODEC, this.connectedBlockPos.values());
     }
 
     @Override
-    protected void readData(ReadView view) {
-        super.readData(view);
+    protected void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
         this.connectedBlockPos.clear();
         this.routes.clear();
         view.read("connection", Entry.COLLECTION_CODEC).ifPresent(x -> x.forEach(this::addConnection));
     }
 
     @Override
-    public void removeFromCopiedStackData(WriteView view) {
-        super.removeFromCopiedStackData(view);
-        view.remove("connection");
+    public void removeComponentsFromTag(ValueOutput view) {
+        super.removeComponentsFromTag(view);
+        view.discard("connection");
     }
 
     @Override
-    public void onListenerUpdate(WorldChunk worldChunk) {
-        this.model = (ChainDriveBlock.Model) BlockAwareAttachment.get(worldChunk, pos).holder();
+    public void onListenerUpdate(LevelChunk worldChunk) {
+        this.model = (ChainDriveBlock.Model) BlockAwareAttachment.get(worldChunk, worldPosition).holder();
         this.model.setConnections(this.routes);
     }
 

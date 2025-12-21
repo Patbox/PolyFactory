@@ -16,31 +16,42 @@ import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.InteractionElement;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.*;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.entity.vehicle.*;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Pair;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.*;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Leashable;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.vehicle.VehicleEntity;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
@@ -56,7 +67,7 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
     private static final ItemStack MODEL = ItemDisplayElementUtil.getModel(id("entity/chain_lift"));
     private static final EntityConfig<Boolean, ChainLiftEntity> PLAYER_CONTROL_CONFIG = EntityConfig.of("player_control", Codec.BOOL,
             EntityConfigValue.of(x -> x.playerControllable, (x, y) -> x.playerControllable = y),
-            EntityValueFormatter.text(ScreenTexts::onOrOff),
+            EntityValueFormatter.text(CommonComponents::optionStatus),
             WrenchModifyEntityValue.iterate(List.of(false, true))
     );
 
@@ -72,7 +83,7 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
     private BlockPos targetPos;
 
     @Nullable
-    private Vec3d attachedPos;
+    private Vec3 attachedPos;
 
     private float progress = 0;
     private float centerAngle = 0;
@@ -84,160 +95,160 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
     private boolean canCatchEntities = true;
     private boolean playerControllable = true;
 
-    private static final TrackedData<Quaternionfc> ROTATION = DataTracker.registerData(ChainLiftEntity.class, TrackedDataHandlerRegistry.QUATERNION_F);
+    private static final EntityDataAccessor<Quaternionfc> ROTATION = SynchedEntityData.defineId(ChainLiftEntity.class, EntityDataSerializers.QUATERNION);
 
-    public ChainLiftEntity(EntityType<?> entityType, World world) {
+    public ChainLiftEntity(EntityType<?> entityType, Level world) {
         super(entityType, world);
         EntityAttachment.ofTicking(new Model(), this);
     }
 
     @Override
-    protected void initDataTracker(DataTracker.Builder builder) {
-        super.initDataTracker(builder);
-        builder.add(ROTATION, new Quaternionf());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(ROTATION, new Quaternionf());
     }
 
-    public static ActionResult attach(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public static InteractionResult attach(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         var ent = new ChainLiftEntity(FactoryEntities.CHAIN_LIFT, world);
-        ent.copyComponentsFrom(stack);
+        ent.applyComponentsFromItemStack(stack);
 
-        var vec = hit.getPos().subtract(Vec3d.ofCenter(pos)).normalize().negate();
+        var vec = hit.getLocation().subtract(Vec3.atCenterOf(pos)).normalize().reverse();
 
-        var angle = calculateAngle(vec, state.get(ChainDriveBlock.AXIS));
-        var facingRotFrom = (switch (state.get(ChainDriveBlock.AXIS)) {
-            case Y -> Direction.UP.getRotationQuaternion();
-            case X -> Direction.EAST.getRotationQuaternion();
-            case Z -> Direction.SOUTH.getRotationQuaternion();
+        var angle = calculateAngle(vec, state.getValue(ChainDriveBlock.AXIS));
+        var facingRotFrom = (switch (state.getValue(ChainDriveBlock.AXIS)) {
+            case Y -> Direction.UP.getRotation();
+            case X -> Direction.EAST.getRotation();
+            case Z -> Direction.SOUTH.getRotation();
         }).rotateY(angle);
 
-        ent.attachedPos = Vec3d.ofCenter(pos).add(new Vec3d(new Vector3f(0, 0, ChainDriveBlock.RADIUS).rotate(facingRotFrom)));
-        var entPos = Vec3d.ofCenter(pos).add(new Vec3d(new Vector3f(0, 0, ChainDriveBlock.RADIUS + 0.1f).rotate(facingRotFrom)))
+        ent.attachedPos = Vec3.atCenterOf(pos).add(new Vec3(new Vector3f(0, 0, ChainDriveBlock.RADIUS).rotate(facingRotFrom)));
+        var entPos = Vec3.atCenterOf(pos).add(new Vec3(new Vector3f(0, 0, ChainDriveBlock.RADIUS + 0.1f).rotate(facingRotFrom)))
                 .subtract(0, ent.getType().getHeight(), 0);
-        ent.setPosition(entPos);
+        ent.setPos(entPos);
         ent.sourcePos = pos;
         ent.centerAngle = angle;
-        ent.setYaw(-angle * MathHelper.DEGREES_PER_RADIAN - 90);
-        var box = new Box(entPos.x - 0.4, entPos.y, entPos.z - 0.4, entPos.x + 0.4, entPos.y + 1.5f, entPos.z + 0.4);
+        ent.setYRot(-angle * Mth.RAD_TO_DEG - 90);
+        var box = new AABB(entPos.x - 0.4, entPos.y, entPos.z - 0.4, entPos.x + 0.4, entPos.y + 1.5f, entPos.z + 0.4);
 
-        if (!world.isSpaceEmpty(ent, box )) {
-            return ActionResult.FAIL;
+        if (!world.noCollision(ent, box )) {
+            return InteractionResult.FAIL;
         }
 
-        world.spawnEntity(ent);
-        stack.decrementUnlessCreative(1, player);
-        return ActionResult.SUCCESS_SERVER;
+        world.addFreshEntity(ent);
+        stack.consume(1, player);
+        return InteractionResult.SUCCESS_SERVER;
     }
 
     @Override
-    public ActionResult interact(PlayerEntity player, Hand hand) {
-        if (this.hasPassengers() && !this.hasPlayerRider()) {
-            this.removeAllPassengers();
+    public InteractionResult interact(Player player, InteractionHand hand) {
+        if (this.isVehicle() && !this.hasExactlyOnePlayerPassenger()) {
+            this.ejectPassengers();
             this.shakeAnimationTimer = 10;
-            return ActionResult.SUCCESS_SERVER;
+            return InteractionResult.SUCCESS_SERVER;
         } else {
             player.startRiding(this);
-            return ActionResult.SUCCESS_SERVER;
+            return InteractionResult.SUCCESS_SERVER;
         }
     }
 
     @Override
-    public Vec3d updatePassengerForDismount(LivingEntity passenger) {
-        return this.getEntityPos();
+    public Vec3 getDismountLocationForPassenger(LivingEntity passenger) {
+        return this.position();
     }
 
     @Override
     public void tick() {
-        if (!(this.getEntityWorld() instanceof ServerWorld world)) {
+        if (!(this.level() instanceof ServerLevel world)) {
             return;
         }
 
-        var chainDrive = this.sourcePos != null && this.getEntityWorld().getBlockEntity(this.sourcePos) instanceof ChainDriveBlockEntity be ? be : null;
+        var chainDrive = this.sourcePos != null && this.level().getBlockEntity(this.sourcePos) instanceof ChainDriveBlockEntity be ? be : null;
         var route = this.targetPos != null && chainDrive != null ? chainDrive.getRoute(this.targetPos) : null;
         //noinspection deprecation
-        this.reinitDimensions();
-        if (chainDrive == null || route == null && this.attachedPos != null && Vec3d.ofCenter(this.sourcePos).squaredDistanceTo(this.attachedPos) > (ChainDriveBlock.RADIUS * 2)) {
+        this.fixupDimensions();
+        if (chainDrive == null || route == null && this.attachedPos != null && Vec3.atCenterOf(this.sourcePos).distanceToSqr(this.attachedPos) > (ChainDriveBlock.RADIUS * 2)) {
             this.targetPos = this.sourcePos = null;
             this.attachedPos = null;
-            this.setVelocity(this.getVelocity().multiply(0.98).add(0, -0.06, 0));
-            this.move(MovementType.SELF, this.getVelocity());
+            this.setDeltaMovement(this.getDeltaMovement().scale(0.98).add(0, -0.06, 0));
+            this.move(MoverType.SELF, this.getDeltaMovement());
             super.tick();
-            if (this.isOnGround()) {
-                this.killAndDropSelf(world, world.getDamageSources().fall());
+            if (this.onGround()) {
+                this.destroy(world, world.damageSources().fall());
             }
             return;
         }
         if (this.attachedPos == null) {
-            this.attachedPos = this.getEntityPos().add(0, this.getType().getHeight(), 0);
+            this.attachedPos = this.position().add(0, this.getType().getHeight(), 0);
         }
 
         var passanger = this.getFirstPassenger();
 
-        if (world.isReceivingRedstonePower(this.getBlockPos()) || world.isReceivingRedstonePower(this.getBlockPos().up())) {
-            if (this.hasPassengers()) {
-                this.removeAllPassengers();
+        if (world.hasNeighborSignal(this.blockPosition()) || world.hasNeighborSignal(this.blockPosition().above())) {
+            if (this.isVehicle()) {
+                this.ejectPassengers();
             }
             this.shakeAnimationTimer = 10;
 
             passanger = null;
         } else if (passanger == null && this.canCatchEntities) {
-            var pos = this.getEntityPos();
-            var box = new Box(pos.x - 0.4, pos.y, pos.z - 0.4, pos.x + 0.4, pos.y + 1, pos.z + 0.4);
-            var ents = world.getOtherEntities(this, box, this::canPickupEntity);
+            var pos = this.position();
+            var box = new AABB(pos.x - 0.4, pos.y, pos.z - 0.4, pos.x + 0.4, pos.y + 1, pos.z + 0.4);
+            var ents = world.getEntities(this, box, this::canPickupEntity);
             for (var ent : ents) {
                 passanger = ent;
-                if (passanger.startRiding(this, passanger instanceof AbstractMinecartEntity, true)) {
+                if (passanger.startRiding(this, passanger instanceof AbstractMinecart, true)) {
                     break;
                 }
                 passanger = null;
             }
         }
 
-        Vec3d pos = this.getEntityPos(), attachedPos = this.attachedPos;
-        var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_4 - MathHelper.RADIANS_PER_DEGREE * 10) / ChainDriveBlock.RADIUS;
+        Vec3 pos = this.position(), attachedPos = this.attachedPos;
+        var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_4 - Mth.DEG_TO_RAD * 10) / ChainDriveBlock.RADIUS;
 
         var moveSpeed = Math.clamp(RotationUser.getRotation(world, this.sourcePos).speedRadians(), -rotMax, rotMax);
         var reverse = moveSpeed < 0;
-        var yaw = this.getYaw();
+        var yaw = this.getYRot();
 
-        var centeredChainDrive = Vec3d.ofCenter(chainDrive.getPos());
+        var centeredChainDrive = Vec3.atCenterOf(chainDrive.getBlockPos());
         var canMove = this.ticksSinceBounceEffect == -1 || this.ticksSinceBounceEffect > 4;
         var bounced = !canMove;
 
         if (route == null && canMove) {
-            var axis = chainDrive.getCachedState().get(ChainDriveBlock.AXIS);
+            var axis = chainDrive.getBlockState().getValue(ChainDriveBlock.AXIS);
             var facingRotFrom = (switch (axis) {
-                case Y -> Direction.UP.getRotationQuaternion();
-                case X -> Direction.EAST.getRotationQuaternion();
-                case Z -> Direction.SOUTH.getRotationQuaternion();
+                case Y -> Direction.UP.getRotation();
+                case X -> Direction.EAST.getRotation();
+                case Z -> Direction.SOUTH.getRotation();
             }).rotateY(this.centerAngle);
 
-            var offset = new Vec3d(new Vector3f(0, 0, ChainDriveBlock.RADIUS).rotate(facingRotFrom));
-            pos = centeredChainDrive.subtract(0, this.getType().getHeight(), 0).add(new Vec3d(new Vector3f(0, 0, ChainDriveBlock.RADIUS + 0.1f).rotate(facingRotFrom)));
+            var offset = new Vec3(new Vector3f(0, 0, ChainDriveBlock.RADIUS).rotate(facingRotFrom));
+            pos = centeredChainDrive.subtract(0, this.getType().getHeight(), 0).add(new Vec3(new Vector3f(0, 0, ChainDriveBlock.RADIUS + 0.1f).rotate(facingRotFrom)));
             attachedPos = centeredChainDrive.add(offset);
 
-            var moved = this.checkMove(world, this.getEntityPos(), pos);
-            pos = this.getEntityPos().lerp(pos, moved);
+            var moved = this.checkMove(world, this.position(), pos);
+            pos = this.position().lerp(pos, moved);
             attachedPos = this.attachedPos.lerp(attachedPos, moved);
 
             bounced = moved != 1f;
 
             var newTarget = this.findNewTarget(chainDrive, offset, reverse, moveSpeed * moved);
             var angle = 0d;
-            yaw = -this.centerAngle * MathHelper.DEGREES_PER_RADIAN - 90;
+            yaw = -this.centerAngle * Mth.RAD_TO_DEG - 90;
             this.timeInCenter++;
 
             if (newTarget != null) {
                 if (reverse) {
                     this.targetPos = this.sourcePos;
-                    this.sourcePos = newTarget.getLeft();
-                    this.progress = (float) (newTarget.getRight().distance() - (float) ((moveSpeed - angle) * ChainDriveBlock.RADIUS * moved));
+                    this.sourcePos = newTarget.getA();
+                    this.progress = (float) (newTarget.getB().distance() - (float) ((moveSpeed - angle) * ChainDriveBlock.RADIUS * moved));
                 } else {
-                    this.targetPos = newTarget.getLeft();
+                    this.targetPos = newTarget.getA();
                     this.progress = (float) ((moveSpeed - angle) * ChainDriveBlock.RADIUS * moved);
                 }
                 this.centerAngle = 0;
             } else {
-                this.centerAngle = (this.centerAngle + moveSpeed * moved) % MathHelper.TAU;
+                this.centerAngle = (this.centerAngle + moveSpeed * moved) % Mth.TWO_PI;
             }
         } else if (route == null) {
             this.timeInCenter++;
@@ -245,18 +256,18 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
             this.timeInCenter = 0;
             attachedPos = centeredChainDrive.add(route.startPos().lerp(route.startOffset(), this.progress / route.distance()));
             pos = attachedPos.subtract(0, this.getType().getHeight(), 0);
-            var moved = this.checkMove(world, this.getEntityPos(), pos);
-            pos = this.getEntityPos().lerp(pos, moved);
+            var moved = this.checkMove(world, this.position(), pos);
+            pos = this.position().lerp(pos, moved);
             attachedPos = this.attachedPos.lerp(attachedPos, moved);
 
             bounced = moved != 1f;
             var offset = route.startOffset().subtract(route.startPos()).normalize();
-            yaw = (float) (MathHelper.atan2(offset.z, offset.x) * MathHelper.DEGREES_PER_RADIAN) - 90;
+            yaw = (float) (Mth.atan2(offset.z, offset.x) * Mth.RAD_TO_DEG) - 90;
 
             var mappedProgress = reverse ? route.distance() - this.progress : progress;
 
             if (mappedProgress + Math.abs(moveSpeed * moved) * ChainDriveBlock.RADIUS >= route.distance() - ChainDriveBlock.RADIUS) {
-                var chainDrive2 = reverse ? chainDrive : this.getEntityWorld().getBlockEntity(this.targetPos) instanceof ChainDriveBlockEntity be ? be : null;
+                var chainDrive2 = reverse ? chainDrive : this.level().getBlockEntity(this.targetPos) instanceof ChainDriveBlockEntity be ? be : null;
                 if (chainDrive2 == null) {
                     this.sourcePos = null;
                     this.targetPos = null;
@@ -264,12 +275,12 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
                 }
 
                 var angle = 0f;
-                var vec = Vec3d.ofCenter(reverse ? this.sourcePos : this.targetPos).subtract(attachedPos);
+                var vec = Vec3.atCenterOf(reverse ? this.sourcePos : this.targetPos).subtract(attachedPos);
 
 
-                angle = calculateAngle(vec, chainDrive2.getCachedState().get(ChainDriveBlock.AXIS));
+                angle = calculateAngle(vec, chainDrive2.getBlockState().getValue(ChainDriveBlock.AXIS));
 
-                var newTarget = this.findNewTarget(chainDrive2, vec, reverse, (float) ((mappedProgress + Math.abs(moveSpeed * moved) - route.distance() + ChainDriveBlock.RADIUS) * MathHelper.sign(moveSpeed)));
+                var newTarget = this.findNewTarget(chainDrive2, vec, reverse, (float) ((mappedProgress + Math.abs(moveSpeed * moved) - route.distance() + ChainDriveBlock.RADIUS) * Mth.sign(moveSpeed)));
 
                 if (!reverse) {
                     this.sourcePos = this.targetPos;
@@ -277,26 +288,26 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
 
                 this.progress = 0;
                 this.centerAngle = angle;
-                this.targetPos = newTarget != null ? newTarget.getLeft() : null;
+                this.targetPos = newTarget != null ? newTarget.getA() : null;
             } else {
                 this.progress += moveSpeed * ChainDriveBlock.RADIUS * moved;
             }
         }
 
-        this.setYaw(MathHelper.lerpAngleDegrees(0.3f, this.getYaw(), yaw));
+        this.setYRot(Mth.rotLerp(0.3f, this.getYRot(), yaw));
         if (passanger != null) {
-            if (passanger instanceof AbstractMinecartEntity) {
-                passanger.setYaw(this.getYaw() - 90);
-            } else if (!(passanger instanceof LivingEntity) || passanger instanceof ArmorStandEntity) {
-                passanger.setYaw(this.getYaw());
+            if (passanger instanceof AbstractMinecart) {
+                passanger.setYRot(this.getYRot() - 90);
+            } else if (!(passanger instanceof LivingEntity) || passanger instanceof ArmorStand) {
+                passanger.setYRot(this.getYRot());
             }
         }
 
 
         if (bounced) {
             if (this.ticksSinceBounceEffect++ % 15 == 0) {
-                this.playSound(SoundEvents.BLOCK_CHAIN_BREAK, 0.5f, 0.8f);
-                world.spawnParticles(ParticleTypes.SMOKE, pos.x, pos.y + 0.3, pos.z, 5, 0.3, 0.3, 0.3 ,0);
+                this.playSound(SoundEvents.CHAIN_BREAK, 0.5f, 0.8f);
+                world.sendParticles(ParticleTypes.SMOKE, pos.x, pos.y + 0.3, pos.z, 5, 0.3, 0.3, 0.3 ,0);
             } else if (this.ticksSinceBounceEffect % 5 == 0) {
                 this.bounceAnimationTimes = 8;
             }
@@ -307,46 +318,46 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
         var rotation = new Quaternionf();
 
         if (this.shakeAnimationTimer > 0) {
-            rotation.rotateY((float) (Math.sin((this.age % 360) * MathHelper.RADIANS_PER_DEGREE * 50) * (this.shakeAnimationTimer / 32f)));
+            rotation.rotateY((float) (Math.sin((this.tickCount % 360) * Mth.DEG_TO_RAD * 50) * (this.shakeAnimationTimer / 32f)));
             this.shakeAnimationTimer--;
         }
         if (this.bounceAnimationTimes > 0) {
-            rotation.rotateX(-this.bounceAnimationTimes * 1.5f * MathHelper.RADIANS_PER_DEGREE);
+            rotation.rotateX(-this.bounceAnimationTimes * 1.5f * Mth.DEG_TO_RAD);
             this.bounceAnimationTimes--;
         }
-        this.dataTracker.set(ROTATION, rotation);
+        this.entityData.set(ROTATION, rotation);
 
         if (!Objects.equals(this.attachedPos, attachedPos)) {
             this.attachedPos = attachedPos;
         }
 
-        if (!this.getEntityPos().equals(pos)) {
-            this.setVelocity(pos.subtract(this.getEntityPos()));
-            this.setPosition(pos);
-            if (passanger instanceof ServerPlayerEntity serverPlayer) {
+        if (!this.position().equals(pos)) {
+            this.setDeltaMovement(pos.subtract(this.position()));
+            this.setPos(pos);
+            if (passanger instanceof ServerPlayer serverPlayer) {
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.CHAIN_LIFT);
             }
         } else {
-            this.refreshPosition();
+            this.reapplyPosition();
         }
 
         super.tick();
     }
 
-    private float checkMove(ServerWorld world, Vec3d currentPos, Vec3d newPos) {
+    private float checkMove(ServerLevel world, Vec3 currentPos, Vec3 newPos) {
         var move = 1f;
         while (true) {
-            var box = new Box(newPos.x - 0.2, newPos.y + 0.1, newPos.z - 0.2, newPos.x + 0.2, newPos.y + 1.4f, newPos.z + 0.2);
-            var entbox = new Box(newPos.x - 0.35, newPos.y, newPos.z - 0.35, newPos.x + 0.35, newPos.y + 1.4f, newPos.z + 0.35);
+            var box = new AABB(newPos.x - 0.2, newPos.y + 0.1, newPos.z - 0.2, newPos.x + 0.2, newPos.y + 1.4f, newPos.z + 0.2);
+            var entbox = new AABB(newPos.x - 0.35, newPos.y, newPos.z - 0.35, newPos.x + 0.35, newPos.y + 1.4f, newPos.z + 0.35);
 
             var finalNewPos = newPos;
-            if (world.isSpaceEmpty(this, box) && world.getOtherEntities(this, entbox,
+            if (world.noCollision(this, box) && world.getEntities(this, entbox,
                     x -> {
                         if (!(x instanceof ChainLiftEntity chainLift)) {
                             return false;
                         }
 
-                        if (chainLift.getEntityPos().equals(finalNewPos)) {
+                        if (chainLift.position().equals(finalNewPos)) {
                             return this.getId() < chainLift.getId();
                         } else if (this.targetPos != null && this.targetPos.equals(chainLift.targetPos)) {
                             return this.progress < chainLift.progress;
@@ -357,7 +368,7 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
                 return move;
             }
 
-            if (newPos.squaredDistanceTo(currentPos) < 0.005) {
+            if (newPos.distanceToSqr(currentPos) < 0.005) {
                 return 0;
             }
             newPos = currentPos.lerp(newPos, 0.95);
@@ -366,14 +377,14 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
     }
 
     @Override
-    public EntityDimensions getDimensions(EntityPose pose) {
+    public EntityDimensions getDimensions(Pose pose) {
         var dim = super.getDimensions(pose);
         float width, height;
-        if (this.hasPassengers()) {
+        if (this.isVehicle()) {
             var passanger = this.getFirstPassenger();
 
-            width = Math.max(passanger.getWidth() + 0.1f, dim.width() + 0.1f);
-            height = Math.clamp(passanger.getHeight() - 0.1f, 0.2f, 0.5f);
+            width = Math.max(passanger.getBbWidth() + 0.1f, dim.width() + 0.1f);
+            height = Math.clamp(passanger.getBbHeight() - 0.1f, 0.2f, 0.5f);
         } else {
             width = dim.width() + 0.1f;
             height = 0.5f;
@@ -383,25 +394,25 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
     }
 
     @Override
-    public boolean shouldAlwaysSyncAbsolute() {
+    public boolean getRequiresPrecisePosition() {
         return true;
     }
 
     @Override
-    public boolean canHit() {
+    public boolean isPickable() {
         return true;
     }
 
     private boolean canPickupEntity(Entity entity) {
-        return !(entity instanceof PlayerEntity)
+        return !(entity instanceof Player)
                 && !(entity instanceof ChainLiftEntity)
-                && entity.getHeight() < 2
-                && !(entity instanceof ProjectileEntity)
+                && entity.getBbHeight() < 2
+                && !(entity instanceof Projectile)
                 && !(entity instanceof Leashable leashable && leashable.isLeashed())
-                && !entity.hasVehicle()
+                && !entity.isPassenger()
                 ;
     }
-    private static float calculateAngle(Vec3d vec, Direction.Axis axis) {
+    private static float calculateAngle(Vec3 vec, Direction.Axis axis) {
         return (float) switch (axis) {
             case Y -> Math.atan2(-vec.x, -vec.z);
             case X -> Math.atan2(vec.z, vec.y);
@@ -409,30 +420,30 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
         };
     }
 
-    private Pair<BlockPos, ChainDriveBlock.Route> findNewTarget(ChainDriveBlockEntity chainDrive, Vec3d offset, boolean reverse, float moveSpeed) {
+    private Tuple<BlockPos, ChainDriveBlock.Route> findNewTarget(ChainDriveBlockEntity chainDrive, Vec3 offset, boolean reverse, float moveSpeed) {
         List<BlockPos> conns;
 
-        if (this.getFirstPassenger() instanceof ServerPlayerEntity player && this.playerControllable) {
+        if (this.getFirstPassenger() instanceof ServerPlayer player && this.playerControllable) {
             conns = new ArrayList<>();
-            var camera = player.getRotationVector();
-            var tmp = new ArrayList<Pair<BlockPos, Double>>();
+            var camera = player.getLookAngle();
+            var tmp = new ArrayList<Tuple<BlockPos, Double>>();
             for (var conn : chainDrive.connections()) {
-                var vec = Vec3d.ofCenter(conn).subtract(player.getEyePos()).normalize();
-                tmp.add(new Pair<>(conn, vec.subtract(camera).lengthSquared()));
+                var vec = Vec3.atCenterOf(conn).subtract(player.getEyePosition()).normalize();
+                tmp.add(new Tuple<>(conn, vec.subtract(camera).lengthSqr()));
             }
-            tmp.sort(Comparator.comparingDouble(Pair::getRight));
-            if (!tmp.isEmpty() && tmp.getFirst().getRight() <= 0.25) {
-                conns.add(tmp.getFirst().getLeft());
+            tmp.sort(Comparator.comparingDouble(Tuple::getB));
+            if (!tmp.isEmpty() && tmp.getFirst().getB() <= 0.25) {
+                conns.add(tmp.getFirst().getA());
             } else {
                 for (var t : tmp) {
-                    conns.add(t.getLeft());
+                    conns.add(t.getA());
                 }
             }
         } else {
             conns = new ArrayList<>(chainDrive.connections());
             conns.sort(Comparator.comparingDouble(conn -> {
                 var route = chainDrive.getRoute(conn);
-                var shift = new Vec3d(new Vector3f(ChainDriveBlock.RADIUS - 0.3f, 0, 0).rotate(route.facingRotTo()));
+                var shift = new Vec3(new Vector3f(ChainDriveBlock.RADIUS - 0.3f, 0, 0).rotate(route.facingRotTo()));
 
                 if (reverse) {
                     return Math.abs(route.endPos().add(shift).distanceTo(offset));
@@ -450,14 +461,14 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
             }
 
             var route = chainDrive.getRoute(conn);
-            var shift = new Vec3d(new Vector3f(ChainDriveBlock.RADIUS - 0.3f, 0, 0).rotate(route.facingRotTo()));
+            var shift = new Vec3(new Vector3f(ChainDriveBlock.RADIUS - 0.3f, 0, 0).rotate(route.facingRotTo()));
             //tmp = route.startPos().add(shift).add(Vec3d.ofCenter(this.sourcePos));
             //((ServerWorld) this.getEntityWorld()).spawnParticles(ParticleTypes.BUBBLE, tmp.x, tmp.y + 1, tmp.z, 0, 0, 0, 0, 0);
             if (!reverse && route.startPos().add(shift).distanceTo(offset) <= Math.max(moveSpeed, 0.3f)) {
-                return new Pair<>(conn, route);
+                return new Tuple<>(conn, route);
             }
             if (reverse && route.endPos().add(shift).distanceTo(offset) <= Math.max(-moveSpeed, 0.3f)) {
-                return new Pair<>(conn, route);
+                return new Tuple<>(conn, route);
             }
         }
 
@@ -465,41 +476,41 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
     }
 
     @Override
-    public void setDamageWobbleTicks(int damageWobbleTicks) {
-        super.setDamageWobbleTicks(damageWobbleTicks);
+    public void setHurtTime(int damageWobbleTicks) {
+        super.setHurtTime(damageWobbleTicks);
         this.shakeAnimationTimer = damageWobbleTicks;
     }
 
     @Override
-    protected Item asItem() {
+    protected Item getDropItem() {
         return FactoryItems.CHAIN_LIFT;
     }
 
     @Nullable
     @Override
-    public ItemStack getPickBlockStack() {
-        return asItem().getDefaultStack();
+    public ItemStack getPickResult() {
+        return getDropItem().getDefaultInstance();
     }
 
     @Override
-    protected void readCustomData(ReadView view) {
+    protected void readAdditionalSaveData(ValueInput view) {
         this.sourcePos = view.read("source_pos", BlockPos.CODEC).orElse(null);
         this.targetPos = view.read("target_pos", BlockPos.CODEC).orElse(null);
-        this.centerAngle = view.getFloat("center_angle", 0f);
-        this.progress = view.getFloat("progress", 0f);
-        this.attachedPos = view.read("attached_pos", Vec3d.CODEC).orElse(null);
-        this.timeInCenter = view.getInt("time_in_center", 0);
-        this.canCatchEntities = view.getBoolean("can_catch_entities", true);
-        this.playerControllable = view.getBoolean("player_control", true);
+        this.centerAngle = view.getFloatOr("center_angle", 0f);
+        this.progress = view.getFloatOr("progress", 0f);
+        this.attachedPos = view.read("attached_pos", Vec3.CODEC).orElse(null);
+        this.timeInCenter = view.getIntOr("time_in_center", 0);
+        this.canCatchEntities = view.getBooleanOr("can_catch_entities", true);
+        this.playerControllable = view.getBooleanOr("player_control", true);
     }
 
     @Override
-    protected void writeCustomData(WriteView view) {
-        view.putNullable("source_pos", BlockPos.CODEC, this.sourcePos);
-        view.putNullable("attached_pos", Vec3d.CODEC, this.attachedPos);
+    protected void addAdditionalSaveData(ValueOutput view) {
+        view.storeNullable("source_pos", BlockPos.CODEC, this.sourcePos);
+        view.storeNullable("attached_pos", Vec3.CODEC, this.attachedPos);
 
         if (this.targetPos != null) {
-            view.put("target_pos", BlockPos.CODEC, this.targetPos);
+            view.store("target_pos", BlockPos.CODEC, this.targetPos);
             view.putFloat("progress", this.progress);
         } else if (this.sourcePos != null) {
             view.putFloat("center_angle", this.centerAngle);
@@ -511,22 +522,22 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
     }
 
     @Override
-    public void modifyRawTrackedData(List<DataTracker.SerializedEntry<?>> data, ServerPlayerEntity player, boolean initial) {
+    public void modifyRawTrackedData(List<SynchedEntityData.DataValue<?>> data, ServerPlayer player, boolean initial) {
         var interpolate = false;
         for (int i = 0; i < data.size(); i++) {
             var entry = data.get(i);
             if (entry.id() == ROTATION.id()) {
-                data.set(i, DataTracker.SerializedEntry.of(DisplayTrackedData.LEFT_ROTATION, (Quaternionf) entry.value()));
+                data.set(i, SynchedEntityData.DataValue.create(DisplayTrackedData.LEFT_ROTATION, (Quaternionf) entry.value()));
                 interpolate = true;
             }
         }
         if (initial) {
-            data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.TELEPORTATION_DURATION, 3));
-            data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.INTERPOLATION_DURATION, 2));
-            data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.TRANSLATION, new Vector3f(0, 13 / 16f, 0)));
-            data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.Item.ITEM, MODEL));
+            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.TELEPORTATION_DURATION, 3));
+            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.INTERPOLATION_DURATION, 2));
+            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.TRANSLATION, new Vector3f(0, 13 / 16f, 0)));
+            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.Item.ITEM, MODEL));
         } else if (interpolate) {
-            data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.START_INTERPOLATION, 0));
+            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.START_INTERPOLATION, 0));
         }
 
         PolymerEntity.super.modifyRawTrackedData(data, player, initial);
@@ -538,7 +549,7 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
     }
 
     @Override
-    public List<EntityConfig<?, ChainLiftEntity>> getEntityConfiguration(ServerPlayerEntity player, Vec3d targetPos) {
+    public List<EntityConfig<?, ChainLiftEntity>> getEntityConfiguration(ServerPlayer player, Vec3 targetPos) {
         return CONFIGURATION;
     }
 
@@ -574,7 +585,7 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
         }
 
         @Override
-        public boolean startWatching(ServerPlayNetworkHandler player) {
+        public boolean startWatching(ServerGamePacketListenerImpl player) {
             if (noTick) {
                 onTick();
             }
@@ -587,10 +598,10 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
             this.interaction.setCustomName(ChainLiftEntity.this.getCustomName());
             this.interaction.setCustomNameVisible(ChainLiftEntity.this.isCustomNameVisible());
 
-            if (ChainLiftEntity.this.hasPlayerRider()) {
-                this.interaction.setSize(0, ChainLiftEntity.this.getHeight() - 0.1f);
+            if (ChainLiftEntity.this.hasExactlyOnePlayerPassenger()) {
+                this.interaction.setSize(0, ChainLiftEntity.this.getBbHeight() - 0.1f);
             } else {
-                this.interaction.setSize(ChainLiftEntity.this.getWidth(), ChainLiftEntity.this.getHeight());
+                this.interaction.setSize(ChainLiftEntity.this.getBbWidth(), ChainLiftEntity.this.getBbHeight());
             }
 
             //MAT.translate(0.0F, -0.2f, 0.0F);

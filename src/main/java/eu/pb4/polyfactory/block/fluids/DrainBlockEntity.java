@@ -10,22 +10,20 @@ import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentsAccess;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.ContainerBased, BlockEntityExtraListener {
@@ -48,25 +46,25 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         this.container.writeData(view, "fluid");
         if (!this.catalyst.isEmpty()) {
-            view.put("catalyst", ItemStack.OPTIONAL_CODEC, this.catalyst);
+            view.store("catalyst", ItemStack.OPTIONAL_CODEC, this.catalyst);
         }
         updateModel();
     }
 
     @Override
-    protected void readData(ReadView view) {
-        super.readData(view);
+    protected void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
         this.container.readData(view, "fluid");
         this.setCatalyst(view.read("catalyst", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY));
     }
 
     @Override
-    protected void readComponents(ComponentsAccess components) {
-        super.readComponents(components);
+    protected void applyImplicitComponents(DataComponentGetter components) {
+        super.applyImplicitComponents(components);
         var f = components.get(FactoryDataComponents.FLUID);
         if (f != null) {
             this.container.clear();
@@ -75,15 +73,15 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
     }
 
     @Override
-    protected void addComponents(ComponentMap.Builder componentMapBuilder) {
-        super.addComponents(componentMapBuilder);
-        componentMapBuilder.add(FactoryDataComponents.FLUID, FluidComponent.copyFrom(this.container));
+    protected void collectImplicitComponents(DataComponentMap.Builder componentMapBuilder) {
+        super.collectImplicitComponents(componentMapBuilder);
+        componentMapBuilder.set(FactoryDataComponents.FLUID, FluidComponent.copyFrom(this.container));
     }
 
     @Override
-    public void removeFromCopiedStackData(WriteView view) {
-        super.removeFromCopiedStackData(view);
-        view.remove("fluid");
+    public void removeComponentsFromTag(ValueOutput view) {
+        super.removeComponentsFromTag(view);
+        view.discard("fluid");
     }
 
     @Override
@@ -97,7 +95,7 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
     }
 
     private void onFluidChanged() {
-        this.markDirty();
+        this.setChanged();
         this.updateModel();
     }
 
@@ -109,8 +107,8 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
     }
 
     @Override
-    public void onListenerUpdate(WorldChunk chunk) {
-        var x = BlockAwareAttachment.get(chunk, pos);
+    public void onListenerUpdate(LevelChunk chunk) {
+        var x = BlockAwareAttachment.get(chunk, worldPosition);
         if (x != null && x.holder() instanceof DrainBlock.Model model) {
             this.model = model;
             this.updateModel();
@@ -126,23 +124,23 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
         if (this.model != null) {
             this.model.setCatalyst(this.catalyst);
         }
-        this.markDirty();
+        this.setChanged();
     }
 
     @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        super.onBlockReplaced(pos, oldState);
-        if (this.world != null) {
-            ItemScatterer.spawn(world, pos, DefaultedList.copyOf(ItemStack.EMPTY, this.catalyst));
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        super.preRemoveSideEffects(pos, oldState);
+        if (this.level != null) {
+            Containers.dropContents(level, pos, NonNullList.of(ItemStack.EMPTY, this.catalyst));
         }
     }
 
-    public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
+    public static <T extends BlockEntity> void ticker(Level world, BlockPos pos, BlockState state, T t) {
         if (!(t instanceof DrainBlockEntity be)) {
             return;
         }
 
-        if (world.hasRain(pos.up())) {
+        if (world.isRainingAt(pos.above())) {
             // Actually done some math:
             // For 49 cauldrons, it took 4 days to get 18 lvl-1, 15 lvl-2 and 4 lvl-3.
             // So 60 bottles total. 15 bottles per day, 15×27000 = 405000 droplets per day

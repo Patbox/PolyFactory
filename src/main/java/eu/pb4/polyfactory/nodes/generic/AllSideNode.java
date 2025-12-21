@@ -8,13 +8,12 @@ import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import net.minecraft.core.Direction;
 
 public record AllSideNode() implements BlockNode, DirectionCheckingNode {
     public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("all_side"), AllSideNode::new);
@@ -29,7 +28,7 @@ public record AllSideNode() implements BlockNode, DirectionCheckingNode {
         var list = new ArrayList<HalfLink>();
 
         for (var dir : Direction.values()) {
-            self.getGraphWorld().getNodesAt(self.getBlockPos().offset(dir))
+            self.getGraphWorld().getNodesAt(self.getBlockPos().relative(dir))
                     .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).forEach(list::add);
         }
         return list;
@@ -42,7 +41,7 @@ public record AllSideNode() implements BlockNode, DirectionCheckingNode {
 
     @Override
     public boolean canConnect(@NotNull NodeHolder<BlockNode> self, @NotNull HalfLink other) {
-        return self.getBlockPos().getManhattanDistance(other.other().getBlockPos()) == 1;
+        return self.getBlockPos().distManhattan(other.other().getBlockPos()) == 1;
     }
 
     @Override

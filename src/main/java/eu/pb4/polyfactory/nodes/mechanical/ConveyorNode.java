@@ -11,12 +11,12 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.nodes.AxisNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Predicate;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 
 public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue value) implements AxisNode {
     public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("conveyor"), RecordCodecBuilder.<ConveyorNode>create(instance -> instance.group(
@@ -31,7 +31,7 @@ public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue val
 
     @Override
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
-        var nextPos = new BlockPos.Mutable();
+        var nextPos = new BlockPos.MutableBlockPos();
         var list = new ArrayList<HalfLink>();
 
         var view = self.getGraphWorld();
@@ -64,7 +64,7 @@ public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue val
             addNodes(view, nextPos, conv, list);
         }
 
-        var side = direction.rotateYClockwise();
+        var side = direction.getClockWise();
 
         nextPos.set(pos).move(side, 1);
         addNodes(view, nextPos, sides, list);
@@ -91,6 +91,6 @@ public record ConveyorNode(Direction direction, ConveyorBlock.DirectionValue val
 
     @Override
     public Direction.Axis axis() {
-        return this.direction.rotateYClockwise().getAxis();
+        return this.direction.getClockWise().getAxis();
     }
 }

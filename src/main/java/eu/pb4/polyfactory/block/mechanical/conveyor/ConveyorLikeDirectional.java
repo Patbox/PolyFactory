@@ -1,15 +1,14 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.Direction;
-
 import java.util.Locale;
+import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.block.state.BlockState;
 
 public interface ConveyorLikeDirectional {
     TransferMode getTransferMode(BlockState selfState, Direction direction);
 
-    enum TransferMode implements StringIdentifiable {
+    enum TransferMode implements StringRepresentable {
         BOTH(true, true),
         FROM_CONVEYOR(true, false),
         TO_CONVEYOR(false, true);
@@ -23,7 +22,7 @@ public interface ConveyorLikeDirectional {
         }
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return this.name().toLowerCase(Locale.ROOT);
         }
     }

@@ -11,128 +11,128 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
-import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.redstone.Orientation;
 
 public class RedstoneValvePipeBlock extends PipeBaseBlock implements ConfigurableBlock, RedstoneConnectable {
-    public static final EnumProperty<Direction.Axis> AXIS = Properties.AXIS;
-    public static final BooleanProperty POWERED = Properties.POWERED;
-    public static final BooleanProperty INVERTED = Properties.INVERTED;
+    public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
     private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(BlockConfig.AXIS, BlockConfig.INVERTED);
-    public RedstoneValvePipeBlock(AbstractBlock.Settings settings) {
+    public RedstoneValvePipeBlock(BlockBehaviour.Properties settings) {
         super(settings);
     }
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        var state = this.getDefaultState();
-        return waterLog(ctx, state.with(AXIS, ctx.getSide().getAxis()));
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var state = this.defaultBlockState();
+        return waterLog(ctx, state.setValue(AXIS, ctx.getClickedFace().getAxis()));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(AXIS, POWERED, INVERTED);
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         tickWater(state, world, tickView, pos);
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+        return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        if (!oldState.isOf(state.getBlock())) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (!oldState.is(state.getBlock())) {
             this.updatePowered(world, pos, state);
         }
-        super.onBlockAdded(state,world,pos, oldState, notify);
+        super.onPlace(state,world,pos, oldState, notify);
     }
 
-    private void updatePowered(World world, BlockPos pos, BlockState state) {
-        boolean powered = world.isReceivingRedstonePower(pos);
-        if (powered != state.get(POWERED)) {
-            world.setBlockState(pos, state.with(POWERED, powered), 4);
+    private void updatePowered(Level world, BlockPos pos, BlockState state) {
+        boolean powered = world.hasNeighborSignal(pos);
+        if (powered != state.getValue(POWERED)) {
+            world.setBlock(pos, state.setValue(POWERED, powered), 4);
         }
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, @Nullable Orientation wireOrientation, boolean notify) {
         this.updatePowered(world, pos, state);
-        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
+        super.neighborChanged(state, world, pos, sourceBlock, wireOrientation, notify);
     }
 
     public EnumSet<Direction> getFlowDirections(BlockState state) {
-        if (state.get(POWERED) == state.get(INVERTED)) {
-            var axis = state.get(AXIS);
+        if (state.getValue(POWERED) == state.getValue(INVERTED)) {
+            var axis = state.getValue(AXIS);
             return EnumSet.of(Direction.get(Direction.AxisDirection.POSITIVE, axis), Direction.get(Direction.AxisDirection.NEGATIVE, axis));
         }
         return EnumSet.noneOf(Direction.class);
     }
 
     @Override
-    public Collection<BlockNode> createPipeNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return state.get(POWERED) == state.get(INVERTED) ? super.createPipeNodes(state, world, pos) : List.of();
+    public Collection<BlockNode> createPipeNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return state.getValue(POWERED) == state.getValue(INVERTED) ? super.createPipeNodes(state, world, pos) : List.of();
     }
 
     @Override
     public boolean checkModelDirection(BlockState state, Direction direction) {
-        return state.get(AXIS) == direction.getAxis();
+        return state.getValue(AXIS) == direction.getAxis();
     }
 
     @Override
-    protected BlockState rotate(BlockState state, BlockRotation rotation) {
+    protected BlockState rotate(BlockState state, Rotation rotation) {
         return FactoryUtil.rotateAxis(state, AXIS, rotation);
     }
 
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new RedstoneValvePipeBlockEntity(pos, state);
     }
 
     @Override
-    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return RedstoneValvePipeBlockEntity::tick;
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return WRENCH_ACTIONS;
     }
 
     @Override
     public boolean canRedstoneConnect(BlockState state, @Nullable Direction dir) {
-        return dir == null || state.get(AXIS) != dir.getAxis();
+        return dir == null || state.getValue(AXIS) != dir.getAxis();
     }
 
     public static final class Model extends BlockModel {
@@ -146,7 +146,7 @@ public class RedstoneValvePipeBlock extends PipeBaseBlock implements Configurabl
         }
 
         private void updateStatePos(BlockState state) {
-            var dir = state.get(AXIS);
+            var dir = state.getValue(AXIS);
             float p = -90;
             float y = 0;
 

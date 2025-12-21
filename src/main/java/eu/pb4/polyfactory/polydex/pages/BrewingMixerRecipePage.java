@@ -7,9 +7,9 @@ import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.BrewingMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public class BrewingMixerRecipePage extends MixerRecipePage<BrewingMixingRecipe> {
 
-    public BrewingMixerRecipePage(RecipeEntry<BrewingMixingRecipe> recipe) {
+    public BrewingMixerRecipePage(RecipeHolder<BrewingMixingRecipe> recipe) {
         super(recipe);
     }
 

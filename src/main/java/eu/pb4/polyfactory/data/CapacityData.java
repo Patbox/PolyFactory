@@ -3,9 +3,7 @@ package eu.pb4.polyfactory.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
 public record CapacityData(long stored, long capacity) implements DataContainer {
@@ -42,7 +40,7 @@ public record CapacityData(long stored, long capacity) implements DataContainer 
 
     @Override
     public int asRedstoneOutput() {
-        return (int) MathHelper.clamp((15 * this.stored / this.capacity), 0, 15);
+        return (int) Mth.clamp((15 * this.stored / this.capacity), 0, 15);
     }
 
     @Override

@@ -17,30 +17,6 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.EntityPosition;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.network.packet.s2c.play.PositionFlag;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -48,57 +24,79 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.Vec3;
 
 public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlock,  BarrierBasedWaterloggable, ConfigurableBlock {
-    public static final EnumProperty<Direction> FACING = Properties.FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 
-    public TurntableBlock(Settings settings) {
+    public TurntableBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING);
         builder.add(WATERLOGGED);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getSide().getOpposite()));
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return waterLog(ctx, this.defaultBlockState().setValue(FACING, ctx.getClickedFace().getOpposite()));
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         tickWater(state, world, tickView, pos);
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+        return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return FactoryUtil.transform(state, rotation::rotate, FACING);
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return FactoryUtil.transform(state, mirror::apply, FACING);
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        return FactoryUtil.transform(state, mirror::mirror, FACING);
     }
 
     @Override
-    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new FunctionalDirectionNode(state.get(FACING)));
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return List.of(new FunctionalDirectionNode(state.getValue(FACING)));
     }
 
     @Override
-    public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
-        if (state.get(FACING) == Direction.DOWN) {
+    public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {
+        if (state.getValue(FACING) == Direction.DOWN) {
             float mult = 1;
 
             if (entity instanceof LivingEntity livingEntity) {
@@ -109,10 +107,10 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
             }
             var rot = RotationUser.getRotation(world, pos);
             var speed = Math.min(rot.speed(), 1028f) * mult;
-            if (speed != 0 && !(entity instanceof ServerPlayerEntity)) {
+            if (speed != 0 && !(entity instanceof ServerPlayer)) {
                 var rotate = (float) (rot.isNegative() ? speed : -speed);
-                entity.setYaw(entity.getYaw() + rotate);
-                entity.setHeadYaw(entity.getHeadYaw() + rotate);
+                entity.setYRot(entity.getYRot() + rotate);
+                entity.setYHeadRot(entity.getYHeadRot() + rotate);
 
                 //if (entity instanceof ServerPlayerEntity player) {
                 //    player.networkHandler.requestTeleport(new EntityPosition(Vec3d.ZERO, Vec3d.ZERO, rotate, 0), EnumSet.allOf(PositionFlag.class));
@@ -123,26 +121,26 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.STRIPPED_OAK_LOG.getDefaultState();
+        return Blocks.STRIPPED_OAK_LOG.defaultBlockState();
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
     @Override
-    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(world, initialBlockState);
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(BlockConfig.FACING);
     }
 
@@ -150,14 +148,14 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
         private final ItemDisplayElement mainElement;
         private BlockCollection blocks;
 
-        private Model(ServerWorld world, BlockState state) {
+        private Model(ServerLevel world, BlockState state) {
             this.mainElement = LodItemDisplayElement.createSimple(ItemDisplayElementUtil.getModel(state.getBlock().asItem()), this.getUpdateRate(), 0.3f, 0.6f);
-            this.updateAnimation(0, state.get(FACING));
+            this.updateAnimation(0, state.getValue(FACING));
             this.addElement(this.mainElement);
             if (false) {
                 this.blocks = new BlockCollection(BlockCollectionData.createDebug());
                 this.blocks.setCenter(4, 0, 4);
-                this.blocks.setOffset(Vec3d.of(state.get(FACING).getOpposite().getVector()));
+                this.blocks.setOffset(Vec3.atLowerCornerOf(state.getValue(FACING).getOpposite().getUnitVec3i()));
 
                 this.addElement(this.blocks);
             }
@@ -183,21 +181,21 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
 
         private void updateAnimation(float speed, Direction facing) {
             var mat = mat();
-            mat.rotate(facing.getOpposite().getRotationQuaternion());
-            mat.rotateY(((float) ((facing.getDirection() == Direction.AxisDirection.NEGATIVE) ? speed : -speed)));
+            mat.rotate(facing.getOpposite().getRotation());
+            mat.rotateY(((float) ((facing.getAxisDirection() == Direction.AxisDirection.NEGATIVE) ? speed : -speed)));
             mat.scale(2f);
             this.mainElement.setTransformation(mat);
         }
 
         @Override
         protected void onTick() {
-            var tick = this.getAttachment().getWorld().getTime();
-            var facing = this.blockState().get(FACING);
+            var tick = this.getAttachment().getWorld().getGameTime();
+            var facing = this.blockState().getValue(FACING);
             var rotation = this.getRotation();
             if (this.blocks != null) {
                 this.blocks.setQuaternion(new Quaternionf().rotateAxis(
-                        ((float) ((facing.getDirection() == Direction.AxisDirection.NEGATIVE) ? rotation : -rotation)),
-                        facing.getOpposite().getUnitVector()));
+                        ((float) ((facing.getAxisDirection() == Direction.AxisDirection.NEGATIVE) ? rotation : -rotation)),
+                        facing.getOpposite().step()));
                 this.blocks.tick();
             }
 

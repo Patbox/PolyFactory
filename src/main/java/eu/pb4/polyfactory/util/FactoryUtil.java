@@ -5,8 +5,8 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.polyfactory.ModInit;
-import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
-import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
+import eu.pb4.polyfactory.util.inventory.CustomInsertContainer;
+import eu.pb4.polyfactory.util.movingitem.MovingItemContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polymer.blocks.api.BlockModelType;
 import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
@@ -19,49 +19,50 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlaySoundFromEntityS2CPacket;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.registry.entry.RegistryEntryOwner;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.screen.PlayerScreenHandler;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderOwner;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.protocol.game.ClientboundExplodePacket;
+import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.Property;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.*;
-import net.minecraft.util.collection.Pool;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.util.random.WeightedList;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,7 +75,7 @@ import java.util.stream.Stream;
 public class FactoryUtil {
     public static final List<Direction> REORDERED_DIRECTIONS = List.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
     public static final GameProfile GENERIC_PROFILE = new GameProfile(Util.NIL_UUID, "[PolyFactory]");
-    public static final Vec3d HALF_BELOW = new Vec3d(0, -0.5, 0);
+    public static final Vec3 HALF_BELOW = new Vec3(0, -0.5, 0);
     public static final List<Direction> HORIZONTAL_DIRECTIONS = List.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
     public static final List<EquipmentSlot> ARMOR_EQUIPMENT = Arrays.stream(EquipmentSlot.values()).filter(x -> x.getType() == EquipmentSlot.Type.HUMANOID_ARMOR).toList();
     public static final List<DyeColor> COLORS_CREATIVE = List.of(DyeColor.WHITE,
@@ -94,23 +95,23 @@ public class FactoryUtil {
             DyeColor.MAGENTA,
             DyeColor.PINK);
 
-    public static final Map<Direction, BlockState> TRAPDOOR_REGULAR = Util.mapEnum(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
+    public static final Map<Direction, BlockState> TRAPDOOR_REGULAR = Util.makeEnumMap(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
         case UP -> "BOTTOM";
         case DOWN -> "TOP";
-        default -> x.asString().toUpperCase(Locale.ROOT);
+        default -> x.getSerializedName().toUpperCase(Locale.ROOT);
     } + "_TRAPDOOR")));
 
-    public static final Map<Direction, BlockState> TRAPDOOR_WATERLOGGED = Util.mapEnum(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
+    public static final Map<Direction, BlockState> TRAPDOOR_WATERLOGGED = Util.makeEnumMap(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
         case UP -> "BOTTOM";
         case DOWN -> "TOP";
-        default -> x.asString().toUpperCase(Locale.ROOT);
+        default -> x.getSerializedName().toUpperCase(Locale.ROOT);
     } + "_TRAPDOOR_WATERLOGGED")));
 
 
-    public static final Map<Direction.Axis, BlockState> LIGHTNING_ROD_REGULAR = Util.mapEnum(Direction.Axis.class,
+    public static final Map<Direction.Axis, BlockState> LIGHTNING_ROD_REGULAR = Util.makeEnumMap(Direction.Axis.class,
             x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf( "LIGHTNING_ROD_" + x.name())));
 
-    public static final Map<Direction.Axis, BlockState> LIGHTNING_ROD_WATERLOGGED = Util.mapEnum(Direction.Axis.class,
+    public static final Map<Direction.Axis, BlockState> LIGHTNING_ROD_WATERLOGGED = Util.makeEnumMap(Direction.Axis.class,
             x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf( "LIGHTNING_ROD_" + x.name() + "_WATERLOGGED")));
 
     private static final List<Runnable> RUN_NEXT_TICK = new ArrayList<>();
@@ -142,50 +143,50 @@ public class FactoryUtil {
     }
 
     public static Identifier id(String path) {
-        return Identifier.of(ModInit.ID, path);
+        return Identifier.fromNamespaceAndPath(ModInit.ID, path);
     }
 
-    public static void playSoundToPlayer(PlayerEntity player, SoundEvent soundEvent, SoundCategory category, float volume, float pitch) {
-        if (player instanceof ServerPlayerEntity serverPlayer) {
-            serverPlayer.networkHandler.sendPacket(new PlaySoundFromEntityS2CPacket(Registries.SOUND_EVENT.getEntry(soundEvent), category, player, volume, pitch, player.getRandom().nextLong()));
+    public static void playSoundToPlayer(Player player, SoundEvent soundEvent, SoundSource category, float volume, float pitch) {
+        if (player instanceof ServerPlayer serverPlayer) {
+            serverPlayer.connection.send(new ClientboundSoundEntityPacket(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundEvent), category, player, volume, pitch, player.getRandom().nextLong()));
         }
     }
 
-    public static MutableText fluidTextIngots(long amount) {
+    public static MutableComponent fluidTextIngots(long amount) {
         if (amount >= FluidConstants.BLOCK) {
             long buckets = amount / (FluidConstants.BLOCK / 1000);
-            return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + " ").append(Text.translatable("text.polyfactory.amount.block"));
+            return Component.literal((buckets / 1000) + "." + (buckets / 10 % 100) + " ").append(Component.translatable("text.polyfactory.amount.block"));
         } else if (amount >= FluidConstants.INGOT) {
             long buckets = amount / (FluidConstants.INGOT / 1000);
-            return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + " ").append(Text.translatable("text.polyfactory.amount.ingot"));
+            return Component.literal((buckets / 1000) + "." + (buckets / 10 % 100) + " ").append(Component.translatable("text.polyfactory.amount.ingot"));
         } else if (amount >= FluidConstants.NUGGET) {
             //noinspection PointlessArithmeticExpression
             long buckets = amount / (FluidConstants.NUGGET / 1000);
-            return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + " ").append(Text.translatable("text.polyfactory.amount.nuggets"));
+            return Component.literal((buckets / 1000) + "." + (buckets / 10 % 100) + " ").append(Component.translatable("text.polyfactory.amount.nuggets"));
         } else if (amount != 0) {
-            return Text.literal((amount) + "d");
+            return Component.literal((amount) + "d");
         } else {
-            return Text.literal("0");
+            return Component.literal("0");
         }
     }
 
-    public static MutableText fluidTextGeneric(long amount) {
+    public static MutableComponent fluidTextGeneric(long amount) {
         if (amount >= FluidConstants.BLOCK) {
             long buckets = amount / (FluidConstants.BLOCK / 1000);
-            return Text.literal((buckets / 1000) + "." + (buckets / 10 % 100) + "B");
+            return Component.literal((buckets / 1000) + "." + (buckets / 10 % 100) + "B");
         } else if (amount >= 81) {
             long buckets = amount / (FluidConstants.BLOCK / 1000);
-            return Text.literal((buckets) + "mB");
+            return Component.literal((buckets) + "mB");
         } else if (amount != 0) {
-            return Text.literal((amount) + "d");
+            return Component.literal((amount) + "d");
         } else {
-            return Text.literal("0");
+            return Component.literal("0");
         }
     }
 
-    public static void sendVelocityDelta(ServerPlayerEntity player, Vec3d delta) {
-        player.networkHandler.sendPacket(new ExplosionS2CPacket(new Vec3d(player.getX(), player.getY() - 9999, player.getZ()), 0, 0, Optional.of(delta),
-                ParticleTypes.BUBBLE, Registries.SOUND_EVENT.getEntry(SoundEvents.INTENTIONALLY_EMPTY), Pool.empty()));
+    public static void sendVelocityDelta(ServerPlayer player, Vec3 delta) {
+        player.connection.send(new ClientboundExplodePacket(new Vec3(player.getX(), player.getY() - 9999, player.getZ()), 0, 0, Optional.of(delta),
+                ParticleTypes.BUBBLE, BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.EMPTY), WeightedList.of()));
     }
 
     public static float wrap(float value, float min, float max) {
@@ -208,21 +209,21 @@ public class FactoryUtil {
         return value;
     }
 
-    public static ItemStack exchangeStack(ItemStack inputStack, int subtractedAmount, PlayerEntity player, ItemStack outputStack, boolean creativeOverride) {
-        boolean bl = player.isInCreativeMode();
+    public static ItemStack exchangeStack(ItemStack inputStack, int subtractedAmount, Player player, ItemStack outputStack, boolean creativeOverride) {
+        boolean bl = player.hasInfiniteMaterials();
         if (creativeOverride && bl) {
             if (!player.getInventory().contains(outputStack)) {
-                player.getInventory().insertStack(outputStack);
+                player.getInventory().add(outputStack);
             }
 
             return inputStack;
         } else {
-            inputStack.decrementUnlessCreative(subtractedAmount, player);
+            inputStack.consume(subtractedAmount, player);
             if (inputStack.isEmpty()) {
                 return outputStack;
             } else {
-                if (!player.getInventory().insertStack(outputStack)) {
-                    player.dropItem(outputStack, false);
+                if (!player.getInventory().add(outputStack)) {
+                    player.drop(outputStack, false);
                 }
 
                 return inputStack;
@@ -230,12 +231,12 @@ public class FactoryUtil {
         }
     }
 
-    public static ItemStack exchangeStack(ItemStack inputStack, int subtractedAmount, PlayerEntity player, ItemStack outputStack) {
+    public static ItemStack exchangeStack(ItemStack inputStack, int subtractedAmount, Player player, ItemStack outputStack) {
         return exchangeStack(inputStack, subtractedAmount, player, outputStack, true);
     }
 
-    public static int tryInserting(World world, BlockPos pos, ItemStack itemStack, Direction direction) {
-        var inv = HopperBlockEntity.getInventoryAt(world, pos);
+    public static int tryInserting(Level world, BlockPos pos, ItemStack itemStack, Direction direction) {
+        var inv = HopperBlockEntity.getContainerAt(world, pos);
 
         if (inv != null) {
             return FactoryUtil.tryInsertingInv(inv, itemStack, direction);
@@ -246,7 +247,7 @@ public class FactoryUtil {
             try (var t = Transaction.openOuter()) {
                 var x = storage.insert(ItemVariant.of(itemStack), itemStack.getCount(), t);
                 t.commit();
-                itemStack.decrement((int) x);
+                itemStack.shrink((int) x);
                 return (int) x;
             }
         }
@@ -254,24 +255,24 @@ public class FactoryUtil {
         return -1;
     }
 
-    public static int tryInsertingInv(Inventory inventory, ItemStack itemStack, Direction direction) {
-        if (inventory instanceof CustomInsertInventory customInsertInventory) {
-            return customInsertInventory.insertStack(itemStack, direction);
-        } else if (inventory instanceof SidedInventory sidedInventory) {
+    public static int tryInsertingInv(Container inventory, ItemStack itemStack, Direction direction) {
+        if (inventory instanceof CustomInsertContainer customInsertContainer) {
+            return customInsertContainer.insertStack(itemStack, direction);
+        } else if (inventory instanceof WorldlyContainer sidedInventory) {
             return tryInsertingSided(sidedInventory, itemStack, direction);
         } else {
             return tryInsertingRegular(inventory, itemStack);
         }
     }
 
-    public static MovableResult tryInsertingMovable(ContainerHolder conveyor, World world, BlockPos conveyorPos, BlockPos targetPos, Direction dir, Direction selfDir, @Nullable TagKey<Block> requiredTag) {
+    public static MovableResult tryInsertingMovable(MovingItemContainerHolder conveyor, Level world, BlockPos conveyorPos, BlockPos targetPos, Direction dir, Direction selfDir, @Nullable TagKey<Block> requiredTag) {
         var holdStack = conveyor.getContainer();
         if (holdStack == null || holdStack.get().isEmpty()) {
             return MovableResult.FAILURE;
         }
 
         var pointer = new WorldPointer(world, targetPos);
-        if (requiredTag != null && !pointer.getBlockState().isIn(requiredTag)) {
+        if (requiredTag != null && !pointer.getBlockState().is(requiredTag)) {
             return MovableResult.FAILURE;
         }
 
@@ -290,29 +291,29 @@ public class FactoryUtil {
         return MovableResult.FAILURE;
     }
 
-    private static int tryInsertingSided(SidedInventory inventory, ItemStack itemStack, Direction direction) {
-        var slots = inventory.getAvailableSlots(direction);
+    private static int tryInsertingSided(WorldlyContainer inventory, ItemStack itemStack, Direction direction) {
+        var slots = inventory.getSlotsForFace(direction);
         var init = itemStack.getCount();
 
         for (int i = 0; i < slots.length; i++) {
             var slot = slots[i];
 
-            if (!inventory.canInsert(slot, itemStack, direction)) {
+            if (!inventory.canPlaceItemThroughFace(slot, itemStack, direction)) {
                 continue;
             }
 
-            var current = inventory.getStack(slot);
+            var current = inventory.getItem(slot);
 
             if (current.isEmpty()) {
-                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxCountPerStack());
-                inventory.setStack(slot, itemStack.copyWithCount(maxMove));
-                itemStack.decrement(maxMove);
-            } else if (ItemStack.areItemsAndComponentsEqual(current, itemStack)) {
-                var maxMove = Math.min(Math.min(current.getMaxCount() - current.getCount(), itemStack.getCount()), inventory.getMaxCountPerStack());
+                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize());
+                inventory.setItem(slot, itemStack.copyWithCount(maxMove));
+                itemStack.shrink(maxMove);
+            } else if (ItemStack.isSameItemSameComponents(current, itemStack)) {
+                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize());
 
                 if (maxMove > 0) {
-                    current.increment(maxMove);
-                    itemStack.decrement(maxMove);
+                    current.grow(maxMove);
+                    itemStack.shrink(maxMove);
                 }
             }
 
@@ -325,23 +326,23 @@ public class FactoryUtil {
     }
 
 
-    public static int insertBetween(Inventory inventory, int start, int end, ItemStack itemStack) {
-        var size = Math.min(inventory.size(), end);
+    public static int insertBetween(Container inventory, int start, int end, ItemStack itemStack) {
+        var size = Math.min(inventory.getContainerSize(), end);
         var init = itemStack.getCount();
         for (int i = start; i < size; i++) {
-            var current = inventory.getStack(i);
+            var current = inventory.getItem(i);
 
             if (current.isEmpty()) {
-                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxCountPerStack());
-                inventory.setStack(i, itemStack.copyWithCount(maxMove));
-                itemStack.decrement(maxMove);
+                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize());
+                inventory.setItem(i, itemStack.copyWithCount(maxMove));
+                itemStack.shrink(maxMove);
 
-            } else if (ItemStack.areItemsAndComponentsEqual(current, itemStack)) {
-                var maxMove = Math.min(Math.min(current.getMaxCount() - current.getCount(), itemStack.getCount()), inventory.getMaxCountPerStack());
+            } else if (ItemStack.isSameItemSameComponents(current, itemStack)) {
+                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize());
 
                 if (maxMove > 0) {
-                    current.increment(maxMove);
-                    itemStack.decrement(maxMove);
+                    current.grow(maxMove);
+                    itemStack.shrink(maxMove);
                 }
             }
 
@@ -353,23 +354,23 @@ public class FactoryUtil {
         return init - itemStack.getCount();
     }
 
-    public static int tryInsertingRegular(Inventory inventory, ItemStack itemStack) {
-        var size = inventory.size();
+    public static int tryInsertingRegular(Container inventory, ItemStack itemStack) {
+        var size = inventory.getContainerSize();
         var init = itemStack.getCount();
         for (int i = 0; i < size; i++) {
-            var current = inventory.getStack(i);
+            var current = inventory.getItem(i);
 
             if (current.isEmpty()) {
-                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxCountPerStack());
-                inventory.setStack(i, itemStack.copyWithCount(maxMove));
-                itemStack.decrement(maxMove);
+                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize());
+                inventory.setItem(i, itemStack.copyWithCount(maxMove));
+                itemStack.shrink(maxMove);
 
-            } else if (ItemStack.areItemsAndComponentsEqual(current, itemStack)) {
-                var maxMove = Math.min(Math.min(current.getMaxCount() - current.getCount(), itemStack.getCount()), inventory.getMaxCountPerStack());
+            } else if (ItemStack.isSameItemSameComponents(current, itemStack)) {
+                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize());
 
                 if (maxMove > 0) {
-                    current.increment(maxMove);
-                    itemStack.decrement(maxMove);
+                    current.grow(maxMove);
+                    itemStack.shrink(maxMove);
                 }
             }
 
@@ -382,8 +383,8 @@ public class FactoryUtil {
     }
 
 
-    public static int tryInsertingIntoSlot(World world, BlockPos pos, ItemStack itemStack, Direction direction, IntList slots) {
-        var inv = HopperBlockEntity.getInventoryAt(world, pos);
+    public static int tryInsertingIntoSlot(Level world, BlockPos pos, ItemStack itemStack, Direction direction, IntList slots) {
+        var inv = HopperBlockEntity.getContainerAt(world, pos);
 
         if (inv != null) {
             return FactoryUtil.tryInsertingInvIntoSlot(inv, itemStack, direction, slots);
@@ -398,7 +399,7 @@ public class FactoryUtil {
                         continue;
                     }
                     var x = slottedStorage.getSlot(slot).insert(ItemVariant.of(itemStack), itemStack.getCount(), t);
-                    itemStack.decrement((int) x);
+                    itemStack.shrink((int) x);
                     total += x;
                     if (itemStack.isEmpty()) {
                         break;
@@ -412,39 +413,39 @@ public class FactoryUtil {
         return -1;
     }
 
-    public static int tryInsertingInvIntoSlot(Inventory inventory, ItemStack itemStack, Direction direction, IntList slots) {
-        if (inventory instanceof CustomInsertInventory customInsertInventory) {
-            return customInsertInventory.insertStackSlots(itemStack, direction, slots);
-        } else if (inventory instanceof SidedInventory sidedInventory) {
+    public static int tryInsertingInvIntoSlot(Container inventory, ItemStack itemStack, Direction direction, IntList slots) {
+        if (inventory instanceof CustomInsertContainer customInsertContainer) {
+            return customInsertContainer.insertStackSlots(itemStack, direction, slots);
+        } else if (inventory instanceof WorldlyContainer sidedInventory) {
             return tryInsertingSidedIntoSlot(sidedInventory, itemStack, direction, slots);
         } else {
             return tryInsertingRegularIntoSlot(inventory, itemStack, slots);
         }
     }
 
-    private static int tryInsertingSidedIntoSlot(SidedInventory inventory, ItemStack itemStack, Direction direction, IntList allowedSlots) {
-        var slots = inventory.getAvailableSlots(direction);
+    private static int tryInsertingSidedIntoSlot(WorldlyContainer inventory, ItemStack itemStack, Direction direction, IntList allowedSlots) {
+        var slots = inventory.getSlotsForFace(direction);
         var init = itemStack.getCount();
 
         for (int i = 0; i < slots.length; i++) {
             var slot = slots[i];
 
-            if (!inventory.canInsert(slot, itemStack, direction) || !allowedSlots.contains(slot)) {
+            if (!inventory.canPlaceItemThroughFace(slot, itemStack, direction) || !allowedSlots.contains(slot)) {
                 continue;
             }
 
-            var current = inventory.getStack(slot);
+            var current = inventory.getItem(slot);
 
             if (current.isEmpty()) {
-                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxCountPerStack());
-                inventory.setStack(slot, itemStack.copyWithCount(maxMove));
-                itemStack.decrement(maxMove);
-            } else if (ItemStack.areItemsAndComponentsEqual(current, itemStack)) {
-                var maxMove = Math.min(Math.min(current.getMaxCount() - current.getCount(), itemStack.getCount()), inventory.getMaxCountPerStack());
+                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize());
+                inventory.setItem(slot, itemStack.copyWithCount(maxMove));
+                itemStack.shrink(maxMove);
+            } else if (ItemStack.isSameItemSameComponents(current, itemStack)) {
+                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize());
 
                 if (maxMove > 0) {
-                    current.increment(maxMove);
-                    itemStack.decrement(maxMove);
+                    current.grow(maxMove);
+                    itemStack.shrink(maxMove);
                 }
             }
 
@@ -456,27 +457,27 @@ public class FactoryUtil {
         return init - itemStack.getCount();
     }
 
-    public static int tryInsertingRegularIntoSlot(Inventory inventory, ItemStack itemStack, IntList slots) {
-        var size = inventory.size();
+    public static int tryInsertingRegularIntoSlot(Container inventory, ItemStack itemStack, IntList slots) {
+        var size = inventory.getContainerSize();
         var init = itemStack.getCount();
         for (int i : slots) {
             if (i >= size) {
                 continue;
             }
 
-            var current = inventory.getStack(i);
+            var current = inventory.getItem(i);
 
             if (current.isEmpty()) {
-                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxCountPerStack());
-                inventory.setStack(i, itemStack.copyWithCount(maxMove));
-                itemStack.decrement(maxMove);
+                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize());
+                inventory.setItem(i, itemStack.copyWithCount(maxMove));
+                itemStack.shrink(maxMove);
 
-            } else if (ItemStack.areItemsAndComponentsEqual(current, itemStack)) {
-                var maxMove = Math.min(Math.min(current.getMaxCount() - current.getCount(), itemStack.getCount()), inventory.getMaxCountPerStack());
+            } else if (ItemStack.isSameItemSameComponents(current, itemStack)) {
+                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize());
 
                 if (maxMove > 0) {
-                    current.increment(maxMove);
-                    itemStack.decrement(maxMove);
+                    current.grow(maxMove);
+                    itemStack.shrink(maxMove);
                 }
             }
 
@@ -489,36 +490,36 @@ public class FactoryUtil {
     }
 
     public static <T extends Comparable<T>> BlockState transform(BlockState input, Function<T, T> transform, Property<T> property) {
-        return input.withIfExists(property, transform.apply(input.get(property)));
+        return input.trySetValue(property, transform.apply(input.getValue(property)));
     }
 
-    public static PlayerEntity getClosestPlayer(World world, BlockPos pos, double distance) {
-        return world.getClosestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, distance, false);
+    public static Player getClosestPlayer(Level world, BlockPos pos, double distance) {
+        return world.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, distance, false);
     }
 
-    public static Text asText(@Nullable Direction dir) {
-        return Text.translatable("text.polyfactory.direction." + (dir != null ? dir.asString() : "none"));
+    public static Component asText(@Nullable Direction dir) {
+        return Component.translatable("text.polyfactory.direction." + (dir != null ? dir.getSerializedName() : "none"));
     }
 
-    public static void setSafeVelocity(Entity entity, Vec3d vec) {
-        entity.setVelocity(safeVelocity(vec));
+    public static void setSafeVelocity(Entity entity, Vec3 vec) {
+        entity.setDeltaMovement(safeVelocity(vec));
     }
 
-    public static Vec3d safeVelocity(Vec3d vec) {
+    public static Vec3 safeVelocity(Vec3 vec) {
         var l = vec.length();
 
         if (l > 1028) {
-            return vec.multiply(1028 / l);
+            return vec.scale(1028 / l);
         } else {
             return vec;
         }
     }
 
-    public static void addSafeVelocity(Entity entity, Vec3d vec) {
-        setSafeVelocity(entity, entity.getVelocity().add(vec));
+    public static void addSafeVelocity(Entity entity, Vec3 vec) {
+        setSafeVelocity(entity, entity.getDeltaMovement().add(vec));
     }
 
-    public static BlockPos findFurthestFluidBlockForRemoval(World world, BlockState target, BlockPos start) {
+    public static BlockPos findFurthestFluidBlockForRemoval(Level world, BlockState target, BlockPos start) {
         return start;
     }
 
@@ -527,69 +528,69 @@ public class FactoryUtil {
     }
 
     public static Consumer<ItemStack> getItemConsumer(Entity entity) {
-        if (entity instanceof PlayerEntity player) {
-            return player.getInventory()::offerOrDrop;
-        } else if (entity instanceof Inventory inventory) {
+        if (entity instanceof Player player) {
+            return player.getInventory()::placeItemBackInInventory;
+        } else if (entity instanceof Container inventory) {
             return stack -> {
                 tryInsertingRegular(inventory, stack);
                 if (!stack.isEmpty()) {
-                    entity.dropStack((ServerWorld) entity.getEntityWorld(), stack);
+                    entity.spawnAtLocation((ServerLevel) entity.level(), stack);
                 }
             };
         }
 
-        return (stack) -> entity.dropStack((ServerWorld) entity.getEntityWorld(), stack);
+        return (stack) -> entity.spawnAtLocation((ServerLevel) entity.level(), stack);
     }
 
-    public static void sendSlotUpdate(Entity entity, Hand hand) {
-        if (entity instanceof ServerPlayerEntity player) {
-            GuiHelpers.sendSlotUpdate(player, player.playerScreenHandler.syncId, hand == Hand.MAIN_HAND
-                            ? PlayerScreenHandler.HOTBAR_START + player.getInventory().getSelectedSlot()
-                            : PlayerScreenHandler.OFFHAND_ID,
-                    player.getStackInHand(hand), player.playerScreenHandler.nextRevision());
+    public static void sendSlotUpdate(Entity entity, InteractionHand hand) {
+        if (entity instanceof ServerPlayer player) {
+            GuiHelpers.sendSlotUpdate(player, player.inventoryMenu.containerId, hand == InteractionHand.MAIN_HAND
+                            ? InventoryMenu.USE_ROW_SLOT_START + player.getInventory().getSelectedSlot()
+                            : InventoryMenu.SHIELD_SLOT,
+                    player.getItemInHand(hand), player.inventoryMenu.incrementStateId());
         }
     }
 
-    public static BlockState rotateAxis(BlockState state, Property<Direction.Axis> axis, BlockRotation rotation) {
-        var a = state.get(axis);
+    public static BlockState rotateAxis(BlockState state, Property<Direction.Axis> axis, Rotation rotation) {
+        var a = state.getValue(axis);
 
-        if (a == Direction.Axis.Y || rotation == BlockRotation.NONE || rotation == BlockRotation.CLOCKWISE_180) {
+        if (a == Direction.Axis.Y || rotation == Rotation.NONE || rotation == Rotation.CLOCKWISE_180) {
             return state;
         }
 
-        return state.with(axis, a == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X);
+        return state.setValue(axis, a == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X);
     }
 
-    public static <T extends Comparable<T>> BlockState rotate(BlockState state, Property<T> north, Property<T> south, Property<T> east, Property<T> west, BlockRotation rotation) {
+    public static <T extends Comparable<T>> BlockState rotate(BlockState state, Property<T> north, Property<T> south, Property<T> east, Property<T> west, Rotation rotation) {
         return switch (rotation) {
-            case CLOCKWISE_180 -> state.with(north, state.get(south))
-                    .with(east, state.get(west))
-                    .with(south, state.get(north))
-                    .with(west, state.get(east));
-            case COUNTERCLOCKWISE_90 -> state.with(north, state.get(east))
-                    .with(east, state.get(south))
-                    .with(south, state.get(west))
-                    .with(west, state.get(north));
-            case CLOCKWISE_90 -> state.with(north, state.get(west))
-                    .with(east, state.get(north))
-                    .with(south, state.get(east))
-                    .with(west, state.get(south));
+            case CLOCKWISE_180 -> state.setValue(north, state.getValue(south))
+                    .setValue(east, state.getValue(west))
+                    .setValue(south, state.getValue(north))
+                    .setValue(west, state.getValue(east));
+            case COUNTERCLOCKWISE_90 -> state.setValue(north, state.getValue(east))
+                    .setValue(east, state.getValue(south))
+                    .setValue(south, state.getValue(west))
+                    .setValue(west, state.getValue(north));
+            case CLOCKWISE_90 -> state.setValue(north, state.getValue(west))
+                    .setValue(east, state.getValue(north))
+                    .setValue(south, state.getValue(east))
+                    .setValue(west, state.getValue(south));
             default -> state;
         };
     }
 
-    public static <T extends Comparable<T>> BlockState mirror(BlockState state, Property<T> north, Property<T> south, Property<T> east, Property<T> west, BlockMirror mirror) {
+    public static <T extends Comparable<T>> BlockState mirror(BlockState state, Property<T> north, Property<T> south, Property<T> east, Property<T> west, Mirror mirror) {
         return switch (mirror) {
-            case LEFT_RIGHT -> state.with(north, state.get(south)).with(south, state.get(north));
-            case FRONT_BACK -> state.with(east, state.get(west)).with(west, state.get(east));
+            case LEFT_RIGHT -> state.setValue(north, state.getValue(south)).setValue(south, state.getValue(north));
+            case FRONT_BACK -> state.setValue(east, state.getValue(west)).setValue(west, state.getValue(east));
             default -> state;
         };
     }
 
 
     public static String recipeKeyNamespace = "polyfactory";
-    public static RegistryKey<Recipe<?>> recipeKey(String s) {
-        return RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(recipeKeyNamespace, s));
+    public static ResourceKey<Recipe<?>> recipeKey(String s) {
+        return ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(recipeKeyNamespace, s));
     }
 
     public static <T extends Enum<T>> T nextEnum(T activeMode, T[] values, boolean next) {
@@ -597,17 +598,17 @@ public class FactoryUtil {
     }
 
     public static <T extends Comparable<T>> Codec<T> propertyCodec(Property<T> property) {
-        return Codec.stringResolver(property::name, x -> property.parse(x).orElse(property.getValues().getFirst()));
+        return Codec.stringResolver(property::getName, x -> property.getValue(x).orElse(property.getPossibleValues().getFirst()));
     }
 
     /*public static ItemStack fromNbtStack(RegistryWrapper.WrapperLookup lookup, NbtElement stack) {
         return stack instanceof NbtCompound compound && compound.isEmpty() ? ItemStack.EMPTY : ItemStack.fromNbt(lookup, stack).orElse(ItemStack.EMPTY);
     }*/
 
-    public static <T> RegistryEntryList<T> fakeTagList(TagKey<T> tag) {
-        return new RegistryEntryList<T>() {
+    public static <T> HolderSet<T> fakeTagList(TagKey<T> tag) {
+        return new HolderSet<T>() {
             @Override
-            public Stream<RegistryEntry<T>> stream() {
+            public Stream<Holder<T>> stream() {
                 return Stream.empty();
             }
 
@@ -622,38 +623,38 @@ public class FactoryUtil {
             }
 
             @Override
-            public Either<TagKey<T>, List<RegistryEntry<T>>> getStorage() {
+            public Either<TagKey<T>, List<Holder<T>>> unwrap() {
                 return Either.left(tag);
             }
 
             @Override
-            public Optional<RegistryEntry<T>> getRandom(Random random) {
+            public Optional<Holder<T>> getRandomElement(RandomSource random) {
                 return Optional.empty();
             }
 
             @Override
-            public RegistryEntry<T> get(int index) {
+            public Holder<T> get(int index) {
                 return null;
             }
 
             @Override
-            public boolean contains(RegistryEntry<T> entry) {
+            public boolean contains(Holder<T> entry) {
                 return false;
             }
 
             @Override
-            public boolean ownerEquals(RegistryEntryOwner<T> owner) {
+            public boolean canSerializeIn(HolderOwner<T> owner) {
                 return true;
             }
 
             @Override
-            public Optional<TagKey<T>> getTagKey() {
+            public Optional<TagKey<T>> unwrapKey() {
                 return Optional.of(tag);
             }
 
             @NotNull
             @Override
-            public Iterator<RegistryEntry<T>> iterator() {
+            public Iterator<Holder<T>> iterator() {
                 return Collections.emptyIterator();
             }
         };
@@ -672,20 +673,20 @@ public class FactoryUtil {
                     break;
                 }
 
-                if (slot.canInsert(stack)) {
-                    var stackInSlot = slot.getStack();
-                    if (!stackInSlot.isEmpty() && ItemStack.areItemsAndComponentsEqual(stack, stackInSlot)) {
+                if (slot.mayPlace(stack)) {
+                    var stackInSlot = slot.getItem();
+                    if (!stackInSlot.isEmpty() && ItemStack.isSameItemSameComponents(stack, stackInSlot)) {
                         var totalCount = stackInSlot.getCount() + stack.getCount();
-                        var maxSize = slot.getMaxItemCount(stackInSlot);
+                        var maxSize = slot.getMaxStackSize(stackInSlot);
                         if (totalCount <= maxSize) {
                             stack.setCount(0);
                             stackInSlot.setCount(totalCount);
-                            slot.markDirty();
+                            slot.setChanged();
                             modified = true;
                         } else if (stackInSlot.getCount() < maxSize) {
-                            stack.decrement(maxSize - stackInSlot.getCount());
+                            stack.shrink(maxSize - stackInSlot.getCount());
                             stackInSlot.setCount(maxSize);
-                            slot.markDirty();
+                            slot.setChanged();
                             modified = true;
                         }
                     }
@@ -695,12 +696,12 @@ public class FactoryUtil {
 
         if (!stack.isEmpty()) {
             for (var slot : slots) {
-                if (slot.canInsert(stack)) {
-                    var stackInSlot = slot.getStack();
-                    if (stackInSlot.isEmpty() && slot.canInsert(stack)) {
-                        var maxSize = slot.getMaxItemCount(stack);
-                        slot.setStack(stack.split(Math.min(stack.getCount(), maxSize)));
-                        slot.markDirty();
+                if (slot.mayPlace(stack)) {
+                    var stackInSlot = slot.getItem();
+                    if (stackInSlot.isEmpty() && slot.mayPlace(stack)) {
+                        var maxSize = slot.getMaxStackSize(stack);
+                        slot.setByPlayer(stack.split(Math.min(stack.getCount(), maxSize)));
+                        slot.setChanged();
                         modified = true;
                         break;
                     }

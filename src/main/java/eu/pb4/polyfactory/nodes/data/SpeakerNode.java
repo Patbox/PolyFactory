@@ -12,13 +12,13 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.generic.FunctionalNode;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import net.minecraft.core.Direction;
 
 
 public record SpeakerNode(Direction facing, EnumSet<Direction> cableDir, int channel) implements FunctionalNode, DirectionCheckingNode, DataReceiverNode {
@@ -40,7 +40,7 @@ public record SpeakerNode(Direction facing, EnumSet<Direction> cableDir, int cha
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
         var list = new ArrayList<HalfLink>();
         for (var dir : cableDir) {
-            FactoryNodes.findNodes(self, self.getBlockPos().offset(dir)).forEach(list::add);
+            FactoryNodes.findNodes(self, self.getBlockPos().relative(dir)).forEach(list::add);
         }
         return list;
     }

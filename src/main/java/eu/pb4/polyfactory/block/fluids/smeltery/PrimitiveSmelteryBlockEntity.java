@@ -18,84 +18,79 @@ import eu.pb4.polyfactory.ui.FuelSlot;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
-import eu.pb4.sgui.api.elements.GuiElementBuilder;
+import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.sgui.virtual.inventory.VirtualSlot;
-import it.unimi.dsi.fastutil.booleans.BooleanList;
-import it.unimi.dsi.fastutil.floats.FloatList;
-import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.input.SingleStackRecipeInput;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.*;
-import net.minecraft.world.World;
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Containers;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, FluidOutput.ContainerBased {
+public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements MinimalSidedContainer, FluidOutput.ContainerBased {
     public static final int FLUID_CAPACITY = (int) (FluidConstants.INGOT * 9);
     private static final int[] ALL_SLOTS = IntStream.range(0, 1).toArray();
     private static final int[] INPUT_SLOTS = new int[]{0};
     private static final int[] FUEL_SLOTS = new int[]{1};
-    private final DefaultedList<ItemStack> items = DefaultedList.ofSize(2, ItemStack.EMPTY);
-    private final FluidContainerImpl fluidContainer = new FluidContainerImpl(FLUID_CAPACITY, this::markDirty);
+    private final NonNullList<ItemStack> items = NonNullList.withSize(2, ItemStack.EMPTY);
+    private final FluidContainerImpl fluidContainer = new FluidContainerImpl(FLUID_CAPACITY, this::setChanged);
     public int fuelTicks = 0;
     public int fuelInitial = 1;
     private int progress = -1;
     private int progressEnd = 1;
     @SuppressWarnings("unchecked")
-    private RecipeEntry<SmelteryRecipe> recipes;
+    private RecipeHolder<SmelteryRecipe> recipes;
     private ItemStack currentStack = ItemStack.EMPTY;
 
     public PrimitiveSmelteryBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.PRIMITIVE_SMELTERY, pos, state);
     }
 
-    public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
+    public static <T extends BlockEntity> void tick(Level world, BlockPos pos, BlockState state, T t) {
         var self = (PrimitiveSmelteryBlockEntity) t;
 
-        FluidContainerUtil.tick(self.fluidContainer, (ServerWorld) world, pos, self.fuelTicks > 0 ? BlockHeat.LAVA : BlockHeat.NEUTRAL, self::addToOutputOrDrop);
+        FluidContainerUtil.tick(self.fluidContainer, (ServerLevel) world, pos, self.fuelTicks > 0 ? BlockHeat.LAVA : BlockHeat.NEUTRAL, self::addToOutputOrDrop);
 
         var dirty = false;
 
         var triesSmelting = false;
 
         {
-            var stack = self.getStack(0);
+            var stack = self.getItem(0);
             if (stack.isEmpty()) {
                 self.progress = -1;
                 self.currentStack = ItemStack.EMPTY;
                 dirty = true;
             } else {
-                var isDirtyStack = !ItemStack.areItemsAndComponentsEqual(self.currentStack, stack);
+                var isDirtyStack = !ItemStack.isSameItemSameComponents(self.currentStack, stack);
                 if (!(!isDirtyStack && self.recipes == null)) {
-                    var input = new SingleStackRecipeInput(stack);
+                    var input = new SingleRecipeInput(stack);
 
                     var nullRecipe = self.recipes == null;
 
                     if (self.recipes == null || !self.recipes.value().matches(input, world)) {
-                        self.recipes = world.getServer().getRecipeManager().getFirstMatch(FactoryRecipeTypes.SMELTERY, input, world).orElse(null);
+                        self.recipes = world.getServer().getRecipeManager().getRecipeFor(FactoryRecipeTypes.SMELTERY, input, world).orElse(null);
                         if (self.recipes == null) {
                             self.progress = -1;
                         } else {
@@ -129,18 +124,18 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
                                 dirty = true;
                             } else if (stored <= self.fluidContainer.capacity()) {
                                 dirty = true;
-                                stack.decrement(1);
+                                stack.shrink(1);
                                 self.progress = 0;
 
                                 for (var x : result) {
                                     self.fluidContainer.insert(x, false);
                                 }
-                                if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
+                                if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayer player) {
                                     TriggerCriterion.trigger(player, FactoryTriggers.SMELTERY_MELTS);
-                                    Criteria.RECIPE_CRAFTED.trigger(player, self.recipes.id(), List.of());
+                                    CriteriaTriggers.RECIPE_CRAFTED.trigger(player, self.recipes.id(), List.of());
                                 }
                             }
-                        } else if (self.world.getServer().getTicks() % 4 == 0) {
+                        } else if (self.level.getServer().getTickCount() % 4 == 0) {
                             var x = Math.max(self.progress - 5, -1);
                             if (x != self.progress) {
                                 self.progress = x;
@@ -155,30 +150,30 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
         if (self.fuelTicks > 0) {
             self.fuelTicks -= triesSmelting ? 4 : 2;
 
-            if (!state.get(SteamEngineBlock.LIT)) {
-                world.setBlockState(pos, state.with(SteamEngineBlock.LIT, true));
+            if (!state.getValue(SteamEngineBlock.LIT)) {
+                world.setBlockAndUpdate(pos, state.setValue(SteamEngineBlock.LIT, true));
             }
         } else {
             var isFueled = false;
             if (triesSmelting) {
-                var stack = self.getStack(1);
+                var stack = self.getItem(1);
 
                 if (!stack.isEmpty()) {
-                    var value = world.getFuelRegistry().getFuelTicks(stack);
+                    var value = world.fuelValues().burnDuration(stack);
                     if (value > 0) {
                         var remainder = stack.getRecipeRemainder();
-                        stack.decrement(1);
+                        stack.shrink(1);
                         self.fuelTicks = value;
                         self.fuelInitial = self.fuelTicks;
                         isFueled = true;
                         if (stack.isEmpty()) {
-                            self.setStack(1, ItemStack.EMPTY);
+                            self.setItem(1, ItemStack.EMPTY);
                         }
 
                         if (!remainder.isEmpty()) {
                             FactoryUtil.insertBetween(self, 9, 12, remainder);
                             if (!remainder.isEmpty()) {
-                                ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, remainder);
+                                Containers.dropItemStack(world, pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, remainder);
                             }
                         }
 
@@ -188,64 +183,64 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
 
             }
 
-            if (state.get(SteamEngineBlock.LIT) != isFueled) {
-                world.setBlockState(pos, state.with(SteamEngineBlock.LIT, isFueled));
+            if (state.getValue(SteamEngineBlock.LIT) != isFueled) {
+                world.setBlockAndUpdate(pos, state.setValue(SteamEngineBlock.LIT, isFueled));
             }
         }
 
         if (dirty) {
-            self.markDirty();
+            self.setChanged();
         }
     }
 
     private void addToOutputOrDrop(ItemStack stack) {
         FactoryUtil.insertBetween(this, 0, 9, stack);
         if (!stack.isEmpty()) {
-            assert this.world != null;
-            ItemScatterer.spawn(this.world, this.pos.getX() + 0.5, this.pos.getY() + 2, this.pos.getZ() + 0.5, stack);
+            assert this.level != null;
+            Containers.dropItemStack(this.level, this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 2, this.worldPosition.getZ() + 0.5, stack);
         }
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        Inventories.writeData(view, this.items);
+    protected void saveAdditional(ValueOutput view) {
+        ContainerHelper.saveAllItems(view, this.items);
         this.fluidContainer.writeData(view, "fluids");
         view.putInt("fuel_ticks", this.fuelTicks);
         view.putInt("fuel_initial", this.fuelInitial);
-        super.writeData(view);
+        super.saveAdditional(view);
     }
 
     @Override
-    public void readData(ReadView view) {
-        Inventories.readData(view, items);
+    public void loadAdditional(ValueInput view) {
+        ContainerHelper.loadAllItems(view, items);
         this.fluidContainer.readData(view, "fluids");
-        this.fuelInitial = view.getInt("fuel_initial", 0);
-        this.fuelTicks = view.getInt("fuel_ticks", 0);
-        super.readData(view);
+        this.fuelInitial = view.getIntOr("fuel_initial", 0);
+        this.fuelTicks = view.getIntOr("fuel_ticks", 0);
+        super.loadAdditional(view);
         this.currentStack = ItemStack.EMPTY;
     }
 
     @Override
-    public DefaultedList<ItemStack> getStacks() {
+    public NonNullList<ItemStack> getStacks() {
         return this.items;
     }
 
     @Override
-    public int[] getAvailableSlots(Direction side) {
+    public int[] getSlotsForFace(Direction side) {
         return ALL_SLOTS;
     }
 
     @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return this.world != null && (slot == 1 == this.world.getFuelRegistry().isFuel(stack));
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
+        return this.level != null && (slot == 1 == this.level.fuelValues().isFuel(stack));
     }
 
     @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return !this.world.getFuelRegistry().isFuel(stack) && slot == 1;
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
+        return !this.level.fuelValues().isFuel(stack) && slot == 1;
     }
 
-    public void createGui(ServerPlayerEntity player) {
+    public void createGui(ServerPlayer player) {
         new Gui(player);
     }
 
@@ -260,10 +255,10 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
     }
 
     @Override
-    public void markDirty() {
-        super.markDirty();
-        if (this.world != null) {
-            this.world.updateComparators(this.getPos().up(), this.getCachedState().getBlock());
+    public void setChanged() {
+        super.setChanged();
+        if (this.level != null) {
+            this.level.updateNeighbourForOutputSignal(this.getBlockPos().above(), this.getBlockState().getBlock());
         }
     }
 
@@ -275,10 +270,10 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
         private int lastFluidUpdate = -1;
         private int delayTick = -1;
 
-        public Gui(ServerPlayerEntity player) {
-            super(ScreenHandlerType.GENERIC_9X3, player, false);
+        public Gui(ServerPlayer player) {
+            super(MenuType.GENERIC_9x3, player, false);
             this.inputSlot = new Slot(PrimitiveSmelteryBlockEntity.this, 0, 0, 0);
-            this.fuelSlot = new FuelSlot(PrimitiveSmelteryBlockEntity.this, 1, player.getEntityWorld().getFuelRegistry());
+            this.fuelSlot = new FuelSlot(PrimitiveSmelteryBlockEntity.this, 1, player.level().fuelValues());
             this.setSlotRedirect(2, this.inputSlot);
             this.setSlotRedirect(9 * 2 + 2, this.fuelSlot);
 
@@ -299,11 +294,11 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
 
         private void updateTitleAndFluid() {
             var text = GuiTextures.PRIMITIVE_SMELTERY.apply(
-                    Text.empty()
-                            .append(Text.literal(GuiTextures.SMELTERY_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
+                    Component.empty()
+                            .append(Component.literal(GuiTextures.SMELTERY_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
                             .append(FluidTextures.PRIMITIVE_SMELTERY.render(PrimitiveSmelteryBlockEntity.this.fluidContainer::provideRender))
-                            .append(Text.literal(GuiTextures.SMELTERY_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
-                            .append(PrimitiveSmelteryBlockEntity.this.getCachedState().getBlock().getName())
+                            .append(Component.literal(GuiTextures.SMELTERY_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
+                            .append(PrimitiveSmelteryBlockEntity.this.getBlockState().getBlock().getName())
             );
 
 
@@ -316,20 +311,20 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
         }
 
         private void updateSmeltingProgress() {
-            var progress = MathHelper.clamp((float) PrimitiveSmelteryBlockEntity.this.progress / PrimitiveSmelteryBlockEntity.this.progressEnd, 0, 1);
+            var progress = Mth.clamp((float) PrimitiveSmelteryBlockEntity.this.progress / PrimitiveSmelteryBlockEntity.this.progressEnd, 0, 1);
             this.setSlot(9 + 3, GuiTextures.PROGRESS_HORIZONTAL_OFFSET_RIGHT.get(progress));
         }
 
 
         private float fuelProgress() {
             return PrimitiveSmelteryBlockEntity.this.fuelInitial > 0
-                    ? MathHelper.clamp(PrimitiveSmelteryBlockEntity.this.fuelTicks / (float) PrimitiveSmelteryBlockEntity.this.fuelInitial, 0, 1)
+                    ? Mth.clamp(PrimitiveSmelteryBlockEntity.this.fuelTicks / (float) PrimitiveSmelteryBlockEntity.this.fuelInitial, 0, 1)
                     : 0;
         }
 
         @Override
         public void onTick() {
-            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(PrimitiveSmelteryBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.position().distanceToSqr(Vec3.atCenterOf(PrimitiveSmelteryBlockEntity.this.worldPosition)) > (18 * 18)) {
                 this.close();
             }
 
@@ -354,14 +349,14 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
         public ItemStack quickMove(int index) {
             ItemStack itemStack = ItemStack.EMPTY;
             Slot slot = this.getSlotRedirectOrPlayer(index);
-            if (slot != null && slot.hasStack() && !(slot instanceof VirtualSlot)) {
-                ItemStack itemStack2 = slot.getStack();
+            if (slot != null && slot.hasItem() && !(slot instanceof VirtualSlot)) {
+                ItemStack itemStack2 = slot.getItem();
                 itemStack = itemStack2.copy();
                 if (index < this.getVirtualSize()) {
                     if (!this.insertItem(itemStack2, this.getVirtualSize(), this.getVirtualSize() + 36, true)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (this.player.getEntityWorld().getFuelRegistry().isFuel(itemStack2)) {
+                } else if (this.player.level().fuelValues().isFuel(itemStack2)) {
                     if (!FactoryUtil.insertItemIntoSlots(itemStack2, List.of(this.fuelSlot), false)) {
                         return ItemStack.EMPTY;
                     }
@@ -372,12 +367,12 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
                 }
 
                 if (itemStack2.isEmpty()) {
-                    slot.setStack(ItemStack.EMPTY);
+                    slot.setByPlayer(ItemStack.EMPTY);
                 } else {
-                    slot.markDirty();
+                    slot.setChanged();
                 }
             } else if (slot instanceof VirtualSlot) {
-                return slot.getStack();
+                return slot.getItem();
             }
 
             return itemStack;

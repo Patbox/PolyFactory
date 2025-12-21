@@ -10,16 +10,14 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntityExtraListener {
     static {
@@ -30,22 +28,22 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
     private ItemStack filterStack = ItemStack.EMPTY;
     private FilterData filter = FilterData.of(ItemStack.EMPTY, true);
     private final Storage<ItemVariant> storage = new FilteredRedirectedStorage<>(ItemStorage.SIDED,
-            this::getWorld, this::getPos, () -> this.getCachedState().get(FunnelBlock.FACING), (t) -> this.matches(t.toStack()));
+            this::getLevel, this::getBlockPos, () -> this.getBlockState().getValue(FunnelBlock.FACING), (t) -> this.matches(t.toStack()));
 
     public FunnelBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.FUNNEL, pos, state);
     }
 
     @Override
-    protected void writeData(WriteView view) {
+    protected void saveAdditional(ValueOutput view) {
         if (!this.filterStack.isEmpty()) {
-            view.put("FilterStack", ItemStack.OPTIONAL_CODEC, this.filterStack);
+            view.store("FilterStack", ItemStack.OPTIONAL_CODEC, this.filterStack);
         }
     }
 
     @Override
-    public void setWorld(World world) {
-        super.setWorld(world);
+    public void setLevel(Level world) {
+        super.setLevel(world);
     }
 
 
@@ -57,7 +55,7 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
     }
 
     @Override
-    public void readData(ReadView view) {
+    public void loadAdditional(ValueInput view) {
         this.filterStack = view.read("FilterStack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         this.filter = FilterData.of(this.filterStack, true);
     }
@@ -67,8 +65,8 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
     }
 
     @Override
-    public void markRemoved() {
-        super.markRemoved();
+    public void setRemoved() {
+        super.setRemoved();
     }
 
     public ItemStack getFilter() {
@@ -78,21 +76,21 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
     public void setFilter(ItemStack stack) {
         this.filterStack = stack;
         this.filter = FilterData.of(stack, true);
-        this.markDirty();
+        this.setChanged();
         this.updateHologram();
     }
 
     @Override
-    public void onListenerUpdate(WorldChunk chunk) {
-        this.model = BlockBoundAttachment.get(chunk, this.pos).holder() instanceof FunnelBlock.Model model ? model : null;
+    public void onListenerUpdate(LevelChunk chunk) {
+        this.model = BlockBoundAttachment.get(chunk, this.worldPosition).holder() instanceof FunnelBlock.Model model ? model : null;
         this.updateHologram();
     }
 
     @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        super.onBlockReplaced(pos, oldState);
-        if (this.world != null) {
-            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, this.getFilter());
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        super.preRemoveSideEffects(pos, oldState);
+        if (this.level != null) {
+            Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, this.getFilter());
         }
     }
 }

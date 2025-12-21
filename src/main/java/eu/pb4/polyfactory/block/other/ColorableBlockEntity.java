@@ -4,14 +4,12 @@ import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 public class ColorableBlockEntity extends BlockEntity implements BlockEntityExtraListener, ColorProvider {
@@ -24,15 +22,15 @@ public class ColorableBlockEntity extends BlockEntity implements BlockEntityExtr
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         view.putInt("color", this.color);
     }
 
     @Override
-    public void readData(ReadView view) {
-        super.readData(view);
-        setColor(view.getInt("color", 0));
+    public void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
+        setColor(view.getIntOr("color", 0));
     }
 
     @Override
@@ -42,7 +40,7 @@ public class ColorableBlockEntity extends BlockEntity implements BlockEntityExtr
             if (this.model != null) {
                 this.model.setColor(color);
             }
-            this.markDirty();
+            this.setChanged();
         }
     }
 
@@ -53,8 +51,8 @@ public class ColorableBlockEntity extends BlockEntity implements BlockEntityExtr
     }
 
     @Override
-    public void onListenerUpdate(WorldChunk chunk) {
-        this.model = (Consumer) BlockBoundAttachment.get(chunk, this.getPos()).holder();
+    public void onListenerUpdate(LevelChunk chunk) {
+        this.model = (Consumer) BlockBoundAttachment.get(chunk, this.getBlockPos()).holder();
         this.model.setColor(this.color);
     }
 

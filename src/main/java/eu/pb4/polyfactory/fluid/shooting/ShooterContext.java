@@ -1,19 +1,18 @@
 package eu.pb4.polyfactory.fluid.shooting;
 
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-
 import java.util.UUID;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.phys.Vec3;
 
 public interface ShooterContext {
-    Random random();
-    ServerWorld world();
+    RandomSource random();
+    ServerLevel world();
     UUID uuid();
-    Vec3d position();
-    Vec3d rotation();
-    SoundCategory soundCategory();
+    Vec3 position();
+    Vec3 rotation();
+    SoundSource soundCategory();
 
     default float force() {
         return 1;

@@ -1,15 +1,15 @@
 package eu.pb4.polyfactory.other;
 
-import net.minecraft.entity.damage.DamageType;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-
 import static eu.pb4.polyfactory.ModInit.id;
 
-public interface FactoryDamageTypes {
-    RegistryKey<DamageType> EXPERIENCE_SPLASH = of("experience_splash");
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.damagesource.DamageType;
 
-    static RegistryKey<DamageType> of(String path) {
-        return RegistryKey.of(RegistryKeys.DAMAGE_TYPE, id(path));
+public interface FactoryDamageTypes {
+    ResourceKey<DamageType> EXPERIENCE_SPLASH = of("experience_splash");
+
+    static ResourceKey<DamageType> of(String path) {
+        return ResourceKey.create(Registries.DAMAGE_TYPE, id(path));
     }
 }

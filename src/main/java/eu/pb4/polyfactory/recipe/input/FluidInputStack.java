@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;
-import net.minecraft.text.MutableText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Unit;
 
 public record FluidInputStack(FluidInstance<?> instance, long required, long used) {
@@ -26,7 +26,7 @@ public record FluidInputStack(FluidInstance<?> instance, long required, long use
         return new FluidInputStack(this.instance, required, this.used);
     }
 
-    public MutableText toTextRequired() {
+    public MutableComponent toTextRequired() {
         return this.instance.toLabeledAmount(required);
     }
 

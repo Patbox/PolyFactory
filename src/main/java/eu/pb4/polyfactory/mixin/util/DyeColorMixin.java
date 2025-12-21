@@ -1,8 +1,8 @@
 package eu.pb4.polyfactory.mixin.util;
 
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import net.minecraft.block.MapColor;
-import net.minecraft.util.DyeColor;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.material.MapColor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

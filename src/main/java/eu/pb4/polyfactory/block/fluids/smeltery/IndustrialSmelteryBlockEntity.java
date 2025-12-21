@@ -2,7 +2,6 @@ package eu.pb4.polyfactory.block.fluids.smeltery;
 
 import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
-import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.BlockHeat;
@@ -20,7 +19,7 @@ import eu.pb4.polyfactory.ui.FuelSlot;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
+import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.sgui.virtual.inventory.VirtualSlot;
@@ -28,25 +27,30 @@ import it.unimi.dsi.fastutil.booleans.BooleanList;
 import it.unimi.dsi.fastutil.floats.FloatList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.input.SingleStackRecipeInput;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.*;
-import net.minecraft.world.World;
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Containers;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -54,20 +58,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, FluidOutput.ContainerBased {
+public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implements MinimalSidedContainer, FluidOutput.ContainerBased {
     public static final int FLUID_CAPACITY = (int) (FluidConstants.BUCKET * 12 * 2);
     private static final Codec<List<BlockState>> BLOCK_STATE_LIST_CODEC = BlockState.CODEC.listOf();
     private static final int[] ALL_SLOTS = IntStream.range(0, 12).toArray();
     private static final int[] INPUT_SLOTS = IntStream.range(0, 9).toArray();
     private static final int[] FUEL_SLOTS = IntStream.range(9, 12).toArray();
-    private final DefaultedList<ItemStack> items = DefaultedList.ofSize(12, ItemStack.EMPTY);
+    private final NonNullList<ItemStack> items = NonNullList.withSize(12, ItemStack.EMPTY);
     private final int[] progress = new int[9];
     private final int[] progressEnd = new int[9];
     @SuppressWarnings("unchecked")
-    private final RecipeEntry<SmelteryRecipe>[] recipes = new RecipeEntry[9];
+    private final RecipeHolder<SmelteryRecipe>[] recipes = new RecipeHolder[9];
     private final ItemStack[] currentStacks = new ItemStack[9];
     private List<BlockState> positionedStates = new ArrayList<>();
-    private final FluidContainerImpl fluidContainer = new FluidContainerImpl(FLUID_CAPACITY, this::markDirty);
+    private final FluidContainerImpl fluidContainer = new FluidContainerImpl(FLUID_CAPACITY, this::setChanged);
     public int fuelTicks = 0;
     public int fuelInitial = 1;
     private boolean alreadyBreaking = false;
@@ -79,10 +83,10 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
         Arrays.fill(this.progressEnd, 1);
     }
 
-    public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
+    public static <T extends BlockEntity> void tick(Level world, BlockPos pos, BlockState state, T t) {
         var self = (IndustrialSmelteryBlockEntity) t;
 
-        FluidContainerUtil.tick(self.fluidContainer, (ServerWorld) world, pos, self.fuelTicks > 0 ? BlockHeat.LAVA : BlockHeat.NEUTRAL, self::addToOutputOrDrop);
+        FluidContainerUtil.tick(self.fluidContainer, (ServerLevel) world, pos, self.fuelTicks > 0 ? BlockHeat.LAVA : BlockHeat.NEUTRAL, self::addToOutputOrDrop);
 
         var dirty = false;
 
@@ -96,17 +100,17 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                 dirty = true;
                 continue;
             }
-            var isDirtyStack = !ItemStack.areItemsAndComponentsEqual(self.currentStacks[i], stack);
+            var isDirtyStack = !ItemStack.isSameItemSameComponents(self.currentStacks[i], stack);
             if (!isDirtyStack && self.recipes[i] == null) {
                 continue;
             }
 
-            var input = new SingleStackRecipeInput(stack);
+            var input = new SingleRecipeInput(stack);
 
             var nullRecipe = self.recipes[i] == null;
 
             if (self.recipes[i] == null || !self.recipes[i].value().matches(input, world)) {
-                self.recipes[i] = world.getServer().getRecipeManager().getFirstMatch(FactoryRecipeTypes.SMELTERY, input, world).orElse(null);
+                self.recipes[i] = world.getServer().getRecipeManager().getRecipeFor(FactoryRecipeTypes.SMELTERY, input, world).orElse(null);
                 if (self.recipes[i] == null) {
                     self.progress[i] = -1;
                 } else {
@@ -146,18 +150,18 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                     continue;
                 }
                 dirty = true;
-                stack.decrement(1);
+                stack.shrink(1);
                 self.progress[i] = 0;
 
                 for (var x : result) {
                     self.fluidContainer.insert(x, false);
                 }
 
-                if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
+                if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayer player) {
                     TriggerCriterion.trigger(player, FactoryTriggers.SMELTERY_MELTS);
-                    Criteria.RECIPE_CRAFTED.trigger(player, self.recipes[i].id(), List.of());
+                    CriteriaTriggers.RECIPE_CRAFTED.trigger(player, self.recipes[i].id(), List.of());
                 }
-            } else if (self.world.getServer().getTicks() % 4 == 0) {
+            } else if (self.level.getServer().getTickCount() % 4 == 0) {
                 var x = Math.max(self.progress[i] - 1, -1);
                 if (x != self.progress[i]) {
                     self.progress[i] = x;
@@ -169,31 +173,31 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
         if (self.fuelTicks > 0) {
             self.fuelTicks -= triesSmelting ? 3 : 1;
 
-            if (!state.get(SteamEngineBlock.LIT)) {
-                world.setBlockState(pos, state.with(SteamEngineBlock.LIT, true));
+            if (!state.getValue(SteamEngineBlock.LIT)) {
+                world.setBlockAndUpdate(pos, state.setValue(SteamEngineBlock.LIT, true));
             }
         } else {
             var isFueled = false;
             if (triesSmelting) {
                 for (int i = 9; i < 12; i++) {
-                    var stack = self.getStack(i);
+                    var stack = self.getItem(i);
 
                     if (!stack.isEmpty()) {
-                        var value = world.getFuelRegistry().getFuelTicks(stack);
+                        var value = world.fuelValues().burnDuration(stack);
                         if (value > 0) {
                             var remainder = stack.getRecipeRemainder();
-                            stack.decrement(1);
+                            stack.shrink(1);
                             self.fuelTicks = value;
                             self.fuelInitial = self.fuelTicks;
                             isFueled = true;
                             if (stack.isEmpty()) {
-                                self.setStack(i, ItemStack.EMPTY);
+                                self.setItem(i, ItemStack.EMPTY);
                             }
 
                             if (!remainder.isEmpty()) {
                                 FactoryUtil.insertBetween(self, 9, 12, remainder);
                                 if (!remainder.isEmpty()) {
-                                    ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, remainder);
+                                    Containers.dropItemStack(world, pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, remainder);
                                 }
                             }
 
@@ -204,66 +208,66 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                 }
             }
 
-            if (state.get(SteamEngineBlock.LIT) != isFueled) {
-                world.setBlockState(pos, state.with(SteamEngineBlock.LIT, isFueled));
+            if (state.getValue(SteamEngineBlock.LIT) != isFueled) {
+                world.setBlockAndUpdate(pos, state.setValue(SteamEngineBlock.LIT, isFueled));
             }
         }
 
         if (dirty) {
-            self.markDirty();
+            self.setChanged();
         }
     }
 
     private void addToOutputOrDrop(ItemStack stack) {
         FactoryUtil.insertBetween(this, 0, 9, stack);
         if (!stack.isEmpty()) {
-            assert this.world != null;
-            ItemScatterer.spawn(this.world, this.pos.getX() + 0.5, this.pos.getY() + 2, this.pos.getZ() + 0.5, stack);
+            assert this.level != null;
+            Containers.dropItemStack(this.level, this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 2, this.worldPosition.getZ() + 0.5, stack);
         }
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        Inventories.writeData(view, this.items);
+    protected void saveAdditional(ValueOutput view) {
+        ContainerHelper.saveAllItems(view, this.items);
         this.fluidContainer.writeData(view, "fluids");
         view.putInt("fuel_ticks", this.fuelTicks);
         view.putInt("fuel_initial", this.fuelInitial);
-        view.put("positioned_states", BLOCK_STATE_LIST_CODEC, this.positionedStates);
-        super.writeData(view);
+        view.store("positioned_states", BLOCK_STATE_LIST_CODEC, this.positionedStates);
+        super.saveAdditional(view);
     }
 
     @Override
-    public void readData(ReadView view) {
-        Inventories.readData(view, items);
+    public void loadAdditional(ValueInput view) {
+        ContainerHelper.loadAllItems(view, items);
         this.fluidContainer.readData(view, "fluids");
-        this.fuelInitial = view.getInt("fuel_initial", 0);
-        this.fuelTicks = view.getInt("fuel_ticks", 0);
+        this.fuelInitial = view.getIntOr("fuel_initial", 0);
+        this.fuelTicks = view.getIntOr("fuel_ticks", 0);
         this.positionedStates = view.read("positioned_states", BLOCK_STATE_LIST_CODEC).orElse(List.of());
-        super.readData(view);
+        super.loadAdditional(view);
         Arrays.fill(this.currentStacks, ItemStack.EMPTY);
     }
 
     @Override
-    public DefaultedList<ItemStack> getStacks() {
+    public NonNullList<ItemStack> getStacks() {
         return this.items;
     }
 
     @Override
-    public int[] getAvailableSlots(Direction side) {
+    public int[] getSlotsForFace(Direction side) {
         return ALL_SLOTS;
     }
 
     @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return this.world != null && (slot >= 9 == this.world.getFuelRegistry().isFuel(stack));
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
+        return this.level != null && (slot >= 9 == this.level.fuelValues().isFuel(stack));
     }
 
     @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return !this.world.getFuelRegistry().isFuel(stack) && slot >= 9;
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
+        return !this.level.fuelValues().isFuel(stack) && slot >= 9;
     }
 
-    public void createGui(ServerPlayerEntity player) {
+    public void createGui(ServerPlayer player) {
         new Gui(player);
     }
 
@@ -278,40 +282,40 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
     }
 
     @Override
-    public void markDirty() {
-        super.markDirty();
-        if (this.world == null) {
+    public void setChanged() {
+        super.setChanged();
+        if (this.level == null) {
             return;
         }
-        for (var pos : BlockPos.iterateOutwards(this.getPos(), 1, 1, 1)) {
-            if (pos.equals(this.getPos())) {
+        for (var pos : BlockPos.withinManhattan(this.getBlockPos(), 1, 1, 1)) {
+            if (pos.equals(this.getBlockPos())) {
                 continue;
             }
-            this.world.updateComparators(pos, this.getCachedState().getBlock());
+            this.level.updateNeighbourForOutputSignal(pos, this.getBlockState().getBlock());
         }
     }
 
     @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
         //super.onBlockReplaced(pos, oldState);
-        breakSmeltery((ServerWorld) world, pos, pos, true);
+        breakSmeltery((ServerLevel) level, pos, pos, true);
     }
 
-    public void breakSmeltery(ServerWorld world, BlockPos pos, BlockPos brokenPos, boolean center) {
+    public void breakSmeltery(ServerLevel world, BlockPos pos, BlockPos brokenPos, boolean center) {
         if (this.alreadyBreaking) {
             return;
         }
         this.alreadyBreaking = true;
         int i = 0;
-        ItemScatterer.spawn(world, pos.offset(this.getCachedState().get(IndustrialSmelteryBlock.FACING), 2), this);
-        for (var blockPos : BlockPos.iterate(pos.add(-1, -1, -1), pos.add(1, 1, 1))) {
-            var state = this.positionedStates.size() > i ? this.positionedStates.get(i) : Blocks.AIR.getDefaultState();
+        Containers.dropContents(world, pos.relative(this.getBlockState().getValue(IndustrialSmelteryBlock.FACING), 2), this);
+        for (var blockPos : BlockPos.betweenClosed(pos.offset(-1, -1, -1), pos.offset(1, 1, 1))) {
+            var state = this.positionedStates.size() > i ? this.positionedStates.get(i) : Blocks.AIR.defaultBlockState();
             i++;
             if (brokenPos.equals(blockPos) && !state.isAir()) {
-                ItemScatterer.spawn(world, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5,
-                        state.getBlock().asItem().getDefaultStack());
+                Containers.dropItemStack(world, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5,
+                        state.getBlock().asItem().getDefaultInstance());
             } else {
-                world.setBlockState(blockPos, state);
+                world.setBlockAndUpdate(blockPos, state);
             }
         }
 
@@ -344,8 +348,8 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
         private final List<Slot> inputSlots = new ArrayList<>();
         private final List<Slot> fuelSlots = new ArrayList<>();
 
-        public Gui(ServerPlayerEntity player) {
-            super(ScreenHandlerType.GENERIC_9X5, player, false);
+        public Gui(ServerPlayer player) {
+            super(MenuType.GENERIC_9x5, player, false);
             for (int y = 0; y < 3; y++) {
                 for (int x = 0; x < 3; x++) {
                     var slot = new Slot(IndustrialSmelteryBlockEntity.this, y * 3 + x, x, y);
@@ -358,7 +362,7 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                 for (int y = 0; y < 5; y++) {
                     this.setSlot(9 * y + 5 + x, fluid);
                 }
-                var slot = new FuelSlot(IndustrialSmelteryBlockEntity.this, 9 + x, player.getEntityWorld().getFuelRegistry());
+                var slot = new FuelSlot(IndustrialSmelteryBlockEntity.this, 9 + x, player.level().fuelValues());
 
                 this.setSlotRedirect(9 * 4 + 1 + x, slot);
                 this.fuelSlots.add(slot);
@@ -375,11 +379,11 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
 
         private void updateTitleAndFluid() {
             var text = GuiTextures.SMELTERY.apply(
-                    Text.empty()
-                            .append(Text.literal(GuiTextures.SMELTERY_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
+                    Component.empty()
+                            .append(Component.literal(GuiTextures.SMELTERY_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
                             .append(FluidTextures.SMELTERY.render(IndustrialSmelteryBlockEntity.this.fluidContainer::provideRender))
-                            .append(Text.literal(GuiTextures.SMELTERY_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
-                            .append(IndustrialSmelteryBlockEntity.this.getCachedState().getBlock().getName())
+                            .append(Component.literal(GuiTextures.SMELTERY_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
+                            .append(IndustrialSmelteryBlockEntity.this.getBlockState().getBlock().getName())
             );
 
 
@@ -399,8 +403,8 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                 for (int x = 0; x < 3; x++) {
                     int i = y * 3 + x;
                     progress[x] = (float) IndustrialSmelteryBlockEntity.this.progress[i] / IndustrialSmelteryBlockEntity.this.progressEnd[i];
-                    enabled[x] = IndustrialSmelteryBlockEntity.this.progress[i] > -1 && !IndustrialSmelteryBlockEntity.this.getStack(i).isEmpty();
-                    color[x] = ColorHelper.lerp(progress[x], 0xFFFFFF, 0xFF2200);
+                    enabled[x] = IndustrialSmelteryBlockEntity.this.progress[i] > -1 && !IndustrialSmelteryBlockEntity.this.getItem(i).isEmpty();
+                    color[x] = ARGB.srgbLerp(progress[x], 0xFFFFFF, 0xFF2200);
                 }
                 enabled[3] = true;
                 this.setSlot(y * 9 + 4, new GuiElementBuilder(GuiTextures.LEFT_SHIFTED_3_BARS)
@@ -412,13 +416,13 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
 
         private float fuelProgress() {
             return IndustrialSmelteryBlockEntity.this.fuelInitial > 0
-                    ? MathHelper.clamp(IndustrialSmelteryBlockEntity.this.fuelTicks / (float) IndustrialSmelteryBlockEntity.this.fuelInitial, 0, 1)
+                    ? Mth.clamp(IndustrialSmelteryBlockEntity.this.fuelTicks / (float) IndustrialSmelteryBlockEntity.this.fuelInitial, 0, 1)
                     : 0;
         }
 
         @Override
         public void onTick() {
-            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(IndustrialSmelteryBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.position().distanceToSqr(Vec3.atCenterOf(IndustrialSmelteryBlockEntity.this.worldPosition)) > (18 * 18)) {
                 this.close();
             }
 
@@ -442,14 +446,14 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
         public ItemStack quickMove(int index) {
             ItemStack itemStack = ItemStack.EMPTY;
             Slot slot = this.getSlotRedirectOrPlayer(index);
-            if (slot != null && slot.hasStack() && !(slot instanceof VirtualSlot)) {
-                ItemStack itemStack2 = slot.getStack();
+            if (slot != null && slot.hasItem() && !(slot instanceof VirtualSlot)) {
+                ItemStack itemStack2 = slot.getItem();
                 itemStack = itemStack2.copy();
                 if (index < this.getVirtualSize()) {
                     if (!this.insertItem(itemStack2, this.getVirtualSize(), this.getVirtualSize() + 36, true)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (this.player.getEntityWorld().getFuelRegistry().isFuel(itemStack2)) {
+                } else if (this.player.level().fuelValues().isFuel(itemStack2)) {
                     if (!FactoryUtil.insertItemIntoSlots(itemStack2, this.fuelSlots, false)) {
                         return ItemStack.EMPTY;
                     }
@@ -460,12 +464,12 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                 }
 
                 if (itemStack2.isEmpty()) {
-                    slot.setStack(ItemStack.EMPTY);
+                    slot.setByPlayer(ItemStack.EMPTY);
                 } else {
-                    slot.markDirty();
+                    slot.setChanged();
                 }
             } else if (slot instanceof VirtualSlot) {
-                return slot.getStack();
+                return slot.getItem();
             }
 
             return itemStack;

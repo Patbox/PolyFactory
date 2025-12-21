@@ -7,15 +7,14 @@ import eu.pb4.polydex.api.v1.recipe.PolydexStack;
 import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.recipe.grinding.StrippingGrindingRecipe;
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.display.SlotDisplay;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -30,14 +29,14 @@ public class StrippingGrindingRecipePage extends GrindingRecipePage<StrippingGri
     private final IdentityHashMap<Item, Item> input2output = new IdentityHashMap<>();
     private final IdentityHashMap<Item, Item> output2input = new IdentityHashMap<>();
 
-    public StrippingGrindingRecipePage(RecipeEntry<StrippingGrindingRecipe> recipe) {
+    public StrippingGrindingRecipePage(RecipeHolder<StrippingGrindingRecipe> recipe) {
         super(recipe);
         var inputs = new ArrayList<Item>();
         var outputs = new ArrayList<PolydexStack<?>>();
 
         if (recipe.value().input().isPresent()) {
-            recipe.value().input().get().getMatchingItems().forEach(ref -> {
-                var stripped = ref.value() instanceof BlockItem blockItem ? StrippableBlockRegistry.getStrippedBlockState(blockItem.getBlock().getDefaultState()) : null;
+            recipe.value().input().get().items().forEach(ref -> {
+                var stripped = ref.value() instanceof BlockItem blockItem ? StrippableBlockRegistry.getStrippedBlockState(blockItem.getBlock().defaultBlockState()) : null;
                 if (stripped != null) {
                     input2output.put(ref.value(), stripped.getBlock().asItem());
                     output2input.put(stripped.getBlock().asItem(), ref.value());
@@ -47,10 +46,10 @@ public class StrippingGrindingRecipePage extends GrindingRecipePage<StrippingGri
             });
         }
 
-        this.inputDisplay = inputs.stream().map(Item::getDefaultStack).toArray(ItemStack[]::new);
+        this.inputDisplay = inputs.stream().map(Item::getDefaultInstance).toArray(ItemStack[]::new);
         this.output = outputs.toArray(PolydexStack[]::new);
         this.outputExtra = PolydexCompatImpl.createOutput(this.recipe.output());
-        this.ingredients = List.of(PolydexIngredient.of(Ingredient.ofItems(inputs.toArray(ItemConvertible[]::new))));
+        this.ingredients = List.of(PolydexIngredient.of(Ingredient.of(inputs.toArray(ItemLike[]::new))));
     }
 
     @Override
@@ -63,7 +62,7 @@ public class StrippingGrindingRecipePage extends GrindingRecipePage<StrippingGri
         if (polydexEntry != null && polydexEntry.stack().getBacking() instanceof ItemStack stack) {
             var x = input2output.get(stack.getItem());
             if (x != null) {
-                return x.getDefaultStack();
+                return x.getDefaultInstance();
             }
             x = output2input.get(stack.getItem());
             if (x != null) {
@@ -91,11 +90,11 @@ public class StrippingGrindingRecipePage extends GrindingRecipePage<StrippingGri
     }
 
     @Override
-    public ItemStack entryIcon(@Nullable PolydexEntry entry, ServerPlayerEntity player) {
+    public ItemStack entryIcon(@Nullable PolydexEntry entry, ServerPlayer player) {
         if (entry != null && entry.stack().getBacking() instanceof ItemStack stack) {
             var x = input2output.get(stack.getItem());
             if (x != null) {
-                return x.getDefaultStack();
+                return x.getDefaultInstance();
             }
             x = output2input.get(stack.getItem());
             if (x != null) {
@@ -107,16 +106,16 @@ public class StrippingGrindingRecipePage extends GrindingRecipePage<StrippingGri
     }
 
     @Override
-    public void createPage(@Nullable PolydexEntry entry, ServerPlayerEntity player, PageBuilder layer) {
+    public void createPage(@Nullable PolydexEntry entry, ServerPlayer player, PageBuilder layer) {
         if (entry != null && entry.stack().getBacking() instanceof ItemStack stack) {
             var x = input2output.get(stack.getItem());
             var y = output2input.get(stack.getItem());
 
             if (x != null) {
                 layer.setIngredient(4, 1, stack);
-                layer.setOutput(3, 3, x.getDefaultStack());
+                layer.setOutput(3, 3, x.getDefaultInstance());
             } else if (y != null) {
-                layer.setIngredient(4, 1, y.getDefaultStack());
+                layer.setIngredient(4, 1, y.getDefaultInstance());
                 layer.setOutput(3, 3, stack);
             } else {
                 layer.setIngredient(4, 1, this.inputDisplay);

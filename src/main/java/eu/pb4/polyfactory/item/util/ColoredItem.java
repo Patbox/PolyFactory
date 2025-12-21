@@ -3,13 +3,11 @@ package eu.pb4.polyfactory.item.util;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryColors;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
-
 import java.util.Locale;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public interface ColoredItem {
     static ItemStack stack(Item input, int count, DyeColor color) {
@@ -52,7 +50,7 @@ public interface ColoredItem {
 
     static boolean hasColor(ItemStack stack) {
         if (stack.getItem() instanceof ColoredItem) {
-            return stack.contains(FactoryDataComponents.COLOR);
+            return stack.has(FactoryDataComponents.COLOR);
         }
 
         return false;
@@ -76,13 +74,13 @@ public interface ColoredItem {
         return false;
     }
 
-    static Text getColorName(int color) {
+    static Component getColorName(int color) {
         if (color == FactoryColors.YTTR_TEAL) {
-            return Text.translatable("color.polyfactory.teal");
+            return Component.translatable("color.polyfactory.teal");
         }
 
         DyeColor dyeColor = DyeColorExtra.BY_COLOR.get(color);
 
-        return dyeColor == null ? Text.translatable("item.minecraft.firework_star.custom_color") : Text.translatable("item.minecraft.firework_star." + dyeColor.asString());
+        return dyeColor == null ? Component.translatable("item.minecraft.firework_star.custom_color") : Component.translatable("item.minecraft.firework_star." + dyeColor.getSerializedName());
     }
 }

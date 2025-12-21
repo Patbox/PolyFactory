@@ -7,20 +7,18 @@ import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.CustomModelDataTintSource;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
-
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.state.BlockState;
 
 import static eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras.bridgeModel;
 
@@ -35,8 +33,8 @@ public class DirectionConnectingModel {
         this.colored = colored;
 
         for (var i = 0; i < SIZE; i++) {
-            this.models[i] = Items.PAPER.getDefaultStack();
-            this.models[i].set(DataComponentTypes.ITEM_MODEL, bridgeModel(baseModel.withSuffixedPath("/" + i)));
+            this.models[i] = Items.PAPER.getDefaultInstance();
+            this.models[i].set(DataComponents.ITEM_MODEL, bridgeModel(baseModel.withSuffix("/" + i)));
         }
     }
 
@@ -51,18 +49,18 @@ public class DirectionConnectingModel {
             for (var element : model.getAsJsonArray("elements")) {
                 var name = element.getAsJsonObject().get("name");
 
-                if (name == null || Direction.byId(name.getAsString()) == null || hasDirection(i, Direction.byId(name.getAsString()))) {
+                if (name == null || Direction.byName(name.getAsString()) == null || hasDirection(i, Direction.byName(name.getAsString()))) {
                     elements.add(element);
                 }
             }
             base.add("elements", elements);
 
-            dataWriter.accept(AssetPaths.model(this.baseModel.withSuffixedPath("/" + i + ".json")), base.toString().getBytes(StandardCharsets.UTF_8));
+            dataWriter.accept(AssetPaths.model(this.baseModel.withSuffix("/" + i + ".json")), base.toString().getBytes(StandardCharsets.UTF_8));
             if (this.colored) {
-                dataWriter.accept(AssetPaths.itemAsset(bridgeModel(this.baseModel.withSuffixedPath("/" + i))),
+                dataWriter.accept(AssetPaths.itemAsset(bridgeModel(this.baseModel.withSuffix("/" + i))),
                         new ItemAsset(
                                 new BasicItemModel(
-                                        this.baseModel.withSuffixedPath("/" + i),
+                                        this.baseModel.withSuffix("/" + i),
                                         List.of(new CustomModelDataTintSource(0, 0xFFFFFF))
                                 ),
                                 ItemAsset.Properties.DEFAULT).toJson().getBytes(StandardCharsets.UTF_8));

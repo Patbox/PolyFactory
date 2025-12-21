@@ -14,36 +14,36 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Util;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public abstract class SmelteryRecipePage<T extends SmelteryRecipe> extends PrioritizedRecipePage<T> {
-    private static final ItemStack ICON = new GuiElementBuilder(FactoryItems.SMELTERY).setName(Text.translatable("polydex_category.polyfactory.polyfactory.smeltery")).asStack();
+    private static final ItemStack ICON = new GuiElementBuilder(FactoryItems.SMELTERY).setName(Component.translatable("polydex_category.polyfactory.polyfactory.smeltery")).asStack();
     private final PolydexIngredient<?> ingredient;
     private final PolydexStack<?>[] outputFluids;
 
     @Override
-    public @Nullable Text texture(ServerPlayerEntity player) {
-        return Text.empty()
+    public @Nullable Component texture(ServerPlayer player) {
+        return Component.empty()
                 .append(PolydexTextures.SMELTERY)
-                .append(Text.literal("" + GuiTextures.POLYDEX_OFFSET_N + GuiTextures.SMELTERY_POLYDEX_FLUID_OFFSET).setStyle(UiResourceCreator.STYLE))
+                .append(Component.literal("" + GuiTextures.POLYDEX_OFFSET_N + GuiTextures.SMELTERY_POLYDEX_FLUID_OFFSET).setStyle(UiResourceCreator.STYLE))
                 .append(FluidTextures.SMELTERY.render((a) -> {
                     for (var x : getFluidOutput()) {
                         //a.accept(x.instance(), (float) (x.amount() / (double) IndustrialSmelteryBlockEntity.FLUID_CAPACITY));
                         a.accept(x.instance(), (float) (x.amount() / (double) (FluidConstants.BLOCK * 8)));
                     }
                 }))
-                .append(Text.literal("" + GuiTextures.SMELTERY_POLYDEX_FLUID_OFFSET_N + GuiTextures.POLYDEX_OFFSET).setStyle(UiResourceCreator.STYLE));
+                .append(Component.literal("" + GuiTextures.SMELTERY_POLYDEX_FLUID_OFFSET_N + GuiTextures.POLYDEX_OFFSET).setStyle(UiResourceCreator.STYLE));
     }
 
     @Override
@@ -54,21 +54,21 @@ public abstract class SmelteryRecipePage<T extends SmelteryRecipe> extends Prior
     protected abstract Ingredient getInput();
     protected abstract List<FluidStack<?>> getFluidOutput();
 
-    public SmelteryRecipePage(RecipeEntry<T> recipe) {
+    public SmelteryRecipePage(RecipeHolder<T> recipe) {
         super(recipe);
         this.ingredient = PolydexIngredient.of(getInput());
         this.outputFluids = PolydexCompatImpl.createFluids(getFluidOutput()).toArray(new PolydexStack[0]);
     }
     @Override
-    public ItemStack typeIcon(ServerPlayerEntity player) {
+    public ItemStack typeIcon(ServerPlayer player) {
         return ICON;
     }
 
     @Override
-    public ItemStack entryIcon(@Nullable PolydexEntry entry, ServerPlayerEntity player) {
+    public ItemStack entryIcon(@Nullable PolydexEntry entry, ServerPlayer player) {
         var b = GuiElementBuilder.from(this.outputFluids[0].toTypeDisplayItemStack(player));
         for (var x : this.ingredient.asStacks()) {
-            b.addLoreLine(Text.literal("- ").append(x.getName()).formatted(Formatting.GRAY));
+            b.addLoreLine(Component.literal("- ").append(x.getName()).withStyle(ChatFormatting.GRAY));
         }
         return b.asStack();
     }
@@ -90,13 +90,13 @@ public abstract class SmelteryRecipePage<T extends SmelteryRecipe> extends Prior
     }
 
     @Override
-    public void createPage(@Nullable PolydexEntry entry, ServerPlayerEntity player, PageBuilder layer) {
+    public void createPage(@Nullable PolydexEntry entry, ServerPlayer player, PageBuilder layer) {
         layer.setIngredient(2, 2, this.ingredient);
 
         var fluid = GuiTextures.EMPTY_BUILDER.get();
-        fluid.setName(Text.translatable("text.polyfactory.polydex.created_fluids"));
+        fluid.setName(Component.translatable("text.polyfactory.polydex.created_fluids"));
         for (var stack : getFluidOutput()) {
-            fluid.addLoreLine(stack.toTextRequired().setStyle(Style.EMPTY.withColor(Formatting.GRAY).withItalic(false)));
+            fluid.addLoreLine(stack.toTextRequired().setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY).withItalic(false)));
         }
 
         for (int y = 0; y < 5; y++) {

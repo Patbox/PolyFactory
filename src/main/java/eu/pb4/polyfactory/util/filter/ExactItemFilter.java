@@ -1,13 +1,12 @@
 package eu.pb4.polyfactory.util.filter;
 
-import net.minecraft.item.ItemStack;
-
 import java.util.Objects;
+import net.minecraft.world.item.ItemStack;
 
 public record ExactItemFilter(ItemStack item) implements ItemFilter {
     @Override
     public boolean test(ItemStack stack) {
-        return !stack.isEmpty() && ItemStack.areItemsAndComponentsEqual(item, stack);
+        return !stack.isEmpty() && ItemStack.isSameItemSameComponents(item, stack);
     }
 
     @Override
@@ -15,7 +14,7 @@ public record ExactItemFilter(ItemStack item) implements ItemFilter {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ExactItemFilter that = (ExactItemFilter) o;
-        return ItemStack.areItemsAndComponentsEqual(that.item, this.item);
+        return ItemStack.isSameItemSameComponents(that.item, this.item);
     }
 
     @Override

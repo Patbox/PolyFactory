@@ -1,10 +1,9 @@
 package eu.pb4.polyfactory.block.other;
 
 import com.mojang.serialization.*;
-import net.minecraft.block.BlockState;
-
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
+import net.minecraft.world.level.block.state.BlockState;
 
 public interface StatePropertiesCodecPatcher {
     static MapCodec<BlockState> modifier(MapCodec<BlockState> codec, Modifier modifier) {

@@ -5,66 +5,64 @@ import eu.pb4.polyfactory.block.collection.BlockCollectionData;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.joml.Quaternionf;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Optional;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 
-public class MinecartWithBlocksEntity extends AbstractMinecartEntity implements PolymerEntity {
+public class MinecartWithBlocksEntity extends AbstractMinecart implements PolymerEntity {
     private final ElementHolder holder;
     private final BlockCollection blocks;
 
-    public MinecartWithBlocksEntity(EntityType<?> entityType, World world) {
+    public MinecartWithBlocksEntity(EntityType<?> entityType, Level world) {
         super(entityType, world);
         this.holder = new ElementHolder();
         this.blocks = new BlockCollection(BlockCollectionData.createDebug());
         this.blocks.setCenter(4, 0, 4);
-        this.blocks.setOffset(new Vec3d(0, 2f, 0));
+        this.blocks.setOffset(new Vec3(0, 2f, 0));
         this.holder.addElement(this.blocks);
         EntityAttachment.ofTicking(this.holder, this);
-        this.setCustomBlockState(Optional.of(Blocks.DROPPER.getDefaultState()));
-        this.setBlockOffset(8);
+        this.setCustomDisplayBlockState(Optional.of(Blocks.DROPPER.defaultBlockState()));
+        this.setDisplayOffset(8);
     }
 
     @Override
-    public void onRemoved() {
-        super.onRemoved();
+    public void onClientRemoval() {
+        super.onClientRemoval();
         this.blocks.setWorld(null);
     }
 
     @Override
-    public void onRemove(RemovalReason reason) {
-        super.onRemove(reason);
+    public void onRemoval(RemovalReason reason) {
+        super.onRemoval(reason);
         this.blocks.setWorld(null);
 
     }
 
     @Override
     public void tick() {
-        this.blocks.setWorld((ServerWorld) this.getEntityWorld());
+        this.blocks.setWorld((ServerLevel) this.level());
         super.tick();
         this.blocks.setOverridePos(this.blocks.getCurrentPos().lerp(this.holder.getPos().add(0, 2, 0), 0.25));
         //this.blocks.setQuaternion(new Quaternionf().rotateY(this.getYaw() * MathHelper.RADIANS_PER_DEGREE));
     }
 
     @Override
-    public ItemStack getPickBlockStack() {
+    public ItemStack getPickResult() {
         return ItemStack.EMPTY;
     }
 
     @Override
-    protected Item asItem() {
+    protected Item getDropItem() {
         return Items.AIR;
     }
 

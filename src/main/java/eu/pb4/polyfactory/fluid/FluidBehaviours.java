@@ -1,11 +1,11 @@
 package eu.pb4.polyfactory.fluid;
 
 
-import net.minecraft.block.BlockState;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Pair;
+import net.minecraft.util.Tuple;
 import net.minecraft.util.Unit;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -16,8 +16,8 @@ import java.util.function.Function;
 
 public interface FluidBehaviours {
     long EXPERIENCE_ORB_TO_FLUID = 500;
-    Map<BlockState, Pair<FluidStack<Unit>, BlockState>> BLOCK_STATE_TO_FLUID_EXTRACT = new IdentityHashMap<>();
-    Map<BlockState, List<Pair<FluidStack<?>, BlockState>>> BLOCK_STATE_TO_FLUID_INSERT = new IdentityHashMap<>();
+    Map<BlockState, Tuple<FluidStack<Unit>, BlockState>> BLOCK_STATE_TO_FLUID_EXTRACT = new IdentityHashMap<>();
+    Map<BlockState, List<Tuple<FluidStack<?>, BlockState>>> BLOCK_STATE_TO_FLUID_INSERT = new IdentityHashMap<>();
 
     Map<Item, Function<ItemStack, @Nullable FluidInstance<?>>> ITEM_TO_FLUID = new IdentityHashMap<>();
 
@@ -30,14 +30,14 @@ public interface FluidBehaviours {
     }
 
     static void addBlockStateConversions(BlockState withFluid, BlockState withoutFluid, FluidStack<Unit> fluid) {
-        BLOCK_STATE_TO_FLUID_EXTRACT.put(withFluid, new Pair<>(fluid, withoutFluid));
-        BLOCK_STATE_TO_FLUID_INSERT.computeIfAbsent(withoutFluid, (a) -> new ArrayList<>()).add(new Pair<>(fluid, withFluid));
+        BLOCK_STATE_TO_FLUID_EXTRACT.put(withFluid, new Tuple<>(fluid, withoutFluid));
+        BLOCK_STATE_TO_FLUID_INSERT.computeIfAbsent(withoutFluid, (a) -> new ArrayList<>()).add(new Tuple<>(fluid, withFluid));
     }
     static void addBlockStateInsert(BlockState withFluid, BlockState withoutFluid, FluidStack<Unit> fluid) {
-        BLOCK_STATE_TO_FLUID_INSERT.computeIfAbsent(withoutFluid, (a) -> new ArrayList<>()).add(new Pair<>(fluid, withFluid));
+        BLOCK_STATE_TO_FLUID_INSERT.computeIfAbsent(withoutFluid, (a) -> new ArrayList<>()).add(new Tuple<>(fluid, withFluid));
     }
 
     static void addBlockStateExtract(BlockState withFluid, BlockState withoutFluid, FluidStack<Unit> fluid) {
-        BLOCK_STATE_TO_FLUID_EXTRACT.put(withFluid, new Pair<>(fluid, withoutFluid));
+        BLOCK_STATE_TO_FLUID_EXTRACT.put(withFluid, new Tuple<>(fluid, withoutFluid));
     }
 }

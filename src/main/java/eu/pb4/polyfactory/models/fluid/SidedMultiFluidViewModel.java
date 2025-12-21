@@ -9,8 +9,6 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -20,6 +18,8 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 
 public class SidedMultiFluidViewModel {
     private final Map<FluidInstance<?>, SidedMultiFluidViewModel.Layer> fluidLayers = new Object2ObjectOpenHashMap<>();
@@ -57,7 +57,7 @@ public class SidedMultiFluidViewModel {
     }
 
     private static int textureId(float amount) {
-        return MathHelper.clamp(Math.round(amount * 15), 0, 15);
+        return Mth.clamp(Math.round(amount * 15), 0, 15);
     }
 
     private void setLayer(FluidInstance<?> instance, float amount) {
@@ -72,7 +72,7 @@ public class SidedMultiFluidViewModel {
                 parts.put(dir, model);
                 if (dir.getAxis() != Direction.Axis.Y) {
                     model.setPitch(90);
-                    model.setYaw(dir.getPositiveHorizontalDegrees());
+                    model.setYaw(dir.toYRot());
                 }
                 instance.brightness().ifPresent(model::setBrightness);
             }
@@ -148,7 +148,7 @@ public class SidedMultiFluidViewModel {
                     model.addElement(parts.get(Direction.NORTH));
                     model.addElement(parts.get(Direction.SOUTH));
                 } else {
-                    var dir = Direction.from(Direction.Axis.Z, val);
+                    var dir = Direction.fromAxisAndDirection(Direction.Axis.Z, val);
                     model.addElement(parts.get(dir));
                     model.removeElement(parts.get(dir.getOpposite()));
                 }
@@ -163,7 +163,7 @@ public class SidedMultiFluidViewModel {
                     model.addElement(parts.get(Direction.EAST));
                     model.addElement(parts.get(Direction.WEST));
                 } else {
-                    var dir = Direction.from(Direction.Axis.X, val);
+                    var dir = Direction.fromAxisAndDirection(Direction.Axis.X, val);
                     model.addElement(parts.get(dir));
                     model.removeElement(parts.get(dir.getOpposite()));
                 }

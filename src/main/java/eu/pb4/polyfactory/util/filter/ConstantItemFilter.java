@@ -1,9 +1,7 @@
 package eu.pb4.polyfactory.util.filter;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-
 import java.util.Objects;
+import net.minecraft.world.item.ItemStack;
 
 public record ConstantItemFilter(boolean value) implements ItemFilter {
     public static final ItemFilter TRUE = new ConstantItemFilter(true);

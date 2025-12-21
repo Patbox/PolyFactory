@@ -3,14 +3,11 @@ package eu.pb4.polyfactory.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.registry.Registries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.ItemStack;
 
 public record ItemStackData(ItemStack stack, String name) implements DataContainer {
     public static MapCodec<ItemStackData> TYPE_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -20,7 +17,7 @@ public record ItemStackData(ItemStack stack, String name) implements DataContain
 
 
     public static ItemStackData of(ItemStack stack) {
-        return new ItemStackData(stack.copy(), stack.getName().getString());
+        return new ItemStackData(stack.copy(), stack.getHoverName().getString());
     }
 
     @Override
@@ -51,10 +48,10 @@ public record ItemStackData(ItemStack stack, String name) implements DataContain
     @Override
     public DataContainer extract(String field) {
         return switch (field) {
-            case "type" -> new StringData(Registries.ITEM.getId(this.stack.getItem()).toString());
+            case "type" -> new StringData(BuiltInRegistries.ITEM.getKey(this.stack.getItem()).toString());
             case "name" -> new StringData(asString());
             case "count" -> new LongData(asLong());
-            case "damage" -> new LongData(this.stack.getDamage());
+            case "damage" -> new LongData(this.stack.getDamageValue());
             default -> DataContainer.super.extract(field);
         };
     }
@@ -64,12 +61,12 @@ public record ItemStackData(ItemStack stack, String name) implements DataContain
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         ItemStackData that = (ItemStackData) object;
-        return Objects.equals(name, that.name) && ItemStack.areItemsAndComponentsEqual(stack, that.stack);
+        return Objects.equals(name, that.name) && ItemStack.isSameItemSameComponents(stack, that.stack);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode() * 31 + ItemStack.hashCode(stack);
+        return name.hashCode() * 31 + ItemStack.hashItemAndComponents(stack);
     }
 
     @Override

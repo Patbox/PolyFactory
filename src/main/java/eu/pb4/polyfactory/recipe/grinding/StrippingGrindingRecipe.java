@@ -9,14 +9,14 @@ import eu.pb4.polyfactory.recipe.GrindingRecipe;
 import eu.pb4.polyfactory.recipe.input.GrindingInput;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -34,17 +34,17 @@ public record StrippingGrindingRecipe(String group, Optional<Ingredient> input, 
             ).apply(x, StrippingGrindingRecipe::new)
     );
 
-    public static RecipeEntry< StrippingGrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double minimumSpeed, double optimalSpeed, OutputStack... outputs) {
-        return new RecipeEntry<>(FactoryUtil.recipeKey("grinding/" + string), new StrippingGrindingRecipe( "", Optional.ofNullable(ingredient), List.of(outputs),  grindTime, minimumSpeed, optimalSpeed));
+    public static RecipeHolder< StrippingGrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double minimumSpeed, double optimalSpeed, OutputStack... outputs) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("grinding/" + string), new StrippingGrindingRecipe( "", Optional.ofNullable(ingredient), List.of(outputs),  grindTime, minimumSpeed, optimalSpeed));
     }
     
     @Override
-    public List<ItemStack> output(GrindingInput input, RegistryWrapper.WrapperLookup registryManager, @Nullable Random random) {
+    public List<ItemStack> output(GrindingInput input, HolderLookup.Provider registryManager, @Nullable RandomSource random) {
         var items = new ArrayList<ItemStack>();
 
-        var stripped = input.stack().getItem() instanceof BlockItem blockItem ? StrippableBlockRegistry.getStrippedBlockState(blockItem.getBlock().getDefaultState()) : null;
+        var stripped = input.stack().getItem() instanceof BlockItem blockItem ? StrippableBlockRegistry.getStrippedBlockState(blockItem.getBlock().defaultBlockState()) : null;
         if (stripped != null)  {
-            items.add(stripped.getBlock().asItem().getDefaultStack());
+            items.add(stripped.getBlock().asItem().getDefaultInstance());
         }
 
         for (var out : this.output) {
@@ -77,10 +77,10 @@ public record StrippingGrindingRecipe(String group, Optional<Ingredient> input, 
     }
 
     @Override
-    public boolean matches(GrindingInput input, World world) {
+    public boolean matches(GrindingInput input, Level world) {
         return (this.input.isEmpty() || this.input.get().test(input.stack()))
                 && input.stack().getItem() instanceof BlockItem blockItem
-                && StrippableBlockRegistry.getStrippedBlockState(blockItem.getBlock().getDefaultState()) != null;
+                && StrippableBlockRegistry.getStrippedBlockState(blockItem.getBlock().defaultBlockState()) != null;
     }
 
     @Override

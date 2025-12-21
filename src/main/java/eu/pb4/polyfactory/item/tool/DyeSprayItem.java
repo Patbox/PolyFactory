@@ -16,32 +16,32 @@ import it.unimi.dsi.fastutil.booleans.BooleanList;
 import it.unimi.dsi.fastutil.floats.FloatList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.minecraft.block.BedBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.enums.BedPart;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.StackReference;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.Items;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.registry.Registries;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ClickType;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.properties.BedPart;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
@@ -49,7 +49,7 @@ import java.util.List;
 public class DyeSprayItem extends Item implements PolymerItem, ColoredItem {
     public static final int MAX_USES = 128;
 
-    public DyeSprayItem(Settings settings) {
+    public DyeSprayItem(Properties settings) {
         super(settings);
     }
 
@@ -62,61 +62,61 @@ public class DyeSprayItem extends Item implements PolymerItem, ColoredItem {
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        var stack = context.getStack();
+    public InteractionResult useOn(UseOnContext context) {
+        var stack = context.getItemInHand();
         var color = ColoredItem.getColor(stack);
         var uses = getUses(stack);
 
         if (color == -1 || uses == 0) {
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
         }
 
-        var state = context.getWorld().getBlockState(context.getBlockPos());
-        var blockEntity = context.getWorld().getBlockEntity(context.getBlockPos());
+        var state = context.getLevel().getBlockState(context.getClickedPos());
+        var blockEntity = context.getLevel().getBlockEntity(context.getClickedPos());
         boolean success = false;
 
         if (state.getBlock() instanceof AbstractCableBlock cableBlock && cableBlock.hasCable(state)) {
-            success = cableBlock.setColor(state, context.getWorld(), context.getBlockPos(), color);
+            success = cableBlock.setColor(state, context.getLevel(), context.getClickedPos(), color);
         } else if (state.getBlock() instanceof LampBlock lampBlock) {
-            success = lampBlock.setColor(context.getWorld(), context.getBlockPos(), color);
+            success = lampBlock.setColor(context.getLevel(), context.getClickedPos(), color);
         } else if (state.getBlock() instanceof SidedLampBlock lampBlock) {
-            success = lampBlock.setColor(context.getWorld(), context.getBlockPos(), color);
-        } else if (state.getBlock() instanceof WindmillBlock && context.getWorld().getBlockEntity(context.getBlockPos()) instanceof WindmillBlockEntity be) {
+            success = lampBlock.setColor(context.getLevel(), context.getClickedPos(), color);
+        } else if (state.getBlock() instanceof WindmillBlock && context.getLevel().getBlockEntity(context.getClickedPos()) instanceof WindmillBlockEntity be) {
             var stacks = be.getSails();
             for (int i = 0; i < stacks.size(); i++) {
                 var x = stacks.get(i);
                 if (!x.isEmpty() && be.getSailColor(i) != color) {
-                    x.set(DataComponentTypes.DYED_COLOR, new DyedColorComponent(color));
+                    x.set(DataComponents.DYED_COLOR, new DyedItemColor(color));
                     be.addSail(i, x);
                     success = true;
                     break;
                 }
             }
-        } else if (state.getBlock() instanceof NixieTubeBlock && context.getWorld().getBlockEntity(context.getBlockPos()) instanceof NixieTubeBlockEntity be) {
+        } else if (state.getBlock() instanceof NixieTubeBlock && context.getLevel().getBlockEntity(context.getClickedPos()) instanceof NixieTubeBlockEntity be) {
             success = be.setColor(color);
             if (success) {
                 be.updateTextDisplay();
             }
-        } else if (state.isIn(FactoryBlockTags.SPRAY_CAN_COLORABLE) && DyeColorExtra.BY_COLOR.get(color) != null
-                && !(blockEntity instanceof Inventory)) {
+        } else if (state.is(FactoryBlockTags.SPRAY_CAN_COLORABLE) && DyeColorExtra.BY_COLOR.get(color) != null
+                && !(blockEntity instanceof Container)) {
             var dye = DyeColorExtra.BY_COLOR.get(color);
-            var id = Registries.BLOCK.getId(state.getBlock());
+            var id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
             Identifier newId;
             if (id.getPath().equals("glass") || id.getPath().equals("glass_pane")) {
-                newId = id.withPrefixedPath(dye.asString() + "_stained_");
+                newId = id.withPrefix(dye.getSerializedName() + "_stained_");
             } else {
                 var x = id.getPath().split("_", 2);
-                newId = DyeColor.byId(x[0], null) == null ? id.withPath(dye.asString() + "_" + id.getPath()) : id.withPath(dye.asString() + "_" + x[1]);
+                newId = DyeColor.byName(x[0], null) == null ? id.withPath(dye.getSerializedName() + "_" + id.getPath()) : id.withPath(dye.getSerializedName() + "_" + x[1]);
             }
 
-            var block = Registries.BLOCK.get(newId);
+            var block = BuiltInRegistries.BLOCK.getValue(newId);
             if (block != Blocks.AIR && block != state.getBlock()) {
-                context.getWorld().setBlockState(context.getBlockPos(), block.getStateWithProperties(state), Block.FORCE_STATE | Block.NOTIFY_ALL_AND_REDRAW);
+                context.getLevel().setBlock(context.getClickedPos(), block.withPropertiesOf(state), Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_ALL_IMMEDIATE);
 
                 if (state.getBlock() instanceof BedBlock) {
-                    var dir = state.get(BedBlock.FACING);
-                    var offset = context.getBlockPos().offset(dir, state.get(BedBlock.PART) == BedPart.HEAD ? -1 : 1);
-                    context.getWorld().setBlockState(offset, block.getStateWithProperties(context.getWorld().getBlockState(offset)), Block.FORCE_STATE | Block.NOTIFY_ALL_AND_REDRAW);
+                    var dir = state.getValue(BedBlock.FACING);
+                    var offset = context.getClickedPos().relative(dir, state.getValue(BedBlock.PART) == BedPart.HEAD ? -1 : 1);
+                    context.getLevel().setBlock(offset, block.withPropertiesOf(context.getLevel().getBlockState(offset)), Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_ALL_IMMEDIATE);
                 }
                 success = true;
             }
@@ -124,46 +124,46 @@ public class DyeSprayItem extends Item implements PolymerItem, ColoredItem {
         }
 
         if (success) {
-            context.getWorld().playSound(null, context.getBlockPos(), SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS);
+            context.getLevel().playSound(null, context.getClickedPos(), SoundEvents.DYE_USE, SoundSource.BLOCKS);
             if (context.getPlayer() == null || !context.getPlayer().isCreative()) {
                 setUses(stack, uses - 1);
             }
 
-            ((ServerWorld) context.getWorld()).spawnParticles(new DustParticleEffect(color, 1), context.getHitPos().x, context.getHitPos().y, context.getHitPos().z, 10, 0.2f, 0.2f, 0.2f, 1);
+            ((ServerLevel) context.getLevel()).sendParticles(new DustParticleOptions(color, 1), context.getClickLocation().x, context.getClickLocation().y, context.getClickLocation().z, 10, 0.2f, 0.2f, 0.2f, 1);
 
-            return ActionResult.SUCCESS_SERVER;
+            return InteractionResult.SUCCESS_SERVER;
         }
-        return ActionResult.FAIL;
+        return InteractionResult.FAIL;
     }
 
     @Override
-    public Text getName(ItemStack stack) {
+    public Component getName(ItemStack stack) {
         if (getUses(stack) == 0) {
-            return Text.translatable(getTranslationKey() + ".empty");
+            return Component.translatable(getDescriptionId() + ".empty");
         }
         var color = ColoredItem.getColor(stack);
         if (!DyeColorExtra.hasLang(color)) {
-            return Text.translatable(this.getTranslationKey() + ".colored.full",
+            return Component.translatable(this.getDescriptionId() + ".colored.full",
                     ColoredItem.getColorName(color), ColoredItem.getHexName(color));
         } else {
-            return Text.translatable(this.getTranslationKey() + ".colored", ColoredItem.getColorName(color));
+            return Component.translatable(this.getDescriptionId() + ".colored", ColoredItem.getColorName(color));
         }
     }
 
     @Override
-    public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
+    public boolean overrideOtherStackedOnMe(ItemStack stack, ItemStack otherStack, Slot slot, ClickAction clickType, Player player, SlotAccess cursorStackReference) {
         var color = ColoredItem.getColor(stack);
         var uses = getUses(stack);
 
-        if (otherStack.isIn(ConventionalItemTags.DYES) && uses + 8 <= MAX_USES) {
+        if (otherStack.is(ConventionalItemTags.DYES) && uses + 8 <= MAX_USES) {
             var dyeColor = DyeColorExtra.getColor(otherStack);
 
             if (dyeColor == color || uses == 0) {
                 ColoredItem.setColor(stack, dyeColor);
                 setUses(stack, uses + 8);
-                otherStack.decrement(1);
+                otherStack.shrink(1);
             }
-        } else if (otherStack.isOf(Items.WATER_BUCKET)) {
+        } else if (otherStack.is(Items.WATER_BUCKET)) {
             setUses(stack, 0);
         } else {
             return false;
@@ -188,15 +188,15 @@ public class DyeSprayItem extends Item implements PolymerItem, ColoredItem {
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipType tooltipType, PacketContext context) {
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context) {
         var out = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, context);
         var uses = getUses(itemStack);
 
-        out.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(FloatList.of((float) uses / MAX_USES),
+        out.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(FloatList.of((float) uses / MAX_USES),
                 BooleanList.of(uses != 0), List.of(), IntList.of(ColoredItem.getColor(itemStack))));
-        out.set(DataComponentTypes.MAX_DAMAGE, MAX_USES);
+        out.set(DataComponents.MAX_DAMAGE, MAX_USES);
         if (uses != 0) {
-            out.set(DataComponentTypes.DAMAGE, MAX_USES - uses);
+            out.set(DataComponents.DAMAGE, MAX_USES - uses);
         }
         return out;
     }

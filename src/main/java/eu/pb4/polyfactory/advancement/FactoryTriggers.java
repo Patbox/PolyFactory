@@ -1,8 +1,8 @@
 package eu.pb4.polyfactory.advancement;
 
-import net.minecraft.util.Identifier;
-
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
+
+import net.minecraft.resources.Identifier;
 
 public interface FactoryTriggers {
     Identifier POWER_HAND_CRANK = id("power_hand_crank");

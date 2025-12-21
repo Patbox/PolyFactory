@@ -13,37 +13,37 @@ import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.models.fluid.TopFluidViewModel;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
+import eu.pb4.polyfactory.util.movingitem.MovingItemContainerHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 public class MixerBlock extends TallItemMachineBlock implements PipeConnectable {
-    public MixerBlock(Settings settings) {
+    public MixerBlock(Properties settings) {
         super(settings);
         Model.MODEL_PISTON.isEmpty();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.ANVIL.getDefaultState();
+        return Blocks.ANVIL.defaultBlockState();
     }
 
 
@@ -54,19 +54,19 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world instanceof ServerWorld && type == FactoryBlockEntities.MIXER ? MixerBlockEntity::ticker : null;
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+        return world instanceof ServerLevel && type == FactoryBlockEntities.MIXER ? MixerBlockEntity::ticker : null;
     }
 
 
     @Override
-    protected ElementHolder createModel(ServerWorld serverWorld, BlockPos pos, BlockState initialBlockState) {
+    protected ElementHolder createModel(ServerLevel serverWorld, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
     @Override
-    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
-        if (self.getBlockState().get(INPUT_FACING).getOpposite() != pushDirection || self.getBlockState().get(PART) == Part.TOP) {
+    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainerHolder conveyor) {
+        if (self.getBlockState().getValue(INPUT_FACING).getOpposite() != pushDirection || self.getBlockState().getValue(PART) == Part.TOP) {
             return false;
         }
 
@@ -82,12 +82,12 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
                 var targetStack = container.getContainer().get();
                 var sourceStack = conveyor.getContainer().get();
 
-                if (ItemStack.areItemsAndComponentsEqual(container.getContainer().get(), conveyor.getContainer().get())) {
+                if (ItemStack.isSameItemSameComponents(container.getContainer().get(), conveyor.getContainer().get())) {
                     var count = Math.min(targetStack.getCount() + sourceStack.getCount(), container.getMaxStackCount(sourceStack));
                     if (count != targetStack.getCount()) {
                         var dec = count - targetStack.getCount();
-                        targetStack.increment(dec);
-                        sourceStack.decrement(dec);
+                        targetStack.grow(dec);
+                        sourceStack.shrink(dec);
                         if (sourceStack.isEmpty()) {
                             conveyor.clearContainer();
                         }
@@ -101,13 +101,13 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
     }
 
     @Override
-    public void getItemFrom(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public void getItemFrom(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainerHolder conveyor) {
 
     }
 
     @Override
-    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
-        return state.get(PART) == Part.MAIN;
+    public boolean canPipeConnect(LevelReader world, BlockPos pos, BlockState state, Direction dir) {
+        return state.getValue(PART) == Part.MAIN;
     }
 
 
@@ -137,8 +137,8 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
             this.gearB.setViewRange(0.4f);
 
             this.updateStatePos(state);
-            var dir = state.get(INPUT_FACING);
-            this.updateAnimation(true,  true, 0, (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
+            var dir = state.getValue(INPUT_FACING);
+            this.updateAnimation(true,  true, 0, (dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
             this.addElement(this.whisk);
             this.addElement(this.main);
             this.addElement(this.gearA);
@@ -146,12 +146,12 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
         }
 
         private void updateStatePos(BlockState state) {
-            var direction = state.get(INPUT_FACING);
+            var direction = state.getValue(INPUT_FACING);
 
-            this.main.setYaw(direction.getPositiveHorizontalDegrees());
-            this.whisk.setYaw(direction.getPositiveHorizontalDegrees());
-            this.gearA.setYaw(direction.getPositiveHorizontalDegrees());
-            this.gearB.setYaw(direction.getPositiveHorizontalDegrees());
+            this.main.setYaw(direction.toYRot());
+            this.whisk.setYaw(direction.toYRot());
+            this.gearA.setYaw(direction.toYRot());
+            this.gearB.setYaw(direction.toYRot());
         }
 
         private void updateAnimation(boolean b, boolean c, float rotation, boolean negative) {
@@ -159,7 +159,7 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
             mat.translate(0, 0.5f, 0);
             if (b) {
                 mat.pushMatrix();
-                mat.rotateY(negative ? MathHelper.HALF_PI : -MathHelper.HALF_PI);
+                mat.rotateY(negative ? Mth.HALF_PI : -Mth.HALF_PI);
                 mat.translate(0, 0.5f, 0.40f);
                 mat.rotateZ(rotation);
                 this.gearA.setTransformation(mat);
@@ -189,10 +189,10 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
 
             var c = this.getTick() % 2 == 0;
 
-            var dir = this.blockState().get(INPUT_FACING);
+            var dir = this.blockState().getValue(INPUT_FACING);
             this.updateAnimation(b, c,
-                    b ? RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().up()).rotation() : 0,
-                    (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
+                    b ? RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().above()).rotation() : 0,
+                    (dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
             this.whisk.startInterpolationIfDirty();
 
 
@@ -205,9 +205,9 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
         }
 
         public void rotate(float speed) {
-            this.rotation += speed * MathHelper.RADIANS_PER_DEGREE * 2;
-            if (this.rotation > MathHelper.TAU) {
-                this.rotation -= MathHelper.TAU;
+            this.rotation += speed * Mth.DEG_TO_RAD * 2;
+            if (this.rotation > Mth.TWO_PI) {
+                this.rotation -= Mth.TWO_PI;
             }
         }
 

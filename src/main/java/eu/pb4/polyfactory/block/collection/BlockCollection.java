@@ -12,28 +12,37 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MovementType;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.EntityPosition;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.*;
-import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.*;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.CollisionView;
-import net.minecraft.world.border.WorldBorder;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundBundlePacket;
+import net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.entity.Relative;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.CollisionGetter;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -41,7 +50,7 @@ import org.joml.Vector3f;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class BlockCollection extends AbstractElement implements CollisionView {
+public class BlockCollection extends AbstractElement implements CollisionGetter {
     public static boolean ignoreCollisions = false;
     private final DisplayElement main = ItemDisplayElementUtil.createSimple(ItemStack.EMPTY, 2);
     private final int[] blockId;
@@ -50,17 +59,17 @@ public class BlockCollection extends AbstractElement implements CollisionView {
     private final IntList blockIdList = new IntArrayList();
     private final IntList allIdList = new IntArrayList();
     private final BlockCollectionData data;
-    private final Quaternionf newQuaternion = Direction.UP.getRotationQuaternion();
-    private final Quaternionf quaternion = Direction.UP.getRotationQuaternion();
+    private final Quaternionf newQuaternion = Direction.UP.getRotation();
+    private final Quaternionf quaternion = Direction.UP.getRotation();
     private float centerX;
     private float centerY;
     private float centerZ;
     @Nullable
-    private ServerWorld world;
+    private ServerLevel world;
     private boolean quaternionDirty = false;
     private boolean disableCollision;
 
-    private Int2ObjectMap<Vec3d> previousShift = new Int2ObjectOpenHashMap<>();
+    private Int2ObjectMap<Vec3> previousShift = new Int2ObjectOpenHashMap<>();
 
     public BlockCollection(int sizeX, int sizeY, int sizeZ) {
         this(new BlockCollectionData(sizeX, sizeY, sizeZ));
@@ -92,7 +101,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
     }
 
     @Override
-    public void startWatching(ServerPlayerEntity player, Consumer<Packet<ClientPlayPacketListener>> packetConsumer) {
+    public void startWatching(ServerPlayer player, Consumer<Packet<ClientGamePacketListener>> packetConsumer) {
         this.main.startWatching(player, packetConsumer);
         var pos = this.main.getLastSyncedPos();
         var vec = new Vector3f();
@@ -109,49 +118,49 @@ public class BlockCollection extends AbstractElement implements CollisionView {
         packetConsumer.accept(VirtualEntityUtils.createRidePacket(this.main.getEntityId(), this.blockIdList));
     }
 
-    public void sendInitialBlockVisual(Consumer<Packet<ClientPlayPacketListener>> packetConsumer, int x, int y, int z, Vec3d pos, Vector3f vec, Quaternionf quaternion) {
+    public void sendInitialBlockVisual(Consumer<Packet<ClientGamePacketListener>> packetConsumer, int x, int y, int z, Vec3 pos, Vector3f vec, Quaternionf quaternion) {
         var i = index(x, y, z);
         var id = this.blockId[i];
         if (id != -1) {
-            packetConsumer.accept(new EntitySpawnS2CPacket(id, UUID.randomUUID(),
+            packetConsumer.accept(new ClientboundAddEntityPacket(id, UUID.randomUUID(),
                     pos.x, pos.y, pos.z, 0f, 0f,
-                    EntityType.BLOCK_DISPLAY, 0, Vec3d.ZERO, 0d
+                    EntityType.BLOCK_DISPLAY, 0, Vec3.ZERO, 0d
             ));
 
-            packetConsumer.accept(new EntityTrackerUpdateS2CPacket(id, List.of(
-                    DataTracker.SerializedEntry.of(DisplayTrackedData.INTERPOLATION_DURATION, 1),
-                    DataTracker.SerializedEntry.of(DisplayTrackedData.Block.BLOCK_STATE, this.data.states()[i]),
-                    DataTracker.SerializedEntry.of(DisplayTrackedData.TRANSLATION, new Vector3f(x - 0.5f - this.centerX, y - 0.5f - this.centerY, z - 0.5f - this.centerZ)
+            packetConsumer.accept(new ClientboundSetEntityDataPacket(id, List.of(
+                    SynchedEntityData.DataValue.create(DisplayTrackedData.INTERPOLATION_DURATION, 1),
+                    SynchedEntityData.DataValue.create(DisplayTrackedData.Block.BLOCK_STATE, this.data.states()[i]),
+                    SynchedEntityData.DataValue.create(DisplayTrackedData.TRANSLATION, new Vector3f(x - 0.5f - this.centerX, y - 0.5f - this.centerY, z - 0.5f - this.centerZ)
                             .rotate(quaternion)),
-                    DataTracker.SerializedEntry.of(DisplayTrackedData.LEFT_ROTATION, quaternion),
-                    DataTracker.SerializedEntry.of(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
+                    SynchedEntityData.DataValue.create(DisplayTrackedData.LEFT_ROTATION, quaternion),
+                    SynchedEntityData.DataValue.create(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
 
             )));
         }
     }
 
-    public void sendInitialBlockCollision(Consumer<Packet<ClientPlayPacketListener>> packetConsumer, int x, int y, int z, Vec3d pos, Vector3f vec, Quaternionf quaternion) {
+    public void sendInitialBlockCollision(Consumer<Packet<ClientGamePacketListener>> packetConsumer, int x, int y, int z, Vec3 pos, Vector3f vec, Quaternionf quaternion) {
         var i = index(x, y, z);
         var id = this.collisionBlockId[i];
         if (id != -1) {
             vec.set(x - this.centerX, y - this.centerY, z - this.centerZ).rotate(quaternion);
-            packetConsumer.accept(new EntitySpawnS2CPacket(id, UUID.randomUUID(),
+            packetConsumer.accept(new ClientboundAddEntityPacket(id, UUID.randomUUID(),
                     pos.x + vec.x, pos.y + vec.y - 0.5, pos.z + vec.z, 0f, 0f,
-                    EntityType.SHULKER, 0, Vec3d.ZERO, 0d
+                    EntityType.SHULKER, 0, Vec3.ZERO, 0d
             ));
 
-            packetConsumer.accept(new EntityTrackerUpdateS2CPacket(id, List.of(
-                    DataTracker.SerializedEntry.of(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
+            packetConsumer.accept(new ClientboundSetEntityDataPacket(id, List.of(
+                    SynchedEntityData.DataValue.create(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
             )));
 
-            packetConsumer.accept(new EntitySpawnS2CPacket(this.collisionBlockId2[i], UUID.randomUUID(),
+            packetConsumer.accept(new ClientboundAddEntityPacket(this.collisionBlockId2[i], UUID.randomUUID(),
                     pos.x + vec.x, pos.y + vec.y - 0.5, pos.z + vec.z, 0f, 0f,
-                    EntityType.BLOCK_DISPLAY, 0, Vec3d.ZERO, 0d
+                    EntityType.BLOCK_DISPLAY, 0, Vec3.ZERO, 0d
             ));
 
-            packetConsumer.accept(new EntityTrackerUpdateS2CPacket(this.collisionBlockId2[i], List.of(
+            packetConsumer.accept(new ClientboundSetEntityDataPacket(this.collisionBlockId2[i], List.of(
                     //DataTracker.SerializedEntry.of(DisplayTrackedData.INTERPOLATION_DURATION, 1),
-                    DataTracker.SerializedEntry.of(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
+                    SynchedEntityData.DataValue.create(EntityTrackedData.FLAGS, (byte) (1 << EntityTrackedData.INVISIBLE_FLAG_INDEX))
             )));
 
             packetConsumer.accept(VirtualEntityUtils.createRidePacket(this.collisionBlockId2[i], IntList.of(id)));
@@ -166,7 +175,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
     }
 
     @Override
-    public Vec3d getLastSyncedPos() {
+    public Vec3 getLastSyncedPos() {
         if (this.lastSyncedPos == null) {
             this.updateLastSyncedPos();
         }
@@ -216,18 +225,18 @@ public class BlockCollection extends AbstractElement implements CollisionView {
                 this.allIdList.removeInt(this.collisionBlockId[i]);
                 this.allIdList.removeInt(this.collisionBlockId2[i]);
                 if (this.getHolder() != null) {
-                    this.getHolder().sendPacket(new EntitiesDestroyS2CPacket(IntList.of(
+                    this.getHolder().sendPacket(new ClientboundRemoveEntitiesPacket(IntList.of(
                             this.blockId[i], this.collisionBlockId[i], this.collisionBlockId2[i])));
                 }
             } else if (this.getHolder() != null && this.blockId[i] != -1) {
-                this.getHolder().sendPacket(new EntitiesDestroyS2CPacket(IntList.of(this.blockId[i])));
+                this.getHolder().sendPacket(new ClientboundRemoveEntitiesPacket(IntList.of(this.blockId[i])));
             }
             this.blockId[i] = this.collisionBlockId[i] = this.collisionBlockId2[i] = -1;
         } else {
             var noCollision = state.getCollisionShape(this, new BlockPos(x, y, z)).isEmpty();
             if (this.getHolder() != null) {
-                this.getHolder().sendPacket(new EntityTrackerUpdateS2CPacket(this.blockId[i], List.of(
-                        DataTracker.SerializedEntry.of(DisplayTrackedData.Block.BLOCK_STATE, this.data.states()[i])
+                this.getHolder().sendPacket(new ClientboundSetEntityDataPacket(this.blockId[i], List.of(
+                        SynchedEntityData.DataValue.create(DisplayTrackedData.Block.BLOCK_STATE, this.data.states()[i])
                 )));
             }
 
@@ -235,7 +244,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
                 this.allIdList.removeInt(this.collisionBlockId[i]);
                 this.allIdList.removeInt(this.collisionBlockId2[i]);
                 if (this.getHolder() != null) {
-                    this.getHolder().sendPacket(new EntitiesDestroyS2CPacket(IntList.of(this.collisionBlockId[i], this.collisionBlockId2[i])));
+                    this.getHolder().sendPacket(new ClientboundRemoveEntitiesPacket(IntList.of(this.collisionBlockId[i], this.collisionBlockId2[i])));
                 }
                 this.collisionBlockId[i] = this.collisionBlockId2[i] = 0;
             } else if (this.collisionBlockId[i] == -1 && !noCollision) {
@@ -269,7 +278,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
 
     public BlockState getBlockState(int x, int y, int z) {
         var i = index(x, y, z);
-        return i != -1 ? this.data.states()[i] : Blocks.VOID_AIR.getDefaultState();
+        return i != -1 ? this.data.states()[i] : Blocks.VOID_AIR.defaultBlockState();
     }
 
     @Override
@@ -287,7 +296,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
     }
 
     @Override
-    public int getBottomY() {
+    public int getMinY() {
         return 0;
     }
 
@@ -297,18 +306,18 @@ public class BlockCollection extends AbstractElement implements CollisionView {
     }
 
     @Override
-    public void stopWatching(ServerPlayerEntity player, Consumer<Packet<ClientPlayPacketListener>> packetConsumer) {
+    public void stopWatching(ServerPlayer player, Consumer<Packet<ClientGamePacketListener>> packetConsumer) {
         this.main.stopWatching(player, packetConsumer);
     }
 
     @Override
-    public void notifyMove(Vec3d oldPos, Vec3d currentPos, Vec3d delta) {
+    public void notifyMove(Vec3 oldPos, Vec3 currentPos, Vec3 delta) {
         this.main.notifyMove(oldPos, currentPos, delta);
     }
 
     @Override
     public void tick() {
-        var newPreviousShift = new Int2ObjectOpenHashMap<Vec3d>();
+        var newPreviousShift = new Int2ObjectOpenHashMap<Vec3>();
         if (this.quaternionDirty || !this.getCurrentPos().equals(this.getLastSyncedPos())) {
             var pos = this.getCurrentPos();
             var previous = this.getLastSyncedPos();
@@ -317,11 +326,11 @@ public class BlockCollection extends AbstractElement implements CollisionView {
             }
             var vec = new Vector3f();
             var vec2 = new Vector3f();
-            var b = new ArrayList<Packet<? super ClientPlayPacketListener>>();
-            var box = new Box(pos.x - this.centerX - 2, pos.y - this.centerY - 2, pos.z - this.centerZ - 2,
+            var b = new ArrayList<Packet<? super ClientGamePacketListener>>();
+            var box = new AABB(pos.x - this.centerX - 2, pos.y - this.centerY - 2, pos.z - this.centerZ - 2,
                     pos.x - this.centerX + this.data.sizeX() + 2, pos.y - this.centerY + this.data.sizeY() + 2, pos.z - this.centerZ + this.data.sizeZ() + 2);
 
-            var ents = this.world != null ? this.world.getOtherEntities(null, box, EntityPredicates.EXCEPT_SPECTATOR) : List.<Entity>of();
+            var ents = this.world != null ? this.world.getEntities((Entity) null, box, EntitySelector.NO_SPECTATORS) : List.<Entity>of();
             var quaternion = new Quaternionf(this.newQuaternion);
             var quaternionOldInverted = new Quaternionf(this.quaternion).invert();
             var diff = pos.subtract(previous);
@@ -335,18 +344,18 @@ public class BlockCollection extends AbstractElement implements CollisionView {
                         var i = index(x, y, z);
                         var id = this.blockId[i];
                         if (id != -1) {
-                            b.add(new EntityTrackerUpdateS2CPacket(id, List.of(
-                                    DataTracker.SerializedEntry.of(DisplayTrackedData.TRANSLATION, new Vector3f(x - 0.5f - this.centerX, y - 0.5f - this.centerY, z - 0.5f - this.centerZ).rotate(quaternion)),
-                                    DataTracker.SerializedEntry.of(DisplayTrackedData.LEFT_ROTATION, quaternion),
-                                    DataTracker.SerializedEntry.of(DisplayTrackedData.START_INTERPOLATION, 0)
+                            b.add(new ClientboundSetEntityDataPacket(id, List.of(
+                                    SynchedEntityData.DataValue.create(DisplayTrackedData.TRANSLATION, new Vector3f(x - 0.5f - this.centerX, y - 0.5f - this.centerY, z - 0.5f - this.centerZ).rotate(quaternion)),
+                                    SynchedEntityData.DataValue.create(DisplayTrackedData.LEFT_ROTATION, quaternion),
+                                    SynchedEntityData.DataValue.create(DisplayTrackedData.START_INTERPOLATION, 0)
                             )));
                         }
                         id = this.collisionBlockId2[i];
                         if (id != -1) {
                             vec.set(x - this.centerX, y - this.centerY, z - this.centerZ);
                             vec.rotate(this.newQuaternion);
-                            b.add(new EntityPositionSyncS2CPacket(id,
-                                    new EntityPosition(new Vec3d(pos.x + vec.x, pos.y + vec.y - 0.5, pos.z + vec.z), Vec3d.ZERO, 0, 0), false
+                            b.add(new ClientboundEntityPositionSyncPacket(id,
+                                    new PositionMoveRotation(new Vec3(pos.x + vec.x, pos.y + vec.y - 0.5, pos.z + vec.z), Vec3.ZERO, 0, 0), false
                             ));
                             vec2.set(x - this.centerX, y - this.centerY, z - this.centerZ);
                             vec2.rotate(this.quaternion);
@@ -360,12 +369,12 @@ public class BlockCollection extends AbstractElement implements CollisionView {
                                     vec.sub(vec2);
                                     evec.y = Math.max(evec.y, vec.y);
 
-                                    vec.set(entity.getX() - previous.getX(), entity.getY() - previous.getY(), entity.getZ() - previous.getZ());
+                                    vec.set(entity.getX() - previous.x(), entity.getY() - previous.y(), entity.getZ() - previous.z());
                                     vec.rotate(quaternionOldInverted);
                                     vec.rotate(quaternion);
 
-                                    evec.x = (float) (vec.x - entity.getX() + previous.getX());
-                                    evec.z = (float) (vec.z - entity.getZ() + previous.getZ());
+                                    evec.x = (float) (vec.x - entity.getX() + previous.x());
+                                    evec.z = (float) (vec.z - entity.getZ() + previous.z());
                                 }
                             }
                         }
@@ -375,12 +384,12 @@ public class BlockCollection extends AbstractElement implements CollisionView {
 
             idMap.forEach((entity, val) -> {
                 var move = diff.add(val.x, val.y, val.z);
-                if (!MathHelper.approximatelyEquals(move.x, 0) || !MathHelper.approximatelyEquals(move.y, 0) || !MathHelper.approximatelyEquals(move.z, 0)) {
-                    entity.move(MovementType.SHULKER, move);
-                    if (entity instanceof ServerPlayerEntity player) {
+                if (!Mth.equal(move.x, 0) || !Mth.equal(move.y, 0) || !Mth.equal(move.z, 0)) {
+                    entity.move(MoverType.SHULKER, move);
+                    if (entity instanceof ServerPlayer player) {
                         //FactoryUtil.sendVelocityDelta(player, move);
-                        FactoryUtil.runNextTick(() -> player.networkHandler.requestTeleport(new EntityPosition(move.add(0, player.getFinalGravity(), 0), Vec3d.ZERO, 0, 0),
-                                EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.DELTA_X, PositionFlag.DELTA_Y, PositionFlag.DELTA_Z, PositionFlag.Y_ROT, PositionFlag.X_ROT
+                        FactoryUtil.runNextTick(() -> player.connection.teleport(new PositionMoveRotation(move.add(0, player.getGravity(), 0), Vec3.ZERO, 0, 0),
+                                EnumSet.of(Relative.X, Relative.Y, Relative.Z, Relative.DELTA_X, Relative.DELTA_Y, Relative.DELTA_Z, Relative.Y_ROT, Relative.X_ROT
                                 )));
 
                         //newPreviousShift.put(player.getId(), move);
@@ -391,15 +400,15 @@ public class BlockCollection extends AbstractElement implements CollisionView {
 
             this.disableCollision = false;
             if (this.getHolder() != null) {
-                this.getHolder().sendPacket(new BundleS2CPacket(b));
+                this.getHolder().sendPacket(new ClientboundBundlePacket(b));
             }
             this.quaternion.set(newQuaternion);
             this.updateLastSyncedPos();
         }
         if (this.world != null) {
             this.previousShift.forEach((entity, val) -> {
-                if (world.getEntityById(entity) instanceof ServerPlayerEntity player) {
-                    var oldMove = this.previousShift.getOrDefault(player.getId(), Vec3d.ZERO);
+                if (world.getEntity(entity) instanceof ServerPlayer player) {
+                    var oldMove = this.previousShift.getOrDefault(player.getId(), Vec3.ZERO);
                     //FactoryUtil.sendVelocityDelta(player, oldMove.multiply(0.54).negate());
                 }
             });
@@ -414,7 +423,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
         this.main.setHolder(holder);
     }
 
-    public void setWorld(ServerWorld world) {
+    public void setWorld(ServerLevel world) {
         if (this.world == world) {
             return;
         }
@@ -430,20 +439,20 @@ public class BlockCollection extends AbstractElement implements CollisionView {
     }
 
     @Override
-    public void setInitialPosition(Vec3d newPos) {
+    public void setInitialPosition(Vec3 newPos) {
         super.setInitialPosition(newPos);
         this.main.setInitialPosition(newPos);
     }
 
     @Override
-    public void setOffset(Vec3d offset) {
+    public void setOffset(Vec3 offset) {
         super.setOffset(offset);
         this.main.setOffset(offset);
     }
 
     @Nullable
     @Override
-    public void setOverridePos(Vec3d vec3d) {
+    public void setOverridePos(Vec3 vec3d) {
         super.setOverridePos(vec3d);
         this.main.setOverridePos(vec3d);
     }
@@ -455,11 +464,11 @@ public class BlockCollection extends AbstractElement implements CollisionView {
 
     @Nullable
     @Override
-    public BlockView getChunkAsView(int chunkX, int chunkZ) {
+    public BlockGetter getChunkForCollisions(int chunkX, int chunkZ) {
         return this;
     }
 
-    public void provideCollisions(Box box, Consumer<VoxelShape> consumer) {
+    public void provideCollisions(AABB box, Consumer<VoxelShape> consumer) {
         if (this.disableCollision || ignoreCollisions) {
             return;
         }
@@ -483,7 +492,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
                             pos.x + vec.x - 0.5, pos.y + vec.y - 0.5, pos.z + vec.z - 0.5,
                             pos.x + vec.x + 0.5, pos.y + vec.y + 0.5, pos.z + vec.z + 0.5
                     )) {
-                        consumer.accept(VoxelShapes.cuboid(
+                        consumer.accept(Shapes.box(
                                 pos.x + vec.x - 0.5, pos.y + vec.y - 0.5, pos.z + vec.z - 0.5,
                                 pos.x + vec.x + 0.5, pos.y + vec.y + 0.5, pos.z + vec.z + 0.5
                         ));
@@ -494,7 +503,7 @@ public class BlockCollection extends AbstractElement implements CollisionView {
     }
 
     @Override
-    public List<VoxelShape> getEntityCollisions(@Nullable Entity entity, Box box) {
+    public List<VoxelShape> getEntityCollisions(@Nullable Entity entity, AABB box) {
         var arr = new ArrayList<VoxelShape>();
         this.provideCollisions(box, arr::add);
         return arr;

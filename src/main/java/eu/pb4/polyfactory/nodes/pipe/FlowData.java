@@ -11,9 +11,9 @@ import eu.pb4.polyfactory.mixin.SimpleBlockGraphAccessor;
 import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import it.unimi.dsi.fastutil.objects.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,10 +32,10 @@ public class FlowData implements GraphEntity<FlowData> {
                 case Y, Z -> Direction.Axis.X;
                 case X -> Direction.Axis.Z;
             };
-            preference[2] = Direction.from(startAxis, dir.getDirection());
+            preference[2] = Direction.fromAxisAndDirection(startAxis, dir.getAxisDirection());
             preference[3] = preference[2].getOpposite();
-            preference[4] = preference[2].rotateClockwise(dir.getAxis());
-            preference[5] = preference[2].rotateCounterclockwise(dir.getAxis());
+            preference[4] = preference[2].getClockWise(dir.getAxis());
+            preference[5] = preference[2].getCounterClockWise(dir.getAxis());
 
             arr[dir.ordinal()] = preference;
         }
@@ -124,7 +124,7 @@ public class FlowData implements GraphEntity<FlowData> {
             var isPulling = pump.getNode().isPulling();
             Direction direction;
             int distance;
-            var mut = new BlockPos.Mutable();
+            var mut = new BlockPos.MutableBlockPos();
             states.add(new LastState(pump.getNode().direction(), pump.getBlockPos(), pump.getNode().range()));
 
             var nodeMap = ((SimpleBlockGraphAccessor) this.ctx.getGraph()).getNodesInPos();
@@ -156,7 +156,7 @@ public class FlowData implements GraphEntity<FlowData> {
                         }
 
                         flow = new CurrentState(new MutableInt(), EnumSet.noneOf(Direction.class), EnumSet.noneOf(Direction.class), node);
-                        map.put(mut.toImmutable(), flow);
+                        map.put(mut.immutable(), flow);
                     }
                     if (flow.distance.getValue() >= distance) {
                         break;
@@ -207,7 +207,7 @@ public class FlowData implements GraphEntity<FlowData> {
                     if (dirsI == 1) {
                         direction = dirs[0];
                     } else {
-                        var cur = mut.toImmutable();
+                        var cur = mut.immutable();
                         boolean canContinue = false;
                         for (var i = 0; i < dirsI; i++) {
                             var d = dirs[i];

@@ -8,36 +8,36 @@ import eu.pb4.polyfactory.block.configurable.WrenchModifyBlockValue;
 import eu.pb4.polyfactory.block.other.StatePropertiesCodecPatcher;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.enums.Orientation;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.FrontAndTop;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 public abstract class OrientableCabledDataBlock extends BaseCabledDataBlock implements StatePropertiesCodecPatcher {
-    public static final EnumProperty<Orientation> ORIENTATION = Properties.ORIENTATION;
+    public static final EnumProperty<FrontAndTop> ORIENTATION = BlockStateProperties.ORIENTATION;
 
     public final BlockConfig<?> facingAction = BlockConfig.of("orientation", ORIENTATION, (dir, world, pos, side, state) ->
-                    Text.empty().append(FactoryUtil.asText(dir.getFacing())).append(" / ").append(FactoryUtil.asText(dir.getRotation())),
+                    Component.empty().append(FactoryUtil.asText(dir.front())).append(" / ").append(FactoryUtil.asText(dir.top())),
             WrenchModifyBlockValue.ofProperty(ORIENTATION),
             BlockConfigValue.ofPropertyCustom(ORIENTATION, (property, value, world, pos, side, state) -> {
-                var oldDir = state.get(property);
-                state = state.with(ORIENTATION, value).with(FACING_PROPERTIES.get(value.getFacing()), false);
-                return state.get(HAS_CABLE) ? state.with(FACING_PROPERTIES.get(oldDir.getFacing()),
-                        canConnectTo(world, getColor(world, pos), pos.offset(oldDir.getFacing()), world.getBlockState(pos.offset(oldDir.getFacing())), oldDir.getFacing().getOpposite())) : state;
+                var oldDir = state.getValue(property);
+                state = state.setValue(ORIENTATION, value).setValue(FACING_PROPERTIES.get(value.front()), false);
+                return state.getValue(HAS_CABLE) ? state.setValue(FACING_PROPERTIES.get(oldDir.front()),
+                        canConnectTo(world, getColor(world, pos), pos.relative(oldDir.front()), world.getBlockState(pos.relative(oldDir.front())), oldDir.front().getOpposite())) : state;
             })).withAlt(WrenchModifyBlockValue.ofAltOrientation(ORIENTATION));
-    public OrientableCabledDataBlock(Settings settings) {
+    public OrientableCabledDataBlock(Properties settings) {
         super(settings);
     }
 
@@ -47,54 +47,54 @@ public abstract class OrientableCabledDataBlock extends BaseCabledDataBlock impl
             if (oldFacing != null) {
                 var dir = Direction.CODEC.decode(ops, oldFacing).getOrThrow().getFirst();
 
-                state = state.with(ORIENTATION, Objects.requireNonNullElse(Orientation.byDirections(dir, dir.getAxis() == Direction.Axis.Y ? Direction.SOUTH : Direction.UP), Orientation.SOUTH_UP));
+                state = state.setValue(ORIENTATION, Objects.requireNonNullElse(FrontAndTop.fromFrontAndTop(dir, dir.getAxis() == Direction.Axis.Y ? Direction.SOUTH : Direction.UP), FrontAndTop.SOUTH_UP));
             }
 
-            var facing = state.get(ORIENTATION).getFacing();
-            if (input.get(facing.getOpposite().asString()) == null) {
-                return state.with(FACING_PROPERTIES.get(facing.getOpposite()), true);
+            var facing = state.getValue(ORIENTATION).front();
+            if (input.get(facing.getOpposite().getSerializedName()) == null) {
+                return state.setValue(FACING_PROPERTIES.get(facing.getOpposite()), true);
             }
             return state;
         });
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(ORIENTATION);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        var state = ctx.getWorld().getBlockState(ctx.getBlockPos());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var state = ctx.getLevel().getBlockState(ctx.getClickedPos());
 
-        var delta = ctx.getHitPos().subtract(ctx.getBlockPos().getX() + 0.5, ctx.getBlockPos().getY() + 0.5, ctx.getBlockPos().getZ() + 0.5);
+        var delta = ctx.getClickLocation().subtract(ctx.getClickedPos().getX() + 0.5, ctx.getClickedPos().getY() + 0.5, ctx.getClickedPos().getZ() + 0.5);
 
-        var facing = state.isOf(FactoryBlocks.CABLE)
-                && delta.getX() < 4 / 16f && delta.getX() > -4 / 16f
-                && delta.getY() < 4 / 16f && delta.getY() > -4 / 16f
-                && delta.getZ() < 4 / 16f && delta.getZ() > -4 / 16f
-                ? ctx.getSide() : ctx.getPlayerLookDirection();
+        var facing = state.is(FactoryBlocks.CABLE)
+                && delta.x() < 4 / 16f && delta.x() > -4 / 16f
+                && delta.y() < 4 / 16f && delta.y() > -4 / 16f
+                && delta.z() < 4 / 16f && delta.z() > -4 / 16f
+                ? ctx.getClickedFace() : ctx.getNearestLookingDirection();
 
         var dir2 = switch (facing) {
-            case DOWN -> ctx.getHorizontalPlayerFacing();
-            case UP -> ctx.getHorizontalPlayerFacing().getOpposite();
+            case DOWN -> ctx.getHorizontalDirection();
+            case UP -> ctx.getHorizontalDirection().getOpposite();
             default -> Direction.UP;
         };
 
-        return super.getPlacementState(ctx).with(ORIENTATION, Orientation.byDirections(facing, dir2))
-                .with(HAS_CABLE, state.isOf(FactoryBlocks.CABLE))
-                .with(FACING_PROPERTIES.get(ctx.getPlayerLookDirection()), false);
+        return super.getStateForPlacement(ctx).setValue(ORIENTATION, FrontAndTop.fromFrontAndTop(facing, dir2))
+                .setValue(HAS_CABLE, state.is(FactoryBlocks.CABLE))
+                .setValue(FACING_PROPERTIES.get(ctx.getNearestLookingDirection()), false);
     }
 
     @Override
     protected Direction getFacing(BlockState state) {
-        return state.get(ORIENTATION).getFacing();
+        return state.getValue(ORIENTATION).front();
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(
                 BlockConfig.CHANNEL,
                 this.facingAction
@@ -102,8 +102,8 @@ public abstract class OrientableCabledDataBlock extends BaseCabledDataBlock impl
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(initialBlockState);
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
+        return new eu.pb4.polyfactory.block.data.util.OrientableCabledDataBlock.Model(initialBlockState);
     }
 
     public static class Model extends BaseCabledDataBlock.Model {
@@ -114,8 +114,8 @@ public abstract class OrientableCabledDataBlock extends BaseCabledDataBlock impl
 
         @Override
         protected void updateStatePos(BlockState state) {
-            var orientation = state.get(ORIENTATION);
-            var dir = orientation.getFacing();
+            var orientation = state.getValue(ORIENTATION);
+            var dir = orientation.front();
             float p = -90;
             float y;
 
@@ -123,10 +123,10 @@ public abstract class OrientableCabledDataBlock extends BaseCabledDataBlock impl
                 if (dir == Direction.DOWN) {
                     p = 90;
                 }
-                y = orientation.getRotation().getPositiveHorizontalDegrees();
+                y = orientation.top().toYRot();
             } else {
                 p = 0;
-                y = dir.getPositiveHorizontalDegrees();
+                y = dir.toYRot();
             }
 
             this.base.setYaw(y);

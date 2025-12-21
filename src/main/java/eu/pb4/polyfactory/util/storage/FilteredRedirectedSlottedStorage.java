@@ -8,10 +8,9 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.TransferVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +24,7 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("UnstableApiUsage")
 public class FilteredRedirectedSlottedStorage<T extends TransferVariant<?>> implements SlottedStorage<T>, RedirectingStorage {
-    private final Supplier<World> world;
+    private final Supplier<Level> world;
     private final Supplier<BlockPos> pos;
     private final Supplier<Direction> direction;
     private final BlockApiLookup<Storage<T>, Direction> lookup;
@@ -33,7 +32,7 @@ public class FilteredRedirectedSlottedStorage<T extends TransferVariant<?>> impl
     private final int[] slotMap;
     private final T defaultValue;
 
-    public FilteredRedirectedSlottedStorage(BlockApiLookup<Storage<T>, @Nullable Direction> lookup, Supplier<World> world,
+    public FilteredRedirectedSlottedStorage(BlockApiLookup<Storage<T>, @Nullable Direction> lookup, Supplier<Level> world,
                                             Supplier<BlockPos> pos, Supplier<Direction> direction,
                                             T defaultValue,
                                             int[] slotMap,
@@ -50,7 +49,7 @@ public class FilteredRedirectedSlottedStorage<T extends TransferVariant<?>> impl
     @Nullable
     public SlottedStorage<T> getTargetStorage() {
         var dir = direction.get();
-        var storage = this.lookup.find(world.get(), pos.get().offset(dir), dir.getOpposite());
+        var storage = this.lookup.find(world.get(), pos.get().relative(dir), dir.getOpposite());
 
         return storage instanceof RedirectingStorage ? null : (storage instanceof SlottedStorage<T> s ? s : null);
     }

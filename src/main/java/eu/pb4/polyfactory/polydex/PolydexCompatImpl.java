@@ -39,18 +39,20 @@ import eu.pb4.polyfactory.util.DebugTextProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.sgui.api.elements.GuiElement;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.*;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
-
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -76,7 +78,7 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(StrippingGrindingRecipe.class, StrippingGrindingRecipePage::new);
         PolydexPage.registerRecipeViewer(ColoringCraftingRecipe.class, ColoringCraftingRecipePage::new);
         //noinspection unchecked
-        PolydexPage.registerRecipeViewer(ShapelessNbtCopyRecipe.class, (x) -> new ShapelessCraftingRecipePage((RecipeEntry<ShapelessRecipe>) (Object) x));
+        PolydexPage.registerRecipeViewer(ShapelessNbtCopyRecipe.class, (x) -> new ShapelessCraftingRecipePage((RecipeHolder<ShapelessRecipe>) (Object) x));
         PolydexPage.registerRecipeViewer(SimpleSpoutRecipe.class, SimpleSpoutRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleCastingRecipe.class, SimpleCastingRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleCauldronCastingRecipe.class, SimpleCauldronCastingRecipePage::new);
@@ -84,8 +86,8 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(SimpleSmelteryRecipe.class, SimpleSmelteryRecipePage::new);
         //noinspection RedundantCast
         PolydexPage.registerRecipeViewer((Class<? extends Recipe<?>>) (Object) CraftingWithLeftoverRecipe.class,
-                x -> PolydexImpl.RECIPE_VIEWS.get(((CraftingWithLeftoverRecipe) x.value()).backingRecipe().getClass()).apply(new RecipeEntry<Recipe<?>>(
-                        (RegistryKey<Recipe<?>>) (Object) x.id(),
+                x -> PolydexImpl.RECIPE_VIEWS.get(((CraftingWithLeftoverRecipe) x.value()).backingRecipe().getClass()).apply(new RecipeHolder<Recipe<?>>(
+                        (ResourceKey<Recipe<?>>) (Object) x.id(),
                         (Recipe<?>) (Object) ((CraftingWithLeftoverRecipe) x.value()).backingRecipe())));
         PolydexPage.register(PolydexCompatImpl::createPages);
 
@@ -122,9 +124,9 @@ public class PolydexCompatImpl {
     private static PolydexEntry seperateColoredItems(ItemStack stack) {
         var color = ColoredItem.getColor(stack);
         var dye = DyeColorExtra.BY_COLOR.get(color);
-        Identifier baseId = Registries.ITEM.getId(stack.getItem());
+        Identifier baseId = BuiltInRegistries.ITEM.getKey(stack.getItem());
         if (dye != null) {
-            baseId = baseId.withSuffixedPath("/" + dye.asString());
+            baseId = baseId.withSuffix("/" + dye.getSerializedName());
         }
         return PolydexEntry.of(baseId, stack, PolydexCompatImpl::isSameColoredObject);
     }
@@ -132,7 +134,7 @@ public class PolydexCompatImpl {
     private static boolean isSameColoredObject(PolydexEntry polydexEntry, PolydexStack<?> polydexStack) {
         if (polydexStack.getBacking() instanceof ItemStack stack) {
             var base = (ItemStack) polydexEntry.stack().getBacking();
-            if (!base.isOf(stack.getItem())) {
+            if (!base.is(stack.getItem())) {
                 return false;
             }
 
@@ -147,19 +149,19 @@ public class PolydexCompatImpl {
     }
 
     private static PolydexEntry seperateFluidItems(ItemStack stack) {
-        var id = Registries.ITEM.getId(stack.getItem());
+        var id = BuiltInRegistries.ITEM.getKey(stack.getItem());
         var fluids = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
         if (fluids.isEmpty()) {
             return PolydexEntry.of(id, stack, PolydexCompatImpl::isSameFluidObject);
         }
 
-        return PolydexEntry.of(id.withSuffixedPath("/" + fluids.fluids().stream().sorted(Comparator.comparing(x -> x.getName().getString())).map((instance) -> {
-            var base = Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.getId(instance.type())).toUnderscoreSeparatedString();
+        return PolydexEntry.of(id.withSuffix("/" + fluids.fluids().stream().sorted(Comparator.comparing(x -> x.getName().getString())).map((instance) -> {
+            var base = Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.getKey(instance.type())).toDebugFileName();
             if (instance.type().defaultData() == Unit.INSTANCE) {
                 return base;
-            } else if (instance.data() instanceof PotionContentsComponent potion) {
-                if (potion.potion().isPresent() && potion.potion().get().getKey().isPresent()) {
-                    return base + "_" + potion.potion().get().getKey().get().getValue().toUnderscoreSeparatedString();
+            } else if (instance.data() instanceof PotionContents potion) {
+                if (potion.potion().isPresent() && potion.potion().get().unwrapKey().isPresent()) {
+                    return base + "_" + potion.potion().get().unwrapKey().get().identifier().toDebugFileName();
                 }
 
                 return base + "_" + potion.hashCode();
@@ -171,7 +173,7 @@ public class PolydexCompatImpl {
     private static boolean isSameFluidObject(PolydexEntry polydexEntry, PolydexStack<?> polydexStack) {
         if (polydexStack.getBacking() instanceof ItemStack stack) {
             var base = (ItemStack) polydexEntry.stack().getBacking();
-            if (!base.isOf(stack.getItem())) {
+            if (!base.is(stack.getItem())) {
                 return false;
             }
 
@@ -186,11 +188,11 @@ public class PolydexCompatImpl {
         var target = hoverDisplayBuilder.getTarget();
         if (target.hasTarget() && target.entity() == null
                 && target.blockState().getBlock() instanceof BlockStateNameProvider provider) {
-            hoverDisplayBuilder.setComponent(HoverDisplayBuilder.NAME, provider.getName(target.player().getEntityWorld(), target.pos(), target.blockState(), target.blockEntity()));
+            hoverDisplayBuilder.setComponent(HoverDisplayBuilder.NAME, provider.getName(target.player().level(), target.pos(), target.blockState(), target.blockEntity()));
         }
 
         if (target.blockState().getBlock() instanceof NetworkComponent.Rotational) {
-            var rot = RotationUser.getRotation(target.player().getEntityWorld(), target.pos()).getStateText();
+            var rot = RotationUser.getRotation(target.player().level(), target.pos()).getStateText();
             if (rot != null) {
                 hoverDisplayBuilder.setComponent(MACHINE_STATE, rot);
             }
@@ -199,10 +201,10 @@ public class PolydexCompatImpl {
         BlockEntity entity = target.blockEntity();
         if (entity == null) {
             if (target.blockState().getBlock() instanceof MultiBlock multiBlock) {
-                entity = target.player().getEntityWorld().getBlockEntity(multiBlock.getCenter(target.blockState(), target.pos()));
+                entity = target.player().level().getBlockEntity(multiBlock.getCenter(target.blockState(), target.pos()));
             } else if (target.blockState().getBlock() instanceof TallItemMachineBlock
-                    && target.blockState().get(TallItemMachineBlock.PART) == TallItemMachineBlock.Part.TOP) {
-                entity = target.player().getEntityWorld().getBlockEntity(target.pos().down());
+                    && target.blockState().getValue(TallItemMachineBlock.PART) == TallItemMachineBlock.Part.TOP) {
+                entity = target.player().level().getBlockEntity(target.pos().below());
             }
         }
 
@@ -223,7 +225,7 @@ public class PolydexCompatImpl {
         if (entity instanceof FilledStateProvider provider) {
             var text = provider.getFilledStateText();
             if (text != null) {
-                hoverDisplayBuilder.setComponent(FILLED, Text.empty().append(text).withColor(0xd6d6d6));
+                hoverDisplayBuilder.setComponent(FILLED, Component.empty().append(text).withColor(0xd6d6d6));
             }
         }
 
@@ -232,7 +234,7 @@ public class PolydexCompatImpl {
     public static GuiElement getButton(RecipeType<?> type) {
         var category = PolydexCategory.of(type);
         return GuiTextures.POLYDEX_BUTTON.get()
-                .setName(Text.translatable("text.polyfactory.recipes"))
+                .setName(Component.translatable("text.polyfactory.recipes"))
                 .setCallback((index, type1, action, gui) -> {
                     PolydexPageUtils.openCategoryUi(gui.getPlayer(), category, gui::open);
                     GuiUtils.playClickSound(gui.getPlayer());

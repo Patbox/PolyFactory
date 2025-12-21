@@ -1,12 +1,12 @@
 package eu.pb4.polyfactory.util;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public interface BlockStateNameProvider {
-    Text getName(ServerWorld world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity);
+    Component getName(ServerLevel world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity);
 }

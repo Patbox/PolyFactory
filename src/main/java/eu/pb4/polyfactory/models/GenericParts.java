@@ -1,8 +1,8 @@
 package eu.pb4.polyfactory.models;
 
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 

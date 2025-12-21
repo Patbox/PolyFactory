@@ -6,28 +6,6 @@ import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.block.other.TagRedirector;
 import eu.pb4.polyfactory.block.other.XInWallBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.WallBlock;
-import net.minecraft.block.enums.WallShape;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.loot.context.LootWorldContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -35,91 +13,113 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.IdentityHashMap;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.WallBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.WallSide;
+import net.minecraft.world.level.storage.loot.LootParams;
 
 public class PipeInWallBlock extends PipeBaseBlock implements ConfigurableBlock, XInWallBlock {
-    public static final EnumProperty<Direction.Axis> AXIS = Properties.HORIZONTAL_AXIS;
+    public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
     private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(BlockConfig.HORIZONTAL_AXIS);
     public static final IdentityHashMap<Block, PipeInWallBlock> MAP = new IdentityHashMap<>();
     private final WallBlock backing;
 
-    public PipeInWallBlock(Settings settings, WallBlock wallBlock) {
+    public PipeInWallBlock(Properties settings, WallBlock wallBlock) {
         super(settings);
         this.backing = wallBlock;
         MAP.put(wallBlock, this);
     }
 
-    public static BlockState fromWall(BlockState state, ItemUsageContext context) {
+    public static BlockState fromWall(BlockState state, UseOnContext context) {
         var base = MAP.get(state.getBlock());
         if (base == null) {
             return null;
         }
-        var axis = context.getSide().getAxis() == Direction.Axis.Y ? context.getHorizontalPlayerFacing().getAxis() : context.getSide().getAxis();
-        return base.getDefaultState().with(WATERLOGGED, state.get(WATERLOGGED)).with(AXIS, axis);
+        var axis = context.getClickedFace().getAxis() == Direction.Axis.Y ? context.getHorizontalDirection().getAxis() : context.getClickedFace().getAxis();
+        return base.defaultBlockState().setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(AXIS, axis);
     }
 
-    public MutableText getName() {
-        return Text.translatable("block.polyfactory.wall_with_pipe", this.backing.getName());
+    public MutableComponent getName() {
+        return Component.translatable("block.polyfactory.wall_with_pipe", this.backing.getName());
     }
 
     @Override
     public BlockState convertToBacking(BlockState state) {
-        var a = state.get(AXIS) == Direction.Axis.X ? WallBlock.NORTH_WALL_SHAPE : WallBlock.WEST_WALL_SHAPE;
-        var b = state.get(AXIS) == Direction.Axis.X ? WallBlock.SOUTH_WALL_SHAPE : WallBlock.EAST_WALL_SHAPE;
+        var a = state.getValue(AXIS) == Direction.Axis.X ? WallBlock.NORTH : WallBlock.WEST;
+        var b = state.getValue(AXIS) == Direction.Axis.X ? WallBlock.SOUTH : WallBlock.EAST;
 
-        return this.backing.getDefaultState().with(WATERLOGGED, state.get(WATERLOGGED)).with(WallBlock.UP, false).with(a, WallShape.TALL).with(b, WallShape.TALL);
+        return this.backing.defaultBlockState().setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(WallBlock.UP, false).setValue(a, WallSide.TALL).setValue(b, WallSide.TALL);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        var state = this.getDefaultState();
-        var axis = ctx.getSide().getAxis() == Direction.Axis.Y ? ctx.getHorizontalPlayerFacing().getAxis() : ctx.getSide().getAxis();
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var state = this.defaultBlockState();
+        var axis = ctx.getClickedFace().getAxis() == Direction.Axis.Y ? ctx.getHorizontalDirection().getAxis() : ctx.getClickedFace().getAxis();
 
-        return waterLog(ctx, state.with(AXIS, axis));
+        return waterLog(ctx, state.setValue(AXIS, axis));
     }
 
     @Override
-    protected float calcBlockBreakingDelta(BlockState state, PlayerEntity player, BlockView world, BlockPos pos) {
-        return this.getPolymerBlockState(state, null).calcBlockBreakingDelta(player, world, pos);
+    protected float getDestroyProgress(BlockState state, Player player, BlockGetter world, BlockPos pos) {
+        return this.getPolymerBlockState(state, null).getDestroyProgress(player, world, pos);
     }
 
     @Override
-    protected List<ItemStack> getDroppedStacks(BlockState state, LootWorldContext.Builder builder) {
+    protected List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         var list = new ArrayList<ItemStack>();
-        list.addAll(this.getPolymerBlockState(state, null).getDroppedStacks(builder));
-        list.addAll(FactoryBlocks.PIPE.getDefaultState().getDroppedStacks(builder));
+        list.addAll(this.getPolymerBlockState(state, null).getDrops(builder));
+        list.addAll(FactoryBlocks.PIPE.defaultBlockState().getDrops(builder));
         return list;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(AXIS);
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         tickWater(state, world, tickView, pos);
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+        return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     public EnumSet<Direction> getFlowDirections(BlockState state) {
-        var axis = state.get(AXIS);
+        var axis = state.getValue(AXIS);
         return EnumSet.of(Direction.get(Direction.AxisDirection.POSITIVE, axis), Direction.get(Direction.AxisDirection.NEGATIVE, axis));
     }
 
     @Override
     public boolean checkModelDirection(BlockState state, Direction direction) {
-        return state.get(AXIS) == direction.getAxis();
+        return state.getValue(AXIS) == direction.getAxis();
     }
 
     @Override
-    protected BlockState rotate(BlockState state, BlockRotation rotation) {
+    protected BlockState rotate(BlockState state, Rotation rotation) {
         return FactoryUtil.rotateAxis(state, AXIS, rotation);
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return WRENCH_ACTIONS;
     }
 

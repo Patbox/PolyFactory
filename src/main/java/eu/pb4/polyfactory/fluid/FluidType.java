@@ -8,18 +8,18 @@ import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.ModelRenderType;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.minecraft.entity.decoration.Brightness;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.particle.ItemStackParticleEffect;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Brightness;
 import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
+import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -34,8 +34,8 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
                            Optional<Identifier> solidTexture,
                            ModelRenderType modelRenderType,
                            Optional<ColorProvider<T>> color,
-                           Optional<BiFunction<FluidType<T>, T, Text>> name,
-                           Function<FluidInstance<T>, ParticleEffect> particleGetter,
+                           Optional<BiFunction<FluidType<T>, T, Component>> name,
+                           Function<FluidInstance<T>, ParticleOptions> particleGetter,
                            MaxFlowProvider<T> maxFlow,
                            FlowSpeedProvider<T> flowSpeedMultiplier,
                            Optional<Brightness> brightness,
@@ -46,7 +46,7 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
     public static final Comparator<FluidType<?>> DENSITY_COMPARATOR = Comparator.comparingInt(FluidType::density);
     public static final Comparator<FluidType<?>> DENSITY_COMPARATOR_REVERSED = DENSITY_COMPARATOR.reversed();
     public static final long BLOCK_AMOUNT = FluidConstants.BLOCK;
-    public static final Codec<FluidType<?>> CODEC = FactoryRegistries.FLUID_TYPES.getCodec();
+    public static final Codec<FluidType<?>> CODEC = FactoryRegistries.FLUID_TYPES.byNameCodec();
 
     public FluidType {
         backingFluid.ifPresent(x -> FLUID_TO_TYPE.put(x, this));
@@ -56,20 +56,20 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         return FLUID_TO_TYPE.get(fluid);
     }
 
-    public Text getName() {
-        return Text.translatable(Util.createTranslationKey("fluid_type", FactoryRegistries.FLUID_TYPES.getId(this)));
+    public Component getName() {
+        return Component.translatable(Util.makeDescriptionId("fluid_type", FactoryRegistries.FLUID_TYPES.getKey(this)));
     }
 
-    public Text getName(T data) {
+    public Component getName(T data) {
         return this.name.isEmpty() ? getName() : this.name.get().apply(this, data);
     }
 
-    public MutableText toLabeledAmount(long amount, T data) {
-        return Text.empty().append(getName(data)).append(": ").append(getAmountText(amount, data));
+    public MutableComponent toLabeledAmount(long amount, T data) {
+        return Component.empty().append(getName(data)).append(": ").append(getAmountText(amount, data));
     }
 
-    public MutableText getAmountText(long amount, T data) {
-        if (FactoryRegistries.FLUID_TYPES.getEntry(this).isIn(FactoryFluidTags.USE_INGOTS_FOR_AMOUNT)) {
+    public MutableComponent getAmountText(long amount, T data) {
+        if (FactoryRegistries.FLUID_TYPES.wrapAsHolder(this).is(FactoryFluidTags.USE_INGOTS_FOR_AMOUNT)) {
             return FactoryUtil.fluidTextIngots(amount);
         }
 
@@ -105,14 +105,14 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
             return this.textureOverride().get();
         }
 
-        var id = FactoryRegistries.FLUID_TYPES.getId(this);
+        var id = FactoryRegistries.FLUID_TYPES.getKey(this);
         if (id == null) {
             throw new RuntimeException("Unregistered type type!");
         }
         if (id.getNamespace().equals(Identifier.DEFAULT_NAMESPACE)) {
             return id("block/fluid/" + id.getPath());
         } else {
-            return id.withPrefixedPath("block/fluid/");
+            return id.withPrefix("block/fluid/");
         }
     }
 
@@ -129,12 +129,12 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
     }
 
     public interface MaxFlowProvider<T> {
-        long getMaxFlow(@Nullable ServerWorld world, T data);
+        long getMaxFlow(@Nullable ServerLevel world, T data);
     }
 
 
     public interface FlowSpeedProvider<T> {
-        double getSpeedMultiplier(@Nullable ServerWorld world, T data);
+        double getSpeedMultiplier(@Nullable ServerLevel world, T data);
     }
 
     public static <T> Builder<T> of(Codec<T> dataCodec, T defaultData) {
@@ -161,8 +161,8 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         private Optional<ColorProvider<T>> color = Optional.empty();
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        private Optional<BiFunction<FluidType<T>, T, Text>> name = Optional.empty();
-        private Function<FluidInstance<T>, ParticleEffect> particleGetter = (x) -> new ItemStackParticleEffect(ParticleTypes.ITEM, FactoryModels.FLUID_FLAT_FULL.get(x));
+        private Optional<BiFunction<FluidType<T>, T, Component>> name = Optional.empty();
+        private Function<FluidInstance<T>, ParticleOptions> particleGetter = (x) -> new ItemParticleOption(ParticleTypes.ITEM, FactoryModels.FLUID_FLAT_FULL.get(x));
         private MaxFlowProvider<T> maxFlow = (w, x) -> FluidConstants.BOTTLE;
         private FlowSpeedProvider<T> flowSpeedMultiplier = (w, x) -> 1;
         private FluidShootingBehavior<T> shootingBehavior = new NoOpFluidShootingBehavior<>();
@@ -185,7 +185,7 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         public Builder<T> fluid(Fluid fluid) {
             this.fluid = Optional.ofNullable(fluid);
             if (this.texture.isEmpty()) {
-                this.texture(Registries.FLUID.getId(fluid).withPrefixedPath("block/").withSuffixedPath("_still"));
+                this.texture(BuiltInRegistries.FLUID.getKey(fluid).withPrefix("block/").withSuffix("_still"));
             }
             return this;
         }
@@ -221,7 +221,7 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
             return this;
         }
 
-        public Builder<T> name(BiFunction<FluidType<T>, T, Text> name) {
+        public Builder<T> name(BiFunction<FluidType<T>, T, Component> name) {
             this.name = Optional.of(name);
             return this;
         }
@@ -235,10 +235,10 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
             return this;
         }
 
-        public Builder<T> particle(ParticleEffect particle) {
+        public Builder<T> particle(ParticleOptions particle) {
             return particle(x -> particle);
         }
-        public Builder<T> particle(Function<FluidInstance<T>, ParticleEffect> particle) {
+        public Builder<T> particle(Function<FluidInstance<T>, ParticleOptions> particle) {
             this.particleGetter = particle;
             return this;
         }

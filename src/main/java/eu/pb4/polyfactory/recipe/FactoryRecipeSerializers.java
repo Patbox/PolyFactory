@@ -14,18 +14,18 @@ import eu.pb4.polyfactory.recipe.grinding.SimpleGrindingRecipe;
 import eu.pb4.polyfactory.recipe.grinding.StrippingGrindingRecipe;
 import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
 import eu.pb4.polyfactory.recipe.spout.*;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
 import eu.pb4.polyfactory.recipe.mixing.*;
 import eu.pb4.polyfactory.recipe.press.FillSprayCanPressRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.ShapedRecipe;
-import net.minecraft.recipe.ShapelessRecipe;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.Codecs;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
@@ -44,14 +44,14 @@ public class FactoryRecipeSerializers {
     public static final LazyRecipeSerializer<ShapelessNbtCopyRecipe> CRAFTING_SHAPELESS_NBT_COPY = register("crafting/shapeless_nbt_copy", ShapelessNbtCopyRecipe.CODEC);
     public static final LazyRecipeSerializer<PRTKeySetterCraftingRecipe> CRAFTING_PRT_KEY_SETTER = register("crafting/prt_key_setter", PRTKeySetterCraftingRecipe.CODEC);
     public static final LazyRecipeSerializer<CraftingWithLeftoverRecipe<ShapedRecipe>> CRAFTING_SHAPED_LEFTOVER = register("crafting/shaped_leftover",
-            CraftingWithLeftoverRecipe.createCodec(RecipeSerializer.SHAPED.codec(), () -> FactoryRecipeSerializers.CRAFTING_SHAPED_LEFTOVER));
+            CraftingWithLeftoverRecipe.createCodec(RecipeSerializer.SHAPED_RECIPE.codec(), () -> FactoryRecipeSerializers.CRAFTING_SHAPED_LEFTOVER));
     public static final LazyRecipeSerializer<CraftingWithLeftoverRecipe<ShapelessRecipe>> CRAFTING_SHAPELESS_LEFTOVER = register("crafting/shapeless_leftover",
-            CraftingWithLeftoverRecipe.createCodec(RecipeSerializer.SHAPELESS.codec(), () -> FactoryRecipeSerializers.CRAFTING_SHAPELESS_LEFTOVER));
+            CraftingWithLeftoverRecipe.createCodec(RecipeSerializer.SHAPELESS_RECIPE.codec(), () -> FactoryRecipeSerializers.CRAFTING_SHAPELESS_LEFTOVER));
 
     public static final LazyRecipeSerializer<FillSprayCanCraftingRecipe> CRAFTING_FILL_SPRAY_CAN = register("crafting/fill_spray_can",
-            CraftingRecipeCategory.CODEC.xmap(FillSprayCanCraftingRecipe::new, FillSprayCanCraftingRecipe::category).fieldOf("category"));
+            CraftingBookCategory.CODEC.xmap(FillSprayCanCraftingRecipe::new, FillSprayCanCraftingRecipe::category).fieldOf("category"));
     public static final LazyRecipeSerializer<FillSprayCanPressRecipe> PRESS_FILL_SPRAY_CAN = register("press/fill_spray_can",
-            Codecs.POSITIVE_INT.xmap(FillSprayCanPressRecipe::new, FillSprayCanPressRecipe::amount).fieldOf("amount"));
+            ExtraCodecs.POSITIVE_INT.xmap(FillSprayCanPressRecipe::new, FillSprayCanPressRecipe::amount).fieldOf("amount"));
 
     public static final LazyRecipeSerializer<SimpleDrainRecipe> DRAIN_SIMPLE = register("drain/simple", SimpleDrainRecipe.CODEC);
     public static final LazyRecipeSerializer<PotionAddDrainRecipe> DRAIN_POTION_ADD = register("drain/potion_add", PotionAddDrainRecipe.CODEC);
@@ -67,14 +67,14 @@ public class FactoryRecipeSerializers {
     public static final LazyRecipeSerializer<RemovingFluidInteractionRecipe> FLUID_INTERACTION_REMOVING = register("fluid_interaction/removing", RemovingFluidInteractionRecipe.CODEC);
 
     public static void register() {
-        Registries.RECIPE_SERIALIZER.addAlias(id("grinding"), id("grinding/simple"));
+        BuiltInRegistries.RECIPE_SERIALIZER.addAlias(id("grinding"), id("grinding/simple"));
     }
 
     public static <T extends RecipeSerializer<?>> T register(String path, T recipeSerializer) {
-        return Registry.register(Registries.RECIPE_SERIALIZER, Identifier.of(ModInit.ID, path), recipeSerializer);
+        return Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath(ModInit.ID, path), recipeSerializer);
     }
 
     public static <T extends Recipe<?>> LazyRecipeSerializer<T> register(String path, MapCodec<T> codec) {
-        return Registry.register(Registries.RECIPE_SERIALIZER, Identifier.of(ModInit.ID, path), new LazyRecipeSerializer<>(codec));
+        return Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath(ModInit.ID, path), new LazyRecipeSerializer<>(codec));
     }
 }

@@ -1,8 +1,7 @@
 package eu.pb4.polyfactory.util.filter;
 
-import net.minecraft.item.ItemStack;
-
 import java.util.Collection;
+import net.minecraft.world.item.ItemStack;
 
 public record OneOfItemFilter(Collection<ItemFilter> filters, boolean value) implements ItemFilter {
     @Override

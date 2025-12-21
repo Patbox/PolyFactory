@@ -3,8 +3,7 @@ package eu.pb4.polyfactory.util;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polymer.common.api.PolymerCommonUtils;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.math.random.Random;
-
+import net.minecraft.util.RandomSource;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -12,7 +11,7 @@ import java.util.List;
 
 public class PotatoWisdom {
     public static final List<String> RANDOM = new ArrayList<>();
-    public static String get(Random random) {
+    public static String get(RandomSource random) {
         if (random.nextFloat() > 0.8 && Calendar.getInstance().get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY) {
             return "It Is Wednesday My Dudes";
         }

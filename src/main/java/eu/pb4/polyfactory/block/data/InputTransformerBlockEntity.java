@@ -4,13 +4,11 @@ import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.data.DataContainer;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class InputTransformerBlockEntity extends LockableBlockEntity {
     protected DataContainer lastInput = DataContainer.empty();
@@ -32,7 +30,7 @@ public class InputTransformerBlockEntity extends LockableBlockEntity {
 
     public DataContainer setLastInput(DataContainer lastInput1) {
         this.lastInput = lastInput1;
-        this.markDirty();
+        this.setChanged();
         return lastInput1;
     }
 
@@ -42,25 +40,25 @@ public class InputTransformerBlockEntity extends LockableBlockEntity {
 
     public DataContainer setLastOutput(DataContainer lastOutput) {
         this.lastOutput = lastOutput;
-        this.markDirty();
+        this.setChanged();
         return lastOutput;
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         view.putInt("input_channel", this.channelInput);
         view.putInt("output_channel", this.channelOutput);
 
-        view.put("input_data", DataContainer.CODEC, this.lastInput);
-        view.put("output_data", DataContainer.CODEC, this.lastOutput);
+        view.store("input_data", DataContainer.CODEC, this.lastInput);
+        view.store("output_data", DataContainer.CODEC, this.lastOutput);
     }
 
     @Override
-    public void readData(ReadView view) {
-        super.readData(view);
-        this.channelInput = view.getInt("input_channel", 0);
-        this.channelOutput = view.getInt("output_channel", 0);
+    public void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
+        this.channelInput = view.getIntOr("input_channel", 0);
+        this.channelOutput = view.getIntOr("output_channel", 0);
 
         this.lastInput = view.read("input_data", DataContainer.CODEC).orElse(DataContainer.empty());
         this.lastOutput = view.read("output_data", DataContainer.CODEC).orElse(DataContainer.empty());
@@ -77,17 +75,17 @@ public class InputTransformerBlockEntity extends LockableBlockEntity {
 
     public void setInputChannel(int channel) {
         this.channelInput = channel;
-        if (this.hasWorld()) {
-            NetworkComponent.Data.updateDataAt(this.world, this.pos);
-            this.markDirty();
+        if (this.hasLevel()) {
+            NetworkComponent.Data.updateDataAt(this.level, this.worldPosition);
+            this.setChanged();
         }
     }
 
     public void setOutputChannel(int channel) {
         this.channelOutput = channel;
-        if (this.hasWorld()) {
-            NetworkComponent.Data.updateDataAt(this.world, this.pos);
-            this.markDirty();
+        if (this.hasLevel()) {
+            NetworkComponent.Data.updateDataAt(this.level, this.worldPosition);
+            this.setChanged();
         }
     }
 }

@@ -8,11 +8,11 @@ import com.kneelawk.graphlib.api.util.HalfLink;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.AxisNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import net.minecraft.core.Direction;
 
 public record AxleWithGearMechanicalNode(Direction.Axis axis) implements AxisNode, GearMechanicalNode {
     public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("axle_with_gear"), Direction.Axis.CODEC.xmap(AxleWithGearMechanicalNode::new, AxleWithGearMechanicalNode::axis));
@@ -23,9 +23,9 @@ public record AxleWithGearMechanicalNode(Direction.Axis axis) implements AxisNod
     @Override
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
         var list = new ArrayList<HalfLink>();
-        self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.axis,1))
+        self.getGraphWorld().getNodesAt(self.getBlockPos().relative(this.axis,1))
                 .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).forEach(list::add);
-        self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.axis,-1))
+        self.getGraphWorld().getNodesAt(self.getBlockPos().relative(this.axis,-1))
                 .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).forEach(list::add);
 
         return list;

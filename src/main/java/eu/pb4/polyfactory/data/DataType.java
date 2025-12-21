@@ -2,17 +2,14 @@ package eu.pb4.polyfactory.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.text.Text;
-import net.minecraft.util.StringIdentifiable;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringRepresentable;
 
-public record DataType<T extends DataContainer>(String id, MapCodec<T> codec, List<String> fields) implements StringIdentifiable {
+public record DataType<T extends DataContainer>(String id, MapCodec<T> codec, List<String> fields) implements StringRepresentable {
     private static final Map<String, DataType<DataContainer>> TYPES = new HashMap<>();
 
     public DataType(String id, MapCodec<T> codec, String... fields) {
@@ -49,11 +46,11 @@ public record DataType<T extends DataContainer>(String id, MapCodec<T> codec, Li
     }
 
     @Override
-    public String asString() {
+    public String getSerializedName() {
         return this.id;
     }
 
-    public Text name() {
-        return Text.translatable("data_type.polyfactory." + this.id);
+    public Component name() {
+        return Component.translatable("data_type.polyfactory." + this.id);
     }
 }

@@ -3,12 +3,11 @@ package eu.pb4.polyfactory.block.fluids;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 
 public interface FluidOutput {
     long extractFluid(FluidInstance<?> type, long amount, Direction direction, boolean change);
@@ -37,6 +36,6 @@ public interface FluidOutput {
     }
 
     interface Getter {
-        FluidOutput getFluidOutput(ServerWorld world, BlockPos pos, Direction direction);
+        FluidOutput getFluidOutput(ServerLevel world, BlockPos pos, Direction direction);
     }
 }

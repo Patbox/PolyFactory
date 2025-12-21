@@ -11,28 +11,23 @@ import eu.pb4.sgui.api.GuiHelpers;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.StackReference;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
-
 import java.util.List;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 
 public class SimpleFilterItem extends AbstractFilterItem {
-    public SimpleFilterItem(Settings settings) {
+    public SimpleFilterItem(Properties settings) {
         super(settings);
     }
 
     @Override
-    public void openConfiguration(ServerPlayerEntity player, ItemStack stack) {
+    public void openConfiguration(ServerPlayer player, ItemStack stack) {
         new Gui(player, stack);
     }
 
@@ -48,9 +43,9 @@ public class SimpleFilterItem extends AbstractFilterItem {
     }
 
     @Override
-    public Text getName(ItemStack stack) {
+    public Component getName(ItemStack stack) {
         var filter = getStack(stack);
-        return Text.translatable(this.getTranslationKey() + (filter.isEmpty() ? ".empty" : ".with"), filter.getName());
+        return Component.translatable(this.getDescriptionId() + (filter.isEmpty() ? ".empty" : ".with"), filter.getHoverName());
     }
 
     public static ItemStack getStack(ItemStack stack) {
@@ -58,7 +53,7 @@ public class SimpleFilterItem extends AbstractFilterItem {
     }
 
     public static void setStack(ItemStack filter, ItemStack target) {
-        if (target.isOf(FactoryItems.ITEM_FILTER)) {
+        if (target.is(FactoryItems.ITEM_FILTER)) {
             var alt = getStack(target);
             if (!alt.isEmpty()) {
                 target = alt;
@@ -73,8 +68,8 @@ public class SimpleFilterItem extends AbstractFilterItem {
     }
 
     @Override
-    public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, net.minecraft.util.ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
-        if (otherStack.isEmpty() || clickType == net.minecraft.util.ClickType.LEFT) {
+    public boolean overrideOtherStackedOnMe(ItemStack stack, ItemStack otherStack, Slot slot, net.minecraft.world.inventory.ClickAction clickType, Player player, SlotAccess cursorStackReference) {
+        if (otherStack.isEmpty() || clickType == net.minecraft.world.inventory.ClickAction.PRIMARY) {
             return false;
         }
 
@@ -85,10 +80,10 @@ public class SimpleFilterItem extends AbstractFilterItem {
     private static class Gui extends SimpleGui {
         private final ItemStack stack;
 
-        public Gui(ServerPlayerEntity player, ItemStack stack) {
-            super(ScreenHandlerType.HOPPER, player, false);
+        public Gui(ServerPlayer player, ItemStack stack) {
+            super(MenuType.HOPPER, player, false);
             this.stack = stack;
-            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(Text.translatable(stack.getItem().getTranslationKey())));
+            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(Component.translatable(stack.getItem().getDescriptionId())));
             this.setSlot(2, new GuiElementInterface() {
                 @Override
                 public ItemStack getItemStack() {
@@ -103,18 +98,18 @@ public class SimpleFilterItem extends AbstractFilterItem {
             this.open();
         }
 
-        private void onSetSlot(int i, ClickType type, SlotActionType slotActionType, SlotGuiInterface guiInterface) {
-            setStack(stack, this.screenHandler.getCursorStack());
+        private void onSetSlot(int i, ClickType type, net.minecraft.world.inventory.ClickType slotActionType, SlotGuiInterface guiInterface) {
+            setStack(stack, this.screenHandler.getCarried());
         }
 
         @Override
-        public boolean onAnyClick(int index, ClickType type, SlotActionType action) {
+        public boolean onAnyClick(int index, ClickType type, net.minecraft.world.inventory.ClickType action) {
             if (index == -999) {
                 return true;
             }
 
-            if (this.screenHandler.getSlot(index).getStack() == stack) {
-                GuiHelpers.sendSlotUpdate(player, this.screenHandler.syncId, index, stack, 0);
+            if (this.screenHandler.getSlot(index).getItem() == stack) {
+                GuiHelpers.sendSlotUpdate(player, this.screenHandler.containerId, index, stack, 0);
                 return false;
             }
 

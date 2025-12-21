@@ -1,11 +1,10 @@
 package eu.pb4.polyfactory.block.property;
 
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.Direction;
-
 import java.util.Locale;
+import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
 
-public enum ConnectablePart implements StringIdentifiable {
+public enum ConnectablePart implements StringRepresentable {
     NEGATIVE(Direction.AxisDirection.NEGATIVE),
     MIDDLE(null),
     POSITIVE(Direction.AxisDirection.POSITIVE),
@@ -41,7 +40,7 @@ public enum ConnectablePart implements StringIdentifiable {
     }
 
     @Override
-    public String asString() {
+    public String getSerializedName() {
         return this.name().toLowerCase(Locale.ROOT);
     }
 

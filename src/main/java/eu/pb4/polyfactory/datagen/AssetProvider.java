@@ -32,18 +32,17 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.PotionTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.model.ModelAsset;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.data.DataOutput;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.DataWriter;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.data.PackOutput;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.ColorHelper;
-
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -60,7 +59,7 @@ import java.util.function.Function;
 import static eu.pb4.polyfactory.ModInit.id;
 
 class AssetProvider implements DataProvider {
-    private final DataOutput output;
+    private final PackOutput output;
 
     public AssetProvider(FabricDataOutput output) {
         this.output = output;
@@ -90,9 +89,9 @@ class AssetProvider implements DataProvider {
         for (var style : GaugeBlock.Style.values()) {
             if (style == GaugeBlock.Style.DEFAULT) continue;
 
-            assetWriter.accept("assets/polyfactory/models/block/gauge_" + style.asString() +".json", ModelAsset.builder()
+            assetWriter.accept("assets/polyfactory/models/block/gauge_" + style.getSerializedName() +".json", ModelAsset.builder()
                     .parent(id("block/gauge"))
-                    .texture("front_inner", "polyfactory:block/gauge/front_inner_" + style.asString())
+                    .texture("front_inner", "polyfactory:block/gauge/front_inner_" + style.getSerializedName())
                     .build().toBytes()
             );
         }
@@ -108,39 +107,39 @@ class AssetProvider implements DataProvider {
     }
 
     private static void createMold(BiConsumer<String, byte[]> assetWriter, SpoutMolds mold, MoldTextures moldTexture) {
-        var stencil = ResourceUtils.getTexture(mold.name().withPrefixedPath("item/mold/source/"));
+        var stencil = ResourceUtils.getTexture(mold.name().withPrefix("item/mold/source/"));
 
 
         {
-            var id = Registries.ITEM.getId(mold.mold());
+            var id = BuiltInRegistries.ITEM.getKey(mold.mold());
             assetWriter.accept(AssetPaths.itemModel(id),
-                    ModelAsset.builder().parent(Identifier.of("item/generated"))
-                            .texture("layer0", id.withPrefixedPath("item/").toString())
+                    ModelAsset.builder().parent(Identifier.parse("item/generated"))
+                            .texture("layer0", id.withPrefix("item/").toString())
                             .build().toBytes()
             );
-            createStencilTexture(id.withPrefixedPath("item/"), moldTexture.steelBase, moldTexture.steelBorder, stencil, assetWriter);
+            createStencilTexture(id.withPrefix("item/"), moldTexture.steelBase, moldTexture.steelBorder, stencil, assetWriter);
         }
 
         {
-            var id = Registries.ITEM.getId(mold.clay());
+            var id = BuiltInRegistries.ITEM.getKey(mold.clay());
             assetWriter.accept(AssetPaths.itemModel(id),
-                    ModelAsset.builder().parent(Identifier.of("item/generated"))
-                            .texture("layer0", id.withPrefixedPath("item/").toString())
+                    ModelAsset.builder().parent(Identifier.parse("item/generated"))
+                            .texture("layer0", id.withPrefix("item/").toString())
                             .build().toBytes()
             );
-            createStencilTexture(id.withPrefixedPath("item/"), moldTexture.clayBase, moldTexture.clayBorder, stencil, assetWriter);
+            createStencilTexture(id.withPrefix("item/"), moldTexture.clayBase, moldTexture.clayBorder, stencil, assetWriter);
 
         }
 
 
         {
-            var id = Registries.ITEM.getId(mold.hardened());
+            var id = BuiltInRegistries.ITEM.getKey(mold.hardened());
             assetWriter.accept(AssetPaths.itemModel(id),
-                    ModelAsset.builder().parent(Identifier.of("item/generated"))
-                            .texture("layer0", id.withPrefixedPath("item/").toString())
+                    ModelAsset.builder().parent(Identifier.parse("item/generated"))
+                            .texture("layer0", id.withPrefix("item/").toString())
                             .build().toBytes()
             );
-            createStencilTexture(id.withPrefixedPath("item/"), moldTexture.hardenedBase, moldTexture.hardenedBorder, stencil, assetWriter);
+            createStencilTexture(id.withPrefix("item/"), moldTexture.hardenedBase, moldTexture.hardenedBorder, stencil, assetWriter);
         }
     }
 
@@ -154,7 +153,7 @@ class AssetProvider implements DataProvider {
         for (var x = 0; x < base.getWidth(); x++) {
             for (var y = 0; y < base.getHeight(); y++) {
                 var s = stencil.getRGB(x, y);
-                if (ColorHelper.getAlpha(s) == 0) {
+                if (ARGB.alpha(s) == 0) {
                     image.setRGB(x, y, base.getRGB(x, y));
                 } else if (s == 0xFF000000) {
                     image.setRGB(x, y, border.getRGB(x, y));
@@ -169,40 +168,40 @@ class AssetProvider implements DataProvider {
             throw new RuntimeException(e);
         }
 
-        assetWriter.accept(AssetPaths.texture(identifier.withSuffixedPath(".png")), stream.toByteArray());
+        assetWriter.accept(AssetPaths.texture(identifier.withSuffix(".png")), stream.toByteArray());
     }
 
     private static void createItems(BiConsumer<Identifier, ItemAsset> consumer) {
         var fromItem = new BiConsumer<Item, Function<Identifier, ItemAsset>>() {
             @Override
             public void accept(Item item, Function<Identifier, ItemAsset> function) {
-                var id = Registries.ITEM.getId(item);
+                var id = BuiltInRegistries.ITEM.getKey(item);
                 consumer.accept(id, function.apply(id));
             }
         };
-        for (var item : Registries.ITEM) {
-            var id = Registries.ITEM.getId(item);
+        for (var item : BuiltInRegistries.ITEM) {
+            var id = BuiltInRegistries.ITEM.getKey(item);
             if (!id.getNamespace().equals("polyfactory") || item instanceof BaseDebugItem || item instanceof FluidModelItem) {
                 continue;
             }
-            consumer.accept(id, new ItemAsset(new BasicItemModel(id.withPrefixedPath(item instanceof BlockItem ? "block/" : "item/")), ItemAsset.Properties.DEFAULT));
+            consumer.accept(id, new ItemAsset(new BasicItemModel(id.withPrefix(item instanceof BlockItem ? "block/" : "item/")), ItemAsset.Properties.DEFAULT));
         }
-        fromItem.accept(FactoryItems.WINDMILL_SAIL, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("item/"),
+        fromItem.accept(FactoryItems.WINDMILL_SAIL, id -> new ItemAsset(new BasicItemModel(id.withPrefix("item/"),
                 List.of(new ConstantTintSource(-1), new CustomModelDataTintSource(0, 0xFFFFFF))), ItemAsset.Properties.DEFAULT));
 
-        fromItem.accept(FactoryItems.CABLE, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("item/"),
+        fromItem.accept(FactoryItems.CABLE, id -> new ItemAsset(new BasicItemModel(id.withPrefix("item/"),
                 List.of(new ConstantTintSource(-1), new CustomModelDataTintSource(0, 0xFFFFFF))), ItemAsset.Properties.DEFAULT));
 
-        fromItem.accept(FactoryItems.ARTIFICIAL_DYE, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("item/"),
+        fromItem.accept(FactoryItems.ARTIFICIAL_DYE, id -> new ItemAsset(new BasicItemModel(id.withPrefix("item/"),
                 List.of(new CustomModelDataTintSource(0, -1))), ItemAsset.Properties.DEFAULT));
-        fromItem.accept(FactoryItems.BRITTLE_POTION, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("item/"),
+        fromItem.accept(FactoryItems.BRITTLE_POTION, id -> new ItemAsset(new BasicItemModel(id.withPrefix("item/"),
                 List.of(new PotionTintSource())), ItemAsset.Properties.DEFAULT));
-        fromItem.accept(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("item/"),
+        fromItem.accept(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER, id -> new ItemAsset(new BasicItemModel(id.withPrefix("item/"),
                 List.of(new CustomModelDataTintSource(0, 0xFFFFFF))), ItemAsset.Properties.DEFAULT));
 
         fromItem.accept(FactoryItems.SPRAY_CAN, id -> new ItemAsset(new ConditionItemModel(new CustomModelDataFlagProperty(0),
-                new BasicItemModel(id.withPrefixedPath("item/"), List.of(new CustomModelDataTintSource(0, -1))),
-                new BasicItemModel(id.withPrefixedPath("item/").withSuffixedPath("_empty"), List.of())),
+                new BasicItemModel(id.withPrefix("item/"), List.of(new CustomModelDataTintSource(0, -1))),
+                new BasicItemModel(id.withPrefix("item/").withSuffix("_empty"), List.of())),
                 ItemAsset.Properties.DEFAULT));
 
         fromItem.accept(FactoryItems.LAMP, id -> new ItemAsset(new BasicItemModel(id("block/colored_lamp_off"),
@@ -218,25 +217,25 @@ class AssetProvider implements DataProvider {
         fromItem.accept(FactoryItems.INVERTED_FIXTURE_LAMP, id -> new ItemAsset(new BasicItemModel(id("block/fixture_lamp_on"),
                 List.of(new ConstantTintSource(-1), new CustomModelDataTintSource(0, 0xFFFFFF))), ItemAsset.Properties.DEFAULT));
 
-        fromItem.accept(FactoryItems.FAN, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("block/").withSuffixedPath("_base")), ItemAsset.Properties.DEFAULT));
-        fromItem.accept(FactoryItems.FUNNEL, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("block/").withSuffixedPath("_out")), ItemAsset.Properties.DEFAULT));
-        fromItem.accept(FactoryItems.SLOT_AWARE_FUNNEL, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("block/").withSuffixedPath("_out")), ItemAsset.Properties.DEFAULT));
-        fromItem.accept(FactoryItems.FLUID_TANK, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("block/").withSuffixedPath("/single_single_single")), ItemAsset.Properties.DEFAULT));
-        fromItem.accept(FactoryItems.INVERTED_REDSTONE_LAMP, id -> new ItemAsset(new BasicItemModel(Identifier.ofVanilla("block/redstone_lamp_on")), ItemAsset.Properties.DEFAULT));
+        fromItem.accept(FactoryItems.FAN, id -> new ItemAsset(new BasicItemModel(id.withPrefix("block/").withSuffix("_base")), ItemAsset.Properties.DEFAULT));
+        fromItem.accept(FactoryItems.FUNNEL, id -> new ItemAsset(new BasicItemModel(id.withPrefix("block/").withSuffix("_out")), ItemAsset.Properties.DEFAULT));
+        fromItem.accept(FactoryItems.SLOT_AWARE_FUNNEL, id -> new ItemAsset(new BasicItemModel(id.withPrefix("block/").withSuffix("_out")), ItemAsset.Properties.DEFAULT));
+        fromItem.accept(FactoryItems.FLUID_TANK, id -> new ItemAsset(new BasicItemModel(id.withPrefix("block/").withSuffix("/single_single_single")), ItemAsset.Properties.DEFAULT));
+        fromItem.accept(FactoryItems.INVERTED_REDSTONE_LAMP, id -> new ItemAsset(new BasicItemModel(Identifier.withDefaultNamespace("block/redstone_lamp_on")), ItemAsset.Properties.DEFAULT));
         fromItem.accept(FactoryItems.ELECTRIC_MOTOR, id -> new ItemAsset(new BasicItemModel(id("block/motor")), ItemAsset.Properties.DEFAULT));
-        fromItem.accept(FactoryItems.DATA_MEMORY, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("item/")), ItemAsset.Properties.DEFAULT));
-        fromItem.accept(FactoryItems.EJECTOR, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("item/")), ItemAsset.Properties.DEFAULT));
+        fromItem.accept(FactoryItems.DATA_MEMORY, id -> new ItemAsset(new BasicItemModel(id.withPrefix("item/")), ItemAsset.Properties.DEFAULT));
+        fromItem.accept(FactoryItems.EJECTOR, id -> new ItemAsset(new BasicItemModel(id.withPrefix("item/")), ItemAsset.Properties.DEFAULT));
 
         fromItem.accept(FactoryItems.PRESSURE_FLUID_GUN, id -> new ItemAsset(new ConditionItemModel(
                 new UsingItemProperty(),
-                new BasicItemModel(id.withPrefixedPath("item/").withSuffixedPath("_active")),
-                new BasicItemModel(id.withPrefixedPath("item/"))
+                new BasicItemModel(id.withPrefix("item/").withSuffix("_active")),
+                new BasicItemModel(id.withPrefix("item/"))
         ), new ItemAsset.Properties(false)));
 
         for (var item : List.of(FactoryItems.TINY_POTATO_SPRING, FactoryItems.GOLDEN_TINY_POTATO_SPRING, FactoryItems.PIPE, FactoryItems.MECHANICAL_DRAIN, FactoryItems.PORTABLE_FLUID_TANK,
                 FactoryItems.LARGE_STEEL_GEAR,
                 FactoryItems.PUMP, FactoryItems.STEEL_BUTTON, FactoryDebugItems.ROTATION_DEBUG)) {
-            fromItem.accept(item, id -> new ItemAsset(new BasicItemModel(id.withPrefixedPath("item/")), ItemAsset.Properties.DEFAULT));
+            fromItem.accept(item, id -> new ItemAsset(new BasicItemModel(id.withPrefix("item/")), ItemAsset.Properties.DEFAULT));
         }
 
         fromItem.accept(FactoryItems.STEEL_GEAR, id -> new ItemAsset(SelectItemModel.builder(new DisplayContextProperty())
@@ -245,8 +244,8 @@ class AssetProvider implements DataProvider {
                         ItemDisplayContext.FIRST_PERSON_RIGHT_HAND,
                         ItemDisplayContext.THIRD_PERSON_LEFT_HAND,
                         ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
-                ), new BasicItemModel(id.withPrefixedPath("item/").withSuffixedPath("_world")))
-                .fallback(new BasicItemModel(id.withPrefixedPath("item/")))
+                ), new BasicItemModel(id.withPrefix("item/").withSuffix("_world")))
+                .fallback(new BasicItemModel(id.withPrefix("item/")))
                 .build(), ItemAsset.Properties.DEFAULT));
 
         consumer.accept(id("debug_item"), new ItemAsset(
@@ -289,7 +288,7 @@ class AssetProvider implements DataProvider {
             }
         }
 
-        consumer.accept(GuiTextures.LEFT_SHIFTED_3_BARS.get(DataComponentTypes.ITEM_MODEL), new ItemAsset(new CompositeItemModel(list), new ItemAsset.Properties(false, true)));
+        consumer.accept(GuiTextures.LEFT_SHIFTED_3_BARS.get(DataComponents.ITEM_MODEL), new ItemAsset(new CompositeItemModel(list), new ItemAsset.Properties(false, true)));
     }
 
 
@@ -357,17 +356,17 @@ class AssetProvider implements DataProvider {
     }
 
     @Override
-    public CompletableFuture<?> run(DataWriter writer) {
+    public CompletableFuture<?> run(CachedOutput writer) {
         BiConsumer<String, byte[]> assetWriter = (path, data) -> {
             try {
-                writer.write(this.output.getPath().resolve(path), data, HashCode.fromBytes(data));
+                writer.writeIfNeeded(this.output.getOutputFolder().resolve(path), data, HashCode.fromBytes(data));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         };
         return CompletableFuture.runAsync(() -> {
             runWriters(assetWriter);
-        }, Util.getMainWorkerExecutor());
+        }, Util.backgroundExecutor());
     }
 
     @Override

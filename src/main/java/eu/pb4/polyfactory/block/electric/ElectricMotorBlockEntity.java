@@ -4,14 +4,12 @@ import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.nodes.electric.EnergyData;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class ElectricMotorBlockEntity extends LockableBlockEntity {
     private float speed = 10;
@@ -22,26 +20,26 @@ public class ElectricMotorBlockEntity extends LockableBlockEntity {
     }
 
     @Override
-    protected void createGui(ServerPlayerEntity playerEntity) {
+    protected void createGui(ServerPlayer playerEntity) {
         //new Gui(playerEntity);
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         view.putFloat("speed", this.speed);
         view.putFloat("stress", this.stress);
     }
 
 
     @Override
-    public void readData(ReadView view) {
-        super.readData(view);
-        this.speed = view.getFloat("speed", 0);
-        this.stress = view.getFloat("stress", 0);
+    public void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
+        this.speed = view.getFloatOr("speed", 0);
+        this.stress = view.getFloatOr("stress", 0);
     }
 
-    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld serverWorld, BlockPos pos) {
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerLevel serverWorld, BlockPos pos) {
         var energy = EnergyUser.getEnergy(serverWorld, pos);
 
         if (energy.current() > 0) {
@@ -49,7 +47,7 @@ public class ElectricMotorBlockEntity extends LockableBlockEntity {
         }
     }
 
-    public void updateEnergyData(EnergyData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+    public void updateEnergyData(EnergyData.State modifier, BlockState state, ServerLevel world, BlockPos pos) {
         modifier.use((long) (this.speed * (this.stress * 1.2f)));
     }
 

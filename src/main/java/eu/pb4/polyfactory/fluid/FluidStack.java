@@ -2,7 +2,7 @@ package eu.pb4.polyfactory.fluid;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.text.MutableText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Unit;
 
 public record FluidStack<T>(FluidInstance<T> instance, long amount) {
@@ -22,7 +22,7 @@ public record FluidStack<T>(FluidInstance<T> instance, long amount) {
         return this.instance.data();
     }
 
-    public MutableText toTextRequired() {
+    public MutableComponent toTextRequired() {
         return this.instance.toLabeledAmount(amount);
     }
 

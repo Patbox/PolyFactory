@@ -19,40 +19,40 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
 
-public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, BlockEntityProvider, CableConnectable, RotationUser, EnergyUser, ConfigurableBlock {
-    public static final EnumProperty<Direction> FACING = Properties.FACING;
+public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, EntityBlock, CableConnectable, RotationUser, EnergyUser, ConfigurableBlock {
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 
-    public ElectricMotorBlock(Settings settings) {
+    public ElectricMotorBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    protected void updateNetworkAt(WorldView world, BlockPos pos) {
+    protected void updateNetworkAt(LevelReader world, BlockPos pos) {
         NetworkComponent.Rotational.updateRotationalAt(world, pos);
         NetworkComponent.Energy.updateEnergyAt(world, pos);
     }
@@ -63,83 +63,83 @@ public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, Bl
     }
 
     @Override
-    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerLevel world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof ElectricMotorBlockEntity be) {
             be.updateRotationalData(modifier, state, world, pos);
         }
     }
 
     @Override
-    public void updateEnergyData(EnergyData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+    public void updateEnergyData(EnergyData.State modifier, BlockState state, ServerLevel world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof ElectricMotorBlockEntity be) {
             be.updateEnergyData(modifier, state, world, pos);
         }
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getPlayer() != null && ctx.getPlayer().isSneaking() ? ctx.getSide() : ctx.getSide().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return this.defaultBlockState().setValue(FACING, ctx.getPlayer() != null && ctx.getPlayer().isShiftKeyDown() ? ctx.getClickedFace() : ctx.getClickedFace().getOpposite());
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
+        return Blocks.IRON_BLOCK.defaultBlockState();
     }
 
     @Override
-    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new FunctionalDirectionNode(state.get(FACING)));
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return List.of(new FunctionalDirectionNode(state.getValue(FACING)));
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         //if (!player.isSneaking() && hand == Hand.MAIN_HAND && hit.getSide() != state.get(FACING) && player.isCreative() && world.getBlockEntity(pos) instanceof ElectricMotorBlockEntity be && player instanceof ServerPlayerEntity serverPlayer) {
         //    be.openGui(serverPlayer);
         //    return ActionResult.SUCCESS;
         //}
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ElectricMotorBlockEntity(pos, state);
     }
 
     @Override
-    public Collection<BlockNode> createEnergyNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new FunctionalDirectionNode(state.get(FACING).getOpposite()));
+    public Collection<BlockNode> createEnergyNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return List.of(new FunctionalDirectionNode(state.getValue(FACING).getOpposite()));
     }
 
     @Override
-    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
-        return state.get(FACING) == dir.getOpposite();
+    public boolean canCableConnect(LevelReader world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+        return state.getValue(FACING) == dir.getOpposite();
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(BlockConfig.FACING);
     }
 
@@ -153,15 +153,15 @@ public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, Bl
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);
-            this.updateAnimation(0, state.get(FACING));
+            this.updateAnimation(0, state.getValue(FACING));
             this.addElement(this.axle);
             this.addElement(this.base);
         }
 
         private void updateAnimation(float speed, Direction facing) {
             var mat = mat();
-            mat.rotate(facing.getOpposite().getRotationQuaternion());
-            mat.rotateY((facing.getDirection() == Direction.AxisDirection.NEGATIVE) ? speed : -speed);
+            mat.rotate(facing.getOpposite().getRotation());
+            mat.rotateY((facing.getAxisDirection() == Direction.AxisDirection.NEGATIVE) ? speed : -speed);
 
             mat.scale(2f);
             this.axle.setTransformation(mat);
@@ -169,10 +169,10 @@ public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, Bl
 
         @Override
         protected void onTick() {
-            var tick = this.getAttachment().getWorld().getTime();
+            var tick = this.getAttachment().getWorld().getGameTime();
 
             if (tick % this.getUpdateRate() == 0) {
-                var facing = this.blockState().get(FACING);
+                var facing = this.blockState().getValue(FACING);
 
                 this.updateAnimation(this.getRotation(), facing);
                 this.axle.startInterpolationIfDirty();
@@ -180,13 +180,13 @@ public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, Bl
         }
 
         private void updateStatePos(BlockState state) {
-            var dir = state.get(FACING);
+            var dir = state.getValue(FACING);
             float p = -90;
             float y = 0;
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.getPositiveHorizontalDegrees();
+                y = dir.toYRot();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             }

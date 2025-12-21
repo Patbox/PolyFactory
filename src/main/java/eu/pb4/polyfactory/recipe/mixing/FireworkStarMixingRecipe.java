@@ -6,19 +6,18 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.input.MixingInput;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.FireworkStarRecipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.world.World;
-
 import java.util.Collections;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.FireworkStarRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 
 public record FireworkStarMixingRecipe(double time,
                                        double minimumSpeed,
                                        double optimalSpeed) implements MixingRecipe {
-    public static final FireworkStarRecipe VANILLA = new FireworkStarRecipe(CraftingRecipeCategory.BUILDING);
+    public static final FireworkStarRecipe VANILLA = new FireworkStarRecipe(CraftingBookCategory.BUILDING);
 
     public static final MapCodec<FireworkStarMixingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.DOUBLE.fieldOf("time").forGetter(FireworkStarMixingRecipe::time),
@@ -33,13 +32,13 @@ public record FireworkStarMixingRecipe(double time,
     }
 
     @Override
-    public void applyRecipeUse(MixerBlockEntity inventory, World world) {
+    public void applyRecipeUse(MixerBlockEntity inventory, Level world) {
         for (int i = 0; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
-            var stack = inventory.getStack(i);
+            var stack = inventory.getItem(i);
             if (!stack.isEmpty()) {
-                stack.decrement(1);
+                stack.shrink(1);
                 if (stack.isEmpty()) {
-                    inventory.setStack(i, ItemStack.EMPTY);
+                    inventory.setItem(i, ItemStack.EMPTY);
                 }
             }
         }
@@ -56,7 +55,7 @@ public record FireworkStarMixingRecipe(double time,
     }
 
     @Override
-    public boolean matches(MixingInput inventory, World world) {
+    public boolean matches(MixingInput inventory, Level world) {
         if (!inventory.fluids().isEmpty()) {
             return false;
         }
@@ -64,8 +63,8 @@ public record FireworkStarMixingRecipe(double time,
     }
 
     @Override
-    public ItemStack craft(MixingInput inventory, RegistryWrapper.WrapperLookup registryManager) {
-        return VANILLA.craft(inventory.asCraftingRecipeInput(), registryManager);
+    public ItemStack assemble(MixingInput inventory, HolderLookup.Provider registryManager) {
+        return VANILLA.assemble(inventory.asCraftingRecipeInput(), registryManager);
     }
 
     @Override

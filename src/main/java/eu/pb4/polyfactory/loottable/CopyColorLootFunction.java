@@ -4,25 +4,25 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.ColorProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContext;
-import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.loot.function.LootFunction;
-import net.minecraft.loot.function.LootFunctionType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
-public class CopyColorLootFunction implements LootFunction {
-    public static final LootFunction INSTANCE = new CopyColorLootFunction();
-    public static final LootFunctionType TYPE = new LootFunctionType(MapCodec.unit(INSTANCE));
+public class CopyColorLootFunction implements LootItemFunction {
+    public static final LootItemFunction INSTANCE = new CopyColorLootFunction();
+    public static final LootItemFunctionType TYPE = new LootItemFunctionType(MapCodec.unit(INSTANCE));
 
     @Override
-    public LootFunctionType getType() {
+    public LootItemFunctionType getType() {
         return TYPE;
     }
 
     @Override
     public ItemStack apply(ItemStack stack, LootContext lootContext) {
-        if (stack.getItem() instanceof ColoredItem && lootContext.hasParameter(LootContextParameters.BLOCK_ENTITY)) {
-            if (lootContext.get(LootContextParameters.BLOCK_ENTITY) instanceof ColorProvider provider && !provider.isDefaultColor()) {
+        if (stack.getItem() instanceof ColoredItem && lootContext.hasParameter(LootContextParams.BLOCK_ENTITY)) {
+            if (lootContext.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof ColorProvider provider && !provider.isDefaultColor()) {
                 ColoredItem.setColor(stack, provider.getColor());
             }
         }

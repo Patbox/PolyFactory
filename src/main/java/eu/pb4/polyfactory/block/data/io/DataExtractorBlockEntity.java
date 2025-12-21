@@ -11,26 +11,23 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
 import it.unimi.dsi.fastutil.objects.ReferenceSortedSets;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Unit;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import java.util.Objects;
 
 public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
@@ -46,20 +43,20 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         view.putString("field", this.field);
     }
 
     @Override
-    public void readData(ReadView view) {
-        super.readData(view);
-        this.field = view.getString("field", "");
+    public void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
+        this.field = view.getStringOr("field", "");
     }
 
     public void setField(String field) {
         this.field = field;
-        this.markDirty();
+        this.setChanged();
     }
 
     public String field() {
@@ -67,21 +64,21 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
     }
 
     @Override
-    protected void createGui(ServerPlayerEntity playerEntity) {
+    protected void createGui(ServerPlayer playerEntity) {
         new Gui(playerEntity, this);
     }
 
     private static class Gui extends AnvilInputGui {
         private final DataExtractorBlockEntity blockEntity;
 
-        public Gui(ServerPlayerEntity player, DataExtractorBlockEntity blockEntity) {
+        public Gui(ServerPlayer player, DataExtractorBlockEntity blockEntity) {
             super(player, true);
             this.blockEntity = blockEntity;
             this.setTitle(GuiTextures.DATA_EXTRACTOR.apply(blockEntity.getDisplayName()));
             this.setDefaultInputValue(blockEntity.field);
             this.updateDone();
-            this.setSlot(2, GuiTextures.BUTTON_CLOSE.get().setName(ScreenTexts.BACK).setCallback(x -> {
-                FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
+            this.setSlot(2, GuiTextures.BUTTON_CLOSE.get().setName(CommonComponents.GUI_BACK).setCallback(x -> {
+                FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
                 this.close();
             }));
             this.open();
@@ -92,34 +89,34 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
             super.onInput(input);
             this.updateDone();
             if (this.screenHandler != null) {
-                this.screenHandler.setReceivedStack(2, ItemStack.EMPTY);
+                this.screenHandler.setRemoteSlot(2, ItemStack.EMPTY);
             }
 
         }
 
         private void updateDone() {
-            this.setSlot(1, GuiTextures.BUTTON_DONE.get().setName(ScreenTexts.DONE).setCallback(x -> {
-                FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
+            this.setSlot(1, GuiTextures.BUTTON_DONE.get().setName(CommonComponents.GUI_DONE).setCallback(x -> {
+                FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
                 this.blockEntity.setField(this.getInput());
-                var b = ((DataExtractorBlock) this.blockEntity.getCachedState().getBlock());
-                b.sendData(this.blockEntity.world, this.blockEntity.getCachedState().get(DataExtractorBlock.FACING_OUTPUT), this.blockEntity.getPos(), this.blockEntity.lastInput());
+                var b = ((DataExtractorBlock) this.blockEntity.getBlockState().getBlock());
+                b.sendData(this.blockEntity.level, this.blockEntity.getBlockState().getValue(DataExtractorBlock.FACING_OUTPUT), this.blockEntity.getBlockPos(), this.blockEntity.lastInput());
                 this.close();
             }));
 
             int i = 3;
             {
-                var b = new GuiElementBuilder(Items.NETHER_STAR).setName(Text.translatable("data_type.polyfactory.any").formatted(Formatting.ITALIC));
+                var b = new GuiElementBuilder(Items.NETHER_STAR).setName(Component.translatable("data_type.polyfactory.any").withStyle(ChatFormatting.ITALIC));
                 for (var field : DataContainer.GENERIC_EXTRACTS) {
-                    var color = Formatting.GRAY;
+                    var color = ChatFormatting.GRAY;
 
                     if (this.getInput().equals(field)) {
-                        color = Formatting.YELLOW;
+                        color = ChatFormatting.YELLOW;
                     }
 
-                    b.addLoreLine(Text.empty()
-                            .append(Text.literal(" " + field).setStyle(Style.EMPTY.withItalic(true)))
+                    b.addLoreLine(Component.empty()
+                            .append(Component.literal(" " + field).setStyle(Style.EMPTY.withItalic(true)))
                             .append(" - ")
-                            .append(Text.translatable("data_type_field.polyfactory.any." + field + ".desc"))
+                            .append(Component.translatable("data_type_field.polyfactory.any." + field + ".desc"))
                             .setStyle(Style.EMPTY.withColor(color))
                     );
                 }
@@ -134,19 +131,19 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
                     b.glow();
                 }
                 for (var field : x.fields()) {
-                    var color = Formatting.GRAY;
+                    var color = ChatFormatting.GRAY;
 
                     if (
                             (field.endsWith("*") && this.getInput().startsWith(field.substring(0, field.length() - 1)))
                                     || (!field.endsWith("*") && this.getInput().equals(field))) {
-                        color = Formatting.YELLOW;
+                        color = ChatFormatting.YELLOW;
                     }
 
 
-                    b.addLoreLine(Text.empty()
-                            .append(Text.literal(" " + field).setStyle(Style.EMPTY.withItalic(true)))
+                    b.addLoreLine(Component.empty()
+                            .append(Component.literal(" " + field).setStyle(Style.EMPTY.withItalic(true)))
                             .append(" - ")
-                            .append(Text.translatable("data_type_field.polyfactory." + x.asString() + "." + field + ".desc"))
+                            .append(Component.translatable("data_type_field.polyfactory." + x.getSerializedName() + "." + field + ".desc"))
                             .setStyle(Style.EMPTY.withColor(color))
                     );
                 }
@@ -161,15 +158,15 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
                 updateDone();
             }
             var itemStack = GuiTextures.EMPTY.getItemStack().copy();
-            itemStack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(input));
-            itemStack.set(DataComponentTypes.TOOLTIP_DISPLAY, new TooltipDisplayComponent(true, ReferenceSortedSets.emptySet()));
+            itemStack.set(DataComponents.CUSTOM_NAME, Component.literal(input));
+            itemStack.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, ReferenceSortedSets.emptySet()));
             this.setSlot(0, itemStack, Objects.requireNonNull(this.getSlot(0)).getGuiCallback());
         }
 
         @Override
         public void onTick() {
             if (this.blockEntity.isRemoved()
-                    || player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(this.blockEntity.getPos())) > (18 * 18)) {
+                    || player.position().distanceToSqr(Vec3.atCenterOf(this.blockEntity.getBlockPos())) > (18 * 18)) {
                 this.close();
                 return;
             }

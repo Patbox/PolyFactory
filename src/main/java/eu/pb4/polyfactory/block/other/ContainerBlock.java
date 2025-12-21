@@ -14,72 +14,74 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.*;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 
-public class ContainerBlock extends Block implements FactoryBlock, BlockEntityProvider, AttackableBlock, SneakBypassingBlock, BarrierBasedWaterloggable {
-    public static EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
+public class ContainerBlock extends Block implements FactoryBlock, EntityBlock, AttackableBlock, SneakBypassingBlock, BarrierBasedWaterloggable {
+    public static EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public final int maxStackCount;
 
-    public ContainerBlock(int maxStackCount, Settings settings) {
+    public ContainerBlock(int maxStackCount, Properties settings) {
         super(settings);
         this.maxStackCount = maxStackCount;
-        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING);
         builder.add(WATERLOGGED);
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         tickWater(state, world, tickView, pos);
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+        return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be && hit.getSide() == state.get(FACING)) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be && hit.getDirection() == state.getValue(FACING)) {
             if (be.checkUnlocked(player)) {
-                var stack = player.getStackInHand(Hand.MAIN_HAND);
+                var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
 
-                if (player.isSneaking() && stack.isEmpty() && !be.getItemStack().isEmpty()) {
-                    var inv = player.getInventory().getMainStacks();
+                if (player.isShiftKeyDown() && stack.isEmpty() && !be.getItemStack().isEmpty()) {
+                    var inv = player.getInventory().getNonEquipmentItems();
                     for (int i = 0; i < inv.size(); i++) {
                         var curr = inv.get(i);
                         if (be.matches(curr)) {
-                            curr.decrement(be.addItems(curr.getCount()));
+                            curr.shrink(be.addItems(curr.getCount()));
                             if (curr.isEmpty()) {
                                 inv.set(i, ItemStack.EMPTY);
                             }
@@ -89,60 +91,60 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
                         }
                     }
                 } else if (stack.isEmpty()) {
-                    return ActionResult.FAIL;
+                    return InteractionResult.FAIL;
                 } else {
-                    if (player instanceof ServerPlayerEntity serverPlayer) {
+                    if (player instanceof ServerPlayer serverPlayer) {
                         TriggerCriterion.trigger(serverPlayer, FactoryTriggers.CONTAINER_ADD_ITEM);
                     }
-                    var count = player.isSneaking() ? stack.getCount() : 1;
+                    var count = player.isShiftKeyDown() ? stack.getCount() : 1;
                     if (be.getItemStack().isEmpty()) {
                         be.setItemStack(stack);
-                        stack.decrement(be.addItems(count));
+                        stack.shrink(be.addItems(count));
                     } else if (be.matches(stack)) {
-                        stack.decrement(be.addItems(count));
+                        stack.shrink(be.addItems(count));
                     }
 
                     if (stack.isEmpty()) {
-                        player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
+                        player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                     }
                 }
             }
-            return ActionResult.SUCCESS_SERVER;
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 
     @Override
-    public ActionResult onPlayerAttack(BlockState state, PlayerEntity player, World world, BlockPos pos, Direction direction) {
-        if (direction == state.get(FACING)) {
+    public InteractionResult onPlayerAttack(BlockState state, Player player, Level world, BlockPos pos, Direction direction) {
+        if (direction == state.getValue(FACING)) {
             if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be && be.checkUnlocked(player)) {
                 if (!be.isEmpty()) {
-                    var stack = be.extract(player.isSneaking() ? be.getItemStack().getMaxCount() : 1);
-                    player.getInventory().offerOrDrop(stack);
+                    var stack = be.extract(player.isShiftKeyDown() ? be.getItemStack().getMaxStackSize() : 1);
+                    player.getInventory().placeItemBackInInventory(stack);
                 } else {
                     be.setItemStack(ItemStack.EMPTY);
                 }
             }
-            return ActionResult.SUCCESS_SERVER;
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        world.updateComparators(pos, this);
-        super.onStateReplaced(state, world, pos, moved);
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
+        world.updateNeighbourForOutputSignal(pos, this);
+        super.affectNeighborsAfterRemoval(state, world, pos, moved);
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState state) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
         if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be) {
             return (int) ((be.storage.amount * 15) / be.storage.getCapacity());
         }
@@ -151,38 +153,38 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterLog(ctx, this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite()));
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return waterLog(ctx, this.defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite()));
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return FactoryUtil.transform(state, rotation::rotate, FACING);
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return FactoryUtil.transform(state, mirror::apply, FACING);
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        return FactoryUtil.transform(state, mirror::mirror, FACING);
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.OAK_PLANKS.getDefaultState();
+        return Blocks.OAK_PLANKS.defaultBlockState();
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ContainerBlockEntity(pos, state);
     }
 
     @Override
-    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(world, pos, initialBlockState);
     }
 
@@ -192,7 +194,7 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
         private final ItemDisplayElement itemElement;
         private final TextDisplayElement countElement;
 
-        private Model(ServerWorld world, BlockPos pos, BlockState state) {
+        private Model(ServerLevel world, BlockPos pos, BlockState state) {
             this.mainElement = ItemDisplayElementUtil.createSimple(ContainerBlock.this.asItem());
 
             this.itemElement = ItemDisplayElementUtil.createSimple();
@@ -200,7 +202,7 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
             this.itemElement.setItemDisplayContext(ItemDisplayContext.GUI);
             this.itemElement.setViewRange(0.3f);
 
-            this.countElement = new TextDisplayElement(Text.literal("0"));
+            this.countElement = new TextDisplayElement(Component.literal("0"));
             this.countElement.setDisplaySize(1, 1);
             this.countElement.setBackground(0);
             this.countElement.setInvisible(true);
@@ -216,15 +218,15 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
 
         public void setDisplay(ItemStack stack, long count) {
             this.itemElement.setItem(stack.copy());
-            this.countElement.setText(Text.literal("" + count));
+            this.countElement.setText(Component.literal("" + count));
         }
 
         private void updateFacing(BlockState facing) {
-            var rot = facing.get(FACING).getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
+            var rot = facing.getValue(FACING).getRotation().mul(Direction.NORTH.getRotation());
             mat.clear();
             mat.rotate(rot);
             mat.pushMatrix();
-            mat.rotateY(MathHelper.PI);
+            mat.rotateY(Mth.PI);
             mat.scale(2f);
             this.mainElement.setTransformation(mat);
             mat.popMatrix();
@@ -238,7 +240,7 @@ public class ContainerBlock extends Block implements FactoryBlock, BlockEntityPr
 
             mat.pushMatrix();
             mat.translate(0, -6.25f / 16f, -6.2f / 16f);
-            mat.rotateY(MathHelper.PI);
+            mat.rotateY(Mth.PI);
             mat.scale(0.5f, 0.5f, 0.02f);
             this.countElement.setTransformation(mat);
             mat.popMatrix();

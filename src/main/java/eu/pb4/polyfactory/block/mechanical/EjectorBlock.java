@@ -20,37 +20,37 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.Flutterer;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.*;
-import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.block.WireOrientation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.FlyingAnimal;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -60,105 +60,105 @@ import java.util.Locale;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
-public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider, ConfigurableBlock {
-    public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
-    public static final BooleanProperty ENABLED = Properties.ENABLED;
+public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, EntityBlock, ConfigurableBlock {
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
     private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(
             BlockConfig.FACING_HORIZONTAL,
             BlockConfig.ofBlockEntity("angle", Codec.FLOAT, EjectorBlockEntity.class,
-                    (x, world, pos, side, state) -> Text.literal(String.format(Locale.ROOT, "%.0f", x)),
+                    (x, world, pos, side, state) -> Component.literal(String.format(Locale.ROOT, "%.0f", x)),
                     EjectorBlockEntity::angle, EjectorBlockEntity::setAngle,
                     WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 5f : -5f), 10, 65))),
             BlockConfig.ofBlockEntity("strength", Codec.FLOAT, EjectorBlockEntity.class,
-                    (x, world, pos, side, state) -> Text.literal(String.format(Locale.ROOT, "%.2f", x)),
+                    (x, world, pos, side, state) -> Component.literal(String.format(Locale.ROOT, "%.2f", x)),
                     EjectorBlockEntity::strength, EjectorBlockEntity::setStrength,
                     WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.25f : -0.25f), 1, 2.5f)))
             );
 
 
-    public EjectorBlock(Settings settings) {
+    public EjectorBlock(Properties settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(ENABLED, true));
+        registerDefaultState(defaultBlockState().setValue(ENABLED, true));
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return this.defaultBlockState().setValue(FACING, ctx.getHorizontalDirection());
     }
 
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        if (!oldState.isOf(state.getBlock())) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (!oldState.is(state.getBlock())) {
             this.updateEnabled(world, pos, state);
         }
-        super.onBlockAdded(state,world,pos, oldState, notify);
+        super.onPlace(state,world,pos, oldState, notify);
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, @Nullable Orientation wireOrientation, boolean notify) {
         this.updateEnabled(world, pos, state);
-        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
+        super.neighborChanged(state, world, pos, sourceBlock, wireOrientation, notify);
     }
 
-    private void updateEnabled(World world, BlockPos pos, BlockState state) {
-        boolean powered = world.isReceivingRedstonePower(pos);
-        if (powered == state.get(ENABLED)) {
-            world.setBlockState(pos, state.with(ENABLED, !powered), 4);
+    private void updateEnabled(Level world, BlockPos pos, BlockState state) {
+        boolean powered = world.hasNeighborSignal(pos);
+        if (powered == state.getValue(ENABLED)) {
+            world.setBlock(pos, state.setValue(ENABLED, !powered), 4);
         }
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, ENABLED);
     }
 
     @Override
-    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new FunctionalAxisNode(state.get(FACING).rotateYClockwise().getAxis()));
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return List.of(new FunctionalAxisNode(state.getValue(FACING).getClockWise().getAxis()));
     }
 
-    public void onLandedUpon(World world, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
-        if (!(world.getBlockEntity(pos) instanceof EjectorBlockEntity be) || (be.progress() < 1 && be.ignoredTick() + 4 < world.getTime()) || !state.get(ENABLED)) {
+    public void onLandedUpon(Level world, BlockState state, BlockPos pos, Entity entity, float fallDistance) {
+        if (!(world.getBlockEntity(pos) instanceof EjectorBlockEntity be) || (be.progress() < 1 && be.ignoredTick() + 4 < world.getGameTime()) || !state.getValue(ENABLED)) {
             return;
         }
-        super.onLandedUpon(world, state, pos, entity, fallDistance);
+        super.fallOn(world, state, pos, entity, fallDistance);
     }
 
     @Override
-    public void onSteppedOn(World world, BlockPos pos, BlockState state, Entity entity) {
-        if (!(world.getBlockEntity(pos) instanceof EjectorBlockEntity be) || (be.progress() < 1 && be.ignoredTick() + 4 < world.getTime()) || !state.get(ENABLED)) {
+    public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {
+        if (!(world.getBlockEntity(pos) instanceof EjectorBlockEntity be) || (be.progress() < 1 && be.ignoredTick() + 4 < world.getGameTime()) || !state.getValue(ENABLED)) {
             return;
         }
 
         if (be.progress() >= 1) {
-            world.playSound(null, pos, FactorySoundEvents.BLOCK_EJECTOR_LAUNCH, SoundCategory.BLOCKS);
-            be.setIgnoredTick(world.getTime());
+            world.playSound(null, pos, FactorySoundEvents.BLOCK_EJECTOR_LAUNCH, SoundSource.BLOCKS);
+            be.setIgnoredTick(world.getGameTime());
         }
         be.setProgress(0);
 
 
-        var rot = state.get(FACING).rotateYClockwise();
+        var rot = state.getValue(FACING).getClockWise();
 
         var verticalDrag = 0.98f;
         var horizontalDrag = 0.98f;
 
         if (entity instanceof LivingEntity livingEntity) {
-            horizontalDrag = livingEntity.hasNoDrag() ? 1 : 0.91F;
+            horizontalDrag = livingEntity.shouldDiscardFriction() ? 1 : 0.91F;
         }
-        if (entity instanceof Flutterer ) {
+        if (entity instanceof FlyingAnimal ) {
             verticalDrag = horizontalDrag;
         }
 
-        var vec = new Vec3d(state.get(FACING).getUnitVector()
+        var vec = new Vec3(state.getValue(FACING).step()
                 .mul(1 / verticalDrag, 1 / horizontalDrag, 1 / verticalDrag)
                 .mul(be.strength())
-                .mul((float) (entity.getFinalGravity() / 0.08))
-                .rotateAxis(be.angle() * MathHelper.RADIANS_PER_DEGREE, rot.getOffsetX(), rot.getOffsetY(), rot.getOffsetZ())
+                .mul((float) (entity.getGravity() / 0.08))
+                .rotateAxis(be.angle() * Mth.DEG_TO_RAD, rot.getStepX(), rot.getStepY(), rot.getStepZ())
         );
         entity.setOnGround(false);
-        entity.setVelocity(vec);
-        if (entity instanceof ServerPlayerEntity player) {
-            FactoryUtil.sendVelocityDelta(player, vec.add(0, player.getFinalGravity(), 0));
+        entity.setDeltaMovement(vec);
+        if (entity instanceof ServerPlayer player) {
+            FactoryUtil.sendVelocityDelta(player, vec.add(0, player.getGravity(), 0));
             TriggerCriterion.trigger(player, FactoryTriggers.LAUNCHED_BY_EJECTOR);
         } else if (entity instanceof LastFanEffectedTickConsumer c) {
             c.polyfactory$setLastFanTick();
@@ -167,98 +167,98 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new EjectorBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world instanceof ServerWorld && type == FactoryBlockEntities.EJECTOR ? EjectorBlockEntity::tick : null;
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+        return world instanceof ServerLevel && type == FactoryBlockEntities.EJECTOR ? EjectorBlockEntity::tick : null;
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return FactoryUtil.transform(state, rotation::rotate, FACING);
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return FactoryUtil.transform(state, mirror::apply, FACING);
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        return FactoryUtil.transform(state, mirror::mirror, FACING);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
+        return Blocks.IRON_BLOCK.defaultBlockState();
     }
 
     @Override
-    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return WRENCH_ACTIONS;
     }
 
     @Override
-    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerLevel world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof EjectorBlockEntity be) {
             be.updateRotationalData(modifier, state, world, pos);
         }
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState state) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
         return world.getBlockEntity(pos) instanceof EjectorBlockEntity be ? (int) (be.progress() * 15) : 0;
     }
 
     @Override
-    public void wrenchTick(ServerPlayerEntity player, BlockHitResult hit, BlockState state) {
+    public void wrenchTick(ServerPlayer player, BlockHitResult hit, BlockState state) {
         if (true) {
             return;
         }
 
-        var world = player.getEntityWorld();
+        var world = player.level();
         if (!(world.getBlockEntity(hit.getBlockPos()) instanceof EjectorBlockEntity be)) {
             return;
         }
-        var out = Vec3d.ofCenter(hit.getBlockPos(), 1);
+        var out = Vec3.upFromBottomCenterOf(hit.getBlockPos(), 1);
 
-        var rot = state.get(FACING).rotateYClockwise();
-        var vec = new Vec3d(state.get(FACING).getUnitVector()
+        var rot = state.getValue(FACING).getClockWise();
+        var vec = new Vec3(state.getValue(FACING).step()
                 .mul(1 / 0.98f, 1 / 0.98f, 1 / 0.98f)
                 .mul(be.strength())
                 .mul(0.5f)
-                .rotateAxis(be.angle() * MathHelper.RADIANS_PER_DEGREE, rot.getOffsetX(), rot.getOffsetY(), rot.getOffsetZ())
+                .rotateAxis(be.angle() * Mth.DEG_TO_RAD, rot.getStepX(), rot.getStepY(), rot.getStepZ())
         );
 
-        int endTime = (player.age / 4) % 10;
+        int endTime = (player.tickCount / 4) % 10;
 
-        var particle = new DustParticleEffect(0xFF0000, 1);
+        var particle = new DustParticleOptions(0xFF0000, 1);
 
         for (int i = 0; i < 40; i++) {
-            player.networkHandler.sendPacket(new ParticleS2CPacket(particle, true, true,
+            player.connection.send(new ClientboundLevelParticlesPacket(particle, true, true,
                     out.x, out.y, out.z, 0, 0, 0, 0, 0));
             vec = vec.add(0, -0.08, 0);
             out = out.add(vec);
-            vec = vec.multiply(0.98);
+            vec = vec.scale(0.98);
         }
     }
 
@@ -288,8 +288,8 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
         }
 
         private void updateStatePos(BlockState state) {
-            var dir = state.get(FACING);
-            float y = dir.getPositiveHorizontalDegrees();
+            var dir = state.getValue(FACING);
+            float y = dir.toYRot();
             this.base.setYaw(y);
             this.plate.setYaw(y);
             this.link.setYaw(y);

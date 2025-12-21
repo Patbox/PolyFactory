@@ -3,10 +3,9 @@ package eu.pb4.polyfactory.fluid;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
-import net.minecraft.inventory.StackReference;
-import net.minecraft.item.ItemStack;
-
 import java.util.List;
+import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.item.ItemStack;
 
 public interface FluidContainerFromComponent extends FluidContainer {
     static FluidContainerFromComponent of(ItemStack stack) {
@@ -23,7 +22,7 @@ public interface FluidContainerFromComponent extends FluidContainer {
         };
     }
 
-    static FluidContainerFromComponent of(StackReference stack) {
+    static FluidContainerFromComponent of(SlotAccess stack) {
         return new FluidContainerFromComponent() {
             @Override
             public FluidComponent component() {
@@ -37,7 +36,7 @@ public interface FluidContainerFromComponent extends FluidContainer {
         };
     }
 
-    static FluidContainerFromComponent ofCopying(StackReference stack) {
+    static FluidContainerFromComponent ofCopying(SlotAccess stack) {
         return new FluidContainerFromComponent() {
             @Override
             public FluidComponent component() {

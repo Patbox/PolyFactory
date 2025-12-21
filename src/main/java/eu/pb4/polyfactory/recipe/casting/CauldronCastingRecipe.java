@@ -5,20 +5,20 @@ import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polyfactory.recipe.input.SingleItemWithFluid;
-import net.minecraft.recipe.IngredientPlacement;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.book.RecipeBookCategories;
-import net.minecraft.recipe.book.RecipeBookCategory;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.sound.SoundEvent;
+import net.minecraft.core.Holder;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategories;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
+import net.minecraft.world.item.crafting.RecipeType;
 
 public interface CauldronCastingRecipe extends Recipe<FluidContainerInput> {
     static double getTime(FluidInstance<?> fluidInstance, long amount) {
         return Math.max(30 * amount / fluidInstance.getFlowSpeedMultiplier(null) / fluidInstance.getMaxFlow(null), 1);
     }
     FluidStack<?> fluidInput(FluidContainerInput input);
-    RegistryEntry<SoundEvent> soundEvent();
+    Holder<SoundEvent> soundEvent();
     double time(FluidContainerInput input);
     double coolingTime(FluidContainerInput input);
 
@@ -28,17 +28,17 @@ public interface CauldronCastingRecipe extends Recipe<FluidContainerInput> {
     };
 
     @Override
-    default IngredientPlacement getIngredientPlacement() {
-        return IngredientPlacement.NONE;
+    default PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
     }
 
     @Override
-    default RecipeBookCategory getRecipeBookCategory() {
+    default RecipeBookCategory recipeBookCategory() {
         return RecipeBookCategories.CAMPFIRE;
     }
 
     @Override
-    default boolean isIgnoredInRecipeBook() {
+    default boolean isSpecial() {
         return true;
     }
 }

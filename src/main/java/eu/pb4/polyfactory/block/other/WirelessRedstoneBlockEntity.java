@@ -5,18 +5,16 @@ import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.BlockHitResult;
 
 @SuppressWarnings("UnstableApiUsage")
 public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements BlockEntityExtraListener {
@@ -33,22 +31,22 @@ public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements 
     }
 
     @Override
-    protected void writeData(WriteView view) {
+    protected void saveAdditional(ValueOutput view) {
         if (!this.key1.isEmpty()) {
-            view.put("key1", ItemStack.OPTIONAL_CODEC, this.key1);
+            view.store("key1", ItemStack.OPTIONAL_CODEC, this.key1);
         }
         if (!this.key2.isEmpty()) {
-            view.put("key2", ItemStack.OPTIONAL_CODEC, this.key2);
+            view.store("key2", ItemStack.OPTIONAL_CODEC, this.key2);
         }
-        super.writeData(view);
+        super.saveAdditional(view);
     }
 
     @Override
-    public void readData(ReadView view) {
+    public void loadAdditional(ValueInput view) {
         this.key1 = view.read("key1", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         this.key2 = view.read("key2", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         updateStack();
-        super.readData(view);
+        super.loadAdditional(view);
     }
 
     private void updateStack() {
@@ -59,22 +57,22 @@ public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements 
 
     private void updateStackWithTick() {
         updateStack();
-        if (this.model != null && this.world != null) {
+        if (this.model != null && this.level != null) {
             model.tick();
         }
     }
 
-    public boolean updateKey(PlayerEntity player, BlockHitResult hit, ItemStack mainHandStack) {
-        if (hit.getSide() != this.getCachedState().get(WirelessRedstoneBlock.FACING).getOpposite()) {
+    public boolean updateKey(Player player, BlockHitResult hit, ItemStack mainHandStack) {
+        if (hit.getDirection() != this.getBlockState().getValue(WirelessRedstoneBlock.FACING).getOpposite()) {
             return false;
         }
 
-        var delta = hit.getPos().subtract(hit.getBlockPos().toCenterPos());
-        boolean upper = hit.getSide() == Direction.DOWN ? delta.z < 0 : hit.getSide() == Direction.UP ? delta.z > 0 : delta.y > 0;
+        var delta = hit.getLocation().subtract(hit.getBlockPos().getCenter());
+        boolean upper = hit.getDirection() == Direction.DOWN ? delta.z < 0 : hit.getDirection() == Direction.UP ? delta.z > 0 : delta.y > 0;
 
         var current = upper ? this.key1 : this.key2;
 
-        if (ItemStack.areItemsAndComponentsEqual(current, mainHandStack)) {
+        if (ItemStack.isSameItemSameComponents(current, mainHandStack)) {
             return false;
         }
 
@@ -85,7 +83,7 @@ public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements 
         }
 
         updateStackWithTick();
-        this.markDirty();
+        this.setChanged();
         return true;
     }
 
@@ -98,12 +96,12 @@ public class WirelessRedstoneBlockEntity extends LockableBlockEntity implements 
     }
 
     public boolean matches(ItemStack key1, ItemStack key2) {
-        return ItemStack.areItemsAndComponentsEqual(this.key1, key1) && ItemStack.areItemsAndComponentsEqual(this.key2, key2);
+        return ItemStack.isSameItemSameComponents(this.key1, key1) && ItemStack.isSameItemSameComponents(this.key2, key2);
     }
 
     @Override
-    public void onListenerUpdate(WorldChunk chunk) {
-        this.model = BlockBoundAttachment.get(chunk, this.pos).holder() instanceof ItemUpdater model ? model : null;
+    public void onListenerUpdate(LevelChunk chunk) {
+        this.model = BlockBoundAttachment.get(chunk, this.worldPosition).holder() instanceof ItemUpdater model ? model : null;
         this.updateStack();
     }
 

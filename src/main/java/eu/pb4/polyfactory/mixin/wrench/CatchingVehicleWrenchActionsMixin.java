@@ -3,22 +3,21 @@ package eu.pb4.polyfactory.mixin.wrench;
 import eu.pb4.polyfactory.entity.EntityCatchingVehicle;
 import eu.pb4.polyfactory.entity.configurable.ConfigurableEntity;
 import eu.pb4.polyfactory.entity.configurable.EntityConfig;
-import net.minecraft.entity.vehicle.AbstractBoatEntity;
-import net.minecraft.entity.vehicle.MinecartEntity;
-import net.minecraft.entity.vehicle.VehicleEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.vehicle.VehicleEntity;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
+import net.minecraft.world.entity.vehicle.minecart.Minecart;
+import net.minecraft.world.phys.Vec3;
 
-@Mixin({MinecartEntity.class, AbstractBoatEntity.class})
+@Mixin({Minecart.class, AbstractBoat.class})
 public abstract class CatchingVehicleWrenchActionsMixin implements ConfigurableEntity<VehicleEntity>, EntityCatchingVehicle {
     @SuppressWarnings("AddedMixinMembersNamePattern")
     @Override
-    public List<EntityConfig<?, VehicleEntity>> getEntityConfiguration(ServerPlayerEntity player, Vec3d targetPos) {
+    public List<EntityConfig<?, VehicleEntity>> getEntityConfiguration(ServerPlayer player, Vec3 targetPos) {
         //noinspection unchecked
         return (List<EntityConfig<?, VehicleEntity>>) (Object) EntityCatchingVehicle.CONFIGS;
     }

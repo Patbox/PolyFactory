@@ -12,26 +12,29 @@ import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.shooting.ShooterContext;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.*;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
 public class NozzleBlockEntity extends BlockEntity implements FluidInput.ContainerBased, ShooterContext, OwnedBlockEntity {
-    protected final FluidContainerImpl container = new FluidContainerImpl(FluidConstants.BLOCK * 3 / 2, this::markDirty);
+    protected final FluidContainerImpl container = new FluidContainerImpl(FluidConstants.BLOCK * 3 / 2, this::setChanged);
     private double speed;
     @Nullable
     private FluidInstance<?> currentFluid;
@@ -44,38 +47,38 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         view.putDouble("speed", this.speed);
         view.putInt("tick", this.tick);
         this.container.writeData(view, "fluid");
         view.putFloat("spread", this.extraSpread);
         if (this.currentFluid != null) {
-            view.put("current_fluid", FluidInstance.CODEC, this.currentFluid);
+            view.store("current_fluid", FluidInstance.CODEC, this.currentFluid);
         }
         if (this.owner != null) {
-            view.put("owner", NbtCompound.CODEC, LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+            view.store("owner", CompoundTag.CODEC, LegacyNbtHelper.writeGameProfile(new CompoundTag(), this.owner));
         }
     }
 
     @Override
-    protected void readData(ReadView view) {
-        super.readData(view);
-        this.speed = view.getDouble("speed", 0);
-        this.tick = view.getInt("tick", 0);
+    protected void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
+        this.speed = view.getDoubleOr("speed", 0);
+        this.tick = view.getIntOr("tick", 0);
         this.container.readData(view, "fluid");
         this.currentFluid = view.read("current_fluid", FluidInstance.CODEC).orElse(null);
-        this.extraSpread = view.getFloat("spread", 0);
-        view.read("owner", NbtCompound.CODEC).ifPresent(x -> this.owner = LegacyNbtHelper.toGameProfile(x));
+        this.extraSpread = view.getFloatOr("spread", 0);
+        view.read("owner", CompoundTag.CODEC).ifPresent(x -> this.owner = LegacyNbtHelper.toGameProfile(x));
     }
 
-    public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
+    public static <T extends BlockEntity> void tick(Level world, BlockPos pos, BlockState state, T t) {
         if (!(t instanceof NozzleBlockEntity nozzle)) {
             return;
         }
-        var goodDir = nozzle.getCachedState().get(NozzleBlock.FACING);
+        var goodDir = nozzle.getBlockState().getValue(NozzleBlock.FACING);
 
-        if (!nozzle.world().getChunkManager().chunkLoadingManager.getLevelManager().shouldTickEntities(ChunkPos.toLong(pos.offset(goodDir)))) {
+        if (!nozzle.world().getChunkSource().chunkMap.getDistanceManager().inEntityTickingRange(ChunkPos.asLong(pos.relative(goodDir)))) {
             return;
         }
 
@@ -83,12 +86,12 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
             nozzle.stopShooting();
             if (nozzle.speed != 0) {
                 nozzle.speed = 0;
-                nozzle.markDirty();
+                nozzle.setChanged();
             }
             return;
         }
         var num = new MutableDouble();
-        NetworkComponent.Pipe.getLogic((ServerWorld) world, pos).runPushFlows(pos, () -> true, (dir, strength) -> {
+        NetworkComponent.Pipe.getLogic((ServerLevel) world, pos).runPushFlows(pos, () -> true, (dir, strength) -> {
             if (dir == goodDir) {
                 num.add(strength);
             } else {
@@ -103,7 +106,7 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
         }
         if (nozzle.speed != strength) {
             nozzle.speed = strength;
-            nozzle.markDirty();
+            nozzle.setChanged();
         }
 
         if (nozzle.currentFluid != null) {
@@ -111,7 +114,7 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
             var fluid = (FluidInstance<Object>) nozzle.currentFluid;
             if (fluid.shootingBehavior().canShoot(nozzle, fluid, nozzle.container)) {
                 fluid.shootingBehavior().continueShooting(nozzle, fluid, nozzle.tick++, nozzle.container);
-                nozzle.markDirty();
+                nozzle.setChanged();
                 return;
             }
 
@@ -125,10 +128,10 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
                 nozzle.currentFluid = fluid;
                 nozzle.tick = 0;
                 fluid.shootingBehavior().startShooting(nozzle, fluid, nozzle.container);
-                if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayerEntity player) {
+                if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayer player) {
                     FluidShootsCriterion.triggerNozzle(player, fluid);
                 }
-                nozzle.markDirty();
+                nozzle.setChanged();
                 break;
             }
         }
@@ -143,12 +146,12 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
         fluid.shootingBehavior().stopShooting(this, fluid);
         this.tick = 0;
         this.currentFluid = null;
-        this.markDirty();
+        this.setChanged();
     }
 
     @Override
     public @Nullable FluidContainer getFluidContainer(Direction direction) {
-        return direction == this.getCachedState().get(NozzleBlock.FACING).getOpposite() ? this.getMainFluidContainer() : null;
+        return direction == this.getBlockState().getValue(NozzleBlock.FACING).getOpposite() ? this.getMainFluidContainer() : null;
     }
 
     @Override
@@ -157,13 +160,13 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
     }
 
     @Override
-    public Random random() {
-        return this.world.random;
+    public RandomSource random() {
+        return this.level.random;
     }
 
     @Override
-    public ServerWorld world() {
-        return (ServerWorld) this.world;
+    public ServerLevel world() {
+        return (ServerLevel) this.level;
     }
 
     @Override
@@ -172,18 +175,18 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
     }
 
     @Override
-    public Vec3d position() {
-        return Vec3d.ofCenter(this.pos).offset(this.getCachedState().get(NozzleBlock.FACING), 0.75);
+    public Vec3 position() {
+        return Vec3.atCenterOf(this.worldPosition).relative(this.getBlockState().getValue(NozzleBlock.FACING), 0.75);
     }
 
     @Override
-    public Vec3d rotation() {
-        return new Vec3d(this.getCachedState().get(NozzleBlock.FACING).getUnitVector());
+    public Vec3 rotation() {
+        return new Vec3(this.getBlockState().getValue(NozzleBlock.FACING).step());
     }
 
     @Override
-    public SoundCategory soundCategory() {
-        return SoundCategory.BLOCKS;
+    public SoundSource soundCategory() {
+        return SoundSource.BLOCKS;
     }
 
     @Override
@@ -198,17 +201,17 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
 
     public void setExtraSpread(float extraSpread) {
         this.extraSpread = extraSpread;
-        this.markDirty();
+        this.setChanged();
     }
 
     @Override
     public void setOwner(GameProfile profile) {
         this.owner = profile;
-        this.markDirty();
+        this.setChanged();
     }
 
     @Override
     public float force() {
-        return (float) MathHelper.clamp(this.speed * 10, 0.4, 1);
+        return (float) Mth.clamp(this.speed * 10, 0.4, 1);
     }
 }

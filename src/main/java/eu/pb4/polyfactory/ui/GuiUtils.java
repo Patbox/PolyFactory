@@ -4,18 +4,17 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 
 public class GuiUtils {
     public static final GuiElement EMPTY = GuiElement.EMPTY;
 
-    public static void playClickSound(ServerPlayerEntity player) {
-        FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
+    public static void playClickSound(ServerPlayer player) {
+        FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
     }
 
 

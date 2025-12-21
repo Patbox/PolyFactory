@@ -6,55 +6,42 @@ import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock;
 import eu.pb4.polyfactory.block.mechanical.AxleWithLargeGearBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
-import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.phys.Vec3;
 
 public class AxleItem extends FactoryBlockItem {
-    public AxleItem(AxleBlock block, Settings settings) {
+    public AxleItem(AxleBlock block, Properties settings) {
         super(block, settings);
     }
 
     @Nullable
     @Override
-    public ItemPlacementContext getPlacementContext(ItemPlacementContext ctx) {
-        if (ctx.shouldCancelInteraction()) {
+    public BlockPlaceContext updatePlacementContext(BlockPlaceContext ctx) {
+        if (ctx.isSecondaryUseActive()) {
             return ctx;
         }
-        var otherPos = ctx.getBlockPos().offset(ctx.getSide().getOpposite());
-        var otherState = ctx.getWorld().getBlockState(otherPos);
+        var otherPos = ctx.getClickedPos().relative(ctx.getClickedFace().getOpposite());
+        var otherState = ctx.getLevel().getBlockState(otherPos);
         int max = 4;
         if (otherState.getBlock() instanceof AxleBlock) {
-            var axis = otherState.get(AxleBlock.AXIS);
-            var dir = ctx.getPlayerLookDirection().getAxis() == axis ? ctx.getPlayerLookDirection()
-                    : Direction.from(axis, ctx.getHitPos().subtract(Vec3d.ofCenter(otherPos)).getComponentAlongAxis(axis) > 0 ? Direction.AxisDirection.POSITIVE : Direction.AxisDirection.NEGATIVE);
-            while (ctx.getWorld().getBlockState(otherPos.offset(dir)).getBlock() instanceof AxleBlock && ctx.getWorld().getBlockState(otherPos.offset(dir)).get(AxleBlock.AXIS) == axis && --max > 0) {
-                otherPos = otherPos.offset(dir);
+            var axis = otherState.getValue(AxleBlock.AXIS);
+            var dir = ctx.getNearestLookingDirection().getAxis() == axis ? ctx.getNearestLookingDirection()
+                    : Direction.fromAxisAndDirection(axis, ctx.getClickLocation().subtract(Vec3.atCenterOf(otherPos)).get(axis) > 0 ? Direction.AxisDirection.POSITIVE : Direction.AxisDirection.NEGATIVE);
+            while (ctx.getLevel().getBlockState(otherPos.relative(dir)).getBlock() instanceof AxleBlock && ctx.getLevel().getBlockState(otherPos.relative(dir)).getValue(AxleBlock.AXIS) == axis && --max > 0) {
+                otherPos = otherPos.relative(dir);
             }
 
-            if (!ctx.getWorld().getBlockState(otherPos.offset(dir)).canReplace(ItemPlacementContext.offset(ctx, otherPos, dir))) {
+            if (!ctx.getLevel().getBlockState(otherPos.relative(dir)).canBeReplaced(BlockPlaceContext.at(ctx, otherPos, dir))) {
                 return ctx;
             }
 
-            return ItemPlacementContext.offset(ctx, otherPos, dir);
+            return BlockPlaceContext.at(ctx, otherPos, dir);
         }
 
-        return super.getPlacementContext(ctx);
+        return super.updatePlacementContext(ctx);
     }
 }

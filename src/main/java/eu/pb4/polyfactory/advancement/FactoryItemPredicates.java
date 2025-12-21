@@ -3,9 +3,8 @@ package eu.pb4.polyfactory.advancement;
 import eu.pb4.factorytools.api.util.ExtraItemPredicates;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.FireworkRocketItem;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.Identifier;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
@@ -16,7 +15,7 @@ public class FactoryItemPredicates {
 
     public static void register() {
         ExtraItemPredicates.PREDICATES.put(CUSTOM_FIREWORK_COLOR, stack -> {
-            var nbt = stack.get(DataComponentTypes.FIREWORK_EXPLOSION);
+            var nbt = stack.get(DataComponents.FIREWORK_EXPLOSION);
             if (nbt == null) {
                 return false;
             }

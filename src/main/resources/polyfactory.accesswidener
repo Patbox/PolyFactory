@@ -1,6 +1,5 @@
-accessWidener v1 named
-
-accessible class net/minecraft/datafixer/fix/ItemStackComponentizationFix$StackData
-accessible class net/minecraft/enchantment/EnchantmentHelper$ContextAwareConsumer
-accessible class net/minecraft/recipe/BrewingRecipeRegistry$Recipe
-accessible method net/minecraft/data/recipe/ShapedRecipeJsonBuilder <init> (Lnet/minecraft/registry/RegistryEntryLookup;Lnet/minecraft/recipe/book/RecipeCategory;Lnet/minecraft/item/ItemConvertible;I)V
+accessWidener	v1	named
+accessible	class	net/minecraft/util/datafix/fixes/ItemStackComponentizationFix$ItemStackData
+accessible	class	net/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentInSlotVisitor
+accessible	class	net/minecraft/world/item/alchemy/PotionBrewing$Mix
+accessible	method	net/minecraft/data/recipes/ShapedRecipeBuilder	<init>	(Lnet/minecraft/core/HolderGetter;Lnet/minecraft/data/recipes/RecipeCategory;Lnet/minecraft/world/level/ItemLike;I)V

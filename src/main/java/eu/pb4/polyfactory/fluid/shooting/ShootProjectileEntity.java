@@ -3,33 +3,32 @@ package eu.pb4.polyfactory.fluid.shooting;
 import eu.pb4.polyfactory.entity.splash.SplashEntity;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
-import eu.pb4.polyfactory.mixin.ProjectileEntityAccessor;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LazyEntityReference;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvent;
-import org.joml.Quaternionf;
+import eu.pb4.polyfactory.mixin.ProjectileAccessor;
+import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityReference;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.projectile.Projectile;
 import org.joml.Vector3f;
 
 public record ShootProjectileEntity<T>(EntityCreator<T> entityCreator,
                                        int splashPerTick, AmountGetter<T> amount,
                                        float baseSpeed, float extraSpeed,
                                        float initialDivergence, float maxDivergence,
-                                       RegistryEntry<SoundEvent> soundEvent)
+                                       Holder<SoundEvent> soundEvent)
             implements FluidShootingBehavior<T> {
 
-    public static <T> FluidShootingBehavior<T> ofSplash(EntityType<? extends SplashEntity<T>> entityType, int splashPerTick, long amount, RegistryEntry<SoundEvent> soundEvent) {
+    public static <T> FluidShootingBehavior<T> ofSplash(EntityType<? extends SplashEntity<T>> entityType, int splashPerTick, long amount, Holder<SoundEvent> soundEvent) {
         return ofSplash(entityType, splashPerTick, amount, 2, 0.5f, 0.1f, 0.3f, soundEvent);
     }
 
     public static <T> FluidShootingBehavior<T> ofSplash(EntityType<? extends SplashEntity<T>> entityType, int splashPerTick, long amount, float baseSpeed, float extraSpeed,
-                                                        float initialDivergence, float maxDivergence, RegistryEntry<SoundEvent> soundEvent) {
+                                                        float initialDivergence, float maxDivergence, Holder<SoundEvent> soundEvent) {
         return new ShootProjectileEntity<>((world, fluid, a) -> {
-            var splash = entityType.create(world, SpawnReason.SPAWN_ITEM_USE);
+            var splash = entityType.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
             assert splash != null;
             splash.setFluidData(fluid.data());
             return splash;
@@ -37,8 +36,8 @@ public record ShootProjectileEntity<T>(EntityCreator<T> entityCreator,
     }
 
     public static <T> FluidShootingBehavior<T> ofEntity(EntityType<?> entityType, int splashPerTick, long amount, float baseSpeed, float extraSpeed,
-                                                    float initialDivergence, float maxDivergence, RegistryEntry<SoundEvent> soundEvent) {
-        return new ShootProjectileEntity<>((world, fluid, a) -> entityType.create(world, SpawnReason.SPAWN_ITEM_USE), splashPerTick, (w, a, b, c) -> amount, baseSpeed, extraSpeed, initialDivergence, maxDivergence, soundEvent);
+                                                    float initialDivergence, float maxDivergence, Holder<SoundEvent> soundEvent) {
+        return new ShootProjectileEntity<>((world, fluid, a) -> entityType.create(world, EntitySpawnReason.SPAWN_ITEM_USE), splashPerTick, (w, a, b, c) -> amount, baseSpeed, extraSpeed, initialDivergence, maxDivergence, soundEvent);
     }
 
     @Override
@@ -66,25 +65,25 @@ public record ShootProjectileEntity<T>(EntityCreator<T> entityCreator,
         var world = context.world();
         for (int i = 0; i < this.splashPerTick; i++) {
             var entity = entityCreator.createEntity(world, fluidInstance, amount);
-            if (entity instanceof ProjectileEntity projectile) {
-                ((ProjectileEntityAccessor) projectile).setOwner(LazyEntityReference.ofUUID(context.uuid()));
+            if (entity instanceof Projectile projectile) {
+                ((ProjectileAccessor) projectile).setOwner(EntityReference.of(context.uuid()));
 
                 if (!context.isEntity()) {
-                    ((ProjectileEntityAccessor) projectile).setLeftOwner(true);
+                    ((ProjectileAccessor) projectile).setLeftOwner(true);
                 }
             }
-            entity.setPosition(pos);
+            entity.setPos(pos);
             vec.set(rotation.x, rotation.y, rotation.z);
-            vec.add((float) random.nextTriangular(0, divergence),
-                    (float) random.nextTriangular(0, divergence),
-                    (float) random.nextTriangular(0, divergence));
+            vec.add((float) random.triangle(0, divergence),
+                    (float) random.triangle(0, divergence),
+                    (float) random.triangle(0, divergence));
             vec.normalize();
             vec.mul((this.baseSpeed + random.nextFloat() * this.extraSpeed) * context.force());
 
-            entity.setVelocity(vec.x, vec.y, vec.z);
-            world.spawnEntity(entity);
+            entity.setDeltaMovement(vec.x, vec.y, vec.z);
+            world.addFreshEntity(entity);
         }
-        world.playSound(null, pos.x, pos.y, pos.z, this.soundEvent, context.soundCategory(), 0.5f, (float) random.nextTriangular(1, 0.1));
+        world.playSound(null, pos.x, pos.y, pos.z, this.soundEvent, context.soundCategory(), 0.5f, (float) random.triangle(1, 0.1));
     }
 
     @Override
@@ -92,10 +91,10 @@ public record ShootProjectileEntity<T>(EntityCreator<T> entityCreator,
 
 
     public interface AmountGetter<T> {
-        long getAmount(ServerWorld world, FluidContainer container, FluidInstance<T> instance, boolean isCheck);
+        long getAmount(ServerLevel world, FluidContainer container, FluidInstance<T> instance, boolean isCheck);
     }
 
     public interface EntityCreator<T> {
-        Entity createEntity(ServerWorld world, FluidInstance<T> fluid, long amount);
+        Entity createEntity(ServerLevel world, FluidInstance<T> fluid, long amount);
     }
 }

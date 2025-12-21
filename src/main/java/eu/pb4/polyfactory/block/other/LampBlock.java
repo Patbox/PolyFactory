@@ -13,50 +13,48 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.RedstoneLampBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.component.type.FireworkExplosionComponent;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.RedstoneLampBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockEntityProvider, BlockStateNameProvider {
+public class LampBlock extends RedstoneLampBlock implements FactoryBlock, EntityBlock, BlockStateNameProvider {
     private final boolean inverted;
 
-    public LampBlock(Settings settings, boolean inverted) {
+    public LampBlock(Properties settings, boolean inverted) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(LIT, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(LIT, false));
         this.inverted = inverted;
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        var stack = super.getPickStack(world, pos, state, includeData);
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
+        var stack = super.getCloneItemStack(world, pos, state, includeData);
         if (world.getBlockEntity(pos) instanceof ColorableBlockEntity be && !be.isDefaultColor()) {
             ColoredItem.setColor(stack, be.getColor());
         }
         return stack;
     }
 
-    public boolean setColor(World world, BlockPos pos, int color) {
+    public boolean setColor(Level world, BlockPos pos, int color) {
         color = FactoryItems.LAMP.downSampleColor(color);
         if (world.getBlockEntity(pos) instanceof ColorProvider provider && provider.getColor() != color) {
             provider.setColor(color);
@@ -67,38 +65,38 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
     }
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         if (world.getBlockEntity(pos) instanceof ColorableBlockEntity be) {
             be.setColor(FactoryItems.LAMP.getItemColor(itemStack));
         }
 
-        super.onPlaced(world, pos, state, placer, itemStack);
+        super.setPlacedBy(world, pos, state, placer, itemStack);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(pos, initialBlockState, this.inverted);
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ColorableBlockEntity(pos, state);
     }
 
     @Override
-    public Text getName(ServerWorld world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
+    public Component getName(ServerLevel world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
         if (blockEntity instanceof ColorableBlockEntity be && !be.isDefaultColor()) {
             if (!DyeColorExtra.hasLang(be.getColor())) {
-                return Text.translatable( this.getTranslationKey() + ".colored.full",
+                return Component.translatable( this.getDescriptionId() + ".colored.full",
                         ColoredItem.getColorName(be.getColor()), ColoredItem.getHexName(be.getColor()));
             } else {
-                return Text.translatable(this.getTranslationKey() + ".colored", ColoredItem.getColorName(be.getColor()));
+                return Component.translatable(this.getDescriptionId() + ".colored", ColoredItem.getColorName(be.getColor()));
             }
         }
         return this.getName();
@@ -110,13 +108,13 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
     }
 
     @Override
-    protected boolean isTransparent(BlockState state) {
+    protected boolean propagatesSkylightDown(BlockState state) {
         return true;
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.GLASS.getDefaultState();
+        return Blocks.GLASS.defaultBlockState();
     }
 
     public static final class Model extends BlockModel implements ColorProvider.Consumer {
@@ -127,7 +125,7 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
 
         private Model(BlockPos pos, BlockState state, boolean inverted) {
             this.main = ItemDisplayElementUtil.createSimple();
-            this.main.setScale(new Vector3f(2 + (pos.getManhattanDistance(BlockPos.ORIGIN) % 2) * 0.001f));
+            this.main.setScale(new Vector3f(2 + (pos.distManhattan(BlockPos.ZERO) % 2) * 0.001f));
             this.main.setViewRange(0.8f);
             this.state = state;
             this.inverted = inverted;
@@ -151,8 +149,8 @@ public class LampBlock extends RedstoneLampBlock implements FactoryBlock, BlockE
 
         private void updateModel() {
             var stack = new ItemStack(Items.FIREWORK_STAR);
-            stack.set(DataComponentTypes.ITEM_MODEL, this.state.get(LIT) == this.inverted ? id("colored_lamp") : id("inverted_colored_lamp"));
-            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), IntList.of(this.color)));
+            stack.set(DataComponents.ITEM_MODEL, this.state.getValue(LIT) == this.inverted ? id("colored_lamp") : id("inverted_colored_lamp"));
+            stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), IntList.of(this.color)));
             this.main.setItem(stack);
             this.tick();
         }

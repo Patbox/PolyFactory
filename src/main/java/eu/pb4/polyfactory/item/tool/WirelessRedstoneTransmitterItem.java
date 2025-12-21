@@ -7,54 +7,50 @@ import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.block.other.WirelessRedstoneBlock;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.util.ColoredItem;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.level.Level;
 
 public class WirelessRedstoneTransmitterItem extends Item implements SimpleColoredItem, ColoredItem {
-    public WirelessRedstoneTransmitterItem(Settings settings) {
+    public WirelessRedstoneTransmitterItem(Properties settings) {
         super(settings);
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity user, Hand hand) {
-        var x = user.getStackInHand(hand).get(FactoryDataComponents.REMOTE_KEYS);
+    public InteractionResult use(Level world, Player user, InteractionHand hand) {
+        var x = user.getItemInHand(hand).get(FactoryDataComponents.REMOTE_KEYS);
 
-        if (x != null && world instanceof ServerWorld serverWorld) {
-            WirelessRedstoneBlock.send(serverWorld, user.getBlockPos(), 20, x.getFirst(), x.getSecond());
-            FactoryUtil.playSoundToPlayer(user, SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_ON, SoundCategory.PLAYERS, 1f, 1.5f);
-            FactoryUtil.playSoundToPlayer(user, SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_OFF, SoundCategory.PLAYERS, 1f, 1.4f);
-            return ActionResult.SUCCESS_SERVER;
+        if (x != null && world instanceof ServerLevel serverWorld) {
+            WirelessRedstoneBlock.send(serverWorld, user.blockPosition(), 20, x.getFirst(), x.getSecond());
+            FactoryUtil.playSoundToPlayer(user, SoundEvents.WOODEN_BUTTON_CLICK_ON, SoundSource.PLAYERS, 1f, 1.5f);
+            FactoryUtil.playSoundToPlayer(user, SoundEvents.WOODEN_BUTTON_CLICK_OFF, SoundSource.PLAYERS, 1f, 1.4f);
+            return InteractionResult.SUCCESS_SERVER;
         }
 
         return super.use(world, user, hand);
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> tooltip, TooltipType type) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> tooltip, TooltipFlag type) {
         var x = stack.get(FactoryDataComponents.REMOTE_KEYS);
         if (x != null) {
-            tooltip.accept(x.getFirst().toHoverableText().copy().formatted(Formatting.GRAY));
-            tooltip.accept(x.getSecond().toHoverableText().copy().formatted(Formatting.GRAY));
+            tooltip.accept(x.getFirst().getDisplayName().copy().withStyle(ChatFormatting.GRAY));
+            tooltip.accept(x.getSecond().getDisplayName().copy().withStyle(ChatFormatting.GRAY));
         }
     }
 

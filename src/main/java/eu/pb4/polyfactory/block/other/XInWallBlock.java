@@ -8,17 +8,6 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -26,6 +15,17 @@ import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderSet;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public interface XInWallBlock extends TagRedirector, BlockWithElementHolder, PolymerBlock {
     Block backing();
@@ -34,16 +34,16 @@ public interface XInWallBlock extends TagRedirector, BlockWithElementHolder, Pol
 
     @Override
     default boolean customIsIn(TagKey<Block> tagKey, boolean original) {
-        return original || this.backing().getRegistryEntry().isIn(tagKey);
+        return original || this.backing().builtInRegistryHolder().is(tagKey);
     }
 
     @Override
-    default boolean customIsIn(RegistryEntryList<Block> entryList, boolean original) {
-        return original || entryList.contains(this.backing().getRegistryEntry());
+    default boolean customIsIn(HolderSet<Block> entryList, boolean original) {
+        return original || entryList.contains(this.backing().builtInRegistryHolder());
     }
 
     @Override
-    default @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    default @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         var converted = this.convertToBacking(initialBlockState);
         var holder = BlockWithElementHolder.get(converted);
         if (holder == null) {
@@ -80,7 +80,7 @@ public interface XInWallBlock extends TagRedirector, BlockWithElementHolder, Pol
     record ProxyAttachement(ElementHolder owner, ElementHolder holder, Supplier<BlockState> blockStateSupplier) implements BlockAwareAttachment, VirtualElement {
         @Override
         public BlockPos getBlockPos() {
-            return BlockPos.ofFloored(owner.getPos());
+            return BlockPos.containing(owner.getPos());
         }
 
         @Override
@@ -104,20 +104,20 @@ public interface XInWallBlock extends TagRedirector, BlockWithElementHolder, Pol
         }
 
         @Override
-        public Vec3d getPos() {
+        public Vec3 getPos() {
             return owner.getPos();
         }
 
         @Override
-        public ServerWorld getWorld() {
+        public ServerLevel getWorld() {
             return owner.getAttachment().getWorld();
         }
 
         @Override
-        public void updateCurrentlyTracking(Collection<ServerPlayNetworkHandler> collection) {}
+        public void updateCurrentlyTracking(Collection<ServerGamePacketListenerImpl> collection) {}
 
         @Override
-        public void updateTracking(ServerPlayNetworkHandler serverPlayNetworkHandler) {}
+        public void updateTracking(ServerGamePacketListenerImpl serverPlayNetworkHandler) {}
 
         @Override
         public IntList getEntityIds() {
@@ -133,28 +133,28 @@ public interface XInWallBlock extends TagRedirector, BlockWithElementHolder, Pol
         }
 
         @Override
-        public Vec3d getOffset() {
-            return Vec3d.ZERO;
+        public Vec3 getOffset() {
+            return Vec3.ZERO;
         }
 
         @Override
-        public void setOffset(Vec3d vec3d) {}
+        public void setOffset(Vec3 vec3d) {}
 
         @Override
-        public void startWatching(ServerPlayerEntity serverPlayerEntity, Consumer<Packet<ClientPlayPacketListener>> consumer) {
+        public void startWatching(ServerPlayer serverPlayerEntity, Consumer<Packet<ClientGamePacketListener>> consumer) {
             this.holder.startWatching(serverPlayerEntity);
         }
 
         @Override
-        public void stopWatching(ServerPlayerEntity serverPlayerEntity, Consumer<Packet<ClientPlayPacketListener>> consumer) {
+        public void stopWatching(ServerPlayer serverPlayerEntity, Consumer<Packet<ClientGamePacketListener>> consumer) {
             this.holder.stopWatching(serverPlayerEntity);
         }
 
         @Override
-        public void notifyMove(Vec3d vec3d, Vec3d vec3d1, Vec3d vec3d2) {}
+        public void notifyMove(Vec3 vec3d, Vec3 vec3d1, Vec3 vec3d2) {}
 
         @Override
-        public InteractionHandler getInteractionHandler(ServerPlayerEntity serverPlayerEntity) {
+        public InteractionHandler getInteractionHandler(ServerPlayer serverPlayerEntity) {
             return null;
         }
 

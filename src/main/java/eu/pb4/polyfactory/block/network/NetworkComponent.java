@@ -7,42 +7,40 @@ import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.data.DataStorage;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.nodes.pipe.FlowData;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.state.BlockState;
 
 public interface NetworkComponent {
     interface Rotational extends NetworkComponent {
-        static void updateRotationalAt(WorldView world, BlockPos pos) {
-            if (world instanceof ServerWorld serverWorld) {
+        static void updateRotationalAt(LevelReader world, BlockPos pos) {
+            if (world instanceof ServerLevel serverWorld) {
                 FactoryNodes.ROTATIONAL.getGraphWorld(serverWorld).updateNodes(pos);
             }
         }
 
-        Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos);
+        Collection<BlockNode> createRotationalNodes(BlockState state, ServerLevel world, BlockPos pos);
 
 
-        static RotationData getLogic(ServerWorld world, BlockPos pos) {
+        static RotationData getLogic(ServerLevel world, BlockPos pos) {
             return RotationUser.getRotation(world, pos);
         }
     }
 
     interface Pipe extends NetworkComponent {
-        static void updatePipeAt(WorldView world, BlockPos pos) {
-            if (world instanceof ServerWorld serverWorld) {
+        static void updatePipeAt(LevelReader world, BlockPos pos) {
+            if (world instanceof ServerLevel serverWorld) {
                 FactoryNodes.PIPE.getGraphWorld(serverWorld).updateNodes(pos);
             }
         }
 
-        Collection<BlockNode> createPipeNodes(BlockState state, ServerWorld world, BlockPos pos);
+        Collection<BlockNode> createPipeNodes(BlockState state, ServerLevel world, BlockPos pos);
 
-        static FlowData getLogic(ServerWorld world, BlockPos pos) {
+        static FlowData getLogic(ServerLevel world, BlockPos pos) {
             var o = FactoryNodes.PIPE.getGraphWorld(world).getNodesAt(pos).findFirst();
             if (o.isPresent()) {
                 return o.get().getGraph().getGraphEntity(FlowData.TYPE);
@@ -50,7 +48,7 @@ public interface NetworkComponent {
             return FlowData.EMPTY;
         }
 
-        static void forEachLogic(ServerWorld world, BlockPos pos, Consumer<FlowData> consumer) {
+        static void forEachLogic(ServerLevel world, BlockPos pos, Consumer<FlowData> consumer) {
             FactoryNodes.PIPE.getGraphWorld(world).getNodesAt(pos).forEach(x -> {
                 consumer.accept(x.getGraph().getGraphEntity(FlowData.TYPE));
             });
@@ -58,24 +56,24 @@ public interface NetworkComponent {
     }
 
     interface RotationalConnector extends NetworkComponent {
-        static void updateRotationalConnectorAt(WorldView world, BlockPos pos) {
-            if (world instanceof ServerWorld serverWorld) {
+        static void updateRotationalConnectorAt(LevelReader world, BlockPos pos) {
+            if (world instanceof ServerLevel serverWorld) {
                 FactoryNodes.ROTATIONAL_CONNECTOR.getGraphWorld(serverWorld).updateNodes(pos);
             }
         }
-        Collection<BlockNode> createRotationalConnectorNodes(BlockState state, ServerWorld world, BlockPos pos);
+        Collection<BlockNode> createRotationalConnectorNodes(BlockState state, ServerLevel world, BlockPos pos);
     }
 
     interface Data extends NetworkComponent {
-        static void updateDataAt(WorldView world, BlockPos pos) {
-            if (world instanceof ServerWorld serverWorld) {
+        static void updateDataAt(LevelReader world, BlockPos pos) {
+            if (world instanceof ServerLevel serverWorld) {
                 FactoryNodes.DATA.getGraphWorld(serverWorld).updateNodes(pos);
             }
         }
 
-        Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos);
+        Collection<BlockNode> createDataNodes(BlockState state, ServerLevel world, BlockPos pos);
 
-        static DataStorage getLogic(ServerWorld world, BlockPos pos) {
+        static DataStorage getLogic(ServerLevel world, BlockPos pos) {
             {
                 var o = FactoryNodes.DATA.getGraphWorld(world).getNodesAt(pos).findFirst();
                 if (o.isPresent()) {
@@ -85,7 +83,7 @@ public interface NetworkComponent {
             return DataStorage.EMPTY;
         }
 
-        static DataStorage getLogic(ServerWorld world, BlockPos pos, Predicate<NodeHolder<BlockNode>> predicate) {
+        static DataStorage getLogic(ServerLevel world, BlockPos pos, Predicate<NodeHolder<BlockNode>> predicate) {
             {
                 var o = FactoryNodes.DATA.getGraphWorld(world).getNodesAt(pos).filter(predicate).findFirst();
                 if (o.isPresent()) {
@@ -97,12 +95,12 @@ public interface NetworkComponent {
     }
 
     interface Energy extends NetworkComponent {
-        static void updateEnergyAt(WorldView world, BlockPos pos) {
-            if (world instanceof ServerWorld serverWorld) {
+        static void updateEnergyAt(LevelReader world, BlockPos pos) {
+            if (world instanceof ServerLevel serverWorld) {
                 FactoryNodes.ENERGY.getGraphWorld(serverWorld).updateNodes(pos);
             }
         }
 
-        Collection<BlockNode> createEnergyNodes(BlockState state, ServerWorld world, BlockPos pos);
+        Collection<BlockNode> createEnergyNodes(BlockState state, ServerLevel world, BlockPos pos);
     }
 }

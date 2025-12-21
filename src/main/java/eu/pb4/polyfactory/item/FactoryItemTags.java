@@ -1,10 +1,9 @@
 package eu.pb4.polyfactory.item;
 
 import eu.pb4.polyfactory.ModInit;
-import net.minecraft.item.Item;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 
 public class FactoryItemTags {
     public static final TagKey<Item> ALLOWED_IN_MINER = of("allowed_in_miner");
@@ -23,6 +22,6 @@ public class FactoryItemTags {
     public static final TagKey<Item> GLASS_BOTTLE_MELTABLE = of("glass_bottle_meltable");
 
     private static TagKey<Item> of(String path) {
-        return TagKey.of(RegistryKeys.ITEM, ModInit.id(path));
+        return TagKey.create(Registries.ITEM, ModInit.id(path));
     }
 }

@@ -1,16 +1,16 @@
 package eu.pb4.polyfactory.block.other;
 
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
 public interface MachineInfoProvider {
-    Text OVERSTRESSED_TEXT = Text.translatable("text.polyfactory.state.overstressed").formatted(Formatting.RED);
-    Text LOCKED_TEXT = Text.translatable("text.polyfactory.state.locked").formatted(Formatting.RED);
-    Text TOO_SLOW_TEXT = Text.translatable("text.polyfactory.state.too_slow").formatted(Formatting.YELLOW);
-    Text TOO_HOT_TEXT = Text.translatable("text.polyfactory.state.too_hot").formatted(Formatting.YELLOW);
-    Text TOO_COLD_TEXT = Text.translatable("text.polyfactory.state.too_cold").formatted(Formatting.YELLOW);
-    Text INCORRECT_ITEMS_TEXT = Text.translatable("text.polyfactory.state.incorrect_items").formatted(Formatting.YELLOW);
-    Text OUTPUT_FULL_TEXT = Text.translatable("text.polyfactory.state.output_full").formatted(Formatting.YELLOW);
-    @Nullable Text getCurrentState();
+    Component OVERSTRESSED_TEXT = Component.translatable("text.polyfactory.state.overstressed").withStyle(ChatFormatting.RED);
+    Component LOCKED_TEXT = Component.translatable("text.polyfactory.state.locked").withStyle(ChatFormatting.RED);
+    Component TOO_SLOW_TEXT = Component.translatable("text.polyfactory.state.too_slow").withStyle(ChatFormatting.YELLOW);
+    Component TOO_HOT_TEXT = Component.translatable("text.polyfactory.state.too_hot").withStyle(ChatFormatting.YELLOW);
+    Component TOO_COLD_TEXT = Component.translatable("text.polyfactory.state.too_cold").withStyle(ChatFormatting.YELLOW);
+    Component INCORRECT_ITEMS_TEXT = Component.translatable("text.polyfactory.state.incorrect_items").withStyle(ChatFormatting.YELLOW);
+    Component OUTPUT_FULL_TEXT = Component.translatable("text.polyfactory.state.output_full").withStyle(ChatFormatting.YELLOW);
+    @Nullable Component getCurrentState();
 }

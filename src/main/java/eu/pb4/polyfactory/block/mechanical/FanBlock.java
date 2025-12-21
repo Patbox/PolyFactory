@@ -17,29 +17,6 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -47,105 +24,127 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.redstone.Orientation;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
-public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, BlockEntityProvider, ConfigurableBlock {
-    public static final EnumProperty<Direction> FACING = Properties.FACING;
-    public static final BooleanProperty ENABLED = Properties.ENABLED;
+public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, RotationUser, EntityBlock, ConfigurableBlock {
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
+    public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
     public static final BooleanProperty REVERSE = FactoryProperties.REVERSE;
 
-    public FanBlock(Settings settings) {
+    public FanBlock(Properties settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(ENABLED, true).with(REVERSE, false));
+        registerDefaultState(defaultBlockState().setValue(ENABLED, true).setValue(REVERSE, false));
         Model.ITEM_MODEL.getItem();
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getPlayerLookDirection());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return this.defaultBlockState().setValue(FACING, ctx.getNearestLookingDirection());
     }
 
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        if (!oldState.isOf(state.getBlock())) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (!oldState.is(state.getBlock())) {
             this.updateEnabled(world, pos, state);
         }
-        super.onBlockAdded(state,world,pos, oldState, notify);
+        super.onPlace(state,world,pos, oldState, notify);
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, @Nullable Orientation wireOrientation, boolean notify) {
         this.updateEnabled(world, pos, state);
-        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
+        super.neighborChanged(state, world, pos, sourceBlock, wireOrientation, notify);
     }
 
-    private void updateEnabled(World world, BlockPos pos, BlockState state) {
-        boolean powered = world.isReceivingRedstonePower(pos);
-        if (powered == state.get(ENABLED)) {
-            world.setBlockState(pos, state.with(ENABLED, !powered), 4);
+    private void updateEnabled(Level world, BlockPos pos, BlockState state) {
+        boolean powered = world.hasNeighborSignal(pos);
+        if (powered == state.getValue(ENABLED)) {
+            world.setBlock(pos, state.setValue(ENABLED, !powered), 4);
         }
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, ENABLED, REVERSE);
     }
 
     @Override
-    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new FunctionalDirectionNode(state.get(FACING).getOpposite()));
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return List.of(new FunctionalDirectionNode(state.getValue(FACING).getOpposite()));
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new FanBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world instanceof ServerWorld && type == FactoryBlockEntities.FAN ? FanBlockEntity::tick : null;
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+        return world instanceof ServerLevel && type == FactoryBlockEntities.FAN ? FanBlockEntity::tick : null;
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return FactoryUtil.transform(state, rotation::rotate, FACING);
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return FactoryUtil.transform(state, mirror::apply, FACING);
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        return FactoryUtil.transform(state, mirror::mirror, FACING);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
+        return Blocks.IRON_BLOCK.defaultBlockState();
     }
 
     @Override
-    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(BlockConfig.REVERSE, BlockConfig.FACING);
     }
 
     @Override
-    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerLevel world, BlockPos pos) {
         modifier.stress(0.1);
     }
 
@@ -160,7 +159,7 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
         private Model(BlockState state) {
             this.mainElement = ItemDisplayElementUtil.createSimple(FactoryItems.FAN);
             this.mainElement.setScale(new Vector3f(2f));
-            var rot = new Quaternionf().rotateX(MathHelper.HALF_PI);
+            var rot = new Quaternionf().rotateX(Mth.HALF_PI);
             this.mainElement.setRightRotation(rot);
 
             this.fan = LodItemDisplayElement.createSimple(ITEM_MODEL, 2, 0.2f, 0.4f);
@@ -174,14 +173,14 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
         }
 
         private void updateStatePos(BlockState state) {
-            this.reverse = state.get(REVERSE);
-            var dir = state.get(FACING);
+            this.reverse = state.getValue(REVERSE);
+            var dir = state.getValue(FACING);
             float p = 0;
             float y = 0;
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.getPositiveHorizontalDegrees();
+                y = dir.toYRot();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             } else {
@@ -196,10 +195,10 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
         }
 
         private void updateAnimation(double speed) {
-            this.rotation += ((float) Math.min((this.reverse ? -speed : speed) * MathHelper.RADIANS_PER_DEGREE * 3, RotationConstants.MAX_ROTATION_PER_TICK_2)) % MathHelper.TAU;
+            this.rotation += ((float) Math.min((this.reverse ? -speed : speed) * Mth.DEG_TO_RAD * 3, RotationConstants.MAX_ROTATION_PER_TICK_2)) % Mth.TWO_PI;
 
             var mat = mat();
-            mat.rotateX(MathHelper.HALF_PI);
+            mat.rotateX(Mth.HALF_PI);
             mat.rotateY(this.rotation);
             mat.scale(2);
             this.fan.setTransformation(mat);

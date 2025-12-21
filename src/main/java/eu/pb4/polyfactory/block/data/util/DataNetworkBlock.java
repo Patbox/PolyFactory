@@ -2,19 +2,18 @@ package eu.pb4.polyfactory.block.data.util;
 
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
 
 public abstract class DataNetworkBlock extends NetworkBlock implements NetworkComponent.Data {
-    protected DataNetworkBlock(Settings settings) {
+    protected DataNetworkBlock(Properties settings) {
         super(settings);
     }
 
 
     @Override
-    protected void updateNetworkAt(WorldView world, BlockPos pos) {
+    protected void updateNetworkAt(LevelReader world, BlockPos pos) {
         NetworkComponent.Data.updateDataAt(world, pos);
     }
 

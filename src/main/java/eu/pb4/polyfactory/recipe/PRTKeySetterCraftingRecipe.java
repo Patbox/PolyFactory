@@ -6,34 +6,31 @@ import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.minecraft.inventory.RecipeInputInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.SpecialCraftingRecipe;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.world.World;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 
-public class PRTKeySetterCraftingRecipe extends SpecialCraftingRecipe {
-    public static final MapCodec<PRTKeySetterCraftingRecipe> CODEC = MapCodec.unit(() -> new PRTKeySetterCraftingRecipe(CraftingRecipeCategory.MISC));
-    public PRTKeySetterCraftingRecipe(CraftingRecipeCategory category) {
+public class PRTKeySetterCraftingRecipe extends CustomRecipe {
+    public static final MapCodec<PRTKeySetterCraftingRecipe> CODEC = MapCodec.unit(() -> new PRTKeySetterCraftingRecipe(CraftingBookCategory.MISC));
+    public PRTKeySetterCraftingRecipe(CraftingBookCategory category) {
         super(category);
     }
 
     @Override
-    public boolean matches(CraftingRecipeInput inventory, World world) {
+    public boolean matches(CraftingInput inventory, Level world) {
         int transmitter = -1;
         int key1 = -1;
         int key2 = -1;
 
         var x = 0;
-        for (var stack : inventory.getStacks()) {
-            if (!stack.isEmpty() && !stack.isIn(ConventionalItemTags.DYES)) {
-                if (stack.isOf(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
+        for (var stack : inventory.items()) {
+            if (!stack.isEmpty() && !stack.is(ConventionalItemTags.DYES)) {
+                if (stack.is(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
                     if (transmitter != -1) {
                         return false;
                     } else {
@@ -46,7 +43,7 @@ public class PRTKeySetterCraftingRecipe extends SpecialCraftingRecipe {
                 } else {
                     return false;
                 }
-            } else if (stack.isIn(ConventionalItemTags.DYES)) {
+            } else if (stack.is(ConventionalItemTags.DYES)) {
                 return false;
             }
             x++;
@@ -56,14 +53,14 @@ public class PRTKeySetterCraftingRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public ItemStack craft(CraftingRecipeInput inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack assemble(CraftingInput inventory, HolderLookup.Provider registryManager) {
         ItemStack transmitter = ItemStack.EMPTY;
         ItemStack key1 = ItemStack.EMPTY;
         ItemStack key2 = ItemStack.EMPTY;
 
-        for (var stack : inventory.getStacks()) {
+        for (var stack : inventory.items()) {
             if (!stack.isEmpty()) {
-                if (stack.isOf(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
+                if (stack.is(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
                     transmitter = stack;
                 } else if (key1.isEmpty()) {
                     key1 = stack;
@@ -82,12 +79,12 @@ public class PRTKeySetterCraftingRecipe extends SpecialCraftingRecipe {
 
 
     @Override
-    public DefaultedList<ItemStack> getRecipeRemainders(CraftingRecipeInput inventory) {
-        DefaultedList<ItemStack> defaultedList = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
+    public NonNullList<ItemStack> getRemainingItems(CraftingInput inventory) {
+        NonNullList<ItemStack> defaultedList = NonNullList.withSize(inventory.size(), ItemStack.EMPTY);
 
         for(int i = 0; i < defaultedList.size(); ++i) {
-            if (!inventory.getStackInSlot(i).isOf(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
-                defaultedList.set(i, inventory.getStackInSlot(i).copyWithCount(1));
+            if (!inventory.getItem(i).is(FactoryItems.PORTABLE_REDSTONE_TRANSMITTER)) {
+                defaultedList.set(i, inventory.getItem(i).copyWithCount(1));
             }
         }
 

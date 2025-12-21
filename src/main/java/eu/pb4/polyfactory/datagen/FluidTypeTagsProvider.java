@@ -6,17 +6,16 @@ import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.other.FactoryRegistries;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.minecraft.registry.RegistryWrapper;
-
+import net.minecraft.core.HolderLookup;
 import java.util.concurrent.CompletableFuture;
 
 class FluidTypeTagsProvider extends FabricTagProvider.FabricValueLookupTagProvider<FluidType<?>> {
-    public FluidTypeTagsProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> completableFuture) {
-        super(output, FactoryRegistries.FLUID_TYPES_KEY, completableFuture, x -> FactoryRegistries.FLUID_TYPES.getKey(x).orElseThrow());
+    public FluidTypeTagsProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
+        super(output, FactoryRegistries.FLUID_TYPES_KEY, completableFuture, x -> FactoryRegistries.FLUID_TYPES.getResourceKey(x).orElseThrow());
     }
 
     @Override
-    protected void configure(RegistryWrapper.WrapperLookup arg) {
+    protected void addTags(HolderLookup.Provider arg) {
         this.valueLookupBuilder(FactoryFluidTags.MOLTEN_METAL)
                 .add(FactoryFluids.IRON)
                 .add(FactoryFluids.GOLD)

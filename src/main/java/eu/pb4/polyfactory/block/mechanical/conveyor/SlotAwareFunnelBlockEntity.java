@@ -5,7 +5,7 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.filter.FilterData;
-import eu.pb4.polyfactory.util.inventory.MinimalInventory;
+import eu.pb4.polyfactory.util.inventory.MinimalContainer;
 import eu.pb4.polyfactory.util.storage.FilteredRedirectedSlottedStorage;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
@@ -14,30 +14,26 @@ import it.unimi.dsi.fastutil.objects.ReferenceSortedSets;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.Unit;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Containers;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -48,11 +44,11 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
         ItemStorage.SIDED.registerForBlockEntity((self, dir) -> self.storage, FactoryBlockEntities.SLOT_AWARE_FUNNEL);
     }
 
-    final DefaultedList<FilterData> filter = DefaultedList.ofSize(TARGET_SLOT_COUNT, FilterData.EMPTY_FALSE);
+    final NonNullList<FilterData> filter = NonNullList.withSize(TARGET_SLOT_COUNT, FilterData.EMPTY_FALSE);
     final int[] slotTargets = new int[TARGET_SLOT_COUNT];
-    private final DefaultedList<ItemStack> items = DefaultedList.ofSize(TARGET_SLOT_COUNT, ItemStack.EMPTY);
+    private final NonNullList<ItemStack> items = NonNullList.withSize(TARGET_SLOT_COUNT, ItemStack.EMPTY);
     private final Storage<ItemVariant> storage = new FilteredRedirectedSlottedStorage<>(ItemStorage.SIDED,
-            this::getWorld, this::getPos, () -> this.getCachedState().get(FunnelBlock.FACING), ItemVariant.blank(), this.slotTargets,
+            this::getLevel, this::getBlockPos, () -> this.getBlockState().getValue(FunnelBlock.FACING), ItemVariant.blank(), this.slotTargets,
             (i, res) -> this.filter.get(i).test(res.toStack()));
 
     public SlotAwareFunnelBlockEntity(BlockPos pos, BlockState state) {
@@ -62,18 +58,18 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
 
 
     @Override
-    protected void writeData(WriteView view) {
-        Inventories.writeData(view, items);
+    protected void saveAdditional(ValueOutput view) {
+        ContainerHelper.saveAllItems(view, items);
         view.putIntArray("targets", slotTargets.clone());
     }
 
     @Override
-    public void readData(ReadView view) {
-        Inventories.readData(view, items);
+    public void loadAdditional(ValueInput view) {
+        ContainerHelper.loadAllItems(view, items);
         for (var i = 0; i < this.items.size(); i++) {
             this.filter.set(i, FilterData.of(this.items.get(i), false));
         }
-        var targets = view.getOptionalIntArray("targets").orElseGet(() -> new int[this.slotTargets.length]);
+        var targets = view.getIntArray("targets").orElseGet(() -> new int[this.slotTargets.length]);
         System.arraycopy(targets, 0, this.slotTargets, 0, Math.min(targets.length, this.slotTargets.length));
     }
 
@@ -83,22 +79,22 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
     }
 
     @Override
-    protected void createGui(ServerPlayerEntity playerEntity) {
+    protected void createGui(ServerPlayer playerEntity) {
         new Gui(playerEntity, this);
     }
 
-    public Inventory asInventory() {
-        return MinimalInventory.createMaxOne(this.items, this::markDirty, this::updateSlot);
+    public Container asInventory() {
+        return MinimalContainer.createMaxOne(this.items, this::setChanged, this::updateSlot);
     }
 
     public static class Gui extends SimpleGui {
         private final SlotAwareFunnelBlockEntity be;
 
-        public Gui(ServerPlayerEntity player, SlotAwareFunnelBlockEntity be) {
-            super(ScreenHandlerType.GENERIC_9X2, player, false);
+        public Gui(ServerPlayer player, SlotAwareFunnelBlockEntity be) {
+            super(MenuType.GENERIC_9x2, player, false);
             this.be = be;
             var pseudoInv = be.asInventory();
-            this.setTitle(GuiTextures.SLOT_AWARE_FUNNEL.apply(be.getCachedState().getBlock().getName()));
+            this.setTitle(GuiTextures.SLOT_AWARE_FUNNEL.apply(be.getBlockState().getBlock().getName()));
             for (int i = 0; i < 9; i++) {
                 this.setSlotRedirect(i, new Slot(pseudoInv, i, 0, 0));
                 final int index = i;
@@ -113,7 +109,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
                     public ClickCallback getGuiCallback() {
                         return (i1, clickType, slotActionType, slotGuiInterface) -> {
                             new SetSlotGui(player, Gui.this, index);
-                            FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
+                            FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
                         };
                     }
                 });
@@ -123,7 +119,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
 
         @Override
         public void onTick() {
-            if (this.be.isRemoved() || player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(this.be.pos)) > (18 * 18)) {
+            if (this.be.isRemoved() || player.position().distanceToSqr(Vec3.atCenterOf(this.be.worldPosition)) > (18 * 18)) {
                 this.close();
             }
             super.onTick();
@@ -131,10 +127,10 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
     }
 
     @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        super.onBlockReplaced(pos, oldState);
-        if (this.world != null) {
-            ItemScatterer.spawn(world, pos, this.asInventory());
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        super.preRemoveSideEffects(pos, oldState);
+        if (this.level != null) {
+            Containers.dropContents(level, pos, this.asInventory());
         }
     }
 
@@ -142,15 +138,15 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
         private final Gui gui;
         private final int slot;
 
-        public SetSlotGui(ServerPlayerEntity player, Gui gui, int slot) {
+        public SetSlotGui(ServerPlayer player, Gui gui, int slot) {
             super(player, false);
             this.gui = gui;
             this.slot = slot;
-            this.setTitle(GuiTextures.INPUT.apply(Text.translatable("block.polyfactory.slot_aware_funnel.set_slot_title", slot)));
+            this.setTitle(GuiTextures.INPUT.apply(Component.translatable("block.polyfactory.slot_aware_funnel.set_slot_title", slot)));
             this.setDefaultInputValue(gui.be.slotTargets[slot] == -1 ? "" : String.valueOf(gui.be.slotTargets[slot]));
             this.updateDone();
-            this.setSlot(2, GuiTextures.BUTTON_CLOSE.get().setName(ScreenTexts.BACK).setCallback(x -> {
-                FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
+            this.setSlot(2, GuiTextures.BUTTON_CLOSE.get().setName(CommonComponents.GUI_BACK).setCallback(x -> {
+                FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
                 this.close(true);
                 this.gui.open();
             }));
@@ -162,7 +158,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
             super.onInput(input);
             this.updateDone();
             if (this.screenHandler != null) {
-                this.screenHandler.setReceivedStack(2, ItemStack.EMPTY);
+                this.screenHandler.setRemoteSlot(2, ItemStack.EMPTY);
             }
         }
 
@@ -179,14 +175,14 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
 
             if (targetSlot > -2 && targetSlot < 100) {
                 int finalTargetSlot = targetSlot;
-                this.setSlot(1, GuiTextures.BUTTON_DONE.get().setName(ScreenTexts.DONE).setCallback(x -> {
-                    FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.UI, 0.5f, 1);
+                this.setSlot(1, GuiTextures.BUTTON_DONE.get().setName(CommonComponents.GUI_DONE).setCallback(x -> {
+                    FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
                     this.gui.be.slotTargets[this.slot] = finalTargetSlot;
                     this.close(true);
                     this.gui.open();
                 }));
             } else {
-                this.setSlot(1, GuiTextures.BUTTON_DONE_BLOCKED.get().setName(Text.empty().append(ScreenTexts.DONE).formatted(Formatting.GRAY)));
+                this.setSlot(1, GuiTextures.BUTTON_DONE_BLOCKED.get().setName(Component.empty().append(CommonComponents.GUI_DONE).withStyle(ChatFormatting.GRAY)));
             }
         }
 
@@ -197,15 +193,15 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
                 updateDone();
             }
             var itemStack = GuiTextures.EMPTY.getItemStack().copy();
-            itemStack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(input));
-            itemStack.set(DataComponentTypes.TOOLTIP_DISPLAY, new TooltipDisplayComponent(true, ReferenceSortedSets.emptySet()));
+            itemStack.set(DataComponents.CUSTOM_NAME, Component.literal(input));
+            itemStack.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, ReferenceSortedSets.emptySet()));
             this.setSlot(0, itemStack, Objects.requireNonNull(this.getSlot(0)).getGuiCallback());
         }
 
         @Override
         public void onTick() {
             if (this.gui.be.isRemoved()
-                    || player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(this.gui.be.getPos())) > (18 * 18)) {
+                    || player.position().distanceToSqr(Vec3.atCenterOf(this.gui.be.getBlockPos())) > (18 * 18)) {
                 this.close();
                 return;
             }

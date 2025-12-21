@@ -13,7 +13,7 @@ import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.FilterIcon;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
+import eu.pb4.polyfactory.util.movingitem.MovingItemContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polyfactory.util.movingitem.MovingItemProvider;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -22,79 +22,81 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.SidedInventory;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.*;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
 
-public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsumer, MovingItemProvider, ConfigurableBlock, BlockEntityProvider, BarrierBasedWaterloggable {
-    public static final EnumProperty<Direction> FACING = Properties.FACING;
-    public static final BooleanProperty ENABLED = Properties.ENABLED;
-    public static final EnumProperty<ConveyorLikeDirectional.TransferMode> MODE = EnumProperty.of("mode", ConveyorLikeDirectional.TransferMode.class,
+public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsumer, MovingItemProvider, ConfigurableBlock, EntityBlock, BarrierBasedWaterloggable {
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
+    public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
+    public static final EnumProperty<ConveyorLikeDirectional.TransferMode> MODE = EnumProperty.create("mode", ConveyorLikeDirectional.TransferMode.class,
             ConveyorLikeDirectional.TransferMode.FROM_CONVEYOR, ConveyorLikeDirectional.TransferMode.TO_CONVEYOR);
 
-    private static final BlockConfig MODE_ACTION = BlockConfig.of("mode", MODE, (t, world, pos, side, state) -> Text.translatable("item.polyfactory.wrench.action.mode.transfer_mode." + t.asString()));
+    private static final BlockConfig MODE_ACTION = BlockConfig.of("mode", MODE, (t, world, pos, side, state) -> Component.translatable("item.polyfactory.wrench.action.mode.transfer_mode." + t.getSerializedName()));
 
-    public FunnelBlock(Settings settings) {
+    public FunnelBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(ENABLED, true));
+        this.registerDefaultState(this.defaultBlockState().setValue(ENABLED, true));
         Model.MODEL_OUT.isEmpty();
-        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING, MODE, ENABLED);
         builder.add(WATERLOGGED);
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         tickWater(state, world, tickView, pos);
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+        return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
-    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainerHolder conveyor) {
         var selfState = self.getBlockState();
-        if (!selfState.get(ENABLED)) {
+        if (!selfState.getValue(ENABLED)) {
             return false;
         }
 
-        var selfDir = selfState.get(FACING);
-        var mode = selfState.get(MODE);
+        var selfDir = selfState.getValue(FACING);
+        var mode = selfState.getValue(MODE);
 
         if (!mode.fromConveyor || relative != Direction.UP || selfDir.getOpposite() == pushDirection || conveyor.movementDelta() < (selfDir == pushDirection ? 0.90 : 0.48) || selfDir.getAxis() == Direction.Axis.Y) {
             return false;
@@ -105,7 +107,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         }
         var stack = conveyor.getContainer();
 
-        if (FactoryUtil.tryInserting(self.getWorld(), self.getPos().offset(selfState.get(FACING)), stack.get(), selfDir.getOpposite()) == -1) {
+        if (FactoryUtil.tryInserting(self.getWorld(), self.getPos().relative(selfState.getValue(FACING)), stack.get(), selfDir.getOpposite()) == -1) {
             return selfDir.getAxis() == pushDirection.getAxis();
         }
 
@@ -120,15 +122,15 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
 
     @SuppressWarnings("UnstableApiUsage")
     @Override
-    public void getItemFrom(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public void getItemFrom(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainerHolder conveyor) {
         if (relative != Direction.DOWN || !conveyor.isContainerEmpty()) {
             return;
         }
 
         var selfState = self.getBlockState();
-        var mode = selfState.get(MODE);
-        var selfFacing = selfState.get(FACING);
-        if (!selfState.get(ENABLED) || !mode.toConveyor || pushDirection == selfFacing) {
+        var mode = selfState.getValue(MODE);
+        var selfFacing = selfState.getValue(FACING);
+        if (!selfState.getValue(ENABLED) || !mode.toConveyor || pushDirection == selfFacing) {
             return;
         }
         var be = self.getBlockEntity() instanceof FunnelBlockEntity x ? x : null;
@@ -136,16 +138,16 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
             return;
         }
 
-        var inv = HopperBlockEntity.getInventoryAt(self.getWorld(), self.getPos().offset(selfFacing));
-        var sided = inv instanceof SidedInventory s ? s : null;
+        var inv = HopperBlockEntity.getContainerAt(self.getWorld(), self.getPos().relative(selfFacing));
+        var sided = inv instanceof WorldlyContainer s ? s : null;
         if (inv != null) {
-            for (var i = 0; i < inv.size(); i++) {
-                var stack = inv.getStack(i);
-                if (!stack.isEmpty() && be.matches(stack) && (sided == null || sided.canExtract(i, stack, selfFacing.getOpposite()))) {
+            for (var i = 0; i < inv.getContainerSize(); i++) {
+                var stack = inv.getItem(i);
+                if (!stack.isEmpty() && be.matches(stack) && (sided == null || sided.canTakeItemThroughFace(i, stack, selfFacing.getOpposite()))) {
                     if (conveyor.pushNew(stack)) {
-                        inv.markDirty();
+                        inv.setChanged();
                         if (stack.isEmpty()) {
-                            inv.setStack(i, ItemStack.EMPTY);
+                            inv.setItem(i, ItemStack.EMPTY);
                         }
                         conveyor.setMovementPosition(pushDirection.getOpposite() == selfFacing ? 0.15 : 0.5);
                         return;
@@ -153,7 +155,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
                 }
             }
         } else {
-            var storage = ItemStorage.SIDED.find(self.getWorld(), self.getPos().offset(selfFacing), selfFacing);
+            var storage = ItemStorage.SIDED.find(self.getWorld(), self.getPos().relative(selfFacing), selfFacing);
 
             if (storage != null) {
                 for (var view : storage) {
@@ -178,119 +180,119 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         }
     }
 
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        if (!oldState.isOf(state.getBlock())) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (!oldState.is(state.getBlock())) {
             this.updateEnabled(world, pos, state);
         }
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, @Nullable Orientation wireOrientation, boolean notify) {
         this.updateEnabled(world, pos, state);
-        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
+        super.neighborChanged(state, world, pos, sourceBlock, wireOrientation, notify);
     }
 
-    private void updateEnabled(World world, BlockPos pos, BlockState state) {
-        boolean powered = world.isReceivingRedstonePower(pos);
-        if (powered == state.get(ENABLED)) {
-            world.setBlockState(pos, state.with(ENABLED, !powered), 4);
+    private void updateEnabled(Level world, BlockPos pos, BlockState state) {
+        boolean powered = world.hasNeighborSignal(pos);
+        if (powered == state.getValue(ENABLED)) {
+            world.setBlock(pos, state.setValue(ENABLED, !powered), 4);
         }
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        if (ctx.getSide() == Direction.DOWN) {
-            this.getDefaultState().with(FACING, Direction.UP).with(MODE, ConveyorLikeDirectional.TransferMode.TO_CONVEYOR);
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        if (ctx.getClickedFace() == Direction.DOWN) {
+            this.defaultBlockState().setValue(FACING, Direction.UP).setValue(MODE, ConveyorLikeDirectional.TransferMode.TO_CONVEYOR);
         }
 
-        var dir = ctx.getSide().getOpposite();
+        var dir = ctx.getClickedFace().getOpposite();
 
         if (dir == Direction.DOWN) {
-            dir = ctx.getHorizontalPlayerFacing();
+            dir = ctx.getHorizontalDirection();
         }
 
-        var selfPos = ctx.getBlockPos();
-        if (ctx.getSide() != Direction.UP) {
-            selfPos = selfPos.offset(ctx.getSide());
+        var selfPos = ctx.getClickedPos();
+        if (ctx.getClickedFace() != Direction.UP) {
+            selfPos = selfPos.relative(ctx.getClickedFace());
         }
 
-        selfPos = selfPos.down();
-        var below = ctx.getWorld().getBlockState(selfPos);
+        selfPos = selfPos.below();
+        var below = ctx.getLevel().getBlockState(selfPos);
         var mode = below.getBlock() instanceof ConveyorLikeDirectional directional
                 ? directional.getTransferMode(below, dir.getOpposite())
                 : ConveyorLikeDirectional.TransferMode.TO_CONVEYOR;
-        return waterLog(ctx, this.getDefaultState().with(FACING, dir).with(MODE, mode));
+        return waterLog(ctx, this.defaultBlockState().setValue(FACING, dir).setValue(MODE, mode));
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        var stack = player.getStackInHand(Hand.MAIN_HAND);
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
 
 
         var be = world.getBlockEntity(pos) instanceof FunnelBlockEntity x ? x : null;
 
         if (be == null || !be.checkUnlocked(player)) {
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
         }
 
         if (stack.getItem() instanceof AbstractFilterItem item && item.isFilterSet(stack)) {
             if (!be.getFilter().isEmpty()) {
-                player.getInventory().offerOrDrop(be.getFilter());
+                player.getInventory().placeItemBackInInventory(be.getFilter());
             }
             be.setFilter(stack.copyWithCount(1));
-            if (player instanceof ServerPlayerEntity serverPlayer) {
+            if (player instanceof ServerPlayer serverPlayer) {
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.ITEM_FILTER_USE);
             }
-            stack.decrement(1);
-            return ActionResult.SUCCESS_SERVER;
+            stack.shrink(1);
+            return InteractionResult.SUCCESS_SERVER;
         } else if (stack.isEmpty() && !be.getFilter().isEmpty()) {
-            player.setStackInHand(Hand.MAIN_HAND, be.getFilter());
+            player.setItemInHand(InteractionHand.MAIN_HAND, be.getFilter());
             be.setFilter(ItemStack.EMPTY);
-            return ActionResult.SUCCESS_SERVER;
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return FactoryUtil.transform(state, rotation::rotate, FACING);
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return FactoryUtil.transform(state, mirror::apply, FACING);
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        return FactoryUtil.transform(state, mirror::mirror, FACING);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.SPRUCE_PLANKS.getDefaultState();
+        return Blocks.SPRUCE_PLANKS.defaultBlockState();
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new FunnelBlockEntity(pos, state);
     }
 
     @Override
-    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState, pos);
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(BlockConfig.FACING, MODE_ACTION);
     }
 
@@ -307,26 +309,26 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
             this.mainElement.setItemDisplayContext(ItemDisplayContext.FIXED);
             this.mainElement.setInvisible(true);
             this.mainElement.setViewRange(0.8f);
-            this.offset = pos.getManhattanDistance(BlockPos.ZERO) % 2 == 0 ? 0.002f : 0;
+            this.offset = pos.distManhattan(BlockPos.ZERO) % 2 == 0 ? 0.002f : 0;
             this.updateFacing(state);
             this.addElement(this.mainElement);
         }
 
         private void updateFacing(BlockState facing) {
-            var rot = facing.get(FACING).getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
+            var rot = facing.getValue(FACING).getRotation().mul(Direction.NORTH.getRotation());
             var mat = mat();
             mat.rotate(rot);
             mat.translate(0, this.offset / 2, this.offset);
             mat.scale(2.01f);
-            var outModel = facing.get(MODE) == ConveyorLikeDirectional.TransferMode.FROM_CONVEYOR;
+            var outModel = facing.getValue(MODE) == ConveyorLikeDirectional.TransferMode.FROM_CONVEYOR;
 
             this.mainElement.setItem(getModel(outModel));
             this.mainElement.setTransformation(mat);
 
             mat.identity();
-            mat.rotate(rot).rotateY(MathHelper.PI);
+            mat.rotate(rot).rotateY(Mth.PI);
             if (outModel) {
-                mat.rotateX(-22.5f * MathHelper.RADIANS_PER_DEGREE);
+                mat.rotateX(-22.5f * Mth.DEG_TO_RAD);
                 mat.translate(0, 7.25f / 16f, 0.008f);
             } else {
                 mat.translate(0, 8.5f / 16f, 0.025f);

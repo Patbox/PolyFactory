@@ -5,20 +5,20 @@ import eu.pb4.factorytools.api.util.ItemComponentPredicate;
 import eu.pb4.polydex.api.v1.recipe.PolydexEntry;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 
 public class SimpleDrainRecipePage extends DrainRecipePage<SimpleDrainRecipe> {
-    public SimpleDrainRecipePage(RecipeEntry<SimpleDrainRecipe> recipe) {
+    public SimpleDrainRecipePage(RecipeHolder<SimpleDrainRecipe> recipe) {
         super(recipe);
     }
 
     @Override
-    public boolean canDisplay(@Nullable PolydexEntry entry, ServerPlayerEntity player) {
+    public boolean canDisplay(@Nullable PolydexEntry entry, ServerPlayer player) {
         return !this.recipe.requirePlayer();
     }
 

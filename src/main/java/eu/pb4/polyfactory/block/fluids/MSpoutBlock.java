@@ -14,24 +14,28 @@ import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.pipe.PumpNode;
-import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
+import eu.pb4.polyfactory.util.movingitem.MovingItemContainerHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.*;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -42,27 +46,27 @@ import java.util.List;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponent.Pipe, PipeConnectable {
-    public MSpoutBlock(Settings settings) {
+    public MSpoutBlock(Properties settings) {
         super(settings);
     }
 
 
     @Override
-    public boolean hasComparatorOutput(BlockState state) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
-        if (world.getBlockEntity(pos) instanceof Inventory inventory) {
-            return ScreenHandler.calculateComparatorOutput(inventory);
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
+        if (world.getBlockEntity(pos) instanceof Container inventory) {
+            return AbstractContainerMenu.getRedstoneSignalFromContainer(inventory);
         }
         return 0;
     }
 
     @Override
-    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
-        if (self.getBlockState().get(INPUT_FACING) == pushDirection || self.getBlockState().get(PART) == Part.TOP) {
+    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainerHolder conveyor) {
+        if (self.getBlockState().getValue(INPUT_FACING) == pushDirection || self.getBlockState().getValue(PART) == Part.TOP) {
             return false;
         }
 
@@ -76,12 +80,12 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             var targetStack = container.getContainer().get();
             var sourceStack = conveyor.getContainer().get();
 
-            if (ItemStack.areItemsAndComponentsEqual(container.getContainer().get(), conveyor.getContainer().get())) {
+            if (ItemStack.isSameItemSameComponents(container.getContainer().get(), conveyor.getContainer().get())) {
                 var count = Math.min(targetStack.getCount() + sourceStack.getCount(), container.getMaxStackCount(sourceStack));
                 if (count != targetStack.getCount()) {
                     var dec = count - targetStack.getCount();
-                    targetStack.increment(dec);
-                    sourceStack.decrement(dec);
+                    targetStack.grow(dec);
+                    sourceStack.shrink(dec);
                 }
 
                 if (sourceStack.isEmpty()) {
@@ -94,9 +98,9 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
     }
 
     @Override
-    public void getItemFrom(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
-        var inputDir = self.getBlockState().get(INPUT_FACING);
-        if (!conveyor.isContainerEmpty() || pushDirection == inputDir || inputDir.getOpposite() != relative || self.getBlockState().get(PART) == Part.TOP) {
+    public void getItemFrom(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainerHolder conveyor) {
+        var inputDir = self.getBlockState().getValue(INPUT_FACING);
+        if (!conveyor.isContainerEmpty() || pushDirection == inputDir || inputDir.getOpposite() != relative || self.getBlockState().getValue(PART) == Part.TOP) {
             return;
         }
 
@@ -114,7 +118,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
         if (stack.getCount() == amount) {
             conveyor.pushAndAttach(out.pullAndRemove());
         } else {
-            stack.decrement(amount);
+            stack.shrink(amount);
             conveyor.setMovementPosition(pushDirection == inputDir.getOpposite() ? 0 : 0.5);
             conveyor.pushNew(stack.copyWithCount(amount));
         }
@@ -122,8 +126,8 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world instanceof ServerWorld && type == FactoryBlockEntities.MECHANICAL_SPOUT ? MSpoutBlockEntity::ticker : null;
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+        return world instanceof ServerLevel && type == FactoryBlockEntities.MECHANICAL_SPOUT ? MSpoutBlockEntity::ticker : null;
     }
 
     @Override
@@ -132,22 +136,22 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
     }
 
     @Override
-    protected ElementHolder createModel(ServerWorld serverWorld, BlockPos pos, BlockState initialBlockState) {
+    protected ElementHolder createModel(ServerLevel serverWorld, BlockPos pos, BlockState initialBlockState) {
         return new Model(serverWorld, initialBlockState);
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.ANVIL.getDefaultState();
+        return Blocks.ANVIL.defaultBlockState();
     }
 
     @Override
-    public Collection<BlockNode> createPipeNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return state.get(PART) == Part.TOP ? List.of(new PumpNode(Direction.DOWN, true, PumpNode.SPOUT_RANGE)) : List.of();
+    public Collection<BlockNode> createPipeNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return state.getValue(PART) == Part.TOP ? List.of(new PumpNode(Direction.DOWN, true, PumpNode.SPOUT_RANGE)) : List.of();
     }
 
     @Override
-    protected void updateNetworkAt(WorldView world, BlockPos pos) {
+    protected void updateNetworkAt(LevelReader world, BlockPos pos) {
         NetworkComponent.Rotational.updateRotationalAt(world, pos);
         NetworkComponent.Pipe.updatePipeAt(world, pos);
     }
@@ -158,7 +162,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
     }
 
     @Override
-    public boolean canPipeConnect(WorldView world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canPipeConnect(LevelReader world, BlockPos pos, BlockState state, Direction dir) {
         return dir == Direction.UP;
     }
 
@@ -174,7 +178,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
         private FluidInstance<?> castingFluid;
         private boolean isCooling = false;
 
-        private Model(ServerWorld world, BlockState state) {
+        private Model(ServerLevel world, BlockState state) {
             this.main = ItemDisplayElementUtil.createSimple(DEFAULT_MODEL);
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
@@ -185,11 +189,11 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             this.gearB.setViewRange(0.4f);
             this.fluid.setViewRange(0.4f);
             this.fluid.setScale(new Vector3f(12 / 16f));
-            this.fluid.setOffset(new Vec3d(0, 7.5 / 16f - (2 / 16f / 16f), 0));
+            this.fluid.setOffset(new Vec3(0, 7.5 / 16f - (2 / 16f / 16f), 0));
 
             updateStatePos(state);
-            var dir = state.get(INPUT_FACING);
-            this.updateAnimation(0, (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
+            var dir = state.getValue(INPUT_FACING);
+            this.updateAnimation(0, (dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
             this.addElement(this.main);
             this.addElement(this.fluid);
             this.addElement(this.gearA);
@@ -197,19 +201,19 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
         }
 
         private void updateStatePos(BlockState state) {
-            var direction = state.get(INPUT_FACING);
+            var direction = state.getValue(INPUT_FACING);
 
-            this.main.setYaw(direction.getPositiveHorizontalDegrees());
-            this.fluid.setYaw(direction.getPositiveHorizontalDegrees());
-            this.gearA.setYaw(direction.getPositiveHorizontalDegrees());
-            this.gearB.setYaw(direction.getPositiveHorizontalDegrees());
+            this.main.setYaw(direction.toYRot());
+            this.fluid.setYaw(direction.toYRot());
+            this.gearA.setYaw(direction.toYRot());
+            this.gearB.setYaw(direction.toYRot());
         }
 
         private void updateAnimation(float rotation, boolean negative) {
             var mat = mat();
             mat.identity();
             mat.translate(0, 0.5f, 0);
-            mat.rotateY(negative ? MathHelper.HALF_PI : -MathHelper.HALF_PI);
+            mat.rotateY(negative ? Mth.HALF_PI : -Mth.HALF_PI);
             mat.translate(0, 0.5f, 0.40f);
             mat.rotateZ(rotation);
             this.gearA.setTransformation(mat);
@@ -221,10 +225,10 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
         protected void onTick() {
             var tick = this.getTick();
             var b = tick % this.getUpdateRate() == 0;
-            var dir = this.blockState().get(INPUT_FACING);
+            var dir = this.blockState().getValue(INPUT_FACING);
             if (b) {
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().up()).rotation(),
-                        (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
+                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().above()).rotation(),
+                        (dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
                 this.gearA.startInterpolationIfDirty();
                 this.gearB.startInterpolationIfDirty();
             }
@@ -268,12 +272,12 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
                 this.fluid.setTranslation(new Vector3f(0, -0.1f, 0));
             } else {
                 var isSolid = process > 0.5 && isCooling;
-                var value = MathHelper.clamp((float) (isSolid ? ((process - 0.50f) / 0.50f) : (1 - (process) / 0.50f)), 0, 1);
-                var color = isCooling ? ColorHelper.fromFloats(1, 1f, 0.6f + value * 0.4f, 0.5f + value * 0.5f) : 0xFFFFFF;
+                var value = Mth.clamp((float) (isSolid ? ((process - 0.50f) / 0.50f) : (1 - (process) / 0.50f)), 0, 1);
+                var color = isCooling ? ARGB.colorFromFloat(1, 1f, 0.6f + value * 0.4f, 0.5f + value * 0.5f) : 0xFFFFFF;
                 this.fluid.setItem(FactoryModels.FLUID_FLAT_14_SPOUT.get(castingFluid,
                         color,
                         isSolid));
-                this.fluid.setTranslation(new Vector3f( 0, (float) ((isCooling ? 1 : MathHelper.clamp(process, 0, 1)) - 0.5) / 16.2f * 12 / 16f, 0));
+                this.fluid.setTranslation(new Vector3f( 0, (float) ((isCooling ? 1 : Mth.clamp(process, 0, 1)) - 0.5) / 16.2f * 12 / 16f, 0));
             }
             if (process > this.progress && !isCooling) {
                 this.fluid.startInterpolationIfDirty();

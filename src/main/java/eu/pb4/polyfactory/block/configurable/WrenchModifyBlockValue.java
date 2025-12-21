@@ -1,16 +1,15 @@
 package eu.pb4.polyfactory.block.configurable;
 
 import eu.pb4.polyfactory.util.FactoryUtil;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.enums.Orientation;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Property;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.FrontAndTop;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.Property;
 import java.util.ArrayList;
 import java.util.function.BiFunction;
 
@@ -18,8 +17,8 @@ public interface WrenchModifyBlockValue<T> {
     @SuppressWarnings({"unchecked", "rawtypes", "RedundantCast"})
     static <T extends Comparable<T>> WrenchModifyBlockValue<T> ofProperty(Property<T> property) {
         return (value, next, player, world, pos, side, state) -> {
-            var elements = property.getValues();
-            return !next ? Util.previous(elements, value) : Util.next(elements, value);
+            var elements = property.getPossibleValues();
+            return !next ? Util.findPreviousInIterable(elements, value) : Util.findNextInIterable(elements, value);
         };
     }
 
@@ -30,7 +29,7 @@ public interface WrenchModifyBlockValue<T> {
     static WrenchModifyBlockValue<Direction> ofDirection(EnumProperty<Direction> property) {
         var reordered = new ArrayList<Direction>();
         for (var x : FactoryUtil.REORDERED_DIRECTIONS) {
-            if (property.getValues().contains(x)) {
+            if (property.getPossibleValues().contains(x)) {
                 reordered.add(x);
             }
         }
@@ -40,23 +39,23 @@ public interface WrenchModifyBlockValue<T> {
     static WrenchModifyBlockValue<Direction> ofAltDirection(EnumProperty<Direction> property) {
         return (dir, next, player, world, pos, side, state) -> {
             var val = next ? side : side.getOpposite();
-            return property.getValues().contains(val) ? val : dir;
+            return property.getPossibleValues().contains(val) ? val : dir;
         };
     }
 
-    static WrenchModifyBlockValue<Orientation> ofAltOrientation(EnumProperty<Orientation> property) {
+    static WrenchModifyBlockValue<FrontAndTop> ofAltOrientation(EnumProperty<FrontAndTop> property) {
         return (dir, next, player, world, pos, side, state) -> {
             var val = next ? side : side.getOpposite();
             var dir2 = switch (val) {
-                case DOWN -> player.getHorizontalFacing();
-                case UP -> player.getHorizontalFacing().getOpposite();
+                case DOWN -> player.getDirection();
+                case UP -> player.getDirection().getOpposite();
                 default -> Direction.UP;
             };
 
-            var orientation = Orientation.byDirections(val, dir2);
-            return property.getValues().contains(orientation) ? orientation : dir;
+            var orientation = FrontAndTop.fromFrontAndTop(val, dir2);
+            return property.getPossibleValues().contains(orientation) ? orientation : dir;
         };
     }
 
-    T modifyValue(T value, boolean next, PlayerEntity player, World world, BlockPos pos, Direction side, BlockState state);
+    T modifyValue(T value, boolean next, Player player, Level world, BlockPos pos, Direction side, BlockState state);
 }

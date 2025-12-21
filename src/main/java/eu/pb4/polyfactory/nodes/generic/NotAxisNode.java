@@ -8,14 +8,12 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.AxisNode;
 import eu.pb4.polyfactory.nodes.DirectionCheckingNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import net.minecraft.core.Direction;
 
 public record NotAxisNode(Direction.Axis axis) implements DirectionCheckingNode {
     public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("not_axis"), Direction.Axis.CODEC.xmap(NotAxisNode::new, NotAxisNode::axis));
@@ -30,7 +28,7 @@ public record NotAxisNode(Direction.Axis axis) implements DirectionCheckingNode 
         var list = new ArrayList<HalfLink>();
         for (var dir : Direction.values()) {
             if (dir.getAxis() != axis) {
-                FactoryNodes.findNodes(self, self.getBlockPos().offset(dir)).forEach(list::add);
+                FactoryNodes.findNodes(self, self.getBlockPos().relative(dir)).forEach(list::add);
             }
         }
         return list;

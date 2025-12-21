@@ -15,65 +15,65 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
 public class AxleWithGearBlock extends AxleBlock implements RotationalConnector, GearPlacementAligner {
-    public AxleWithGearBlock(Settings settings) {
+    public AxleWithGearBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
     }
 
     @Override
-    public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
-        var otherState = ctx.getWorld().getBlockState(ctx.getBlockPos().offset(ctx.getSide().getOpposite()));
-        var axis = ctx.getSide().getAxis();
+    public @Nullable BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var otherState = ctx.getLevel().getBlockState(ctx.getClickedPos().relative(ctx.getClickedFace().getOpposite()));
+        var axis = ctx.getClickedFace().getAxis();
         if (otherState.getBlock() instanceof GearPlacementAligner gearPlacementAligner
-                && gearPlacementAligner.isLargeGear(otherState) == this.isLargeGear(this.getDefaultState())
-                && !ctx.shouldCancelInteraction()) {
+                && gearPlacementAligner.isLargeGear(otherState) == this.isLargeGear(this.defaultBlockState())
+                && !ctx.isSecondaryUseActive()) {
             axis = gearPlacementAligner.getGearAxis(otherState);
         }
 
-        return waterLog(ctx, this.getDefaultState()).with(AXIS, axis);
+        return waterLog(ctx, this.defaultBlockState()).setValue(AXIS, axis);
     }
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        super.onPlaced(world, pos, state, placer, itemStack);
-        if (placer instanceof ServerPlayerEntity player) {
-            var axis = state.get(AXIS);
-            var mut = new BlockPos.Mutable();
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.setPlacedBy(world, pos, state, placer, itemStack);
+        if (placer instanceof ServerPlayer player) {
+            var axis = state.getValue(AXIS);
+            var mut = new BlockPos.MutableBlockPos();
             for (var dir : Direction.values()) {
                 if (dir.getAxis() != axis) {
-                    var state2 = world.getBlockState(mut.set(pos).move(dir).move(dir.rotateClockwise(axis)));
+                    var state2 = world.getBlockState(mut.set(pos).move(dir).move(dir.getClockWise(axis)));
 
-                    if (state2.getBlock() instanceof AxleWithGearBlock && state2.getBlock() != state.getBlock() && state2.get(AxleBlock.AXIS) == axis) {
+                    if (state2.getBlock() instanceof AxleWithGearBlock && state2.getBlock() != state.getBlock() && state2.getValue(AxleBlock.AXIS) == axis) {
                         TriggerCriterion.trigger(player, FactoryTriggers.CONNECT_DIFFERENT_GEARS);
                         break;
                     }
@@ -84,37 +84,37 @@ public class AxleWithGearBlock extends AxleBlock implements RotationalConnector,
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState().with(WATERLOGGED, state.get(WATERLOGGED));
+        return Blocks.BARRIER.defaultBlockState().setValue(WATERLOGGED, state.getValue(WATERLOGGED));
     }
 
     @Override
-    protected boolean canReplace(BlockState state, ItemPlacementContext context) {
+    protected boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
         return false;
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        return FactoryItems.STEEL_GEAR.getDefaultStack();
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
+        return FactoryItems.STEEL_GEAR.getDefaultInstance();
     }
 
     @Override
-    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new AxleWithGearMechanicalNode(state.get(AXIS)));
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return List.of(new AxleWithGearMechanicalNode(state.getValue(AXIS)));
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return VoxelShapes.fullCube();
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        return Shapes.block();
     }
 
     @Override
-    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(world, initialBlockState, pos);
+    public ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
+        return new eu.pb4.polyfactory.block.mechanical.AxleWithGearBlock.Model(world, initialBlockState, pos);
     }
 
     @Override
-    public Collection<BlockNode> createRotationalConnectorNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new SmallGearNode(state.get(AXIS)));
+    public Collection<BlockNode> createRotationalConnectorNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return List.of(new SmallGearNode(state.getValue(AXIS)));
     }
 
     @Override
@@ -123,7 +123,7 @@ public class AxleWithGearBlock extends AxleBlock implements RotationalConnector,
     }
 
     @Override
-    protected void updateNetworkAt(WorldView world, BlockPos pos) {
+    protected void updateNetworkAt(LevelReader world, BlockPos pos) {
         super.updateNetworkAt(world, pos);
         RotationalConnector.updateRotationalConnectorAt(world, pos);
     }
@@ -135,7 +135,7 @@ public class AxleWithGearBlock extends AxleBlock implements RotationalConnector,
 
     @Override
     public Direction.Axis getGearAxis(BlockState state) {
-        return state.get(AXIS);
+        return state.getValue(AXIS);
     }
 
     @Override
@@ -148,20 +148,20 @@ public class AxleWithGearBlock extends AxleBlock implements RotationalConnector,
         public static final ItemStack ITEM_MODEL_2 = ItemDisplayElementUtil.getModel( id("block/axle_with_gear_2"));
 
         private final ItemDisplayElement mainElement;
-        private Model(ServerWorld world, BlockState state, BlockPos pos) {
+        private Model(ServerLevel world, BlockState state, BlockPos pos) {
             this.mainElement = LodItemDisplayElement.createSimple(
                     ((pos.getX() + pos.getY() + pos.getZ()) % 2 == 0) ? ITEM_MODEL_2 : ITEM_MODEL_1,
                     this.getUpdateRate(), 0.3f, 0.6f);
             this.mainElement.setViewRange(0.7f);
-            this.updateAnimation(0,  state.get(AXIS));
+            this.updateAnimation(0,  state.getValue(AXIS));
             this.addElement(this.mainElement);
         }
 
         private void updateAnimation(float rotation, Direction.Axis axis) {
             var mat = mat();
             switch (axis) {
-                case X -> mat.rotate(Direction.EAST.getRotationQuaternion());
-                case Z -> mat.rotate(Direction.SOUTH.getRotationQuaternion());
+                case X -> mat.rotate(Direction.EAST.getRotation());
+                case Z -> mat.rotate(Direction.SOUTH.getRotation());
             }
 
             mat.rotateY(rotation);
@@ -180,11 +180,11 @@ public class AxleWithGearBlock extends AxleBlock implements RotationalConnector,
 
         @Override
         protected void onTick() {
-            var tick = this.getAttachment().getWorld().getTime();
+            var tick = this.getAttachment().getWorld().getGameTime();
 
             if (tick % this.getUpdateRate() == 0) {
                 this.updateAnimation(this.getRotation(),
-                        this.blockAware().getBlockState().get(AXIS));
+                        this.blockAware().getBlockState().getValue(AXIS));
                 this.mainElement.startInterpolationIfDirty();
             }
         }

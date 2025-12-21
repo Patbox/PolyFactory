@@ -1,19 +1,19 @@
 package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.polymer.core.api.block.PolymerBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.RedstoneLampBlock;
-import net.minecraft.block.RedstoneTorchBlock;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RedstoneLampBlock;
+import net.minecraft.world.level.block.RedstoneTorchBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 public class InvertedRedstoneLampBlock extends RedstoneLampBlock implements PolymerBlock {
-    public InvertedRedstoneLampBlock(Settings settings) {
+    public InvertedRedstoneLampBlock(Properties settings) {
         super(settings);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.REDSTONE_LAMP.getDefaultState().with(RedstoneTorchBlock.LIT, !state.get(RedstoneTorchBlock.LIT));
+        return Blocks.REDSTONE_LAMP.defaultBlockState().setValue(RedstoneTorchBlock.LIT, !state.getValue(RedstoneTorchBlock.LIT));
     }
 }

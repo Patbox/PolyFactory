@@ -7,16 +7,16 @@ import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.fluid.shooting.FluidShootingBehavior;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.minecraft.entity.decoration.Brightness;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.Brightness;
 import net.minecraft.util.Unit;
 import org.jetbrains.annotations.Nullable;
 
@@ -82,15 +82,15 @@ public record FluidInstance<T>(FluidType<T> type, T data) {
         }
     }
 
-    public MutableText toLabeledAmount(long amount) {
+    public MutableComponent toLabeledAmount(long amount) {
         return this.type.toLabeledAmount(amount, this.data);
     }
 
-    public MutableText getAmountText(long amount) {
+    public MutableComponent getAmountText(long amount) {
         return this.type.getAmountText(amount, this.data);
     }
 
-    public Text getName() {
+    public Component getName() {
         return this.type.getName(data);
     }
 
@@ -118,15 +118,15 @@ public record FluidInstance<T>(FluidType<T> type, T data) {
         return this.type.heat();
     }
 
-    public ParticleEffect particle() {
+    public ParticleOptions particle() {
         return this.type.particleGetter().apply(this);
     }
 
-    public long getMaxFlow(ServerWorld world) {
+    public long getMaxFlow(ServerLevel world) {
         return this.type.maxFlow().getMaxFlow(world, this.data);
     }
 
-    public double getFlowSpeedMultiplier(ServerWorld world) {
+    public double getFlowSpeedMultiplier(ServerLevel world) {
         return this.type.flowSpeedMultiplier().getSpeedMultiplier(world, this.data);
     }
 
@@ -135,22 +135,22 @@ public record FluidInstance<T>(FluidType<T> type, T data) {
     }
 
     public boolean isIn(TagKey<FluidType<?>> tag) {
-        return FactoryRegistries.FLUID_TYPES.getEntry(this.type).isIn(tag);
+        return FactoryRegistries.FLUID_TYPES.wrapAsHolder(this.type).is(tag);
     }
 
     public FluidShootingBehavior<T> shootingBehavior() {
         return this.type.shootingBehavior();
     }
 
-    public NbtElement toNbt(RegistryWrapper.WrapperLookup lookup) {
-        return CODEC.encodeStart(lookup.getOps(NbtOps.INSTANCE), this).getOrThrow();
+    public Tag toNbt(HolderLookup.Provider lookup) {
+        return CODEC.encodeStart(lookup.createSerializationContext(NbtOps.INSTANCE), this).getOrThrow();
     }
 
     @Nullable
-    public static FluidInstance<?> fromNbt(RegistryWrapper.WrapperLookup lookup, NbtElement element) {
+    public static FluidInstance<?> fromNbt(HolderLookup.Provider lookup, Tag element) {
         if (element == null) {
             return null;
         }
-        return CODEC.decode(lookup.getOps(NbtOps.INSTANCE), element).result().map(Pair::getFirst).orElse(null);
+        return CODEC.decode(lookup.createSerializationContext(NbtOps.INSTANCE), element).result().map(Pair::getFirst).orElse(null);
     }
 }

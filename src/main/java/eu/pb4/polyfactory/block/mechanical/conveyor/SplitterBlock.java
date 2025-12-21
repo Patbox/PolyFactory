@@ -14,39 +14,41 @@ import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.FilterIcon;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.filter.FilterData;
-import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
+import eu.pb4.polyfactory.util.movingitem.MovingItemContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.*;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -54,38 +56,38 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.List;
 
 
-public class SplitterBlock extends Block implements FactoryBlock, MovingItemConsumer, ConfigurableBlock, BlockEntityProvider, BarrierBasedWaterloggable {
-    public static final BooleanProperty ENABLED = Properties.ENABLED;
-    public static final BooleanProperty DISTRIBUTE = BooleanProperty.of("distribute");
-    public static final BooleanProperty BLOCKING = BooleanProperty.of("blocking");
-    public static EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
+public class SplitterBlock extends Block implements FactoryBlock, MovingItemConsumer, ConfigurableBlock, EntityBlock, BarrierBasedWaterloggable {
+    public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
+    public static final BooleanProperty DISTRIBUTE = BooleanProperty.create("distribute");
+    public static final BooleanProperty BLOCKING = BooleanProperty.create("blocking");
+    public static EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public SplitterBlock(Settings settings) {
+    public SplitterBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(ENABLED, true).with(DISTRIBUTE, true).with(BLOCKING, true));
-        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(ENABLED, true).setValue(DISTRIBUTE, true).setValue(BLOCKING, true));
+        this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false));
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         tickWater(state, world, tickView, pos);
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+        return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, ENABLED, DISTRIBUTE, BLOCKING);
         builder.add(WATERLOGGED);
 
     }
 
     @Override
-    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainerHolder conveyor) {
         var selfState = self.getBlockState();
-        var dir = selfState.get(FACING);
+        var dir = selfState.getValue(FACING);
         var item = conveyor.getContainer();
 
-        if (!selfState.get(ENABLED) || item == null || item.get().isEmpty() || conveyor.movementDelta() < 0.49) {
+        if (!selfState.getValue(ENABLED) || item == null || item.get().isEmpty() || conveyor.movementDelta() < 0.49) {
             return false;
         }
         if (self.getBlockEntity() instanceof SplitterBlockEntity blockEntity) {
@@ -94,160 +96,160 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
             var stack = item.get();
 
             if (blockEntity.filtersEmpty()) {
-                dirs = List.of(dir.rotateYCounterclockwise(), dir, dir.rotateYClockwise());
+                dirs = List.of(dir.getCounterClockWise(), dir, dir.getClockWise());
             } else if (blockEntity.matchesSides(stack)) {
-                dirs = List.of(dir.rotateYCounterclockwise(), dir.rotateYClockwise());
+                dirs = List.of(dir.getCounterClockWise(), dir.getClockWise());
             } else if (blockEntity.matchesLeft(item.get())) {
-                dirs = List.of(dir.rotateYCounterclockwise());
+                dirs = List.of(dir.getCounterClockWise());
             } else if (blockEntity.matchesRight(item.get())) {
-                dirs = List.of(dir.rotateYClockwise());
+                dirs = List.of(dir.getClockWise());
             } else if (blockEntity.isLeftFilterEmpty()) {
-                dirs = List.of(dir.rotateYCounterclockwise(), dir);
+                dirs = List.of(dir.getCounterClockWise(), dir);
             } else if (blockEntity.isRightFilterEmpty()) {
-                dirs = List.of(dir.rotateYClockwise(), dir);
+                dirs = List.of(dir.getClockWise(), dir);
             } else {
                 return false;
             }
 
-            if (selfState.get(DISTRIBUTE) && dirs.size() > 1) {
+            if (selfState.getValue(DISTRIBUTE) && dirs.size() > 1) {
                 dirs = List.of(dirs.get(blockEntity.pos(dirs.size())));
             }
 
             for (var direction : dirs) {
-                var x = FactoryUtil.tryInsertingMovable(conveyor, self.getWorld(), conveyorPos, conveyorPos.offset(direction), direction, direction, FactoryBlockTags.SPLITTER_SIDE_OUTPUT);
+                var x = FactoryUtil.tryInsertingMovable(conveyor, self.getWorld(), conveyorPos, conveyorPos.relative(direction), direction, direction, FactoryBlockTags.SPLITTER_SIDE_OUTPUT);
 
                 if (x != FactoryUtil.MovableResult.FAILURE) {
                     return true;
                 }
 
-                x = FactoryUtil.tryInsertingMovable(conveyor, self.getWorld(), conveyorPos, conveyorPos.offset(direction).up(), direction, direction, FactoryBlockTags.SPLITTER_SIDE_OUTPUT);
+                x = FactoryUtil.tryInsertingMovable(conveyor, self.getWorld(), conveyorPos, conveyorPos.relative(direction).above(), direction, direction, FactoryBlockTags.SPLITTER_SIDE_OUTPUT);
                 if (x != FactoryUtil.MovableResult.FAILURE) {
                     return true;
                 }
             }
-            return !selfState.get(BLOCKING);
+            return !selfState.getValue(BLOCKING);
         }
 
         return false;
     }
 
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        if (!oldState.isOf(state.getBlock())) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+        if (!oldState.is(state.getBlock())) {
             this.updateEnabled(world, pos, state);
         }
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, @Nullable Orientation wireOrientation, boolean notify) {
         this.updateEnabled(world, pos, state);
-        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
+        super.neighborChanged(state, world, pos, sourceBlock, wireOrientation, notify);
     }
 
-    private void updateEnabled(World world, BlockPos pos, BlockState state) {
-        boolean powered = world.isReceivingRedstonePower(pos);
-        if (powered == state.get(ENABLED)) {
-            world.setBlockState(pos, state.with(ENABLED, !powered), 4);
+    private void updateEnabled(Level world, BlockPos pos, BlockState state) {
+        boolean powered = world.hasNeighborSignal(pos);
+        if (powered == state.getValue(ENABLED)) {
+            world.setBlock(pos, state.setValue(ENABLED, !powered), 4);
         }
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        var below = ctx.getWorld().getBlockState(ctx.getBlockPos().down());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var below = ctx.getLevel().getBlockState(ctx.getClickedPos().below());
 
         Direction dir;
 
         if (below.getBlock() instanceof ConveyorBlock) {
-            dir = below.get(ConveyorBlock.DIRECTION);
+            dir = below.getValue(ConveyorBlock.DIRECTION);
         } else {
-            dir = ctx.getHorizontalPlayerFacing();
+            dir = ctx.getHorizontalDirection();
         }
 
-        return waterLog(ctx, this.getDefaultState().with(FACING, dir));
+        return waterLog(ctx, this.defaultBlockState().setValue(FACING, dir));
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player,  BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player,  BlockHitResult hit) {
         var be = world.getBlockEntity(pos);
-        var hand = Hand.MAIN_HAND;
-        var stack = player.getStackInHand(hand);
+        var hand = InteractionHand.MAIN_HAND;
+        var stack = player.getItemInHand(hand);
         if ((stack.getItem() instanceof AbstractFilterItem item && item.isFilterSet(stack) || stack.isEmpty()) && be instanceof SplitterBlockEntity splitterBlockEntity) {
             if (!splitterBlockEntity.checkUnlocked(player)) {
-                return ActionResult.FAIL;
+                return InteractionResult.FAIL;
             }
 
-            var dir = state.get(FACING);
-            if (hit.getSide().getAxis() != Direction.Axis.Y && hit.getSide().getAxis() != dir.getAxis()) {
-                if (hit.getSide() == dir.rotateYCounterclockwise() && (!splitterBlockEntity.getFilterLeft().isEmpty() || !stack.isEmpty())) {
+            var dir = state.getValue(FACING);
+            if (hit.getDirection().getAxis() != Direction.Axis.Y && hit.getDirection().getAxis() != dir.getAxis()) {
+                if (hit.getDirection() == dir.getCounterClockWise() && (!splitterBlockEntity.getFilterLeft().isEmpty() || !stack.isEmpty())) {
                     if (stack.isEmpty()) {
-                        player.setStackInHand(hand, splitterBlockEntity.getFilterLeft());
+                        player.setItemInHand(hand, splitterBlockEntity.getFilterLeft());
                         splitterBlockEntity.setFilterLeft(ItemStack.EMPTY);
                     } else {
                         if (!splitterBlockEntity.getFilterLeft().isEmpty()) {
-                            player.getInventory().offerOrDrop(splitterBlockEntity.getFilterLeft());
+                            player.getInventory().placeItemBackInInventory(splitterBlockEntity.getFilterLeft());
                         }
                         splitterBlockEntity.setFilterLeft(stack.copyWithCount(1));
-                        stack.decrement(1);
-                        if (player instanceof ServerPlayerEntity serverPlayer) {
+                        stack.shrink(1);
+                        if (player instanceof ServerPlayer serverPlayer) {
                             TriggerCriterion.trigger(serverPlayer, FactoryTriggers.ITEM_FILTER_USE);
                         }
                     }
-                    return ActionResult.SUCCESS_SERVER;
+                    return InteractionResult.SUCCESS_SERVER;
                 } else if (!splitterBlockEntity.getFilterRight().isEmpty() || !stack.isEmpty()) {
                     if (stack.isEmpty()) {
-                        player.setStackInHand(hand, splitterBlockEntity.getFilterRight());
+                        player.setItemInHand(hand, splitterBlockEntity.getFilterRight());
                         splitterBlockEntity.setFilterRight(ItemStack.EMPTY);
                     } else {
                         if (!splitterBlockEntity.getFilterRight().isEmpty()) {
-                            player.getInventory().offerOrDrop(splitterBlockEntity.getFilterRight());
+                            player.getInventory().placeItemBackInInventory(splitterBlockEntity.getFilterRight());
                         }
                         splitterBlockEntity.setFilterRight(stack.copyWithCount(1));
-                        stack.decrement(1);
-                        if (player instanceof ServerPlayerEntity serverPlayer) {
+                        stack.shrink(1);
+                        if (player instanceof ServerPlayer serverPlayer) {
                             TriggerCriterion.trigger(serverPlayer, FactoryTriggers.ITEM_FILTER_USE);
                         }
                     }
-                    return ActionResult.SUCCESS_SERVER;
+                    return InteractionResult.SUCCESS_SERVER;
                 }
             }
         }
 
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return FactoryUtil.transform(state, rotation::rotate, FACING);
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return FactoryUtil.transform(state, mirror::apply, FACING);
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        return FactoryUtil.transform(state, mirror::mirror, FACING);
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.SMOOTH_STONE.getDefaultState();
+        return Blocks.SMOOTH_STONE.defaultBlockState();
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new SplitterBlockEntity(pos, state);
     }
 
     @Override
-    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(BlockConfig.FACING_HORIZONTAL);
     }
 
@@ -261,7 +263,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
             this.mainElement = new ItemDisplayElement();
             this.mainElement.setDisplaySize(1, 1);
             this.mainElement.setItemDisplayContext(ItemDisplayContext.FIXED);
-            this.mainElement.setItem(FactoryItems.SPLITTER.getDefaultStack());
+            this.mainElement.setItem(FactoryItems.SPLITTER.getDefaultInstance());
             this.mainElement.setInvisible(true);
             this.mainElement.setViewRange(0.8f);
 
@@ -270,18 +272,18 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
         }
 
         private void updateFacing(BlockState facing) {
-            var rot = facing.get(FACING).getRotationQuaternion().mul(Direction.NORTH.getRotationQuaternion());
+            var rot = facing.getValue(FACING).getRotation().mul(Direction.NORTH.getRotation());
             mat.identity();
             mat.rotate(rot);
             mat.pushMatrix();
             mat.scale(2f);
-            mat.rotateY(MathHelper.PI);
+            mat.rotateY(Mth.PI);
             this.mainElement.setTransformation(mat);
             mat.popMatrix();
 
             mat.pushMatrix();
             mat.translate(-0.51f, 5.5f / 16f, 0);
-            mat.rotateY(MathHelper.HALF_PI);
+            mat.rotateY(Mth.HALF_PI);
             mat.scale(0.3f, 0.3f, 0.005f);
             this.leftLockElement.setTransformation(mat);
             mat.popMatrix();
@@ -289,7 +291,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
 
             mat.pushMatrix();
             mat.translate(0.51f, 5.5f / 16f, 0);
-            mat.rotateY(-MathHelper.HALF_PI);
+            mat.rotateY(-Mth.HALF_PI);
             mat.scale(0.3f, 0.3f, 0.005f);
             this.rightLockElement.setTransformation(mat);
             mat.popMatrix();

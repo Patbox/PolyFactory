@@ -2,11 +2,10 @@ package eu.pb4.polyfactory.mixin.machines;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import eu.pb4.polyfactory.util.LastFanEffectedTickConsumer;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.FallingBlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.FallingBlockEntity;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,13 +15,13 @@ public abstract class FallingBlockEntityMixin extends Entity implements LastFanE
     @Unique
     private int lastFanAge = -9999;
 
-    public FallingBlockEntityMixin(EntityType<?> type, World world) {
+    public FallingBlockEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
 
-    @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/FallingBlockEntity;isOnGround()Z"))
+    @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/item/FallingBlockEntity;onGround()Z"))
     private boolean canBePlaced(boolean value) {
-        return value && this.age - this.lastFanAge > 10;
+        return value && this.tickCount - this.lastFanAge > 10;
     }
 
     /*@Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
@@ -37,7 +36,7 @@ public abstract class FallingBlockEntityMixin extends Entity implements LastFanE
 
     @Override
     public void polyfactory$setLastFanTick() {
-        this.lastFanAge = this.age;
+        this.lastFanAge = this.tickCount;
     }
 
     @Override

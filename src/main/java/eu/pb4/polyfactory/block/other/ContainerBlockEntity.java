@@ -4,7 +4,7 @@ import com.mojang.serialization.Dynamic;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.mixin.NbtReadViewAccessor;
+import eu.pb4.polyfactory.mixin.TagValueInputAccessor;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -12,20 +12,20 @@ import net.fabricmc.fabric.api.transfer.v1.item.base.SingleItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.SharedConstants;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.datafixer.Schemas;
-import net.minecraft.datafixer.TypeReferences;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.datafix.DataFixers;
+import net.minecraft.util.datafix.fixes.References;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -63,35 +63,35 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
             @Override
             protected void onFinalCommit() {
                 super.onFinalCommit();
-                ContainerBlockEntity.this.markDirty();
-                world.updateComparators(pos, ContainerBlockEntity.this.getCachedState().getBlock());
+                ContainerBlockEntity.this.setChanged();
+                level.updateNeighbourForOutputSignal(worldPosition, ContainerBlockEntity.this.getBlockState().getBlock());
                 updateStackWithTick();
             }
         };
     }
 
     @Override
-    protected void writeData(WriteView view) {
+    protected void saveAdditional(ValueOutput view) {
         this.storage.writeData(view);
         // amount -> long
         // variant -> { item -> string/id, tag -> compound/null }
-        super.writeData(view);
+        super.saveAdditional(view);
     }
 
     @Override
-    public void readData(ReadView view) {
+    public void loadAdditional(ValueInput view) {
         updateStackWithTick();
-        super.readData(view);
-        if (view instanceof NbtReadView) {
-            var nbt = ((NbtReadViewAccessor) view).getNbt();
+        super.loadAdditional(view);
+        if (view instanceof TagValueInput) {
+            var nbt = ((TagValueInputAccessor) view).getInput();
             try {
                 if (nbt.getCompoundOrEmpty("variant").contains("tag")) {
-                    var hack = new NbtCompound();
+                    var hack = new CompoundTag();
                     var variant = nbt.getCompoundOrEmpty("variant");
                     hack.put("tag", variant.get("tag"));
                     hack.put("id", variant.get("item"));
                     hack.putInt("Count", 1);
-                    var updated = (NbtCompound) Schemas.getFixer().update(TypeReferences.ITEM_STACK, new Dynamic<>(NbtOps.INSTANCE, hack), 3700, SharedConstants.WORLD_VERSION).getValue();
+                    var updated = (CompoundTag) DataFixers.getDataFixer().update(References.ITEM_STACK, new Dynamic<>(NbtOps.INSTANCE, hack), 3700, SharedConstants.WORLD_VERSION).getValue();
                     variant.put("components", updated.get("components"));
                 }
             } catch (Throwable e) {
@@ -111,31 +111,31 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
 
     private void updateStackWithTick() {
         updateStack();
-        if (this.model != null && this.world != null) {
+        if (this.model != null && this.level != null) {
             model.tick();
         }
     }
 
     @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        super.onBlockReplaced(pos, oldState);
-        if (this.world != null) {
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        super.preRemoveSideEffects(pos, oldState);
+        if (this.level != null) {
             var count = this.storage.amount;
-            var max = this.getItemStack().getMaxCount();
+            var max = this.getItemStack().getMaxStackSize();
             while (count > 0) {
                 var stack = this.storage.variant.toStack((int) Math.min(max, count));
                 count -= stack.getCount();
-                ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
+                Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
             }
         }
     }
 
     public int getMaxCount(ItemStack stack) {
-        return getMaxStackCount() * stack.getMaxCount();
+        return getMaxStackCount() * stack.getMaxStackSize();
     }
 
     protected int getMaxStackCount() {
-        return this.getCachedState().getBlock() instanceof ContainerBlock c ? c.maxStackCount : 0;
+        return this.getBlockState().getBlock() instanceof ContainerBlock c ? c.maxStackCount : 0;
     }
 
     public boolean matches(ItemStack stackInHand) {
@@ -156,7 +156,7 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
             var variant = this.storage.variant;
             var i = this.storage.extract(variant, amount, t);
             t.commit();
-            this.markDirty();
+            this.setChanged();
             return variant.toStack((int) i);
         }
     }
@@ -174,14 +174,14 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
     }
 
     @Override
-    public void onListenerUpdate(WorldChunk chunk) {
-        this.model = BlockBoundAttachment.get(chunk, this.pos).holder() instanceof ContainerBlock.Model model ? model : null;
+    public void onListenerUpdate(LevelChunk chunk) {
+        this.model = BlockBoundAttachment.get(chunk, this.worldPosition).holder() instanceof ContainerBlock.Model model ? model : null;
         this.updateStackWithTick();
     }
 
     @Override
-    public @Nullable Text getFilledStateText() {
-        return Text.translatable("text.polyfactory.x_out_of_y", this.storage.amount, this.storage.getCapacity());
+    public @Nullable Component getFilledStateText() {
+        return Component.translatable("text.polyfactory.x_out_of_y", this.storage.amount, this.storage.getCapacity());
     }
 
     @Override

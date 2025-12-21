@@ -3,13 +3,11 @@ package eu.pb4.polyfactory.ui;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
-
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
@@ -18,24 +16,24 @@ import static eu.pb4.polyfactory.ModInit.id;
 import static eu.pb4.polyfactory.ui.UiResourceCreator.*;
 
 public class GuiTextures {
-    public static final Function<Text, Text> CRAFTER = background("crafter");
-    public static final Function<Text, Text> GRINDER = background("grinder");
-    public static final Function<Text, Text> PRESS = background("press");
-    public static final Function<Text, Text> MIXER = background("mixer");
-    public static final Function<Text, Text> MECHANICAL_DRAIN = background("mechanical_drain");
-    public static final Function<Text, Text> MECHANICAL_SPOUT = background("mechanical_spout");
-    public static final Function<Text, Text> MECHANICAL_SPOUT_NO_CONN = background("mechanical_spout_noconn");
-    public static final Function<Text, Text> STEAM_ENGINE = background("steam_engine");
-    public static final Function<Text, Text> SMELTERY = background("smeltery");
-    public static final Function<Text, Text> PRIMITIVE_SMELTERY = background("primitive_smeltery");
-    public static final Function<Text, Text> CENTER_SLOT_GENERIC = background("center_slot");
-    public static final Function<Text, Text> FILL3 = background("fill3");
-    public static final Function<Text, Text> BLUEPRINT_WORKBENCH = background("blueprint_workbench");
-    public static final Function<Text, Text> SLOT_AWARE_FUNNEL = background("slot_aware_funnel");
-    public static final Function<Text, Text> ITEM_FILTER = background("item_filter");
-    public static final Function<Text, Text> INPUT = backgroundAnvil("input");
-    public static final Function<Text, Text> TEXT_INPUT = backgroundAnvil("text_input");
-    public static final Function<Text, Text> DATA_EXTRACTOR = backgroundAnvil("data_extractor");
+    public static final Function<Component, Component> CRAFTER = background("crafter");
+    public static final Function<Component, Component> GRINDER = background("grinder");
+    public static final Function<Component, Component> PRESS = background("press");
+    public static final Function<Component, Component> MIXER = background("mixer");
+    public static final Function<Component, Component> MECHANICAL_DRAIN = background("mechanical_drain");
+    public static final Function<Component, Component> MECHANICAL_SPOUT = background("mechanical_spout");
+    public static final Function<Component, Component> MECHANICAL_SPOUT_NO_CONN = background("mechanical_spout_noconn");
+    public static final Function<Component, Component> STEAM_ENGINE = background("steam_engine");
+    public static final Function<Component, Component> SMELTERY = background("smeltery");
+    public static final Function<Component, Component> PRIMITIVE_SMELTERY = background("primitive_smeltery");
+    public static final Function<Component, Component> CENTER_SLOT_GENERIC = background("center_slot");
+    public static final Function<Component, Component> FILL3 = background("fill3");
+    public static final Function<Component, Component> BLUEPRINT_WORKBENCH = background("blueprint_workbench");
+    public static final Function<Component, Component> SLOT_AWARE_FUNNEL = background("slot_aware_funnel");
+    public static final Function<Component, Component> ITEM_FILTER = background("item_filter");
+    public static final Function<Component, Component> INPUT = backgroundAnvil("input");
+    public static final Function<Component, Component> TEXT_INPUT = backgroundAnvil("text_input");
+    public static final Function<Component, Component> DATA_EXTRACTOR = backgroundAnvil("data_extractor");
     public static final Supplier<GuiElementBuilder> EMPTY_BUILDER = icon16("empty");
     public static final GuiElement EMPTY = EMPTY_BUILDER.get().hideTooltip().build();
     public static final Supplier<GuiElementBuilder> POLYDEX_BUTTON = icon32("polydex");
@@ -117,7 +115,7 @@ public class GuiTextures {
 
             return fire.get(progress);
         }
-        public ItemStack getNamed(float progress, Text text) {
+        public ItemStack getNamed(float progress, Component text) {
             if (progress < 0) {
                 return ice.getNamed(-progress, text);
             }
@@ -135,9 +133,9 @@ public class GuiTextures {
             return elements[Math.min((int) Math.ceil(progress * elements.length), elements.length - 1)];
         }
 
-        public ItemStack getNamed(float progress, Text text) {
+        public ItemStack getNamed(float progress, Component text) {
             var base = withTooltip[Math.min((int) (progress * withTooltip.length), withTooltip.length - 1)].copy();
-            base.set(DataComponentTypes.ITEM_NAME, text);
+            base.set(DataComponents.ITEM_NAME, text);
             return base;
         }
 

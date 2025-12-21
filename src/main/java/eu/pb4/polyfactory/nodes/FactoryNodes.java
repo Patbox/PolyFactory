@@ -16,12 +16,12 @@ import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
 import eu.pb4.polyfactory.nodes.pipe.FlowData;
 import eu.pb4.polyfactory.nodes.pipe.NozzleNode;
 import eu.pb4.polyfactory.nodes.pipe.PumpNode;
-import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
+import net.minecraft.core.BlockPos;
 
 import static eu.pb4.polyfactory.ModInit.id;
 

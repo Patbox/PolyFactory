@@ -2,34 +2,33 @@ package eu.pb4.polyfactory.entity.configurable;
 
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Unit;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 
-public record EntityConfig<T, E extends Entity>(String id, Text name, Codec<T> codec, EntityConfigValue<T, E> value, EntityValueFormatter<T, E> formatter,
+public record EntityConfig<T, E extends Entity>(String id, Component name, Codec<T> codec, EntityConfigValue<T, E> value, EntityValueFormatter<T, E> formatter,
                                                 WrenchModifyEntityValue<T, E> action, WrenchModifyEntityValue<T, E> alt) {
     public static EntityConfig<Float, ?> PITCH = of("pitch", Codec.FLOAT,
-            EntityConfigValue.of(Entity::getPitch, Entity::setPitch),
-            EntityValueFormatter.str(x -> String.valueOf((int) MathHelper.wrap(x, 90))),
-            WrenchModifyEntityValue.simple((a, b) -> (float) MathHelper.wrapDegrees(Math.round(a) + (b ? 1 : -1)))
-    ).withAlt((value1, next, player, entity, targetPos) -> player.getPitch());
+            EntityConfigValue.of(Entity::getXRot, Entity::setXRot),
+            EntityValueFormatter.str(x -> String.valueOf((int) Mth.triangleWave(x, 90))),
+            WrenchModifyEntityValue.simple((a, b) -> (float) Mth.wrapDegrees(Math.round(a) + (b ? 1 : -1)))
+    ).withAlt((value1, next, player, entity, targetPos) -> player.getXRot());
 
     public static EntityConfig<Float, ?> YAW = of("yaw", Codec.FLOAT,
-            EntityConfigValue.of(Entity::getYaw, Entity::setYaw),
-            EntityValueFormatter.str(x -> String.valueOf((int) MathHelper.wrapDegrees(x))),
-            WrenchModifyEntityValue.simple((a, b) -> (float) MathHelper.wrapDegrees(Math.round(a) + (b ? 1 : -1)))
-    ).withAlt((value1, next, player, entity, targetPos) -> player.getYaw());
+            EntityConfigValue.of(Entity::getYRot, Entity::setYRot),
+            EntityValueFormatter.str(x -> String.valueOf((int) Mth.wrapDegrees(x))),
+            WrenchModifyEntityValue.simple((a, b) -> (float) Mth.wrapDegrees(Math.round(a) + (b ? 1 : -1)))
+    ).withAlt((value1, next, player, entity, targetPos) -> player.getYRot());
 
     public static EntityConfig<?, ?> DISMOUNT = of("dismount", Unit.CODEC,
-            EntityConfigValue.of(x -> x.hasPassengers() ? Unit.INSTANCE : null, (a, b) -> a.removeAllPassengers()),
+            EntityConfigValue.of(x -> x.isVehicle() ? Unit.INSTANCE : null, (a, b) -> a.ejectPassengers()),
             (unused, entity, pos) -> {
                 var passenger = entity.getFirstPassenger();
                 if (passenger == null) {
-                    return Text.translatable("text.polyfactory.none_wrapped").formatted(Formatting.GRAY);
+                    return Component.translatable("text.polyfactory.none_wrapped").withStyle(ChatFormatting.GRAY);
                 }
                 return passenger.getName();
             },
@@ -38,7 +37,7 @@ public record EntityConfig<T, E extends Entity>(String id, Text name, Codec<T> c
 
     public static <T, E extends Entity> EntityConfig<T, E> of(String id, Codec<T> codec, EntityConfigValue<T, E> value, EntityValueFormatter<T, E> formatter,
                                                               WrenchModifyEntityValue<T, E> action) {
-        return new EntityConfig<T, E>(id, Text.translatable("item.polyfactory.wrench.action." + id),
+        return new EntityConfig<T, E>(id, Component.translatable("item.polyfactory.wrench.action." + id),
                 codec,
                 value,
                 formatter,
@@ -47,7 +46,7 @@ public record EntityConfig<T, E extends Entity>(String id, Text name, Codec<T> c
 
     public static <T, E extends Entity> EntityConfig<T, E> of(String id, Codec<T> codec, EntityConfigValue<T, E> value,
                                                               WrenchModifyEntityValue<T, E> action) {
-        return new EntityConfig<T, E>(id, Text.translatable("item.polyfactory.wrench.action." + id),
+        return new EntityConfig<T, E>(id, Component.translatable("item.polyfactory.wrench.action." + id),
                 codec,
                 value,
                 EntityValueFormatter.getDefault(),
@@ -59,7 +58,7 @@ public record EntityConfig<T, E extends Entity>(String id, Text name, Codec<T> c
         return new EntityConfig<>(this.id, this.name, this.codec, this.value, this.formatter, this.action, alt);
     }
 
-    public Text getDisplayValue(E entity, Vec3d pos) {
+    public Component getDisplayValue(E entity, Vec3 pos) {
         return this.formatter.getDisplayValue(this.value.getValue(entity, pos), entity, pos);
     }
 

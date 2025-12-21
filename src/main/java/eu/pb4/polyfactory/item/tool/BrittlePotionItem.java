@@ -2,45 +2,35 @@ package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
-import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.potion.Potions;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.stat.Stats;
-import net.minecraft.text.Text;
-import net.minecraft.world.World;
-import net.minecraft.world.event.GameEvent;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
 
 public class BrittlePotionItem extends Item implements PolymerItem {
-    public BrittlePotionItem(Settings settings) {
+    public BrittlePotionItem(Properties settings) {
         super(settings);
     }
 
 
-    public ItemStack getDefaultStack() {
-        ItemStack itemStack = super.getDefaultStack();
-        itemStack.set(DataComponentTypes.POTION_CONTENTS, new PotionContentsComponent(Potions.WATER));
+    public ItemStack getDefaultInstance() {
+        ItemStack itemStack = super.getDefaultInstance();
+        itemStack.set(DataComponents.POTION_CONTENTS, new PotionContents(Potions.WATER));
         return itemStack;
     }
 
     @Override
-    public Text getName(ItemStack stack) {
-        return Text.translatable(this.getTranslationKey(),
-                stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT).getName(Items.POTION.getTranslationKey() + ".effect."));
+    public Component getName(ItemStack stack) {
+        return Component.translatable(this.getDescriptionId(),
+                stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).getName(Items.POTION.getDescriptionId() + ".effect."));
     }
 
     @Override

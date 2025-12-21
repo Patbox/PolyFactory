@@ -17,30 +17,32 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.WorldlyContainerHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;
@@ -50,50 +52,50 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.Collection;
 import java.util.List;
 
-public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockEntityProvider, InventoryProvider, RotationUser {
-    public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
-    public static final BooleanProperty LIT = Properties.LIT;
+public class SteamEngineBlock extends MultiBlock implements FactoryBlock, EntityBlock, WorldlyContainerHolder, RotationUser {
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
-    public SteamEngineBlock(Settings settings) {
+    public SteamEngineBlock(Properties settings) {
         super(2, 3, 2, settings);
         Model.AXLE.getItem();
-        this.setDefaultState(this.getDefaultState().with(LIT, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(LIT, false));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, LIT);
-        super.appendProperties(builder);
+        super.createBlockStateDefinition(builder);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (getY(state) != 2 && !player.isSneaking() && world.getBlockEntity(getCenter(state, pos)) instanceof SteamEngineBlockEntity be) {
-            be.openGui((ServerPlayerEntity) player);
-            return ActionResult.SUCCESS_SERVER;
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (getY(state) != 2 && !player.isShiftKeyDown() && world.getBlockEntity(getCenter(state, pos)) instanceof SteamEngineBlockEntity be) {
+            be.openGui((ServerPlayer) player);
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return this.defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
     }
 
     @Override
     public int getMaxX(BlockState state) {
-        return state.get(FACING).getAxis() == Direction.Axis.X ? 0 : 1;
+        return state.getValue(FACING).getAxis() == Direction.Axis.X ? 0 : 1;
     }
 
     @Override
     public int getMaxZ(BlockState state) {
-        return state.get(FACING).getAxis() == Direction.Axis.Z ? 0 : 1;
+        return state.getValue(FACING).getAxis() == Direction.Axis.Z ? 0 : 1;
     }
 
     @Override
-    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerWorld world, BlockPos pos) {
+    public void updateRotationalData(RotationData.State modifier, BlockState state, ServerLevel world, BlockPos pos) {
         var center = this.getCenter(state, pos);
         if (world.getBlockEntity(center) instanceof SteamEngineBlockEntity be) {
             be.updateRotationalData(modifier, state, world, pos);
@@ -102,71 +104,71 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
 
 
     @Override
-    protected void onPlacedMultiBlock(World world, BlockPos pos, BlockState state, PlayerEntity player, ItemStack stack) {
+    protected void onPlacedMultiBlock(Level world, BlockPos pos, BlockState state, Player player, ItemStack stack) {
         if (getY(state) == 2) {
             NetworkComponent.Rotational.updateRotationalAt(world, pos);
         }
     }
 
     @Override
-    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        super.onBlockAdded(state, world, pos, oldState, notify);
+    protected void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+        super.onPlace(state, world, pos, oldState, notify);
         if (getY(state) == 2) {
             NetworkComponent.Rotational.updateRotationalAt(world, pos);
         }
     }
 
     @Override
-    protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        super.onStateReplaced(state, world, pos, moved);
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
+        super.affectNeighborsAfterRemoval(state, world, pos, moved);
         if (getY(state) == 2) {
             NetworkComponent.Rotational.updateRotationalAt(world, pos);
         }
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return isCenter(initialBlockState) ? new Model(initialBlockState) : null;
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return isCenter(state) ? new SteamEngineBlockEntity(pos, state) : null;
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return isCenter(state) ? SteamEngineBlockEntity::tick : null;
     }
 
     @Override
-    public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
+    public WorldlyContainer getContainer(BlockState state, LevelAccessor world, BlockPos pos) {
         var center = this.getCenter(state, pos);
         var be = world.getBlockEntity(center);
 
-        return be instanceof SidedInventory inv ? inv : null;
+        return be instanceof WorldlyContainer inv ? inv : null;
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.DEEPSLATE_BRICKS.getDefaultState();
+        return Blocks.DEEPSLATE_BRICKS.defaultBlockState();
     }
 
     @Override
-    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerLevel world, BlockPos pos) {
         return getY(state) == 2 ? List.of(getX(state) == 0 && getZ(state) == 0 ?
-                new FunctionalAxisNode(state.get(FACING).rotateYCounterclockwise().getAxis()) : new SimpleAxisNode(state.get(FACING).rotateYCounterclockwise().getAxis())) : List.of();
+                new FunctionalAxisNode(state.getValue(FACING).getCounterClockWise().getAxis()) : new SimpleAxisNode(state.getValue(FACING).getCounterClockWise().getAxis())) : List.of();
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
@@ -182,10 +184,10 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
         private final LodItemDisplayElement axle;
 
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.get(SteamEngineBlock.LIT) ? LIT : FactoryItems.STEAM_ENGINE.getDefaultStack());
+            this.main = ItemDisplayElementUtil.createSimple(state.getValue(SteamEngineBlock.LIT) ? LIT : FactoryItems.STEAM_ENGINE.getDefaultInstance());
             this.main.setScale(new Vector3f(2));
-            var facing = state.get(FACING);
-            var offset = new Vec3d(
+            var facing = state.getValue(FACING);
+            var offset = new Vec3(
                     facing.getAxis() == Direction.Axis.Z ? 0.5f : 0,
                     -1,
                     facing.getAxis() == Direction.Axis.X ? 0.5f : 0
@@ -206,8 +208,8 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
 
 
             this.updateStatePos(state);
-            var dir = state.get(FACING);
-            this.updateAnimation(0, (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
+            var dir = state.getValue(FACING);
+            this.updateAnimation(0, (dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
             this.addElement(this.main);
             this.addElement(this.rotatingA);
             this.addElement(this.rotatingB);
@@ -215,22 +217,22 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
         }
 
         private void updateStatePos(BlockState state) {
-            var direction = state.get(FACING);
+            var direction = state.getValue(FACING);
 
-            this.main.setYaw(direction.getPositiveHorizontalDegrees());
-            this.main.setItem(state.get(SteamEngineBlock.LIT) ? LIT : FactoryItems.STEAM_ENGINE.getDefaultStack());
-            this.axle.setYaw(direction.getPositiveHorizontalDegrees());
-            this.rotatingA.setYaw(direction.getPositiveHorizontalDegrees());
-            this.rotatingB.setYaw(direction.getPositiveHorizontalDegrees());
+            this.main.setYaw(direction.toYRot());
+            this.main.setItem(state.getValue(SteamEngineBlock.LIT) ? LIT : FactoryItems.STEAM_ENGINE.getDefaultInstance());
+            this.axle.setYaw(direction.toYRot());
+            this.rotatingA.setYaw(direction.toYRot());
+            this.rotatingB.setYaw(direction.toYRot());
         }
 
         private void updateAnimation(float rotation, boolean negative) {
             rotation = negative ? rotation : -rotation;
             this.axle.setLeftRotation(new Quaternionf().rotateX(rotation));
 
-            var sin = MathHelper.sin(rotation);
-            var cos = MathHelper.cos(rotation);
-            var sin2 = MathHelper.sin(rotation - MathHelper.HALF_PI) * 0.6f;
+            var sin = Mth.sin(rotation);
+            var cos = Mth.cos(rotation);
+            var sin2 = Mth.sin(rotation - Mth.HALF_PI) * 0.6f;
 
             mat.identity()
                     .translate(-8f / 16, sin * -10 / 16f, cos * 10 / 16f)
@@ -257,9 +259,9 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, BlockE
         @Override
         protected void onTick() {
             if (this.getTick() % this.getUpdateRate() == 0) {
-                var dir = this.blockState().get(FACING);
-                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().up()).rotation(),
-                        (dir.getDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
+                var dir = this.blockState().getValue(FACING);
+                this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().above()).rotation(),
+                        (dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
                 //if (this.whisk.isDirty()) {
                 //    this.whisk.startInterpolation();
                 //}

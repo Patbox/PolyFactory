@@ -5,53 +5,50 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.factorytools.api.advancement.FactoryAdvancementCriteria;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.fluid.FluidInstance;
-import net.minecraft.advancement.AdvancementCriterion;
-import net.minecraft.advancement.criterion.AbstractCriterion;
-import net.minecraft.item.ItemStack;
-import net.minecraft.predicate.NumberRange;
-import net.minecraft.predicate.entity.LootContextPredicate;
-import net.minecraft.predicate.item.ItemPredicate;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.advancements.Criterion;
+import net.minecraft.advancements.criterion.ContextAwarePredicate;
+import net.minecraft.advancements.criterion.ItemPredicate;
+import net.minecraft.advancements.criterion.SimpleCriterionTrigger;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 
-public class FluidShootsCriterion extends AbstractCriterion<FluidShootsCriterion.Condition> {
-    public static AdvancementCriterion<?> ofNozzle(FluidInstance<?>... fluids) {
-        return PolyFactoryAdvancementCriteria.NOZZLE_SHOOTS.create(new Condition(Optional.empty(), List.of(fluids)));
+public class FluidShootsCriterion extends SimpleCriterionTrigger<FluidShootsCriterion.Condition> {
+    public static Criterion<?> ofNozzle(FluidInstance<?>... fluids) {
+        return PolyFactoryAdvancementCriteria.NOZZLE_SHOOTS.createCriterion(new Condition(Optional.empty(), List.of(fluids)));
     }
 
-    public static AdvancementCriterion<?> ofFluidLauncher(FluidInstance<?>... fluids) {
-        return PolyFactoryAdvancementCriteria.FLUID_LAUNCHER_SHOOTS.create(new Condition(Optional.empty(), List.of(fluids)));
+    public static Criterion<?> ofFluidLauncher(FluidInstance<?>... fluids) {
+        return PolyFactoryAdvancementCriteria.FLUID_LAUNCHER_SHOOTS.createCriterion(new Condition(Optional.empty(), List.of(fluids)));
     }
 
-    public static AdvancementCriterion<?> ofFluidLauncher(ItemPredicate.Builder builder, FluidInstance<?>... fluids) {
-        return PolyFactoryAdvancementCriteria.FLUID_LAUNCHER_SHOOTS.create(new Condition(Optional.of(builder.build()), List.of(fluids)));
+    public static Criterion<?> ofFluidLauncher(ItemPredicate.Builder builder, FluidInstance<?>... fluids) {
+        return PolyFactoryAdvancementCriteria.FLUID_LAUNCHER_SHOOTS.createCriterion(new Condition(Optional.of(builder.build()), List.of(fluids)));
     }
 
-    public static void triggerNozzle(ServerPlayerEntity player, FluidInstance<?> instance) {
+    public static void triggerNozzle(ServerPlayer player, FluidInstance<?> instance) {
         PolyFactoryAdvancementCriteria.NOZZLE_SHOOTS.trigger(player, condition -> condition.fluids.isEmpty() || condition.fluids.contains(instance));
     }
 
-    public static void triggerFluidLauncher(ServerPlayerEntity player, ItemStack stack, FluidInstance<?> instance) {
+    public static void triggerFluidLauncher(ServerPlayer player, ItemStack stack, FluidInstance<?> instance) {
         PolyFactoryAdvancementCriteria.FLUID_LAUNCHER_SHOOTS.trigger(player, condition ->
                 (condition.fluids.isEmpty() || condition.fluids.contains(instance))
                         && (condition.itemPredicate.isEmpty() || condition.itemPredicate.get().test(stack)));
     }
 
     @Override
-    public Codec<FluidShootsCriterion.Condition> getConditionsCodec() {
+    public Codec<FluidShootsCriterion.Condition> codec() {
         return Condition.CODEC;
     }
 
-    public record Condition(Optional<ItemPredicate> itemPredicate, List<FluidInstance<?>> fluids) implements Conditions {
+    public record Condition(Optional<ItemPredicate> itemPredicate, List<FluidInstance<?>> fluids) implements SimpleInstance {
         public static final Codec<Condition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 ItemPredicate.CODEC.optionalFieldOf("item").forGetter(Condition::itemPredicate),
                 FluidInstance.CODEC.listOf().fieldOf("fluid").forGetter(Condition::fluids)
         ).apply(instance, Condition::new));
         @Override
-        public Optional<LootContextPredicate> player() {
+        public Optional<ContextAwarePredicate> player() {
             return Optional.empty();
         }
     }

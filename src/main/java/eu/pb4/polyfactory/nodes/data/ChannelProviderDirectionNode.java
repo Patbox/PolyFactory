@@ -12,13 +12,11 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.generic.FunctionalNode;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import net.minecraft.core.Direction;
 
 
 public record ChannelProviderDirectionNode(Direction direction, int channel) implements FunctionalNode, DirectionNode, DataProviderNode {
@@ -34,7 +32,7 @@ public record ChannelProviderDirectionNode(Direction direction, int channel) imp
 
     @Override
     public @NotNull Collection<HalfLink> findConnections(@NotNull NodeHolder<BlockNode> self) {
-        return self.getGraphWorld().getNodesAt(self.getBlockPos().offset(this.direction))
+        return self.getGraphWorld().getNodesAt(self.getBlockPos().relative(this.direction))
                 .filter(x -> FactoryNodes.canBothConnect(self, x)).map(x -> new HalfLink(EmptyLinkKey.INSTANCE, x)).toList();
     }
 

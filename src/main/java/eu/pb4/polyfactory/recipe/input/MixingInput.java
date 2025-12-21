@@ -2,16 +2,15 @@ package eu.pb4.polyfactory.recipe.input;
 
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.recipe.input.RecipeInput;
-import net.minecraft.world.World;
-
 import java.util.List;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.level.Level;
 
-public record MixingInput(List<ItemStack> stacks, FluidContainerInput fluidContainer, World world) implements RecipeInput {
+public record MixingInput(List<ItemStack> stacks, FluidContainerInput fluidContainer, Level world) implements RecipeInput {
     @Override
-    public ItemStack getStackInSlot(int slot) {
+    public ItemStack getItem(int slot) {
         return this.stacks.get(slot);
     }
 
@@ -20,8 +19,8 @@ public record MixingInput(List<ItemStack> stacks, FluidContainerInput fluidConta
         return this.stacks.size();
     }
 
-    public CraftingRecipeInput asCraftingRecipeInput() {
-        return CraftingRecipeInput.create(2, 3, this.stacks);
+    public CraftingInput asCraftingRecipeInput() {
+        return CraftingInput.of(2, 3, this.stacks);
     }
 
     public long getFluid(FluidInstance<?> type) {

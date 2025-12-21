@@ -12,15 +12,15 @@ import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
@@ -54,7 +54,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
 
     @Nullable
     public SentData getData(int channel) {
-        if (channel == -1 || this.ctx == null || !(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
+        if (channel == -1 || this.ctx == null || !(this.ctx.getBlockWorld() instanceof ServerLevel world)) {
             return null;
         }
 
@@ -96,7 +96,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
 
     @Override
     public void onTick() {
-        if (this.ctx == null || !(this.ctx.getBlockWorld() instanceof ServerWorld world)) {
+        if (this.ctx == null || !(this.ctx.getBlockWorld() instanceof ServerLevel world)) {
             return;
         }
 
@@ -130,7 +130,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
     public void onPostNodeCreated(@NotNull NodeHolder<BlockNode> node, @Nullable NodeEntity nodeEntity) {
         GraphEntity.super.onPostNodeCreated(node, nodeEntity);
         storeReceiverOrProvider(node);
-        if (node.getBlockWorld() instanceof ServerWorld serverWorld) {
+        if (node.getBlockWorld() instanceof ServerLevel serverWorld) {
             if (node.getNode() instanceof DataProviderNode providerNode) {
                 var state = node.getBlockWorld().getBlockState(node.getBlockPos());
                 if (state.getBlock() instanceof DataProvider provider && providerNode.channel() != -1) {
@@ -223,7 +223,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 for (var x : this.receivers.get(channel.intValue())) {
                     var state = this.ctx.getBlockWorld().getBlockState(x.pos());
                     if (state.getBlock() instanceof DataReceiver receiver) {
-                        receiver.receiveData((ServerWorld) this.ctx.getBlockWorld(), x.pos(), state, channel, data.container, x.node(), data.pos, data.direction);
+                        receiver.receiveData((ServerLevel) this.ctx.getBlockWorld(), x.pos(), state, channel, data.container, x.node(), data.pos, data.direction);
                     }
                 }
             }

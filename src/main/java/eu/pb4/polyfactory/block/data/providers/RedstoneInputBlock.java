@@ -9,88 +9,88 @@ import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.RedstoneData;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 public class RedstoneInputBlock extends DirectionalCabledDataProviderBlock implements RedstoneConnectable {
-    public static final IntProperty POWER = RedstoneOutputBlock.POWER;
+    public static final IntegerProperty POWER = RedstoneOutputBlock.POWER;
 
-    public RedstoneInputBlock(AbstractBlock.Settings settings) {
+    public RedstoneInputBlock(BlockBehaviour.Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(POWER, 0));
+        this.registerDefaultState(this.defaultBlockState().setValue(POWER, 0));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(POWER);
     }
 
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return super.getPlacementState(ctx).with(POWER, clamp(ctx.getWorld().getReceivedRedstonePower(ctx.getBlockPos())));
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return super.getStateForPlacement(ctx).setValue(POWER, clamp(ctx.getLevel().getBestNeighborSignal(ctx.getClickedPos())));
     }
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        super.onPlaced(world, pos, state, placer, itemStack);
-        sendData((ServerWorld) world, pos, new RedstoneData(state.get(POWER)));
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.setPlacedBy(world, pos, state, placer, itemStack);
+        sendData((ServerLevel) world, pos, new RedstoneData(state.getValue(POWER)));
     }
 
     private int clamp(int receivedRedstonePower) {
-        return MathHelper.clamp(receivedRedstonePower, 0, 15);
+        return Mth.clamp(receivedRedstonePower, 0, 15);
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
-        if (!world.isClient()) {
-            var power = state.get(POWER);
-            var dir = state.get(FACING);
-            var input = clamp(world.getEmittedRedstonePower(pos.offset(dir), dir));
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, @Nullable Orientation wireOrientation, boolean notify) {
+        if (!world.isClientSide()) {
+            var power = state.getValue(POWER);
+            var dir = state.getValue(FACING);
+            var input = clamp(world.getSignal(pos.relative(dir), dir));
             if (power != input) {
-                world.setBlockState(pos, state.with(POWER, input), Block.NOTIFY_LISTENERS);
-                sendData((ServerWorld) world, pos, new RedstoneData(input));
+                world.setBlock(pos, state.setValue(POWER, input), Block.UPDATE_CLIENTS);
+                sendData((ServerLevel) world, pos, new RedstoneData(input));
             }
         }
     }
 
-    public static int sendData(WorldView world, BlockPos selfPos, DataContainer data) {
+    public static int sendData(LevelReader world, BlockPos selfPos, DataContainer data) {
         var i = DataProvider.sendData(world, selfPos, data);
-        if (i > 0 && FactoryUtil.getClosestPlayer((World) world, selfPos, 32) instanceof ServerPlayerEntity player) {
+        if (i > 0 && FactoryUtil.getClosestPlayer((Level) world, selfPos, 32) instanceof ServerPlayer player) {
             TriggerCriterion.trigger(player, FactoryTriggers.REDSTONE_IN);
         }
         return i;
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new RedstoneOutputBlock.Model(initialBlockState);
     }
 
     @Override
     public boolean canRedstoneConnect(BlockState state, @Nullable Direction dir) {
-        return state.get(FACING).getOpposite() == dir;
+        return state.getValue(FACING).getOpposite() == dir;
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
+        return Blocks.IRON_BLOCK.defaultBlockState();
     }
 }

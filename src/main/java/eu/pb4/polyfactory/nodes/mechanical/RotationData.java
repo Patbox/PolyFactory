@@ -22,12 +22,12 @@ import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2FloatOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.fabric.api.util.TriState;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +47,7 @@ public class RotationData implements GraphEntity<RotationData> {
     public static final GraphEntityType<RotationData> TYPE = GraphEntityType.of(id("rotation_info"), CODEC, RotationData::new, RotationData::split);
     public static RotationData EMPTY = new RotationData() {
         @Override
-        public void update(ServerWorld world) {
+        public void update(ServerLevel world) {
         }
     };
     protected boolean overstressed = false;
@@ -75,7 +75,7 @@ public class RotationData implements GraphEntity<RotationData> {
         for (var connection : connectors) {
             //DebugInfoSender.addGameTestMarker((ServerWorld) connection.getBlockWorld(), connection.getBlockPos(), "Alt", 0x88FFFF66, 50 * 4 * 20);
 
-            var connectGraph = Objects.requireNonNull(FactoryNodes.ROTATIONAL_CONNECTOR.getGraphWorld((ServerWorld) connection.getBlockWorld()))
+            var connectGraph = Objects.requireNonNull(FactoryNodes.ROTATIONAL_CONNECTOR.getGraphWorld((ServerLevel) connection.getBlockWorld()))
                     .getAllGraphsAt(connection.getBlockPos()).findFirst();
             if (connectGraph.isPresent() /*&& checked2.add(connectGraph.get().getId())*/) {
                 var self = connectGraph.get().getNodesAt(connection.getBlockPos()).findFirst();
@@ -110,7 +110,7 @@ public class RotationData implements GraphEntity<RotationData> {
             } else if (blockNodeNodeHolder.getNode() instanceof LargeGearNode a) {
                 var delta = blockNodeNodeHolder.getBlockPos().subtract(x.getBlockPos());
 
-                nextDirection = (delta.getComponentAlongAxis(a.axis()) == delta.getComponentAlongAxis(((LargeGearNode) x.getNode()).axis())) == currentDirection;
+                nextDirection = (delta.get(a.axis()) == delta.get(((LargeGearNode) x.getNode()).axis())) == currentDirection;
             } else {
                 nextDirection = !currentDirection;
             }
@@ -126,7 +126,7 @@ public class RotationData implements GraphEntity<RotationData> {
 
             if (dirMap.containsKey(targetGraph.getId())) {
                 if (dirMap.get(targetGraph.getId()) == !nextDirection
-                        || !MathHelper.approximatelyEquals(speedMap.get(targetGraph.getId()), nextGearSpeed)) {
+                        || !Mth.equal(speedMap.get(targetGraph.getId()), nextGearSpeed)) {
                     clogged.setTrue();
                 }
             } else {
@@ -177,8 +177,8 @@ public class RotationData implements GraphEntity<RotationData> {
         return this.negative;
     }
 
-    public void update(ServerWorld world) {
-        var currentTick = world.getServer().getTicks();
+    public void update(ServerLevel world) {
+        var currentTick = world.getServer().getTickCount();
         if (this.ctx == null || this.lastTick == currentTick) {
             return;
         }
@@ -261,10 +261,10 @@ public class RotationData implements GraphEntity<RotationData> {
                 speed = -speed;
             }
 
-            var baseDelta = speed * MathHelper.RADIANS_PER_DEGREE * delta;
-            float r = Math.abs((float) ((baseDelta + this.rotationValue) % (MathHelper.TAU * biggest)));
+            var baseDelta = speed * Mth.DEG_TO_RAD * delta;
+            float r = Math.abs((float) ((baseDelta + this.rotationValue) % (Mth.TWO_PI * biggest)));
 
-            var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_3 - MathHelper.RADIANS_PER_DEGREE * 15) * delta;
+            var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_3 - Mth.DEG_TO_RAD * 15) * delta;
 
             /*final var deg45 = (MathHelper.PI / 8);
 
@@ -296,7 +296,7 @@ public class RotationData implements GraphEntity<RotationData> {
                 if (Math.abs(baseDelta / div) < rotMax) {
                     data.rotation = data.rotationValue;
                 } else {
-                    data.rotation = (data.rotation + (data.negative ? -rotMax : rotMax)) % MathHelper.TAU;
+                    data.rotation = (data.rotation + (data.negative ? -rotMax : rotMax)) % Mth.TWO_PI;
                 }
             }
         }
@@ -304,13 +304,13 @@ public class RotationData implements GraphEntity<RotationData> {
 
     private void spawnSmoke(NodeHolder<BlockNode> entry) {
         if (entry.getNode() instanceof FunctionalNode) {
-            var world = (ServerWorld) this.ctx.getBlockWorld();
+            var world = (ServerLevel) this.ctx.getBlockWorld();
             var pos = entry.getBlockPos();
-            world.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.3, 0.3, 0.3, 0.2);
+            world.sendParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.3, 0.3, 0.3, 0.2);
         }
     }
 
-    private void calculateState(ServerWorld world, State state) {
+    private void calculateState(ServerLevel world, State state) {
         var list = this.ctx.getGraph().getCachedNodes(FunctionalDirectionNode.CACHE);
 
         if (list.isEmpty()) {
@@ -341,7 +341,7 @@ public class RotationData implements GraphEntity<RotationData> {
         this.speed = Math.abs(state.finalSpeed() / state.providerCount);
     }
 
-    private void updateSelf(ServerWorld world, float delta) {
+    private void updateSelf(ServerLevel world, float delta) {
         var graph = this.ctx.getGraph();
         var state = new State();
         calculateState(world, state);
@@ -349,27 +349,27 @@ public class RotationData implements GraphEntity<RotationData> {
 
         this.negative = state.speed == 0 ? this.negative : state.speed < 0;
 
-        var speed = this.speed != 0 ? this.speed * MathHelper.sign(state.speed) : 0;
+        var speed = this.speed != 0 ? this.speed * Mth.sign(state.speed) : 0;
 
         if (this.overstressed) {
             for (var entry : graph.getCachedNodes(FunctionalDirectionNode.CACHE)) {
                 var pos = entry.getBlockPos();
-                world.spawnParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.3, 0.3, 0.3, 0.2);
+                world.sendParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.3, 0.3, 0.3, 0.2);
             }
             return;
         }
 
-        var baseDelta = speed * MathHelper.RADIANS_PER_DEGREE * delta;
-        float r = (float) ((baseDelta + this.rotationValue) % MathHelper.TAU);
+        var baseDelta = speed * Mth.DEG_TO_RAD * delta;
+        float r = (float) ((baseDelta + this.rotationValue) % Mth.TWO_PI);
 
-        var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_3 - MathHelper.RADIANS_PER_DEGREE * 15) * delta;
+        var rotMax = (RotationConstants.MAX_ROTATION_PER_TICK_3 - Mth.DEG_TO_RAD * 15) * delta;
 
         this.rotationValue = r;//(this.negative ? -r : r);
 
         if (Math.abs(baseDelta) < rotMax) {
             this.rotation = this.rotationValue;
         } else {
-            this.rotation = (this.rotation + (this.negative ? -rotMax : rotMax)) % MathHelper.TAU;
+            this.rotation = (this.rotation + (this.negative ? -rotMax : rotMax)) % Mth.TWO_PI;
         }
     }
 
@@ -411,20 +411,20 @@ public class RotationData implements GraphEntity<RotationData> {
         return this.overstressed;
     }
     @Nullable
-    public Text getStateText() {
+    public Component getStateText() {
         if (this.overstressed) {
             return this.stressCapacity == 0 ? MachineInfoProvider.LOCKED_TEXT : MachineInfoProvider.OVERSTRESSED_TEXT;
         }
         return null;
     }
 
-    public Text getStateTextOrElse(Text fallback) {
+    public Component getStateTextOrElse(Component fallback) {
         var state = getStateText();
         return state != null ? state : fallback;
     }
 
     public float speedRadians() {
-        return (float) (this.speed * (this.negative ? -1 : 1) * MathHelper.RADIANS_PER_DEGREE);
+        return (float) (this.speed * (this.negative ? -1 : 1) * Mth.DEG_TO_RAD);
     }
 
     public static class State {

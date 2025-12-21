@@ -12,14 +12,11 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.CustomModelDataTintSource;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomModelData;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
@@ -61,8 +58,8 @@ public class FluidModel {
     }
 
     protected void runStuff() {
-        for (var fluid : FactoryRegistries.FLUID_TYPES.getIds()) {
-            this.handleFluidTexture(fluid, Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.get(fluid)), function);
+        for (var fluid : FactoryRegistries.FLUID_TYPES.keySet()) {
+            this.handleFluidTexture(fluid, Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.getValue(fluid)), function);
         }
 
         RegistryEntryAddedCallback.event(FactoryRegistries.FLUID_TYPES).register((rawId, id, object) -> {
@@ -83,7 +80,7 @@ public class FluidModel {
         }
         stack = stack.copy();
         //noinspection unchecked
-        stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), IntList.of((fluid.color().get()).getColor(data))));
+        stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), IntList.of((fluid.color().get()).getColor(data))));
         return stack;
     }
 
@@ -97,13 +94,13 @@ public class FluidModel {
     protected void addTextures(Identifier id, FluidType<?> object, Function<ModelRenderType, Item> function) {
         this.textures.add(new Texture(id, object.texture(), object.color().isPresent() || this.alwaysColored));
         var stack = new ItemStack(function.apply(this.alwaysColored ? ModelRenderType.COLORED : object.modelRenderType()));
-        stack.set(DataComponentTypes.ITEM_MODEL, bridgeModelNoItem(this.baseModel.withSuffixedPath("/" + id.getNamespace() + "/" + id.getPath())));
+        stack.set(DataComponents.ITEM_MODEL, bridgeModelNoItem(this.baseModel.withSuffix("/" + id.getNamespace() + "/" + id.getPath())));
         this.model.put(object, stack);
     }
 
     protected void generateAssets(BiConsumer<String, byte[]> assetWriter) {
         for (var fluid : this.textures) {
-            var modelId = bridgeModelNoItem(baseModel.withSuffixedPath("/" + fluid.id().getNamespace() + "/" + fluid.id().getPath()));
+            var modelId = bridgeModelNoItem(baseModel.withSuffix("/" + fluid.id().getNamespace() + "/" + fluid.id().getPath()));
             assetWriter.accept(AssetPaths.model(modelId) + ".json",
                     BASE_MODEL.replace("|BASE|", this.baseModel.toString())
                             .replace("|ID|", fluid.texture().toString())
@@ -126,7 +123,7 @@ public class FluidModel {
     }
 
     public Identifier getModelId(Identifier type) {
-        return bridgeModelNoItem(baseModel.withSuffixedPath("/" + type.getNamespace() + "/" + type.getPath()));
+        return bridgeModelNoItem(baseModel.withSuffix("/" + type.getNamespace() + "/" + type.getPath()));
     }
 
     protected record Texture(Identifier id, Identifier texture, boolean colored) {}

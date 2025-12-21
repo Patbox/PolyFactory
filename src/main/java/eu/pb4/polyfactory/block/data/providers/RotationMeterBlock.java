@@ -27,23 +27,6 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -51,15 +34,32 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock implements FactoryBlock, CableConnectable, DataProvider,
-        NetworkComponent.Data, NetworkComponent.Rotational, BlockEntityProvider {
-    public RotationMeterBlock(Settings settings) {
+        NetworkComponent.Data, NetworkComponent.Rotational, EntityBlock {
+    public RotationMeterBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    protected void updateNetworkAt(WorldView world, BlockPos pos) {
+    protected void updateNetworkAt(LevelReader world, BlockPos pos) {
         Rotational.updateRotationalAt(world, pos);
         Data.updateDataAt(world, pos);
     }
@@ -70,31 +70,31 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
+        return Blocks.IRON_BLOCK.defaultBlockState();
     }
 
     @Override
-    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerLevel world, BlockPos pos) {
         return List.of(new FunctionalAxisNode(getAxis(state)));
     }
 
     @Override
-    public Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new ChannelProviderDirectionNode(state.get(FACING), getChannel(world, pos)));
+    public Collection<BlockNode> createDataNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return List.of(new ChannelProviderDirectionNode(state.getValue(FACING), getChannel(world, pos)));
     }
 
-    protected int getChannel(ServerWorld world, BlockPos pos) {
+    protected int getChannel(ServerLevel world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof ChannelContainer container) {
             return container.channel();
         }
@@ -102,22 +102,22 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
     @Override
-    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
-        return state.get(FACING) == dir;
+    public boolean canCableConnect(LevelReader world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+        return state.getValue(FACING) == dir;
     }
 
     @Override
-    public @Nullable DataContainer provideData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataProviderNode node) {
+    public @Nullable DataContainer provideData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataProviderNode node) {
         if (world.getBlockEntity(selfPos) instanceof ChanneledDataCache be && be.channel() == channel) {
             return be.getCachedData();
         }
@@ -126,70 +126,70 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ChanneledDataBlockEntity(pos, state);
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(BlockConfig.CHANNEL, BlockConfig.FACING, FIRST_AXIS_CONFIG);
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return this::tick;
     }
 
-    protected abstract  <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t);
+    protected abstract  <T extends BlockEntity> void tick(Level world, BlockPos pos, BlockState state, T t);
 
     public static final class Speed extends RotationMeterBlock {
-        public static final EnumProperty<ValueModifier> VALUE_MODIFIER = EnumProperty.of("value_modifier", ValueModifier.class, ValueModifier.ABSOLUTE, ValueModifier.UNMODIFIED);
+        public static final EnumProperty<ValueModifier> VALUE_MODIFIER = EnumProperty.create("value_modifier", ValueModifier.class, ValueModifier.ABSOLUTE, ValueModifier.UNMODIFIED);
         private static final BlockConfig<ValueModifier> VALUE_MODIFIER_CONFIG = BlockConfig.of(VALUE_MODIFIER, BlockValueFormatter.text(ValueModifier::text));
 
-        public Speed(Settings settings) {
+        public Speed(Properties settings) {
             super(settings);
-            this.setDefaultState(this.getDefaultState().with(VALUE_MODIFIER, ValueModifier.ABSOLUTE));
+            this.registerDefaultState(this.defaultBlockState().setValue(VALUE_MODIFIER, ValueModifier.ABSOLUTE));
         }
 
         @Override
-        protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-            super.appendProperties(builder);
+        protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+            super.createBlockStateDefinition(builder);
             builder.add(VALUE_MODIFIER);
         }
 
         @Override
-        protected <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
+        protected <T extends BlockEntity> void tick(Level world, BlockPos pos, BlockState state, T t) {
             var rot = RotationUser.getRotation(world, pos);
-            DataProvider.sendData(world, pos, new LongData((long) (rot.speed() / 360 * 60 * 20 * state.get(VALUE_MODIFIER).apply(rot.isNegative() ? -1 : 1))));
+            DataProvider.sendData(world, pos, new LongData((long) (rot.speed() / 360 * 60 * 20 * state.getValue(VALUE_MODIFIER).apply(rot.isNegative() ? -1 : 1))));
         }
 
         @Override
-        public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
             return List.of(BlockConfig.CHANNEL, BlockConfig.FACING, FIRST_AXIS_CONFIG, VALUE_MODIFIER_CONFIG);
         }
     }
 
     public static final class Stress extends RotationMeterBlock {
-        public static final EnumProperty<Type> TYPE = EnumProperty.of("type", Type.class);
+        public static final EnumProperty<Type> TYPE = EnumProperty.create("type", Type.class);
 
         public static final BlockConfig<?> TYPE_CONFIG = BlockConfig.of("type", TYPE);
 
-        public Stress(Settings settings) {
+        public Stress(Properties settings) {
             super(settings);
-            this.setDefaultState(this.getDefaultState().with(TYPE, Type.LEFT));
+            this.registerDefaultState(this.defaultBlockState().setValue(TYPE, Type.LEFT));
         }
 
         @Override
-        protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-            super.appendProperties(builder);
+        protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+            super.createBlockStateDefinition(builder);
             builder.add(TYPE);
         }
 
         @Override
-        protected <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
+        protected <T extends BlockEntity> void tick(Level world, BlockPos pos, BlockState state, T t) {
             var rot = RotationUser.getRotation(world, pos);
-            DataProvider.sendData(world, pos, switch (state.get(TYPE)) {
+            DataProvider.sendData(world, pos, switch (state.getValue(TYPE)) {
                 case LEFT -> new CapacityData((long) (rot.stressCapacity() - rot.stressUsage()), (long) rot.stressCapacity());
                 case CAPACITY -> new LongData((long) rot.stressCapacity());
                 case USED ->  new CapacityData((long) rot.stressUsage(), (long) rot.stressCapacity());
@@ -197,17 +197,17 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
         }
 
         @Override
-        public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+        public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
             return List.of(BlockConfig.CHANNEL, BlockConfig.FACING, FIRST_AXIS_CONFIG, TYPE_CONFIG);
         }
 
-        public enum Type implements StringIdentifiable {
+        public enum Type implements StringRepresentable {
             LEFT,
             CAPACITY,
             USED;
 
             @Override
-            public String asString() {
+            public String getSerializedName() {
                 return this.name().toLowerCase(Locale.ROOT);
             }
         }
@@ -232,8 +232,8 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
             var mat = mat();
             mat.identity();
             switch (getAxis(state)) {
-                case X -> mat.rotate(Direction.EAST.getRotationQuaternion());
-                case Z -> mat.rotate(Direction.SOUTH.getRotationQuaternion());
+                case X -> mat.rotate(Direction.EAST.getRotation());
+                case Z -> mat.rotate(Direction.SOUTH.getRotation());
             }
 
             mat.rotateY(speed);
@@ -244,7 +244,7 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
 
         @Override
         protected void onTick() {
-            var tick = this.getAttachment().getWorld().getTime();
+            var tick = this.getAttachment().getWorld().getGameTime();
 
             if (tick % this.getUpdateRate() == 0) {
 
@@ -258,8 +258,8 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
         private void updateStatePos(BlockState state) {
             var mat = mat();
             mat.identity();
-            mat.rotate(state.get(FIRST_AXIS) ? MathHelper.HALF_PI : 0, state.get(FACING).getUnitVector());
-            mat.rotate(state.get(FACING).getRotationQuaternion());
+            mat.rotate(state.getValue(FIRST_AXIS) ? Mth.HALF_PI : 0, state.getValue(FACING).step());
+            mat.rotate(state.getValue(FACING).getRotation());
             mat.scale(2f);
             this.base.setTransformation(mat);
         }

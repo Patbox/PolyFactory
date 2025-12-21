@@ -7,33 +7,30 @@ import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.recipe.press.PressRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.minecraft.inventory.RecipeInputInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.CraftingRecipe;
-import net.minecraft.recipe.IngredientPlacement;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
-import net.minecraft.world.World;
-
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 import java.util.List;
 
-public record FillSprayCanCraftingRecipe(CraftingRecipeCategory category) implements CraftingRecipe {
+public record FillSprayCanCraftingRecipe(CraftingBookCategory category) implements CraftingRecipe {
     @Override
-    public boolean matches(CraftingRecipeInput inventory, World world) {
+    public boolean matches(CraftingInput inventory, Level world) {
         ItemStack can = ItemStack.EMPTY;
         int dye = -1;
         int count = 0;
-        for (var stack : inventory.getStacks()) {
-            if (stack.isOf(FactoryItems.SPRAY_CAN)) {
+        for (var stack : inventory.items()) {
+            if (stack.is(FactoryItems.SPRAY_CAN)) {
                 if (can.isEmpty()) {
                     can = stack;
                 } else {
                     return false;
                 }
-            } else if (stack.isIn(ConventionalItemTags.DYES)) {
+            } else if (stack.is(ConventionalItemTags.DYES)) {
                 count++;
                 if (dye == -1) {
                     dye = DyeColorExtra.getColor(stack);
@@ -51,14 +48,14 @@ public record FillSprayCanCraftingRecipe(CraftingRecipeCategory category) implem
     }
 
     @Override
-    public ItemStack craft(CraftingRecipeInput inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack assemble(CraftingInput inventory, HolderLookup.Provider registryManager) {
         ItemStack can = ItemStack.EMPTY;
         int dye = -1;
         int dyeCount = 0;
-        for (var stack : inventory.getStacks()) {
-            if (stack.isOf(FactoryItems.SPRAY_CAN)) {
+        for (var stack : inventory.items()) {
+            if (stack.is(FactoryItems.SPRAY_CAN)) {
                 can = stack.copy();
-            } else if (stack.isIn(ConventionalItemTags.DYES)) {
+            } else if (stack.is(ConventionalItemTags.DYES)) {
                 dyeCount++;
                 if (dye == -1) {
                     dye = DyeColorExtra.getColor(stack);
@@ -78,17 +75,17 @@ public record FillSprayCanCraftingRecipe(CraftingRecipeCategory category) implem
     }
 
     @Override
-    public IngredientPlacement getIngredientPlacement() {
-        return IngredientPlacement.NONE;
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
     }
 
     @Override
-    public boolean isIgnoredInRecipeBook() {
+    public boolean isSpecial() {
         return true;
     }
 
     @Override
-    public CraftingRecipeCategory getCategory() {
+    public CraftingBookCategory category() {
         return category;
     }
 }

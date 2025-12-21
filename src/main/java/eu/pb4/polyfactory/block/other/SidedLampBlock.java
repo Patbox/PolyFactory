@@ -18,35 +18,35 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.redstone.Orientation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -59,76 +59,76 @@ import java.util.Map;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public abstract class SidedLampBlock extends Block implements FactoryBlock, BlockEntityProvider, BlockStateNameProvider, QuickWaterloggable, PolymerBlock {
-    public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
-    public static final BooleanProperty LIT = Properties.LIT;
-    public static final EnumProperty<Direction> FACING = Properties.FACING;
+public abstract class SidedLampBlock extends Block implements FactoryBlock, EntityBlock, BlockStateNameProvider, QuickWaterloggable, PolymerBlock {
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
     private final Identifier onModel;
     private final Identifier offModel;
 
-    public SidedLampBlock(Settings settings, Identifier onModel, Identifier offModel) {
+    public SidedLampBlock(Properties settings, Identifier onModel, Identifier offModel) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(LIT, false).with(WATERLOGGED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(LIT, false).setValue(WATERLOGGED, false));
         this.onModel = onModel;
         this.offModel = offModel;
     }
 
-    public SidedLampBlock(Settings settings, Identifier id, boolean inverted) {
-        this(settings, inverted ? id : id.withPrefixedPath("inverted_"), inverted ? id.withPrefixedPath("inverted_") : id);
+    public SidedLampBlock(Properties settings, Identifier id, boolean inverted) {
+        this(settings, inverted ? id : id.withPrefix("inverted_"), inverted ? id.withPrefix("inverted_") : id);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(WATERLOGGED).add(LIT).add(FACING);
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.GLASS.getDefaultState();
+        return Blocks.GLASS.defaultBlockState();
     }
 
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return waterLog(ctx, this.getDefaultState()
-                .with(FACING, ctx.getSide())
-                .with(LIT, ctx.getWorld().isEmittingRedstonePower(ctx.getBlockPos().offset(ctx.getSide().getOpposite()), ctx.getSide().getOpposite()))
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return waterLog(ctx, this.defaultBlockState()
+                .setValue(FACING, ctx.getClickedFace())
+                .setValue(LIT, ctx.getLevel().hasSignal(ctx.getClickedPos().relative(ctx.getClickedFace().getOpposite()), ctx.getClickedFace().getOpposite()))
         );
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         tickWater(state, world, tickView, pos);
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+        return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
-    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
-        super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
-        if (!world.isClient()) {
-            boolean bl = state.get(LIT);
-            if (bl != world.isEmittingRedstonePower(pos.offset(state.get(FACING).getOpposite()), state.get(FACING).getOpposite())) {
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, @Nullable Orientation wireOrientation, boolean notify) {
+        super.neighborChanged(state, world, pos, sourceBlock, wireOrientation, notify);
+        if (!world.isClientSide()) {
+            boolean bl = state.getValue(LIT);
+            if (bl != world.hasSignal(pos.relative(state.getValue(FACING).getOpposite()), state.getValue(FACING).getOpposite())) {
                 if (bl) {
-                    world.scheduleBlockTick(pos, this, 4);
+                    world.scheduleTick(pos, this, 4);
                 } else {
-                    world.setBlockState(pos, state.cycle(LIT), 2);
+                    world.setBlock(pos, state.cycle(LIT), 2);
                 }
             }
         }
     }
 
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        var dir = state.get(FACING);
-        if (state.get(LIT) != world.isEmittingRedstonePower(pos.offset(dir.getOpposite()), dir.getOpposite())) {
-            world.setBlockState(pos, state.cycle(LIT), 2);
+    public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+        var dir = state.getValue(FACING);
+        if (state.getValue(LIT) != world.hasSignal(pos.relative(dir.getOpposite()), dir.getOpposite())) {
+            world.setBlock(pos, state.cycle(LIT), 2);
         }
     }
 
-    public boolean setColor(World world, BlockPos pos, int color) {
+    public boolean setColor(Level world, BlockPos pos, int color) {
         color = FactoryItems.LAMP.downSampleColor(color);
         if (world.getBlockEntity(pos) instanceof ColorProvider provider && provider.getColor() != color) {
             provider.setColor(color);
@@ -144,8 +144,8 @@ public abstract class SidedLampBlock extends Block implements FactoryBlock, Bloc
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        var stack = super.getPickStack(world, pos, state, includeData);
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
+        var stack = super.getCloneItemStack(world, pos, state, includeData);
         if (world.getBlockEntity(pos) instanceof ColorableBlockEntity be && !be.isDefaultColor()) {
             ColoredItem.setColor(stack, be.getColor());
         }
@@ -153,52 +153,52 @@ public abstract class SidedLampBlock extends Block implements FactoryBlock, Bloc
     }
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         if (world.getBlockEntity(pos) instanceof ColorableBlockEntity be) {
             be.setColor(FactoryItems.LAMP.getItemColor(itemStack));
         }
 
-        super.onPlaced(world, pos, state, placer, itemStack);
+        super.setPlacedBy(world, pos, state, placer, itemStack);
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(pos, initialBlockState);
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ColorableBlockEntity(pos, state);
     }
 
     @Override
-    public Text getName(ServerWorld world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
+    public Component getName(ServerLevel world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
         if (blockEntity instanceof ColorableBlockEntity be && !be.isDefaultColor()) {
             if (!DyeColorExtra.hasLang(be.getColor())) {
-                return Text.translatable(this.getTranslationKey() + ".colored.full",
+                return Component.translatable(this.getDescriptionId() + ".colored.full",
                         ColoredItem.getColorName(be.getColor()), ColoredItem.getHexName(be.getColor()));
             } else {
-                return Text.translatable(this.getTranslationKey() + ".colored", ColoredItem.getColorName(be.getColor()));
+                return Component.translatable(this.getDescriptionId() + ".colored", ColoredItem.getColorName(be.getColor()));
             }
         }
         return this.getName();
     }
 
     public static final class Full extends SidedLampBlock implements BarrierBasedWaterloggable {
-        public Full(Settings settings, Identifier id, boolean inverted) {
+        public Full(Properties settings, Identifier id, boolean inverted) {
             super(settings, id, inverted);
         }
     }
 
     public static final class Flat extends SidedLampBlock implements PolymerTexturedBlock {
-        public Flat(Settings settings, Identifier id, boolean inverted) {
+        public Flat(Properties settings, Identifier id, boolean inverted) {
             super(settings, id, inverted);
         }
 
         @Override
         public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-            return (state.get(WATERLOGGED) ? FactoryUtil.TRAPDOOR_WATERLOGGED : FactoryUtil.TRAPDOOR_REGULAR).get(state.get(FACING));
+            return (state.getValue(WATERLOGGED) ? FactoryUtil.TRAPDOOR_WATERLOGGED : FactoryUtil.TRAPDOOR_REGULAR).get(state.getValue(FACING));
         }
     }
 
@@ -212,7 +212,7 @@ public abstract class SidedLampBlock extends Block implements FactoryBlock, Bloc
             this.main = ItemDisplayElementUtil.createSimple();
             this.main.setScale(new Vector3f(2));
             this.main.setViewRange(0.8f);
-            this.main.setRightRotation(new Quaternionf().rotateX(MathHelper.HALF_PI));
+            this.main.setRightRotation(new Quaternionf().rotateX(Mth.HALF_PI));
             this.state = state;
             updateStatePos(state);
             this.addElement(this.main);
@@ -235,13 +235,13 @@ public abstract class SidedLampBlock extends Block implements FactoryBlock, Bloc
         }
 
         private void updateStatePos(BlockState state) {
-            var dir = state.get(FACING);
+            var dir = state.getValue(FACING);
             float p = 0;
             float y = 0;
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.getPositiveHorizontalDegrees();
+                y = dir.toYRot();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             } else {
@@ -255,8 +255,8 @@ public abstract class SidedLampBlock extends Block implements FactoryBlock, Bloc
 
         private void updateModel() {
             var stack = new ItemStack(Items.FIREWORK_STAR);
-            stack.set(DataComponentTypes.ITEM_MODEL, this.state.get(LIT) ? onModel : offModel);
-            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), IntList.of(this.color)));
+            stack.set(DataComponents.ITEM_MODEL, this.state.getValue(LIT) ? onModel : offModel);
+            stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), IntList.of(this.color)));
             this.main.setItem(stack);
             this.tick();
         }

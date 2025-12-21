@@ -1,14 +1,14 @@
 package eu.pb4.polyfactory.util;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.text.Text;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-public enum OptionalDirection implements StringIdentifiable {
+public enum OptionalDirection implements StringRepresentable {
     NORTH(Direction.NORTH),
     EAST(Direction.EAST),
     SOUTH(Direction.SOUTH),
@@ -17,13 +17,13 @@ public enum OptionalDirection implements StringIdentifiable {
     DOWN(Direction.DOWN),
     NONE(null);
 
-    public static final Codec<OptionalDirection> CODEC = StringIdentifiable.createCodec(OptionalDirection::values);
+    public static final Codec<OptionalDirection> CODEC = StringRepresentable.fromEnum(OptionalDirection::values);
 
     private final String name;
     @Nullable
     private final Direction direction;
     OptionalDirection(@Nullable Direction direction) {
-        this.name = direction != null ? direction.asString() : "none";
+        this.name = direction != null ? direction.getSerializedName() : "none";
         this.direction = direction;
     }
 
@@ -40,7 +40,7 @@ public enum OptionalDirection implements StringIdentifiable {
     }
 
     @Override
-    public String asString() {
+    public String getSerializedName() {
         return this.name;
     }
 
@@ -50,14 +50,14 @@ public enum OptionalDirection implements StringIdentifiable {
     }
 
     public Vec3i getVector() {
-        return this.direction == null ? Vec3i.ZERO : this.direction.getVector();
+        return this.direction == null ? Vec3i.ZERO : this.direction.getUnitVec3i();
     }
 
-    public Vec3d getDoubleVector() {
-        return this.direction == null ? Vec3d.ZERO : this.direction.getDoubleVector();
+    public Vec3 getDoubleVector() {
+        return this.direction == null ? Vec3.ZERO : this.direction.getUnitVec3();
     }
 
-    public Text asText() {
+    public Component asText() {
         return FactoryUtil.asText(this.direction);
     }
 }

@@ -2,72 +2,70 @@ package eu.pb4.polyfactory.entity.splash;
 
 import eu.pb4.polyfactory.effects.FactoryEffects;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
-import net.minecraft.block.AbstractCandleBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CampfireBlock;
-import net.minecraft.block.FarmlandBlock;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.passive.AxolotlEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.Items;
-import net.minecraft.particle.ItemStackParticleEffect;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Unit;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldEvents;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.AbstractCandleBlock;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.LevelEvent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 
 public class HoneySplashEntity extends SplashEntity<Unit> {
-    private static final ParticleEffect PARTICLE = new ItemStackParticleEffect(ParticleTypes.ITEM, Items.HONEY_BLOCK.getDefaultStack());
+    private static final ParticleOptions PARTICLE = new ItemParticleOption(ParticleTypes.ITEM, Items.HONEY_BLOCK.getDefaultInstance());
 
-    public HoneySplashEntity(EntityType<? extends ProjectileEntity> entityType, World world) {
+    public HoneySplashEntity(EntityType<? extends Projectile> entityType, Level world) {
         super(entityType, world, FactoryFluids.HONEY);
     }
 
     @Override
-    protected void onBlockHit(BlockHitResult blockHitResult) {
-        if (!this.getEntityWorld().isClient()) {
-            Direction direction = blockHitResult.getSide();
+    protected void onHitBlock(BlockHitResult blockHitResult) {
+        if (!this.level().isClientSide()) {
+            Direction direction = blockHitResult.getDirection();
             BlockPos targetBlockPos = blockHitResult.getBlockPos();
-            BlockPos sidePos = targetBlockPos.offset(direction);
+            BlockPos sidePos = targetBlockPos.relative(direction);
             this.extinguishFire(sidePos);
-            this.extinguishFire(sidePos.offset(direction.getOpposite()));
+            this.extinguishFire(sidePos.relative(direction.getOpposite()));
 
-            for(Direction direction2 : Direction.Type.HORIZONTAL) {
-                this.extinguishFire(sidePos.offset(direction2));
+            for(Direction direction2 : Direction.Plane.HORIZONTAL) {
+                this.extinguishFire(sidePos.relative(direction2));
             }
         }
-        super.onBlockHit(blockHitResult);
+        super.onHitBlock(blockHitResult);
     }
     @Override
-    protected void onEntityHit(EntityHitResult entityHitResult) {
+    protected void onHitEntity(EntityHitResult entityHitResult) {
         if (this.random.nextFloat() < 0.3) {
             var entity = entityHitResult.getEntity();
 
-            if (getEntityWorld() instanceof ServerWorld && entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
+            if (level() instanceof ServerLevel && entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
                 if (livingEntity.isOnFire() && livingEntity.isAlive() && this.canInteractEntity(entity)) {
-                    livingEntity.extinguishWithSound();
+                    livingEntity.extinguishFire();
                 }
-                var effect = livingEntity.getStatusEffect(FactoryEffects.STICKY_HONEY);
+                var effect = livingEntity.getEffect(FactoryEffects.STICKY_HONEY);
                 int time = 20;
                 if (effect != null) {
                     time += effect.getDuration();
                 }
-                livingEntity.addStatusEffect(new StatusEffectInstance(FactoryEffects.STICKY_HONEY, Math.min(time, 20 * 60), 0), this);            }
+                livingEntity.addEffect(new MobEffectInstance(FactoryEffects.STICKY_HONEY, Math.min(time, 20 * 60), 0), this);            }
         }
-        super.onEntityHit(entityHitResult);
+        super.onHitEntity(entityHitResult);
     }
 
     @Override
-    public ParticleEffect getBaseParticle() {
+    public ParticleOptions getBaseParticle() {
         return PARTICLE;
     }
 
@@ -77,15 +75,15 @@ public class HoneySplashEntity extends SplashEntity<Unit> {
                 return;
             }
 
-            BlockState blockState = this.getEntityWorld().getBlockState(pos);
-            if (blockState.isIn(BlockTags.FIRE)) {
-                this.getEntityWorld().breakBlock(pos, false, this);
-            } else if (AbstractCandleBlock.isLitCandle(blockState)) {
-                AbstractCandleBlock.extinguish(null, blockState, this.getEntityWorld(), pos);
+            BlockState blockState = this.level().getBlockState(pos);
+            if (blockState.is(BlockTags.FIRE)) {
+                this.level().destroyBlock(pos, false, this);
+            } else if (AbstractCandleBlock.isLit(blockState)) {
+                AbstractCandleBlock.extinguish(null, blockState, this.level(), pos);
             } else if (CampfireBlock.isLitCampfire(blockState)) {
-                this.getEntityWorld().syncWorldEvent(null, WorldEvents.FIRE_EXTINGUISHED, pos, 0);
-                CampfireBlock.extinguish(this.getOwner(), this.getEntityWorld(), pos, blockState);
-                this.getEntityWorld().setBlockState(pos, blockState.with(CampfireBlock.LIT, false));
+                this.level().levelEvent(null, LevelEvent.SOUND_EXTINGUISH_FIRE, pos, 0);
+                CampfireBlock.dowse(this.getOwner(), this.level(), pos, blockState);
+                this.level().setBlockAndUpdate(pos, blockState.setValue(CampfireBlock.LIT, false));
             }
         }
     }

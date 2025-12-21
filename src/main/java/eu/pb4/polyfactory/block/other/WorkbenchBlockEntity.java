@@ -5,45 +5,45 @@ import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlock;
 import eu.pb4.polyfactory.ui.WorkbenchScreenHandler;
-import eu.pb4.polyfactory.util.inventory.CrafterLikeInsertInventory;
-import eu.pb4.polyfactory.util.inventory.CustomInsertInventory;
-import eu.pb4.polyfactory.util.inventory.MinimalSidedInventory;
+import eu.pb4.polyfactory.util.inventory.CrafterLikeInsertContainer;
+import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.CraftingResultInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.RecipeInputInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.*;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.StackedItemContents;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.ResultContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-public class WorkbenchBlockEntity extends LockableBlockEntity implements MinimalSidedInventory, CrafterLikeInsertInventory, RecipeInputInventory, BlockEntityExtraListener {
+public class WorkbenchBlockEntity extends LockableBlockEntity implements MinimalSidedContainer, CrafterLikeInsertContainer, CraftingContainer, BlockEntityExtraListener {
 
     private static final int[] INPUT_SLOTS = IntStream.range(0, 9).toArray();
-    private final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(9, ItemStack.EMPTY);
-    private final CraftingResultInventory result = new CraftingResultInventory();
+    private final NonNullList<ItemStack> stacks = NonNullList.withSize(9, ItemStack.EMPTY);
+    private final ResultContainer result = new ResultContainer();
     @Nullable
-    private RecipeEntry<CraftingRecipe> currentRecipe;
+    private RecipeHolder<CraftingRecipe> currentRecipe;
 
     private WorkbenchBlock.Model model;
 
@@ -52,18 +52,18 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        Inventories.writeData(view, this.stacks);
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        ContainerHelper.saveAllItems(view, this.stacks);
+        super.saveAdditional(view);
     }
 
     @Override
-    public void readData(ReadView view) {
-        Inventories.readData(view, this.stacks);
-        if (this.world != null) {
+    public void loadAdditional(ValueInput view) {
+        ContainerHelper.loadAllItems(view, this.stacks);
+        if (this.level != null) {
             updateResult();
         }
-        super.readData(view);
+        super.loadAdditional(view);
         if (this.model != null) {
             for (int i = 0; i < 9; i++) {
                 this.markSlotDirty(i);
@@ -72,18 +72,18 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
     }
 
     @Override
-    public DefaultedList<ItemStack> getStacks() {
+    public NonNullList<ItemStack> getStacks() {
         return this.stacks;
     }
 
     @Override
-    public int[] getAvailableSlots(Direction side) {
+    public int[] getSlotsForFace(Direction side) {
         return INPUT_SLOTS;
     }
 
     @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        if (dir != null && (dir == Direction.UP || dir.getOpposite() == this.getCachedState().get(MCrafterBlock.FACING))) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
+        if (dir != null && (dir == Direction.UP || dir.getOpposite() == this.getBlockState().getValue(MCrafterBlock.FACING))) {
             return getLeastPopulatedInputSlot(stack) == slot;
         }
 
@@ -96,21 +96,21 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
     }
 
     @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
         return false;
     }
 
-    public void createGui(ServerPlayerEntity player) {
-        player.openHandledScreen(new NamedScreenHandlerFactory() {
+    public void createGui(ServerPlayer player) {
+        player.openMenu(new MenuProvider() {
             @Override
-            public Text getDisplayName() {
+            public Component getDisplayName() {
                 return WorkbenchBlockEntity.this.getDisplayName();
             }
 
             @Nullable
             @Override
-            public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-                return new WorkbenchScreenHandler(syncId, getCachedState().getBlock(), playerInventory, WorkbenchBlockEntity.this, WorkbenchBlockEntity.this.result, ScreenHandlerContext.create(world, pos));
+            public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
+                return new WorkbenchScreenHandler(syncId, getBlockState().getBlock(), playerInventory, WorkbenchBlockEntity.this, WorkbenchBlockEntity.this.result, ContainerLevelAccess.create(level, worldPosition));
             }
         });
     }
@@ -126,26 +126,26 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
     }
 
     @Override
-    public List<ItemStack> getHeldStacks() {
+    public List<ItemStack> getItems() {
         return List.copyOf(this.stacks.subList(0, 9));
     }
 
     @Override
-    public void provideRecipeInputs(RecipeFinder finder) {
+    public void fillStackedContents(StackedItemContents finder) {
         for (int i = 0; i < 9; i++) {
-            finder.addInput(this.getStack(i));
+            finder.accountStack(this.getItem(i));
         }
     }
 
     protected void updateResult() {
         ItemStack itemStack = ItemStack.EMPTY;
-        Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, this.createRecipeInput(), world, this.currentRecipe);
+        Optional<RecipeHolder<CraftingRecipe>> optional = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, this.asCraftInput(), level, this.currentRecipe);
         if (optional.isPresent()) {
-            RecipeEntry<CraftingRecipe> recipeEntry = optional.get();
+            RecipeHolder<CraftingRecipe> recipeEntry = optional.get();
             CraftingRecipe craftingRecipe = recipeEntry.value();
             //if (result.shouldCraftRecipe(world, null, recipeEntry)) {
-            ItemStack itemStack2 = craftingRecipe.craft(this.createRecipeInput(), world.getRegistryManager());
-            if (itemStack2.isItemEnabled(world.getEnabledFeatures())) {
+            ItemStack itemStack2 = craftingRecipe.assemble(this.asCraftInput(), level.registryAccess());
+            if (itemStack2.isItemEnabled(level.enabledFeatures())) {
                 itemStack = itemStack2;
             }
             //}
@@ -154,19 +154,19 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
             this.currentRecipe = null;
         }
 
-        result.setStack(0, itemStack);
+        result.setItem(0, itemStack);
     }
 
     @Override
     public void markSlotDirty(int index) {
         if (this.model != null) {
-            this.model.setStack(index, this.getStack(index));
+            this.model.setStack(index, this.getItem(index));
         }
     }
 
     @Override
-    public void markDirty() {
-        super.markDirty();
+    public void setChanged() {
+        super.setChanged();
         updateResult();
     }
 
@@ -182,13 +182,13 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
                 return init - itemStack.getCount();
             }
 
-            var current = this.getStack(slot);
+            var current = this.getItem(slot);
             if (current.isEmpty()) {
-                this.setStack(slot, itemStack.copyWithCount(1));
-                itemStack.decrement(1);
+                this.setItem(slot, itemStack.copyWithCount(1));
+                itemStack.shrink(1);
             } else {
-                current.increment(1);
-                itemStack.decrement(1);
+                current.grow(1);
+                itemStack.shrink(1);
             }
         }
     }
@@ -205,29 +205,29 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
                 return init - itemStack.getCount();
             }
 
-            var current = this.getStack(slot);
+            var current = this.getItem(slot);
             if (current.isEmpty()) {
-                this.setStack(slot, itemStack.copyWithCount(1));
-                itemStack.decrement(1);
+                this.setItem(slot, itemStack.copyWithCount(1));
+                itemStack.shrink(1);
             } else {
-                current.increment(1);
-                itemStack.decrement(1);
+                current.grow(1);
+                itemStack.shrink(1);
             }
         }
     }
 
 
     @Override
-    public void onListenerUpdate(WorldChunk chunk) {
+    public void onListenerUpdate(LevelChunk chunk) {
         updateResult();
-        this.model = BlockAwareAttachment.get(chunk, this.pos).holder() instanceof WorkbenchBlock.Model m ? m : null;
+        this.model = BlockAwareAttachment.get(chunk, this.worldPosition).holder() instanceof WorkbenchBlock.Model m ? m : null;
         for (int i = 0; i < 9; i++) {
             this.markSlotDirty(i);
         }
     }
 
     @Nullable
-    public RecipeEntry<CraftingRecipe> currentRecipe() {
+    public RecipeHolder<CraftingRecipe> currentRecipe() {
         return this.currentRecipe;
     }
 }

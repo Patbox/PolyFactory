@@ -8,10 +8,10 @@ import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.input.PressInput;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.world.World;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 
 public record FillSprayCanPressRecipe(int amount) implements PressRecipe {
     @Override
@@ -20,21 +20,21 @@ public record FillSprayCanPressRecipe(int amount) implements PressRecipe {
     }
 
     @Override
-    public void applyRecipeUse(PressBlockEntity inventory, World world) {
-        inventory.setStack(0, ItemStack.EMPTY);
-        inventory.getStack(1).decrement(1);
+    public void applyRecipeUse(PressBlockEntity inventory, Level world) {
+        inventory.setItem(0, ItemStack.EMPTY);
+        inventory.getItem(1).shrink(1);
     }
 
     @Override
-    public boolean matches(PressInput inventory, World world) {
+    public boolean matches(PressInput inventory, Level world) {
         var can = inventory.input();
         var dye = inventory.pattern();
-        return can.isOf(FactoryItems.SPRAY_CAN) && dye.isIn(ConventionalItemTags.DYES)
+        return can.is(FactoryItems.SPRAY_CAN) && dye.is(ConventionalItemTags.DYES)
                 && (DyeSprayItem.getUses(can) == 0 || (DyeSprayItem.getUses(can) + amount <= DyeSprayItem.MAX_USES && ColoredItem.getColor(can) == DyeColorExtra.getColor(dye)));
     }
 
     @Override
-    public ItemStack craft(PressInput inventory, RegistryWrapper.WrapperLookup registryManager) {
+    public ItemStack assemble(PressInput inventory, HolderLookup.Provider registryManager) {
         var can = inventory.input().copy();
         var dye = inventory.pattern();
         ColoredItem.setColor(can, DyeColorExtra.getColor(dye));

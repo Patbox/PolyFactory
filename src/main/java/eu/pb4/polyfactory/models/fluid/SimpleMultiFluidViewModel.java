@@ -6,7 +6,6 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.util.math.MathHelper;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -15,6 +14,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import net.minecraft.util.Mth;
 
 public class SimpleMultiFluidViewModel {
     private final Map<FluidInstance<?>, ItemDisplayElement> fluidLayers = new Object2ObjectOpenHashMap<>();
@@ -49,7 +49,7 @@ public class SimpleMultiFluidViewModel {
     }
 
     private int textureId(float amount) {
-        return MathHelper.clamp(Math.round(amount * this.models.length), 0,  this.models.length - 1);
+        return Mth.clamp(Math.round(amount * this.models.length), 0,  this.models.length - 1);
     }
 
     private void setLayer(FluidInstance<?> instance, float amount) {

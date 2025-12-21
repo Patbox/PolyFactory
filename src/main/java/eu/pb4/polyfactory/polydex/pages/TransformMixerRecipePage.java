@@ -6,16 +6,15 @@ import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.TransformMixingRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeEntry;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 
 public class TransformMixerRecipePage extends MixerRecipePage<TransformMixingRecipe> {
 
-    public TransformMixerRecipePage(RecipeEntry<TransformMixingRecipe> recipe) {
+    public TransformMixerRecipePage(RecipeHolder<TransformMixingRecipe> recipe) {
         super(recipe);
     }
 

@@ -8,18 +8,16 @@ import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 public class FilteredPipeBlockEntity extends PipeLikeBlockEntity implements BlockEntityExtraListener {
@@ -34,16 +32,16 @@ public class FilteredPipeBlockEntity extends PipeLikeBlockEntity implements Bloc
 
 
     @Override
-    protected void readData(ReadView view) {
-        super.readData(view);
+    protected void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
         this.setAllowedFluid(view.read("allowed_fluid", FluidInstance.CODEC).orElse(null));
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         if (this.allowedFluid != null) {
-            view.put("allowed_fluid", FluidInstance.CODEC, this.allowedFluid);
+            view.store("allowed_fluid", FluidInstance.CODEC, this.allowedFluid);
         }
     }
 
@@ -53,7 +51,7 @@ public class FilteredPipeBlockEntity extends PipeLikeBlockEntity implements Bloc
     }
 
     private boolean checkFluid(FluidInstance<?> instance) {
-        return allowedFluid == null || allowedFluid.equals(instance) == !this.getCachedState().get(FilteredPipeBlock.INVERTED);
+        return allowedFluid == null || allowedFluid.equals(instance) == !this.getBlockState().getValue(FilteredPipeBlock.INVERTED);
     }
 
     private void markFluidDirty() {
@@ -61,7 +59,7 @@ public class FilteredPipeBlockEntity extends PipeLikeBlockEntity implements Bloc
             this.setAllowedFluid(this.container.topFluid());
         }
 
-        this.markDirty();
+        this.setChanged();
     }
 
     public void setAllowedFluid(@Nullable FluidInstance<?> fluid) {
@@ -74,28 +72,28 @@ public class FilteredPipeBlockEntity extends PipeLikeBlockEntity implements Bloc
         }
     }
 
-    public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
+    public static <T extends BlockEntity> void tick(Level world, BlockPos pos, BlockState state, T t) {
         if (!(t instanceof FilteredPipeBlockEntity pipe)) {
             return;
         }
         pipe.preTick();
         if (pipe.container.isNotEmpty()) {
-            NetworkComponent.Pipe.getLogic((ServerWorld) world, pos).runPushFlows(pos, pipe.container::isNotEmpty, pipe::pushFluid);
+            NetworkComponent.Pipe.getLogic((ServerLevel) world, pos).runPushFlows(pos, pipe.container::isNotEmpty, pipe::pushFluid);
         }
         if (pipe.container.isNotFull()) {
-            NetworkComponent.Pipe.getLogic((ServerWorld) world, pos).runPullFlows(pos, pipe.container::isNotFull, pipe::pullFluid);
+            NetworkComponent.Pipe.getLogic((ServerLevel) world, pos).runPullFlows(pos, pipe.container::isNotFull, pipe::pullFluid);
         }
         pipe.postTick();
     }
 
     @Override
     protected boolean hasDirection(Direction direction) {
-        return this.getCachedState().get(FilteredPipeBlock.AXIS) == direction.getAxis();
+        return this.getBlockState().getValue(FilteredPipeBlock.AXIS) == direction.getAxis();
     }
 
     @Override
-    public void onListenerUpdate(WorldChunk chunk) {
-        var x = BlockAwareAttachment.get(chunk, pos);
+    public void onListenerUpdate(LevelChunk chunk) {
+        var x = BlockAwareAttachment.get(chunk, worldPosition);
         if (x != null && x.holder() instanceof FilteredPipeBlock.Model model) {
             this.model = model;
             this.model.setAllowedFluid(this.allowedFluid);

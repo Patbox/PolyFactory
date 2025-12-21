@@ -1,54 +1,51 @@
 package eu.pb4.polyfactory.entity.splash;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.datafixers.util.Pair;
 import eu.pb4.common.protection.api.CommonProtection;
 import eu.pb4.polyfactory.entity.FluidDataOwner;
 import eu.pb4.polyfactory.fluid.FluidType;
-import eu.pb4.polyfactory.mixin.ProjectileEntityAccessor;
+import eu.pb4.polyfactory.mixin.ProjectileAccessor;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MovementType;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.decoration.DisplayEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.entity.Display;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
 
-public abstract class SplashEntity<T> extends ProjectileEntity implements PolymerEntity, FluidDataOwner<T> {
+public abstract class SplashEntity<T> extends Projectile implements PolymerEntity, FluidDataOwner<T> {
     private final FluidType<T> fluid;
     private T data;
     protected int existenceTime = 5;
     @Nullable
     private GameProfile profile;
-    public SplashEntity(EntityType<? extends ProjectileEntity> entityType, World world, FluidType<T> fluidInstance) {
+    public SplashEntity(EntityType<? extends Projectile> entityType, Level world, FluidType<T> fluidInstance) {
         super(entityType, world);
         this.fluid = fluidInstance;
         this.data = fluidInstance.defaultData();
@@ -72,55 +69,55 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     }
 
     @Override
-    protected Text getDefaultName() {
-        return Text.translatable("entity.polyfactory.splash", this.fluid.getName(this.getFluidData()));
+    protected Component getTypeName() {
+        return Component.translatable("entity.polyfactory.splash", this.fluid.getName(this.getFluidData()));
     }
 
     @Override
-    protected void writeCustomData(WriteView view) {
-        super.writeCustomData(view);
+    protected void addAdditionalSaveData(ValueOutput view) {
+        super.addAdditionalSaveData(view);
         if (this.data != this.fluid.defaultData()) {
-            view.put("fluid_data", this.fluid.dataCodec(), this.data);
+            view.store("fluid_data", this.fluid.dataCodec(), this.data);
         }
     }
 
     @Override
-    protected void readCustomData(ReadView view) {
-        super.readCustomData(view);
+    protected void readAdditionalSaveData(ValueInput view) {
+        super.readAdditionalSaveData(view);
         this.data = view.read("fluid_data", this.fluid.dataCodec()).orElse(this.fluid.defaultData());
     }
 
-    public ParticleEffect getBaseParticle() {
+    public ParticleOptions getBaseParticle() {
         return this.fluid.toInstance(this.data).particle();
     }
 
 
     @Override
-    protected void initDataTracker(DataTracker.Builder builder) {}
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {}
 
     @Override
-    protected void onCollision(HitResult hitResult) {
-        super.onCollision(hitResult);
+    protected void onHit(HitResult hitResult) {
+        super.onHit(hitResult);
         if (hitResult.getType() != HitResult.Type.MISS && !(hitResult instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() == this.getOwner())) {
-            this.spawnDestructionParticles(hitResult.getPos());
+            this.spawnDestructionParticles(hitResult.getLocation());
             this.discard();
         }
     }
 
-    protected void spawnDestructionParticles(Vec3d pos) {
-        ((ServerWorld) this.getEntityWorld()).spawnParticles(this.getBaseParticle(), pos.x, pos.y, pos.z,
+    protected void spawnDestructionParticles(Vec3 pos) {
+        ((ServerLevel) this.level()).sendParticles(this.getBaseParticle(), pos.x, pos.y, pos.z,
                 5, 0, 0, 0, this.getParticleCollisionSpeed());
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult entityHitResult) {
-        super.onEntityHit(entityHitResult);
+    protected void onHitEntity(EntityHitResult entityHitResult) {
+        super.onHitEntity(entityHitResult);
         if (entityHitResult.getEntity() == this.getOwner() || !this.canInteractEntity(entityHitResult.getEntity())) {
             return;
         }
-        var velocity = this.getVelocity().multiply(0.004);
+        var velocity = this.getDeltaMovement().scale(0.004);
         FactoryUtil.addSafeVelocity(entityHitResult.getEntity(), velocity);
-        if (entityHitResult.getEntity() instanceof ServerPlayerEntity player) {
+        if (entityHitResult.getEntity() instanceof ServerPlayer player) {
             FactoryUtil.sendVelocityDelta(player, velocity);
         }
     }
@@ -128,27 +125,27 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     public void tick() {
         super.tick();
 
-        if (this.discardInBlock(this.getBlockStateAtPos(), this.getBlockPos())) {
+        if (this.discardInBlock(this.getInBlockState(), this.blockPosition())) {
             this.discard();
         }
 
-        HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit);
+        HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
         if (hitResult.getType() != HitResult.Type.MISS) {
-            this.hitOrDeflect(hitResult);
+            this.hitTargetOrDeflectSelf(hitResult);
         }
         //this.checkBlockCollision();
         this.updateRotation();
 
         if (this.isAlive()) {
             this.spawnExistenceParticles();
-            this.move(MovementType.SELF, this.getVelocity());
+            this.move(MoverType.SELF, this.getDeltaMovement());
         }
-        if (this.age > this.existenceTime) {
+        if (this.tickCount > this.existenceTime) {
             this.onNaturalDiscard();
             this.discard();
             return;
         }
-        this.setVelocity(this.getVelocity().multiply(0.99));
+        this.setDeltaMovement(this.getDeltaMovement().scale(0.99));
         this.applyGravity();
     }
 
@@ -156,16 +153,16 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     }
 
     @Override
-    public void modifyRawTrackedData(List<DataTracker.SerializedEntry<?>> data, ServerPlayerEntity player, boolean initial) {
+    public void modifyRawTrackedData(List<SynchedEntityData.DataValue<?>> data, ServerPlayer player, boolean initial) {
         PolymerEntity.super.modifyRawTrackedData(data, player, initial);
         if (initial) {
-            data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.TELEPORTATION_DURATION, 2));
+            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.TELEPORTATION_DURATION, 2));
             if (!this.forceParticles()) {
-                data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.BILLBOARD, (byte) DisplayEntity.BillboardMode.CENTER.ordinal()));
+                data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.BILLBOARD, (byte) Display.BillboardConstraints.CENTER.ordinal()));
                 if (this.fluid.brightness().isPresent()) {
-                    data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.BRIGHTNESS, this.fluid.brightness().get().pack()));
+                    data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.BRIGHTNESS, this.fluid.brightness().get().pack()));
                 }
-                data.add(DataTracker.SerializedEntry.of(DisplayTrackedData.Item.ITEM, getParticleItem()));
+                data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.Item.ITEM, getParticleItem()));
             }
         }
     }
@@ -180,17 +177,17 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
 
 
     protected void spawnExistenceParticles() {
-        if (forceParticles() && this.age % 2 == 1) {
-            var velocity = this.getVelocity();
-            ((ServerWorld) this.getEntityWorld()).spawnParticles(this.getBaseParticle(), this.getX(), this.getY(), this.getZ(),
-                    0, velocity.getX(), velocity.getY(), velocity.getZ(), this.getParticleSpeed());
+        if (forceParticles() && this.tickCount % 2 == 1) {
+            var velocity = this.getDeltaMovement();
+            ((ServerLevel) this.level()).sendParticles(this.getBaseParticle(), this.getX(), this.getY(), this.getZ(),
+                    0, velocity.x(), velocity.y(), velocity.z(), this.getParticleSpeed());
         }
     }
     protected boolean discardInBlock(BlockState state, BlockPos blockPos) {
-        if (state.getFluidState().isIn(FluidTags.LAVA)) {
-            ((ServerWorld) this.getEntityWorld()).spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
+        if (state.getFluidState().is(FluidTags.LAVA)) {
+            ((ServerLevel) this.level()).sendParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
                     0, 0, 0, 0, 0);
-            this.playExtinguishSound();
+            this.playEntityOnFireExtinguishedSound();
         }
 
         return !state.getFluidState().isEmpty();
@@ -205,18 +202,18 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     }
 
     @Override
-    protected double getGravity() {
+    protected double getDefaultGravity() {
         return 0.01;
     }
 
     @Override
-    public boolean canUsePortals(boolean allowVehicles) {
+    public boolean canUsePortal(boolean allowVehicles) {
         return true;
     }
 
     @Override
-    protected boolean canHit(Entity entity) {
-        return super.canHit(entity) && !(entity instanceof SplashEntity<?>);
+    protected boolean canHitEntity(Entity entity) {
+        return super.canHitEntity(entity) && !(entity instanceof SplashEntity<?>);
     }
 
     @Override
@@ -225,38 +222,38 @@ public abstract class SplashEntity<T> extends ProjectileEntity implements Polyme
     }
 
     @Override
-    protected SoundEvent getSplashSound() {
-        return SoundEvents.INTENTIONALLY_EMPTY;
+    protected SoundEvent getSwimSplashSound() {
+        return SoundEvents.EMPTY;
     }
 
     @Override
-    protected SoundEvent getHighSpeedSplashSound() {
-        return SoundEvents.INTENTIONALLY_EMPTY;
+    protected SoundEvent getSwimHighSpeedSplashSound() {
+        return SoundEvents.EMPTY;
     }
 
     protected GameProfile getProfile() {
-        if (this.getOwner() instanceof PlayerEntity player) {
+        if (this.getOwner() instanceof Player player) {
             this.profile = player.getGameProfile();
         } else if (this.profile == null) {
-            var x = ((ProjectileEntityAccessor) this).getOwner();
-            this.profile = new GameProfile(x != null ? x.getUuid() : this.getUuid(), "Splash");
+            var x = ((ProjectileAccessor) this).getOwner();
+            this.profile = new GameProfile(x != null ? x.getUUID() : this.getUUID(), "Splash");
         }
         return this.profile;
     }
 
     protected boolean canDamageEntity(Entity entity) {
-        return CommonProtection.canDamageEntity(getEntityWorld(), entity, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
+        return CommonProtection.canDamageEntity(level(), entity, getProfile(), this.getOwner() instanceof Player player ? player : null);
     }
 
     protected boolean canInteractEntity(Entity entity) {
-        return CommonProtection.canInteractEntity(getEntityWorld(), entity, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
+        return CommonProtection.canInteractEntity(level(), entity, getProfile(), this.getOwner() instanceof Player player ? player : null);
     }
 
     protected boolean canBreakBlock(BlockPos pos) {
-        return CommonProtection.canBreakBlock(getEntityWorld(), pos, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
+        return CommonProtection.canBreakBlock(level(), pos, getProfile(), this.getOwner() instanceof Player player ? player : null);
     }
 
     protected boolean canPlaceBlock(BlockPos pos) {
-        return CommonProtection.canPlaceBlock(getEntityWorld(), pos, getProfile(), this.getOwner() instanceof PlayerEntity player ? player : null);
+        return CommonProtection.canPlaceBlock(level(), pos, getProfile(), this.getOwner() instanceof Player player ? player : null);
     }
 }

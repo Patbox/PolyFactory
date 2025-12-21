@@ -12,60 +12,60 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 
-public abstract class GenericDirectionalDataBlock extends DataNetworkBlock implements FactoryBlock, ConfigurableBlock, BlockEntityProvider, CableConnectable {
-    public static EnumProperty<Direction> FACING = Properties.FACING;
+public abstract class GenericDirectionalDataBlock extends DataNetworkBlock implements FactoryBlock, ConfigurableBlock, EntityBlock, CableConnectable {
+    public static EnumProperty<Direction> FACING = BlockStateProperties.FACING;
     protected final boolean oppositeFacing;
 
-    public GenericDirectionalDataBlock(Settings settings, boolean oppositeFacing) {
+    public GenericDirectionalDataBlock(Properties settings, boolean oppositeFacing) {
         super(settings);
         this.oppositeFacing = oppositeFacing;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return super.getPlacementState(ctx).with(FACING, ctx.getPlayerLookDirection());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return super.getStateForPlacement(ctx).setValue(FACING, ctx.getNearestLookingDirection());
     }
 
     @Override
-    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
-        return state.get(FACING) == (oppositeFacing ? dir.getOpposite() : dir);
+    public boolean canCableConnect(LevelReader world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+        return state.getValue(FACING) == (oppositeFacing ? dir.getOpposite() : dir);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.BARRIER.getDefaultState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(
                 BlockConfig.CHANNEL,
                 BlockConfig.FACING
@@ -73,17 +73,17 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState, this.oppositeFacing);
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ChanneledDataBlockEntity(pos, state);
     }
 
-    protected int getChannel(ServerWorld world, BlockPos pos) {
+    protected int getChannel(ServerLevel world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof ChannelContainer container) {
             return container.channel();
         }
@@ -91,7 +91,7 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return FactoryUtil.transform(state, rotation::rotate, FACING);
     }
 
@@ -109,13 +109,13 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
         }
 
         protected void updateStatePos(BlockState state) {
-            var dir = this.oppositeFacing ? state.get(FACING) : state.get(FACING).getOpposite();
+            var dir = this.oppositeFacing ? state.getValue(FACING) : state.getValue(FACING).getOpposite();
             float p = -90;
             float y = 0;
 
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.getPositiveHorizontalDegrees();
+                y = dir.toYRot();
             } else if (dir == Direction.DOWN) {
                 p = 90;
             }

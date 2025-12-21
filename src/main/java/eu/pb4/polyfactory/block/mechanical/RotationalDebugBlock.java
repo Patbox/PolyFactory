@@ -7,50 +7,50 @@ import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.decoration.DisplayEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Display;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class RotationalDebugBlock extends RotationalNetworkBlock implements PolymerBlock, BlockWithElementHolder {
-    public RotationalDebugBlock(Settings settings) {
+    public RotationalDebugBlock(Properties settings) {
         super(settings);
     }
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.DAYLIGHT_DETECTOR.getDefaultState();
+        return Blocks.DAYLIGHT_DETECTOR.defaultBlockState();
     }
 
     @Override
-    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerWorld world, BlockPos pos) {
+    public Collection<BlockNode> createRotationalNodes(BlockState state, ServerLevel world, BlockPos pos) {
         return List.of(new AllSideNode());
     }
 
     @Override
-    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(world, pos);
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
     public final class Model extends BlockModel {
         private final TextDisplayElement mainElement;
-        private final ServerWorld world;
+        private final ServerLevel world;
         private final BlockPos pos;
 
-        private Model(ServerWorld world, BlockPos pos) {
+        private Model(ServerLevel world, BlockPos pos) {
             this.mainElement = new TextDisplayElement();
-            this.mainElement.setBillboardMode(DisplayEntity.BillboardMode.CENTER);
+            this.mainElement.setBillboardMode(Display.BillboardConstraints.CENTER);
             this.addElement(this.mainElement);
             this.world = world;
             this.pos = pos;
@@ -62,7 +62,7 @@ public class RotationalDebugBlock extends RotationalNetworkBlock implements Poly
         protected void onTick() {
             var rotation = RotationUser.getRotation(this.world, this.pos);
 
-            this.mainElement.setText(Text.translatable("""
+            this.mainElement.setText(Component.translatable("""
                     Speed: %s (%s) 
                     Speed (rad): %s
                     Stress: %s / %s

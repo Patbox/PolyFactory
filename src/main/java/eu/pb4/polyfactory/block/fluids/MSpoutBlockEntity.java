@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.fluids;
 
+import com.mojang.math.Axis;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
@@ -18,33 +19,34 @@ import eu.pb4.polyfactory.ui.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.movingitem.SimpleContainer;
+import eu.pb4.polyfactory.util.movingitem.SimpleMovingItemContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentsAccess;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.particle.ItemStackParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.FurnaceOutputSlot;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.*;
-import net.minecraft.world.World;
+import net.minecraft.world.inventory.FurnaceResultSlot;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -57,14 +59,14 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
     public static final int INPUT_FIRST = 0;
     private static final int[] OUTPUT_SLOTS = {1};
     private static final int[] INPUT_SLOTS = {0};
-    private final SimpleContainer[] containers = new SimpleContainer[]{
-            new SimpleContainer(0, this::addMoving, this::removeMoving),
-            new SimpleContainer(1, this::addMoving, this::removeMoving)
+    private final SimpleMovingItemContainer[] containers = new SimpleMovingItemContainer[]{
+            new SimpleMovingItemContainer(0, this::addMoving, this::removeMoving),
+            new SimpleMovingItemContainer(1, this::addMoving, this::removeMoving)
     };
     protected double process = 0;
     protected double speedScale = 0;
     @Nullable
-    protected RecipeEntry<SpoutRecipe> currentRecipe = null;
+    protected RecipeHolder<SpoutRecipe> currentRecipe = null;
     private boolean active;
     private MSpoutBlock.Model model;
     private boolean inventoryChanged = false;
@@ -78,10 +80,10 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
     }
 
     private SingleItemWithFluid asInput() {
-        return SingleItemWithFluid.of(this.getStack(INPUT_FIRST).copy(), fluidContainer, (ServerWorld) world);
+        return SingleItemWithFluid.of(this.getItem(INPUT_FIRST).copy(), fluidContainer, (ServerLevel) level);
     }
 
-    public static <T extends BlockEntity> void ticker(World world, BlockPos pos, BlockState state, T t) {
+    public static <T extends BlockEntity> void ticker(Level world, BlockPos pos, BlockState state, T t) {
         var self = (MSpoutBlockEntity) t;
 
         if (self.model == null) {
@@ -92,17 +94,17 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
             }
         }
 
-        var alt = !self.containers[0].isContainerEmpty() && self.containers[0].getContainer().get().isIn(FactoryItemTags.SPOUT_ITEM_HORIZONTAL);
+        var alt = !self.containers[0].isContainerEmpty() && self.containers[0].getContainer().get().is(FactoryItemTags.SPOUT_ITEM_HORIZONTAL);
         self.model.altModel(alt);
         self.state = null;
-        var posAbove = pos.up();
+        var posAbove = pos.above();
 
         var rot = RotationUser.getRotation(world, posAbove);
         var fullSpeed = rot.speed();
         var strength = fullSpeed / 60 / 20;
-        NetworkComponent.Pipe.forEachLogic((ServerWorld) world, posAbove, l -> l.setSourceStrength(posAbove, strength));
+        NetworkComponent.Pipe.forEachLogic((ServerLevel) world, posAbove, l -> l.setSourceStrength(posAbove, strength));
 
-        var container = world.getBlockEntity(pos.up(2)) instanceof FluidContainerOwner owner ? owner.getFluidContainer(Direction.DOWN) : null;
+        var container = world.getBlockEntity(pos.above(2)) instanceof FluidContainerOwner owner ? owner.getFluidContainer(Direction.DOWN) : null;
 
         if (self.isInputEmpty()) {
             self.process = 0;
@@ -130,14 +132,14 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
         self.containerUpdateId = container.updateId();
         self.fluidContainer = container;
 
-        var inputStack = self.getStack(INPUT_FIRST);
+        var inputStack = self.getItem(INPUT_FIRST);
 
         var input = self.asInput();
 
         if (self.currentRecipe == null || !self.currentRecipe.value().matches(input, world)) {
             self.process = 0;
             self.speedScale = 0;
-            self.currentRecipe = ((ServerWorld) world).getRecipeManager().getFirstMatch(FactoryRecipeTypes.SPOUT, input, world).orElse(null);
+            self.currentRecipe = ((ServerLevel) world).recipeAccess().getRecipeFor(FactoryRecipeTypes.SPOUT, input, world).orElse(null);
 
             if (self.currentRecipe == null) {
                 self.active = false;
@@ -164,61 +166,61 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
             if (coolingTime > 0 && !self.isCooling) {
                 self.isCooling = true;
                 self.process = 0;
-                self.markDirty();
+                self.setChanged();
                 return;
             }
 
-            var itemOut = self.currentRecipe.value().craft(input, world.getRegistryManager());
-            var currentOutput = self.getStack(OUTPUT_FIRST);
+            var itemOut = self.currentRecipe.value().assemble(input, world.registryAccess());
+            var currentOutput = self.getItem(OUTPUT_FIRST);
             if (currentOutput.isEmpty()) {
-                self.setStack(OUTPUT_FIRST, itemOut);
-            } else if (ItemStack.areItemsAndComponentsEqual(itemOut, currentOutput) && currentOutput.getCount() + itemOut.getCount() <= itemOut.getMaxCount()) {
-                currentOutput.increment(itemOut.getCount());
+                self.setItem(OUTPUT_FIRST, itemOut);
+            } else if (ItemStack.isSameItemSameComponents(itemOut, currentOutput) && currentOutput.getCount() + itemOut.getCount() <= itemOut.getMaxStackSize()) {
+                currentOutput.grow(itemOut.getCount());
             } else {
                 return;
             }
-            if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayerEntity serverPlayer) {
+            if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayer serverPlayer) {
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.SPOUT_CRAFT);
-                Criteria.RECIPE_CRAFTED.trigger(serverPlayer, self.currentRecipe.id(), List.of(inputStack.copy()));
+                CriteriaTriggers.RECIPE_CRAFTED.trigger(serverPlayer, self.currentRecipe.id(), List.of(inputStack.copy()));
             }
-            inputStack.decrement(self.currentRecipe.value().decreasedInputItemAmount(input));
+            inputStack.shrink(self.currentRecipe.value().decreasedInputItemAmount(input));
             var damage = self.currentRecipe.value().damageInputItemAmount(input);
 
             if (damage > 0) {
                 var x = inputStack.copy();
-                inputStack.damage(damage, (ServerWorld) world, null, Consumers.nop());
+                inputStack.hurtAndBreak(damage, (ServerLevel) world, null, Consumers.nop());
                 if (inputStack.isEmpty()) {
-                    if (x.contains(DataComponentTypes.BREAK_SOUND)) {
-                        world.playSound(null, pos, x.get(DataComponentTypes.BREAK_SOUND).value(), SoundCategory.BLOCKS);
+                    if (x.has(DataComponents.BREAK_SOUND)) {
+                        world.playSound(null, pos, x.get(DataComponents.BREAK_SOUND).value(), SoundSource.BLOCKS);
                     }
-                    ((ServerWorld) world).spawnParticles(new ItemStackParticleEffect(ParticleTypes.ITEM, x),
+                    ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, x),
                             pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.51, 5,
                             0.2, 0, 0.2, 0.5);
                 }
             }
             if (inputStack.isEmpty()) {
-                self.setStack(INPUT_FIRST, ItemStack.EMPTY);
+                self.setItem(INPUT_FIRST, ItemStack.EMPTY);
             }
 
             for (var fluid : self.currentRecipe.value().fluidInput(input)) {
                 container.extract(fluid, false);
             }
-            world.playSound(null, pos, self.currentRecipe.value().soundEvent().value(), SoundCategory.BLOCKS);
+            world.playSound(null, pos, self.currentRecipe.value().soundEvent().value(), SoundSource.BLOCKS);
             self.process = 0;
             self.isCooling = false;
             self.model.setProgress(false, 0, null);
-            self.markDirty();
+            self.setChanged();
         } else {
             var speed = Math.min(Math.abs(strength) * 1, 1);
             self.speedScale = speed;
             if (speed > 0 || self.isCooling) {
                 self.process += self.isCooling ? 1 : speed;
-                markDirty(world, pos, self.getCachedState());
-                var fluid = Util.getRandomOrEmpty(self.currentRecipe.value().fluidInput(input), world.random);
+                setChanged(world, pos, self.getBlockState());
+                var fluid = Util.getRandomSafe(self.currentRecipe.value().fluidInput(input), world.random);
                 if (fluid.isPresent()) {
                     var progress = self.process / time;
                     if (!self.isCooling) {
-                        ((ServerWorld) world).spawnParticles(fluid.get().instance().particle(),
+                        ((ServerLevel) world).sendParticles(fluid.get().instance().particle(),
                                 pos.getX() + 0.5, pos.getY() + 0.5 + 1 + 4 / 16f, pos.getZ() + 0.5, 0,
                                 0, -1, 0, 0.1);
                     }
@@ -241,26 +243,26 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
         if (!c.isContainerEmpty()) {
             assert c.getContainer() != null;
             var container = c.getContainer();
-            Vec3d base = Vec3d.ofCenter(this.pos);
+            Vec3 base = Vec3.atCenterOf(this.worldPosition);
             var scale = 0.75f;
             Quaternionf rot;
-            var dir = this.getCachedState().get(MDrainBlock.INPUT_FACING);
+            var dir = this.getBlockState().getValue(MDrainBlock.INPUT_FACING);
             if (id == INPUT_FIRST) {
-                if (container.get().isIn(FactoryItemTags.SPOUT_ITEM_HORIZONTAL)) {
+                if (container.get().is(FactoryItemTags.SPOUT_ITEM_HORIZONTAL)) {
                     base = base.add(0, 7.5f / 16 - (2 / 16f / 16f), 0);
-                    rot = RotationAxis.POSITIVE_Y.rotation(0).mul(dir.getOpposite().getRotationQuaternion());
+                    rot = Axis.YP.rotation(0).mul(dir.getOpposite().getRotation());
                     scale = 2 * 12 / 16f;//1.25f;
                 } else {
                     base = base.add(0, 10f / 16, 0);
-                    rot = Direction.UP.getRotationQuaternion().rotateY(dir.getPositiveHorizontalDegrees() * MathHelper.RADIANS_PER_DEGREE);
+                    rot = Direction.UP.getRotation().rotateY(dir.toYRot() * Mth.DEG_TO_RAD);
                 }
             } else {
-                if (!containers[0].isContainerEmpty() && containers[0].getContainer().get().isIn(FactoryItemTags.SPOUT_ITEM_HORIZONTAL)) {
+                if (!containers[0].isContainerEmpty() && containers[0].getContainer().get().is(FactoryItemTags.SPOUT_ITEM_HORIZONTAL)) {
                     base = base.add(0, 1 / 16f, 0);
                 }
 
-                base = base.add(0, 7.5 / 16, 0).offset(dir, -0.4);
-                rot = RotationAxis.POSITIVE_Y.rotation(MathHelper.PI).mul(dir.getOpposite().getRotationQuaternion());
+                base = base.add(0, 7.5 / 16, 0).relative(dir, -0.4);
+                rot = Axis.YP.rotation(Mth.PI).mul(dir.getOpposite().getRotation());
             }
 
             container.setPos(base);
@@ -270,61 +272,61 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
     }
 
     @Override
-    protected void writeData(WriteView view) {
+    protected void saveAdditional(ValueOutput view) {
         this.writeInventoryView(view);
         view.putDouble("Progress", this.process);
         view.putBoolean("is_cooling", this.isCooling);
-        super.writeData(view);
+        super.saveAdditional(view);
     }
 
     @Override
-    public void readData(ReadView view) {
+    public void loadAdditional(ValueInput view) {
         this.readInventoryView(view);
-        this.process = view.getDouble("Progress", 0);
-        this.isCooling = view.getBoolean("is_cooling", false);
+        this.process = view.getDoubleOr("Progress", 0);
+        this.isCooling = view.getBooleanOr("is_cooling", false);
         this.inventoryChanged = true;
-        super.readData(view);
+        super.loadAdditional(view);
     }
 
     @Override
-    protected void readComponents(ComponentsAccess components) {
-        super.readComponents(components);
+    protected void applyImplicitComponents(DataComponentGetter components) {
+        super.applyImplicitComponents(components);
     }
 
     @Override
-    protected void addComponents(ComponentMap.Builder componentMapBuilder) {
-        super.addComponents(componentMapBuilder);
+    protected void collectImplicitComponents(DataComponentMap.Builder componentMapBuilder) {
+        super.collectImplicitComponents(componentMapBuilder);
     }
 
     @Override
-    public void removeFromCopiedStackData(WriteView view) {
-        super.removeFromCopiedStackData(view);
-        view.remove("fluid");
+    public void removeComponentsFromTag(ValueOutput view) {
+        super.removeComponentsFromTag(view);
+        view.discard("fluid");
     }
 
     @Override
-    public int[] getAvailableSlots(Direction side) {
-        var facing = this.getCachedState().get(MDrainBlock.INPUT_FACING);
+    public int[] getSlotsForFace(Direction side) {
+        var facing = this.getBlockState().getValue(MDrainBlock.INPUT_FACING);
         return facing.getOpposite() == side || side == Direction.DOWN ? OUTPUT_SLOTS : INPUT_SLOTS;
     }
 
     @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
         return slot != OUTPUT_FIRST;
     }
 
     @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
         return slot == OUTPUT_FIRST;
     }
 
-    public void createGui(ServerPlayerEntity player) {
+    public void createGui(ServerPlayer player) {
         new Gui(player);
     }
 
     private boolean isInputEmpty() {
         for (int i = 0; i < OUTPUT_FIRST; i++) {
-            if (!this.getStack(i).isEmpty()) {
+            if (!this.getItem(i).isEmpty()) {
                 return false;
             }
         }
@@ -339,13 +341,13 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
     }
 
     @Override
-    public void markDirty() {
-        super.markDirty();
+    public void setChanged() {
+        super.setChanged();
         this.inventoryChanged = true;
     }
 
     @Override
-    public SimpleContainer[] getContainers() {
+    public SimpleMovingItemContainer[] getContainers() {
         return this.containers;
     }
 
@@ -359,25 +361,25 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
         private int delayTick = -1;
         private FluidContainer lastContainer;
 
-        public Gui(ServerPlayerEntity player) {
-            super(ScreenHandlerType.GENERIC_9X3, player, false);
+        public Gui(ServerPlayer player) {
+            super(MenuType.GENERIC_9x3, player, false);
             this.updateTitleAndFluid();
             this.setSlot(9, PolydexCompat.getButton(FactoryRecipeTypes.SPOUT));
 
             this.setSlotRedirect(9 + 3, new Slot(MSpoutBlockEntity.this, 0, 0, 0));
-            this.setSlotRedirect(9 + 6, new FurnaceOutputSlot(player, MSpoutBlockEntity.this, 1, 1, 0));
+            this.setSlotRedirect(9 + 6, new FurnaceResultSlot(player, MSpoutBlockEntity.this, 1, 1, 0));
             this.setSlot(9 + 4, GuiTextures.PROGRESS_HORIZONTAL_OFFSET_RIGHT.get(progress()));
             this.open();
         }
 
         private void updateTitleAndFluid() {
             var text = fluidContainer != null ? GuiTextures.MECHANICAL_SPOUT.apply(
-                    Text.empty()
-                            .append(Text.literal(GuiTextures.MECHANICAL_SPOUT_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
+                    Component.empty()
+                            .append(Component.literal(GuiTextures.MECHANICAL_SPOUT_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
                             .append(FluidTextures.MIXER.render(MSpoutBlockEntity.this.fluidContainer::provideRender))
-                            .append(Text.literal(GuiTextures.MECHANICAL_SPOUT_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
-                            .append(MSpoutBlockEntity.this.getCachedState().getBlock().getName()))
-                    : GuiTextures.MECHANICAL_SPOUT_NO_CONN.apply(MSpoutBlockEntity.this.getCachedState().getBlock().getName());
+                            .append(Component.literal(GuiTextures.MECHANICAL_SPOUT_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
+                            .append(MSpoutBlockEntity.this.getBlockState().getBlock().getName()))
+                    : GuiTextures.MECHANICAL_SPOUT_NO_CONN.apply(MSpoutBlockEntity.this.getBlockState().getBlock().getName());
 
             var fluidSlot = FluidContainerUtil.guiElement(fluidContainer, false);
 
@@ -410,12 +412,12 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
             }
 
 
-            return (float) MathHelper.clamp(value, 0, 1);
+            return (float) Mth.clamp(value, 0, 1);
         }
 
         @Override
         public void onTick() {
-            if (player.getEntityPos().squaredDistanceTo(Vec3d.ofCenter(MSpoutBlockEntity.this.pos)) > (18 * 18)) {
+            if (player.position().distanceToSqr(Vec3.atCenterOf(MSpoutBlockEntity.this.worldPosition)) > (18 * 18)) {
                 this.close();
             }
             if (fluidContainer != lastContainer) {

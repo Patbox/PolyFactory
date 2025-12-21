@@ -31,34 +31,38 @@ import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.DisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.decoration.Brightness;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
-import net.minecraft.particle.DustColorTransitionParticleEffect;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.DustColorTransitionOptions;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.Brightness;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.SkullBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -71,22 +75,22 @@ import java.util.Locale;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class HologramProjectorBlock extends DataNetworkBlock implements FactoryBlock, ConfigurableBlock, BlockEntityProvider, CableConnectable, DataReceiver, BarrierBasedWaterloggable {
+public class HologramProjectorBlock extends DataNetworkBlock implements FactoryBlock, ConfigurableBlock, EntityBlock, CableConnectable, DataReceiver, BarrierBasedWaterloggable {
     public static final BooleanProperty ACTIVE = FactoryProperties.ACTIVE;
-    public static final EnumProperty<Direction> FACING = Properties.FACING;
-    public static final IntProperty FRONT = FactoryProperties.FRONT;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
+    public static final IntegerProperty FRONT = FactoryProperties.FRONT;
     private static final BlockConfig<?> CHANGE_ROTATION = BlockConfig.of("front", FRONT, (value, world, pos, side, state) -> {
-        var axis = state.get(FACING).getAxis();
+        var axis = state.getValue(FACING).getAxis();
         if (axis == Direction.Axis.Y) {
             var rot = Direction.NORTH;
             for (var i = 0; i < value; i++) {
-                rot = rot.rotateClockwise(axis);
+                rot = rot.getClockWise(axis);
             }
             return FactoryUtil.asText(rot);
         } else {
             var rot = Direction.UP;
             for (var i = 0; i < value; i++) {
-                rot = rot.rotateCounterclockwise(axis);
+                rot = rot.getCounterClockWise(axis);
             }
             return FactoryUtil.asText(rot);
         }
@@ -105,72 +109,72 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
     );
 
     public static final BlockConfig<?> CHANGE_PITCH = BlockConfig.ofBlockEntity("pitch", Codec.FLOAT, HologramProjectorBlockEntity.class,
-            BlockValueFormatter.str(x -> Math.round(x * MathHelper.DEGREES_PER_RADIAN) + "°"),
+            BlockValueFormatter.str(x -> Math.round(x * Mth.RAD_TO_DEG) + "°"),
             HologramProjectorBlockEntity::pitch, HologramProjectorBlockEntity::setPitch,
-            WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
-                    0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
+            WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + Mth.DEG_TO_RAD * (n ? 5 : -5),
+                    0, Mth.TWO_PI - Mth.DEG_TO_RAD * 5))
     );
 
     public static final BlockConfig<?> CHANGE_YAW = BlockConfig.ofBlockEntity("yaw", Codec.FLOAT, HologramProjectorBlockEntity.class,
-            BlockValueFormatter.str(x -> Math.round(x * MathHelper.DEGREES_PER_RADIAN) + "°"),
+            BlockValueFormatter.str(x -> Math.round(x * Mth.RAD_TO_DEG) + "°"),
             HologramProjectorBlockEntity::yaw, HologramProjectorBlockEntity::setYaw,
-            WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
-                    0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
+            WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + Mth.DEG_TO_RAD * (n ? 5 : -5),
+                    0, Mth.TWO_PI - Mth.DEG_TO_RAD * 5))
     );
     public static final BlockConfig<?> CHANGE_ROLL = BlockConfig.ofBlockEntity("roll", Codec.FLOAT, HologramProjectorBlockEntity.class,
-            BlockValueFormatter.str(x -> Math.round(x * MathHelper.DEGREES_PER_RADIAN) + "°"),
+            BlockValueFormatter.str(x -> Math.round(x * Mth.RAD_TO_DEG) + "°"),
             HologramProjectorBlockEntity::roll, HologramProjectorBlockEntity::setRoll,
-            WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + MathHelper.RADIANS_PER_DEGREE * (n ? 5 : -5),
-                    0, MathHelper.TAU - MathHelper.RADIANS_PER_DEGREE * 5))
+            WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + Mth.DEG_TO_RAD * (n ? 5 : -5),
+                    0, Mth.TWO_PI - Mth.DEG_TO_RAD * 5))
     );
 
     public static final BlockConfig<?> FORCE_TEXT = BlockConfig.ofBlockEntity("force_text", Codec.BOOL, HologramProjectorBlockEntity.class,
-            BlockValueFormatter.text(ScreenTexts::onOrOff),
+            BlockValueFormatter.text(CommonComponents::optionStatus),
             HologramProjectorBlockEntity::forceText, HologramProjectorBlockEntity::setForceText,
             WrenchModifyBlockValue.simple((x, n) -> !x)
     );
 
-    public HologramProjectorBlock(Settings settings) {
+    public HologramProjectorBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(WATERLOGGED, false).with(ACTIVE, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false).setValue(ACTIVE, false));
         //noinspection ResultOfMethodCallIgnored
         Model.ACTIVE_MODEL.getCount();
     }
 
     @Override
-    public @Nullable BlockState getPlacementState(ItemPlacementContext ctx) {
-        Direction direction = ctx.getSide();
+    public @Nullable BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        Direction direction = ctx.getClickedFace();
 
         var rot = switch (direction) {
-            case UP, DOWN -> ctx.getHorizontalPlayerFacing().getAxis() == Direction.Axis.Z
-                    ? ctx.getHorizontalPlayerFacing().getHorizontalQuarterTurns() : ctx.getHorizontalPlayerFacing().getOpposite().getHorizontalQuarterTurns();
-            case NORTH, SOUTH, WEST, EAST -> ctx.getHorizontalPlayerFacing().getAxis() == ctx.getSide().getAxis()
-                    ? (ctx.getVerticalPlayerLookDirection() == Direction.UP ? 2 : 0)
-                    : ((ctx.getHorizontalPlayerFacing().getDirection() == Direction.AxisDirection.POSITIVE) == (direction.getAxis() == Direction.Axis.Z) ? 1 : 3);
+            case UP, DOWN -> ctx.getHorizontalDirection().getAxis() == Direction.Axis.Z
+                    ? ctx.getHorizontalDirection().get2DDataValue() : ctx.getHorizontalDirection().getOpposite().get2DDataValue();
+            case NORTH, SOUTH, WEST, EAST -> ctx.getHorizontalDirection().getAxis() == ctx.getClickedFace().getAxis()
+                    ? (ctx.getNearestLookingVerticalDirection() == Direction.UP ? 2 : 0)
+                    : ((ctx.getHorizontalDirection().getAxisDirection() == Direction.AxisDirection.POSITIVE) == (direction.getAxis() == Direction.Axis.Z) ? 1 : 3);
         };
 
-        return waterLog(ctx, this.getDefaultState().with(FACING, direction).with(FRONT, rot));
+        return waterLog(ctx, this.defaultBlockState().setValue(FACING, direction).setValue(FRONT, rot));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(WATERLOGGED).add(ACTIVE).add(FACING, FRONT);
     }
 
     @Override
-    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
-        return state.get(FACING).getOpposite() == dir;
+    public boolean canCableConnect(LevelReader world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+        return state.getValue(FACING).getOpposite() == dir;
     }
 
-    protected int getChannel(ServerWorld world, BlockPos pos) {
+    protected int getChannel(ServerLevel world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof ChannelContainer container) {
             return container.channel();
         }
         return 0;
     }
 
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return List.of(
                 BlockConfig.CHANNEL_WITH_DISABLED,
                 BlockConfig.FACING,
@@ -191,36 +195,36 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
+        return Blocks.IRON_BLOCK.defaultBlockState();
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         tickWater(state, world, tickView, pos);
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
+        return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
-    public Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos) {
-        return List.of(new ChannelReceiverDirectionNode(state.get(FACING).getOpposite(), getChannel(world, pos)));
+    public Collection<BlockNode> createDataNodes(BlockState state, ServerLevel world, BlockPos pos) {
+        return List.of(new ChannelReceiverDirectionNode(state.getValue(FACING).getOpposite(), getChannel(world, pos)));
     }
 
     @Override
-    public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
+    public boolean receiveData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
         if (world.getBlockEntity(selfPos) instanceof HologramProjectorBlockEntity be) {
             be.setCachedData(data);
-            var active = selfState.get(ACTIVE);
+            var active = selfState.getValue(ACTIVE);
             if (data.isEmpty() == active) {
-                if (!data.isEmpty() && FactoryUtil.getClosestPlayer(world, selfPos, 32) instanceof ServerPlayerEntity player) {
+                if (!data.isEmpty() && FactoryUtil.getClosestPlayer(world, selfPos, 32) instanceof ServerPlayer player) {
                     TriggerCriterion.trigger(player, FactoryTriggers.HOLOGRAM_PROJECTOR_ACTIVATES);
                 }
 
-                world.setBlockState(selfPos, selfState.cycle(ACTIVE));
+                world.setBlockAndUpdate(selfPos, selfState.cycle(ACTIVE));
             }
             return true;
         }
@@ -228,28 +232,28 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
 
     @Override
-    public boolean tickElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }
 
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new HologramProjectorBlockEntity(pos, state);
     }
 
     public static class Model extends BlockModel {
         private static final ItemStack ACTIVE_MODEL = ItemDisplayElementUtil.getModel(id("block/hologram_projector_active"));
-        private static final ParticleEffect EFFECT = new DustColorTransitionParticleEffect(
-                ColorHelper.getArgb(0, 153, 250, 255),
-                ColorHelper.getArgb(0, 235, 254, 255),
+        private static final ParticleOptions EFFECT = new DustColorTransitionOptions(
+                ARGB.color(0, 153, 250, 255),
+                ARGB.color(0, 235, 254, 255),
                 0.2f);
 
-        private static final Random RANDOM = Random.create();
+        private static final RandomSource RANDOM = RandomSource.create();
         private final ItemDisplayElement base;
         private DisplayElement currentDisplay;
         private DisplayElement currentDisplayExtra;
@@ -268,7 +272,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
         private float extraOffset;
 
         public Model(BlockState state) {
-            this.base = ItemDisplayElementUtil.createSimple(state.get(ACTIVE) ? ACTIVE_MODEL : ItemDisplayElementUtil.getModel(state.getBlock().asItem()));
+            this.base = ItemDisplayElementUtil.createSimple(state.getValue(ACTIVE) ? ACTIVE_MODEL : ItemDisplayElementUtil.getModel(state.getBlock().asItem()));
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);
@@ -282,11 +286,11 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 var x = this.axis.choose(0.1, f, f);
                 var y = this.axis.choose(f, 0.1, f);
                 var z = this.axis.choose(f, f, 0.1);
-                var pos = getPos().offset(this.facing,  this.offset + this.scale / 2)
+                var pos = getPos().relative(this.facing,  this.offset + this.scale / 2)
                         .add(RANDOM.nextFloat() * x * 2 - x, RANDOM.nextFloat() * y * 2 - y, RANDOM.nextFloat() * z * 2 - z);
-                this.sendPacket(new ParticleS2CPacket(new DustColorTransitionParticleEffect(
-                        ColorHelper.getArgb(133, 250, 255),
-                        ColorHelper.getArgb(235, 254, 255),
+                this.sendPacket(new ClientboundLevelParticlesPacket(new DustColorTransitionOptions(
+                        ARGB.color(133, 250, 255),
+                        ARGB.color(235, 254, 255),
                         0.8f), false, false, pos.x, pos.y, pos.z, 0, 0, 0, 0, 0));
 
                 if (this.currentDisplay != null) {
@@ -300,24 +304,24 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
         }
 
         private void updateStatePos(BlockState state) {
-            var dir = state.get(FACING);
+            var dir = state.getValue(FACING);
             var rot = (dir.getAxis() == Direction.Axis.Y ? Direction.NORTH : Direction.UP);
 
-            for (var i = 0; i < state.get(FRONT); i++) {
-                rot = rot.rotateClockwise(dir.getAxis());
+            for (var i = 0; i < state.getValue(FRONT); i++) {
+                rot = rot.getClockWise(dir.getAxis());
             }
             this.axis = rot.getAxis();
             this.facing = dir;
-            this.active = state.get(ACTIVE);
+            this.active = state.getValue(ACTIVE);
             float p = -90;
-            float y = rot.getPositiveHorizontalDegrees();
+            float y = rot.toYRot();
 
-            y = rot.getPositiveHorizontalDegrees();
-            var q = new Quaternionf().rotateX(MathHelper.HALF_PI);
+            y = rot.toYRot();
+            var q = new Quaternionf().rotateX(Mth.HALF_PI);
             if (dir.getAxis() != Direction.Axis.Y) {
                 p = 0;
-                y = dir.getPositiveHorizontalDegrees();
-                q.rotateY((float) (MathHelper.HALF_PI * state.get(FRONT)));
+                y = dir.toYRot();
+                q.rotateY((float) (Mth.HALF_PI * state.getValue(FRONT)));
             } else if (dir == Direction.DOWN) {
                 p = 90;
             }
@@ -336,7 +340,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 var state = this.blockState();
-                this.base.setItem(state.get(ACTIVE) ? ACTIVE_MODEL : ItemDisplayElementUtil.getModel(state.getBlock().asItem()));
+                this.base.setItem(state.getValue(ACTIVE) ? ACTIVE_MODEL : ItemDisplayElementUtil.getModel(state.getBlock().asItem()));
                 updateStatePos(state);
                 this.base.tick();
                 if (this.currentDisplay != null) {
@@ -426,7 +430,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                      list.add(string.substring(start));
                 }
 
-                var text = Text.literal(String.join("\n", list)).formatted(Formatting.AQUA);
+                var text = Component.literal(String.join("\n", list)).withStyle(ChatFormatting.AQUA);
                 if (this.currentDisplay instanceof TextDisplayElement display && this.currentDisplayExtra instanceof TextDisplayElement displayExtra) {
                     display.setText(text);
                     display.tick();
@@ -484,12 +488,12 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
             var mat = mat();
             mat.identity();
 
-            mat.rotate(Direction.get(Direction.AxisDirection.POSITIVE, this.facing.getAxis()).getRotationQuaternion());
+            mat.rotate(Direction.get(Direction.AxisDirection.POSITIVE, this.facing.getAxis()).getRotation());
             if (display instanceof TextDisplayElement && id == 0) {
-                mat.rotateY(MathHelper.PI);
+                mat.rotateY(Mth.PI);
             }
-            mat.rotateY((float) (MathHelper.HALF_PI * blockState().get(FRONT)));
-            mat.rotateZ((this.facing.getDirection() == Direction.AxisDirection.POSITIVE ? 0 : MathHelper.PI));
+            mat.rotateY((float) (Mth.HALF_PI * blockState().getValue(FRONT)));
+            mat.rotateZ((this.facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 0 : Mth.PI));
 
             mat.translate(0, this.offset + this.scale / 2 , 0);
             mat.scale(new Vector3f(this.scale, this.scale, display instanceof TextDisplayElement ? 1f : 0.01f).mul(this.extraScale));

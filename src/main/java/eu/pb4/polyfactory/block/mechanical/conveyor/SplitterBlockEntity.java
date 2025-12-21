@@ -6,18 +6,14 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.WorldChunk;
-
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class SplitterBlockEntity extends LockableBlockEntity implements BlockEntityExtraListener {
     private FilterData filterLeft = FilterData.EMPTY_FALSE;
@@ -34,12 +30,12 @@ public class SplitterBlockEntity extends LockableBlockEntity implements BlockEnt
     }
 
     @Override
-    protected void writeData(WriteView view) {
+    protected void saveAdditional(ValueOutput view) {
         if (!this.filterStackLeft.isEmpty()) {
-            view.put("FilterStackLeft", ItemStack.OPTIONAL_CODEC, this.filterStackLeft);
+            view.store("FilterStackLeft", ItemStack.OPTIONAL_CODEC, this.filterStackLeft);
         }
         if (!this.filterStackRight.isEmpty()) {
-            view.put("FilterStackRight", ItemStack.OPTIONAL_CODEC, this.filterStackRight);
+            view.store("FilterStackRight", ItemStack.OPTIONAL_CODEC, this.filterStackRight);
         }
         view.putByte("CurPos", (byte) this.position);
     }
@@ -52,13 +48,13 @@ public class SplitterBlockEntity extends LockableBlockEntity implements BlockEnt
     }
 
     @Override
-    public void readData(ReadView view) {
+    public void loadAdditional(ValueInput view) {
         this.filterStackLeft = view.read("FilterStackLeft", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         this.filterStackRight = view.read("FilterStackRight", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         this.filterRight = FilterData.of(this.filterStackRight, false);
         this.filterLeft = FilterData.of(this.filterStackLeft, false);
         this.filtersEqual = Objects.equals(this.filterLeft.filter(), this.filterRight.filter());
-        this.position = view.getByte("CurPos", (byte) 0);
+        this.position = view.getByteOr("CurPos", (byte) 0);
     }
 
     public int pos(int max) {
@@ -67,7 +63,7 @@ public class SplitterBlockEntity extends LockableBlockEntity implements BlockEnt
             c = 0;
         }
         this.position = c;
-        this.markDirty();
+        this.setChanged();
         return c;
     }
 
@@ -80,8 +76,8 @@ public class SplitterBlockEntity extends LockableBlockEntity implements BlockEnt
     }
 
     @Override
-    public void markRemoved() {
-        super.markRemoved();
+    public void setRemoved() {
+        super.setRemoved();
     }
 
     public ItemStack getFilterLeft() {
@@ -92,7 +88,7 @@ public class SplitterBlockEntity extends LockableBlockEntity implements BlockEnt
         this.filterStackLeft = stack;
         this.filterLeft = FilterData.of(stack, false);
         this.filtersEqual = Objects.equals(this.filterLeft.filter(), this.filterRight.filter());
-        this.markDirty();
+        this.setChanged();
         this.updateHologram();
     }
 
@@ -104,13 +100,13 @@ public class SplitterBlockEntity extends LockableBlockEntity implements BlockEnt
         this.filterStackRight = stack;
         this.filterRight = FilterData.of(stack, false);
         this.filtersEqual = Objects.equals(this.filterLeft.filter(), this.filterRight.filter());
-        this.markDirty();
+        this.setChanged();
         this.updateHologram();
     }
 
     @Override
-    public void onListenerUpdate(WorldChunk chunk) {
-        this.model = BlockBoundAttachment.get(chunk, this.pos).holder() instanceof SplitterBlock.Model model ? model : null;
+    public void onListenerUpdate(LevelChunk chunk) {
+        this.model = BlockBoundAttachment.get(chunk, this.worldPosition).holder() instanceof SplitterBlock.Model model ? model : null;
         this.updateHologram();
     }
 
@@ -131,11 +127,11 @@ public class SplitterBlockEntity extends LockableBlockEntity implements BlockEnt
     }
 
     @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        super.onBlockReplaced(pos, oldState);
-        if (this.world != null) {
-            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, this.getFilterRight());
-            ItemScatterer.spawn(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, this.getFilterLeft());
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        super.preRemoveSideEffects(pos, oldState);
+        if (this.level != null) {
+            Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, this.getFilterRight());
+            Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, this.getFilterLeft());
         }
     }
 }

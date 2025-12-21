@@ -1,9 +1,9 @@
 package eu.pb4.polyfactory.block.fluids;
 
 import eu.pb4.polyfactory.fluid.FluidInstance;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 
 public interface FluidInput {
     long insertFluid(FluidInstance<?> type, long amount, Direction direction);
@@ -18,6 +18,6 @@ public interface FluidInput {
     }
 
     interface Getter {
-        FluidInput getFluidInput(ServerWorld world, BlockPos pos, Direction direction);
+        FluidInput getFluidInput(ServerLevel world, BlockPos pos, Direction direction);
     }
 }

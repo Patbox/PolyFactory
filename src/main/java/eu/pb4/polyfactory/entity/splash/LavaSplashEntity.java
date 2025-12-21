@@ -1,69 +1,75 @@
 package eu.pb4.polyfactory.entity.splash;
 
 import eu.pb4.polyfactory.fluid.FactoryFluids;
-import net.minecraft.block.*;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageTypes;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.Properties;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Unit;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.event.GameEvent;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseFireBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.CandleBlock;
+import net.minecraft.world.level.block.CandleCakeBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 
 public class LavaSplashEntity extends SplashEntity<Unit> {
-    public LavaSplashEntity(EntityType<? extends ProjectileEntity> entityType, World world) {
+    public LavaSplashEntity(EntityType<? extends Projectile> entityType, Level world) {
         super(entityType, world, FactoryFluids.LAVA);
     }
     @Override
-    protected void onBlockHit(BlockHitResult context) {
-        if (!this.getEntityWorld().isClient() && this.random.nextFloat() < 0.3 && this.canBreakBlock(context.getBlockPos())) {
+    protected void onHitBlock(BlockHitResult context) {
+        if (!this.level().isClientSide() && this.random.nextFloat() < 0.3 && this.canBreakBlock(context.getBlockPos())) {
             var blockPos = context.getBlockPos();
-            var world = this.getEntityWorld();
+            var world = this.level();
             var blockState = world.getBlockState(blockPos);
-            if (!CampfireBlock.canBeLit(blockState) && !CandleBlock.canBeLit(blockState) && !CandleCakeBlock.canBeLit(blockState)) {
-                BlockPos blockPos2 = blockPos.offset(context.getSide());
-                if (AbstractFireBlock.canPlaceAt(world, blockPos2, context.getSide())) {
-                    BlockState blockState2 = AbstractFireBlock.getState(world, blockPos2);
-                    world.setBlockState(blockPos2, blockState2, Block.NOTIFY_ALL_AND_REDRAW);
-                    world.emitGameEvent(this, GameEvent.BLOCK_PLACE, blockPos);
+            if (!CampfireBlock.canLight(blockState) && !CandleBlock.canLight(blockState) && !CandleCakeBlock.canLight(blockState)) {
+                BlockPos blockPos2 = blockPos.relative(context.getDirection());
+                if (BaseFireBlock.canBePlacedAt(world, blockPos2, context.getDirection())) {
+                    BlockState blockState2 = BaseFireBlock.getState(world, blockPos2);
+                    world.setBlock(blockPos2, blockState2, Block.UPDATE_ALL_IMMEDIATE);
+                    world.gameEvent(this, GameEvent.BLOCK_PLACE, blockPos);
                 }
             } else {
-                world.setBlockState(blockPos, blockState.with(Properties.LIT, true), Block.NOTIFY_ALL_AND_REDRAW);
-                world.emitGameEvent(this, GameEvent.BLOCK_CHANGE, blockPos);
+                world.setBlock(blockPos, blockState.setValue(BlockStateProperties.LIT, true), Block.UPDATE_ALL_IMMEDIATE);
+                world.gameEvent(this, GameEvent.BLOCK_CHANGE, blockPos);
             }
         }
-        super.onBlockHit(context);
+        super.onHitBlock(context);
     }
     @Override
-    protected void onEntityHit(EntityHitResult entityHitResult) {
+    protected void onHitEntity(EntityHitResult entityHitResult) {
         if (this.random.nextFloat() < 0.3) {
-            if (this.getEntityWorld() instanceof ServerWorld world && entityHitResult.getEntity() instanceof LivingEntity livingEntity && this.canDamageEntity(livingEntity)) {
-                livingEntity.setOnFireFor(4);
-                livingEntity.damage(world, this.getDamageSources().create(DamageTypes.LAVA, this, this.getOwner()), 4F);
+            if (this.level() instanceof ServerLevel world && entityHitResult.getEntity() instanceof LivingEntity livingEntity && this.canDamageEntity(livingEntity)) {
+                livingEntity.igniteForSeconds(4);
+                livingEntity.hurtServer(world, this.damageSources().source(DamageTypes.LAVA, this, this.getOwner()), 4F);
             }
         }
-        super.onEntityHit(entityHitResult);
+        super.onHitEntity(entityHitResult);
     }
 
     @Override
     protected boolean discardInBlock(BlockState state, BlockPos blockPos) {
-        if (state.getFluidState().isIn(FluidTags.WATER)) {
-            ((ServerWorld) this.getEntityWorld()).spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
+        if (state.getFluidState().is(FluidTags.WATER)) {
+            ((ServerLevel) this.level()).sendParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
                     0, 0, 0, 0, 0);
-            this.playExtinguishSound();
-        } else if (state.isOf(Blocks.POWDER_SNOW)) {
-            ((ServerWorld) this.getEntityWorld()).spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
+            this.playEntityOnFireExtinguishedSound();
+        } else if (state.is(Blocks.POWDER_SNOW)) {
+            ((ServerLevel) this.level()).sendParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY(), this.getZ(),
                     0, 0, 0, 0, 0);
-            this.playExtinguishSound();
-            this.getEntityWorld().setBlockState(blockPos, Blocks.AIR.getDefaultState());
+            this.playEntityOnFireExtinguishedSound();
+            this.level().setBlockAndUpdate(blockPos, Blocks.AIR.defaultBlockState());
             return true;
         }
 
@@ -71,7 +77,7 @@ public class LavaSplashEntity extends SplashEntity<Unit> {
     }
 
     @Override
-    public ParticleEffect getBaseParticle() {
+    public ParticleOptions getBaseParticle() {
         return ParticleTypes.FLAME;
     }
 

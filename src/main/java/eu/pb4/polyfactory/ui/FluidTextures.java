@@ -3,14 +3,14 @@ package eu.pb4.polyfactory.ui;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidType;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 
 public record FluidTextures(Map<FluidType<?>, char[]> textures, FluidUiPositionCreator uiPositionCreator, char back) {
     private static final Int2ObjectOpenHashMap<FluidUiTextureCreator> TEXTURE_CREATORS = new Int2ObjectOpenHashMap<>();
@@ -22,8 +22,8 @@ public record FluidTextures(Map<FluidType<?>, char[]> textures, FluidUiPositionC
     public static final FluidTextures PRIMITIVE_SMELTERY = FluidTextures.of("primitive_smeltery", 48, 44, 21);
 
 
-    public Text render(Consumer<BiConsumer<FluidInstance<?>, Float>> provider) {
-        var out = Text.empty().setStyle(this.uiPositionCreator.style);
+    public Component render(Consumer<BiConsumer<FluidInstance<?>, Float>> provider) {
+        var out = Component.empty().setStyle(this.uiPositionCreator.style);
 
         var line = new MutableInt(0);
 
@@ -35,14 +35,14 @@ public record FluidTextures(Map<FluidType<?>, char[]> textures, FluidUiPositionC
             }
 
             var start = line.getValue();
-            var count = Math.min(MathHelper.ceil(amount * this.uiPositionCreator.height()) + start, lines.length);
+            var count = Math.min(Mth.ceil(amount * this.uiPositionCreator.height()) + start, lines.length);
 
             for (int i = start; i < count; i++) {
                 b.append(lines[i]);
                 b.append(this.back);
             }
 
-            var t = Text.literal(b.toString());
+            var t = Component.literal(b.toString());
             if (type.type().color().isPresent()) {
                 //noinspection unchecked
                 t.withColor(((FluidType.ColorProvider<Object>) type.type().color().get()).getColor(type.data()));

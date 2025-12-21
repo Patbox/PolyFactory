@@ -1,23 +1,23 @@
 package eu.pb4.polyfactory.entity;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
-public class PlatformCartEntity extends AbstractMinecartEntity {
-    protected PlatformCartEntity(EntityType<?> entityType, World world) {
+public class PlatformCartEntity extends AbstractMinecart {
+    protected PlatformCartEntity(EntityType<?> entityType, Level world) {
         super(entityType, world);
     }
 
     @Override
-    public ItemStack getPickBlockStack() {
+    public ItemStack getPickResult() {
         return null;
     }
 
     @Override
-    protected Item asItem() {
+    protected Item getDropItem() {
         return null;
     }
 }

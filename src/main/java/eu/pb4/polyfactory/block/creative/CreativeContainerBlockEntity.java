@@ -7,9 +7,9 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.base.SingleItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 @SuppressWarnings("UnstableApiUsage")
 public class CreativeContainerBlockEntity extends ContainerBlockEntity {
@@ -26,7 +26,7 @@ public class CreativeContainerBlockEntity extends ContainerBlockEntity {
         return new SingleItemStorage() {
             @Override
             protected long getCapacity(ItemVariant variant) {
-                return variant.getItem().getMaxCount();
+                return variant.getItem().getDefaultMaxStackSize();
             }
 
             @Override
@@ -36,7 +36,7 @@ public class CreativeContainerBlockEntity extends ContainerBlockEntity {
 
             @Override
             public long insert(ItemVariant insertedVariant, long maxAmount, TransactionContext transaction) {
-                return Math.min(variant.getItem().getMaxCount() - this.amount, maxAmount);
+                return Math.min(variant.getItem().getDefaultMaxStackSize() - this.amount, maxAmount);
             }
 
             @Override

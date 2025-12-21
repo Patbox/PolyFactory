@@ -12,21 +12,19 @@ import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentsAccess;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -49,14 +47,14 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
         this.container.writeData(view, "fluid");
     }
 
     @Override
-    protected void readData(ReadView view) {
-        super.readData(view);
+    protected void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
         this.container.readData(view, "fluid");
         if (!this.postInitialRead) {
             updateModel();
@@ -65,8 +63,8 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
     }
 
     @Override
-    protected void readComponents(ComponentsAccess components) {
-        super.readComponents(components);
+    protected void applyImplicitComponents(DataComponentGetter components) {
+        super.applyImplicitComponents(components);
         var f = components.get(FactoryDataComponents.FLUID);
         if (f != null) {
             this.container.clear();
@@ -75,27 +73,27 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
     }
 
     @Override
-    protected void addComponents(ComponentMap.Builder componentMapBuilder) {
-        super.addComponents(componentMapBuilder);
-        componentMapBuilder.add(FactoryDataComponents.FLUID, FluidComponent.copyFrom(this.container));
+    protected void collectImplicitComponents(DataComponentMap.Builder componentMapBuilder) {
+        super.collectImplicitComponents(componentMapBuilder);
+        componentMapBuilder.set(FactoryDataComponents.FLUID, FluidComponent.copyFrom(this.container));
     }
 
     @Override
-    public void removeFromCopiedStackData(WriteView view) {
-        super.removeFromCopiedStackData(view);
-        view.remove("fluid");
+    public void removeComponentsFromTag(ValueOutput view) {
+        super.removeComponentsFromTag(view);
+        view.discard("fluid");
     }
 
     @Override
     public long insertFluid(FluidInstance<?> type, long amount, Direction direction) {
-        if (this.world == null) {
+        if (this.level == null) {
             return FluidInputOutput.ContainerBased.super.insertFluid(type, amount, direction);
         }
-        var mut = this.pos.mutableCopy();
+        var mut = this.worldPosition.mutable();
         var tank = this;
         while (amount != 0) {
             amount = tank.container.insert(type, amount, false);
-            if (tank.getCachedState().get(FluidTankBlock.PART_Y).hasNext() && tank.world.getBlockEntity(mut.move(Direction.UP)) instanceof FluidTankBlockEntity tank2) {
+            if (tank.getBlockState().getValue(FluidTankBlock.PART_Y).hasNext() && tank.level.getBlockEntity(mut.move(Direction.UP)) instanceof FluidTankBlockEntity tank2) {
                 tank = tank2;
             } else {
                 break;
@@ -116,7 +114,7 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
     }
 
     private void onFluidChanged() {
-        this.markDirty();
+        this.setChanged();
     }
 
     private void updateModel() {
@@ -126,14 +124,14 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
     }
 
     @Override
-    public void onListenerUpdate(WorldChunk chunk) {
-        var x = BlockAwareAttachment.get(chunk, pos);
+    public void onListenerUpdate(LevelChunk chunk) {
+        var x = BlockAwareAttachment.get(chunk, worldPosition);
         if (x != null && x.holder() instanceof FluidTankBlock.Model model) {
             this.model = model;
         }
     }
 
-    public static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
+    public static <T extends BlockEntity> void tick(Level world, BlockPos pos, BlockState state, T t) {
         if (!(t instanceof FluidTankBlockEntity tank)) {
             return;
         }
@@ -143,24 +141,24 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
         updateVertical(world, tank, pos, state);
 
 
-        var y = state.get(FluidTankBlock.PART_Y);
+        var y = state.getValue(FluidTankBlock.PART_Y);
         if ((y.single() || y.positive()) && tank.model != null) {
             tank.model.setFluidAbove(null);
         }
         if ((y.single() || y.negative()) && tank.model != null) {
             tank.model.setFluidBelow(null);
         }
-        FluidContainerUtil.tick(tank.container, (ServerWorld) world, pos, tank.blockTemperature, tank::dropItem);
+        FluidContainerUtil.tick(tank.container, (ServerLevel) world, pos, tank.blockTemperature, tank::dropItem);
         tank.updateModel();
     }
 
     private void dropItem(ItemStack stack) {
-        ItemScatterer.spawn(world, this.pos.getX() + 0.5, this.pos.getY() + 0.5, this.pos.getZ() + 0.5, stack);
+        Containers.dropItemStack(level, this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 0.5, this.worldPosition.getZ() + 0.5, stack);
     }
 
-    private static void updateVertical(World world, FluidTankBlockEntity tank, BlockPos pos, BlockState state) {
-        var y = state.get(FluidTankBlock.PART_Y);
-        if ((y.middle() || y.positive()) && world.getBlockEntity(pos.offset(Direction.DOWN)) instanceof FluidTankBlockEntity below) {
+    private static void updateVertical(Level world, FluidTankBlockEntity tank, BlockPos pos, BlockState state) {
+        var y = state.getValue(FluidTankBlock.PART_Y);
+        if ((y.middle() || y.positive()) && world.getBlockEntity(pos.relative(Direction.DOWN)) instanceof FluidTankBlockEntity below) {
             tank.blockTemperature = below.blockTemperature;
             if (below.container.isNotFull()) {
                 while (below.container.isNotFull() && tank.container.isNotEmpty()) {
@@ -194,11 +192,11 @@ public class FluidTankBlockEntity extends BlockEntity implements FluidInputOutpu
         }
     }
 
-    private static void updateHorizontal(World world, FluidTankBlockEntity tank, BlockPos pos, BlockState state) {
-        var p = new BlockPos.Mutable();
+    private static void updateHorizontal(Level world, FluidTankBlockEntity tank, BlockPos pos, BlockState state) {
+        var p = new BlockPos.MutableBlockPos();
 
-        var x = state.get(FluidTankBlock.PART_X);
-        var z = state.get(FluidTankBlock.PART_Z);
+        var x = state.getValue(FluidTankBlock.PART_X);
+        var z = state.getValue(FluidTankBlock.PART_Z);
         if (!x.single() || !z.single()) {
             var tanks = new ArrayList<FluidTankBlockEntity>(5);
             tanks.add(tank);

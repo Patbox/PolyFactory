@@ -3,22 +3,22 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
-import eu.pb4.polyfactory.util.movingitem.InventorySimpleContainerProvider;
+import eu.pb4.polyfactory.util.movingitem.SimpleMovingItemContainerProvider;
 import eu.pb4.polyfactory.util.movingitem.MovingItem;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.SidedInventory;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class TallItemMachineBlockEntity extends LockableBlockEntity implements MachineInfoProvider, InventorySimpleContainerProvider, SidedInventory {
-    protected Text state;
+public abstract class TallItemMachineBlockEntity extends LockableBlockEntity implements MachineInfoProvider, SimpleMovingItemContainerProvider, WorldlyContainer {
+    protected Component state;
     public TallItemMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
@@ -41,7 +41,7 @@ public abstract class TallItemMachineBlockEntity extends LockableBlockEntity imp
                 updatePosition(i);
             }
         }
-        this.markDirty();
+        this.setChanged();
     }
 
     protected void removeMoving(MovingItem movingItem, boolean fullRemove) {
@@ -54,16 +54,16 @@ public abstract class TallItemMachineBlockEntity extends LockableBlockEntity imp
                 model.removeElementWithoutUpdates(movingItem);
             }
         }
-        this.markDirty();
+        this.setChanged();
     }
 
     @Override
-    public @Nullable Text getCurrentState() {
+    public @Nullable Component getCurrentState() {
         return this.state;
     }
 
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        this.openGui((ServerPlayerEntity) player);
-        return ActionResult.SUCCESS_SERVER;
+    public InteractionResult onUse(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        this.openGui((ServerPlayer) player);
+        return InteractionResult.SUCCESS_SERVER;
     }
 }

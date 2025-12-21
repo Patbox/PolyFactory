@@ -1,8 +1,8 @@
 package eu.pb4.polyfactory.block.fluids;
 
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 
 public interface FluidInputOutput extends FluidOutput, FluidInput {
     interface ContainerBased extends FluidInputOutput, FluidOutput.ContainerBased, FluidInput.ContainerBased {
@@ -10,15 +10,15 @@ public interface FluidInputOutput extends FluidOutput, FluidInput {
     }
 
     interface Getter extends FluidOutput.Getter, FluidInput.Getter {
-        FluidInputOutput getFluidInputOutput(ServerWorld world, BlockPos pos, Direction direction);
+        FluidInputOutput getFluidInputOutput(ServerLevel world, BlockPos pos, Direction direction);
 
         @Override
-        default FluidInput getFluidInput(ServerWorld world, BlockPos pos, Direction direction) {
+        default FluidInput getFluidInput(ServerLevel world, BlockPos pos, Direction direction) {
             return getFluidInputOutput(world, pos, direction);
         }
 
         @Override
-        default FluidOutput getFluidOutput(ServerWorld world, BlockPos pos, Direction direction) {
+        default FluidOutput getFluidOutput(ServerLevel world, BlockPos pos, Direction direction) {
             return getFluidInputOutput(world, pos, direction);
         }
     }

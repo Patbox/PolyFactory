@@ -18,70 +18,61 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiPredicate;
 
-public abstract class AbstracterCableBlock extends CableNetworkBlock implements BlockEntityProvider, CableConnectable {
+public abstract class AbstracterCableBlock extends CableNetworkBlock implements EntityBlock, CableConnectable {
     public static final int DEFAULT_COLOR = 0xbbbbbb;
 
-    public AbstracterCableBlock(Settings settings) {
+    public AbstracterCableBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    protected ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (stack.isIn(ConventionalItemTags.DYES) && setColor(state, world, pos, FactoryItems.CABLE.downSampleColor(DyeColorExtra.getColor(stack)))) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (stack.is(ConventionalItemTags.DYES) && setColor(state, world, pos, FactoryItems.CABLE.downSampleColor(DyeColorExtra.getColor(stack)))) {
             if (!player.isCreative()) {
-                stack.decrement(1);
+                stack.shrink(1);
             }
-            world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS);
-            return ActionResult.SUCCESS_SERVER;
-        } else if (stack.isOf(FactoryItems.TREATED_DRIED_KELP) && setColor(state, world, pos, DEFAULT_COLOR)) {
-            world.playSound(null, pos, SoundEvents.ITEM_DYE_USE, SoundCategory.BLOCKS);
-            return ActionResult.SUCCESS_SERVER;
+            world.playSound(null, pos, SoundEvents.DYE_USE, SoundSource.BLOCKS);
+            return InteractionResult.SUCCESS_SERVER;
+        } else if (stack.is(FactoryItems.TREATED_DRIED_KELP) && setColor(state, world, pos, DEFAULT_COLOR)) {
+            world.playSound(null, pos, SoundEvents.DYE_USE, SoundSource.BLOCKS);
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+        return super.useItemOn(stack, state, world, pos, player, hand, hit);
     }
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        var stack = super.getPickStack(world, pos, state, includeData);
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
+        var stack = super.getCloneItemStack(world, pos, state, includeData);
         if (world.getBlockEntity(pos) instanceof ColorProvider be && !be.isDefaultColor()) {
             ColoredItem.setColor(stack, be.getColor());
         }
         return stack;
     }
 
-    public boolean setColor(BlockState state, World world, BlockPos pos, int color) {
+    public boolean setColor(BlockState state, Level world, BlockPos pos, int color) {
         color = FactoryItems.CABLE.downSampleColor(color);
         if (world.getBlockEntity(pos) instanceof ColorProvider provider && provider.getColor() != color) {
             provider.setColor(color);
@@ -92,30 +83,30 @@ public abstract class AbstracterCableBlock extends CableNetworkBlock implements 
     }
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         if (world.getBlockEntity(pos) instanceof ColorProvider be) {
             if (itemStack.getItem() instanceof ColoredItem) {
                 be.setColor(FactoryItems.CABLE.getItemColor(itemStack));
             }
         }
-        super.onPlaced(world, pos, state, placer, itemStack);
+        super.setPlacedBy(world, pos, state, placer, itemStack);
     }
 
-    public static int getColor(WorldView world, BlockPos pos) {
+    public static int getColor(LevelReader world, BlockPos pos) {
         return world.getBlockEntity(pos) instanceof ColorProvider be ? be.getColor() : DEFAULT_COLOR;
     }
 
-    protected boolean canConnectTo(WorldView world, int ownColor, BlockPos neighborPos, BlockState neighborState, Direction direction) {
+    protected boolean canConnectTo(LevelReader world, int ownColor, BlockPos neighborPos, BlockState neighborState, Direction direction) {
         return neighborState.getBlock() instanceof CableConnectable connectable && connectable.canCableConnect(world, ownColor, neighborPos, neighborState, direction);
     }
 
     @Override
-    public Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos) {
+    public Collection<BlockNode> createDataNodes(BlockState state, ServerLevel world, BlockPos pos) {
         return List.of(new SelectiveSideNode(this.getDirections(state)));
     }
 
     @Override
-    public Collection<BlockNode> createEnergyNodes(BlockState state, ServerWorld world, BlockPos pos) {
+    public Collection<BlockNode> createEnergyNodes(BlockState state, ServerLevel world, BlockPos pos) {
         return List.of(new SelectiveSideNode(this.getDirections(state)));
     }
 
@@ -124,7 +115,7 @@ public abstract class AbstracterCableBlock extends CableNetworkBlock implements 
     protected abstract boolean isDirectionBlocked(BlockState state, Direction direction);
 
     @Override
-    public boolean canCableConnect(WorldView world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canCableConnect(LevelReader world, int cableColor, BlockPos pos, BlockState state, Direction dir) {
         if (world.getBlockEntity(pos) instanceof ColorProvider be) {
             return be.getColor() == cableColor || be.isDefaultColor() || cableColor == DEFAULT_COLOR;
         }
@@ -177,7 +168,7 @@ public abstract class AbstracterCableBlock extends CableNetworkBlock implements 
 
         protected void updateModel() {
             var stack = getModel(this.state, ((AbstracterCableBlock) state.getBlock())::checkModelDirection);
-            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), IntList.of(this.color)));
+            stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), IntList.of(this.color)));
             this.cable.setItem(stack);
 
             if (this.cable.getHolder() == this && this.color >= 0) {

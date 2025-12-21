@@ -3,59 +3,58 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.movingitem.ContainerHolder;
+import eu.pb4.polyfactory.util.movingitem.MovingItemContainerHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.SidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 public class SlotAwareFunnelBlock extends FunnelBlock {
-    public SlotAwareFunnelBlock(Settings settings) {
+    public SlotAwareFunnelBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!player.isSneaking() && player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof SlotAwareFunnelBlockEntity be) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!player.isShiftKeyDown() && player instanceof ServerPlayer serverPlayer && world.getBlockEntity(pos) instanceof SlotAwareFunnelBlockEntity be) {
             be.openGui(serverPlayer);
-            return ActionResult.SUCCESS_SERVER;
+            return InteractionResult.SUCCESS_SERVER;
         }
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new SlotAwareFunnelBlockEntity(pos, state);
     }
 
     @Override
-    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public boolean pushItemTo(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainerHolder conveyor) {
         var selfState = self.getBlockState();
-        if (!selfState.get(ENABLED)) {
+        if (!selfState.getValue(ENABLED)) {
             return false;
         }
 
-        var selfDir = selfState.get(FACING);
-        var mode = selfState.get(MODE);
+        var selfDir = selfState.getValue(FACING);
+        var mode = selfState.getValue(MODE);
 
         if (!mode.fromConveyor || relative != Direction.UP || selfDir.getOpposite() == pushDirection || conveyor.movementDelta() < (selfDir == pushDirection ? 0.90 : 0.48) || selfDir.getAxis() == Direction.Axis.Y) {
             return false;
@@ -82,7 +81,7 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
         }
 
 
-        if (FactoryUtil.tryInsertingIntoSlot(self.getWorld(), self.getPos().offset(selfState.get(FACING)), stack.get(), selfDir.getOpposite(), list) == -1) {
+        if (FactoryUtil.tryInsertingIntoSlot(self.getWorld(), self.getPos().relative(selfState.getValue(FACING)), stack.get(), selfDir.getOpposite(), list) == -1) {
             return selfDir.getAxis() == pushDirection.getAxis();
         }
 
@@ -97,15 +96,15 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
 
     @SuppressWarnings("UnstableApiUsage")
     @Override
-    public void getItemFrom(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, ContainerHolder conveyor) {
+    public void getItemFrom(WorldPointer self, Direction pushDirection, Direction relative, BlockPos conveyorPos, MovingItemContainerHolder conveyor) {
         if (relative != Direction.DOWN || !conveyor.isContainerEmpty()) {
             return;
         }
 
         var selfState = self.getBlockState();
-        var mode = selfState.get(MODE);
-        var selfFacing = selfState.get(FACING);
-        if (!selfState.get(ENABLED) || !mode.toConveyor || pushDirection == selfFacing) {
+        var mode = selfState.getValue(MODE);
+        var selfFacing = selfState.getValue(FACING);
+        if (!selfState.getValue(ENABLED) || !mode.toConveyor || pushDirection == selfFacing) {
             return;
         }
         var be = self.getBlockEntity() instanceof SlotAwareFunnelBlockEntity x ? x : null;
@@ -113,21 +112,21 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
             return;
         }
 
-        var inv = HopperBlockEntity.getInventoryAt(self.getWorld(), self.getPos().offset(selfFacing));
-        var sided = inv instanceof SidedInventory s ? s : null;
+        var inv = HopperBlockEntity.getContainerAt(self.getWorld(), self.getPos().relative(selfFacing));
+        var sided = inv instanceof WorldlyContainer s ? s : null;
         if (inv != null) {
             for (var a = 0; a < be.slotTargets.length; a++) {
                 var i = be.slotTargets[a];
-                if (i >= inv.size() || i == -1) {
+                if (i >= inv.getContainerSize() || i == -1) {
                     continue;
                 }
 
-                var stack = inv.getStack(i);
-                if (!stack.isEmpty() && be.filter.get(a).test(stack) && (sided == null || sided.canExtract(i, stack, selfFacing.getOpposite()))) {
+                var stack = inv.getItem(i);
+                if (!stack.isEmpty() && be.filter.get(a).test(stack) && (sided == null || sided.canTakeItemThroughFace(i, stack, selfFacing.getOpposite()))) {
                     if (conveyor.pushNew(stack)) {
-                        inv.markDirty();
+                        inv.setChanged();
                         if (stack.isEmpty()) {
-                            inv.setStack(i, ItemStack.EMPTY);
+                            inv.setItem(i, ItemStack.EMPTY);
                         }
                         conveyor.setMovementPosition(pushDirection.getOpposite() == selfFacing ? 0.15 : 0.5);
                         return;
@@ -135,7 +134,7 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
                 }
             }
         } else {
-            var storage = ItemStorage.SIDED.find(self.getWorld(), self.getPos().offset(selfFacing), selfFacing);
+            var storage = ItemStorage.SIDED.find(self.getWorld(), self.getPos().relative(selfFacing), selfFacing);
 
             if (storage instanceof SlottedStorage<ItemVariant> slottedStorage) {
                 for (var a = 0; a < be.slotTargets.length; a++) {
@@ -165,13 +164,13 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
     }
 
     @Override
-    public ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(initialBlockState, pos);
+    public ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
+        return new eu.pb4.polyfactory.block.mechanical.conveyor.SlotAwareFunnelBlock.Model(initialBlockState, pos);
     }
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
+        return Blocks.IRON_BLOCK.defaultBlockState();
     }
 
     public static final class Model extends FunnelBlock.Model {

@@ -5,23 +5,21 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.elements.*;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.inventory.StackReference;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.function.Consumer;
+import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 
-public class MovingItem implements VirtualElement, StackReference {
+public class MovingItem implements VirtualElement, SlotAccess {
     private ItemStack stack;
     private ItemStack stackCurrent;
     private final ItemDisplayElement[] itemDisplay = new ItemDisplayElement[4];
@@ -29,20 +27,20 @@ public class MovingItem implements VirtualElement, StackReference {
     private float globalScale = 1;
     private int tick;
     private boolean isFirstMove = true;
-    private Vec3d pos = Vec3d.ZERO;
+    private Vec3 pos = Vec3.ZERO;
 
     @Deprecated
     public MovingItem(ItemStack stack) {
-        this(stack, Vec3d.ZERO);
+        this(stack, Vec3.ZERO);
     }
 
-    public MovingItem(ItemStack stack, Vec3d pos) {
+    public MovingItem(ItemStack stack, Vec3 pos) {
         this.stack = stack.copy();
         this.stackCurrent = stack.copy();
 
         for (var i = 0; i < 4; i++) {
             this.itemDisplay[i] = new LodItemDisplayElement();
-            this.itemDisplay[i].setLeftRotation(Direction.NORTH.getRotationQuaternion());
+            this.itemDisplay[i].setLeftRotation(Direction.NORTH.getRotation());
             this.itemDisplay[i].setDisplayWidth(1);
             this.itemDisplay[i].setDisplayHeight(2);
             this.itemDisplay[i].setViewRange(i == 0 ? 0.5f : 0.2f);
@@ -56,13 +54,13 @@ public class MovingItem implements VirtualElement, StackReference {
         this.setPos(pos);
     }
 
-    public MovingItem split(ContainerHolder aware) {
+    public MovingItem split(MovingItemContainerHolder aware) {
         return split(aware.getMaxStackCount(this.stack));
     }
 
     public MovingItem split(int newCount) {
         var x = new MovingItem(this.stack.copyWithCount(newCount), this.getCurrentPos());
-        this.stack.decrement(newCount);
+        this.stack.shrink(newCount);
         return x;
     }
 
@@ -89,7 +87,7 @@ public class MovingItem implements VirtualElement, StackReference {
 
     @Override
     public boolean set(ItemStack stack) {
-        if (ItemStack.areItemsAndComponentsEqual(this.stack, stack)) {
+        if (ItemStack.isSameItemSameComponents(this.stack, stack)) {
             return false;
         }
         this.stack = stack;
@@ -99,7 +97,7 @@ public class MovingItem implements VirtualElement, StackReference {
         return true;
     }
 
-    public void setPos(Vec3d vec3d) {
+    public void setPos(Vec3 vec3d) {
         this.setOverridePos(vec3d);
         for (var x : this.itemDisplay) {
             x.setOverridePos(vec3d);
@@ -108,12 +106,12 @@ public class MovingItem implements VirtualElement, StackReference {
 
     @Nullable
     @Override
-    public void setOverridePos(Vec3d vec3d) {
+    public void setOverridePos(Vec3 vec3d) {
         this.pos = vec3d;
     }
 
     @Override
-    public @Nullable Vec3d getOverridePos() {
+    public @Nullable Vec3 getOverridePos() {
         return this.pos;
     }
 
@@ -135,16 +133,16 @@ public class MovingItem implements VirtualElement, StackReference {
     }
 
     @Override
-    public Vec3d getOffset() {
-        return Vec3d.ZERO;
+    public Vec3 getOffset() {
+        return Vec3.ZERO;
     }
 
     @Override
-    public void setOffset(Vec3d vec3d) {
+    public void setOffset(Vec3 vec3d) {
     }
 
     @Override
-    public void startWatching(ServerPlayerEntity player, Consumer<Packet<ClientPlayPacketListener>> packetConsumer) {
+    public void startWatching(ServerPlayer player, Consumer<Packet<ClientGamePacketListener>> packetConsumer) {
         for (var x : itemDisplay) {
             x.startWatching(player, packetConsumer);
         }
@@ -152,10 +150,10 @@ public class MovingItem implements VirtualElement, StackReference {
     }
 
     @Override
-    public void stopWatching(ServerPlayerEntity player, Consumer<Packet<ClientPlayPacketListener>> packetConsumer) {}
+    public void stopWatching(ServerPlayer player, Consumer<Packet<ClientGamePacketListener>> packetConsumer) {}
 
     @Override
-    public void notifyMove(Vec3d oldPos, Vec3d currentPos, Vec3d delta) {
+    public void notifyMove(Vec3 oldPos, Vec3 currentPos, Vec3 delta) {
     }
 
     @Override
@@ -177,7 +175,7 @@ public class MovingItem implements VirtualElement, StackReference {
     }
 
     @Override
-    public InteractionHandler getInteractionHandler(ServerPlayerEntity player) {
+    public InteractionHandler getInteractionHandler(ServerPlayer player) {
         return InteractionHandler.EMPTY;
     }
 
@@ -202,7 +200,7 @@ public class MovingItem implements VirtualElement, StackReference {
     }
 
     public void checkItems() {
-        if (this.stack.getCount() != this.stackCurrent.getCount() || ItemStack.areItemsAndComponentsEqual(this.stack, this.stackCurrent)) {
+        if (this.stack.getCount() != this.stackCurrent.getCount() || ItemStack.isSameItemSameComponents(this.stack, this.stackCurrent)) {
             this.stackCurrent = this.stack.copy();
             for (var i = 0; i < 4; i++) {
                 this.updateDisplay(i);

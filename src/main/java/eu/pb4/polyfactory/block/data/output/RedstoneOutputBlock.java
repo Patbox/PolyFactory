@@ -17,108 +17,108 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.block.OrientationHelper;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.redstone.ExperimentalRedstoneUtils;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 import static eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras.bridgeModel;
 
 public class RedstoneOutputBlock extends DirectionalCabledDataBlock implements DataReceiver, RedstoneConnectable {
-    public static final IntProperty POWER = Properties.POWER;
-    public static final BooleanProperty STRONG = BooleanProperty.of("strong");
+    public static final IntegerProperty POWER = BlockStateProperties.POWER;
+    public static final BooleanProperty STRONG = BooleanProperty.create("strong");
 
     public final List<BlockConfig<?>> blockConfigs = List.of(
             BlockConfig.CHANNEL,
             this.facingAction,
-            BlockConfig.of("redstone.strong", STRONG, BlockValueFormatter.text(ScreenTexts::onOrOff))
+            BlockConfig.of("redstone.strong", STRONG, BlockValueFormatter.text(CommonComponents::optionStatus))
     );
 
-    public RedstoneOutputBlock(Settings settings) {
+    public RedstoneOutputBlock(Properties settings) {
         super(settings);
-        this.setDefaultState(this.getDefaultState().with(POWER, 0).with(STRONG, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(POWER, 0).setValue(STRONG, false));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(POWER, STRONG);
     }
 
     @Override
-    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        super.onBlockAdded(state, world, pos, oldState, notify);
-        this.update(world, pos, state.get(FACING));
+    protected void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+        super.onPlace(state, world, pos, oldState, notify);
+        this.update(world, pos, state.getValue(FACING));
     }
 
     @Override
-    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
         if (!moved) {
-            this.update(world, pos, state.get(FACING));
+            this.update(world, pos, state.getValue(FACING));
         }
-        super.onStateReplaced(state, world, pos, moved);
+        super.affectNeighborsAfterRemoval(state, world, pos, moved);
     }
 
-    private void update(World world, BlockPos pos, Direction dir) {
-        var wireOrientation = OrientationHelper.getEmissionOrientation(world, null, dir);
+    private void update(Level world, BlockPos pos, Direction dir) {
+        var wireOrientation = ExperimentalRedstoneUtils.initialOrientation(world, null, dir);
 
         for(var direction : Direction.values()) {
-            world.updateNeighborsAlways(pos.offset(direction), this, OrientationHelper.withFrontNullable(wireOrientation, direction));
+            world.updateNeighborsAt(pos.relative(direction), this, ExperimentalRedstoneUtils.withFront(wireOrientation, direction));
         }
     }
 
 
     @Override
-    public boolean emitsRedstonePower(BlockState state) {
+    public boolean isSignalSource(BlockState state) {
         return true;
     }
 
     @Override
-    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-        return direction.getOpposite() == state.get(FACING) ? state.get(POWER) : 0;
+    public int getSignal(BlockState state, BlockGetter world, BlockPos pos, Direction direction) {
+        return direction.getOpposite() == state.getValue(FACING) ? state.getValue(POWER) : 0;
     }
 
     @Override
-    protected int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-        return state.get(STRONG) ? getWeakRedstonePower(state, world, pos, direction) : 0;
+    protected int getDirectSignal(BlockState state, BlockGetter world, BlockPos pos, Direction direction) {
+        return state.getValue(STRONG) ? getSignal(state, world, pos, direction) : 0;
     }
 
     @Override
-    public Collection<BlockNode> createDataNodes(BlockState state, ServerWorld world, BlockPos pos) {
+    public Collection<BlockNode> createDataNodes(BlockState state, ServerLevel world, BlockPos pos) {
         return List.of(new ChannelReceiverSelectiveSideNode(getDirections(state), getChannel(world, pos)));
     }
 
     @Override
-    public boolean receiveData(ServerWorld world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
-        var val = MathHelper.clamp(data.asRedstoneOutput(), 0, 15);
-        if (selfState.get(POWER) != val) {
-            world.setBlockState(selfPos, selfState.with(POWER, val));
-            if (FactoryUtil.getClosestPlayer(world, selfPos, 32) instanceof ServerPlayerEntity player) {
+    public boolean receiveData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
+        var val = Mth.clamp(data.asRedstoneOutput(), 0, 15);
+        if (selfState.getValue(POWER) != val) {
+            world.setBlockAndUpdate(selfPos, selfState.setValue(POWER, val));
+            if (FactoryUtil.getClosestPlayer(world, selfPos, 32) instanceof ServerPlayer player) {
                 TriggerCriterion.trigger(player, FactoryTriggers.REDSTONE_OUT);
             }
         }
@@ -128,21 +128,21 @@ public class RedstoneOutputBlock extends DirectionalCabledDataBlock implements D
 
     @Override
     public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
-        return Blocks.IRON_BLOCK.getDefaultState();
+        return Blocks.IRON_BLOCK.defaultBlockState();
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
-        return new Model(initialBlockState);
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
+        return new eu.pb4.polyfactory.block.data.output.RedstoneOutputBlock.Model(initialBlockState);
     }
 
     @Override
     public boolean canRedstoneConnect(BlockState state, @Nullable Direction dir) {
-        return state.get(FACING).getOpposite() == dir;
+        return state.getValue(FACING).getOpposite() == dir;
     }
 
     @Override
-    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayerEntity player, BlockPos blockPos, Direction side, BlockState state) {
+    public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
         return this.blockConfigs;
     }
 
@@ -163,8 +163,8 @@ public class RedstoneOutputBlock extends DirectionalCabledDataBlock implements D
 
         private ItemStack createOverlay(BlockState state) {
             var stack = new ItemStack(Items.PAPER);
-            stack.set(DataComponentTypes.ITEM_MODEL, state.isOf(FactoryBlocks.REDSTONE_OUTPUT) ? OUTPUT_OVERLAY : INPUT_OVERLAY);
-            stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(List.of(), List.of(), List.of(), IntList.of(RedstoneWireBlock.getWireColor(state.get(POWER)))));
+            stack.set(DataComponents.ITEM_MODEL, state.is(FactoryBlocks.REDSTONE_OUTPUT) ? OUTPUT_OVERLAY : INPUT_OVERLAY);
+            stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), IntList.of(RedStoneWireBlock.getColorForPower(state.getValue(POWER)))));
             return stack;
         }
 

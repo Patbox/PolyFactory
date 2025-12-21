@@ -7,13 +7,13 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import net.minecraft.block.BlockSetType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ButtonBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -24,7 +24,7 @@ public class PolymerButtonBlock extends ButtonBlock implements FactoryBlock {
     private final ItemStack modelNormal;
     private final ItemStack modelPressed;
 
-    public PolymerButtonBlock(String name, BlockSetType blockSetType, int pressTicks, Settings settings) {
+    public PolymerButtonBlock(String name, BlockSetType blockSetType, int pressTicks, Properties settings) {
         super(blockSetType, pressTicks, settings);
         this.modelNormal = ItemDisplayElementUtil.getModel(id("block/" + name + "_button"));
         this.modelPressed = ItemDisplayElementUtil.getModel(id("block/" + name + "_button_pressed"));
@@ -32,11 +32,11 @@ public class PolymerButtonBlock extends ButtonBlock implements FactoryBlock {
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.STONE_BUTTON.getStateWithProperties(state);
+        return Blocks.STONE_BUTTON.withPropertiesOf(state);
     }
 
     @Override
-    public @Nullable ElementHolder createElementHolder(ServerWorld world, BlockPos pos, BlockState initialBlockState) {
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState);
     }
     
@@ -60,13 +60,13 @@ public class PolymerButtonBlock extends ButtonBlock implements FactoryBlock {
         }
 
         private void updateState(BlockState blockState) {
-            this.base.setItem(blockState.get(ButtonBlock.POWERED) ? modelPressed : modelNormal);
-            float p = switch (blockState.get(ButtonBlock.FACE)) {
+            this.base.setItem(blockState.getValue(ButtonBlock.POWERED) ? modelPressed : modelNormal);
+            float p = switch (blockState.getValue(ButtonBlock.FACE)) {
                 case WALL -> -90;
                 case FLOOR -> 0;
                 case CEILING -> 180;
             };
-            float y = blockState.get(FACING).getPositiveHorizontalDegrees() + 180;
+            float y = blockState.getValue(FACING).toYRot() + 180;
 
             this.base.setYaw(y);
             this.base.setPitch(p);

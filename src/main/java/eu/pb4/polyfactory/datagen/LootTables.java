@@ -13,106 +13,105 @@ import eu.pb4.polyfactory.loottable.CopyFluidsLootFunction;
 import eu.pb4.polyfactory.loottable.CopyReadOnlyLootFunction;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.loot.LootPool;
-import net.minecraft.loot.LootTable;
-import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
-import net.minecraft.loot.condition.SurvivesExplosionLootCondition;
-import net.minecraft.loot.entry.ItemEntry;
-import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
-import net.minecraft.predicate.StatePredicate;
-import net.minecraft.registry.RegistryWrapper;
-
+import net.minecraft.advancements.criterion.StatePropertiesPredicate;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 class LootTables extends FabricBlockLootTableProvider {
 
-    protected LootTables(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
+    protected LootTables(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
         super(dataOutput, registryLookup);
     }
 
     @Override
     public void generate() {
-        this.addDrop(FactoryBlocks.SPLITTER);
-        this.addDrop(FactoryBlocks.MINER);
-        this.addDrop(FactoryBlocks.PLANTER);
-        this.addDrop(FactoryBlocks.FAN);
-        this.addDrop(FactoryBlocks.EJECTOR);
-        this.addDrop(FactoryBlocks.GRINDER);
-        this.addDrop(FactoryBlocks.PLACER);
-        this.addDrop(FactoryBlocks.STEEL_BUTTON);
+        this.dropSelf(FactoryBlocks.SPLITTER);
+        this.dropSelf(FactoryBlocks.MINER);
+        this.dropSelf(FactoryBlocks.PLANTER);
+        this.dropSelf(FactoryBlocks.FAN);
+        this.dropSelf(FactoryBlocks.EJECTOR);
+        this.dropSelf(FactoryBlocks.GRINDER);
+        this.dropSelf(FactoryBlocks.PLACER);
+        this.dropSelf(FactoryBlocks.STEEL_BUTTON);
         this.addTallMachineDrop(FactoryBlocks.PRESS);
         this.addTallMachineDrop(FactoryBlocks.MIXER);
-        this.addDrop(FactoryBlocks.HAND_CRANK);
-        this.addDrop(FactoryBlocks.CONVEYOR);
-        this.addDrop(FactoryBlocks.STICKY_CONVEYOR);
-        this.addDrop(FactoryBlocks.ELECTRIC_MOTOR);
-        this.addDrop(FactoryBlocks.FUNNEL);
-        this.addDrop(FactoryBlocks.STEEL_BLOCK);
-        this.addDrop(FactoryBlocks.SLOT_AWARE_FUNNEL);
-        this.addDrop(FactoryBlocks.AXLE);
-        this.addDrop(FactoryBlocks.CHAIN_DRIVE);
-        this.addDrop(FactoryBlocks.ITEM_PACKER);
-        this.addDrop(FactoryBlocks.GEARBOX);
-        this.addDrop(FactoryBlocks.CLUTCH);
-        this.addDrop(FactoryBlocks.CONTAINER);
-        this.addDrop(FactoryBlocks.TEXT_INPUT);
-        this.addDrop(FactoryBlocks.NIXIE_TUBE);
-        this.addDrop(FactoryBlocks.METAL_GRID);
-        this.addDrop(FactoryBlocks.DATA_COMPARATOR);
-        this.addDrop(FactoryBlocks.DATA_EXTRACTOR);
-        this.addDrop(FactoryBlocks.PROGRAMMABLE_DATA_EXTRACTOR);
-        this.addDrop(FactoryBlocks.SPEAKER);
-        this.addDrop(FactoryBlocks.RECORD_PLAYER);
-        this.addDrop(FactoryBlocks.MINER);
-        this.addDrop(FactoryBlocks.STEAM_ENGINE);
-        this.addDrop(FactoryBlocks.SMELTERY_CORE);
-        this.addDrop(FactoryBlocks.PRIMITIVE_SMELTERY);
-        this.addDrop(FactoryBlocks.CASTING_TABLE);
-        this.addDrop(FactoryBlocks.FAUCED);
-        this.addDrop(FactoryBlocks.HOLOGRAM_PROJECTOR);
-        this.addDrop(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
-        this.addDrop(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER);
-        this.addDrop(FactoryBlocks.ARITHMETIC_OPERATOR);
-        this.addDrop(FactoryBlocks.TACHOMETER);
-        this.addDrop(FactoryBlocks.GAUGE);
-        this.addDrop(FactoryBlocks.GATED_CABLE);
-        this.addDrop(FactoryBlocks.STRESSOMETER);
-        this.addDrop(FactoryBlocks.PIPE);
-        this.addDrop(FactoryBlocks.FILTERED_PIPE);
-        this.addDrop(FactoryBlocks.REDSTONE_VALVE_PIPE);
-        this.addDrop(FactoryBlocks.PUMP);
-        this.addDrop(FactoryBlocks.NOZZLE);
-        this.addDrop(FactoryBlocks.DRAIN);
+        this.dropSelf(FactoryBlocks.HAND_CRANK);
+        this.dropSelf(FactoryBlocks.CONVEYOR);
+        this.dropSelf(FactoryBlocks.STICKY_CONVEYOR);
+        this.dropSelf(FactoryBlocks.ELECTRIC_MOTOR);
+        this.dropSelf(FactoryBlocks.FUNNEL);
+        this.dropSelf(FactoryBlocks.STEEL_BLOCK);
+        this.dropSelf(FactoryBlocks.SLOT_AWARE_FUNNEL);
+        this.dropSelf(FactoryBlocks.AXLE);
+        this.dropSelf(FactoryBlocks.CHAIN_DRIVE);
+        this.dropSelf(FactoryBlocks.ITEM_PACKER);
+        this.dropSelf(FactoryBlocks.GEARBOX);
+        this.dropSelf(FactoryBlocks.CLUTCH);
+        this.dropSelf(FactoryBlocks.CONTAINER);
+        this.dropSelf(FactoryBlocks.TEXT_INPUT);
+        this.dropSelf(FactoryBlocks.NIXIE_TUBE);
+        this.dropSelf(FactoryBlocks.METAL_GRID);
+        this.dropSelf(FactoryBlocks.DATA_COMPARATOR);
+        this.dropSelf(FactoryBlocks.DATA_EXTRACTOR);
+        this.dropSelf(FactoryBlocks.PROGRAMMABLE_DATA_EXTRACTOR);
+        this.dropSelf(FactoryBlocks.SPEAKER);
+        this.dropSelf(FactoryBlocks.RECORD_PLAYER);
+        this.dropSelf(FactoryBlocks.MINER);
+        this.dropSelf(FactoryBlocks.STEAM_ENGINE);
+        this.dropSelf(FactoryBlocks.SMELTERY_CORE);
+        this.dropSelf(FactoryBlocks.PRIMITIVE_SMELTERY);
+        this.dropSelf(FactoryBlocks.CASTING_TABLE);
+        this.dropSelf(FactoryBlocks.FAUCED);
+        this.dropSelf(FactoryBlocks.HOLOGRAM_PROJECTOR);
+        this.dropSelf(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
+        this.dropSelf(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER);
+        this.dropSelf(FactoryBlocks.ARITHMETIC_OPERATOR);
+        this.dropSelf(FactoryBlocks.TACHOMETER);
+        this.dropSelf(FactoryBlocks.GAUGE);
+        this.dropSelf(FactoryBlocks.GATED_CABLE);
+        this.dropSelf(FactoryBlocks.STRESSOMETER);
+        this.dropSelf(FactoryBlocks.PIPE);
+        this.dropSelf(FactoryBlocks.FILTERED_PIPE);
+        this.dropSelf(FactoryBlocks.REDSTONE_VALVE_PIPE);
+        this.dropSelf(FactoryBlocks.PUMP);
+        this.dropSelf(FactoryBlocks.NOZZLE);
+        this.dropSelf(FactoryBlocks.DRAIN);
         this.addTallMachineDrop(FactoryBlocks.MECHANICAL_DRAIN);
         this.addTallMachineDrop(FactoryBlocks.MECHANICAL_SPOUT);
-        this.addDrop(FactoryBlocks.FLUID_TANK);
-        this.addDrop(FactoryBlocks.PORTABLE_FLUID_TANK, LootTable.builder().pool(LootPool.builder()
-                .conditionally(SurvivesExplosionLootCondition.builder())
-                .rolls(ConstantLootNumberProvider.create(1.0F))
-                .with(ItemEntry.builder(FactoryBlocks.PORTABLE_FLUID_TANK)
+        this.dropSelf(FactoryBlocks.FLUID_TANK);
+        this.add(FactoryBlocks.PORTABLE_FLUID_TANK, LootTable.lootTable().withPool(LootPool.lootPool()
+                .when(ExplosionCondition.survivesExplosion())
+                .setRolls(ConstantValue.exactly(1.0F))
+                .add(LootItem.lootTableItem(FactoryBlocks.PORTABLE_FLUID_TANK)
                         .apply(() -> CopyFluidsLootFunction.INSTANCE)
                 )));
 
-        this.addDrop(FactoryBlocks.DATA_MEMORY, LootTable.builder().pool(LootPool.builder()
-                .conditionally(SurvivesExplosionLootCondition.builder())
-                .rolls(ConstantLootNumberProvider.create(1.0F))
-                .with(ItemEntry.builder(FactoryItems.DATA_MEMORY)
+        this.add(FactoryBlocks.DATA_MEMORY, LootTable.lootTable().withPool(LootPool.lootPool()
+                .when(ExplosionCondition.survivesExplosion())
+                .setRolls(ConstantValue.exactly(1.0F))
+                .add(LootItem.lootTableItem(FactoryItems.DATA_MEMORY)
                         .apply(() -> CopyCachedDataLootFunction.INSTANCE)
                         .apply(() -> CopyReadOnlyLootFunction.INSTANCE)
                 )));
 
-        this.addDrop(FactoryBlocks.INVERTED_REDSTONE_LAMP);
-        this.addDrop(FactoryBlocks.ELECTRIC_GENERATOR);
-        this.addDrop(FactoryBlocks.TINY_POTATO_SPRING);
-        this.addDrop(FactoryBlocks.GOLDEN_TINY_POTATO_SPRING);
-        this.addDrop(FactoryBlocks.CRAFTER);
-        this.addDrop(FactoryBlocks.WORKBENCH);
-        this.addDrop(FactoryBlocks.BLUEPRINT_WORKBENCH);
-        this.addDrop(FactoryBlocks.WINDMILL, FactoryItems.AXLE);
-        this.addDrop(FactoryBlocks.TURNTABLE);
+        this.dropSelf(FactoryBlocks.INVERTED_REDSTONE_LAMP);
+        this.dropSelf(FactoryBlocks.ELECTRIC_GENERATOR);
+        this.dropSelf(FactoryBlocks.TINY_POTATO_SPRING);
+        this.dropSelf(FactoryBlocks.GOLDEN_TINY_POTATO_SPRING);
+        this.dropSelf(FactoryBlocks.CRAFTER);
+        this.dropSelf(FactoryBlocks.WORKBENCH);
+        this.dropSelf(FactoryBlocks.BLUEPRINT_WORKBENCH);
+        this.dropOther(FactoryBlocks.WINDMILL, FactoryItems.AXLE);
+        this.dropSelf(FactoryBlocks.TURNTABLE);
 
 
         this.addOptionalCable(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
@@ -137,62 +136,62 @@ class LootTables extends FabricBlockLootTableProvider {
     }
 
     private void addTallMachineDrop(TallItemMachineBlock block) {
-        this.addDrop(block, (block2) -> this.dropsWithProperty(block2, MixerBlock.PART, MixerBlock.Part.MAIN));
+        this.add(block, (block2) -> this.createSinglePropConditionTable(block2, MixerBlock.PART, MixerBlock.Part.MAIN));
     }
 
     private void addAxle(Block block, Item item) {
-        this.addDrop(block, LootTable.builder()
-                .pool(LootPool.builder()
-                        .conditionally(SurvivesExplosionLootCondition.builder())
-                        .rolls(ConstantLootNumberProvider.create(1.0F))
-                        .with(ItemEntry.builder(FactoryBlocks.AXLE)))
-                .pool(LootPool.builder()
-                        .conditionally(SurvivesExplosionLootCondition.builder())
-                        .rolls(ConstantLootNumberProvider.create(1.0F))
-                        .with(ItemEntry.builder(item)))
+        this.add(block, LootTable.lootTable()
+                .withPool(LootPool.lootPool()
+                        .when(ExplosionCondition.survivesExplosion())
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .add(LootItem.lootTableItem(FactoryBlocks.AXLE)))
+                .withPool(LootPool.lootPool()
+                        .when(ExplosionCondition.survivesExplosion())
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .add(LootItem.lootTableItem(item)))
         );
     }
 
     private void addOptionalCable(Block block) {
-        this.addDrop(block, LootTable.builder()
-                .pool(LootPool.builder()
-                        .conditionally(SurvivesExplosionLootCondition.builder()
-                                .and(BlockStatePropertyLootCondition.builder(block).properties(StatePredicate.Builder.create()
-                                        .exactMatch(DirectionalCabledDataBlock.HAS_CABLE, true))))
-                        .with(ItemEntry.builder(FactoryItems.CABLE)
+        this.add(block, LootTable.lootTable()
+                .withPool(LootPool.lootPool()
+                        .when(ExplosionCondition.survivesExplosion()
+                                .and(LootItemBlockStatePropertyCondition.hasBlockStateProperties(block).setProperties(StatePropertiesPredicate.Builder.properties()
+                                        .hasProperty(DirectionalCabledDataBlock.HAS_CABLE, true))))
+                        .add(LootItem.lootTableItem(FactoryItems.CABLE)
                                 .apply(() -> CopyColorLootFunction.INSTANCE)
                         )
                 )
-                .pool(LootPool.builder()
-                        .conditionally(SurvivesExplosionLootCondition.builder())
-                        .rolls(ConstantLootNumberProvider.create(1.0F))
-                        .with(ItemEntry.builder(block)))
+                .withPool(LootPool.lootPool()
+                        .when(ExplosionCondition.survivesExplosion())
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .add(LootItem.lootTableItem(block)))
         );
     }
 
     private void addWallWithCable(WallWithCableBlock block) {
-        this.addDrop(block, LootTable.builder()
-                .pool(LootPool.builder()
-                        .with(ItemEntry.builder(FactoryItems.CABLE)
+        this.add(block, LootTable.lootTable()
+                .withPool(LootPool.lootPool()
+                        .add(LootItem.lootTableItem(FactoryItems.CABLE)
                                 .apply(() -> CopyColorLootFunction.INSTANCE)
                         )
                 )
-                .pool(LootPool.builder()
-                        .conditionally(SurvivesExplosionLootCondition.builder())
-                        .rolls(ConstantLootNumberProvider.create(1.0F))
-                        .with(ItemEntry.builder(block.backing())))
+                .withPool(LootPool.lootPool()
+                        .when(ExplosionCondition.survivesExplosion())
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .add(LootItem.lootTableItem(block.backing())))
         );
     }
 
     private void addWallWithPipe(PipeInWallBlock block) {
-        this.addDrop(block, LootTable.builder()
-                .pool(LootPool.builder()
-                        .with(ItemEntry.builder(FactoryItems.PIPE))
+        this.add(block, LootTable.lootTable()
+                .withPool(LootPool.lootPool()
+                        .add(LootItem.lootTableItem(FactoryItems.PIPE))
                 )
-                .pool(LootPool.builder()
-                        .conditionally(SurvivesExplosionLootCondition.builder())
-                        .rolls(ConstantLootNumberProvider.create(1.0F))
-                        .with(ItemEntry.builder(block.backing())))
+                .withPool(LootPool.lootPool()
+                        .when(ExplosionCondition.survivesExplosion())
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .add(LootItem.lootTableItem(block.backing())))
         );
     }
 
@@ -202,14 +201,14 @@ class LootTables extends FabricBlockLootTableProvider {
     }
 
     private void addColored(Block block, Consumer<LootTable.Builder> consumer) {
-        var x = LootTable.builder().pool(LootPool.builder()
-                .conditionally(SurvivesExplosionLootCondition.builder())
-                .rolls(ConstantLootNumberProvider.create(1.0F))
-                .with(ItemEntry.builder(block)
+        var x = LootTable.lootTable().withPool(LootPool.lootPool()
+                .when(ExplosionCondition.survivesExplosion())
+                .setRolls(ConstantValue.exactly(1.0F))
+                .add(LootItem.lootTableItem(block)
                         .apply(() -> CopyColorLootFunction.INSTANCE)
                 ));
         consumer.accept(x);
 
-        this.addDrop(block, x);
+        this.add(block, x);
     }
 }
