@@ -28,8 +28,11 @@ public interface DataProvider {
     }
 
     static int sendData(@Nullable LevelReader world, BlockPos selfPos, int channel, @Nullable Direction direction, DataContainer data) {
+        return sendData(world, selfPos, channel, direction, data, 0);
+    }
+    static int sendData(@Nullable LevelReader world, BlockPos selfPos, int channel, @Nullable Direction direction, DataContainer data, int dataId) {
         if (world instanceof ServerLevel serverWorld) {
-            return NetworkComponent.Data.getLogic(serverWorld, selfPos, x -> x.getNode() instanceof DataProviderNode).pushDataUpdate(selfPos, channel, data, direction);
+            return NetworkComponent.Data.getLogic(serverWorld, selfPos, x -> x.getNode() instanceof DataProviderNode).pushDataUpdate(selfPos, channel, data, direction, dataId);
         }
         return 0;
     }

@@ -54,6 +54,7 @@ public class FactoryDataComponents {
             .persistent(StringRepresentable.fromEnum(ImprovedFilterItem.Type::values)).build());
 
     public static final DataComponentType<ConfigurationData> CONFIGURATION_DATA = register("configuration_data", DataComponentType.<ConfigurationData>builder().persistent(ConfigurationData.CODEC).build());
+    public static final DataComponentType<List<String>> PUNCH_CARD_DATA = register("punch_card_data", DataComponentType.<List<String>>builder().persistent(Codec.STRING.listOf()).build());
 
 
     public static void register() {

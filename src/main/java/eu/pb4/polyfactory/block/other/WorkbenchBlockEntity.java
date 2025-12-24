@@ -159,7 +159,7 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
 
     @Override
     public void markSlotDirty(int index) {
-        if (this.model != null) {
+        if (this.model != null && this.stacks.size() > index) {
             this.model.setStack(index, this.getItem(index));
         }
     }

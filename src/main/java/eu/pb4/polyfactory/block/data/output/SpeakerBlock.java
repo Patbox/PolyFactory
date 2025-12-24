@@ -41,13 +41,13 @@ public class SpeakerBlock extends DirectionalCabledDataBlock implements DataRece
     }
 
     @Override
-    public boolean receiveData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
+    public boolean receiveData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir, int dataId) {
         if (data.isEmpty()) {
             return false;
         }
 
         final var x = BlockAwareAttachment.get(world, selfPos);
-        if (x == null || !(x.holder() instanceof eu.pb4.polyfactory.block.data.output.SpeakerBlock.Model model)) {
+        if (x == null || !(x.holder() instanceof SpeakerBlock.Model model)) {
             return false;
         }
         if (data instanceof ListData listData) {
@@ -57,7 +57,7 @@ public class SpeakerBlock extends DirectionalCabledDataBlock implements DataRece
         }
     }
 
-    private boolean playNote(DataContainer data, eu.pb4.polyfactory.block.data.output.SpeakerBlock.Model model, BlockPos selfPos, BlockState selfState, ServerLevel world)  {
+    private boolean playNote(DataContainer data, SpeakerBlock.Model model, BlockPos selfPos, BlockState selfState, ServerLevel world)  {
         var soundEvent = BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.EMPTY);
         var volume = 1f;
         var pitch = 1f;
@@ -98,19 +98,25 @@ public class SpeakerBlock extends DirectionalCabledDataBlock implements DataRece
 
         model.playSound(soundEvent, Math.min(volume, 1.5f), pitch, seed);
 
-        var facing = Vec3.atCenterOf(selfPos).relative(selfState.getValue(FACING), 0.6);
-        world.sendParticles(ParticleTypes.NOTE, facing.x, facing.y, facing.z, 0, pitch / 24, 0, 0, 1);
+        var tick = world.getGameTime();
+        if (model.particleTick != tick) {
+            model.particleTick = tick;
+            var facing = Vec3.atCenterOf(selfPos).relative(selfState.getValue(FACING), 0.6);
+            world.sendParticles(ParticleTypes.NOTE, facing.x, facing.y, facing.z, 0, pitch / 24, 0, 0, 1);
+        }
 
         return true;
     }
 
     @Override
     public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
-        return new eu.pb4.polyfactory.block.data.output.SpeakerBlock.Model(initialBlockState);
+        return new SpeakerBlock.Model(initialBlockState);
     }
 
     public static class Model extends DirectionalCabledDataBlock.Model {
         private final ItemDisplayElement soundSource = new ItemDisplayElement();
+        protected long particleTick = -1;
+
         protected Model(BlockState state) {
             super(state);
             this.soundSource.setInvisible(true);

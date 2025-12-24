@@ -712,6 +712,12 @@ public class FactoryUtil {
         return modified;
     }
 
+    public static <T> List<T> collect(Iterable<T> iterable) {
+        var list = new ArrayList<T>();
+        iterable.forEach(list::add);
+        return list;
+    }
+
 
     public enum MovableResult {
         SUCCESS_MOVABLE,

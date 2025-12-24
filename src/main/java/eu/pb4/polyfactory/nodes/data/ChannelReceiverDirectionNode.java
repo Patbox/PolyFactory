@@ -19,11 +19,16 @@ import java.util.Collection;
 import net.minecraft.core.Direction;
 
 
-public record ChannelReceiverDirectionNode(Direction direction, int channel) implements FunctionalNode, DirectionNode, DataReceiverNode {
+public record ChannelReceiverDirectionNode(Direction direction, int channel, boolean instant) implements FunctionalNode, DirectionNode, DataReceiverNode {
     public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("channel/direction/receiver"), RecordCodecBuilder.<ChannelReceiverDirectionNode>create(instance -> instance.group(
             Direction.CODEC.fieldOf("dir").forGetter(ChannelReceiverDirectionNode::direction),
-            Codec.INT.fieldOf("channel").forGetter(ChannelReceiverDirectionNode::channel)
+            Codec.INT.fieldOf("channel").forGetter(ChannelReceiverDirectionNode::channel),
+            Codec.BOOL.optionalFieldOf("instant", false).forGetter(ChannelReceiverDirectionNode::instant)
     ).apply(instance, ChannelReceiverDirectionNode::new)));
+
+    public ChannelReceiverDirectionNode(Direction direction, int channel) {
+        this(direction, channel, false);
+    }
 
     @Override
     public @NotNull BlockNodeType getType() {

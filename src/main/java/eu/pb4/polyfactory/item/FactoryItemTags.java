@@ -15,6 +15,7 @@ public class FactoryItemTags {
     public static final TagKey<Item> SPOUT_ITEM_HORIZONTAL = of("spout_item_horizontal");
     public static final TagKey<Item> CASTING_SMALL_FLUID = of("casting_small_fluid");
     public static final TagKey<Item> MOLDS = of("molds");
+    public static final TagKey<Item> SHAPEABLE_CLAY_MOLDS = of("shapeable_clay_molds");
     public static final TagKey<Item> PIPES = of("pipes");
     public static final TagKey<Item> MOLD_SHAPE_BOTTLE = of("mold_shape/bottle");
     public static final TagKey<Item> MOLD_SHAPE_THROWABLE_BOTTLE = of("mold_shape/throwable_bottle");

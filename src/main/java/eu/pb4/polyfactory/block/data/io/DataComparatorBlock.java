@@ -65,15 +65,15 @@ public class DataComparatorBlock extends DoubleInputTransformerBlock {
         super.onPlace(state, world, pos, oldState, notify);
         if (state.is(oldState.getBlock()) && (state.getValue(OPERATION) != oldState.getValue(OPERATION))
                 && world instanceof ServerLevel serverWorld && world.getBlockEntity(pos) instanceof DoubleInputTransformerBlockEntity be) {
-            sendData(world, state.getValue(FACING_OUTPUT), pos, this.transformData(be.lastInput1(), be.lastInput2(), serverWorld, pos, state, be));
+            sendData(world, state.getValue(FACING_OUTPUT), pos, this.transformData(be.lastInput1(), be.lastInput2(), serverWorld, pos, state, be), 0);
         } else {
             world.updateNeighborsAt(pos, this, null);
         }
     }
 
     @Override
-    public int sendData(LevelAccessor world, Direction direction, BlockPos selfPos, DataContainer data) {
-        var i = super.sendData(world, direction, selfPos, data);
+    public int sendData(LevelAccessor world, Direction direction, BlockPos selfPos, DataContainer data, int dataId) {
+        var i = super.sendData(world, direction, selfPos, data, dataId);
         if (world instanceof Level w) {
             w.updateNeighborsAt(selfPos, this, null);
         }

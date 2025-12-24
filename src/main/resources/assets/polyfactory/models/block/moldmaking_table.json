@@ -1,0 +1,13 @@
+{
+	"parent": "polyfactory:block/workbench",
+	"textures": {
+		"side": "polyfactory:block/workbench/moldmaking/front",
+		"bottom": "polyfactory:block/workbench/moldmaking/bottom",
+		"top": "polyfactory:block/workbench/moldmaking/top",
+		"front": "polyfactory:block/workbench/moldmaking/side",
+		"inner": "polyfactory:block/workbench/moldmaking/inner",
+		"inner_side": "polyfactory:block/workbench/moldmaking/side",
+		"shelf": "polyfactory:block/empty",
+		"particle": "polyfactory:block/workbench/moldmaking/front"
+	}
+}

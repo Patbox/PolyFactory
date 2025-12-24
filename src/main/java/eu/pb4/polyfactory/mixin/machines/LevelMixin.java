@@ -77,7 +77,7 @@ public abstract class LevelMixin implements LevelAccessor {
                 if (selfState.is(FactoryBlocks.ITEM_COUNTER) && selfState.getValue(DataProviderBlock.FACING) == dir.getOpposite()) {
                     DataProvider.sendData(world, selfPos, data);
                 } else if (selfState.is(FactoryBlocks.GAUGE) && selfState.getValue(GaugeBlock.ORIENTATION).front() == dir) {
-                    FactoryBlocks.GAUGE.receiveData(world, selfPos, selfState, -2, data, null, originalPos, null);
+                    FactoryBlocks.GAUGE.receiveData(world, selfPos, selfState, -2, data, null, originalPos, null, 0);
                 }
             }
         }

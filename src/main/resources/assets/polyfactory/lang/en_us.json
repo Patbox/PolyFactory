@@ -14,6 +14,7 @@
   "block.polyfactory.item_packer": "Item Packer",
   "block.polyfactory.workbench": "Workbench",
   "block.polyfactory.blueprint_workbench": "Blueprint Workbench",
+  "block.polyfactory.moldmaking_table": "Moldmaking Table",
   "block.polyfactory.grinder": "Grinder",
   "block.polyfactory.press": "Mechanical Press",
   "block.polyfactory.miner": "Mechanical Miner",
@@ -430,6 +431,7 @@
   "text.polyfactory.polydex.drain_required": "Nearby Fluid Drain required!",
   "polydex_category.polyfactory.fluids": "Item to Fluid",
   "polydex_category.polyfactory.polyfactory.smeltery": "Smeltery",
+  "polydex_category.polyfactory.moldmaking": "Moldmaking",
 
   "text.polyfactory.amount.bucket": "Buckets",
   "text.polyfactory.amount.milibucket": "Milibuckets",

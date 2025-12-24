@@ -49,7 +49,7 @@ public class ArithmeticOperatorBlock extends DoubleInputTransformerBlock {
 
         if (state.is(oldState.getBlock()) && (state.getValue(MODE) != oldState.getValue(MODE) || state.getValue(OPERATION) != oldState.getValue(OPERATION))
                 && world instanceof ServerLevel serverWorld && world.getBlockEntity(pos) instanceof DoubleInputTransformerBlockEntity be) {
-            sendData(world, state.getValue(FACING_OUTPUT), pos, this.transformData(be.lastInput1(), be.lastInput2(), serverWorld, pos, state, be));
+            sendData(world, state.getValue(FACING_OUTPUT), pos, this.transformData(be.lastInput1(), be.lastInput2(), serverWorld, pos, state, be), 0);
         }
     }
 

@@ -90,7 +90,7 @@ public class FactoryBlocks {
     public static final WindmillBlock WINDMILL = register("windmill", BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_OAK_WOOD), settings -> new WindmillBlock(settings.strength(2.5F).noOcclusion()));
     public static final ContainerBlock CONTAINER = register("wooden_container", BlockBehaviour.Properties.ofFullCopy(Blocks.CHEST), settings -> new ContainerBlock(9 * 5, settings.noOcclusion()));
     public static final ItemPackerBlock ITEM_PACKER = register("item_packer", BlockBehaviour.Properties.ofFullCopy(SPLITTER), ItemPackerBlock::new);
-    public static final CableBlock CABLE = register("cable", BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS), settings -> new CableBlock(settings.instabreak().noOcclusion()));
+    public static final CableBlock CABLE = register("cable", BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).sound(SoundType.WOOL), settings -> new CableBlock(settings.instabreak().noOcclusion()));
     public static final GatedCableBlock GATED_CABLE = register("gated_cable", BlockBehaviour.Properties.ofFullCopy(SPLITTER).strength(2.2F).sound(SoundType.STONE), GatedCableBlock::new);
     public static final Map<Block, WallWithCableBlock> WALL_WITH_CABLE = WallWithCableBlock.MAP;
     public static final DirectionalCabledDataProviderBlock ITEM_COUNTER = register("item_counter", BlockBehaviour.Properties.ofFullCopy(SPLITTER), DirectionalCabledDataProviderBlock::new);
@@ -124,6 +124,7 @@ public class FactoryBlocks {
     public static final ElectricGeneratorBlock ELECTRIC_GENERATOR = register("electric_generator", settings -> new ElectricGeneratorBlock(settings.destroyTime(2).noOcclusion()));
     public static final WorkbenchBlock WORKBENCH = register("workbench", BlockBehaviour.Properties.ofFullCopy(Blocks.CRAFTING_TABLE), settings -> new WorkbenchBlock(settings.noOcclusion()));
     public static final BlueprintWorkbenchBlock BLUEPRINT_WORKBENCH = register("blueprint_workbench", BlockBehaviour.Properties.ofFullCopy(WORKBENCH), BlueprintWorkbenchBlock::new);
+    public static final MoldMakingTableBlock MOLDMAKING_TABLE = register("moldmaking_table", BlockBehaviour.Properties.ofFullCopy(WORKBENCH), MoldMakingTableBlock::new);
     public static final CreativeMotorBlock CREATIVE_MOTOR = register("creative_motor", settings -> new CreativeMotorBlock(settings.strength(-1, -1).noOcclusion().noLootTable()));
     public static final CreativeContainerBlock CREATIVE_CONTAINER = register("creative_container", settings -> new CreativeContainerBlock(settings.strength(-1, -1).noOcclusion().noLootTable()));
     public static final InvertedRedstoneLampBlock INVERTED_REDSTONE_LAMP = register("inverted_redstone_lamp",

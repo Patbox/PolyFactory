@@ -96,6 +96,30 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         return new FluidStack<T>(this, data, FluidConstants.BUCKET);
     }
 
+    public FluidStack<T> ofIngot() {
+        return new FluidStack<>(defaultInstance(), FluidConstants.INGOT);
+    }
+
+    public FluidStack<T> ofIngots(int mult) {
+        return new FluidStack<>(defaultInstance(), FluidConstants.INGOT * mult);
+    }
+
+    public FluidStack<T> ofIngot(T data) {
+        return new FluidStack<>(this, data, FluidConstants.INGOT);
+    }
+
+    public FluidStack<T> ofNugget() {
+        return new FluidStack<>(defaultInstance(), FluidConstants.NUGGET);
+    }
+
+    public FluidStack<T> ofNuggets(int mult) {
+        return new FluidStack<>(defaultInstance(), FluidConstants.NUGGET * mult);
+    }
+
+    public FluidStack<T> ofNugget(T data) {
+        return new FluidStack<>(this, data, FluidConstants.NUGGET);
+    }
+
     public FluidStack<T> of(long amount, T data) {
         return new FluidStack<T>(this, data, amount);
     }

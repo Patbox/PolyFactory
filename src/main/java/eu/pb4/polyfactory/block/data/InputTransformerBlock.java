@@ -104,7 +104,7 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
     }
 
     @Override
-    public boolean receiveData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
+    public boolean receiveData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir, int dataId) {
         if (node instanceof ChannelReceiverDirectionNode direction && world.getBlockEntity(selfPos) instanceof InputTransformerBlockEntity be) {
             DataContainer input = be.lastInput();
             boolean matchingData = false;
@@ -114,7 +114,7 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
             }
 
             if (matchingData) {
-                sendData(world, selfState.getValue(FACING_OUTPUT), selfPos, this.transformData(input, world, selfPos, selfState, be));
+                sendData(world, selfState.getValue(FACING_OUTPUT), selfPos, this.transformData(input, world, selfPos, selfState, be), dataId);
                 return true;
             }
         }
@@ -124,12 +124,12 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
 
     protected abstract DataContainer transformData(DataContainer input, ServerLevel world, BlockPos selfPos, BlockState selfState, InputTransformerBlockEntity be);
 
-    public int sendData(LevelAccessor world, Direction direction, BlockPos selfPos, DataContainer data) {
+    public int sendData(LevelAccessor world, Direction direction, BlockPos selfPos, DataContainer data, int dataId) {
         if (data != null && world instanceof ServerLevel serverWorld && world.getBlockEntity(selfPos) instanceof InputTransformerBlockEntity be) {
             be.setLastOutput(data);
             return Data.getLogic(serverWorld, selfPos,
                     x -> x.getNode() instanceof ChannelProviderDirectionNode p && p.channel() == be.outputChannel() && p.direction() == direction)
-                    .pushDataUpdate(selfPos, be.outputChannel(), data, direction);
+                    .pushDataUpdate(selfPos, be.outputChannel(), data, direction, dataId);
         }
         return 0;
     }

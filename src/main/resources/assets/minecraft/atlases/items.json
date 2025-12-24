@@ -1,0 +1,17 @@
+{
+    "sources": [
+        {
+            "type": "directory",
+            "source": "sgui/elements",
+            "prefix": "sgui/elements/"
+        },
+        {
+            "type": "single",
+            "resource": "polyfactory:entity/chain_lift"
+        },
+        {
+            "type": "single",
+            "resource": "polyfactory:icon"
+        }
+    ]
+}

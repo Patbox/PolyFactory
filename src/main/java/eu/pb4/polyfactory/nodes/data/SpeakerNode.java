@@ -46,6 +46,11 @@ public record SpeakerNode(Direction facing, EnumSet<Direction> cableDir, int cha
     }
 
     @Override
+    public boolean instant() {
+        return true;
+    }
+
+    @Override
     public void onConnectionsChanged(@NotNull NodeHolder<BlockNode> self) {
     }
 

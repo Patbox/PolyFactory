@@ -114,7 +114,7 @@ public class RedstoneOutputBlock extends DirectionalCabledDataBlock implements D
     }
 
     @Override
-    public boolean receiveData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
+    public boolean receiveData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir, int dataId) {
         var val = Mth.clamp(data.asRedstoneOutput(), 0, 15);
         if (selfState.getValue(POWER) != val) {
             world.setBlockAndUpdate(selfPos, selfState.setValue(POWER, val));

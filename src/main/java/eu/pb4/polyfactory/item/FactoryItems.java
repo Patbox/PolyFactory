@@ -62,7 +62,6 @@ import static eu.pb4.polyfactory.ModInit.id;
 
 public class FactoryItems {
     // Util
-    public static final Item MOD_ICON = register("mod_icon", SimplePolymerItem::new);
     public static final Item FLUID_MODEL = register("fluid_model", FluidModelItem::new);
     // Actual items
     public static final WrenchItem WRENCH = register("wrench", settings -> new WrenchItem(settings.stacksTo(1)));
@@ -150,6 +149,8 @@ public class FactoryItems {
             settings -> new WirelessRedstoneTransmitterItem(settings.stacksTo(1)
                     .component(FactoryDataComponents.REMOTE_KEYS, new Pair<>(ItemStack.EMPTY, ItemStack.EMPTY))));
 
+    public static final PunchCardItem PUNCH_CARD = register("punch_card", PunchCardItem::new);
+
     public static final CableItem CABLE = register("cable", (settings) -> new CableItem(FactoryBlocks.CABLE, AbstractCableBlock.DEFAULT_COLOR, settings.useBlockDescriptionPrefix()));
     public static final Item GATED_CABLE = register(FactoryBlocks.GATED_CABLE);
     public static final ColoredDownsampledBlockItem LAMP = registerColored(FactoryBlocks.LAMP, -1);
@@ -163,6 +164,7 @@ public class FactoryItems {
     public static final Item ELECTRIC_GENERATOR = register(FactoryBlocks.ELECTRIC_GENERATOR);
     public static final Item WORKBENCH = register(FactoryBlocks.WORKBENCH);
     public static final Item BLUEPRINT_WORKBENCH = register(FactoryBlocks.BLUEPRINT_WORKBENCH);
+    public static final Item MOLDMAKING_TABLE = register(FactoryBlocks.MOLDMAKING_TABLE);
     public static final Item ARTIFICIAL_DYE = register("artificial_dye", ArtificialDyeItem::new);
     public static final Item DYNAMITE = register("dynamite", settings -> new DynamiteItem(settings.stacksTo(16)));
     public static final Item STICKY_DYNAMITE = register("sticky_dynamite", settings -> new DynamiteItem(settings.stacksTo(16)));
@@ -292,6 +294,7 @@ public class FactoryItems {
                     entries.accept(PRIMITIVE_SMELTERY);
                     entries.accept(SMELTERY_CORE);
                     entries.accept(CASTING_TABLE);
+                    entries.accept(MOLDMAKING_TABLE);
                     entries.accept(SMELTERY_FAUCED);
 
                     // Data

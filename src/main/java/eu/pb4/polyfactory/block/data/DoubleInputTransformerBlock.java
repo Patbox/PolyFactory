@@ -133,7 +133,7 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
     }
 
     @Override
-    public boolean receiveData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
+    public boolean receiveData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir, int dataId) {
         if (node instanceof ChannelReceiverDirectionNode direction && world.getBlockEntity(selfPos) instanceof DoubleInputTransformerBlockEntity be) {
             DataContainer input1 = be.lastInput1();
             DataContainer input2 = be.lastInput2();
@@ -148,7 +148,7 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
             }
 
             if (matchingData) {
-                sendData(world, selfState.getValue(FACING_OUTPUT), selfPos, this.transformData(input1, input2, world, selfPos, selfState, be));
+                sendData(world, selfState.getValue(FACING_OUTPUT), selfPos, this.transformData(input1, input2, world, selfPos, selfState, be), dataId);
                 return true;
             }
         }
@@ -158,12 +158,12 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
 
     protected abstract DataContainer transformData(DataContainer input1, DataContainer input2, ServerLevel world, BlockPos selfPos, BlockState selfState, DoubleInputTransformerBlockEntity be);
 
-    public int sendData(LevelAccessor world, Direction direction, BlockPos selfPos, DataContainer data) {
+    public int sendData(LevelAccessor world, Direction direction, BlockPos selfPos, DataContainer data, int dataId) {
         if (data != null && world instanceof ServerLevel serverWorld && world.getBlockEntity(selfPos) instanceof DoubleInputTransformerBlockEntity be) {
             be.setLastOutput(data);
             return NetworkComponent.Data.getLogic(serverWorld, selfPos,
                     x -> x.getNode() instanceof ChannelProviderDirectionNode p && p.channel() == be.outputChannel() && p.direction() == direction)
-                    .pushDataUpdate(selfPos, be.outputChannel(), data, direction);
+                    .pushDataUpdate(selfPos, be.outputChannel(), data, direction, dataId);
         }
         return 0;
     }

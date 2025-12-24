@@ -13,6 +13,7 @@ import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
+import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.item.util.ColoredItem;
@@ -40,6 +41,7 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.sgui.api.elements.GuiElement;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -47,6 +49,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -68,6 +71,8 @@ public class PolydexCompatImpl {
     });
     private static final HoverDisplayBuilder.ComponentType FILLED = HoverDisplayBuilder.ComponentType.of(id("filled_amount"), HoverDisplayBuilder.ComponentType.Visibility.ALWAYS);
     private static final HoverDisplayBuilder.ComponentType DEBUG_DATA = HoverDisplayBuilder.ComponentType.of(id("debug_data"), HoverDisplayBuilder.ComponentType.Visibility.NEVER);
+
+    public static final PolydexCategory MOLDMAKING_CATEGORY = PolydexCategory.of(id("moldmaking"));
 
     public static void register() {
         PolydexPage.registerRecipeViewer(GenericPressRecipe.class, PressRecipePage::new);
@@ -118,7 +123,11 @@ public class PolydexCompatImpl {
     }
 
     private static void createPages(MinecraftServer server, Consumer<PolydexPage> polydexPageConsumer) {
-
+        var clay = PolydexStack.of(Items.CLAY);
+        for (var item : server.registryAccess().lookupOrThrow(Registries.ITEM).getTagOrEmpty(FactoryItemTags.SHAPEABLE_CLAY_MOLDS)) {
+            var id = item.unwrapKey().orElseThrow().identifier().withPrefix("moldmaking_table/");
+            polydexPageConsumer.accept(new MoldMakingRecipePage(id, clay,  PolydexStack.of(item.value())));
+        }
     }
 
     private static PolydexEntry seperateColoredItems(ItemStack stack) {

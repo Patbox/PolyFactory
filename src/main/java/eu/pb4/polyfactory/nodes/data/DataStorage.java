@@ -12,7 +12,6 @@ import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +29,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
             DataEntry.CODEC.listOf().optionalFieldOf("current_data", List.of()).forGetter(e -> {
                 var list = new ArrayList<DataEntry>();
                 for (var x : e.currentData.int2ObjectEntrySet()) {
-                    list.add(new DataEntry(x.getIntKey(), x.getValue().pos, x.getValue().container, Optional.ofNullable(x.getValue().direction)));
+                    list.add(new DataEntry(x.getIntKey(), x.getValue().pos, x.getValue().container, Optional.ofNullable(x.getValue().direction), x.getValue().dataId));
                 }
                 return list;
             })
@@ -48,7 +47,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
 
     private DataStorage(List<DataEntry> entries) {
         for (var entry : entries) {
-            this.currentData.put(entry.key, new SentData(entry.dataContainer, entry.blockPos, entry.direction.orElse(null)));
+            this.currentData.put(entry.key, new SentData(entry.dataContainer, entry.blockPos, entry.direction.orElse(null), entry.dataId));
         }
     }
 
@@ -74,21 +73,31 @@ public class DataStorage implements GraphEntity<DataStorage> {
             if (state.getBlock() instanceof DataProvider provider) {
                 var c = provider.provideData(world, x.pos(), state, channel, x.node());
                 if (c != null) {
-                    return new SentData(c, x.pos(), x.node() instanceof DirectionNode d ? d.direction() : null);
+                    return new SentData(c, x.pos(), x.node() instanceof DirectionNode d ? d.direction() : null, 0);
                 }
             }
         }
         return null;
     }
 
-    public int pushDataUpdate(BlockPos pos, int channel, DataContainer data, @Nullable Direction direction) {
+    public int pushDataUpdate(BlockPos pos, int channel, DataContainer data, @Nullable Direction direction, int dataId) {
         if (channel == -1) {
             return 0;
         }
-        this.currentData.put(channel, new SentData(data, pos, direction));
+        this.currentData.put(channel, new SentData(data, pos, direction, dataId));
         var receivers = this.receivers.get(channel);
+
         if (receivers == null) {
             return 0;
+        }
+
+        for (var receiver : receivers) {
+            if (receiver.node.instant()) {
+                var state = this.ctx.getBlockWorld().getBlockState(receiver.pos);
+                if (state.getBlock() instanceof DataReceiver receiverx) {
+                    receiverx.receiveData((ServerLevel) this.ctx.getBlockWorld(), receiver.pos, state, channel, data, receiver.node, pos, direction, dataId);
+                }
+            }
         }
 
         return receivers.size();
@@ -114,9 +123,11 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 var rec = receivers.get(data.getIntKey());
                 if (rec != null) {
                     for (var x : rec) {
-                        var state = world.getBlockState(x.pos());
-                        if (state.getBlock() instanceof DataReceiver receiver) {
-                            receiver.receiveData(world, x.pos(), state, data.getIntKey(), data.getValue().container(), x.node(), data.getValue().pos, data.getValue().direction);
+                        if (!x.node.instant()) {
+                            var state = world.getBlockState(x.pos());
+                            if (state.getBlock() instanceof DataReceiver receiver) {
+                                receiver.receiveData(world, x.pos(), state, data.getIntKey(), data.getValue().container(), x.node(), data.getValue().pos, data.getValue().direction, data.getValue().dataId);
+                            }
                         }
                     }
                 }
@@ -136,7 +147,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 if (state.getBlock() instanceof DataProvider provider && providerNode.channel() != -1) {
                     var data = provider.provideData(serverWorld, node.getBlockPos(), state, providerNode.channel(), providerNode);
                     if (data != null) {
-                        pushDataUpdate(node.getBlockPos(), providerNode.channel(), data, providerNode instanceof DirectionNode d ? d.direction() : null);
+                        pushDataUpdate(node.getBlockPos(), providerNode.channel(), data, providerNode instanceof DirectionNode d ? d.direction() : null, 0);
                     }
                 }
             } else if (node.getNode() instanceof DataReceiverNode receiverNode) {
@@ -144,7 +155,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 if (state.getBlock() instanceof DataReceiver receiver && receiverNode.channel() != -1) {
                     var data = this.getData(receiverNode.channel());
                     if (data != null) {
-                        receiver.receiveData(serverWorld, node.getBlockPos(), state, receiverNode.channel(), data.container(), receiverNode, data.pos(), data.direction);
+                        receiver.receiveData(serverWorld, node.getBlockPos(), state, receiverNode.channel(), data.container(), receiverNode, data.pos(), data.direction, data.dataId);
                     }
                 }
             }
@@ -223,7 +234,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 for (var x : this.receivers.get(channel.intValue())) {
                     var state = this.ctx.getBlockWorld().getBlockState(x.pos());
                     if (state.getBlock() instanceof DataReceiver receiver) {
-                        receiver.receiveData((ServerLevel) this.ctx.getBlockWorld(), x.pos(), state, channel, data.container, x.node(), data.pos, data.direction);
+                        receiver.receiveData((ServerLevel) this.ctx.getBlockWorld(), x.pos(), state, channel, data.container, x.node(), data.pos, data.direction, data.dataId);
                     }
                 }
             }
@@ -253,7 +264,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
         return this.providers;
     }
 
-    private record DataEntry(int key, BlockPos blockPos, DataContainer dataContainer, Optional<Direction> direction) {
+    private record DataEntry(int key, BlockPos blockPos, DataContainer dataContainer, Optional<Direction> direction, int dataId) {
         private static final Codec<BlockPos> BLOCK_POS_CODEC = Codec.withAlternative(BlockPos.CODEC, RecordCodecBuilder.create(instance -> instance.group(
                 Codec.INT.fieldOf("X").forGetter(BlockPos::getX),
                 Codec.INT.fieldOf("Y").forGetter(BlockPos::getY),
@@ -263,11 +274,12 @@ public class DataStorage implements GraphEntity<DataStorage> {
                 Codec.INT.fieldOf("__key").forGetter(DataEntry::key),
                 BLOCK_POS_CODEC.fieldOf("__pos").forGetter(DataEntry::blockPos),
                 DataContainer.MAP_CODEC.forGetter(DataEntry::dataContainer),
-                Direction.CODEC.optionalFieldOf("__dir").forGetter(DataEntry::direction)
+                Direction.CODEC.optionalFieldOf("__dir").forGetter(DataEntry::direction),
+                Codec.INT.optionalFieldOf("__data_id", 0).forGetter(DataEntry::dataId)
         ).apply(instance, DataEntry::new));
     }
 
-    public record SentData(DataContainer container, BlockPos pos, @Nullable Direction direction) {
+    public record SentData(DataContainer container, BlockPos pos, @Nullable Direction direction, int dataId) {
     }
 
     public record DataHandler<T>(BlockPos pos, T node) { }

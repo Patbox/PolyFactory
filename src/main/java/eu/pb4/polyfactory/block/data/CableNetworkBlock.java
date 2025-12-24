@@ -6,7 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 
-public abstract class CableNetworkBlock extends NetworkBlock implements NetworkComponent.Data, NetworkComponent.Energy{
+public abstract class CableNetworkBlock extends NetworkBlock implements NetworkComponent.Data, NetworkComponent.Energy {
     protected CableNetworkBlock(Properties settings) {
         super(settings);
     }

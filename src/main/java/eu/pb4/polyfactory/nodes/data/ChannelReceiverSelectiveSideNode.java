@@ -23,12 +23,17 @@ import java.util.List;
 import net.minecraft.core.Direction;
 
 
-public record ChannelReceiverSelectiveSideNode(EnumSet<Direction> directions, int channel) implements FunctionalNode, DirectionCheckingNode, DataReceiverNode {
+public record ChannelReceiverSelectiveSideNode(EnumSet<Direction> directions, int channel, boolean instant) implements FunctionalNode, DirectionCheckingNode, DataReceiverNode {
     public static final BlockNodeType TYPE = BlockNodeType.of(ModInit.id("channel/selective_dir/receiver"), RecordCodecBuilder.<ChannelReceiverSelectiveSideNode>create(instance -> instance.group(
             Direction.CODEC.listOf().xmap(x -> x.isEmpty() ? EnumSet.noneOf(Direction.class) : EnumSet.copyOf(x), List::copyOf)
                     .fieldOf("dir").forGetter(ChannelReceiverSelectiveSideNode::directions),
-            Codec.INT.fieldOf("channel").forGetter(ChannelReceiverSelectiveSideNode::channel)
+            Codec.INT.fieldOf("channel").forGetter(ChannelReceiverSelectiveSideNode::channel),
+            Codec.BOOL.optionalFieldOf("instant", false).forGetter(ChannelReceiverSelectiveSideNode::instant)
     ).apply(instance, ChannelReceiverSelectiveSideNode::new)));
+
+    public ChannelReceiverSelectiveSideNode(EnumSet<Direction> directions, int channel) {
+        this(directions, channel, false);
+    }
 
     @Override
     public @NotNull BlockNodeType getType() {

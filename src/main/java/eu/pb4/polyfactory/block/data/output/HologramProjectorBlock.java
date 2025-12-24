@@ -215,7 +215,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
     }
 
     @Override
-    public boolean receiveData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir) {
+    public boolean receiveData(ServerLevel world, BlockPos selfPos, BlockState selfState, int channel, DataContainer data, DataReceiverNode node, BlockPos sourcePos, @Nullable Direction sourceDir, int dataId) {
         if (world.getBlockEntity(selfPos) instanceof HologramProjectorBlockEntity be) {
             be.setCachedData(data);
             var active = selfState.getValue(ACTIVE);

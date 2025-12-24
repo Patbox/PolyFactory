@@ -58,9 +58,6 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 public class MCrafterBlockEntity extends LockableBlockEntity implements MachineInfoProvider, MinimalSidedContainer, CrafterLikeInsertContainer, CraftingContainer {
-    private static final Codec<BitSet> BIT_SET = Codec.BYTE_BUFFER.xmap(
-            (stream) -> BitSet.valueOf(stream.array()), (set) -> ByteBuffer.wrap(set.toByteArray()));
-
     private static final int[] INPUT_SLOTS = IntStream.range(0, 9).toArray();
     private static final int[] OUTPUT_SLOTS = IntStream.range(9, 9 + 9).toArray();
     private static final SoundEvent CRAFT_SOUND_EVENT = SoundEvent.createVariableRangeEvent(Identifier.parse("minecraft:block.crafter.craft"));
@@ -95,7 +92,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
     public void loadAdditional(ValueInput view) {
         ContainerHelper.loadAllItems(view, this.stacks);
         this.process = view.getDoubleOr("progress", 0);
-        this.lockedSlots = view.read("locked_slots", BIT_SET).orElseGet(() -> new BitSet(9));
+        this.lockedSlots = view.read("locked_slots", ExtraCodecs.BIT_SET).orElseGet(() -> new BitSet(9));
         this.activeMode = view.read("active_mode", ActiveMode.CODEC).orElse(ActiveMode.FILLED);
 
         super.loadAdditional(view);

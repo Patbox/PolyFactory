@@ -99,7 +99,7 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
                 FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
                 this.blockEntity.setField(this.getInput());
                 var b = ((DataExtractorBlock) this.blockEntity.getBlockState().getBlock());
-                b.sendData(this.blockEntity.level, this.blockEntity.getBlockState().getValue(DataExtractorBlock.FACING_OUTPUT), this.blockEntity.getBlockPos(), this.blockEntity.lastInput());
+                b.sendData(this.blockEntity.level, this.blockEntity.getBlockState().getValue(DataExtractorBlock.FACING_OUTPUT), this.blockEntity.getBlockPos(), this.blockEntity.lastInput(), 0);
                 this.close();
             }));
 

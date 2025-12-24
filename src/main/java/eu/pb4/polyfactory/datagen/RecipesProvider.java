@@ -267,6 +267,18 @@ class RecipesProvider extends FabricRecipeProvider {
                         .unlockedBy("get_plate", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.WOODEN_PLATE))
                         .save(output);
 
+                this.shaped(RecipeCategory.MISC, FactoryItems.MOLDMAKING_TABLE, 1)
+                        .pattern(" i ")
+                        .pattern("pPp")
+                        .define('p', FactoryItems.WOODEN_PLATE)
+                        .define('P', ItemTags.PLANKS)
+                        .define('i', Items.COPPER_INGOT)
+                        .unlockedBy("get_plate", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.WOODEN_PLATE))
+                        .save(output);
+
+                this.spoutAndCasting("moldmaking_table", Items.CRAFTING_TABLE, FactoryFluids.COPPER.ofIngot(),  FactoryItems.MOLDMAKING_TABLE, SoundEvents.FIRE_EXTINGUISH, 40, 40);
+
+
                 this.shaped(RecipeCategory.REDSTONE, FactoryItems.PIPE, 3)
                         .pattern("ppp")
                         .pattern("i i")

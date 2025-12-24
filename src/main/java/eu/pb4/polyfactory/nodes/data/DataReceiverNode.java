@@ -4,4 +4,8 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 
 public interface DataReceiverNode extends BlockNode {
     int channel();
+
+    default boolean instant() {
+        return false;
+    }
 }

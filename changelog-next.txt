@@ -1,6 +1,12 @@
-- Recipe Changes:
-  - Added Log/Wood stripping recipe for Grinder.
-  - Removed non-stripped logs from being used for Saw Dust recipe.
-- Portable Fluid Tank can now be filled with a Fauced
-- Using Iron/Gold/Copper/Steel Ingot on Filtered Pipe will set its filter to corresponding fluid.
-- Improved look of some items on shelves.
+- Added Moldmaking Table:
+  - Alternative way to create Unfired Clay Molds without having a base/shaping item (like ingot).
+  - Uses 4 Clay Balls, 1 Clay Block or 1 other Unfired Clay Molds as an input.
+  - Provides Stonecutter-like ui.
+  - Crafted either with 1 Copper Ingot, 1 Plank and 2 Wooden Plates in Crafting Table or by casting 1 Ingot worth of Molten Copper on a Crafting Table.
+- Tweaked how Data Receivers handle incoming data.
+  - Receiver can now specify if it can receive data instantly, allowing it to handle data from multiple sources.
+  - Previously (and by default) all data was first stored and only handled by provider at the end of the world tick, allowing them to handle only single message per tick.
+  - For example, Speaker can now play multiple sounds at the same time, rather than semi-arbitrarily selecting only one sound to play.
+- Changed Cable sound to Wool (most noticable with Polymer Sound Patcher enabled).
+- Fixed textures being added to "blocks" atlas, when they should be in "items".
+- Fixed last slot of Mechanical Crafter not storing it's disabled property.
