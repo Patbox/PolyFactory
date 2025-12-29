@@ -168,7 +168,7 @@ public class GaugeBlock extends DataNetworkBlock implements FactoryBlock, Config
     }
 
     public static class Model extends BlockModel implements ChanneledDataBlockEntity.InitDataListener {
-        private static final ItemStack HAND = ItemDisplayElementUtil.getModel(id("block/gauge_hand"));
+        private static final ItemStack HAND = ItemDisplayElementUtil.getSolidModel(id("block/gauge_hand"));
         private final ItemDisplayElement base;
         private final ItemDisplayElement hand = ItemDisplayElementUtil.createSimple(HAND);
         private ValueModifier modifier;
@@ -299,7 +299,7 @@ public class GaugeBlock extends DataNetworkBlock implements FactoryBlock, Config
 
         Style(String name) {
             this.name = name;
-            this.model = ItemDisplayElementUtil.getModel(id("block/gauge" + (name.equals("default") ? "" : "_" + name)));
+            this.model = ItemDisplayElementUtil.getSolidModel(id("block/gauge" + (name.equals("default") ? "" : "_" + name)));
         }
 
         @Override

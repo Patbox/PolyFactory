@@ -127,8 +127,8 @@ public class PrimitiveSmelteryBlock extends MultiBlock implements FactoryBlock, 
     }
 
     public static final class Model extends BlockModel {
-        private static final ItemStack REGULAR = ItemDisplayElementUtil.getModel(id("block/primitive_smeltery"));
-        private static final ItemStack LIT = ItemDisplayElementUtil.getModel(id("block/primitive_smeltery_lit"));
+        private static final ItemStack REGULAR = ItemDisplayElementUtil.getSolidModel(id("block/primitive_smeltery"));
+        private static final ItemStack LIT = ItemDisplayElementUtil.getSolidModel(id("block/primitive_smeltery_lit"));
 
         private final ItemDisplayElement main;
 

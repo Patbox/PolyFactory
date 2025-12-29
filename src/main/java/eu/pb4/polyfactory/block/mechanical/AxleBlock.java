@@ -116,8 +116,8 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, C
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack ITEM_MODEL = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/axle"));
-        public static final ItemStack ITEM_MODEL_SHORT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/axle_short"));
+        public static final ItemStack ITEM_MODEL = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/axle"));
+        public static final ItemStack ITEM_MODEL_SHORT = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/axle_short"));
         private final ItemDisplayElement mainElement;
         private Model(ServerLevel world, BlockState state) {
             this.mainElement = LodItemDisplayElement.createSimple(ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);

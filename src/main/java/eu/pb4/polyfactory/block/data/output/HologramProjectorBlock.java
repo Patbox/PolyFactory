@@ -247,7 +247,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
     }
 
     public static class Model extends BlockModel {
-        private static final ItemStack ACTIVE_MODEL = ItemDisplayElementUtil.getModel(id("block/hologram_projector_active"));
+        private static final ItemStack ACTIVE_MODEL = ItemDisplayElementUtil.getTransparentModel(id("block/hologram_projector_active"));
         private static final ParticleOptions EFFECT = new DustColorTransitionOptions(
                 ARGB.color(0, 153, 250, 255),
                 ARGB.color(0, 235, 254, 255),
@@ -272,7 +272,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
         private float extraOffset;
 
         public Model(BlockState state) {
-            this.base = ItemDisplayElementUtil.createSimple(state.getValue(ACTIVE) ? ACTIVE_MODEL : ItemDisplayElementUtil.getModel(state.getBlock().asItem()));
+            this.base = ItemDisplayElementUtil.createSimple(state.getValue(ACTIVE) ? ACTIVE_MODEL : ItemDisplayElementUtil.getTransparentModel(state.getBlock().asItem()));
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);
@@ -340,7 +340,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 var state = this.blockState();
-                this.base.setItem(state.getValue(ACTIVE) ? ACTIVE_MODEL : ItemDisplayElementUtil.getModel(state.getBlock().asItem()));
+                this.base.setItem(state.getValue(ACTIVE) ? ACTIVE_MODEL : ItemDisplayElementUtil.getTransparentModel(state.getBlock().asItem()));
                 updateStatePos(state);
                 this.base.tick();
                 if (this.currentDisplay != null) {
@@ -381,7 +381,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                     e.tick();
                     return;
                 } else if (this.currentDisplay instanceof ItemDisplayElement e && asItem) {
-                    e.setItem(ItemDisplayElementUtil.getModel(blockStateData.state().getBlock().asItem()));
+                    e.setItem(ItemDisplayElementUtil.getSolidModel(blockStateData.state().getBlock().asItem()));
                     e.tick();
                     this.extraScale = 2;
                     return;
@@ -390,7 +390,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 this.customCenter = 0;
                 this.extraOffset = 0;
                 if (asItem) {
-                    var i = new ItemDisplayElement(ItemDisplayElementUtil.getModel(blockStateData.state().getBlock().asItem()));
+                    var i = new ItemDisplayElement(ItemDisplayElementUtil.getTransparentModel(blockStateData.state().getBlock().asItem()));
                     i.setItemDisplayContext(ItemDisplayContext.FIXED);
                     this.extraScale = 2;
                     newDisplay = i;

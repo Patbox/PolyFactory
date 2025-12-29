@@ -232,7 +232,7 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithT
         private int highlightTimer = -1;
 
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.main = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
             this.main.setScale(new Vector3f(2f));
             this.updateStatePos(state);
             this.addElement(this.main);

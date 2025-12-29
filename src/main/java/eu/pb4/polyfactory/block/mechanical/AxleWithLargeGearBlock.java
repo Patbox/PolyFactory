@@ -48,7 +48,7 @@ public class AxleWithLargeGearBlock extends AxleWithGearBlock {
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack GEAR_MODEL = ItemDisplayElementUtil.getModel(id("block/large_gear"));
+        public static final ItemStack GEAR_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/large_gear"));
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement mainElement;

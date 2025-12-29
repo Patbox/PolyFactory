@@ -141,7 +141,7 @@ public class PressBlock extends TallItemMachineBlock {
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack MODEL_PISTON =  ItemDisplayElementUtil.getModel(FactoryUtil.id("block/press_piston"));
+        public static final ItemStack MODEL_PISTON =  ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/press_piston"));
 
 
         private final Matrix4fStack mat = new Matrix4fStack(2);

@@ -67,6 +67,10 @@ repositories {
 	maven { url "https://api.modrinth.com/maven/" }
 	maven { url = "https://jitpack.io" }
 	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+	maven {
+		name = 'ParchmentMC'
+		url = 'https://maven.parchmentmc.org'
+	}
 	mavenLocal()
 }
 
@@ -93,7 +97,7 @@ dependencies {
 	modImplementation include('eu.pb4:common-protection-api:1.0.0')
 	modImplementation include('eu.pb4:sidebar-api:0.5.1+1.21.1')
 	modImplementation include('eu.pb4:sgui:1.12.0+1.21.11')
-	modImplementation include('eu.pb4:factorytools:0.9.0+1.21.11')
+	modImplementation include('eu.pb4:factorytools:0.9.2+1.21.11')
 	//modImplementation include('com.kneelawk.graphlib:graphlib-core-fabric:2.0.3-beta.1+1.21.5')
 	modImplementation include('com.kneelawk.graphlib:graphlib-core-fabric:2.0.3-beta.0.patbox+1.21.11')
 

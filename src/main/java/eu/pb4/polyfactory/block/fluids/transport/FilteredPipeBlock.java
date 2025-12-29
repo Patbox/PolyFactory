@@ -173,11 +173,11 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Con
     }
 
     public static final class Model extends RotationAwareModel {
-        private static final ItemStack NEGATED = ItemDisplayElementUtil.getModel(id("block/filtered_pipe_negated"));
+        private static final ItemStack NEGATED = ItemDisplayElementUtil.getSolidModel(id("block/filtered_pipe_negated"));
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement fluid;
         private Model(BlockState state, BlockPos pos) {
-            this.mainElement = ItemDisplayElementUtil.createSimple(state.getValue(FilteredPipeBlock.INVERTED) ? NEGATED : ItemDisplayElementUtil.getModel(state.getBlock().asItem()));
+            this.mainElement = ItemDisplayElementUtil.createSimple(state.getValue(FilteredPipeBlock.INVERTED) ? NEGATED : ItemDisplayElementUtil.getSolidModel(state.getBlock().asItem()));
             this.mainElement.setScale(new Vector3f(2f));
             this.fluid = ItemDisplayElementUtil.createSimple();
             this.fluid.setScale(new Vector3f(2f));
@@ -209,7 +209,7 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Con
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.mainElement.setItem(this.blockState().getValue(FilteredPipeBlock.INVERTED) ? NEGATED : ItemDisplayElementUtil.getModel(this.blockState().getBlock().asItem()));
+                this.mainElement.setItem(this.blockState().getValue(FilteredPipeBlock.INVERTED) ? NEGATED : ItemDisplayElementUtil.getSolidModel(this.blockState().getBlock().asItem()));
                 updateStatePos(this.blockState());
             }
         }

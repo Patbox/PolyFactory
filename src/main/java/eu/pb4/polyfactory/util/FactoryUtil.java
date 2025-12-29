@@ -120,7 +120,6 @@ public class FactoryUtil {
         return switch (type) {
             case SOLID -> Items.STONE;
             case TRANSPARENT -> Items.FEATHER;
-            case COLORED -> Items.LEATHER_HORSE_ARMOR;
         };
     }
 

@@ -11,4 +11,7 @@
 - Fixed Orientable Cabled Blocks being replaced with Cable when placing cable in them.
 - Fixed Item Reader not being rotated correctly visually.
 - Fixed textures being added to "blocks" atlas, when they should be in "items".
+- Fixed block outline allowing to see through a block for most PolyFactory blocks:
+  - This was not fixed for blocks that have texture with partial alpha, such as colored lamps, Item Reader, Hologram Projector and Nixie Tubes.
+  - Additionally it might improve the block rendering performance slightly.
 - Fixed last slot of Mechanical Crafter not storing it's disabled property.

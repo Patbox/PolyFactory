@@ -59,15 +59,15 @@ public class ConveyorModels {
             }
             """;
     private static int currentItemIndex;
-    public static final ItemStack REGULAR_FAST = new ItemStack(Items.PAPER);
-    public static final ItemStack UP_FAST = new ItemStack(Items.PAPER);
-    public static final ItemStack DOWN_FAST = new ItemStack(Items.PAPER);
-    public static final ItemStack STICKY_REGULAR_FAST = new ItemStack(Items.PAPER);
-    public static final ItemStack STICKY_UP_FAST = new ItemStack(Items.PAPER);
-    public static final ItemStack STICKY_DOWN_FAST = new ItemStack(Items.PAPER);
+    public static final ItemStack REGULAR_FAST = new ItemStack(Items.STONE);
+    public static final ItemStack UP_FAST = new ItemStack(Items.STONE);
+    public static final ItemStack DOWN_FAST = new ItemStack(Items.STONE);
+    public static final ItemStack STICKY_REGULAR_FAST = new ItemStack(Items.STONE);
+    public static final ItemStack STICKY_UP_FAST = new ItemStack(Items.STONE);
+    public static final ItemStack STICKY_DOWN_FAST = new ItemStack(Items.STONE);
 
     private static void createItemModel(ItemStack[] array, String path, int i) {
-        var model = ItemDisplayElementUtil.getModel(FactoryUtil.id(path));
+        var model = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id(path));
         array[i == 0 ? 0 : (array.length - i)] = model;
     }
 

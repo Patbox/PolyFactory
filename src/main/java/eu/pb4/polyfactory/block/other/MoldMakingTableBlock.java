@@ -119,7 +119,7 @@ public class MoldMakingTableBlock extends Block implements FactoryBlock, Barrier
         private final ItemDisplayElement base;
 
         public Model(BlockState state) {
-            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
             this.addElement(this.base);
         }

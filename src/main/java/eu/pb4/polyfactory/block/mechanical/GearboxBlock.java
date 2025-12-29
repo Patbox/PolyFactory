@@ -90,7 +90,7 @@ public class GearboxBlock extends RotationalNetworkBlock implements FactoryBlock
         private final ItemDisplayElement zAxle;
 
         private Model() {
-            this.mainElement = ItemDisplayElementUtil.createSimple(FactoryItems.GEARBOX);
+            this.mainElement = ItemDisplayElementUtil.createSolid(FactoryItems.GEARBOX);
             this.mainElement.setScale(new Vector3f(2));
             this.addElement(this.mainElement);
 

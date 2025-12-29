@@ -191,7 +191,7 @@ public class PumpBlock extends NetworkBlock implements FactoryBlock, RotationUse
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack BLOCK_MODEL = ItemDisplayElementUtil.getModel(id("block/pump"));
+        public static final ItemStack BLOCK_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/pump"));
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement gear;
         private final boolean offset;

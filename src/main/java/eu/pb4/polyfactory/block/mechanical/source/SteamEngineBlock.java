@@ -173,9 +173,9 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, Entity
     }
 
     public final class Model extends RotationAwareModel {
-        public static final ItemStack AXLE = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/steam_engine_axle"));
-        public static final ItemStack LIT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/steam_engine_lit"));
-        public static final ItemStack LINK = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/steam_engine_link"));
+        public static final ItemStack AXLE = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/steam_engine_axle"));
+        public static final ItemStack LIT = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/steam_engine_lit"));
+        public static final ItemStack LINK = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/steam_engine_link"));
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement main;

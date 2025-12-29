@@ -162,7 +162,7 @@ public class RedstoneOutputBlock extends DirectionalCabledDataBlock implements D
         }
 
         private ItemStack createOverlay(BlockState state) {
-            var stack = new ItemStack(Items.PAPER);
+            var stack = new ItemStack(Items.STONE);
             stack.set(DataComponents.ITEM_MODEL, state.is(FactoryBlocks.REDSTONE_OUTPUT) ? OUTPUT_OVERLAY : INPUT_OVERLAY);
             stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), IntList.of(RedStoneWireBlock.getColorForPower(state.getValue(POWER)))));
             return stack;

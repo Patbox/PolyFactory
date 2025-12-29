@@ -156,7 +156,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlo
         private final ItemDisplayElement mainElement;
 
         private Model(ServerLevel world, BlockState state) {
-            this.mainElement = LodItemDisplayElement.createSimple(FactoryItems.HAND_CRANK, this.getUpdateRate());
+            this.mainElement = LodItemDisplayElement.createSolid(FactoryItems.HAND_CRANK, this.getUpdateRate());
             this.updateAnimation(0, state.getValue(FACING));
             this.addElement(this.mainElement);
         }

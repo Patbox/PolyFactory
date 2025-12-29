@@ -214,7 +214,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         private FluidInstance<?> fluidType;
 
         private Model(ServerLevel world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.main = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0, -5 / 16f));
             this.fluid = ItemDisplayElementUtil.createSimple();

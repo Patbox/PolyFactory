@@ -93,7 +93,7 @@ public class FluidModel {
 
     protected void addTextures(Identifier id, FluidType<?> object, Function<ModelRenderType, Item> function) {
         this.textures.add(new Texture(id, object.texture(), object.color().isPresent() || this.alwaysColored));
-        var stack = new ItemStack(function.apply(this.alwaysColored ? ModelRenderType.COLORED : object.modelRenderType()));
+        var stack = new ItemStack(function.apply(object.modelRenderType()));
         stack.set(DataComponents.ITEM_MODEL, bridgeModelNoItem(this.baseModel.withSuffix("/" + id.getNamespace() + "/" + id.getPath())));
         this.model.put(object, stack);
     }

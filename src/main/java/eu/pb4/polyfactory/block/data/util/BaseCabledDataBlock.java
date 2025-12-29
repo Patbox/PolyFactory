@@ -106,11 +106,15 @@ public abstract class BaseCabledDataBlock extends AbstractCableBlock implements 
 
         protected Model(BlockState state) {
             super(state);
-            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.base = createBaseModel(state);
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);
             this.addElement(this.base);
+        }
+
+        protected ItemDisplayElement createBaseModel(BlockState state) {
+            return ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
         }
 
         protected abstract void updateStatePos(BlockState state);

@@ -149,7 +149,7 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
         private BlockCollection blocks;
 
         private Model(ServerLevel world, BlockState state) {
-            this.mainElement = LodItemDisplayElement.createSimple(ItemDisplayElementUtil.getModel(state.getBlock().asItem()), this.getUpdateRate(), 0.3f, 0.6f);
+            this.mainElement = LodItemDisplayElement.createSimple(ItemDisplayElementUtil.getSolidModel(state.getBlock().asItem()), this.getUpdateRate(), 0.3f, 0.6f);
             this.updateAnimation(0, state.getValue(FACING));
             this.addElement(this.mainElement);
             if (false) {

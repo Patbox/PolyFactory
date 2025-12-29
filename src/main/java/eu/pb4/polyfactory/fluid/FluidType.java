@@ -235,13 +235,11 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
 
         public Builder<T> color(int color) {
             this.color = Optional.of((x) -> color);
-            this.modelRenderType = ModelRenderType.COLORED;
             return this;
         }
 
         public Builder<T> color(ColorProvider<T> colorProvider) {
             this.color = Optional.of(colorProvider);
-            this.modelRenderType = ModelRenderType.COLORED;
             return this;
         }
 

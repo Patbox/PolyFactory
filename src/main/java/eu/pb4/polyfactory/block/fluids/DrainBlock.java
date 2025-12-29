@@ -174,7 +174,7 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
         private final ItemDisplayElement catalyst;
         private final TopFluidViewModel fluid;
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.main = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
             this.main.setScale(new Vector3f(2f));
             this.fluid = new TopFluidViewModel(this, -7f / 16f + 0.1f, 11f / 16f, 0.5f);
             this.catalyst = ItemDisplayElementUtil.createSimple();

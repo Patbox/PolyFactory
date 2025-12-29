@@ -244,15 +244,15 @@ public class ChainDriveBlock extends AxleBlock implements EntityBlock {
     }
 
     public static final class Model extends RotationAwareModel {
-        private static final ItemStack CHAIN = ItemDisplayElementUtil.getModel(id("block/chain_drive_chain"));
-        private static final ItemStack CHAIN_1 = ItemDisplayElementUtil.getModel(id("block/chain_drive_chain_1"));
-        private static final ItemStack CHAIN_2 = ItemDisplayElementUtil.getModel(id("block/chain_drive_chain_2"));
+        private static final ItemStack CHAIN = ItemDisplayElementUtil.getSolidModel(id("block/chain_drive_chain"));
+        private static final ItemStack CHAIN_1 = ItemDisplayElementUtil.getSolidModel(id("block/chain_drive_chain_1"));
+        private static final ItemStack CHAIN_2 = ItemDisplayElementUtil.getSolidModel(id("block/chain_drive_chain_2"));
         private final ItemDisplayElement mainElement;
         private final Map<BlockPos, Entry> entries = new HashMap<>();
         private float lastRotation = 0;
 
         private Model(ServerLevel world, BlockState state, BlockPos pos) {
-            this.mainElement = LodItemDisplayElement.createSimple(ItemDisplayElementUtil.getModel(state.getBlock().asItem()),
+            this.mainElement = LodItemDisplayElement.createSimple(ItemDisplayElementUtil.getSolidModel(state.getBlock().asItem()),
                     this.getUpdateRate(), 0.3f, 0.6f);
             this.mainElement.setViewRange(0.7f);
             this.updateAnimation(0, state.getValue(AXIS), pos);

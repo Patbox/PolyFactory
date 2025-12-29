@@ -219,8 +219,8 @@ public class IndustrialSmelteryBlock extends MultiBlock implements FactoryBlock,
     }
 
     public static final class Model extends BlockModel {
-        private static final ItemStack REGULAR = ItemDisplayElementUtil.getModel(id("block/smeltery"));
-        private static final ItemStack LIT = ItemDisplayElementUtil.getModel(id("block/smeltery_lit"));
+        private static final ItemStack REGULAR = ItemDisplayElementUtil.getSolidModel(id("block/smeltery"));
+        private static final ItemStack LIT = ItemDisplayElementUtil.getSolidModel(id("block/smeltery_lit"));
 
         private final ItemDisplayElement main;
 
@@ -261,7 +261,7 @@ public class IndustrialSmelteryBlock extends MultiBlock implements FactoryBlock,
     }
 
     public final class ModelTopPipe extends BlockModel {
-        private static final ItemStack MODEL = ItemDisplayElementUtil.getModel(id("block/smeltery_top_pipe"));
+        private static final ItemStack MODEL = ItemDisplayElementUtil.getSolidModel(id("block/smeltery_top_pipe"));
 
         private final ItemDisplayElement main;
 

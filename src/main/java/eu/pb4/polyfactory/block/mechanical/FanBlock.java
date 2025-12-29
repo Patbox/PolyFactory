@@ -149,7 +149,7 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack ITEM_MODEL = ItemDisplayElementUtil.getModel(id("block/fan_rotating"));
+        public static final ItemStack ITEM_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/fan_rotating"));
 
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement fan;
@@ -157,7 +157,7 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
         private boolean reverse;
 
         private Model(BlockState state) {
-            this.mainElement = ItemDisplayElementUtil.createSimple(FactoryItems.FAN);
+            this.mainElement = ItemDisplayElementUtil.createSolid(FactoryItems.FAN);
             this.mainElement.setScale(new Vector3f(2f));
             var rot = new Quaternionf().rotateX(Mth.HALF_PI);
             this.mainElement.setRightRotation(rot);

@@ -297,8 +297,8 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
     }
 
     public static class Model extends BlockModel {
-        private static final ItemStack MODEL_IN = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/funnel_in"));
-        private static final ItemStack MODEL_OUT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/funnel_out"));
+        private static final ItemStack MODEL_IN = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/funnel_in"));
+        private static final ItemStack MODEL_OUT = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/funnel_out"));
         final FilterIcon filterElement = new FilterIcon(this);
         private final ItemDisplayElement mainElement;
         private final float offset;

@@ -41,7 +41,7 @@ public class SpoutFluidModel extends FluidModel {
             return;
         }
         this.textures.add(new Texture(id.withSuffix("__solid"), fluidType.solidTexture().get(), true));
-        var stack = new ItemStack(function.apply(ModelRenderType.COLORED));
+        var stack = new ItemStack(function.apply(ModelRenderType.TRANSPARENT));
         stack.set(DataComponents.ITEM_MODEL, bridgeModelNoItem(this.baseModel.withSuffix("/" + id.getNamespace() + "/" + id.getPath() + "__solid")));
         this.solidFluid.put(fluidType, stack);
     }

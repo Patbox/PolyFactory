@@ -156,14 +156,14 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
     }
 
     public static class Model extends BlockModel {
-        public static final ItemStack INPUT = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_input"));
-        public static final ItemStack OUTPUT = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_output"));
+        public static final ItemStack INPUT = ItemDisplayElementUtil.getSolidModel(id("block/data_cube_connector_input"));
+        public static final ItemStack OUTPUT = ItemDisplayElementUtil.getSolidModel(id("block/data_cube_connector_output"));
         private final ItemDisplayElement base;
         private final ItemDisplayElement input;
         private final ItemDisplayElement output;
 
         private Model(BlockState state) {
-            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 
             this.input = ItemDisplayElementUtil.createSimple(INPUT);

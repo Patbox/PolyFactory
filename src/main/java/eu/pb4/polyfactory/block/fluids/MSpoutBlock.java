@@ -167,8 +167,8 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
     }
 
     public static final class Model extends RotationAwareModel {
-        private final ItemStack DEFAULT_MODEL = ItemDisplayElementUtil.getModel(id("block/mechanical_spout"));
-        private final ItemStack ALT_MODEL = ItemDisplayElementUtil.getModel(id("block/mechanical_spout_alt"));
+        private final ItemStack DEFAULT_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/mechanical_spout"));
+        private final ItemStack ALT_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/mechanical_spout_alt"));
         private final ItemDisplayElement main;
         private final ItemDisplayElement gearA;
         private final ItemDisplayElement gearB;

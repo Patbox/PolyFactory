@@ -127,8 +127,8 @@ public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, 
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack OFF = ItemDisplayElementUtil.getModel(id("block/gated_cable"));
-        public static final ItemStack ON = ItemDisplayElementUtil.getModel(id("block/gated_cable_on"));
+        public static final ItemStack OFF = ItemDisplayElementUtil.getSolidModel(id("block/gated_cable"));
+        public static final ItemStack ON = ItemDisplayElementUtil.getSolidModel(id("block/gated_cable_on"));
 
         private final ItemDisplayElement main;
         private Model(ServerLevel world, BlockState state) {

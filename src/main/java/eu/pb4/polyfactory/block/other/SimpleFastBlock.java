@@ -60,7 +60,7 @@ public abstract class SimpleFastBlock extends Block implements PolymerBlock {
         @Override
         public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
             var model = new BlockModel();
-            var element = ItemDisplayElementUtil.createSimple(this.asItem());
+            var element = ItemDisplayElementUtil.createSolid(this.asItem());
             element.setScale(new Vector3f(2));
             model.addElement(element);
             return model;

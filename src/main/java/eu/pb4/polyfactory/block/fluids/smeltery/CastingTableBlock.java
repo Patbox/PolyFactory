@@ -129,7 +129,7 @@ public class CastingTableBlock extends Block implements FactoryBlock, EntityBloc
         private boolean isCooling;
 
         private Model(ServerLevel world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.main = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
             this.main.setScale(new Vector3f(2));
             this.mold = ItemDisplayElementUtil.createSimple();
             this.mold.setScale(new Vector3f(12 / 16f));

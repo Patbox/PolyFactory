@@ -52,7 +52,7 @@ public class MultiElementConnectedModel {
                 for (var z : ConnectablePart.values()) {
                     var i = index(x, y, z);
                     if (this.models[i] == null) {
-                        this.models[i] = ItemDisplayElementUtil.getModel(base.withSuffix("/" + x.getSerializedName() + "_" + y.getSerializedName() + "_" + z.getSerializedName()));
+                        this.models[i] = ItemDisplayElementUtil.getSolidModel(base.withSuffix("/" + x.getSerializedName() + "_" + y.getSerializedName() + "_" + z.getSerializedName()));
                     }
                 }
             }

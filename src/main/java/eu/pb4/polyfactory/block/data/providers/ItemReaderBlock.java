@@ -108,6 +108,11 @@ public class ItemReaderBlock extends OrientableCabledDataProviderBlock {
         }
 
         @Override
+        protected ItemDisplayElement createBaseModel(BlockState state) {
+            return ItemDisplayElementUtil.createTransparent(state.getBlock().asItem());
+        }
+
+        @Override
         protected void updateStatePos(BlockState state) {
             super.updateStatePos(state);
             if (this.book != null) {

@@ -100,7 +100,7 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
         private final boolean oppositeFacing;
 
         protected Model(BlockState state, boolean oppositeFacing) {
-            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
             this.oppositeFacing = oppositeFacing;
 

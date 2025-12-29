@@ -145,7 +145,7 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
         private final ItemDisplayElement left;
         private final ItemDisplayElement right;
         private Model(ServerLevel world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.main = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
             this.main.setScale(new Vector3f(2));
 
             this.left = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, this.getUpdateRate(), 0.3f, 0.6f);

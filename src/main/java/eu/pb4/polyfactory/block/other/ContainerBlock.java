@@ -195,7 +195,7 @@ public class ContainerBlock extends Block implements FactoryBlock, EntityBlock, 
         private final TextDisplayElement countElement;
 
         private Model(ServerLevel world, BlockPos pos, BlockState state) {
-            this.mainElement = ItemDisplayElementUtil.createSimple(ContainerBlock.this.asItem());
+            this.mainElement = ItemDisplayElementUtil.createSolid(ContainerBlock.this.asItem());
 
             this.itemElement = ItemDisplayElementUtil.createSimple();
             this.itemElement.setDisplaySize(1, 1);

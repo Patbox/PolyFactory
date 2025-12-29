@@ -64,7 +64,7 @@ import java.util.function.Consumer;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, ConfigurableEntity<ChainLiftEntity>, EntityCatchingVehicle {
-    private static final ItemStack MODEL = ItemDisplayElementUtil.getModel(id("entity/chain_lift"));
+    private static final ItemStack MODEL = ItemDisplayElementUtil.getSolidModel(id("entity/chain_lift"));
     private static final EntityConfig<Boolean, ChainLiftEntity> PLAYER_CONTROL_CONFIG = EntityConfig.of("player_control", Codec.BOOL,
             EntityConfigValue.of(x -> x.playerControllable, (x, y) -> x.playerControllable = y),
             EntityValueFormatter.text(CommonComponents::optionStatus),

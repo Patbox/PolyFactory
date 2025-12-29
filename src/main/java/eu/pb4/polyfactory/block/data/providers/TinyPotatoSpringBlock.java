@@ -181,8 +181,8 @@ public class TinyPotatoSpringBlock extends DataNetworkBlock implements FactoryBl
         private float interactionYaw;
 
         private Model(ServerLevel world, BlockPos pos, BlockState state) {
-            this.base = ItemDisplayElementUtil.createSimple(baseModelId);
-            this.tater = LodItemDisplayElement.createSimple(taterModelId, 1);
+            this.base = ItemDisplayElementUtil.createSolid(baseModelId);
+            this.tater = LodItemDisplayElement.createSolid(taterModelId, 1);
             this.tater.setTranslation(new Vector3f(0, -6f / 16, 0));
             //this.tater.setOffset(new Vec3d(0, 2f / 16, 0));
 

@@ -112,7 +112,7 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
 
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack MODEL_PISTON = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/mixer_whisk"));
+        public static final ItemStack MODEL_PISTON = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/mixer_whisk"));
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement whisk;

@@ -191,16 +191,16 @@ public abstract class DoubleInputTransformerBlock extends DataNetworkBlock imple
     }
 
     public static class Model extends BlockModel {
-        public static final ItemStack INPUT_A = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_input_a"));
-        public static final ItemStack INPUT_B = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_input_b"));
-        public static final ItemStack OUTPUT = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_output"));
+        public static final ItemStack INPUT_A = ItemDisplayElementUtil.getSolidModel(id("block/data_cube_connector_input_a"));
+        public static final ItemStack INPUT_B = ItemDisplayElementUtil.getSolidModel(id("block/data_cube_connector_input_b"));
+        public static final ItemStack OUTPUT = ItemDisplayElementUtil.getSolidModel(id("block/data_cube_connector_output"));
         private final ItemDisplayElement base;
         private final ItemDisplayElement inputA;
         private final ItemDisplayElement inputB;
         private final ItemDisplayElement output;
 
         private Model(BlockState state) {
-            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 
             this.inputA = ItemDisplayElementUtil.createSimple(INPUT_A);

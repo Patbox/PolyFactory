@@ -164,8 +164,8 @@ public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack OUTPUT_1 = ItemDisplayElementUtil.getModel(id("block/planter_output"));
-        public static final ItemStack OUTPUT_2 = ItemDisplayElementUtil.getModel(id("block/planter_output_2"));
+        public static final ItemStack OUTPUT_1 = ItemDisplayElementUtil.getSolidModel(id("block/planter_output"));
+        public static final ItemStack OUTPUT_2 = ItemDisplayElementUtil.getSolidModel(id("block/planter_output_2"));
 
         private final ItemDisplayElement output1;
         private final ItemDisplayElement output2;

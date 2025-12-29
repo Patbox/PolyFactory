@@ -172,7 +172,7 @@ public class NozzleBlock extends NetworkBlock implements FactoryBlock, Configura
     public static final class Model extends BlockModel {
         private final ItemDisplayElement main;
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.main = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
             this.main.setScale(new Vector3f(2f));
 
             this.updateStatePos(state);

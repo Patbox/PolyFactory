@@ -140,8 +140,8 @@ public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeC
     }
 
     public static final class Model extends BlockModel {
-        public static final ItemStack BASE_MODEL = ItemDisplayElementUtil.getModel(id("block/portable_fluid_tank"));
-        public static final ItemStack WATERLOGGED_MODEL = ItemDisplayElementUtil.getModel(id("block/portable_fluid_tank_waterlogged"));
+        public static final ItemStack BASE_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/portable_fluid_tank"));
+        public static final ItemStack WATERLOGGED_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/portable_fluid_tank_waterlogged"));
         private final ItemDisplayElement main;
         private final SimpleMultiFluidViewModel fluid = new SimpleMultiFluidViewModel(this, FactoryModels.FLUID_PORTABLE_FLUID_TANK_VERTICAL, 16);
 

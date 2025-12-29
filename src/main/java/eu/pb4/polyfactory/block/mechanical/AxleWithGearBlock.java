@@ -144,8 +144,8 @@ public class AxleWithGearBlock extends AxleBlock implements RotationalConnector,
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack ITEM_MODEL_1 = ItemDisplayElementUtil.getModel( id("block/axle_with_gear_1"));
-        public static final ItemStack ITEM_MODEL_2 = ItemDisplayElementUtil.getModel( id("block/axle_with_gear_2"));
+        public static final ItemStack ITEM_MODEL_1 = ItemDisplayElementUtil.getSolidModel( id("block/axle_with_gear_1"));
+        public static final ItemStack ITEM_MODEL_2 = ItemDisplayElementUtil.getSolidModel( id("block/axle_with_gear_2"));
 
         private final ItemDisplayElement mainElement;
         private Model(ServerLevel world, BlockState state, BlockPos pos) {

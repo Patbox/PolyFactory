@@ -219,7 +219,7 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
 
         public Model(BlockState state) {
             this.axle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
-            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);

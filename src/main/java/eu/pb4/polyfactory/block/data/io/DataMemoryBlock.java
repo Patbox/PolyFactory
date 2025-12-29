@@ -221,11 +221,11 @@ public final class DataMemoryBlock extends DataNetworkBlock implements EntityBlo
     }
 
     public static class Model extends BlockModel {
-        public static final ItemStack BASE = ItemDisplayElementUtil.getModel(id("block/data_memory"));
-        public static final ItemStack COVER = ItemDisplayElementUtil.getModel(id("block/data_memory_cover"));
-        public static final ItemStack COVER_POWERED = ItemDisplayElementUtil.getModel(id("block/data_memory_cover_powered"));
-        public static final ItemStack INPUT = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_input"));
-        public static final ItemStack OUTPUT = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_output"));
+        public static final ItemStack BASE = ItemDisplayElementUtil.getSolidModel(id("block/data_memory"));
+        public static final ItemStack COVER = ItemDisplayElementUtil.getSolidModel(id("block/data_memory_cover"));
+        public static final ItemStack COVER_POWERED = ItemDisplayElementUtil.getSolidModel(id("block/data_memory_cover_powered"));
+        public static final ItemStack INPUT = ItemDisplayElementUtil.getSolidModel(id("block/data_cube_connector_input"));
+        public static final ItemStack OUTPUT = ItemDisplayElementUtil.getSolidModel(id("block/data_cube_connector_output"));
         private final ItemDisplayElement base;
         private final ItemDisplayElement input;
         private final ItemDisplayElement output;

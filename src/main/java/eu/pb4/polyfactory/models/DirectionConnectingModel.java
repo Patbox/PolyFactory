@@ -33,7 +33,7 @@ public class DirectionConnectingModel {
         this.colored = colored;
 
         for (var i = 0; i < SIZE; i++) {
-            this.models[i] = Items.PAPER.getDefaultInstance();
+            this.models[i] = Items.STONE.getDefaultInstance();
             this.models[i].set(DataComponents.ITEM_MODEL, bridgeModel(baseModel.withSuffix("/" + i)));
         }
     }

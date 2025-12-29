@@ -163,14 +163,14 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack MODEL_STONE_WHEEL = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/grindstone_wheel"));
+        public static final ItemStack MODEL_STONE_WHEEL = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/grindstone_wheel"));
 
         private final ItemDisplayElement stoneWheel;
         private final ItemDisplayElement main;
 
         private Model(ServerLevel world, BlockState state) {
 
-            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.GRINDER);
+            this.main = ItemDisplayElementUtil.createSolid(FactoryItems.GRINDER);
             this.stoneWheel = LodItemDisplayElement.createSimple(MODEL_STONE_WHEEL, this.getUpdateRate(), 0.6f, 0.6f);
 
             this.updateAnimation(0, state.getValue(INPUT_FACING));

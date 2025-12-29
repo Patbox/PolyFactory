@@ -26,8 +26,8 @@ public class PolymerButtonBlock extends ButtonBlock implements FactoryBlock {
 
     public PolymerButtonBlock(String name, BlockSetType blockSetType, int pressTicks, Properties settings) {
         super(blockSetType, pressTicks, settings);
-        this.modelNormal = ItemDisplayElementUtil.getModel(id("block/" + name + "_button"));
-        this.modelPressed = ItemDisplayElementUtil.getModel(id("block/" + name + "_button_pressed"));
+        this.modelNormal = ItemDisplayElementUtil.getSolidModel(id("block/" + name + "_button"));
+        this.modelPressed = ItemDisplayElementUtil.getSolidModel(id("block/" + name + "_button_pressed"));
     }
 
     @Override

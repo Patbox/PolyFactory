@@ -12,6 +12,6 @@ public class GenericParts {
     public static final ItemStack FILTER_MESH = create(id("block/filter_mesh"));
 
     private static ItemStack create(Identifier id) {
-        return ItemDisplayElementUtil.getModel(id);
+        return ItemDisplayElementUtil.getSolidModel(id);
     }
 }

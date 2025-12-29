@@ -174,8 +174,8 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
     }
 
     public static final class Model extends FunnelBlock.Model {
-        private static final ItemStack MODEL_IN = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/slot_aware_funnel_in"));
-        private static final ItemStack MODEL_OUT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/slot_aware_funnel_out"));
+        private static final ItemStack MODEL_IN = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/slot_aware_funnel_in"));
+        private static final ItemStack MODEL_OUT = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/slot_aware_funnel_out"));
         private Model(BlockState state, BlockPos pos) {
             super(state, pos);
         }

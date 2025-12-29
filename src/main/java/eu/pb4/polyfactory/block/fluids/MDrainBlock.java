@@ -146,8 +146,8 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
 
 
     public static final class Model extends RotationAwareModel {
-        private static final ItemStack BASE_MODEL = ItemDisplayElementUtil.getModel(id("block/mechanical_drain"));
-        private static final ItemStack AXLE_MODEL = ItemDisplayElementUtil.getModel(id("block/mechanical_drain_axle"));
+        private static final ItemStack BASE_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/mechanical_drain"));
+        private static final ItemStack AXLE_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/mechanical_drain_axle"));
         private final ItemDisplayElement catalyst;
         private final ItemDisplayElement main;
         private final ItemDisplayElement axle;

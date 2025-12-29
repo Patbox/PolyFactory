@@ -150,7 +150,7 @@ public class ItemPackerBlock extends Block implements FactoryBlock, EntityBlock,
         private final ItemDisplayElement itemElement;
 
         private Model(ServerLevel world, BlockPos pos, BlockState state) {
-            this.mainElement = ItemDisplayElementUtil.createSimple(ItemPackerBlock.this.asItem());
+            this.mainElement = ItemDisplayElementUtil.createSolid(ItemPackerBlock.this.asItem());
 
             this.itemElement = ItemDisplayElementUtil.createSimple();
             this.itemElement.setDisplaySize(1, 1);

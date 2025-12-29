@@ -263,9 +263,9 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack BASE_MODEL = ItemDisplayElementUtil.getModel(id("block/ejector_base"));
-        public static final ItemStack PLATE_MODEL = ItemDisplayElementUtil.getModel(id("block/ejector_plate"));
-        public static final ItemStack LINK_MODEL = ItemDisplayElementUtil.getModel(id("block/ejector_link"));
+        public static final ItemStack BASE_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/ejector_base"));
+        public static final ItemStack PLATE_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/ejector_plate"));
+        public static final ItemStack LINK_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/ejector_link"));
 
         private final ItemDisplayElement base;
         private final ItemDisplayElement plate;

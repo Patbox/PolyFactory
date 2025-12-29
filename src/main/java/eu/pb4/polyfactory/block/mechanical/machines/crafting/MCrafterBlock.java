@@ -181,7 +181,7 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
         private final ItemDisplayElement base;
 
         private Model(BlockState state) {
-            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);

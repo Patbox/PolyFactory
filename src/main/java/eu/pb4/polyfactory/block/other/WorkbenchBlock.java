@@ -132,7 +132,7 @@ public class WorkbenchBlock extends Block implements FactoryBlock, EntityBlock, 
         protected final ItemDisplayElement[] items = new ItemDisplayElement[9];
 
         public Model(BlockState state) {
-            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
             for (int i = 0; i < 9; i++) {
                 var element = ItemDisplayElementUtil.createSimple();

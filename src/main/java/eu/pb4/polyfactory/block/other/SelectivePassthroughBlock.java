@@ -95,7 +95,7 @@ public class SelectivePassthroughBlock extends Block implements FactoryBlock, Ba
     @Override
     public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         var model = new BlockModel();
-        var element = ItemDisplayElementUtil.createSimple(this.asItem());
+        var element = ItemDisplayElementUtil.createSolid(this.asItem());
         element.setScale(new Vector3f(1.9995f));
         model.addElement(element);
         return model;

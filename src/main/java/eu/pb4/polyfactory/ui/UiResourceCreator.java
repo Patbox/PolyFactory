@@ -168,7 +168,7 @@ public class UiResourceCreator {
         var texturePath = elementPath(path);
         var modelPath = elementPath(path + extra);
         SIMPLE_MODEL.add(new SimpleModel(texturePath, modelPath, base, offset));
-        return ItemDisplayElementUtil.getModel(texturePath);
+        return ItemDisplayElementUtil.getSolidModel(texturePath);
     }
 
     private static Identifier elementPath(String path) {
