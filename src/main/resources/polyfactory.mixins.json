@@ -10,6 +10,7 @@
     "FallingBlockAccessor",
     "ItemEntityAccessor",
     "MobEffectInstanceAccessor",
+    "ParsedTemplateAccessor",
     "PotionBrewingAccessor",
     "ProjectileAccessor",
     "PropertiesAccessor",

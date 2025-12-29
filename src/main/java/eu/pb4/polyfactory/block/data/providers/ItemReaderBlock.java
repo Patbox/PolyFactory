@@ -109,6 +109,7 @@ public class ItemReaderBlock extends OrientableCabledDataProviderBlock {
 
         @Override
         protected void updateStatePos(BlockState state) {
+            super.updateStatePos(state);
             if (this.book != null) {
                 this.book.setYaw(this.base.getYaw());
                 this.book.setPitch(this.base.getPitch());

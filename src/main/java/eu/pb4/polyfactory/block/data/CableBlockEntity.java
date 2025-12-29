@@ -60,7 +60,7 @@ public class CableBlockEntity extends BlockEntity implements BlockEntityExtraLis
 
     @Override
     public void onListenerUpdate(LevelChunk chunk) {
-        this.model = (AbstractCableBlock.BaseCableModel) BlockBoundAttachment.get(chunk, this.getBlockPos()).holder();
+        this.model = (AbstracterCableBlock.BaseCableModel) BlockBoundAttachment.get(chunk, this.getBlockPos()).holder();
         this.model.setColor(this.color);
     }
 

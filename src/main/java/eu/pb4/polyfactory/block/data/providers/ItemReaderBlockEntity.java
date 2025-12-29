@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.data.providers;
 
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
+import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.data.DataProvider;
@@ -9,15 +10,28 @@ import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.ItemStackData;
+import eu.pb4.polyfactory.data.ListData;
 import eu.pb4.polyfactory.data.StringData;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.SingleStackContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import it.unimi.dsi.fastutil.ints.Int2BooleanOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.fabricmc.loader.api.FabricLoader;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -40,6 +54,7 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
     private int page = 0;
     private String[] lines = NO_DATA;
     private ItemReaderBlock.Model model;
+    private DataContainer[] altData = null;
 
     public ItemReaderBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(FactoryBlockEntities.ITEM_READER, blockPos, blockState);
@@ -77,8 +92,48 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
         if (this.model != null) {
             this.model.setItem(this.stack);
         }
+        this.altData = null;
 
-        if (this.stack.has(DataComponents.WRITABLE_BOOK_CONTENT)) {
+        if (this.stack.has(FactoryDataComponents.PUNCH_CARD_DATA) && ModInit.DEV_ENV) {
+            var lines = this.stack.getOrDefault(FactoryDataComponents.PUNCH_CARD_DATA, List.<String>of());
+            if (lines.isEmpty()) {
+                this.lines = NO_DATA;
+            } else {
+                if (lines.getFirst().startsWith("// Local file: ")) {
+                    var path = FabricLoader.getInstance().getGameDir().resolve(lines.getFirst().substring("// Local file: ".length()));
+
+                    try {
+                        lines = Files.readAllLines(path);
+                    } catch (IOException e) {
+                        // ignore
+                    }
+                }
+
+                if (lines.getFirst().equals("// NoteBlocks.txt")) {
+                    var altData = new ArrayList<List<DataContainer>>();
+
+                    for (var line : lines) {
+                        if (line.startsWith("//")) continue;
+                        var split = line.split(":", 2);
+                        if (split.length != 2) continue;
+                        try {
+                            var index = Integer.parseInt(split[0]) / 2;
+                            while (altData.size() <= index) {
+                                altData.add(new ArrayList<>());
+                            }
+
+                            altData.get(index).add(new StringData(line));
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    this.altData = altData.stream()
+                            .map(x -> (x.size() == 1 ? x.getFirst() : new ListData(x))).toArray(DataContainer[]::new);
+                }
+                
+                this.lines = lines.toArray(new String[0]);
+            }
+        } else if (this.stack.has(DataComponents.WRITABLE_BOOK_CONTENT)) {
             var lines = this.stack.getOrDefault(DataComponents.WRITABLE_BOOK_CONTENT, WritableBookContent.EMPTY).pages();
             if (lines.isEmpty()) {
                 this.lines = NO_DATA;
@@ -115,8 +170,8 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
             this.lines = NO_DATA;
         }
 
-        this.page = this.page % this.lines.length;
-        this.lastData = new ItemStackData(this.stack.copy(), this.lines[this.page]);
+        this.page = this.page % (this.altData != null ? this.altData.length : this.lines.length);
+        this.lastData = this.altData != null ? this.altData[this.page] : new ItemStackData(this.stack.copy(), this.lines[this.page]);
         if (this.level != null) {
             if (DataProvider.sendData(this.level, this.worldPosition, this.lastData) > 0) {
                 if (FactoryUtil.getClosestPlayer(level, worldPosition, 32) instanceof ServerPlayer player) {
@@ -137,8 +192,13 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
     }
 
     public DataContainer nextPage() {
-        this.page = (this.page + 1) % lines.length;
-        this.lastData = new StringData(this.lines[this.page]);
+        if (this.altData != null) {
+            this.page = (this.page + 1) % this.altData.length;
+            this.lastData = this.altData[this.page];
+        } else {
+            this.page = (this.page + 1) % lines.length;
+            this.lastData = new StringData(this.lines[this.page]);
+        }
         return this.lastData;
     }
 

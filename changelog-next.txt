@@ -8,5 +8,7 @@
   - Previously (and by default) all data was first stored and only handled by provider at the end of the world tick, allowing them to handle only single message per tick.
   - For example, Speaker can now play multiple sounds at the same time, rather than semi-arbitrarily selecting only one sound to play.
 - Changed Cable sound to Wool (most noticable with Polymer Sound Patcher enabled).
+- Fixed Orientable Cabled Blocks being replaced with Cable when placing cable in them.
+- Fixed Item Reader not being rotated correctly visually.
 - Fixed textures being added to "blocks" atlas, when they should be in "items".
 - Fixed last slot of Mechanical Crafter not storing it's disabled property.

@@ -12,6 +12,7 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.minecraft.world.level.block.NoteBlock;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -89,6 +90,19 @@ public class SpeakerBlock extends DirectionalCabledDataBlock implements DataRece
                         }
                     }
                 } catch (Throwable ignored) {}
+            }
+
+            if (notFound) {
+                parts = data.asString().split(":", 3);
+                if (parts.length == 3) {
+                    try {
+                        var instrument = NoteBlockInstrument.values()[Integer.parseInt(parts[2])];
+                        soundEvent = instrument.getSoundEvent();
+                        notFound = false;
+                        pitch = NoteBlock.getPitchFromNote(Integer.parseInt(parts[1]));
+                        volume = 0.5f;
+                    } catch (Throwable ignored) {}
+                }
             }
 
             if (notFound) {
