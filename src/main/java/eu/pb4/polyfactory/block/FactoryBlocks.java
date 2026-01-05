@@ -102,6 +102,7 @@ public class FactoryBlocks {
     public static final ItemReaderBlock ITEM_READER = register("item_reader", BlockBehaviour.Properties.ofFullCopy(ITEM_COUNTER), ItemReaderBlock::new);
     public static final BlockObserverBlock BLOCK_OBSERVER = register("block_observer", BlockBehaviour.Properties.ofFullCopy(ITEM_COUNTER), BlockObserverBlock::new);
     public static final TextInputBlock TEXT_INPUT = register("text_input", BlockBehaviour.Properties.ofFullCopy(ITEM_COUNTER), TextInputBlock::new);
+    public static final DigitalClockBlock DIGITAL_CLOCK = register("digital_clock", BlockBehaviour.Properties.ofFullCopy(ITEM_COUNTER), DigitalClockBlock::new);
     public static final ArithmeticOperatorBlock ARITHMETIC_OPERATOR = register("arithmetic_operator",
             BlockBehaviour.Properties.ofFullCopy(ITEM_COUNTER), ArithmeticOperatorBlock::new);
 

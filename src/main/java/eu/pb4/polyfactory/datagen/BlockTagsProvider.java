@@ -99,6 +99,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.FAUCED)
                 .add(FactoryBlocks.ITEM_COUNTER)
                 .add(FactoryBlocks.TEXT_INPUT)
+                .add(FactoryBlocks.DIGITAL_CLOCK)
                 .add(FactoryBlocks.GATED_CABLE)
                 .add(FactoryBlocks.REDSTONE_INPUT)
                 .add(FactoryBlocks.REDSTONE_OUTPUT)

@@ -125,7 +125,7 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
 
         private Model(BlockState state) {
             this.fluid = new TopFluidViewModel(this, -4f / 16f, 10f / 16f, 0.5f);
-            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.MIXER);
+            this.main = ItemDisplayElementUtil.createSolid(FactoryItems.MIXER);
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.whisk = LodItemDisplayElement.createSimple(MODEL_PISTON, 2, 0.4f, 0.8f);

@@ -186,7 +186,7 @@ public class PlacerBlock extends RotationalNetworkBlock implements FactoryBlock,
         private float rotation = 0;
 
         private Model(ServerLevel world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.PLACER);
+            this.main = ItemDisplayElementUtil.createSolid(FactoryItems.PLACER);
             this.item = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 3, 0.5f);
 
             this.updateAnimation(state.getValue(FACING));

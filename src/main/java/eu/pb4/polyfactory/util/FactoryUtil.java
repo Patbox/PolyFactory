@@ -304,11 +304,11 @@ public class FactoryUtil {
             var current = inventory.getItem(slot);
 
             if (current.isEmpty()) {
-                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize());
+                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize(itemStack));
                 inventory.setItem(slot, itemStack.copyWithCount(maxMove));
                 itemStack.shrink(maxMove);
             } else if (ItemStack.isSameItemSameComponents(current, itemStack)) {
-                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize());
+                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize(itemStack));
 
                 if (maxMove > 0) {
                     current.grow(maxMove);
@@ -332,12 +332,12 @@ public class FactoryUtil {
             var current = inventory.getItem(i);
 
             if (current.isEmpty()) {
-                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize());
+                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize(itemStack));
                 inventory.setItem(i, itemStack.copyWithCount(maxMove));
                 itemStack.shrink(maxMove);
 
             } else if (ItemStack.isSameItemSameComponents(current, itemStack)) {
-                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize());
+                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize(itemStack));
 
                 if (maxMove > 0) {
                     current.grow(maxMove);
@@ -360,12 +360,12 @@ public class FactoryUtil {
             var current = inventory.getItem(i);
 
             if (current.isEmpty()) {
-                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize());
+                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize(itemStack));
                 inventory.setItem(i, itemStack.copyWithCount(maxMove));
                 itemStack.shrink(maxMove);
 
             } else if (ItemStack.isSameItemSameComponents(current, itemStack)) {
-                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize());
+                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize(itemStack));
 
                 if (maxMove > 0) {
                     current.grow(maxMove);
@@ -436,11 +436,11 @@ public class FactoryUtil {
             var current = inventory.getItem(slot);
 
             if (current.isEmpty()) {
-                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize());
+                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize(itemStack));
                 inventory.setItem(slot, itemStack.copyWithCount(maxMove));
                 itemStack.shrink(maxMove);
             } else if (ItemStack.isSameItemSameComponents(current, itemStack)) {
-                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize());
+                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize(itemStack));
 
                 if (maxMove > 0) {
                     current.grow(maxMove);
@@ -467,12 +467,12 @@ public class FactoryUtil {
             var current = inventory.getItem(i);
 
             if (current.isEmpty()) {
-                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize());
+                var maxMove = Math.min(itemStack.getCount(), inventory.getMaxStackSize(itemStack));
                 inventory.setItem(i, itemStack.copyWithCount(maxMove));
                 itemStack.shrink(maxMove);
 
             } else if (ItemStack.isSameItemSameComponents(current, itemStack)) {
-                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize());
+                var maxMove = Math.min(Math.min(current.getMaxStackSize() - current.getCount(), itemStack.getCount()), inventory.getMaxStackSize(itemStack));
 
                 if (maxMove > 0) {
                     current.grow(maxMove);

@@ -173,7 +173,7 @@ public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock
         private BlockPos target = null;
 
         private Model(ServerLevel world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.PLANTER);
+            this.main = ItemDisplayElementUtil.createSolid(FactoryItems.PLANTER);
             this.output1 = LodItemDisplayElement.createSimple(OUTPUT_1, 5, 0.3f);
             this.output2 = LodItemDisplayElement.createSimple(OUTPUT_2, 5, 0.3f);
             this.output1.setViewRange(0.5f);

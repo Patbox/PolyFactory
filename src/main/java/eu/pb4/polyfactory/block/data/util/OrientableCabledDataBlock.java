@@ -75,7 +75,7 @@ public abstract class OrientableCabledDataBlock extends BaseCabledDataBlock impl
                 && delta.x() < 4 / 16f && delta.x() > -4 / 16f
                 && delta.y() < 4 / 16f && delta.y() > -4 / 16f
                 && delta.z() < 4 / 16f && delta.z() > -4 / 16f
-                ? ctx.getClickedFace() : ctx.getNearestLookingDirection();
+                ? ctx.getClickedFace() : ctx.isSecondaryUseActive() ? ctx.getNearestLookingDirection().getOpposite() : ctx.getNearestLookingDirection();
 
         var dir2 = switch (facing) {
             case DOWN -> ctx.getHorizontalDirection();

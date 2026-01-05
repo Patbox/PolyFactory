@@ -131,7 +131,7 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<BlockEntity> PROVIDER_DATA_CACHE = register("provider_data_cache",
              FabricBlockEntityTypeBuilder.create(ChanneledDataBlockEntity::migrating, FactoryBlocks.ITEM_COUNTER, FactoryBlocks.REDSTONE_INPUT, FactoryBlocks.REDSTONE_OUTPUT,
                     FactoryBlocks.TACHOMETER, FactoryBlocks.STRESSOMETER, FactoryBlocks.BLOCK_OBSERVER, FactoryBlocks.DATA_MEMORY, FactoryBlocks.TEXT_INPUT,
-                     FactoryBlocks.SPEAKER, FactoryBlocks.TPS_PROVIDER, FactoryBlocks.GAUGE));
+                     FactoryBlocks.SPEAKER, FactoryBlocks.TPS_PROVIDER, FactoryBlocks.GAUGE, FactoryBlocks.DIGITAL_CLOCK));
 
     public static final BlockEntityType<DataMemoryBlockEntity> DATA_MEMORY = register("data_memory",
             FabricBlockEntityTypeBuilder.create(DataMemoryBlockEntity::new, FactoryBlocks.DATA_MEMORY));

@@ -135,6 +135,7 @@ public class FactoryItems {
     public static final Item ITEM_READER = register(FactoryBlocks.ITEM_READER);
     public static final Item BLOCK_OBSERVER = register(FactoryBlocks.BLOCK_OBSERVER);
     public static final Item TEXT_INPUT = register(FactoryBlocks.TEXT_INPUT);
+    public static final Item DIGITAL_CLOCK = register(FactoryBlocks.DIGITAL_CLOCK);
     public static final Item ARITHMETIC_OPERATOR = register(FactoryBlocks.ARITHMETIC_OPERATOR);
     public static final Item DATA_COMPARATOR = register(FactoryBlocks.DATA_COMPARATOR);
     public static final Item DATA_EXTRACTOR = register(FactoryBlocks.DATA_EXTRACTOR);
@@ -311,6 +312,7 @@ public class FactoryItems {
                     entries.accept(ITEM_READER);
                     entries.accept(BLOCK_OBSERVER);
                     entries.accept(TEXT_INPUT);
+                    entries.accept(DIGITAL_CLOCK);
                     entries.accept(RECORD_PLAYER);
                     entries.accept(GAUGE);
                     entries.accept(NIXIE_TUBE_CONTROLLER);

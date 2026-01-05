@@ -71,7 +71,7 @@ public abstract class DirectionalCabledDataBlock extends BaseCabledDataBlock imp
                         && delta.x() < 4 / 16f && delta.x() > -4 / 16f
                         && delta.y() < 4 / 16f && delta.y() > -4 / 16f
                         && delta.z() < 4 / 16f && delta.z() > -4 / 16f
-                        ? ctx.getClickedFace() : ctx.getNearestLookingDirection())
+                        ? ctx.getClickedFace() : ctx.isSecondaryUseActive() ? ctx.getNearestLookingDirection().getOpposite() : ctx.getNearestLookingDirection())
                 .setValue(HAS_CABLE, state.is(FactoryBlocks.CABLE))
                 .setValue(FACING_PROPERTIES.get(ctx.getNearestLookingDirection()), false);
     }

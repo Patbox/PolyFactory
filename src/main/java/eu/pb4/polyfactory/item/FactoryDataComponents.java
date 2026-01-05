@@ -26,7 +26,7 @@ import static eu.pb4.polyfactory.ModInit.id;
 public class FactoryDataComponents {
     private static final Codec<ItemStack> UNCOUNTED_ITEM_STACK_WITH_AIR = ItemStack.SINGLE_ITEM_CODEC.orElse(ItemStack.EMPTY);
 
-    public static final DataComponentType<Integer> COLOR = register("color", DataComponentType.<Integer>builder().persistent(Codec.INT).build());
+    public static final DataComponentType<Integer> COLOR = register("color", DataComponentType.<Integer>builder().persistent(ExtraCodecs.RGB_COLOR_CODEC).build());
     public static final DataComponentType<Integer> USES_LEFT = register("uses_left", DataComponentType.<Integer>builder().persistent(Codec.INT).build());
     public static final DataComponentType<List<ItemStack>> ITEM_FILTER = register("item_filter", DataComponentType.<List<ItemStack>>builder()
             .persistent(ExtraCodecs.compactListCodec(UNCOUNTED_ITEM_STACK_WITH_AIR)).build());

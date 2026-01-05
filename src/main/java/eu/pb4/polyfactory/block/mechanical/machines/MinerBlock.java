@@ -186,7 +186,7 @@ public class MinerBlock extends RotationalNetworkBlock implements FactoryBlock, 
         private float rotation = 0;
 
         private Model(ServerLevel world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.MINER);
+            this.main = ItemDisplayElementUtil.createSolid(FactoryItems.MINER);
             this.item = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 1, 0.5f);
 
             this.updateAnimation(state.getValue(FACING));

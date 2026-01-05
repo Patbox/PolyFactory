@@ -135,6 +135,7 @@ public abstract class AbstractCableBlock extends AbstracterCableBlock {
         return List.of(new SelectiveSideNode(this.getDirections(state)));
     }
 
+    @Override
     public EnumSet<Direction> getDirections(BlockState state) {
         var list = new ArrayList<Direction>(6);
 

@@ -154,7 +154,7 @@ public class PressBlock extends TallItemMachineBlock {
         private float value;
 
         private Model(ServerLevel world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.PRESS);
+            this.main = ItemDisplayElementUtil.createSolid(FactoryItems.PRESS);
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.piston = LodItemDisplayElement.createSimple(MODEL_PISTON, 2, 0.4f, 0.8f);

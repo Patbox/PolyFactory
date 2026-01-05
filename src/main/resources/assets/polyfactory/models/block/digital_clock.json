@@ -1,0 +1,8 @@
+{
+	"parent": "polyfactory:block/nixie_tube_controller",
+	"textures": {
+		"particle": "polyfactory:block/cable/digital_clock_front",
+		"side": "polyfactory:block/cable/digital_clock_side",
+		"front": "polyfactory:block/cable/digital_clock_front"
+	}
+}

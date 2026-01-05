@@ -51,6 +51,7 @@ public class DataStorage implements GraphEntity<DataStorage> {
         }
     }
 
+    @Deprecated
     @Nullable
     public SentData getData(int channel) {
         if (channel == -1 || this.ctx == null || !(this.ctx.getBlockWorld() instanceof ServerLevel world)) {
@@ -141,25 +142,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
     public void onPostNodeCreated(@NotNull NodeHolder<BlockNode> node, @Nullable NodeEntity nodeEntity) {
         GraphEntity.super.onPostNodeCreated(node, nodeEntity);
         storeReceiverOrProvider(node);
-        if (node.getBlockWorld() instanceof ServerLevel serverWorld) {
-            if (node.getNode() instanceof DataProviderNode providerNode) {
-                var state = node.getBlockWorld().getBlockState(node.getBlockPos());
-                if (state.getBlock() instanceof DataProvider provider && providerNode.channel() != -1) {
-                    var data = provider.provideData(serverWorld, node.getBlockPos(), state, providerNode.channel(), providerNode);
-                    if (data != null) {
-                        pushDataUpdate(node.getBlockPos(), providerNode.channel(), data, providerNode instanceof DirectionNode d ? d.direction() : null, 0);
-                    }
-                }
-            } else if (node.getNode() instanceof DataReceiverNode receiverNode) {
-                var state = node.getBlockWorld().getBlockState(node.getBlockPos());
-                if (state.getBlock() instanceof DataReceiver receiver && receiverNode.channel() != -1) {
-                    var data = this.getData(receiverNode.channel());
-                    if (data != null) {
-                        receiver.receiveData(serverWorld, node.getBlockPos(), state, receiverNode.channel(), data.container(), receiverNode, data.pos(), data.direction, data.dataId);
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -230,7 +212,6 @@ public class DataStorage implements GraphEntity<DataStorage> {
         for (var channel : this.receivers.keySet()) {
             var data = getData(channel);
             if (data != null) {
-
                 for (var x : this.receivers.get(channel.intValue())) {
                     var state = this.ctx.getBlockWorld().getBlockState(x.pos());
                     if (state.getBlock() instanceof DataReceiver receiver) {

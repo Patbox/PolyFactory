@@ -3,11 +3,16 @@
   - Uses 4 Clay Balls, 1 Clay Block or 1 other Unfired Clay Molds as an input.
   - Provides Stonecutter-like ui.
   - Crafted either with 1 Copper Ingot, 1 Plank and 2 Wooden Plates in Crafting Table or by casting 1 Ingot worth of Molten Copper on a Crafting Table.
+- Added Digital Clock:
+  - It sends Game Time data every tick.
+  - It also displays current time.
+  - Crafted with 4 Steel Plates, 1 Redstone Chip, 3 Copper Ingots and a Clock.
 - Tweaked how Data Receivers handle incoming data.
   - Receiver can now specify if it can receive data instantly, allowing it to handle data from multiple sources.
   - Previously (and by default) all data was first stored and only handled by provider at the end of the world tick, allowing them to handle only single message per tick.
   - For example, Speaker can now play multiple sounds at the same time, rather than semi-arbitrarily selecting only one sound to play.
 - Changed Cable sound to Wool (most noticable with Polymer Sound Patcher enabled).
+- Placing Cabled Data Blocks without cable will now flip their facing direction when pressing shift.
 - Fixed Orientable Cabled Blocks being replaced with Cable when placing cable in them.
 - Fixed Item Reader not being rotated correctly visually.
 - Fixed textures being added to "blocks" atlas, when they should be in "items".

@@ -1,9 +1,10 @@
 {
+	"format_version": "1.21.6",
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "block/grindstone_round",
-		"1": "block/grindstone_side",
-		"particle": "block/grindstone_round"
+		"0": "polyfactory:block/grindstone_round",
+		"1": "polyfactory:block/grindstone_side",
+		"particle": "polyfactory:block/grindstone_round"
 	},
 	"elements": [
 		{
@@ -35,7 +36,7 @@
 			"scale": [0.4, 0.4, 0.4]
 		},
 		"firstperson_lefthand": {
-			"rotation": [0, 225, 0],
+			"rotation": [0, -135, 0],
 			"scale": [0.4, 0.4, 0.4]
 		},
 		"ground": {
@@ -43,7 +44,7 @@
 			"scale": [0.25, 0.25, 0.25]
 		},
 		"gui": {
-			"rotation": [30, 225, 0],
+			"rotation": [30, -135, 0],
 			"scale": [0.625, 0.625, 0.625]
 		},
 		"head": {
@@ -53,7 +54,7 @@
 			"scale": [0.5, 0.5, 0.5]
 		},
 		"on_shelf": {
-			"rotation": [ 0, 180, 0 ]
+			"rotation": [0, -180, 0]
 		}
 	}
 }

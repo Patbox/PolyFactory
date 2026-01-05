@@ -201,7 +201,7 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
             //noinspection unchecked,rawtypes
             var val = (Comparable) prop.backingToSelf.apply(x.getValue(prop.backing));
             //noinspection unchecked
-            state = state.setValue(prop.self, val);
+            state = state.trySetValue(prop.self, val);
         }
 
         if (world.getBlockEntity(pos) instanceof ColorProvider be) {
@@ -209,7 +209,7 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
                 var prop = getProperty(dir);
                 var nextPos = pos.relative(dir);
                 var val = canConnectTo(world, be.getColor(), nextPos, world.getBlockState(nextPos), dir.getOpposite());
-                state = state.setValue(prop, state.getValue(prop).cable(val));
+                state = state.trySetValue(prop, state.getValue(prop).cable(val));
             }
         }
 
@@ -222,6 +222,7 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
         super.createBlockStateDefinition(builder);
         builder.add(EAST_SHAPE, NORTH_SHAPE, SOUTH_SHAPE, WEST_SHAPE, UP_WALL);
     }
+
 
     protected boolean isTransparent(BlockState state, BlockGetter world, BlockPos pos) {
         return true;
@@ -250,7 +251,7 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
         var backing = this.backing.defaultBlockState();
         for (var x : SELF_TO_BACKING) {
             //noinspection unchecked,rawtypes
-            backing = backing.setValue(x.backing, (Comparable) x.selfToBacking.apply(state.getValue(x.self)));
+            backing = backing.trySetValue(x.backing, (Comparable) x.selfToBacking.apply(state.getValue(x.self)));
         }
         return backing;
     }
