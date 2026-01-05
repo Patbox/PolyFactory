@@ -80,9 +80,20 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
             return selfDir.getAxis() == pushDirection.getAxis();
         }
 
+        var stackToMove = stack.get();
+        var copied = false;
+        if (be.maxStackSize() < stackToMove.getCount()) {
+            stackToMove = stackToMove.split(be.maxStackSize());
+            copied = true;
+        }
 
-        if (FactoryUtil.tryInsertingIntoSlot(self.getWorld(), self.getPos().relative(selfState.getValue(FACING)), stack.get(), selfDir.getOpposite(), list) == -1) {
+
+        if (FactoryUtil.tryInsertingIntoSlot(self.getWorld(), self.getPos().relative(selfState.getValue(FACING)), stackToMove, selfDir.getOpposite(), list) == -1) {
             return selfDir.getAxis() == pushDirection.getAxis();
+        }
+
+        if (copied && !stackToMove.isEmpty()) {
+            stack.get().grow(stackToMove.getCount());
         }
 
         if (stack.get().isEmpty()) {
@@ -123,8 +134,8 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
 
                 var stack = inv.getItem(i);
                 if (!stack.isEmpty() && be.filter.get(a).test(stack) && (sided == null || sided.canTakeItemThroughFace(i, stack, selfFacing.getOpposite()))) {
-                    if (conveyor.pushNew(stack)) {
-                        inv.setChanged();
+                    inv.setChanged();
+                    if (conveyor.pushNew(stack.split(Math.min(be.maxStackSize(), stack.getCount())))) {
                         if (stack.isEmpty()) {
                             inv.setItem(i, ItemStack.EMPTY);
                         }
@@ -148,7 +159,7 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
                     }
                     try (var t = Transaction.openOuter()) {
                         var resource = view.getResource();
-                        var val = view.extract(view.getResource(), conveyor.getMaxStackCount(resource.toStack()), t);
+                        var val = view.extract(view.getResource(), Math.min(conveyor.getMaxStackCount(resource.toStack()), be.maxStackSize()), t);
                         if (val != 0) {
                             t.commit();
 

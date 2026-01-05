@@ -16,6 +16,8 @@ import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
+import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.sidebars.api.Sidebar;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.ChatFormatting;
@@ -64,6 +66,8 @@ public class WrenchHandler {
 
     private ItemStack currentStack = ItemStack.EMPTY;
 
+    private ExtraModelCallbacks extraModelCallbacks = ExtraModelCallbacks.NO_OP;
+
     public WrenchHandler(ServerGamePacketListenerImpl handler) {
         this.sidebar.addPlayer(handler);
         this.sidebar.setDefaultNumberFormat(BlankFormat.INSTANCE);
@@ -86,6 +90,8 @@ public class WrenchHandler {
             this.state = Blocks.AIR.defaultBlockState();
             this.pos = null;
             this.sidebar.hide();
+            this.extraModelCallbacks.stopTargetting(player);
+            this.extraModelCallbacks = ExtraModelCallbacks.NO_OP;
             return;
         }
         var isWrench = stack.is(FactoryItems.WRENCH);
@@ -93,6 +99,8 @@ public class WrenchHandler {
         var hitResult = getTarget(player);
 
         if (hitResult.getType() == HitResult.Type.MISS) {
+            this.extraModelCallbacks.stopTargetting(player);
+            this.extraModelCallbacks = ExtraModelCallbacks.NO_OP;
             this.entity = null;
             this.state = Blocks.AIR.defaultBlockState();
             this.pos = null;
@@ -111,6 +119,11 @@ public class WrenchHandler {
 
             this.state = state;
             this.pos = blockHitResult.getBlockPos();
+            this.extraModelCallbacks.stopTargetting(player);
+            this.extraModelCallbacks = BlockAwareAttachment.get(player.level(), this.pos) instanceof HolderAttachment attachment
+                    && attachment.holder() instanceof ExtraModelCallbacks callbacks ? callbacks : ExtraModelCallbacks.NO_OP;
+            this.extraModelCallbacks.startTargetting(player);
+
             if (this.state.getBlock() instanceof ConfigurableBlock configurableBlock) {
                 if (isWrench) {
                     configurableBlock.wrenchTick(player, blockHitResult, this.state);
@@ -433,5 +446,16 @@ public class WrenchHandler {
             FactoryUtil.playSoundToPlayer(player,FactorySoundEvents.ITEM_WRENCH_SWITCH, SoundSource.PLAYERS, 0.3f, 1f);
             this.entity = null;
         }
+    }
+
+    public void forceUpdate() {
+        this.pos = null;
+    }
+
+    public interface ExtraModelCallbacks {
+        ExtraModelCallbacks NO_OP = new ExtraModelCallbacks() {};
+
+        default void startTargetting(ServerPlayer player) {}
+        default void stopTargetting(ServerPlayer player) {}
     }
 }

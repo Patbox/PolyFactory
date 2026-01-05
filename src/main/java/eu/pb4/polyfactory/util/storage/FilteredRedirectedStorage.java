@@ -13,8 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 public class FilteredRedirectedStorage<T extends TransferVariant<?>> implements Storage<T>, RedirectingStorage {
     private final Supplier<Level> world;
@@ -22,13 +21,17 @@ public class FilteredRedirectedStorage<T extends TransferVariant<?>> implements 
     private final Supplier<Direction> direction;
     private final BlockApiLookup<Storage<T>, Direction> lookup;
     private final Predicate<T> predicate;
+    private final ToLongFunction<T> maxAmount;
 
-    public FilteredRedirectedStorage(BlockApiLookup<Storage<T>, @Nullable Direction> lookup, Supplier<Level> world, Supplier<BlockPos> pos, Supplier<Direction> direction, Predicate<T> predicate) {
+    public FilteredRedirectedStorage(BlockApiLookup<Storage<T>, @Nullable Direction> lookup,
+                                     Supplier<Level> world, Supplier<BlockPos> pos, Supplier<Direction> direction,
+                                     Predicate<T> predicate, ToLongFunction<T> maxAmount) {
         this.lookup = lookup;
         this.world = world;
         this.pos = pos;
         this.direction = direction;
         this.predicate = predicate;
+        this.maxAmount = maxAmount;
     }
 
     @Nullable
@@ -41,6 +44,8 @@ public class FilteredRedirectedStorage<T extends TransferVariant<?>> implements 
 
     @Override
     public long insert(T resource, long maxAmount, TransactionContext transaction) {
+        maxAmount = Math.min(this.maxAmount.applyAsLong(resource), maxAmount);
+
         var storage = getTargetStorage();
         if (storage == null || !this.predicate.test(resource)) {
             return 0;
@@ -50,6 +55,8 @@ public class FilteredRedirectedStorage<T extends TransferVariant<?>> implements 
 
     @Override
     public long extract(T resource, long maxAmount, TransactionContext transaction) {
+        maxAmount = Math.min(this.maxAmount.applyAsLong(resource), maxAmount);
+
         var storage = getTargetStorage();
         if (storage == null || !this.predicate.test(resource)) {
             return 0;

@@ -227,6 +227,7 @@
   "item.polyfactory.wrench.action.type": "Type",
   "item.polyfactory.wrench.action.axis": "Axis",
   "item.polyfactory.wrench.action.mode": "Mode",
+  "item.polyfactory.wrench.action.max_stack_size": "Max Stack Size",
   "item.polyfactory.wrench.action.action": "Action",
   "item.polyfactory.wrench.action.read_only": "Read Only",
   "item.polyfactory.wrench.action.locked": "Locked",
@@ -291,6 +292,9 @@
   "item.polyfactory.wrench.action.mechanical_crafter.active_mode.filled": "Filled",
   "item.polyfactory.wrench.action.mechanical_crafter.active_mode.powered": "Powered",
   "item.polyfactory.wrench.action.mechanical_crafter.active_mode.not_powered": "Not Powered",
+
+
+  "item.polyfactory.wrench.ui.set_to_range": "Set %s in range <%s; %s>",
 
   "item.polyfactory.wrench.action.catch_entities": "Entity Catching",
   "item.polyfactory.wrench.action.player_control": "Player Control",

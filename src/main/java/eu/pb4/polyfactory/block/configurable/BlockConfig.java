@@ -3,16 +3,16 @@ package eu.pb4.polyfactory.block.configurable;
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.block.data.ChannelContainer;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
+import eu.pb4.polyfactory.item.configuration.WrenchHandler;
 import eu.pb4.polyfactory.nodes.data.DataStorage;
+import eu.pb4.polyfactory.ui.SimpleInputGui;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.IntFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -20,7 +20,13 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.Property;
 
-public record BlockConfig<T>(String id, Component name, Codec<T> codec, BlockConfigValue<T> value, BlockValueFormatter<T> formatter,
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.IntFunction;
+
+public record BlockConfig<T>(String id, Component name, Codec<T> codec, BlockConfigValue<T> value,
+                             BlockValueFormatter<T> formatter,
                              WrenchModifyBlockValue<T> action, WrenchModifyBlockValue<T> alt) {
     public static final BlockConfig<Direction> FACING = ofDirection(BlockStateProperties.FACING);
     public static final BlockConfig<Direction.Axis> AXIS = of("axis", BlockStateProperties.AXIS);
@@ -140,28 +146,57 @@ public record BlockConfig<T>(String id, Component name, Codec<T> codec, BlockCon
     }
 
     public static <BE> BlockConfig<Integer> ofChannelWithDisabled(String id, Class<BE> tClass, Function<BE, Integer> get, BiConsumer<BE, Integer> set) {
-        return ofBlockEntityInt(id, tClass, -1, DataStorage.MAX_CHANNELS - 1,
-                x -> x != -1 ? String.valueOf(x + 1) : "X", get, set);
+        return ofBlockEntityInt(id, tClass, -1, DataStorage.MAX_CHANNELS - 1, 1,
+                x -> x != 0 ? String.valueOf(x) : "X", get, set);
     }
 
     public static <BE> BlockConfig<Integer> ofBlockEntityInt(String id, Class<BE> tClass, int minInclusive, int maxInclusive, int displayOffset, Function<BE, Integer> get, BiConsumer<BE, Integer> set) {
-        return ofBlockEntity(id,
-                Codec.INT,
-                tClass,
-                (x, world, pos, side, state) -> Component.literal(String.valueOf(x + displayOffset)),
-                get,
-                set,
-                WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 1 : -1), minInclusive, maxInclusive)));
+        return ofBlockEntityInt(id, tClass, minInclusive, maxInclusive, displayOffset, String::valueOf, get, set);
+
     }
 
     public static <BE> BlockConfig<Integer> ofBlockEntityInt(String id, Class<BE> tClass, int minInclusive, int maxInclusive, IntFunction<String> display, Function<BE, Integer> get, BiConsumer<BE, Integer> set) {
-        return ofBlockEntity(id,
+        return ofBlockEntityInt(id, tClass, minInclusive, maxInclusive, 0, display, get, set);
+    }
+
+    public static <BE> BlockConfig<Integer> ofBlockEntityInt(String id, Class<BE> tClass, int minInclusive, int maxInclusive, int displayOffset, IntFunction<String> display, Function<BE, Integer> get, BiConsumer<BE, Integer> set) {
+        var tmp = ofBlockEntity(id,
                 Codec.INT,
                 tClass,
-                (x, world, pos, side, state) -> Component.literal(display.apply(x)),
+                (x, world, pos, side, state) -> Component.literal(display.apply(x + displayOffset)),
                 get,
                 set,
                 WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 1 : -1), minInclusive, maxInclusive)));
+        var name = tmp.name;
+        return tmp.withAlt((value, next, player, world, pos, side, state) -> {
+            var be = world.getBlockEntity(pos);
+            if (player instanceof ServerPlayer serverPlayer && tClass.isInstance(be)) {
+                new SimpleInputGui(serverPlayer,
+                        Component.translatable("item.polyfactory.wrench.ui.set_to_range", name, minInclusive + displayOffset, maxInclusive + displayOffset),
+                        be::isRemoved,
+                        String.valueOf(value + displayOffset),
+                        x -> {
+                            try {
+                                var val = Integer.parseInt(x) - displayOffset;
+                                return val >= minInclusive && val <= maxInclusive;
+                            } catch (Throwable e) {
+                                // ignore
+                            }
+
+                            return false;
+                        }, x -> {
+                    try {
+                        //noinspection unchecked
+                        set.accept((BE) be, Integer.parseInt(x) - displayOffset);
+                        WrenchHandler.of(serverPlayer).forceUpdate();
+                    } catch (Throwable e) {
+                        // ignore
+                    }
+                });
+                serverPlayer.swing(InteractionHand.MAIN_HAND, true);
+            }
+            return value;
+        });
     }
 
     public BlockConfig<T> withAlt(WrenchModifyBlockValue<T> alt) {

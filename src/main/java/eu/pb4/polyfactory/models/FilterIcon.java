@@ -11,6 +11,7 @@ import org.joml.Matrix4fc;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.world.item.ItemDisplayContext;
+import org.joml.Vector3fc;
 
 public class FilterIcon {
     private final List<ItemDisplayElement> elements = new ArrayList<>();
@@ -97,5 +98,9 @@ public class FilterIcon {
         element.setInvisible(true);
         element.setViewRange(0.3f);
         return element;
+    }
+
+    public int getCount() {
+        return this.filterData.icon().size();
     }
 }

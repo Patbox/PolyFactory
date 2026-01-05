@@ -11,7 +11,14 @@
   - Receiver can now specify if it can receive data instantly, allowing it to handle data from multiple sources.
   - Previously (and by default) all data was first stored and only handled by provider at the end of the world tick, allowing them to handle only single message per tick.
   - For example, Speaker can now play multiple sounds at the same time, rather than semi-arbitrarily selecting only one sound to play.
-- Changed Cable sound to Wool (most noticable with Polymer Sound Patcher enabled).
+- Improved Funnel Blocks:
+  - You can set max size of item stack put to/extracted from container Funnel is attached to.
+    - Worth noting it won't bypass specific limit of conveyor / inventories. Conveyor still can only transport 16 items at the time.
+  - You can configure it using a Wrench. You can also use the F special action to open an UI to input the value directly.
+  - Changed the collision shape to be the same as Trapdoor, matching other similar blocks from the mod.
+  - Model was made slightly slimmer, to match the hitbox better.
+  - The block support collision shape was unchanged (aka kept as full cube), to prevent blocks in existing worlds from popping when updated.
+- Changed Cable sound to Wool (most noticeable with Polymer Sound Patcher enabled).
 - Placing Cabled Data Blocks without cable will now flip their facing direction when pressing shift.
 - Fixed Orientable Cabled Blocks being replaced with Cable when placing cable in them.
 - Fixed Item Reader not being rotated correctly visually.

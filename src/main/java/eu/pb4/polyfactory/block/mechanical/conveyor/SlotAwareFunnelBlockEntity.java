@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
+import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.ui.GuiTextures;
@@ -7,6 +8,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polyfactory.util.inventory.MinimalContainer;
 import eu.pb4.polyfactory.util.storage.FilteredRedirectedSlottedStorage;
+import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
 import eu.pb4.sgui.api.gui.SimpleGui;
@@ -31,13 +33,16 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.Objects;
 
-public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
+public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements BlockEntityExtraListener, FunnelBlock.CommonBlockEntity {
     public static final int TARGET_SLOT_COUNT = 9;
 
     static {
@@ -49,7 +54,10 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
     private final NonNullList<ItemStack> items = NonNullList.withSize(TARGET_SLOT_COUNT, ItemStack.EMPTY);
     private final Storage<ItemVariant> storage = new FilteredRedirectedSlottedStorage<>(ItemStorage.SIDED,
             this::getLevel, this::getBlockPos, () -> this.getBlockState().getValue(FunnelBlock.FACING), ItemVariant.blank(), this.slotTargets,
-            (i, res) -> this.filter.get(i).test(res.toStack()));
+            (i, res) -> this.filter.get(i).test(res.toStack()), (res) -> this.maxStackSize);
+    private int maxStackSize = 64;
+    @Nullable
+    private SlotAwareFunnelBlock.Model model;
 
     public SlotAwareFunnelBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.SLOT_AWARE_FUNNEL, pos, state);
@@ -61,6 +69,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
     protected void saveAdditional(ValueOutput view) {
         ContainerHelper.saveAllItems(view, items);
         view.putIntArray("targets", slotTargets.clone());
+        view.putInt("max_stack_size", this.maxStackSize);
     }
 
     @Override
@@ -71,6 +80,8 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
         }
         var targets = view.getIntArray("targets").orElseGet(() -> new int[this.slotTargets.length]);
         System.arraycopy(targets, 0, this.slotTargets, 0, Math.min(targets.length, this.slotTargets.length));
+        this.maxStackSize = view.getIntOr("max_stack_size", 64);
+        this.updateHologram();
     }
 
 
@@ -85,6 +96,31 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity {
 
     public Container asInventory() {
         return MinimalContainer.createMaxOne(this.items, this::setChanged, this::updateSlot);
+    }
+
+    @Override
+    public int maxStackSize() {
+        return maxStackSize;
+    }
+
+    @Override
+    public void setMaxStackSize(int maxStackSize) {
+        this.maxStackSize = maxStackSize;
+        this.updateHologram();
+        this.setChanged();
+    }
+
+    @Override
+    public void onListenerUpdate(LevelChunk chunk) {
+        this.model = BlockBoundAttachment.get(chunk, this.worldPosition).holder() instanceof SlotAwareFunnelBlock.Model model ? model : null;
+        this.updateHologram();
+    }
+
+    private void updateHologram() {
+        if (this.model != null) {
+            model.countElement.setText(Component.literal("[x" + this.maxStackSize + "]"));
+            model.tick();
+        }
     }
 
     public static class Gui extends SimpleGui {

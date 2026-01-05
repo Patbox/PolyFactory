@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.util.storage;
 
-import com.google.common.collect.Iterators;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -17,10 +16,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.function.ToLongFunction;
 
 @SuppressWarnings("UnstableApiUsage")
 public class FilteredRedirectedSlottedStorage<T extends TransferVariant<?>> implements SlottedStorage<T>, RedirectingStorage {
@@ -31,12 +28,14 @@ public class FilteredRedirectedSlottedStorage<T extends TransferVariant<?>> impl
     private final SlottedPredicate<T> predicate;
     private final int[] slotMap;
     private final T defaultValue;
+    private final ToLongFunction<T> maxAmout;
 
     public FilteredRedirectedSlottedStorage(BlockApiLookup<Storage<T>, @Nullable Direction> lookup, Supplier<Level> world,
                                             Supplier<BlockPos> pos, Supplier<Direction> direction,
                                             T defaultValue,
                                             int[] slotMap,
-                                            SlottedPredicate<T> predicate) {
+                                            SlottedPredicate<T> predicate,
+                                            ToLongFunction<T> maxAmount) {
         this.slotMap = slotMap;
         this.lookup = lookup;
         this.world = world;
@@ -44,6 +43,7 @@ public class FilteredRedirectedSlottedStorage<T extends TransferVariant<?>> impl
         this.direction = direction;
         this.predicate = predicate;
         this.defaultValue = defaultValue;
+        this.maxAmout = maxAmount;
     }
 
     @Nullable
@@ -56,6 +56,8 @@ public class FilteredRedirectedSlottedStorage<T extends TransferVariant<?>> impl
 
     @Override
     public long insert(T resource, long maxAmount, TransactionContext transaction) {
+        maxAmount = Math.min(maxAmount, this.maxAmout.applyAsLong(resource));
+
         var out = 0L;
 
         for (var slot : getSlots()) {
@@ -70,6 +72,7 @@ public class FilteredRedirectedSlottedStorage<T extends TransferVariant<?>> impl
 
     @Override
     public long extract(T resource, long maxAmount, TransactionContext transaction) {
+        maxAmount = Math.min(maxAmount, this.maxAmout.applyAsLong(resource));
         var out = 0L;
 
         for (var slot : getSlots()) {
