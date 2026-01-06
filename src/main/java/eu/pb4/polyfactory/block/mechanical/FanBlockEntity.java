@@ -15,13 +15,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySelector;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -31,6 +30,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Set;
 
 public class FanBlockEntity extends BlockEntity {
 
@@ -138,13 +139,32 @@ public class FanBlockEntity extends BlockEntity {
 
             var original = entity.getDeltaMovement();
             var base = entity.getDeltaMovement().get(dir.getAxis());
+
             FactoryUtil.setSafeVelocity(entity, entity.getDeltaMovement().with(dir.getAxis(), base * 0.8f).add(Vec3.atLowerCornerOf(dir.getUnitVec3i()).scale(x)));
             if (dir.getAxis() == Direction.Axis.Y && dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE == reverse) {
                 entity.fallDistance = 0;
             }
 
-            if (entity instanceof ServerPlayer player) {
-                FactoryUtil.sendVelocityDelta(player, entity.getDeltaMovement().subtract(original));
+            ServerPlayer player;
+            //noinspection ConstantValue
+            if ((entity instanceof ServerPlayer playerx && (player = playerx) != null) || (entity.getControllingPassenger() instanceof ServerPlayer playerx2 && (player = playerx2) != null)) {
+                var set = switch (dir.getAxis()) {
+                    case X, Z -> Set.of(Relative.X, Relative.Y, Relative.Z, Relative.X_ROT, Relative.Y_ROT, Relative.DELTA_X, Relative.DELTA_Z, Relative.DELTA_Y);
+                    case Y -> Set.of(Relative.X, Relative.Y, Relative.Z, Relative.X_ROT, Relative.Y_ROT, Relative.DELTA_X, Relative.DELTA_Z);
+                };
+
+                var vec = switch (dir.getAxis()) {
+                    case X, Z -> entity.getDeltaMovement().subtract(original);
+                    case Y -> Vec3.ZERO.with(dir.getAxis(), entity.getDeltaMovement().get(dir.getAxis()) + entity.getGravity());
+                };
+
+                player.connection.send(
+                        new ClientboundTeleportEntityPacket(entity.getId(),
+                                new PositionMoveRotation(Vec3.ZERO, vec, 0, 0),
+                                set,
+                                false
+                        )
+                );
 
                 ((ServerPlayNetExt) player.connection).polyFactory$resetFloating();
                 if (x > 0.05 || x < -0.05) {

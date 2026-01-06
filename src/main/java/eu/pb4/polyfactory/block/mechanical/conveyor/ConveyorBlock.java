@@ -26,14 +26,13 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.*;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -67,6 +66,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBlock, EntityBlock, ConveyorLikeDirectional, MovingItemConsumer {
     public static final EnumProperty<Direction> DIRECTION = FactoryProperties.HORIZONTAL_DIRECTION;
@@ -309,8 +309,16 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         }
 
         FactoryUtil.addSafeVelocity(entity, vec);
-        if (entity instanceof ServerPlayer player) {
-            FactoryUtil.sendVelocityDelta(player, vec.scale(0.55));
+        ServerPlayer player;
+        //noinspection ConstantValue
+        if ((entity instanceof ServerPlayer playerx && (player = playerx) != null) || (entity.getControllingPassenger() instanceof ServerPlayer playerx2 && (player = playerx2) != null)) {
+            player.connection.send(
+                    new ClientboundTeleportEntityPacket(entity.getId(),
+                            new PositionMoveRotation(Vec3.ZERO, vec, 0, 0),
+                            Set.of(Relative.X, Relative.Y, Relative.Z, Relative.X_ROT, Relative.Y_ROT, Relative.DELTA_Z, Relative.DELTA_X, Relative.DELTA_Y),
+                            entity.onGround()
+                    )
+            );
         }
     }
 

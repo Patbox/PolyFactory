@@ -39,7 +39,9 @@ import eu.pb4.polyfactory.ui.GuiUtils;
 import eu.pb4.polyfactory.util.DebugTextProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.BlockStateNameProvider;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.elements.GuiElement;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -48,13 +50,11 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.ShapelessRecipe;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import java.util.*;
 import java.util.function.Consumer;
@@ -123,8 +123,9 @@ public class PolydexCompatImpl {
     }
 
     private static void createPages(MinecraftServer server, Consumer<PolydexPage> polydexPageConsumer) {
-        var clay = PolydexStack.of(Items.CLAY);
-        for (var item : server.registryAccess().lookupOrThrow(Registries.ITEM).getTagOrEmpty(FactoryItemTags.SHAPEABLE_CLAY_MOLDS)) {
+        var tag = server.registryAccess().lookupOrThrow(Registries.ITEM).getTagOrEmpty(FactoryItemTags.SHAPEABLE_CLAY_MOLDS);
+        var clay = new PolydexIngredientList<>(PolydexStack.of(Items.CLAY), PolydexStack.of(new ItemStack(Items.CLAY_BALL, 4)), PolydexIngredient.of(Ingredient.of(HolderSet.direct(FactoryUtil.collect(tag)))));
+        for (var item : tag) {
             var id = item.unwrapKey().orElseThrow().identifier().withPrefix("moldmaking_table/");
             polydexPageConsumer.accept(new MoldMakingRecipePage(id, clay,  PolydexStack.of(item.value())));
         }

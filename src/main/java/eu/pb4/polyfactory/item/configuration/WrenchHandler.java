@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.item.configuration;
 
 import com.mojang.serialization.JavaOps;
+import eu.pb4.factorytools.api.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
@@ -344,6 +345,7 @@ public class WrenchHandler {
 
     public void attackBlockAction(ServerPlayer player, Level world, BlockPos pos, Direction side) {
         var state = world.getBlockState(pos);
+        VirtualDestroyStage.updateState(player, pos, state, -1);
         if (!(state.getBlock() instanceof ConfigurableBlock configurableBlock)) {
             return;
         }

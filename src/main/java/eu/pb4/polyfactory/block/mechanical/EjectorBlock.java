@@ -24,22 +24,23 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundBundlePacket;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
+import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.entity.Relative;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -57,6 +58,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import static eu.pb4.polyfactory.util.FactoryUtil.id;
 
@@ -73,7 +75,7 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
                     (x, world, pos, side, state) -> Component.literal(String.format(Locale.ROOT, "%.2f", x)),
                     EjectorBlockEntity::strength, EjectorBlockEntity::setStrength,
                     WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.25f : -0.25f), 1, 2.5f)))
-            );
+    );
 
 
     public EjectorBlock(Properties settings) {
@@ -91,7 +93,7 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
         if (!oldState.is(state.getBlock())) {
             this.updateEnabled(world, pos, state);
         }
-        super.onPlace(state,world,pos, oldState, notify);
+        super.onPlace(state, world, pos, oldState, notify);
     }
 
     @Override
@@ -145,7 +147,7 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
         if (entity instanceof LivingEntity livingEntity) {
             horizontalDrag = livingEntity.shouldDiscardFriction() ? 1 : 0.91F;
         }
-        if (entity instanceof FlyingAnimal ) {
+        if (entity instanceof FlyingAnimal) {
             verticalDrag = horizontalDrag;
         }
 
@@ -157,8 +159,16 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
         );
         entity.setOnGround(false);
         entity.setDeltaMovement(vec);
-        if (entity instanceof ServerPlayer player) {
-            FactoryUtil.sendVelocityDelta(player, vec.add(0, player.getGravity(), 0));
+        ServerPlayer player;
+        if ((entity instanceof ServerPlayer playerx && (player = playerx) != null) || (entity.getControllingPassenger() instanceof ServerPlayer playerx2 && (player = playerx2) != null)) {
+            player.connection.send(
+                    new ClientboundTeleportEntityPacket(entity.getId(),
+                            new PositionMoveRotation(Vec3.ZERO, new Vec3(vec.x, entity.getDeltaMovement().y, vec.z), 0, 0),
+                            Set.of(Relative.X, Relative.Y, Relative.Z, Relative.X_ROT, Relative.Y_ROT, state.getValue(FACING).getAxis() == Direction.Axis.X ? Relative.DELTA_Z : Relative.DELTA_X),
+                            false
+                    )
+            );
+
             TriggerCriterion.trigger(player, FactoryTriggers.LAUNCHED_BY_EJECTOR);
         } else if (entity instanceof LastFanEffectedTickConsumer c) {
             c.polyfactory$setLastFanTick();

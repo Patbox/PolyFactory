@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public record MoldMakingRecipePage(Identifier identifier, PolydexStack<?> input, PolydexStack<?> output) implements PolydexPage {
+public record MoldMakingRecipePage(Identifier identifier, PolydexIngredient<?> input, PolydexStack<?> output) implements PolydexPage {
     private static final ItemStack TYPE_ICON = FactoryItems.MOLDMAKING_TABLE.getDefaultInstance();
 
 

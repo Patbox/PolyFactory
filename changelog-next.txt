@@ -18,6 +18,7 @@
   - Changed the collision shape to be the same as Trapdoor, matching other similar blocks from the mod.
   - Model was made slightly slimmer, to match the hitbox better.
   - The block support collision shape was unchanged (aka kept as full cube), to prevent blocks in existing worlds from popping when updated.
+- Tweaked Mechanical Ejector, Mechanical Fan and Conveyor code to move players more accurately and handle player's riding mobs (horses/etc).
 - Changed Cable sound to Wool (most noticeable with Polymer Sound Patcher enabled).
 - Placing Cabled Data Blocks without cable will now flip their facing direction when pressing shift.
 - Fixed Orientable Cabled Blocks being replaced with Cable when placing cable in them.
