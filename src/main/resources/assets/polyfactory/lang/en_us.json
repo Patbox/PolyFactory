@@ -259,6 +259,12 @@
   "item.polyfactory.wrench.action.data_extractor.field": "Extracted Field",
   "item.polyfactory.wrench.action.redstone.strong": "Strongly Powered",
   "item.polyfactory.wrench.action.hand_position": "Hand Position",
+  "item.polyfactory.wrench.action.up": "Up",
+  "item.polyfactory.wrench.action.down": "Down",
+  "item.polyfactory.wrench.action.north": "North",
+  "item.polyfactory.wrench.action.south": "South",
+  "item.polyfactory.wrench.action.east": "East",
+  "item.polyfactory.wrench.action.west": "West",
 
   "item.polyfactory.wrench.action.value_modifier.absolute": "Absolute",
   "item.polyfactory.wrench.action.value_modifier.negated_absolute": "Negated Absolute",

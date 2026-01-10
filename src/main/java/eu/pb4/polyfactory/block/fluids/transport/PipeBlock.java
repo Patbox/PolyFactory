@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.fluids.transport;
 
 import eu.pb4.polyfactory.block.FactoryBlockTags;
+import eu.pb4.polyfactory.block.configurable.BlockValueFormatter;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
 import eu.pb4.polyfactory.block.property.LazyEnumProperty;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
@@ -11,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.Util;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -35,6 +37,7 @@ import java.util.*;
 public class PipeBlock extends PipeBaseBlock implements ConfigurableBlock {
 
     public static final BooleanProperty LOCKED = FactoryProperties.LOCKED;
+    public static final BlockConfig<?> LOCKED_CONFIG = BlockConfig.of("locked", LOCKED);
     public static final LazyEnumProperty<TriState> NORTH = FactoryProperties.TRI_STATE_NORTH;
     public static final LazyEnumProperty<TriState> SOUTH = FactoryProperties.TRI_STATE_SOUTH;
 
@@ -42,8 +45,24 @@ public class PipeBlock extends PipeBaseBlock implements ConfigurableBlock {
     public static final LazyEnumProperty<TriState> WEST = FactoryProperties.TRI_STATE_WEST;
     public static final LazyEnumProperty<TriState> UP = FactoryProperties.TRI_STATE_UP;
     public static final LazyEnumProperty<TriState> DOWN = FactoryProperties.TRI_STATE_DOWN;
-    private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(BlockConfig.of("locked", LOCKED));
     public static final Map<Direction, LazyEnumProperty<TriState>> FACING_PROPERTIES = FactoryProperties.TRI_STATE_DIRECTIONS;
+
+
+    private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(LOCKED_CONFIG);
+    private static final List<BlockConfig<?>> WRENCH_ACTIONS_LOCKED = Util.make(() -> {
+        var l = new ArrayList<BlockConfig<?>>();
+        l.add(LOCKED_CONFIG);
+
+        for (var dir : FactoryUtil.REORDERED_DIRECTIONS) {
+            var prop = FACING_PROPERTIES.get(dir);
+            l.add(BlockConfig.of(prop.getName(), prop,
+                    BlockValueFormatter.str(x -> String.valueOf(x.orElse(true))),
+                    (val, next) -> TriState.of(!val.orElse(true))));
+        }
+
+        return l;
+    });
+
 
     public PipeBlock(Properties settings) {
         super(settings);
@@ -171,6 +190,6 @@ public class PipeBlock extends PipeBaseBlock implements ConfigurableBlock {
 
     @Override
     public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
-        return WRENCH_ACTIONS;
+        return state.getValue(LOCKED) ? WRENCH_ACTIONS_LOCKED : WRENCH_ACTIONS;
     }
 }

@@ -67,6 +67,55 @@ public class FlowData implements GraphEntity<FlowData> {
         runFlows(pos, false, canContinue, consumer);
     }
 
+    public long[] getWeightedMaxFlow(BlockPos pos, boolean push, long maxFlow) {
+        var vals = new long[6];
+
+        if (this.isInvalid && !this.rebuild()) {
+            return vals;
+        }
+
+        var current = this.currentFlow.get(pos);
+        if (current == null) {
+            return vals;
+        }
+        var flows = push ? current.push : current.pull;
+        if (flows.isEmpty()) {
+            return vals;
+        }
+
+        if (flows.size() == 1) {
+            var flow = flows.getFirst();
+            vals[flow.direction.ordinal()] = maxFlow;
+            return vals;
+        }
+
+        double total = 0;
+        var amount = new double[6];
+        for (var flow : flows) {
+            var t = flow.strength * this.sourceStrength.getDouble(flow.source);
+            amount[flow.direction.ordinal()] += t;
+            total += t;
+        }
+
+        var totalVals = 0l;
+
+        for (int i = 0; i < 6; i++) {
+            vals[i] = (long) (maxFlow * amount[i] / total);
+            totalVals += vals[i];
+        }
+
+        if (totalVals < maxFlow) {
+            for (int i = 0; i < 6; i++) {
+                if (vals[i] != 0) {
+                    vals[i] += maxFlow - totalVals;
+                    break;
+                }
+            }
+        }
+
+        return vals;
+    }
+
     public void runFlows(BlockPos pos, boolean push, BooleanSupplier canContinue, FlowConsumer consumer) {
         if (this.isInvalid && !this.rebuild()) {
             return;
@@ -292,18 +341,26 @@ public class FlowData implements GraphEntity<FlowData> {
 
     private record LastState(Direction direction, BlockPos start, int distance) {};
 
-    private static class CurrentFlow {
+    public static class CurrentFlow {
         List<DirectionalFlow> push = new ArrayList<>();
         List<DirectionalFlow> pull = new ArrayList<>();
 
         public CurrentFlow(BlockPos pos) {
         }
+
+        public List<DirectionalFlow> pull() {
+            return pull;
+        }
+
+        public List<DirectionalFlow> push() {
+            return push;
+        }
     }
 
-    private record DirectionalFlow(BlockPos source, Direction direction, double strength, int range) {
+    public record DirectionalFlow(BlockPos source, Direction direction, double strength, int range) {
     }
 
-    private record CurrentState(MutableInt distance, EnumSet<Direction> pull, EnumSet<Direction> push, NodeHolder<BlockNode> node) {
+    public record CurrentState(MutableInt distance, EnumSet<Direction> pull, EnumSet<Direction> push, NodeHolder<BlockNode> node) {
     }
 
     public interface FlowConsumer {

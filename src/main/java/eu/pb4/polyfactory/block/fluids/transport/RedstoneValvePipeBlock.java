@@ -46,6 +46,7 @@ public class RedstoneValvePipeBlock extends PipeBaseBlock implements Configurabl
     private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(BlockConfig.AXIS, BlockConfig.INVERTED);
     public RedstoneValvePipeBlock(BlockBehaviour.Properties settings) {
         super(settings);
+        this.registerDefaultState(this.defaultBlockState().setValue(POWERED, false).setValue(INVERTED, false));
     }
     @Nullable
     @Override

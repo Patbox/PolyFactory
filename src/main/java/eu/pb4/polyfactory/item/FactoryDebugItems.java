@@ -13,6 +13,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import static eu.pb4.polyfactory.item.FactoryItems.register;
 
 public class FactoryDebugItems {
@@ -25,6 +28,9 @@ public class FactoryDebugItems {
         NetworkComponent.Pipe.getLogic((ServerLevel) world, pos).runPushFlows(pos, () -> true, (direction, strength) -> {
             player.displayClientMessage(Component.literal(direction.getSerializedName() + "=" + strength), false);
         });
+        player.displayClientMessage(Component.literal("["
+                + Arrays.stream(NetworkComponent.Pipe.getLogic((ServerLevel) world, pos).getWeightedMaxFlow(pos, true, 1000)).mapToObj(String::valueOf).collect(Collectors.joining(", "))
+                + "]"), false);
         player.displayClientMessage(Component.literal("# Pull: ").withStyle(ChatFormatting.YELLOW), false);
         NetworkComponent.Pipe.getLogic((ServerLevel) world, pos).runPullFlows(pos, () -> true, (direction, strength) -> {
             player.displayClientMessage(Component.literal(direction.getSerializedName() + "=" + strength), false);

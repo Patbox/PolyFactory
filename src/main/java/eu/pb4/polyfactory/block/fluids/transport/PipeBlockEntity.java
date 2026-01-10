@@ -19,11 +19,15 @@ public class PipeBlockEntity extends PipeLikeBlockEntity {
             return;
         }
         pipe.preTick();
-        if (pipe.container.isNotEmpty()) {
-            NetworkComponent.Pipe.getLogic((ServerLevel) world, pos).runPushFlows(pos, pipe.container::isNotEmpty, pipe::pushFluid);
-        }
-        if (pipe.container.isNotFull()) {
-            NetworkComponent.Pipe.getLogic((ServerLevel) world, pos).runPullFlows(pos, pipe.container::isNotFull, pipe::pullFluid);
+        if (pipe.container.isNotEmpty() || pipe.container.isNotFull()) {
+            var logic = NetworkComponent.Pipe.getLogic((ServerLevel) world, pos);
+            if (pipe.container.isNotEmpty()) {
+                var maxFlow = logic.getWeightedMaxFlow(pos, true, pipe.fluidPush.maxPush());
+                logic.runPushFlows(pos, pipe.container::isNotEmpty, (dir, strength) -> pipe.pushFluid(dir, strength, maxFlow[dir.ordinal()]));
+            }
+            if (pipe.container.isNotFull()) {
+                logic.runPullFlows(pos, pipe.container::isNotFull, pipe::pullFluid);
+            }
         }
         pipe.postTick();
     }

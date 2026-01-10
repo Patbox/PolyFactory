@@ -28,6 +28,10 @@ public final class FluidWorldPushInteraction {
 
 
     public void pushFluid(Direction direction, double strength) {
+        this.pushFluid(direction, strength, Long.MAX_VALUE);
+    }
+
+    public void pushFluid(Direction direction, double strength, long maxLocalPush) {
         var pos = this.pos();
         var world = this.world();
         var container = this.container();
@@ -45,7 +49,7 @@ public final class FluidWorldPushInteraction {
             if (fluid != null) {
                 var maxFlow = fluid.getMaxFlow(this.world());
                 var amount = Math.min(Math.min((long) (strength * maxFlow * fluid.getFlowSpeedMultiplier(world)),
-                        maxFlow), this.maxPush());
+                        maxFlow), Math.min(this.maxPush(), maxLocalPush));
 
                 var extracted = container.extract(fluid, amount, false);
                 var leftover = fluidInput.insertFluid(fluid, extracted, direction.getOpposite());
@@ -91,7 +95,7 @@ public final class FluidWorldPushInteraction {
                     if (insert != null && container.canExtract(insert.getA(), true)) {
                         var maxFlow = insert.getA().instance().getMaxFlow(world);
                         var amount = Math.min(Math.min((long) (strength * maxFlow * insert.getA().instance().getFlowSpeedMultiplier(world)),
-                                maxFlow), this.maxPush());
+                                maxFlow), Math.min(this.maxPush(), maxLocalPush));
                         this.setPushOverflow(direction, this.getPushOverflow(direction) + amount);
                         if (this.getPushOverflow(direction) >= insert.getA().amount()) {
                             world.setBlockAndUpdate(mut, insert.getB());

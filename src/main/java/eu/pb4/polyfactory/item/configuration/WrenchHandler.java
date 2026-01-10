@@ -120,10 +120,13 @@ public class WrenchHandler {
 
             this.state = state;
             this.pos = blockHitResult.getBlockPos();
-            this.extraModelCallbacks.stopTargetting(player);
-            this.extraModelCallbacks = BlockAwareAttachment.get(player.level(), this.pos) instanceof HolderAttachment attachment
+            var newCallback = BlockAwareAttachment.get(player.level(), this.pos) instanceof HolderAttachment attachment
                     && attachment.holder() instanceof ExtraModelCallbacks callbacks ? callbacks : ExtraModelCallbacks.NO_OP;
-            this.extraModelCallbacks.startTargetting(player);
+            if (this.extraModelCallbacks != newCallback) {
+                this.extraModelCallbacks.stopTargetting(player);
+                this.extraModelCallbacks = newCallback;
+                this.extraModelCallbacks.startTargetting(player);
+            }
 
             if (this.state.getBlock() instanceof ConfigurableBlock configurableBlock) {
                 if (isWrench) {
@@ -195,6 +198,9 @@ public class WrenchHandler {
                 this.sidebar.hide();
             }
         } else if (hitResult instanceof EntityHitResult entityHitResult) {
+            this.extraModelCallbacks.stopTargetting(player);
+            this.extraModelCallbacks = ExtraModelCallbacks.NO_OP;
+
             this.state = Blocks.AIR.defaultBlockState();
             this.pos = null;
             if (this.entity == entityHitResult.getEntity() && ItemStack.isSameItemSameComponents(stack, this.currentStack)) {
@@ -323,24 +329,30 @@ public class WrenchHandler {
         }
         var current = this.currentAction.get(state.getBlock());
         if (current == null) {
-            current = actions.get(0).id();
+            current = actions.getFirst().id();
         }
+
+        //noinspection unchecked
+        var action = (BlockConfig<Object>) actions.getFirst();
 
         for (var act : actions) {
-            @SuppressWarnings("unchecked") var action = (BlockConfig<Object>) act;
-            if (action.id().equals(current)) {
-                var newValue = (alt ? action.alt() : action.action()).modifyValue(action.value().getValue(world, pos, side, state), !player.isShiftKeyDown(), player, world, pos, side, state);
-                if (action.value().setValue(newValue, world, pos, side, state)) {
-                    this.pos = null;
-                    TriggerCriterion.trigger(player, FactoryTriggers.WRENCH);
-                    FactoryUtil.playSoundToPlayer(player,FactorySoundEvents.ITEM_WRENCH_USE, SoundSource.PLAYERS, 0.3f, player.getRandom().nextFloat() * 0.1f + 0.95f);
-                    return InteractionResult.SUCCESS_SERVER;
-                }
-                return InteractionResult.CONSUME;
+            //noinspection unchecked
+            var possibleAction = (BlockConfig<Object>) act;
+            if (possibleAction.id().equals(current)) {
+                action = possibleAction;
+                break;
             }
         }
+        this.currentAction.put(state.getBlock(), action.id());
 
-        return InteractionResult.PASS;
+        var newValue = (alt ? action.alt() : action.action()).modifyValue(action.value().getValue(world, pos, side, state), !player.isShiftKeyDown(), player, world, pos, side, state);
+        if (action.value().setValue(newValue, world, pos, side, state)) {
+            this.pos = null;
+            TriggerCriterion.trigger(player, FactoryTriggers.WRENCH);
+            FactoryUtil.playSoundToPlayer(player,FactorySoundEvents.ITEM_WRENCH_USE, SoundSource.PLAYERS, 0.3f, player.getRandom().nextFloat() * 0.1f + 0.95f);
+            return InteractionResult.SUCCESS_SERVER;
+        }
+        return InteractionResult.CONSUME;
     }
 
     public void attackBlockAction(ServerPlayer player, Level world, BlockPos pos, Direction side) {
@@ -377,9 +389,11 @@ public class WrenchHandler {
 
         if (foundCurrent) {
             this.currentAction.put(state.getBlock(), player.isShiftKeyDown() ? previousAction : nextAction);
-            FactoryUtil.playSoundToPlayer(player,FactorySoundEvents.ITEM_WRENCH_SWITCH, SoundSource.PLAYERS, 0.3f, 1f);
-            this.pos = null;
+        } else {
+            this.currentAction.put(state.getBlock(), actions.getFirst().id());
         }
+        FactoryUtil.playSoundToPlayer(player,FactorySoundEvents.ITEM_WRENCH_SWITCH, SoundSource.PLAYERS, 0.3f, 1f);
+        this.pos = null;
     }
 
     public InteractionResult useEntityAction(ServerPlayer player, Entity entity, Vec3 pos, boolean alt) {

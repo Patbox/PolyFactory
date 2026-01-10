@@ -97,6 +97,10 @@ public abstract class PipeLikeBlockEntity extends BlockEntity implements FluidIn
         this.fluidPush.pushFluid(direction, strength);
     }
 
+    public final void pushFluid(Direction direction, double strength, long maxPush) {
+        this.fluidPush.pushFluid(direction, strength, maxPush);
+    }
+
     public final void pullFluid(Direction direction, double strength) {
         this.fluidPull.pullFluid(direction, strength);
     }
