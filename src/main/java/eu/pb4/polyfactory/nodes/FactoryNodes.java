@@ -12,6 +12,7 @@ import eu.pb4.polyfactory.nodes.electric.EnergyData;
 import eu.pb4.polyfactory.nodes.generic.*;
 import eu.pb4.polyfactory.nodes.mechanical.*;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.LargeGearNode;
+import eu.pb4.polyfactory.nodes.mechanical_connectors.SelfGearNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
 import eu.pb4.polyfactory.nodes.pipe.FlowData;
 import eu.pb4.polyfactory.nodes.pipe.NozzleNode;
@@ -49,6 +50,7 @@ public class FactoryNodes {
 
         universe.addNodeType(ConveyorNode.TYPE);
         universe.addNodeType(AxleWithGearMechanicalNode.TYPE);
+        universe.addNodeType(HalfAxleWithSelfGearMechanicalNode.TYPE);
         universe.addNodeType(UnconnectedGearMechanicalNode.TYPE);
         universe.addNodeType(UnconnectedFunctionalGearMechanicalNode.TYPE);
         universe.addGraphEntityType(RotationData.TYPE);
@@ -137,6 +139,7 @@ public class FactoryNodes {
         addSimpleNodes(universe);
         universe.addNodeType(LargeGearNode.TYPE);
         universe.addNodeType(SmallGearNode.TYPE);
+        universe.addNodeType(SelfGearNode.TYPE);
         universe.register();
         return universe;
     }

@@ -1,3 +1,10 @@
+- Added Gearshift:
+  - Crafted with 4 Planks, 2 Copper Plates, 1 Steel Gear and 2 Axles.
+  - Similar to Clutch, but instead of disconnecting two sides of a mechanical network, it flips it's direction.
+  - Powering it with Redstone will prevent it from slipping, keeping the rotation direction as is.
+  - This behaviour can be inverted with a Wrench.
 - Tweaked Fluid Pipe logic to push fluids more evenly in pipes that have more than two neighbors.
 - After locking Copper Pipes with a wrench you can now change which faces they point at.
 - Pipe with Redstone Valve will no longer place itself as inverted by default.
+- Updated texture (and internally model) of Clutch to match style of Gearshift.
+- Removed some invisible quads from the Conveyor models.

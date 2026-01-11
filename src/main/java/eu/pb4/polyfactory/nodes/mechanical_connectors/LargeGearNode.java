@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import net.minecraft.core.Direction;
 
-public record LargeGearNode(Direction.Axis axis) implements BlockNode {
+public record LargeGearNode(Direction.Axis axis) implements GearNode {
     public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("large_gear"), Direction.Axis.CODEC.xmap(LargeGearNode::new, LargeGearNode::axis));
 
     @Override

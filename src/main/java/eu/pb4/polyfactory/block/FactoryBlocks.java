@@ -87,6 +87,7 @@ public class FactoryBlocks {
     public static final TurntableBlock TURNTABLE = register("turntable", BlockBehaviour.Properties.ofFullCopy(AXLE), TurntableBlock::new);
     public static final GearboxBlock GEARBOX = register("gearbox", BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_OAK_WOOD), settings -> new GearboxBlock(settings.strength(2.5F).noOcclusion()));
     public static final ClutchBlock CLUTCH = register("clutch", BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_OAK_WOOD), settings -> new ClutchBlock(settings.strength(2.5F).noOcclusion()));
+    public static final GearshiftBlock GEARSHIFT = register("gearshift", BlockBehaviour.Properties.ofFullCopy(CLUTCH), GearshiftBlock::new);
     public static final WindmillBlock WINDMILL = register("windmill", BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_OAK_WOOD), settings -> new WindmillBlock(settings.strength(2.5F).noOcclusion()));
     public static final ContainerBlock CONTAINER = register("wooden_container", BlockBehaviour.Properties.ofFullCopy(Blocks.CHEST), settings -> new ContainerBlock(9 * 5, settings.noOcclusion()));
     public static final ItemPackerBlock ITEM_PACKER = register("item_packer", BlockBehaviour.Properties.ofFullCopy(SPLITTER), ItemPackerBlock::new);

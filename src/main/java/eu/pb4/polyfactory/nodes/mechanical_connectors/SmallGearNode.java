@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import net.minecraft.core.Direction;
 
-public record SmallGearNode(Direction.Axis axis) implements BlockNode {
+public record SmallGearNode(Direction.Axis axis) implements GearNode {
     public static BlockNodeType TYPE = BlockNodeType.of(ModInit.id("small_gear"), Direction.Axis.CODEC.xmap(SmallGearNode::new, SmallGearNode::axis));
 
     @Override

@@ -789,6 +789,17 @@ class RecipesProvider extends FabricRecipeProvider {
                         .unlockedBy("get_axle", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.AXLE))
                         .save(output);
 
+                this.shaped(RecipeCategory.REDSTONE, FactoryItems.GEARSHIFT, 1)
+                        .pattern("sps")
+                        .pattern("wgw")
+                        .pattern("sps")
+                        .define('w', FactoryItems.AXLE)
+                        .define('s', ItemTags.PLANKS)
+                        .define('g', FactoryItems.STEEL_GEAR)
+                        .define('p', FactoryItems.COPPER_PLATE)
+                        .unlockedBy("get_axle", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.AXLE))
+                        .save(output);
+
                 this.shaped(RecipeCategory.REDSTONE, FactoryItems.SMELTERY_CORE, 1)
                         .pattern(" d ")
                         .pattern("dpd")

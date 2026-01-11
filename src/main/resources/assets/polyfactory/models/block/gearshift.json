@@ -1,0 +1,9 @@
+{
+	"parent": "polyfactory:block/clutch",
+	"textures": {
+		"particle": "block/oak_log",
+		"outside_log": "block/oak_log",
+		"side": "polyfactory:block/gearshift_side",
+		"gearbox": "polyfactory:block/gearbox"
+	}
+}

@@ -8,6 +8,7 @@ import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
+import eu.pb4.polyfactory.mixin.PropertiesAccessor;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import eu.pb4.polyfactory.nodes.generic.SimpleAxisNode;
@@ -17,6 +18,7 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
@@ -50,10 +52,15 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
+    private final ItemStack model;
+    private final ItemStack modelPowered;
 
     public ClutchBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false).setValue(POWERED, false).setValue(INVERTED, false));
+        var model = ((PropertiesAccessor) settings).getId().identifier().withPrefix("block/");
+        this.model = ItemDisplayElementUtil.getSolidModel(model);
+        this.modelPowered = ItemDisplayElementUtil.getSolidModel(model.withSuffix("_on"));
     }
 
     @Override
@@ -140,12 +147,12 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
         return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
-    public static final class Model extends RotationAwareModel {
+    public class Model extends RotationAwareModel {
         private final ItemDisplayElement main;
-        private final ItemDisplayElement left;
-        private final ItemDisplayElement right;
-        private Model(ServerLevel world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
+        protected final ItemDisplayElement left;
+        protected final ItemDisplayElement right;
+        protected Model(ServerLevel world, BlockState state) {
+            this.main = ItemDisplayElementUtil.createSimple();
             this.main.setScale(new Vector3f(2));
 
             this.left = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, this.getUpdateRate(), 0.3f, 0.6f);
@@ -164,6 +171,7 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
         }
 
         private void updateStatePos(BlockState state) {
+            this.main.setItem(state.getValue(POWERED) ? modelPowered : model);
             var dir = state.getValue(AXIS);
             float p = 0;
             float y = 0;
@@ -183,7 +191,7 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
             this.main.setPitch(p);
         }
 
-        private void updateAnimation(float left, float right, Direction.Axis axis) {
+        protected void updateAnimation(float left, float right, Direction.Axis axis) {
             var mat = mat();
             switch (axis) {
                 case X -> mat.rotate(Direction.EAST.getRotation());
@@ -240,11 +248,11 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
             }
         }
 
-        private boolean isPositive(NodeHolder<?> nodeHolder) {
+        protected final boolean isPositive(NodeHolder<?> nodeHolder) {
             return nodeHolder.getNode() instanceof DirectionNode directionNode && directionNode.direction().getAxisDirection() == Direction.AxisDirection.POSITIVE;
         }
 
-        private boolean isNegative(NodeHolder<?> nodeHolder) {
+        protected final boolean isNegative(NodeHolder<?> nodeHolder) {
             return nodeHolder.getNode() instanceof DirectionNode directionNode && directionNode.direction().getAxisDirection() == Direction.AxisDirection.NEGATIVE;
         }
     }

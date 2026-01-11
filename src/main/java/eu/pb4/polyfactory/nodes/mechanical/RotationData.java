@@ -2,7 +2,6 @@ package eu.pb4.polyfactory.nodes.mechanical;
 
 import com.kneelawk.graphlib.api.graph.BlockGraph;
 import com.kneelawk.graphlib.api.graph.GraphEntityContext;
-import com.kneelawk.graphlib.api.graph.GraphView;
 import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.kneelawk.graphlib.api.graph.user.GraphEntity;
@@ -15,7 +14,9 @@ import eu.pb4.polyfactory.block.other.MachineInfoProvider;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.generic.FunctionalNode;
+import eu.pb4.polyfactory.nodes.mechanical_connectors.GearNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.LargeGearNode;
+import eu.pb4.polyfactory.nodes.mechanical_connectors.SelfGearNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
 import it.unimi.dsi.fastutil.longs.Long2BooleanOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
@@ -40,8 +41,8 @@ import static eu.pb4.polyfactory.ModInit.id;
 
 public class RotationData implements GraphEntity<RotationData> {
     public static final Codec<RotationData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        Codec.FLOAT.optionalFieldOf("Rot", 0f).forGetter(RotationData::rotation),
-        Codec.FLOAT.optionalFieldOf("RotVal", 0f).forGetter(RotationData::rotationValue)
+            Codec.FLOAT.optionalFieldOf("Rot", 0f).forGetter(RotationData::rotation),
+            Codec.FLOAT.optionalFieldOf("RotVal", 0f).forGetter(RotationData::rotationValue)
     ).apply(instance, RotationData::new));
 
     public static final GraphEntityType<RotationData> TYPE = GraphEntityType.of(id("rotation_info"), CODEC, RotationData::new, RotationData::split);
@@ -69,27 +70,29 @@ public class RotationData implements GraphEntity<RotationData> {
         this.rotationValue = rotationValue;
     }
 
-    private static void collectGraphs(Collection<NodeHolder<GearMechanicalNode>> connectors, ObjectOpenHashSet<BlockPos> checkedNodes,
+    private static void collectGraphs(Collection<NodeHolder<GearMechanicalNode>> connectors, ObjectOpenHashSet<UniquePos> checkedNodes,
                                       Long2BooleanOpenHashMap dirMap, Long2FloatOpenHashMap speedMap, MutableBoolean clogged, ArrayList<RotationData> data,
                                       boolean currentDirection, float speed) {
         for (var connection : connectors) {
             //DebugInfoSender.addGameTestMarker((ServerWorld) connection.getBlockWorld(), connection.getBlockPos(), "Alt", 0x88FFFF66, 50 * 4 * 20);
 
-            var connectGraph = Objects.requireNonNull(FactoryNodes.ROTATIONAL_CONNECTOR.getGraphWorld((ServerLevel) connection.getBlockWorld()))
-                    .getAllGraphsAt(connection.getBlockPos()).findFirst();
-            if (connectGraph.isPresent() /*&& checked2.add(connectGraph.get().getId())*/) {
-                var self = connectGraph.get().getNodesAt(connection.getBlockPos()).findFirst();
-                if (self.isPresent()) {
-                    iterateConnectedNodes(self.get(), connection.getGraphWorld(), checkedNodes, dirMap, speedMap, clogged, data, currentDirection, speed);
-                }
-            }
+            Objects.requireNonNull(FactoryNodes.ROTATIONAL_CONNECTOR.getGraphWorld((ServerLevel) connection.getBlockWorld()))
+                    .getAllGraphsAt(connection.getBlockPos()).forEach(connectGraph -> {
+                        var self = connectGraph.getNodesAt(connection.getBlockPos())
+                                .filter(x -> x.getNode() instanceof GearNode gearNode && gearNode.isConnectedTo(connection)).findFirst();
+                        if (self.isPresent()) {
+                            iterateConnectedNodes(self.get(), connection, checkedNodes, dirMap, speedMap, clogged, data, currentDirection, speed);
+                        }
+                    });
         }
     }
 
-    private static void iterateConnectedNodes(NodeHolder<BlockNode> blockNodeNodeHolder, GraphView graphWorld, ObjectOpenHashSet<BlockPos> checkedSelf,
-                                              Long2BooleanOpenHashMap dirMap, Long2FloatOpenHashMap speedMap, MutableBoolean clogged, ArrayList<RotationData> data,
+    private static void iterateConnectedNodes(NodeHolder<BlockNode> blockNodeNodeHolder, NodeHolder<GearMechanicalNode>
+                                                      connectingNode, ObjectOpenHashSet<UniquePos> checkedSelf,
+                                              Long2BooleanOpenHashMap dirMap, Long2FloatOpenHashMap speedMap, MutableBoolean
+                                                      clogged, ArrayList<RotationData> data,
                                               boolean currentDirection, float speed) {
-        if (!checkedSelf.add(blockNodeNodeHolder.getBlockPos())) {
+        if (!checkedSelf.add(new UniquePos(blockNodeNodeHolder.getBlockPos(), blockNodeNodeHolder.getNode()))) {
             //DebugInfoSender.addGameTestMarker((ServerWorld) graphWorld.getWorld(), blockNodeNodeHolder.getBlockPos(), "Dupe: " + blockNodeNodeHolder.getBlockPos().toShortString(), 0x88FF8888, 100);
             return;
         }
@@ -100,6 +103,7 @@ public class RotationData implements GraphEntity<RotationData> {
 
             var nextGearSpeed = speed;
             boolean nextDirection;
+
             if (blockNodeNodeHolder.getNode().getClass() != x.getNode().getClass()) {
                 if (blockNodeNodeHolder.getNode() instanceof SmallGearNode) {
                     nextGearSpeed *= 2;
@@ -107,22 +111,26 @@ public class RotationData implements GraphEntity<RotationData> {
                     nextGearSpeed /= 2;
                 }
                 nextDirection = !currentDirection;
-            } else if (blockNodeNodeHolder.getNode() instanceof LargeGearNode a) {
+            } else if (blockNodeNodeHolder.getNode() instanceof LargeGearNode(Direction.Axis axis)) {
                 var delta = blockNodeNodeHolder.getBlockPos().subtract(x.getBlockPos());
 
-                nextDirection = (delta.get(a.axis()) == delta.get(((LargeGearNode) x.getNode()).axis())) == currentDirection;
+                nextDirection = (delta.get(axis) == delta.get(((LargeGearNode) x.getNode()).axis())) == currentDirection;
+            } else if (blockNodeNodeHolder.getNode() instanceof SelfGearNode node) {
+                nextDirection = node.flip() != currentDirection;
             } else {
                 nextDirection = !currentDirection;
             }
 
-            iterateConnectedNodes(x, graphWorld, checkedSelf, dirMap, speedMap, clogged, data, nextDirection, nextGearSpeed);
-
-            var optionalGraph = graphWorld.getAllGraphsAt(x.getBlockPos()).findFirst();
-            if (optionalGraph.isEmpty()) {
+            var otherConnectionNode = connectingNode.getGraphWorld().getNodesAt(x.getBlockPos())
+                    .filter(y -> y.getNode() instanceof GearMechanicalNode
+                            && x.getNode() instanceof GearNode gearNode && gearNode.isConnectedTo(y.cast(GearMechanicalNode.class))).findFirst();
+            if (otherConnectionNode.isEmpty()) {
                 return;
             }
 
-            var targetGraph = optionalGraph.get();
+            iterateConnectedNodes(x, otherConnectionNode.get().cast(GearMechanicalNode.class), checkedSelf, dirMap, speedMap, clogged, data, nextDirection, nextGearSpeed);
+
+            var targetGraph = otherConnectionNode.get().getGraph();
 
             if (dirMap.containsKey(targetGraph.getId())) {
                 if (dirMap.get(targetGraph.getId()) == !nextDirection
@@ -153,6 +161,7 @@ public class RotationData implements GraphEntity<RotationData> {
     public double stressCapacity() {
         return this.overstressed ? 0 : this.stressCapacity;
     }
+
     public double directStressCapacity() {
         return stressCapacity;
     }
@@ -194,7 +203,7 @@ public class RotationData implements GraphEntity<RotationData> {
             var clogged = new MutableBoolean();
             var rotationDataList = new ArrayList<RotationData>();
 
-            var checkedNodes = new ObjectOpenHashSet<BlockPos>();
+            var checkedNodes = new ObjectOpenHashSet<UniquePos>();
             collectGraphs(connectors, checkedNodes, dirMap, speedMap, clogged, rotationDataList, false, 1);
 
             if (rotationDataList.isEmpty()) {
@@ -410,6 +419,7 @@ public class RotationData implements GraphEntity<RotationData> {
     public boolean isOverstressed() {
         return this.overstressed;
     }
+
     @Nullable
     public Component getStateText() {
         if (this.overstressed) {
@@ -479,6 +489,21 @@ public class RotationData implements GraphEntity<RotationData> {
             this.stressCapacity = 0;
             this.stressUsed = 0;
             this.providerCount = 0;
+        }
+    }
+
+    public record UniquePos(BlockPos pos, Object unique) {
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof UniquePos(BlockPos pos1, Object unique1)) {
+                return pos1.equals(this.pos) && unique1 == unique();
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return pos.hashCode() + 31 * System.identityHashCode(unique);
         }
     }
 }

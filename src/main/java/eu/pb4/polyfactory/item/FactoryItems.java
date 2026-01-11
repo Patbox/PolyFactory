@@ -92,6 +92,7 @@ public class FactoryItems {
     public static final Item TURNTABLE = register(FactoryBlocks.TURNTABLE);
     public static final Item GEARBOX = register(FactoryBlocks.GEARBOX);
     public static final Item CLUTCH = register(FactoryBlocks.CLUTCH);
+    public static final Item GEARSHIFT = register(FactoryBlocks.GEARSHIFT);
     public static final Item CONTAINER = register( FactoryBlocks.CONTAINER);
     public static final Item NIXIE_TUBE = register(FactoryBlocks.NIXIE_TUBE);
     public static final WindmillSailItem WINDMILL_SAIL = register("windmill_sail", WindmillSailItem::new);
@@ -243,6 +244,7 @@ public class FactoryItems {
                     entries.accept(AXLE);
                     entries.accept(GEARBOX);
                     entries.accept(CLUTCH);
+                    entries.accept(GEARSHIFT);
                     entries.accept(CHAIN_DRIVE);
                     entries.accept(Items.IRON_CHAIN);
                     entries.accept(STEEL_GEAR);

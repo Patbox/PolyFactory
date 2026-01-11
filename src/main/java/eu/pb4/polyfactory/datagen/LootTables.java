@@ -57,6 +57,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.dropSelf(FactoryBlocks.DIGITAL_CLOCK);
         this.dropSelf(FactoryBlocks.GEARBOX);
         this.dropSelf(FactoryBlocks.CLUTCH);
+        this.dropSelf(FactoryBlocks.GEARSHIFT);
         this.dropSelf(FactoryBlocks.CONTAINER);
         this.dropSelf(FactoryBlocks.TEXT_INPUT);
         this.dropSelf(FactoryBlocks.NIXIE_TUBE);

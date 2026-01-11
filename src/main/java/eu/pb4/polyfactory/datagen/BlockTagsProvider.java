@@ -125,6 +125,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.CABLE)
                 .add(FactoryBlocks.CRAFTER)
                 .add(FactoryBlocks.CLUTCH)
+                .add(FactoryBlocks.GEARSHIFT)
                 .add(FactoryBlocks.AXLE)
                 .add(FactoryBlocks.AXLE_WITH_GEAR)
                 .add(FactoryBlocks.CHAIN_DRIVE)
