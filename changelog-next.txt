@@ -8,3 +8,4 @@
 - Pipe with Redstone Valve will no longer place itself as inverted by default.
 - Updated texture (and internally model) of Clutch to match style of Gearshift.
 - Removed some invisible quads from the Conveyor models.
+- Fixed Fauced block not giving you output item correctly when using last item of a stack.

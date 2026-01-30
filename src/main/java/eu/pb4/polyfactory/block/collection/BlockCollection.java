@@ -1,7 +1,9 @@
 package eu.pb4.polyfactory.block.collection;
 
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
+import eu.pb4.polyfactory.block.other.ProxyAttachement;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.elements.AbstractElement;
@@ -56,6 +58,7 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
     private final int[] blockId;
     private final int[] collisionBlockId;
     private final int[] collisionBlockId2;
+    private final ProxyAttachement[] proxyAttachements;
     private final IntList blockIdList = new IntArrayList();
     private final IntList allIdList = new IntArrayList();
     private final BlockCollectionData data;
@@ -80,6 +83,7 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
         this.blockId = new int[size];
         this.collisionBlockId = new int[size];
         this.collisionBlockId2 = new int[size];
+        this.proxyAttachements = new ProxyAttachement[size];
         Arrays.fill(this.blockId, -1);
         Arrays.fill(this.collisionBlockId, -1);
         Arrays.fill(this.collisionBlockId2, -1);
@@ -192,6 +196,17 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
 
     public void updateBlockVisualsAt(int x, int y, int z, BlockState state) {
         var i = index(x, y, z);
+        if (BlockWithElementHolder.get(state) instanceof BlockWithElementHolder blockWithElementHolder) {
+            if (this.proxyAttachements[i] == null || this.proxyAttachements[i].blockStateSupplier().get().getBlock() != state.getBlock()) {
+
+            } else if (this.proxyAttachements[i] != null) {
+                if (this.getHolder() != null) {
+                    this.getHolder().removeElement(this.proxyAttachements[i]);
+                }
+                this.proxyAttachements[i] = null;
+            }
+        }
+
         if (this.blockId[i] == -1 && !state.isAir()) {
             var e = VirtualEntityUtils.requestEntityId();
             this.blockId[i] = e;
@@ -419,8 +434,26 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
 
     @Override
     public void setHolder(ElementHolder holder) {
+        if (this.getHolder() == holder) {
+            return;
+        } else if (this.getHolder() != null) {
+            for (var proxy : this.proxyAttachements) {
+                if (proxy != null) {
+                    this.getHolder().removeElement(proxy);
+                }
+            }
+        }
+
         super.setHolder(holder);
         this.main.setHolder(holder);
+
+        if (holder != null) {
+            for (var proxy : this.proxyAttachements) {
+                if (proxy != null) {
+                    holder.addElement(proxy);
+                }
+            }
+        }
     }
 
     public void setWorld(ServerLevel world) {

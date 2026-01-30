@@ -7,6 +7,7 @@ import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
+import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
@@ -25,7 +26,7 @@ public class RotationalDebugBlock extends RotationalNetworkBlock implements Poly
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        return Blocks.DAYLIGHT_DETECTOR.defaultBlockState();
+        return Blocks.BARRIER.defaultBlockState();
     }
 
     @Override
@@ -51,6 +52,8 @@ public class RotationalDebugBlock extends RotationalNetworkBlock implements Poly
         private Model(ServerLevel world, BlockPos pos) {
             this.mainElement = new TextDisplayElement();
             this.mainElement.setBillboardMode(Display.BillboardConstraints.CENTER);
+            this.mainElement.setBackground(0xFF000000);
+            this.mainElement.setTranslation(new Vector3f(0, -0.4f, 0));
             this.addElement(this.mainElement);
             this.world = world;
             this.pos = pos;

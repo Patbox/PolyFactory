@@ -148,7 +148,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         for (var fluid : recipe.fluidInput(input)) {
             output.extract(fluid);
         }
-        ItemUtils.createFilledResult(stack, player, itemOut, false);
+        player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, itemOut, false));
 
         FactoryUtil.playSoundToPlayer(player, recipe.soundEvent().value(), SoundSource.BLOCKS, 0.5f, 1f);
 

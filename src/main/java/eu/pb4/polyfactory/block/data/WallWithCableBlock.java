@@ -5,6 +5,7 @@ import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.block.other.ProxyAttachement;
 import eu.pb4.polyfactory.block.other.StatePropertiesCodecPatcher;
 import eu.pb4.polyfactory.block.other.XInWallBlock;
 import eu.pb4.polyfactory.item.FactoryItems;

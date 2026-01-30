@@ -303,9 +303,13 @@ public class RotationData implements GraphEntity<RotationData> {
                 data.rotationValue = (data.negative ? -r : r) / div;
 
                 if (Math.abs(baseDelta / div) < rotMax) {
-                    data.rotation = data.rotationValue;
+                    data.rotation = data.rotationValue % Mth.TWO_PI;
                 } else {
                     data.rotation = (data.rotation + (data.negative ? -rotMax : rotMax)) % Mth.TWO_PI;
+                }
+
+                if (data.rotation < 0) {
+                    data.rotation += Mth.TWO_PI;
                 }
             }
         }
