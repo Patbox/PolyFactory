@@ -4,8 +4,9 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 public interface CustomInsertContainer extends Container {
-    int insertStack(ItemStack stack, Direction direction);
-    int insertStackSlots(ItemStack stack, Direction direction, IntList slots);
+    int insertStack(ItemStack stack, @Nullable Direction direction);
+    int insertStackSlots(ItemStack stack, @Nullable Direction direction, IntList slots);
 }

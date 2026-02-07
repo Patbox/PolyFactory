@@ -88,7 +88,7 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
         }
 
 
-        if (FactoryUtil.tryInsertingIntoSlot(self.getWorld(), self.getPos().relative(selfState.getValue(FACING)), stackToMove, selfDir.getOpposite(), list) == -1) {
+        if (FactoryUtil.tryInsertingIntoSlot(self.getWorld(), self.getPos().relative(selfState.getValue(FACING)), stackToMove, /*selfDir.getOpposite()*/ null, list) == -1) {
             return selfDir.getAxis() == pushDirection.getAxis();
         }
 

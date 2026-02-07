@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
+import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
@@ -111,15 +112,16 @@ public class PolydexCompatImpl {
     }
 
     private static void createFluidEntries(MinecraftServer server, PolydexEntry.EntryConsumer consumer) {
-        /*for (var fluid : FactoryRegistries.FLUID_TYPES) {
+        for (var fluid : FactoryRegistries.FLUID_TYPES) {
             if (fluid.dataCodec() == Unit.CODEC) {
-                consumer.accept(PolydexEntry.of(FactoryRegistries.FLUID_TYPES.getId(fluid), new PolydexFluidStack(fluid.defaultInstance(), 0, 1)));
+                consumer.accept(PolydexEntry.of(FactoryRegistries.FLUID_TYPES.getKey(fluid), new PolydexFluidStack(fluid.defaultInstance(), 0, 1)));
             }
         }
 
-        for (var potion : Registries.POTION.getIndexedEntries()) {
-            consumer.accept(PolydexEntry.of(id("potion/" + potion.getKey().get().getValue().toUnderscoreSeparatedString()), new PolydexFluidStack(FactoryFluids.POTION.toInstance(PotionContentsComponent.DEFAULT.with(potion)), 0, 1)));
-        }*/
+        for (var potion : BuiltInRegistries.POTION.asHolderIdMap()) {
+            consumer.accept(PolydexEntry.of(id("potion/" + potion.unwrapKey().get().identifier().toDebugFileName()),
+                    new PolydexFluidStack(FactoryFluids.POTION.toInstance(PotionContents.EMPTY.withPotion(potion)), 0, 1)));
+        }
     }
 
     private static void createPages(MinecraftServer server, Consumer<PolydexPage> polydexPageConsumer) {

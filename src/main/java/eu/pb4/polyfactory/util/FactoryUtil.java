@@ -11,6 +11,7 @@ import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polymer.blocks.api.BlockModelType;
 import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
 import eu.pb4.sgui.api.GuiHelpers;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -234,13 +235,14 @@ public class FactoryUtil {
         return exchangeStack(inputStack, subtractedAmount, player, outputStack, true);
     }
 
-    public static int tryInserting(Level world, BlockPos pos, ItemStack itemStack, Direction direction) {
+    public static int tryInserting(Level world, BlockPos pos, ItemStack itemStack, @Nullable Direction direction) {
         var inv = HopperBlockEntity.getContainerAt(world, pos);
 
         if (inv != null) {
             return FactoryUtil.tryInsertingInv(inv, itemStack, direction);
         }
 
+        //noinspection DataFlowIssue
         var storage = ItemStorage.SIDED.find(world, pos, direction);
         if (storage != null) {
             try (var t = Transaction.openOuter()) {
@@ -254,7 +256,7 @@ public class FactoryUtil {
         return -1;
     }
 
-    public static int tryInsertingInv(Container inventory, ItemStack itemStack, Direction direction) {
+    public static int tryInsertingInv(Container inventory, ItemStack itemStack, @Nullable Direction direction) {
         if (inventory instanceof CustomInsertContainer customInsertContainer) {
             return customInsertContainer.insertStack(itemStack, direction);
         } else if (inventory instanceof WorldlyContainer sidedInventory) {
@@ -290,12 +292,26 @@ public class FactoryUtil {
         return MovableResult.FAILURE;
     }
 
-    private static int tryInsertingSided(WorldlyContainer inventory, ItemStack itemStack, Direction direction) {
-        var slots = inventory.getSlotsForFace(direction);
+    private static int tryInsertingSided(WorldlyContainer inventory, ItemStack itemStack, @Nullable Direction direction) {
+        IntList slots;
+        if (direction == null) {
+            slots = new IntArrayList();
+            for (var dir : Direction.values()) {
+                var arr = inventory.getSlotsForFace(dir);
+                for (int i = 0; i < arr.length; i++) {
+                    if (!slots.contains(arr[i])) {
+                        slots.add(arr[i]);
+                    }
+                }
+            }
+        } else {
+            slots = IntList.of(inventory.getSlotsForFace(direction));
+        }
+
         var init = itemStack.getCount();
 
-        for (int i = 0; i < slots.length; i++) {
-            var slot = slots[i];
+        for (int i = 0; i < slots.size(); i++) {
+            var slot = slots.getInt(i);
 
             if (!inventory.canPlaceItemThroughFace(slot, itemStack, direction)) {
                 continue;

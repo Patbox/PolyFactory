@@ -171,53 +171,6 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
     }
 
     @Override
-    public int insertStack(ItemStack itemStack, Direction direction) {
-        var init = itemStack.getCount();
-        while (true) {
-            if (itemStack.isEmpty()) {
-                return init;
-            }
-            var slot = this.getLeastPopulatedInputSlot(itemStack);
-            if (slot == -1) {
-                return init - itemStack.getCount();
-            }
-
-            var current = this.getItem(slot);
-            if (current.isEmpty()) {
-                this.setItem(slot, itemStack.copyWithCount(1));
-                itemStack.shrink(1);
-            } else {
-                current.grow(1);
-                itemStack.shrink(1);
-            }
-        }
-    }
-
-    @Override
-    public int insertStackSlots(ItemStack itemStack, Direction direction, IntList slots) {
-        var init = itemStack.getCount();
-        while (true) {
-            if (itemStack.isEmpty()) {
-                return init;
-            }
-            var slot = this.getLeastPopulatedInputSlot(itemStack, slots);
-            if (slot == -1) {
-                return init - itemStack.getCount();
-            }
-
-            var current = this.getItem(slot);
-            if (current.isEmpty()) {
-                this.setItem(slot, itemStack.copyWithCount(1));
-                itemStack.shrink(1);
-            } else {
-                current.grow(1);
-                itemStack.shrink(1);
-            }
-        }
-    }
-
-
-    @Override
     public void onListenerUpdate(LevelChunk chunk) {
         updateResult();
         this.model = BlockAwareAttachment.get(chunk, this.worldPosition).holder() instanceof WorkbenchBlock.Model m ? m : null;

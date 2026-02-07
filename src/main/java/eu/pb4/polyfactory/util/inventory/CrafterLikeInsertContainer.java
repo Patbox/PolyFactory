@@ -3,10 +3,11 @@ package eu.pb4.polyfactory.util.inventory;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 public interface CrafterLikeInsertContainer extends CustomInsertContainer {
     @Override
-    default int insertStack(ItemStack itemStack, Direction direction) {
+    default int insertStack(ItemStack itemStack, @Nullable Direction direction) {
         var init = itemStack.getCount();
         while (true) {
             if (itemStack.isEmpty()) {
@@ -29,7 +30,7 @@ public interface CrafterLikeInsertContainer extends CustomInsertContainer {
     }
 
     @Override
-    default int insertStackSlots(ItemStack itemStack, Direction direction, IntList slots) {
+    default int insertStackSlots(ItemStack itemStack, @Nullable Direction direction, IntList slots) {
         var init = itemStack.getCount();
         while (true) {
             if (itemStack.isEmpty()) {

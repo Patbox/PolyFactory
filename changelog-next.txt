@@ -5,7 +5,9 @@
   - This behaviour can be inverted with a Wrench.
 - Tweaked Fluid Pipe logic to push fluids more evenly in pipes that have more than two neighbors.
 - After locking Copper Pipes with a wrench you can now change which faces they point at.
+- Slot-Aware Funnel will no longer be limited by blocks directionality when inserting items.
 - Pipe with Redstone Valve will no longer place itself as inverted by default.
+- Fluids are now visible in Polydex.
 - Updated texture (and internally model) of Clutch to match style of Gearshift.
 - Removed some invisible quads from the Conveyor models.
 - Fixed Fauced block not giving you output item correctly when using last item of a stack.
