@@ -15,8 +15,6 @@ import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.DrainInput;
 import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polymer.blocks.api.BlockModelType;
-import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
 import eu.pb4.polymer.blocks.api.PolymerTexturedBlock;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
@@ -29,7 +27,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.Util;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -53,15 +50,13 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-import java.util.Locale;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
 
-public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedBlock, PipeConnectable {
+public class FaucetBlock extends Block implements FactoryBlock, PolymerTexturedBlock, PipeConnectable {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
-    public FaucedBlock(Properties settings) {
+    public FaucetBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(this.defaultBlockState().setValue(POWERED, false));
     }
@@ -249,7 +244,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         }
     }
 
-    public record SimpleProvider(FaucedBlock.Model model, BlockState selfState, BlockPos faucedPos, ServerLevel world, BooleanSupplier removed, FluidOutput output, Direction direction) implements FaucedProvider {
+    public record SimpleProvider(FaucetBlock.Model model, BlockState selfState, BlockPos faucedPos, ServerLevel world, BooleanSupplier removed, FluidOutput output, Direction direction) implements FaucedProvider {
         @Override
         public FluidContainerInput getFluidContainerInput() {
             return output.getFluidContainerInput(direction);
@@ -273,7 +268,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         }
     }
 
-    public record DynamicProvider(FaucedBlock.Model model, BlockState selfState, BlockPos faucedPos, ServerLevel world, BlockPos sourcePos, Direction direction) implements FaucedProvider {
+    public record DynamicProvider(FaucetBlock.Model model, BlockState selfState, BlockPos faucedPos, ServerLevel world, BlockPos sourcePos, Direction direction) implements FaucedProvider {
         private FluidOutput getOutput() {
             return world.getBlockState(sourcePos).getBlock() instanceof FluidOutput.Getter getter ? getter.getFluidOutput(world, sourcePos, direction) : null;
         }
@@ -305,7 +300,7 @@ public class FaucedBlock extends Block implements FactoryBlock, PolymerTexturedB
         }
     }
 
-    public record ModelOnlyProvider(FaucedBlock.Model model, Direction direction) implements FaucedProvider {
+    public record ModelOnlyProvider(FaucetBlock.Model model, Direction direction) implements FaucedProvider {
         @Override
         public FluidContainerInput getFluidContainerInput() {
             return FluidContainerInput.EMPTY;

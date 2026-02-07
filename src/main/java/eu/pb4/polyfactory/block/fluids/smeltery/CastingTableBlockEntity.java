@@ -50,7 +50,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
     private CastingTableBlock.Model model;
     private boolean activate = false;
     private boolean isCooling;
-    private FaucedBlock.FaucedProvider provider = FaucedBlock.FaucedProvider.EMPTY;
+    private FaucetBlock.FaucedProvider provider = FaucetBlock.FaucedProvider.EMPTY;
     private float rate;
 
     public CastingTableBlockEntity(BlockPos pos, BlockState state) {
@@ -69,10 +69,10 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
 
         if (!self.provider.isValid()) {
             self.provider.setActiveFluid(null);
-            self.provider = FaucedBlock.FaucedProvider.EMPTY;
+            self.provider = FaucetBlock.FaucedProvider.EMPTY;
             if (self.activate) {
-                if (world.getBlockState(pos.above()).is(FactoryBlocks.FAUCED)) {
-                    self.provider = FaucedBlock.getOutput(world.getBlockState(pos.above()), (ServerLevel) world, pos.above());
+                if (world.getBlockState(pos.above()).is(FactoryBlocks.FAUCET)) {
+                    self.provider = FaucetBlock.getOutput(world.getBlockState(pos.above()), (ServerLevel) world, pos.above());
                 }
 
                 if (!self.provider.isValid()) {
@@ -81,7 +81,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
             }
         }
 
-        if (self.provider == FaucedBlock.FaucedProvider.EMPTY || !self.isOutputEmpty() || !self.activate) {
+        if (self.provider == FaucetBlock.FaucedProvider.EMPTY || !self.isOutputEmpty() || !self.activate) {
             self.process = 0;
             self.model.setProgress(false, 0, null);
             self.activate = false;
@@ -89,7 +89,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
             self.isCooling = false;
             self.model.tick();
             self.provider.setActiveFluid(null);
-            self.provider = FaucedBlock.FaucedProvider.EMPTY;
+            self.provider = FaucetBlock.FaucedProvider.EMPTY;
             return;
         }
 
@@ -263,7 +263,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
         return this.stacks;
     }
 
-    public InteractionResult activate(FaucedBlock.FaucedProvider provider, float rate) {
+    public InteractionResult activate(FaucetBlock.FaucedProvider provider, float rate) {
         if (this.isInputEmpty() && !this.isOutputEmpty()) {
             var input = new SingleItemWithFluid(this.getItem(1), provider.getFluidContainerInput(), (ServerLevel) this.level);
 

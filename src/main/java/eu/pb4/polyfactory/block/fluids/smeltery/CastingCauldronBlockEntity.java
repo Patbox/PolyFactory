@@ -37,7 +37,7 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
     protected RecipeHolder<CauldronCastingRecipe> currentRecipe = null;
     private CastingCauldronBlock.Model model;
     private boolean isCooling;
-    private FaucedBlock.FaucedProvider provider = FaucedBlock.FaucedProvider.EMPTY;
+    private FaucetBlock.FaucedProvider provider = FaucetBlock.FaucedProvider.EMPTY;
     private boolean findRecipe = false;
     private float rate;
 
@@ -55,9 +55,9 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
         self.model.setOutput(self.getStack());
         var input = self.asInput();
 
-        if (self.provider == FaucedBlock.FaucedProvider.EMPTY) {
-            if (world.getBlockState(pos.above()).is(FactoryBlocks.FAUCED)) {
-                self.provider = FaucedBlock.getOutput(world.getBlockState(pos.above()), (ServerLevel) world, pos.above());
+        if (self.provider == FaucetBlock.FaucedProvider.EMPTY) {
+            if (world.getBlockState(pos.above()).is(FactoryBlocks.FAUCET)) {
+                self.provider = FaucetBlock.getOutput(world.getBlockState(pos.above()), (ServerLevel) world, pos.above());
             } else {
                 if (self.stack.isEmpty()) {
                     world.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
@@ -76,7 +76,7 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
         } else if (self.currentRecipe == null || !self.provider.isValid() || !self.currentRecipe.value().matches(input, world)) {
             self.currentRecipe = null;
             self.provider.setActiveFluid(null);
-            self.provider = FaucedBlock.FaucedProvider.EMPTY;
+            self.provider = FaucetBlock.FaucedProvider.EMPTY;
             if (self.stack.isEmpty()) {
                 world.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
             }
@@ -220,7 +220,7 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
         return 1;
     }
 
-    public void setup(RecipeHolder<CauldronCastingRecipe> recipe, FaucedBlock.FaucedProvider provider, float rate) {
+    public void setup(RecipeHolder<CauldronCastingRecipe> recipe, FaucetBlock.FaucedProvider provider, float rate) {
         this.currentRecipe = recipe;
         this.provider = provider;
         this.rate = rate;

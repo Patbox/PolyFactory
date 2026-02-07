@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.block.fluids;
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.fluids.smeltery.FaucedBlock;
+import eu.pb4.polyfactory.block.fluids.smeltery.FaucetBlock;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
@@ -36,7 +36,7 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
     private PortableFluidTankBlock.Model model;
 
     private boolean faucedActivate = false;
-    private FaucedBlock.FaucedProvider faucedProvider = FaucedBlock.FaucedProvider.EMPTY;
+    private FaucetBlock.FaucedProvider faucedProvider = FaucetBlock.FaucedProvider.EMPTY;
     @Nullable
     private FluidInstance<?> faucedFluid = null;
     private float faucedRate = 0;
@@ -106,10 +106,10 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
             return;
         }
 
-        if (self.faucedProvider != FaucedBlock.FaucedProvider.EMPTY &&
+        if (self.faucedProvider != FaucetBlock.FaucedProvider.EMPTY &&
                 (!self.faucedProvider.isValid() && self.faucedActivate || self.container.isFull() || self.faucedProvider.getFluidContainerInput().get(self.faucedFluid) == 0)) {
             self.faucedProvider.setActiveFluid(null);
-            self.faucedProvider = FaucedBlock.FaucedProvider.EMPTY;
+            self.faucedProvider = FaucetBlock.FaucedProvider.EMPTY;
             self.faucedActivate = false;
         }
 
@@ -150,14 +150,14 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
         }
     }
 
-    public InteractionResult activate(FaucedBlock.FaucedProvider provider, float rate) {
+    public InteractionResult activate(FaucetBlock.FaucedProvider provider, float rate) {
         if (!provider.isValid() || this.container.isFull() || provider.getFluidContainerInput().isEmpty()) {
             return InteractionResult.FAIL;
         }
         if (this.faucedActivate && provider == this.faucedProvider) {
             this.faucedActivate = false;
             this.faucedProvider.setActiveFluid(null);
-            this.faucedProvider = FaucedBlock.FaucedProvider.EMPTY;
+            this.faucedProvider = FaucetBlock.FaucedProvider.EMPTY;
             return InteractionResult.SUCCESS_SERVER;
         }
 

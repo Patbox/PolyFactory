@@ -44,7 +44,7 @@ public interface XInWallBlock extends TagRedirector, BlockWithElementHolder, Pol
             return null;
         }
 
-        return new SimpleRedirectingModel(elementHolder, this::convertToBacking);
+        return new SimpleRedirectingModel(elementHolder, this::convertToBacking, world);
     }
 
     @Override
@@ -54,8 +54,8 @@ public interface XInWallBlock extends TagRedirector, BlockWithElementHolder, Pol
 
     class SimpleRedirectingModel extends BlockModel {
         private final ProxyAttachement proxied;
-        public SimpleRedirectingModel(ElementHolder elementHolder, Function<BlockState, BlockState> convertToBacking) {
-            this.proxied = new ProxyAttachement(this, elementHolder, () -> convertToBacking.apply(blockState()));
+        public SimpleRedirectingModel(ElementHolder elementHolder, Function<BlockState, BlockState> convertToBacking, ServerLevel level) {
+            this.proxied = new ProxyAttachement(elementHolder, () -> this.currentPos, () -> convertToBacking.apply(blockState()), level);
             elementHolder.setAttachment(this.proxied);
             this.addElement(proxied);
         }

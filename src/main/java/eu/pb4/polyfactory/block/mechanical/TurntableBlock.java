@@ -22,7 +22,6 @@ import org.joml.Quaternionf;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -165,7 +164,7 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
         @Override
         public void setAttachment(@Nullable HolderAttachment attachment) {
             if (this.blocks != null) {
-                this.blocks.setWorld(attachment != null ? attachment.getWorld() : null);
+                this.blocks.setLevel(attachment != null ? attachment.getWorld() : null);
             }
 
             super.setAttachment(attachment);
@@ -175,7 +174,7 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
         public void destroy() {
             super.destroy();
             if (this.blocks != null) {
-                this.blocks.setWorld(null);
+                this.blocks.setLevel(null);
             }
         }
 

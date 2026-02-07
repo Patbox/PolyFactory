@@ -27,6 +27,7 @@ public class GuiTextures {
     public static final Function<Component, Component> SMELTERY = background("smeltery");
     public static final Function<Component, Component> PRIMITIVE_SMELTERY = background("primitive_smeltery");
     public static final Function<Component, Component> CENTER_SLOT_GENERIC = background("center_slot");
+    public static final Function<Component, Component> DEEP_STORAGE_CONTAINER = background("deep_storage_container");
     public static final Function<Component, Component> FILL3 = background("fill3");
     public static final Function<Component, Component> BLUEPRINT_WORKBENCH = background("blueprint_workbench");
     public static final Function<Component, Component> SLOT_AWARE_FUNNEL = background("slot_aware_funnel");
@@ -42,6 +43,11 @@ public class GuiTextures {
     public static final Supplier<GuiElementBuilder> ACTIVATE_BUTTON = icon32("button/activate");
     public static final Supplier<GuiElementBuilder> ACTIVATE_BLOCKED_BUTTON = icon32("button/activate_blocked");
     public static final Supplier<GuiElementBuilder> ACTIVATE_OFF_BUTTON = icon32("button/activate_off");
+
+    public static final Supplier<GuiElementBuilder> BUTTON_ACTIVE_ALWAYS = icon32("button/active/always");
+    public static final Supplier<GuiElementBuilder> BUTTON_ACTIVE_POWERED = icon32("button/active/powered");
+    public static final Supplier<GuiElementBuilder> BUTTON_ACTIVE_NOT_POWERED = icon32("button/active/not_powered");
+
     public static final Supplier<GuiElementBuilder> BUTTON_CLOSE = icon32("button/close");
     public static final Supplier<GuiElementBuilder> BUTTON_DONE = icon32("button/done");
     public static final Supplier<GuiElementBuilder> BUTTON_DONE_BLOCKED = icon32("button/done_blocked");
@@ -50,6 +56,7 @@ public class GuiTextures {
     public static final Supplier<GuiElementBuilder> LOCKED_SLOT = icon32("locked_slot");
 
     public static final Supplier<GuiElementBuilder> NUMBERED_BUTTONS_DISABLED = icon16("numbered_buttons/disabled");
+    public static final Supplier<GuiElementBuilder> NUMBERED_BUTTONS_OTHER = icon16("numbered_buttons/other");
     @SuppressWarnings("unchecked")
     public static final Supplier<GuiElementBuilder>[] NUMBERED_BUTTONS = Util.make(new Supplier[100], (arr) -> {
         for (int i = 0; i < arr.length; i++) {
@@ -70,8 +77,8 @@ public class GuiTextures {
 
     public static final Temperature TEMPERATURE = new Temperature(FLAME, ICE);
     public static final Temperature TEMPERATURE_OFFSET_RIGHT = new Temperature(FLAME_OFFSET_RIGHT, ICE_OFFSET_RIGHT);
-    public static final IntFunction<GuiElementBuilder>[] NUMBERS_FLAT = createNumbers("flat/");
-    //public static final IntFunction<GuiElementBuilder>[] NUMBERS_SHADOW = createNumbers("shadow/");
+    public static final IntFunction<GuiElementBuilder>[] NUMBERS_FLAT_24 = createNumbers(8 * 3, false, 0);
+    public static final IntFunction<GuiElementBuilder>[] NUMBERS_SHADOW_8 = createNumbers(8, true, 0);
     public static final char SPACE_1 = UiResourceCreator.space(1);
     public static final char BLUEPRINT_WORKSTATION_EXTRA_OFFSET = UiResourceCreator.space(-29 + 8);
     public static final char POLYDEX_OFFSET = UiResourceCreator.space(168);

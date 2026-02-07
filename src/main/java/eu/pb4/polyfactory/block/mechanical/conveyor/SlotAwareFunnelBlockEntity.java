@@ -4,12 +4,13 @@ import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.ui.GuiUtils;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polyfactory.util.inventory.MinimalContainer;
 import eu.pb4.polyfactory.util.storage.FilteredRedirectedSlottedStorage;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
-import eu.pb4.sgui.api.elements.GuiElementInterface;
+import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import it.unimi.dsi.fastutil.objects.ReferenceSortedSets;
@@ -52,10 +53,10 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements B
     final NonNullList<FilterData> filter = NonNullList.withSize(TARGET_SLOT_COUNT, FilterData.EMPTY_FALSE);
     final int[] slotTargets = new int[TARGET_SLOT_COUNT];
     private final NonNullList<ItemStack> items = NonNullList.withSize(TARGET_SLOT_COUNT, ItemStack.EMPTY);
+    private int maxStackSize = 64;
     private final Storage<ItemVariant> storage = new FilteredRedirectedSlottedStorage<>(ItemStorage.SIDED,
             this::getLevel, this::getBlockPos, () -> this.getBlockState().getValue(FunnelBlock.FACING), ItemVariant.blank(), this.slotTargets,
             (i, res) -> this.filter.get(i).test(res.toStack()), (res) -> this.maxStackSize);
-    private int maxStackSize = 64;
     @Nullable
     private SlotAwareFunnelBlock.Model model;
 
@@ -123,6 +124,14 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements B
         }
     }
 
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        super.preRemoveSideEffects(pos, oldState);
+        if (this.level != null) {
+            Containers.dropContents(level, pos, this.asInventory());
+        }
+    }
+
     public static class Gui extends SimpleGui {
         private final SlotAwareFunnelBlockEntity be;
 
@@ -134,23 +143,27 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements B
             for (int i = 0; i < 9; i++) {
                 this.setSlotRedirect(i, new Slot(pseudoInv, i, 0, 0));
                 final int index = i;
-                this.setSlot(9 + i, new GuiElementInterface() {
-                    @Override
-                    public ItemStack getItemStack() {
-                        return (be.slotTargets[index] < 0 ? GuiTextures.NUMBERED_BUTTONS_DISABLED : GuiTextures.NUMBERED_BUTTONS[Math.min(be.slotTargets[index], 99)])
-                                .get().hideTooltip().asStack();
-                    }
-
-                    @Override
-                    public ClickCallback getGuiCallback() {
-                        return (i1, clickType, slotActionType, slotGuiInterface) -> {
+                this.setSlot(9 + i, GuiUtils.createDynamicButton(() -> getSlotButtonIcon(be.slotTargets[index]),
+                        (i1, clickType, slotActionType, slotGuiInterface) -> {
                             new SetSlotGui(player, Gui.this, index);
-                            FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
-                        };
-                    }
-                });
+                            FactoryUtil.playSoundToPlayer(player, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
+                        })
+                );
             }
             this.open();
+        }
+
+        private ItemStack getSlotButtonIcon(int slotTarget) {
+            GuiElementBuilder builder;
+            if (slotTarget < 0) {
+                builder = GuiTextures.NUMBERED_BUTTONS_DISABLED.get();
+            } else if (slotTarget >= 0 && slotTarget < 100) {
+                builder = GuiTextures.NUMBERED_BUTTONS[slotTarget].get();
+            } else {
+                builder = GuiTextures.NUMBERED_BUTTONS_OTHER.get();
+            }
+
+            return builder.hideTooltip().asStack();
         }
 
         @Override
@@ -159,14 +172,6 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements B
                 this.close();
             }
             super.onTick();
-        }
-    }
-
-    @Override
-    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
-        super.preRemoveSideEffects(pos, oldState);
-        if (this.level != null) {
-            Containers.dropContents(level, pos, this.asInventory());
         }
     }
 
@@ -182,7 +187,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements B
             this.setDefaultInputValue(gui.be.slotTargets[slot] == -1 ? "" : String.valueOf(gui.be.slotTargets[slot]));
             this.updateDone();
             this.setSlot(2, GuiTextures.BUTTON_CLOSE.get().setName(CommonComponents.GUI_BACK).setCallback(x -> {
-                FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
+                FactoryUtil.playSoundToPlayer(player, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
                 this.close(true);
                 this.gui.open();
             }));
@@ -212,7 +217,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements B
             if (targetSlot > -2 && targetSlot < 100) {
                 int finalTargetSlot = targetSlot;
                 this.setSlot(1, GuiTextures.BUTTON_DONE.get().setName(CommonComponents.GUI_DONE).setCallback(x -> {
-                    FactoryUtil.playSoundToPlayer(player,SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
+                    FactoryUtil.playSoundToPlayer(player, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.UI, 0.5f, 1);
                     this.gui.be.slotTargets[this.slot] = finalTargetSlot;
                     this.close(true);
                     this.gui.open();

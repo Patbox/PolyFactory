@@ -86,9 +86,9 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
             stackToMove = stackToMove.split(be.maxStackSize());
             copied = true;
         }
+        var targetPos =  self.getPos().relative(selfState.getValue(FACING));
 
-
-        if (FactoryUtil.tryInsertingIntoSlot(self.getWorld(), self.getPos().relative(selfState.getValue(FACING)), stackToMove, /*selfDir.getOpposite()*/ null, list) == -1) {
+        if (FactoryUtil.tryInsertingIntoSlot(self.getWorld(), targetPos, stackToMove, null, list) == -1) {
             return selfDir.getAxis() == pushDirection.getAxis();
         }
 
@@ -133,14 +133,16 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
                 }
 
                 var stack = inv.getItem(i);
-                if (!stack.isEmpty() && be.filter.get(a).test(stack) && (sided == null || sided.canTakeItemThroughFace(i, stack, selfFacing.getOpposite()))) {
-                    inv.setChanged();
-                    if (conveyor.pushNew(stack.split(Math.min(be.maxStackSize(), stack.getCount())))) {
-                        if (stack.isEmpty()) {
-                            inv.setItem(i, ItemStack.EMPTY);
+                for (var dir : Direction.values()) {
+                    if (!stack.isEmpty() && be.filter.get(a).test(stack) && (sided == null || sided.canTakeItemThroughFace(i, stack, dir))) {
+                        inv.setChanged();
+                        if (conveyor.pushNew(stack.split(Math.min(be.maxStackSize(), stack.getCount())))) {
+                            if (stack.isEmpty()) {
+                                inv.setItem(i, ItemStack.EMPTY);
+                            }
+                            conveyor.setMovementPosition(pushDirection.getOpposite() == selfFacing ? 0.15 : 0.5);
+                            return;
                         }
-                        conveyor.setMovementPosition(pushDirection.getOpposite() == selfFacing ? 0.15 : 0.5);
-                        return;
                     }
                 }
             }

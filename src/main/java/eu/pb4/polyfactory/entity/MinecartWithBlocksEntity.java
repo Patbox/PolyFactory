@@ -5,7 +5,6 @@ import eu.pb4.polyfactory.block.collection.BlockCollectionData;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
-import org.joml.Quaternionf;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Optional;
@@ -38,21 +37,21 @@ public class MinecartWithBlocksEntity extends AbstractMinecart implements Polyme
     @Override
     public void onClientRemoval() {
         super.onClientRemoval();
-        this.blocks.setWorld(null);
+        this.blocks.setLevel(null);
     }
 
     @Override
     public void onRemoval(RemovalReason reason) {
         super.onRemoval(reason);
-        this.blocks.setWorld(null);
+        this.blocks.setLevel(null);
 
     }
 
     @Override
     public void tick() {
-        this.blocks.setWorld((ServerLevel) this.level());
+        this.blocks.setLevel((ServerLevel) this.level());
         super.tick();
-        this.blocks.setOverridePos(this.blocks.getCurrentPos().lerp(this.holder.getPos().add(0, 2, 0), 0.25));
+        this.blocks.setOverridePos(this.blocks.getCurrentPos().lerp(this.holder.getPos().add(0, 2, 0), 0.5));
         //this.blocks.setQuaternion(new Quaternionf().rotateY(this.getYaw() * MathHelper.RADIANS_PER_DEGREE));
     }
 

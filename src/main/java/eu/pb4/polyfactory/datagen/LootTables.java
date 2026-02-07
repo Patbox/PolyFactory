@@ -23,7 +23,9 @@ import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 class LootTables extends FabricBlockLootTableProvider {
@@ -72,7 +74,7 @@ class LootTables extends FabricBlockLootTableProvider {
         this.dropSelf(FactoryBlocks.SMELTERY_CORE);
         this.dropSelf(FactoryBlocks.PRIMITIVE_SMELTERY);
         this.dropSelf(FactoryBlocks.CASTING_TABLE);
-        this.dropSelf(FactoryBlocks.FAUCED);
+        this.dropSelf(FactoryBlocks.FAUCET);
         this.dropSelf(FactoryBlocks.HOLOGRAM_PROJECTOR);
         this.dropSelf(FactoryBlocks.WIRELESS_REDSTONE_RECEIVER);
         this.dropSelf(FactoryBlocks.WIRELESS_REDSTONE_TRANSMITTER);
@@ -136,6 +138,10 @@ class LootTables extends FabricBlockLootTableProvider {
         this.addColored(FactoryBlocks.INVERTED_FIXTURE_LAMP);
         //FactoryBlocks.WALL_WITH_CABLE.values().forEach(this::addWallWithCable);
         //FactoryBlocks.WALL_WITH_PIPE.values().forEach(this::addWallWithPipe);
+        //noinspection DataFlowIssue
+        this.createMultiPropConditionTable(FactoryBlocks.DEEP_STORAGE_CONTAINER,
+                (block2, pred) -> pred.hasProperty(block2.partX, 0).hasProperty(block2.partY, 0).hasProperty(block2.partZ, 0));
+
     }
 
     private void addTallMachineDrop(TallItemMachineBlock block) {
@@ -153,6 +159,13 @@ class LootTables extends FabricBlockLootTableProvider {
                         .setRolls(ConstantValue.exactly(1.0F))
                         .add(LootItem.lootTableItem(item)))
         );
+    }
+
+    public <T extends Block> void createMultiPropConditionTable(T block, BiFunction<T, StatePropertiesPredicate.Builder, StatePropertiesPredicate.Builder> predicate) {
+        this.add(block, LootTable.lootTable()
+                .withPool(this.applyExplosionCondition(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F))
+                        .add(LootItem.lootTableItem(block)
+                                .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(block).setProperties(predicate.apply(block, StatePropertiesPredicate.Builder.properties())))))));
     }
 
     private void addOptionalCable(Block block) {

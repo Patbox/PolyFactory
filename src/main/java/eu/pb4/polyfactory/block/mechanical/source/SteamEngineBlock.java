@@ -41,12 +41,14 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.spongepowered.asm.mixin.Overwrite;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
@@ -116,6 +118,9 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, Entity
         if (getY(state) == 2) {
             NetworkComponent.Rotational.updateRotationalAt(world, pos);
         }
+        if (getY(state) < 2) {
+            this.updateEnabled(world, pos, state);
+        }
     }
 
     @Override
@@ -125,6 +130,21 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, Entity
             NetworkComponent.Rotational.updateRotationalAt(world, pos);
         }
     }
+
+    @Override
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, @Nullable Orientation wireOrientation, boolean notify) {
+        if (getY(state) < 2) {
+            this.updateEnabled(world, pos, state);
+        }
+        super.neighborChanged(state, world, pos, sourceBlock, wireOrientation, notify);
+    }
+
+    private void updateEnabled(Level world, BlockPos pos, BlockState state) {
+        if (world.getBlockEntity(getCenter(state, pos)) instanceof SteamEngineBlockEntity be) {
+            be.setPowered(getY(state) | getX(state) << 2 | getZ(state) << 4, world.hasNeighborSignal(pos));
+        }
+    }
+
 
     @Override
     public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
@@ -184,7 +204,8 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, Entity
         private final LodItemDisplayElement axle;
 
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.getValue(SteamEngineBlock.LIT) ? LIT : FactoryItems.STEAM_ENGINE.getDefaultInstance());
+            this.main = ItemDisplayElementUtil.createSimple(state.getValue(SteamEngineBlock.LIT) ? LIT
+                    : ItemDisplayElementUtil.getSolidModel(FactoryItems.STEAM_ENGINE));
             this.main.setScale(new Vector3f(2));
             var facing = state.getValue(FACING);
             var offset = new Vec3(
@@ -193,18 +214,18 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, Entity
                     facing.getAxis() == Direction.Axis.X ? 0.5f : 0
             );
             this.main.setOffset(offset);
-            this.main.setDisplayWidth(3);
+            this.main.setDisplaySize(3, 3);
             offset = offset.add(0, 2, 0);
             this.axle = LodItemDisplayElement.createSimple(AXLE, 4);
             this.axle.setOffset(offset);
             this.axle.setScale(new Vector3f(2));
-            this.axle.setDisplayWidth(3);
+            this.axle.setDisplaySize(3,3);
             this.rotatingA = LodItemDisplayElement.createSimple(LINK, 4);
             this.rotatingA.setOffset(offset);
-            this.rotatingA.setDisplayWidth(3);
+            this.rotatingA.setDisplaySize(3, 3);
             this.rotatingB = LodItemDisplayElement.createSimple(LINK, 4);
             this.rotatingB.setOffset(offset);
-            this.rotatingB.setDisplayWidth(3);
+            this.rotatingB.setDisplaySize(3, 3);
 
 
             this.updateStatePos(state);
@@ -220,7 +241,8 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, Entity
             var direction = state.getValue(FACING);
 
             this.main.setYaw(direction.toYRot());
-            this.main.setItem(state.getValue(SteamEngineBlock.LIT) ? LIT : FactoryItems.STEAM_ENGINE.getDefaultInstance());
+            this.main.setItem(state.getValue(SteamEngineBlock.LIT) ? LIT
+                    : ItemDisplayElementUtil.getSolidModel(FactoryItems.STEAM_ENGINE));
             this.axle.setYaw(direction.toYRot());
             this.rotatingA.setYaw(direction.toYRot());
             this.rotatingB.setYaw(direction.toYRot());

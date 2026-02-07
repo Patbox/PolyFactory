@@ -151,7 +151,7 @@ public class IndustrialSmelteryBlock extends MultiBlock implements FactoryBlock,
         for (var x : Direction.values()) {
             var tmp = world.getBlockState(pos.relative(x));
             hasPipe |= (tmp.getBlock() instanceof PipeBaseBlock block && block.checkModelDirection(tmp, x.getOpposite()))
-                    || (tmp.is(FactoryBlocks.FAUCED) && tmp.getValue(FaucedBlock.FACING) == x);
+                    || (tmp.is(FactoryBlocks.FAUCET) && tmp.getValue(FaucetBlock.FACING) == x);
         }
 
         return state.setValue(HAS_PIPE, hasPipe);

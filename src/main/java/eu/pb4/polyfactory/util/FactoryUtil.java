@@ -398,7 +398,7 @@ public class FactoryUtil {
     }
 
 
-    public static int tryInsertingIntoSlot(Level world, BlockPos pos, ItemStack itemStack, Direction direction, IntList slots) {
+    public static int tryInsertingIntoSlot(Level world, BlockPos pos, ItemStack itemStack, @Nullable Direction direction, IntList slots) {
         var inv = HopperBlockEntity.getContainerAt(world, pos);
 
         if (inv != null) {
@@ -428,10 +428,23 @@ public class FactoryUtil {
         return -1;
     }
 
-    public static int tryInsertingInvIntoSlot(Container inventory, ItemStack itemStack, Direction direction, IntList slots) {
+
+    public static int tryInsertingInvIntoSlot(Container inventory, ItemStack itemStack, @Nullable Direction direction, IntList slots) {
         if (inventory instanceof CustomInsertContainer customInsertContainer) {
             return customInsertContainer.insertStackSlots(itemStack, direction, slots);
         } else if (inventory instanceof WorldlyContainer sidedInventory) {
+            if (direction == null) {
+                int count = 0;
+                for (var dir : Direction.values()) {
+                    count += tryInsertingSidedIntoSlot(sidedInventory, itemStack, dir, slots);
+                    if (itemStack.isEmpty()) {
+                        break;
+                    }
+                }
+
+                return count;
+            }
+
             return tryInsertingSidedIntoSlot(sidedInventory, itemStack, direction, slots);
         } else {
             return tryInsertingRegularIntoSlot(inventory, itemStack, slots);

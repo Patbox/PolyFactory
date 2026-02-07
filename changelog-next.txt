@@ -3,11 +3,20 @@
   - Similar to Clutch, but instead of disconnecting two sides of a mechanical network, it flips it's direction.
   - Powering it with Redstone will prevent it from slipping, keeping the rotation direction as is.
   - This behaviour can be inverted with a Wrench.
+- Added Deep Storage Container:
+  - Crafted with 8 Steel Plates and 1 Steel Block.
+  - It's a 2x2x2 multiblock (like Steam Engine) that can store items.
+  - It stores 338 stacks of items (split into 8 pages of 42 stacks).
+  - Pages can be changed by left-clicking the button.
+  - Button's looks can be changed by having an item in cursor and then right-clicking it on the button.
+  - Hoppers / Funnels / etc do not care about pages, seeing this block as one big inventory.
 - Tweaked Fluid Pipe logic to push fluids more evenly in pipes that have more than two neighbors.
 - After locking Copper Pipes with a wrench you can now change which faces they point at.
 - Slot-Aware Funnel will no longer be limited by blocks directionality when inserting items.
 - Pipe with Redstone Valve will no longer place itself as inverted by default.
 - Fluids are now visible in Polydex.
+- Steam Engine can now be set to require redstone signal to work.
 - Updated texture (and internally model) of Clutch to match style of Gearshift.
 - Removed some invisible quads from the Conveyor models.
-- Fixed Fauced block not giving you output item correctly when using last item of a stack.
+- Fixed spelling of Faucet (from Fauced).
+- Fixed Faucet block not giving you output item correctly when using last item of a stack.

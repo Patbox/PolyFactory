@@ -96,6 +96,8 @@ public class FactoryBlockEntities {
             FabricBlockEntityTypeBuilder.create(CastingCauldronBlockEntity::new, FactoryBlocks.CASTING_CAULDRON));
     public static final BlockEntityType<ContainerBlockEntity> CONTAINER = register("container",
              FabricBlockEntityTypeBuilder.create(ContainerBlockEntity::new, FactoryBlocks.CONTAINER));
+    public static final BlockEntityType<DeepStorageContainerBlockEntity> DEEP_STORAGE_CONTAINER = register("deep_storage_container",
+            FabricBlockEntityTypeBuilder.create(DeepStorageContainerBlockEntity::new, FactoryBlocks.DEEP_STORAGE_CONTAINER));
 
     public static final BlockEntityType<GrinderBlockEntity> GRINDER = register("grinder",
              FabricBlockEntityTypeBuilder.create(GrinderBlockEntity::new, FactoryBlocks.GRINDER));

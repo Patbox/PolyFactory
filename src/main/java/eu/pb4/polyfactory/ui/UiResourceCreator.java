@@ -74,7 +74,7 @@ public class UiResourceCreator {
     private static final List<SimpleModel> SIMPLE_MODEL = new ArrayList<>();
     private static final Char2IntMap SPACES = new Char2IntOpenHashMap();
     private static final List<FontTexture> FONT_TEXTURES = new ArrayList<>();
-    private static final List<String> TEXTURES_NUMBERS = new ArrayList<>();
+    private static final List<NumberTexture> TEXTURES_NUMBERS = new ArrayList<>();
     private static char character = 'a';
 
     private static final char CHEST_SPACE0 = character++;
@@ -149,13 +149,14 @@ public class UiResourceCreator {
         return (i) -> new GuiElementBuilder(models[i]).setName(Component.empty()).hideDefaultTooltip();
     }
 
-    public static IntFunction<GuiElementBuilder>[] createNumbers(String prefix) {
+    public static IntFunction<GuiElementBuilder>[] createNumbers(int size, boolean shadow, int xShift) {
         var list = new ArrayList<IntFunction<GuiElementBuilder>>();
+        var prefix = (shadow ? "shadow" : "flat") + "_" + size + "_" + xShift + "/";
 
         for (int i = 0; i < 11; i++) {
             list.add(icon32Color("numbers/" + prefix + i));
         }
-        TEXTURES_NUMBERS.add(prefix);
+        TEXTURES_NUMBERS.add(new NumberTexture(prefix, size, shadow, xShift));
 
         //noinspection unchecked
         return list.toArray((IntFunction<GuiElementBuilder>[]) new IntFunction[0]);
@@ -332,24 +333,28 @@ public class UiResourceCreator {
         assetWriter.accept("assets/polyfactory/font/gui.json", fontBase.toString().getBytes(StandardCharsets.UTF_8));
     }
 
-    private static void generateNumbers(BiConsumer<String, byte[]> assetWriter, String right) throws IOException {
-        for (int i = 0; i < 11; i++) {
+    private static void generateNumbers(BiConsumer<String, byte[]> assetWriter, NumberTexture texture) throws IOException {
+        for (int i = 0; i < 13; i++) {
+            var scale = texture.size / 8;
             var image = new CanvasImage(32, 32);
             int code = switch (i) {
                 case 10 -> '-';
+                case 11 -> '+';
+                case 12 -> '*';
                 default -> 48 + i;
             };
-            var width = DefaultFonts.VANILLA.getGlyphWidth(code, 8 * 3, 0);
-            if (right.equals("shadow/")) {
-                DefaultFonts.VANILLA.drawGlyph(image, code, 14 - width / 2 + 3, 5 + 3, 8 * 3, 0, CanvasColor.WHITE_GRAY_LOWEST);
+            var width = DefaultFonts.VANILLA.getGlyphWidth(code, texture.size, 0);
+            var offset = Math.ceilDiv(scale, 2) - texture.xShift;
+            if (texture.shadow) {
+                DefaultFonts.VANILLA.drawGlyph(image, code, 16 - width / 2 + scale - offset, 16 - texture.size / 2 + scale, texture.size, 0, CanvasColor.GRAY_LOWEST);
             }
-            DefaultFonts.VANILLA.drawGlyph(image, code, 14 - width / 2, 5, 8 * 3, 0, CanvasColor.WHITE_HIGH);
+            DefaultFonts.VANILLA.drawGlyph(image, code, 16 - width / 2 - offset, 16 - texture.size / 2, texture.size, 0, CanvasColor.WHITE_HIGH);
 
             var buf = new ByteArrayOutputStream();
 
             ImageIO.write(CanvasUtils.toImage(image), "png", buf);
 
-            assetWriter.accept("assets/polyfactory/textures/sgui/elements/numbers/" + right + i + ".png", buf.toByteArray());
+            assetWriter.accept("assets/polyfactory/textures/sgui/elements/numbers/" + texture.path + i + ".png", buf.toByteArray());
         }
     }
 
@@ -365,4 +370,6 @@ public class UiResourceCreator {
     public record FontTexture(Identifier path, int ascent, int height, char[][] chars) {};
 
     public record SimpleModel(Identifier texturePath, Identifier modelPath, String base, int offset) {}
+
+    public record NumberTexture(String path, int size, boolean shadow, int xShift) {}
 }

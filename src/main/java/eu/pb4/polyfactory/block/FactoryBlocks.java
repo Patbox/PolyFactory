@@ -90,6 +90,7 @@ public class FactoryBlocks {
     public static final GearshiftBlock GEARSHIFT = register("gearshift", BlockBehaviour.Properties.ofFullCopy(CLUTCH), GearshiftBlock::new);
     public static final WindmillBlock WINDMILL = register("windmill", BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_OAK_WOOD), settings -> new WindmillBlock(settings.strength(2.5F).noOcclusion()));
     public static final ContainerBlock CONTAINER = register("wooden_container", BlockBehaviour.Properties.ofFullCopy(Blocks.CHEST), settings -> new ContainerBlock(9 * 5, settings.noOcclusion()));
+    public static final DeepStorageContainerBlock DEEP_STORAGE_CONTAINER = register("deep_storage_container", BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), DeepStorageContainerBlock::new);
     public static final ItemPackerBlock ITEM_PACKER = register("item_packer", BlockBehaviour.Properties.ofFullCopy(SPLITTER), ItemPackerBlock::new);
     public static final CableBlock CABLE = register("cable", BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).sound(SoundType.WOOL), settings -> new CableBlock(settings.instabreak().noOcclusion()));
     public static final GatedCableBlock GATED_CABLE = register("gated_cable", BlockBehaviour.Properties.ofFullCopy(SPLITTER).strength(2.2F).sound(SoundType.STONE), GatedCableBlock::new);
@@ -143,7 +144,7 @@ public class FactoryBlocks {
     public static final PolymerButtonBlock STEEL_BUTTON = register("steel_button", BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_BUTTON), settings -> new PolymerButtonBlock("steel", BlockSetType.IRON, 5, settings.noOcclusion()));
     public static final TinyPotatoSpringBlock TINY_POTATO_SPRING = register("tiny_potato_spring", settings -> new TinyPotatoSpringBlock(settings.strength(1).noOcclusion()));
     public static final TinyPotatoSpringBlock GOLDEN_TINY_POTATO_SPRING = register("golden_tiny_potato_spring", settings -> new TinyPotatoSpringBlock(settings.strength(2).noOcclusion()));
-    public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", settings -> new RotationalDebugBlock(settings.strength(-1, -1)));
+    public static final RotationalDebugBlock ROTATION_DEBUG = register("rot_debug", settings -> new RotationalDebugBlock(settings.noOcclusion().strength(-1, -1)));
     public static final PipeBlock PIPE = register("pipe", BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK), settings -> new PipeBlock(settings.noOcclusion()));
     public static final FilteredPipeBlock FILTERED_PIPE = register("filtered_pipe", BlockBehaviour.Properties.ofFullCopy(PIPE), settings -> new FilteredPipeBlock(settings.noOcclusion()));
     public static final RedstoneValvePipeBlock REDSTONE_VALVE_PIPE = register("redstone_valve_pipe", BlockBehaviour.Properties.ofFullCopy(PIPE), settings -> new RedstoneValvePipeBlock(settings.noOcclusion()));
@@ -155,7 +156,7 @@ public class FactoryBlocks {
             .lightLevel(x -> x.getValue(PrimitiveSmelteryBlock.LIT) ? 8 : 0), PrimitiveSmelteryBlock::new);
     public static final CastingTableBlock CASTING_TABLE = register("casting_table", BlockBehaviour.Properties.ofFullCopy(Blocks.CAULDRON), CastingTableBlock::new);
     public static final CastingCauldronBlock CASTING_CAULDRON = register("casting_cauldron", BlockBehaviour.Properties.ofFullCopy(Blocks.CAULDRON).overrideLootTable(Blocks.CAULDRON.getLootTable()), CastingCauldronBlock::new);
-    public static final FaucedBlock FAUCED = register("fauced", BlockBehaviour.Properties.ofFullCopy(Blocks.CAULDRON).sound(SoundType.COPPER), FaucedBlock::new);
+    public static final FaucetBlock FAUCET = register("faucet", BlockBehaviour.Properties.ofFullCopy(Blocks.CAULDRON).sound(SoundType.COPPER), FaucetBlock::new);
     public static final PumpBlock PUMP = register("pump", BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK), settings -> new PumpBlock(settings.noOcclusion()));
     public static final NozzleBlock NOZZLE = register("nozzle", BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK), settings -> new NozzleBlock(settings.noOcclusion()));
     public static final DrainBlock DRAIN = register("drain", BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK), settings -> new DrainBlock(settings.noOcclusion()));
@@ -171,6 +172,7 @@ public class FactoryBlocks {
 
 
     public static void register() {
+        BuiltInRegistries.BLOCK.addAlias(id("fauced"), id("faucet"));
         RegistryEntryAddedCallback.allEntries(BuiltInRegistries.BLOCK, block -> {
             if (block.value() instanceof WallBlock wallBlock) {
                 var id = BuiltInRegistries.BLOCK.getKey(wallBlock);

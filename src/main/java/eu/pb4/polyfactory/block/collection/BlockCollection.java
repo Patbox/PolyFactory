@@ -17,22 +17,12 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.network.protocol.game.ClientboundBundlePacket;
-import net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket;
-import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.protocol.game.*;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySelector;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.entity.PositionMoveRotation;
-import net.minecraft.world.entity.Relative;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.CollisionGetter;
@@ -68,9 +58,10 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
     private float centerY;
     private float centerZ;
     @Nullable
-    private ServerLevel world;
+    private ServerLevel level;
     private boolean quaternionDirty = false;
     private boolean disableCollision;
+    private int ticksSinceFullResync = -1;
 
     private Int2ObjectMap<Vec3> previousShift = new Int2ObjectOpenHashMap<>();
 
@@ -195,18 +186,9 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
     }
 
     public void updateBlockVisualsAt(int x, int y, int z, BlockState state) {
+        this.tryUpdatingAttachment(x, y, z, state);
+
         var i = index(x, y, z);
-        if (BlockWithElementHolder.get(state) instanceof BlockWithElementHolder blockWithElementHolder) {
-            if (this.proxyAttachements[i] == null || this.proxyAttachements[i].blockStateSupplier().get().getBlock() != state.getBlock()) {
-
-            } else if (this.proxyAttachements[i] != null) {
-                if (this.getHolder() != null) {
-                    this.getHolder().removeElement(this.proxyAttachements[i]);
-                }
-                this.proxyAttachements[i] = null;
-            }
-        }
-
         if (this.blockId[i] == -1 && !state.isAir()) {
             var e = VirtualEntityUtils.requestEntityId();
             this.blockId[i] = e;
@@ -279,6 +261,51 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
         }
     }
 
+    private void tryUpdatingAttachment(int x, int y, int z, BlockState state) {
+        if (this.level == null) {
+            return;
+        }
+        var i = index(x, y, z);
+
+        if (BlockWithElementHolder.get(state) instanceof BlockWithElementHolder blockWithElementHolder) {
+            if (this.proxyAttachements[i] == null || this.proxyAttachements[i].blockStateSupplier().get().getBlock() != state.getBlock()) {
+                if (this.proxyAttachements[i] != null) {
+                    if (this.getHolder() != null) {
+                        this.getHolder().removeElement(this.proxyAttachements[i]);
+                    }
+                    this.proxyAttachements[i].holder().destroy();
+                }
+                var pos = new BlockPos.MutableBlockPos(x, y, z);
+
+                var elementHolder = blockWithElementHolder.createElementHolder(this.level, pos, state);
+                if (elementHolder != null) {
+                    this.proxyAttachements[i] = new ProxyAttachement(elementHolder, () -> {
+                        var offset = new Vector3f(x - this.centerX, y - this.centerY, z - this.centerZ)
+                                .rotate(quaternion);
+                        return this.getCurrentPos().add(offset.x, offset.y, offset.z);
+                    }, () -> this.data.states()[i], this.level);
+
+                    elementHolder.setAttachment(this.proxyAttachements[i]);
+                    if (this.getHolder() != null) {
+                        this.getHolder().addElement(this.proxyAttachements[i]);
+                    }
+                } else {
+                    this.proxyAttachements[i] = null;
+                }
+            } else if (this.proxyAttachements[i] != null) {
+                if (this.getHolder() != null) {
+                    this.getHolder().removeElement(this.proxyAttachements[i]);
+                }
+                this.proxyAttachements[i] = null;
+            }
+        } else if (this.proxyAttachements[i] != null) {
+            if (this.getHolder() != null) {
+                this.getHolder().removeElement(this.proxyAttachements[i]);
+            }
+            this.proxyAttachements[i] = null;
+        }
+    }
+
     @Nullable
     @Override
     public BlockEntity getBlockEntity(BlockPos pos) {
@@ -333,7 +360,13 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
     @Override
     public void tick() {
         var newPreviousShift = new Int2ObjectOpenHashMap<Vec3>();
-        if (this.quaternionDirty || !this.getCurrentPos().equals(this.getLastSyncedPos())) {
+        var actuallyDirty = this.quaternionDirty || !this.getCurrentPos().equals(this.getLastSyncedPos());
+        if (actuallyDirty || (this.ticksSinceFullResync != -1 && this.ticksSinceFullResync++ % 300 == 0)) {
+            var refreshPos = this.ticksSinceFullResync % 300 == 1;
+            if (this.ticksSinceFullResync > 300 && !actuallyDirty) {
+                this.ticksSinceFullResync = -1;
+            }
+
             var pos = this.getCurrentPos();
             var previous = this.getLastSyncedPos();
             if (previous == null) {
@@ -345,11 +378,10 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
             var box = new AABB(pos.x - this.centerX - 2, pos.y - this.centerY - 2, pos.z - this.centerZ - 2,
                     pos.x - this.centerX + this.data.sizeX() + 2, pos.y - this.centerY + this.data.sizeY() + 2, pos.z - this.centerZ + this.data.sizeZ() + 2);
 
-            var ents = this.world != null ? this.world.getEntities((Entity) null, box, EntitySelector.NO_SPECTATORS) : List.<Entity>of();
+            var ents = this.level != null ? this.level.getEntities((Entity) null, box, EntitySelector.NO_SPECTATORS) : List.<Entity>of();
             var quaternion = new Quaternionf(this.newQuaternion);
             var quaternionOldInverted = new Quaternionf(this.quaternion).invert();
             var diff = pos.subtract(previous);
-            this.disableCollision = true;
 
             var idMap = new IdentityHashMap<Entity, Vector3f>();
 
@@ -396,22 +428,24 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
                     }
                 }
             }
+            this.disableCollision = true;
 
-            idMap.forEach((entity, val) -> {
-                var move = diff.add(val.x, val.y, val.z);
-                if (!Mth.equal(move.x, 0) || !Mth.equal(move.y, 0) || !Mth.equal(move.z, 0)) {
-                    entity.move(MoverType.SHULKER, move);
-                    if (entity instanceof ServerPlayer player) {
-                        //FactoryUtil.sendVelocityDelta(player, move);
-                        FactoryUtil.runNextTick(() -> player.connection.teleport(new PositionMoveRotation(move.add(0, player.getGravity(), 0), Vec3.ZERO, 0, 0),
-                                EnumSet.of(Relative.X, Relative.Y, Relative.Z, Relative.DELTA_X, Relative.DELTA_Y, Relative.DELTA_Z, Relative.Y_ROT, Relative.X_ROT
-                                )));
+            if (actuallyDirty) {
+                idMap.forEach((entity, val) -> {
+                    var move = diff.add(val.x, val.y, val.z);
+                    if (!Mth.equal(move.lengthSqr(), 0)) {
+                        entity.move(MoverType.SHULKER, move);
+                        if (entity instanceof ServerPlayer player) {
+                            //FactoryUtil.sendVelocityDelta(player, move);
+                            FactoryUtil.runNextTick(() -> player.connection.teleport(new PositionMoveRotation(move, Vec3.ZERO, 0, 0),
+                                    EnumSet.of(Relative.X, Relative.Y, Relative.Z, Relative.DELTA_X, Relative.DELTA_Y, Relative.DELTA_Z, Relative.Y_ROT, Relative.X_ROT
+                                    )));
 
-                        //newPreviousShift.put(player.getId(), move);
+                            //newPreviousShift.put(player.getId(), move);
+                        }
                     }
-                }
-            });
-
+                });
+            }
 
             this.disableCollision = false;
             if (this.getHolder() != null) {
@@ -420,9 +454,9 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
             this.quaternion.set(newQuaternion);
             this.updateLastSyncedPos();
         }
-        if (this.world != null) {
+        if (this.level != null) {
             this.previousShift.forEach((entity, val) -> {
-                if (world.getEntity(entity) instanceof ServerPlayer player) {
+                if (level.getEntity(entity) instanceof ServerPlayer player) {
                     var oldMove = this.previousShift.getOrDefault(player.getId(), Vec3.ZERO);
                     //FactoryUtil.sendVelocityDelta(player, oldMove.multiply(0.54).negate());
                 }
@@ -456,19 +490,34 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
         }
     }
 
-    public void setWorld(ServerLevel world) {
-        if (this.world == world) {
+    public void setLevel(ServerLevel level) {
+        if (this.level == level) {
             return;
         }
 
-        if (this.world != null) {
-            ((BlockCollectionView) this.world).polyfactory$removeCollision(this);
-        }
-        if (world != null) {
-            ((BlockCollectionView) world).polyfactory$addCollision(this);
-        }
+        if (this.level != null) {
+            ((BlockCollectionView) this.level).polyfactory$removeCollision(this);
 
-        this.world = world;
+            for (var proxy : this.proxyAttachements) {
+                if (proxy != null) {
+                    proxy.setLevel(null);
+                    proxy.holder().destroy();
+                }
+            }
+            Arrays.fill(this.proxyAttachements, null);
+        }
+        this.level = level;
+
+        if (level != null) {
+            ((BlockCollectionView) level).polyfactory$addCollision(this);
+            for (var x = 0; x < this.data.sizeX(); x++) {
+                for (var y = 0; y < this.data.sizeY(); y++) {
+                    for (var z = 0; z < this.data.sizeZ(); z++) {
+                        this.tryUpdatingAttachment(x, y, z, this.data.getBlockState(x, y, z));
+                    }
+                }
+            }
+        }
     }
 
     @Override

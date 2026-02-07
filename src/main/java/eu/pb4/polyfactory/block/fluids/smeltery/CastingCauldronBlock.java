@@ -79,7 +79,7 @@ public class CastingCauldronBlock extends Block implements PolymerBlock, BlockWi
         return super.useWithoutItem(state, world, pos, player, hit);
     }
 
-    public InteractionResult tryCauldronCasting(ServerLevel world, BlockPos pos, FaucedBlock.FaucedProvider provider, float rate) {
+    public InteractionResult tryCauldronCasting(ServerLevel world, BlockPos pos, FaucetBlock.FaucedProvider provider, float rate) {
         var recipe = world.recipeAccess().getRecipeFor(FactoryRecipeTypes.CASTING_CAULDRON, provider.getFluidContainerInput(), world);
         if (recipe.isEmpty()) {
             return InteractionResult.FAIL;

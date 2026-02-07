@@ -15,14 +15,31 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public record ProxyAttachement(ElementHolder owner, ElementHolder holder,
-                               Supplier<BlockState> blockStateSupplier) implements BlockAwareAttachment, VirtualElement {
+public final class ProxyAttachement implements BlockAwareAttachment, VirtualElement {
+    private final Supplier<Vec3> posSupplier;
+    private ServerLevel level;
+    @Nullable
+    private ElementHolder owner;
+    private final ElementHolder holder;
+    private final Supplier<BlockState> blockStateSupplier;
+
+    public ProxyAttachement(ElementHolder holder,
+                            Supplier<Vec3> pos,
+                            Supplier<BlockState> blockStateSupplier,
+                            ServerLevel level) {
+        this.holder = holder;
+        this.posSupplier = pos;
+        this.blockStateSupplier = blockStateSupplier;
+        this.level = level;
+    }
+
     @Override
     public BlockPos getBlockPos() {
-        return BlockPos.containing(owner.getPos());
+        return BlockPos.containing(this.posSupplier.get());
     }
 
     @Override
@@ -32,7 +49,7 @@ public record ProxyAttachement(ElementHolder owner, ElementHolder holder,
 
     @Override
     public boolean isPartOfTheWorld() {
-        return owner.getAttachment() != null && owner.getAttachment().getWorld() != null;
+        return owner != null && owner.getAttachment() != null && owner.getAttachment().getWorld() != null;
     }
 
     @Override
@@ -42,17 +59,17 @@ public record ProxyAttachement(ElementHolder owner, ElementHolder holder,
 
     @Override
     public void destroy() {
-        this.holder.destroy();
+        //this.holder.destroy();
     }
 
     @Override
     public Vec3 getPos() {
-        return owner.getPos();
+        return this.posSupplier.get();
     }
 
     @Override
     public ServerLevel getWorld() {
-        return owner.getAttachment().getWorld();
+        return level;
     }
 
     @Override
@@ -70,7 +87,7 @@ public record ProxyAttachement(ElementHolder owner, ElementHolder holder,
 
     @Override
     public void setHolder(@Nullable ElementHolder elementHolder) {
-
+        this.owner = elementHolder;
     }
 
     @Override
@@ -109,6 +126,18 @@ public record ProxyAttachement(ElementHolder owner, ElementHolder holder,
     @Override
     public void tick() {
         BlockAwareAttachment.super.tick();
-        this.holder.tick();
+        //this.holder.tick();
+    }
+
+    public ElementHolder owner() {
+        return owner;
+    }
+
+    public Supplier<BlockState> blockStateSupplier() {
+        return blockStateSupplier;
+    }
+
+    public void setLevel(ServerLevel level) {
+        this.level = level;
     }
 }

@@ -79,7 +79,7 @@ public class FactoryItems {
     public static final Item SMELTERY = register(FactoryBlocks.SMELTERY);
     public static final Item PRIMITIVE_SMELTERY = register(FactoryBlocks.PRIMITIVE_SMELTERY);
     public static final Item CASTING_TABLE = register(FactoryBlocks.CASTING_TABLE);
-    public static final Item SMELTERY_FAUCED = register(FactoryBlocks.FAUCED);
+    public static final Item SMELTERY_FAUCET = register(FactoryBlocks.FAUCET);
     public static final Item GRINDER = register(FactoryBlocks.GRINDER);
     public static final Item PRESS = register(FactoryBlocks.PRESS);
     public static final Item CRAFTER = register(FactoryBlocks.CRAFTER);
@@ -94,6 +94,7 @@ public class FactoryItems {
     public static final Item CLUTCH = register(FactoryBlocks.CLUTCH);
     public static final Item GEARSHIFT = register(FactoryBlocks.GEARSHIFT);
     public static final Item CONTAINER = register( FactoryBlocks.CONTAINER);
+    public static final Item DEEP_STORAGE_CONTAINER = register( FactoryBlocks.DEEP_STORAGE_CONTAINER);
     public static final Item NIXIE_TUBE = register(FactoryBlocks.NIXIE_TUBE);
     public static final WindmillSailItem WINDMILL_SAIL = register("windmill_sail", WindmillSailItem::new);
     public static final Item METAL_GRID = register(FactoryBlocks.METAL_GRID);
@@ -230,6 +231,7 @@ public class FactoryItems {
         }));
 
         BuiltInRegistries.ITEM.addAlias(id("copper_nugget"), Identifier.parse("copper_nugget"));
+        BuiltInRegistries.ITEM.addAlias(id("fauced"), id("faucet"));
 
 
         PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.fromNamespaceAndPath(ModInit.ID, "a_group"), CreativeModeTab.builder(CreativeModeTab.Row.BOTTOM, -1)
@@ -264,6 +266,7 @@ public class FactoryItems {
                     entries.accept(SLOT_AWARE_FUNNEL);
                     entries.accept(SPLITTER);
                     entries.accept(CONTAINER);
+                    entries.accept(DEEP_STORAGE_CONTAINER);
                     entries.accept(ITEM_PACKER);
                     entries.accept(ITEM_FILTER);
 
@@ -298,7 +301,7 @@ public class FactoryItems {
                     entries.accept(SMELTERY_CORE);
                     entries.accept(CASTING_TABLE);
                     entries.accept(MOLDMAKING_TABLE);
-                    entries.accept(SMELTERY_FAUCED);
+                    entries.accept(SMELTERY_FAUCET);
 
                     // Data
                     entries.accept(CABLE);

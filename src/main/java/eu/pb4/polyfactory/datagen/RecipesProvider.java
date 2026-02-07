@@ -432,11 +432,20 @@ class RecipesProvider extends FabricRecipeProvider {
                         .unlockedBy("get_steel", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.WOODEN_PLATE))
                         .save(output);
 
-                this.shaped(RecipeCategory.REDSTONE, FactoryItems.CONTAINER, 1)
+                this.shaped(RecipeCategory.MISC, FactoryItems.CONTAINER, 1)
                         .pattern("www")
                         .pattern("wsw")
                         .pattern("www")
                         .define('w', FactoryItems.WOODEN_PLATE).define('s', FactoryItems.STEEL_INGOT)
+                        .unlockedBy("get_steel", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
+                        .save(output);
+
+                this.shaped(RecipeCategory.MISC, FactoryItems.DEEP_STORAGE_CONTAINER, 1)
+                        .pattern("www")
+                        .pattern("wsw")
+                        .pattern("www")
+                        .define('w', FactoryItems.STEEL_PLATE)
+                        .define('s', FactoryItems.STEEL_BLOCK)
                         .unlockedBy("get_steel", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
                         .save(output);
 
@@ -829,7 +838,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .unlockedBy("get_axle", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
                         .save(output);
 
-                this.shaped(RecipeCategory.REDSTONE, FactoryItems.SMELTERY_FAUCED, 1)
+                this.shaped(RecipeCategory.REDSTONE, FactoryItems.SMELTERY_FAUCET, 1)
                         .pattern("csc")
                         .pattern("cic")
                         .define('c', Items.COPPER_INGOT)

@@ -267,7 +267,7 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
     public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         var converted = this.convertToBacking(initialBlockState);
         var elementHolder = BlockWithElementHolder.get(converted) instanceof BlockWithElementHolder holder ? holder.createElementHolder(world, pos, converted) : null;
-        return new Model(initialBlockState, elementHolder, this::convertToBacking);
+        return new Model(initialBlockState, elementHolder, this::convertToBacking, world);
     }
 
     @Override
@@ -316,10 +316,10 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
         @Nullable
         private final ProxyAttachement proxied;
 
-        public Model(BlockState state, @Nullable ElementHolder elementHolder, Function<BlockState, BlockState> convertToBacking) {
+        public Model(BlockState state, @Nullable ElementHolder elementHolder, Function<BlockState, BlockState> convertToBacking, ServerLevel level) {
             super(state);
             if (elementHolder != null) {
-                this.proxied = new ProxyAttachement(this, elementHolder, () -> convertToBacking.apply(blockState()));
+                this.proxied = new ProxyAttachement(elementHolder, () -> this.currentPos, () -> convertToBacking.apply(blockState()), level);
                 elementHolder.setAttachment(this.proxied);
                 this.addElement(proxied);
             } else {

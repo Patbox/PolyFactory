@@ -7,7 +7,9 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.ui.FuelSlot;
 import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.ui.GuiUtils;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.RedstoneActivationType;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.fabricmc.fabric.api.item.v1.FabricItemStack;
@@ -32,10 +34,13 @@ import org.jetbrains.annotations.Nullable;
 
 public class SteamEngineBlockEntity extends LockableBlockEntity implements MinimalSidedContainer {
     private static final int[] SLOTS = new int[]{0, 1, 2};
+    private final NonNullList<ItemStack> items = NonNullList.withSize(3, ItemStack.EMPTY);
     public float state = 0;
     public int fuelTicks = 0;
     public int fuelInitial = 1;
-    private final NonNullList<ItemStack> items = NonNullList.withSize(3, ItemStack.EMPTY);
+    private int redstoneState = 0;
+
+    private RedstoneActivationType activationType = RedstoneActivationType.ALWAYS;
 
     public SteamEngineBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.STEAM_ENGINE, pos, state);
@@ -63,29 +68,31 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
                 ((ServerLevel) world).sendParticles(ParticleTypes.CLOUD, a.x + world.random.nextFloat() - 0.5, a.y + world.random.nextFloat() - 0.5, a.z + world.random.nextFloat() - 0.5, 0, 0, 1, 0, 0.1);
             }
         } else {
-            for (int i = 0; i < 3; i++) {
-                var stack = self.getItem(i);
+            if (self.activationType.isActive(self.redstoneState != 0)) {
+                for (int i = 0; i < 3; i++) {
+                    var stack = self.getItem(i);
 
-                if (!stack.isEmpty()) {
-                    var value = world.fuelValues().burnDuration(stack);
-                    if (value > 0) {
-                        var remainder = ((FabricItemStack) (Object) stack).getRecipeRemainder();
-                        stack.shrink(1);
-                        self.fuelTicks = value * 10;
-                        self.fuelInitial = self.fuelTicks;
-                        if (stack.isEmpty()) {
-                            self.setItem(i, ItemStack.EMPTY);
-                        }
-
-                        if (!remainder.isEmpty()) {
-                            FactoryUtil.tryInsertingRegular(self, remainder);
-                            if (!remainder.isEmpty()) {
-                                Containers.dropItemStack(world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, remainder);
+                    if (!stack.isEmpty()) {
+                        var value = world.fuelValues().burnDuration(stack);
+                        if (value > 0) {
+                            var remainder = stack.getRecipeRemainder();
+                            stack.shrink(1);
+                            self.fuelTicks = value * 10;
+                            self.fuelInitial = self.fuelTicks;
+                            if (stack.isEmpty()) {
+                                self.setItem(i, ItemStack.EMPTY);
                             }
-                        }
 
-                        self.setChanged();
-                        return;
+                            if (!remainder.isEmpty()) {
+                                FactoryUtil.tryInsertingRegular(self, remainder);
+                                if (!remainder.isEmpty()) {
+                                    Containers.dropItemStack(world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, remainder);
+                                }
+                            }
+
+                            self.setChanged();
+                            return;
+                        }
                     }
                 }
             }
@@ -98,7 +105,20 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
                 world.setBlockAndUpdate(pos, state.setValue(SteamEngineBlock.LIT, false));
             }
         }
+    }
 
+    public void setPowered(int id, boolean b) {
+        this.redstoneState = b ? this.redstoneState | (1 << id) : this.redstoneState & ~(1 << id);
+    }
+
+
+    public RedstoneActivationType getRedstoneActivationType() {
+        return this.activationType;
+    }
+
+    public void setRedstoneActivationType(RedstoneActivationType activationType) {
+        this.activationType = activationType;
+        this.setChanged();
     }
 
     @Override
@@ -107,6 +127,8 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
         view.putInt("FuelTicks", this.fuelTicks);
         view.putInt("FuelInitial", this.fuelInitial);
         view.putFloat("State", this.state);
+        view.store("redstone_activation", RedstoneActivationType.CODEC, this.activationType);
+        view.putInt("redstone_state", this.redstoneState);
         super.saveAdditional(view);
     }
 
@@ -116,6 +138,8 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
         this.fuelInitial = view.getIntOr("FuelInitial", 0);
         this.fuelTicks = view.getIntOr("FuelTicks", 0);
         this.state = view.getFloatOr("State", 0);
+        this.activationType = view.read("redstone_activation", RedstoneActivationType.CODEC).orElse(RedstoneActivationType.ALWAYS);
+        this.redstoneState = view.getIntOr("redstone_state", 0);
         super.loadAdditional(view);
     }
 
@@ -176,6 +200,12 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
             this.setSlotRedirect(9 + 4, new FuelSlot(SteamEngineBlockEntity.this, 1, player.level().fuelValues()));
             this.setSlotRedirect(9 + 5, new FuelSlot(SteamEngineBlockEntity.this, 2, player.level().fuelValues()));
             this.setSlot(4, GuiTextures.FLAME.getCeil(progress()));
+            this.setSlot(7 + 9, GuiUtils.createIteratingButton(
+                    SteamEngineBlockEntity.this::getRedstoneActivationType,
+                    SteamEngineBlockEntity.this::setRedstoneActivationType,
+                    RedstoneActivationType.values(),
+                    RedstoneActivationType::createButton
+            ));
             this.active = SteamEngineBlockEntity.this.fuelTicks > 0;
             this.open();
         }

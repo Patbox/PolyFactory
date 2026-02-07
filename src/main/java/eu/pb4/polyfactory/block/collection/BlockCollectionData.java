@@ -1,5 +1,8 @@
 package eu.pb4.polyfactory.block.collection;
 
+import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.block.mechanical.AxleBlock;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -51,7 +54,7 @@ public record BlockCollectionData(int sizeX, int sizeY, int sizeZ, BlockState[] 
         var data = new BlockCollectionData(9, 9, 9);
 
         for (int y = 0; y < 4; y++) {
-            data.setBlockState(4, y, 4, Blocks.STONE.defaultBlockState(), null);
+            data.setBlockState(4, y, 4, FactoryBlocks.AXLE.defaultBlockState().setValue(AxleBlock.AXIS, Direction.Axis.Y), null);
         }
 
         for (int x = 0; x <= 8; x++) {

@@ -30,6 +30,7 @@
   "block.polyfactory.clutch": "Clutch",
   "block.polyfactory.gearshift": "Gearshift",
   "block.polyfactory.wooden_container": "Wooden Container",
+  "block.polyfactory.deep_storage_container": "Deep Storage Container",
   "block.polyfactory.hologram_projector": "Hologram Projector",
   "block.polyfactory.gauge": "Gauge",
   "block.polyfactory.nixie_tube": "Nixie Tube",
@@ -93,7 +94,7 @@
   "block.polyfactory.smeltery_core.tooltip.4": "Rest of the blocks can be placed in any configuration",
   "block.polyfactory.casting_table": "Casting Table",
   "block.polyfactory.casting_cauldron": "Casting Cauldron",
-  "block.polyfactory.fauced": "Fauced",
+  "block.polyfactory.faucet": "Faucet",
   "block.polyfactory.creative_drain": "Creative Fluid Drain",
   "block.polyfactory.fluid_tank": "Fluid Tank",
   "block.polyfactory.portable_fluid_tank": "Portable Fluid Tank",
@@ -326,6 +327,7 @@
   "text.polyfactory.fluid_component.stored_fluids": "Stored Fluids:",
 
   "text.polyfactory.x_out_of_y": "%s / %s",
+  "text.polyfactory.thing_x_out_of_y": "%s | %s / %s",
   "text.polyfactory.wiki_link": "Official PolyFactory Wiki: %s",
 
   "text.polyfactory.char_per_sec": "%s char/sec",
@@ -460,6 +462,12 @@
   "text.polyfactory.amount.nuggets": "Nuggets",
   "text.polyfactory.amount.droplet": "Droplets",
 
+  "text.polyfactory.redstone_activation.always": "Always",
+  "text.polyfactory.redstone_activation.always.desc": "This machine will independent of Redstone power.",
+  "text.polyfactory.redstone_activation.powered": "Powered",
+  "text.polyfactory.redstone_activation.powered.desc": "This machine needs to be powered with Redstone to work.",
+  "text.polyfactory.redstone_activation.not_powered": "Not Powered",
+  "text.polyfactory.redstone_activation.not_powered.desc": "This machine needs to be not powered with Redstone to work.",
 
   "advancements.polyfactory.root.title": "PolyFactory",
   "advancements.polyfactory.root.description": "Welcome to the factory!",
