@@ -65,6 +65,7 @@ public class FactoryItems {
     public static final Item FLUID_MODEL = register("fluid_model", FluidModelItem::new);
     // Actual items
     public static final WrenchItem WRENCH = register("wrench", settings -> new WrenchItem(settings.stacksTo(1)));
+    public static final GuideBookItem GUIDE_BOOK = register("guidebook", settings -> new GuideBookItem(settings.stacksTo(1)));
     public static final Item CLIPBOARD = register("clipboard", settings -> new ClipboardItem(settings.stacksTo(1)));
     public static final Item CONVEYOR = register(FactoryBlocks.CONVEYOR);
     public static final Item STICKY_CONVEYOR = register(FactoryBlocks.STICKY_CONVEYOR);
@@ -489,6 +490,7 @@ public class FactoryItems {
                     .title(Component.translatable("itemgroup." + ModInit.ID + ".experimental"))
                     .displayItems(((context, entries) -> {
                         FactoryDebugItems.addItemGroup(context, entries);
+                        entries.accept(GUIDE_BOOK, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                         entries.accept(ELECTRIC_GENERATOR, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                         entries.accept(ELECTRIC_MOTOR, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                         entries.accept(CLIPBOARD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);

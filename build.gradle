@@ -98,6 +98,8 @@ dependencies {
 	modImplementation include('eu.pb4:sidebar-api:0.5.1+1.21.1')
 	modImplementation include('eu.pb4:sgui:1.12.0+1.21.11')
 	modImplementation include('eu.pb4:factorytools:0.9.2+1.21.11')
+	modImplementation include("eu.pb4:placeholder-api:2.8.2+1.21.10")
+	modImplementation include('xyz.nucleoid:server-translations-api:2.5.2+1.21.9-pre3')
 	//modImplementation include('com.kneelawk.graphlib:graphlib-core-fabric:2.0.3-beta.1+1.21.5')
 	modImplementation include('com.kneelawk.graphlib:graphlib-core-fabric:2.0.3-beta.0.patbox+1.21.11')
 

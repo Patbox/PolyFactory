@@ -16,6 +16,7 @@
 - Pipe with Redstone Valve will no longer place itself as inverted by default.
 - Fluids are now visible in Polydex.
 - Steam Engine can now be set to require redstone signal to work.
+- Squeezing a Wet Sponge in Mechanical Press can now generate 1 bucket worth of water.
 - Updated texture (and internally model) of Clutch to match style of Gearshift.
 - Removed some invisible quads from the Conveyor models.
 - Fixed spelling of Faucet (from Fauced).

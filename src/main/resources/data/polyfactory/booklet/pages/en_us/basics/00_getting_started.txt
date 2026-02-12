@@ -1,0 +1,20 @@
+### Section: PageInfo
+title=Getting Started
+icon=player_head
+category=polyfactory:basics
+### EndSection: PageInfo
+
+By default, the mod doesn't change anything about the world or player's gameplay experience,
+until they start crafting machines and items provided by this mod.
+
+Player start with the mod by crafting the Grinder which allows them to get Coal Dust,
+which then can be mixed with Redstone and Iron Ingot to create Steel Alloy Mixture. From there, player can smelt Steel Ingots and start crafting other items and blocks from the mod with usage of Mechanical Mixer and Mechanical Press. Items can be moved around with usage of Item Conveyors, sorted with Funnels and Item Splitters and then stored in a Wooden Containers or any other compatible/vanilla form of item storage.
+
+To power most of the machines the player needs to use a Hand Crank for initial machines,
+Windmills for later automation or Steam Engine in case where speed and power is required
+(or it's in place which lacks strong enough wind).
+
+Player then can use things like Cables, Data Sources and blocks manipulating/displaying
+data to allow for more automation or general display information.
+
+By default, PolyFactory doesn't display any recipes. To view them, you need to use the Polydex mod.

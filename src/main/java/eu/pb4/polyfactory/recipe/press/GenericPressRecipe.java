@@ -60,6 +60,11 @@ public record GenericPressRecipe(String group, CountedIngredient inputA, Counted
                 CountedIngredient.EMPTY, List.of(new OutputStack(output, 1, 1)),  minimumSpeed, List.of()));
     }
 
+    public static RecipeHolder<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, ItemStack output, FluidStack<?> fluidOutput) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY),
+                CountedIngredient.EMPTY, List.of(new OutputStack(output, 1, 1)),  minimumSpeed, List.of(fluidOutput)));
+    }
+
     public static RecipeHolder<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, ItemLike output) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY), CountedIngredient.EMPTY,
                 List.of(new OutputStack(output.asItem().getDefaultInstance(), 1, 1)), minimumSpeed, List.of()));

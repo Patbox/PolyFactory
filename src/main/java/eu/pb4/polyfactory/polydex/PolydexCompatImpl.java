@@ -49,6 +49,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
 import net.minecraft.world.item.Item;
@@ -311,5 +312,19 @@ public class PolydexCompatImpl {
             list.add(new PolydexFluidStack(x.instance(), x.amount(), 1));
         }
         return list.toArray(new PolydexStack[0]);
+    }
+
+    public static void openUsagePage(ServerPlayer player, Identifier entry, Runnable runnable) {
+        var val = PolydexPageUtils.getEntry(entry);
+        if (val != null) {
+            PolydexPageUtils.openUsagesListUi(player, val, runnable);
+        }
+    }
+
+    public static void openResultPage(ServerPlayer player, Identifier entry, Runnable runnable) {
+        var val = PolydexPageUtils.getEntry(entry);
+        if (val != null) {
+            PolydexPageUtils.openRecipeListUi(player, val, runnable);
+        }
     }
 }

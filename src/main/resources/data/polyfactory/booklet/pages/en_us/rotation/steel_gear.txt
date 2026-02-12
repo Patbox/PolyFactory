@@ -1,0 +1,19 @@
+### Section: PageInfo
+title=Steel Gears
+icon=polyfactory:steel_gear
+category=polyfactory:rotation
+### EndSection: PageInfo
+<yellow><item 'polyfactory:steel_gear'></> is a rotational transmission block and a crafting ingredient.
+It can be connected with other regular steel gears by placing them on the same plane.
+<nl><nl>
+<yellow><item 'polyfactory:large_steel_gear'></> is a rotational transmission block.
+It can be connected with other large steel gears by placing them perpendicularly to each other,
+so their outer part touch visually.
+<nl><nl>
+<item 'polyfactory:steel_gear'> and <item 'polyfactory:large_steel_gear'> can be connected with each other when
+placed diagonally on the same plane.
+
+### Align: Center
+### Width: 300
+<u><blue><polydex 'polyfactory:steel_gear'>View the <item 'polyfactory:steel_gear'> recipe</><nl>
+<u><blue><polydex 'polyfactory:large_steel_gear'>View the <item 'polyfactory:large_steel_gear'> recipe</>

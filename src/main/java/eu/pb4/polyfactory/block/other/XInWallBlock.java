@@ -56,8 +56,18 @@ public interface XInWallBlock extends TagRedirector, BlockWithElementHolder, Pol
         private final ProxyAttachement proxied;
         public SimpleRedirectingModel(ElementHolder elementHolder, Function<BlockState, BlockState> convertToBacking, ServerLevel level) {
             this.proxied = new ProxyAttachement(elementHolder, () -> this.currentPos, () -> convertToBacking.apply(blockState()), level);
-            elementHolder.setAttachment(this.proxied);
-            this.addElement(proxied);
+        }
+
+        @Override
+        public void setAttachment(@Nullable HolderAttachment attachment) {
+            if (attachment == null) {
+                this.removeElement(this.proxied);
+                this.proxied.holder().setAttachment(null);
+            } else {
+                this.proxied.holder().setAttachment(this.proxied);
+                this.addElement(proxied);
+            }
+            super.setAttachment(attachment);
         }
 
         @Override

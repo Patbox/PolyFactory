@@ -14,6 +14,9 @@ import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import it.unimi.dsi.fastutil.chars.*;
 import javax.imageio.ImageIO;
+
+import it.unimi.dsi.fastutil.ints.Int2CharMap;
+import it.unimi.dsi.fastutil.ints.Int2CharOpenHashMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
@@ -73,14 +76,15 @@ public class UiResourceCreator {
     private static final List<SlicedTexture> HORIZONTAL_PROGRESS = new ArrayList<>();
     private static final List<SimpleModel> SIMPLE_MODEL = new ArrayList<>();
     private static final Char2IntMap SPACES = new Char2IntOpenHashMap();
+    private static final Int2CharMap SPACES_BY_WIDTH = new Int2CharOpenHashMap();
     private static final List<FontTexture> FONT_TEXTURES = new ArrayList<>();
     private static final List<NumberTexture> TEXTURES_NUMBERS = new ArrayList<>();
     private static char character = 'a';
 
-    private static final char CHEST_SPACE0 = character++;
-    private static final char CHEST_SPACE1 = character++;
-    private static final char ANVIL_SPACE0 = character++;
-    private static final char ANVIL_SPACE1 = character++;
+    private static final char CHEST_SPACE0 = space(-8);
+    private static final char CHEST_SPACE1 = space(-168);
+    private static final char ANVIL_SPACE0 = space(-60);
+    private static final char ANVIL_SPACE1 = space(-119);
 
     public static Supplier<GuiElementBuilder> icon16(String path) {
         var model = genericIconRaw(Items.ALLIUM, path, BASE_MODEL, 0);
@@ -222,9 +226,11 @@ public class UiResourceCreator {
     }
 
     public static char space(int width) {
-        var c = character++;
-        SPACES.put(c, width);
-        return c;
+        return SPACES_BY_WIDTH.computeIfAbsent(width, widthx -> {
+            var c = character++;
+            SPACES.put(c, widthx);
+            return c;
+        });
     }
 
     public static void setup() {

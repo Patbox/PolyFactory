@@ -320,12 +320,25 @@ public class WallWithCableBlock extends AbstracterCableBlock implements BlockSta
             super(state);
             if (elementHolder != null) {
                 this.proxied = new ProxyAttachement(elementHolder, () -> this.currentPos, () -> convertToBacking.apply(blockState()), level);
-                elementHolder.setAttachment(this.proxied);
-                this.addElement(proxied);
             } else {
                 proxied = null;
             }
         }
+
+        @Override
+        public void setAttachment(@Nullable HolderAttachment attachment) {
+            if (this.proxied != null) {
+                if (attachment == null) {
+                    this.removeElement(this.proxied);
+                    this.proxied.holder().setAttachment(null);
+                } else {
+                    this.proxied.holder().setAttachment(this.proxied);
+                    this.addElement(proxied);
+                }
+            }
+            super.setAttachment(attachment);
+        }
+
 
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {

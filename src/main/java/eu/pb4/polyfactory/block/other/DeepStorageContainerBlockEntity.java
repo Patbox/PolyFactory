@@ -9,10 +9,14 @@ import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
 import eu.pb4.sgui.api.GuiHelpers;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,6 +29,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
@@ -175,9 +180,7 @@ public class DeepStorageContainerBlockEntity extends LockableBlockEntity impleme
                             var carried = screenHandler.getCarried();
                             var oldOverride = iconOverrides.get(i);
                             if (!ItemStack.isSameItemSameComponents(carried, oldOverride)) {
-                                carried = carried.copy();
-                                carried.set(DataComponents.MAX_STACK_SIZE, 10);
-                                carried.setCount(i + 1);
+                                carried = carried.copyWithCount(1);
                                 iconOverrides.set(i, carried);
                                 setChanged();
                                 GuiUtils.playClickSound(this.player);
@@ -191,44 +194,28 @@ public class DeepStorageContainerBlockEntity extends LockableBlockEntity impleme
                     }));
                 }
             }
+            this.setSlot(7, GuiUtils.createDynamicButton(this::getSelectedIcon));
 
             this.open();
             startOpen(player);
         }
 
         private ItemStack getButtonIcon(int page) {
-            GuiElementBuilder b;
             if (iconOverrides.get(page).isEmpty()) {
-                b = GuiTextures.NUMBERS_SHADOW_8[page + 1].apply(page == this.page ? 0xFFFF88 : 0xFFFFFF);
+                return GuiTextures.NUMBERS_SHADOW_8[page + 1].apply(page == this.page ? 0xFFFF88 : 0xFFFFFF).hideTooltip().asStack();
             } else {
-                b = GuiElementBuilder.from(iconOverrides.get(page));
+                return GuiElementBuilder.from(iconOverrides.get(page)).hideTooltip().asStack();
             }
+        }
 
-            /*
-            int count = 0;
-            int lines = 0;
-
-            for (int i = page * PAGE; i < (page + 1) * PAGE; i++) {
-                var stack = stacks.get(i);
-                if (!stack.isEmpty()) {
-                    count++;
-
-                    if (lines < 5) {
-                        lines++;
-                        b.addLoreLine(Component.translatable("item.container.item_count", stack.getHoverName(), stack.getCount()).withStyle(ChatFormatting.GRAY));
-                    }
-                }
+        private ItemStack getSelectedIcon() {
+            var stack = GuiTextures.DEEP_STORAGE_UNIT_SELECTED.copy();
+            var selected = new BooleanArrayList(8);
+            for (int i = 0; i < PAGE_COUNT; i++) {
+                selected.add(i == this.page);
             }
-            if (count > 5) {
-                b.addLoreLine(Component.translatable("item.container.more_items", count - 5).withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
-            }
-            */
-
-
-            return b//.hideDefaultTooltip()
-                    //.setName(Component.translatable("text.polyfactory.x_out_of_y", count, PAGE))
-                    .hideTooltip()
-                    .asStack();
+            stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), selected, List.of(), List.of()));
+            return stack;
         }
 
         private boolean setPage(int page) {

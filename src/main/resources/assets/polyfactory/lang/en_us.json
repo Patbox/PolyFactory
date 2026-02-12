@@ -106,6 +106,8 @@
   "block.polyfactory.chain_drive.required_chains": "Cost: %s %s",
 
   "item.polyfactory.mod_icon": "Mod Icon",
+  "item.polyfactory.guidebook": "Into The Factory",
+  "item.polyfactory.guidebook.desc": "Guide for PolyFactory",
   "item.polyfactory.fluid_model": "Fluid Model",
   "item.polyfactory.windmill_sail": "Windmill Sail",
   "item.polyfactory.dynamite": "Dynamite",
@@ -469,6 +471,12 @@
   "text.polyfactory.redstone_activation.not_powered": "Not Powered",
   "text.polyfactory.redstone_activation.not_powered.desc": "This machine needs to be not powered with Redstone to work.",
 
+  "booklet_category.polyfactory.basics": "The Basics",
+  "booklet_category.polyfactory.rotation": "Rotational Energy",
+  "booklet_category.polyfactory.item_transport": "Item Transportation",
+  "booklet_category.polyfactory.cable": "Cables and Data",
+  "booklet_category.polyfactory.fluids": "Fluids and Smelting",
+
   "advancements.polyfactory.root.title": "PolyFactory",
   "advancements.polyfactory.root.description": "Welcome to the factory!",
 
@@ -657,7 +665,6 @@
   "advancements.polyfactory.tater_128.description": "Click Potato on a Spring 128 times...",
   "advancements.polyfactory.tater_1024.title": "The Potato Master",
   "advancements.polyfactory.tater_1024.description": "Click Potato on a Spring 1024 times. The End! Nothing more",
-
 
   "text.polyfactory.color_simple": "%s (%s)",
   "color.polyfactory.teal": "Teal"

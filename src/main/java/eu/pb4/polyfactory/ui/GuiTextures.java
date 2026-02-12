@@ -11,6 +11,7 @@ import net.minecraft.world.item.Items;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 import static eu.pb4.polyfactory.ModInit.id;
 import static eu.pb4.polyfactory.ui.UiResourceCreator.*;
@@ -67,6 +68,7 @@ public class GuiTextures {
     public static final ItemStack ITEM_FILTER_BLOCKED = icon16("item_filter_blocked").get().asStack();
 
     public static final ItemStack LEFT_SHIFTED_3_BARS = new GuiElementBuilder(Items.TRIAL_KEY).hideTooltip().model(id("-/sgui/left_shifted_3_bars")).asStack();
+    public static final ItemStack DEEP_STORAGE_UNIT_SELECTED = new GuiElementBuilder(Items.TRIAL_KEY).hideTooltip().model(id("-/sgui/deep_storage_unit_selected")).asStack();
     public static final Progress FLAME = Progress.createVertical("flame", 1, 14, true);
     public static final Progress ICE = Progress.createVertical("ice", 1, 14, true);
     public static final Progress FLAME_OFFSET_RIGHT = Progress.createVertical32Right("flame_offset_right", 9, 22, true);
@@ -80,6 +82,11 @@ public class GuiTextures {
     public static final IntFunction<GuiElementBuilder>[] NUMBERS_FLAT_24 = createNumbers(8 * 3, false, 0);
     public static final IntFunction<GuiElementBuilder>[] NUMBERS_SHADOW_8 = createNumbers(8, true, 0);
     public static final char SPACE_1 = UiResourceCreator.space(1);
+    public static final char SPACE_5 = UiResourceCreator.space(5);
+    public static final char SPACE_10 = UiResourceCreator.space(10);
+    public static final char SPACE_20 = UiResourceCreator.space(20);
+    public static final char SPACE_50 = UiResourceCreator.space(50);
+    public static final char SPACE_100 = UiResourceCreator.space(100);
     public static final char BLUEPRINT_WORKSTATION_EXTRA_OFFSET = UiResourceCreator.space(-29 + 8);
     public static final char POLYDEX_OFFSET = UiResourceCreator.space(168);
     public static final char POLYDEX_OFFSET_N = UiResourceCreator.space(-168);
@@ -102,6 +109,20 @@ public class GuiTextures {
     public static final char SMELTERY_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-91 - 7);
     public static final char PRESS_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(107 - 8);
     public static final char PRESS_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-107 + 8);
+    public static final char NEGATIVE_SPACE_1 = UiResourceCreator.space(-1);
+    public static final char NEGATIVE_SPACE_1024 = UiResourceCreator.space(-1024);
+    public static final char NEGATIVE_SPACE_100 = UiResourceCreator.space(-100);
+    public static final char NEGATIVE_SPACE_50 = UiResourceCreator.space(-50);
+    public static final char NEGATIVE_SPACE_20 = UiResourceCreator.space(-20);
+    public static final char NEGATIVE_SPACE_10 = UiResourceCreator.space(-10);
+
+    public static final char INVIS_LINE_RAW = UiResourceCreator.font(id("sgui/invis_line"), 7, 8);
+    public static final char INVIS_FULL_1024_RAW = UiResourceCreator.font(id("sgui/invis_full"), 512, 1024);
+    public static final char INVIS_FULL_100_RAW = UiResourceCreator.font(id("sgui/invis_full"), 50, 100);
+    public static final char INVIS_FULL_50_RAW = UiResourceCreator.font(id("sgui/invis_full"), 25, 50);
+    public static final char INVIS_FULL_20_RAW = UiResourceCreator.font(id("sgui/invis_full"), 10, 20);
+    public static final char INVIS_FULL_10_RAW = UiResourceCreator.font(id("sgui/invis_full"), 5, 10);
+
     public static void register() {
         PolydexTextures.register();
         Progress.createHorizontal("generic_bar", 1, 15, false, 0);

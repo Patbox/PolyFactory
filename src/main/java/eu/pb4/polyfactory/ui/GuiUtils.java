@@ -75,6 +75,10 @@ public class GuiUtils {
         }
     }
 
+    public static GuiElementInterface createDynamicButton(Supplier<ItemStack> itemSupplier) {
+        return createDynamicButton(itemSupplier, GuiElementInterface.EMPTY_CALLBACK);
+    }
+
     public static GuiElementInterface createDynamicButton(Supplier<ItemStack> itemSupplier, Consumer<ClickType> clickTypeConsumer) {
         return createDynamicButton(itemSupplier, (index, type, action, gui) -> clickTypeConsumer.accept(type));
     }

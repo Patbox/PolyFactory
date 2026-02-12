@@ -3,6 +3,7 @@ package eu.pb4.polyfactory;
 import eu.pb4.polyfactory.advancement.PolyFactoryAdvancementCriteria;
 import eu.pb4.polyfactory.advancement.FactoryItemPredicates;
 import eu.pb4.polyfactory.block.FactoryPoi;
+import eu.pb4.polyfactory.booklet.BookletInit;
 import eu.pb4.polyfactory.effects.FactoryEffects;
 import eu.pb4.polyfactory.entity.FactoryEntities;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
@@ -18,6 +19,7 @@ import eu.pb4.polyfactory.ui.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.*;
+import eu.pb4.polyfactory.util.language.VanillaLanguageDownloader;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
@@ -58,6 +60,13 @@ public class ModInit implements ModInitializer {
 			LOGGER.warn("You are on your own!");
 			LOGGER.warn("=====================================================");
 		}
+		if (PolydexCompat.IS_PRESENT) {
+			// Polydex does the same thing, so just reuse that.
+			VanillaLanguageDownloader.markReady();
+		} else {
+			VanillaLanguageDownloader.setup();
+		}
+
 		FactoryRegistries.setup();
 		FactoryBlocks.register();
 		FactoryPoi.register();
@@ -99,6 +108,7 @@ public class ModInit implements ModInitializer {
 
 		ServerPlayConnectionEvents.JOIN.register(FactorySecrets::onJoin);
 
+		BookletInit.init();
 		//for (var block : Registries.BLOCK) {
 		//	SoundPatcher.convertIntoServerSound(block.getDefaultState().getSoundGroup());
 		//}

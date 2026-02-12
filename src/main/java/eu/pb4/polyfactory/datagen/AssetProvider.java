@@ -29,6 +29,7 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.ConstantTintSourc
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.CustomModelDataTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.PotionTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.model.ModelAsset;
+import eu.pb4.polymer.resourcepack.extras.api.format.model.ModelTransformation;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -41,6 +42,8 @@ import net.minecraft.util.Util;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.phys.Vec3;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -52,6 +55,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static eu.pb4.polyfactory.ModInit.id;
@@ -72,6 +76,7 @@ class AssetProvider implements DataProvider {
         FactoryModels.BLOCK_FLUID_TANK.generateModels(assetWriter);
         var map = new HashMap<Identifier, ItemAsset>();
         createItems(map::put);
+        createOtherItemic(map::put, assetWriter);
         map.forEach((id, asset) -> assetWriter.accept(AssetPaths.itemAsset(id), asset.toJson().getBytes(StandardCharsets.UTF_8)));
         createNumberButtons(assetWriter);
         createGaugeStyles(assetWriter);
@@ -261,34 +266,75 @@ class AssetProvider implements DataProvider {
                 new BasicItemModel(id("block/redstone_output_overlay"), List.of(new CustomModelDataTintSource(0, 0xFF0000))), ItemAsset.Properties.DEFAULT));
 
         consumer.accept(id("placeholder"), new ItemAsset(new BasicItemModel(id("item/placeholder")), ItemAsset.Properties.DEFAULT));
-
-        var list = new ArrayList<ItemModel>();
-
-        {
-            var offsets = new int[]{-18 * 3, -18 * 2, -18, 0};
-
-            for (int i = 0; i < 4; i++) {
-                var builder = RangeDispatchItemModel.builder(new CustomModelDataFloatProperty(i)).scale(15);
-                builder.fallback(new EmptyItemModel());
-
-                for (int a = 1; a <= 14; a++) {
-                    builder.entry(a, new BasicItemModel(id("sgui/elements/gen/generic_bar_" + a + "_offset_" + offsets[i]),
-                            List.of(new CustomModelDataTintSource(i, 0xFFFFFF))));
-                }
-
-                list.add(new ConditionItemModel(new CustomModelDataFlagProperty(i),
-                        i == 3 ? new BasicItemModel(id("sgui/elements/empty")) : new CompositeItemModel(List.of(
-                                new BasicItemModel(id("sgui/elements/generic_bar_background_offset_" + offsets[i])),
-                                builder.build())
-                                ),
-                        new EmptyItemModel()
-                ));
-            }
-        }
-
-        consumer.accept(GuiTextures.LEFT_SHIFTED_3_BARS.get(DataComponents.ITEM_MODEL), new ItemAsset(new CompositeItemModel(list), new ItemAsset.Properties(false, true)));
     }
 
+    private static void createOtherItemic(BiConsumer<Identifier, ItemAsset> consumer, BiConsumer<String, byte[]> writer) {
+
+        // LEFT_SHIFTED_3_BARS
+        {
+            var list = new ArrayList<ItemModel>();
+
+            {
+                var offsets = new int[]{-18 * 3, -18 * 2, -18, 0};
+
+                for (int i = 0; i < 4; i++) {
+                    var builder = RangeDispatchItemModel.builder(new CustomModelDataFloatProperty(i)).scale(15);
+                    builder.fallback(new EmptyItemModel());
+
+                    for (int a = 1; a <= 14; a++) {
+                        builder.entry(a, new BasicItemModel(id("sgui/elements/gen/generic_bar_" + a + "_offset_" + offsets[i]),
+                                List.of(new CustomModelDataTintSource(i, 0xFFFFFF))));
+                    }
+
+                    list.add(new ConditionItemModel(new CustomModelDataFlagProperty(i),
+                            i == 3 ? new BasicItemModel(id("sgui/elements/empty")) : new CompositeItemModel(List.of(
+                                    new BasicItemModel(id("sgui/elements/generic_bar_background_offset_" + offsets[i])),
+                                    builder.build())
+                            ),
+                            new EmptyItemModel()
+                    ));
+                }
+            }
+
+            consumer.accept(GuiTextures.LEFT_SHIFTED_3_BARS.get(DataComponents.ITEM_MODEL), new ItemAsset(new CompositeItemModel(list), new ItemAsset.Properties(false, true)));
+        }
+        var baseDeepStorageUnitId = id("sgui/elements/gen/deep_storage_unit/");
+
+        // DEEP_STORAGE_UNIT_SELECTED
+        {
+            var listSelected = new ArrayList<ItemModel>();
+            for (int i = 0; i < 8; i++) {
+                var selectedId = baseDeepStorageUnitId.withSuffix("button_selected_" + (i + 1));
+                var buttonId = baseDeepStorageUnitId.withSuffix("button_" + (i + 1));
+
+                {
+                    var model = ModelAsset.builder();
+                    model.parent(Identifier.withDefaultNamespace("item/generated"));
+                    model.texture("layer0", "polyfactory:sgui/elements/button/mini/base_selected");
+                    //noinspection IntegerDivisionInFloatingPointContext
+                    model.transformation(ItemDisplayContext.GUI, new ModelTransformation(
+                            Vec3.ZERO, new Vec3(18 * (i % 2), -18 * (1 + i / 2), 0), new Vec3(1, 1, 1)
+                    ));
+                    writer.accept(AssetPaths.model(selectedId) + ".json", model.build().toBytes());
+                }
+                {
+                    var model = ModelAsset.builder();
+                    model.parent(Identifier.withDefaultNamespace("item/generated"));
+                    model.texture("layer0", "polyfactory:sgui/elements/button/mini/base");
+                    //noinspection IntegerDivisionInFloatingPointContext
+                    model.transformation(ItemDisplayContext.GUI, new ModelTransformation(
+                            Vec3.ZERO, new Vec3(18 * (i % 2), -18 * (1 + i / 2), 0), new Vec3(1, 1, 1)
+                    ));
+                    writer.accept(AssetPaths.model(buttonId) + ".json", model.build().toBytes());
+                }
+
+                listSelected.add(new ConditionItemModel(new CustomModelDataFlagProperty(i), new BasicItemModel(selectedId), new BasicItemModel(buttonId)));
+            }
+
+            consumer.accept(GuiTextures.DEEP_STORAGE_UNIT_SELECTED.get(DataComponents.ITEM_MODEL),
+                    new ItemAsset(new CompositeItemModel(listSelected), new ItemAsset.Properties(false, true)));
+        }
+    }
 
     private static void createNumberButtons(BiConsumer<String,byte[]> assetWriter) {
         var empty = ResourceUtils.getTexture(id("sgui/elements/numbered_buttons/empty"));

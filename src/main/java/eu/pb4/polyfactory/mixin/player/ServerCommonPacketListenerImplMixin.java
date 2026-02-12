@@ -1,7 +1,9 @@
 package eu.pb4.polyfactory.mixin.player;
 
+import eu.pb4.polyfactory.booklet.BookletInit;
 import eu.pb4.polyfactory.item.tool.PunchCardItem;
 import net.minecraft.network.protocol.common.ServerboundCustomClickActionPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.server.network.ServerPlayerConnection;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,6 +21,9 @@ public class ServerCommonPacketListenerImplMixin {
 
         switch (packet.id().getPath()) {
             case "punch_card_store" -> PunchCardItem.handleClickAction(connection.getPlayer(), packet.id(), packet.payload());
+            case "booklet/open_page" -> BookletInit.openPage(connection.getPlayer(), Identifier.parse(packet.payload().orElseThrow().asString().orElseThrow()));
+            case "booklet/polydex/usage" -> BookletInit.openPolydexUsagePage(connection.getPlayer(), packet.payload().orElseThrow().asCompound().orElseThrow());
+            case "booklet/polydex/result" -> BookletInit.openPolydexResultPage(connection.getPlayer(), packet.payload().orElseThrow().asCompound().orElseThrow());
         }
     }
 }

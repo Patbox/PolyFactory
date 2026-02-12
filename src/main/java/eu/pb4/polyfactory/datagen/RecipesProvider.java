@@ -1021,7 +1021,7 @@ class RecipesProvider extends FabricRecipeProvider {
 
                 of(output,
                         GenericPressRecipe.of("purpur_block", Ingredient.of(Items.POPPED_CHORUS_FRUIT), 4, 5f, new ItemStack(Items.PURPUR_BLOCK, 1)),
-                        GenericPressRecipe.of("sponge", Ingredient.of(Items.WET_SPONGE), 1, 5f, new ItemStack(Items.SPONGE, 1)),
+                        GenericPressRecipe.of("sponge", Ingredient.of(Items.WET_SPONGE), 1, 5f, new ItemStack(Items.SPONGE, 1), FactoryFluids.WATER.ofBucket()),
                         GenericPressRecipe.of("sand", Ingredient.of(Items.SAND), 4, 5f, new ItemStack(Items.SANDSTONE, 1)),
                         GenericPressRecipe.of("honeycomb", Ingredient.of(Items.HONEYCOMB), 4, 4f, new ItemStack(Items.HONEYCOMB_BLOCK, 1)),
                         GenericPressRecipe.of("snow_block", Ingredient.of(Items.SNOWBALL), 4, 3f, new ItemStack(Items.SNOW_BLOCK, 1)),
