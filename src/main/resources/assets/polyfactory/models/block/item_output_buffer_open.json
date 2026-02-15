@@ -1,0 +1,6 @@
+{
+	"parent": "polyfactory:block/item_output_buffer",
+	"textures": {
+		"front": "polyfactory:block/container/buffer_front_open"
+	}
+}

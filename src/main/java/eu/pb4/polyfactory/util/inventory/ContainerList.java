@@ -5,7 +5,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 
 public class ContainerList extends AbstractList<ItemStack> {
-    private final Container backing;
+    public final Container backing;
     private final int start;
     private final int end;
     private final int size;
@@ -24,7 +24,7 @@ public class ContainerList extends AbstractList<ItemStack> {
 
     @Override
     public int size() {
-        return this.backing.getContainerSize();
+        return size;
     }
 
     @Override
@@ -36,6 +36,6 @@ public class ContainerList extends AbstractList<ItemStack> {
     }
 
     private int index(int index) {
-        return index;
+        return index + start;
     }
 }

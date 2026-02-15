@@ -8,6 +8,9 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
+import eu.pb4.polyfactory.block.other.ItemOutputBufferBlock;
+import eu.pb4.polyfactory.block.other.OutputContainerOwner;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
@@ -24,6 +27,7 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.TagLimitedSlot;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.inventory.SubContainer;
 import eu.pb4.polyfactory.util.movingitem.SimpleMovingItemContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
@@ -60,9 +64,10 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class MDrainBlockEntity extends TallItemMachineBlockEntity implements FluidInputOutput.ContainerBased {
+public class MDrainBlockEntity extends TallItemMachineBlockEntity implements FluidInputOutput.ContainerBased, OutputContainerOwner {
 
     public static final int CATALYST_FIRST = 2;
     public static final int OUTPUT_FIRST = 1;
@@ -75,6 +80,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             new SimpleMovingItemContainer(1, this::addMoving, this::removeMoving),
             new SimpleMovingItemContainer()
     };
+    private final Container outputContainer = new SubContainer(this, OUTPUT_FIRST);
     protected double process = 0;
     protected double speedScale = 0;
     @Nullable
@@ -160,14 +166,30 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
         if (self.process >= self.currentRecipe.value().time(input)) {
             var itemOut = self.currentRecipe.value().assemble(input, world.registryAccess());
-            var currentOutput = self.getItem(OUTPUT_FIRST);
-            if (currentOutput.isEmpty()) {
-                self.setItem(OUTPUT_FIRST, itemOut);
-            } else if (ItemStack.isSameItemSameComponents(itemOut, currentOutput) && currentOutput.getCount() + itemOut.getCount() < itemOut.getMaxStackSize()) {
-                currentOutput.grow(itemOut.getCount());
-            } else {
-                return;
+
+            var outputContainer = self.getOutputContainer();
+
+            {
+                var items = new ArrayList<ItemStack>();
+                items.add(itemOut.copy());
+
+                var inv = new net.minecraft.world.SimpleContainer(outputContainer.getContainerSize());
+                for (int i = 0; i < outputContainer.getContainerSize(); i++) {
+                    inv.setItem(i, outputContainer.getItem(i).copy());
+                }
+
+                for (var item : items) {
+                    FactoryUtil.tryInsertingInv(inv, item, null);
+
+                    if (!item.isEmpty()) {
+                        self.state = OUTPUT_FULL_TEXT;
+                        return;
+                    }
+                }
             }
+
+            FactoryUtil.tryInsertingRegular(outputContainer, itemOut);
+
             if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayer serverPlayer) {
                 CriteriaTriggers.RECIPE_CRAFTED.trigger(serverPlayer, self.currentRecipe.id(), List.of(inputStack.copy(), self.catalyst()));
             }
@@ -209,6 +231,21 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
             self.state = rot.getStateTextOrElse(TOO_SLOW_TEXT);
         }
+    }
+
+    @Override
+    public Container getOwnOutputContainer() {
+        return this.outputContainer;
+    }
+
+    @Override
+    public Container getOutputContainer() {
+        return ItemOutputBufferBlock.getOutputContainer(this.outputContainer, this.level, this.getBlockPos(), this.getBlockState().getValue(PressBlock.INPUT_FACING).getOpposite());
+    }
+
+    @Override
+    public boolean isOutputConnectedTo(Direction dir) {
+        return this.getBlockState().getValue(PressBlock.INPUT_FACING).getOpposite() == dir;
     }
 
     private DrainInput asInput() {
@@ -426,7 +463,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
     public int getComparatorOutput(BlockState state, Level world, BlockPos pos, Direction direction) {
         if (state.getValue(MDrainBlock.PART) == TallItemMachineBlock.Part.TOP) {
-            return AbstractContainerMenu.getRedstoneSignalFromContainer((Container) this);
+            return AbstractContainerMenu.getRedstoneSignalFromContainer(this);
         }
         return (int) ((this.fluidContainer.stored() * 15) / this.fluidContainer.capacity());
     }

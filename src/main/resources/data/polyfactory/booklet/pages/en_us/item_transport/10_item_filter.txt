@@ -1,0 +1,24 @@
+### Section: PageInfo
+title=Item Filter
+icon=polyfactory:item_filter
+category=polyfactory:item_transport
+### EndSection: PageInfo
+<yellow>Item Filter</> is an item that allows you to limit which items are accepted by
+<item 'hopper'>s, <item 'polyfactory:funnel'>s and <item 'polyfactory:item_splitter'>s.
+<nl2>
+To configure it, use it while not targeting any interactive blocks. It will then open an interface, which allows you to
+put up to 9 different items to filter against. Do note that the filter will only copy the item into itself, without requiring
+the original to be placed there permanently.
+<nl2>
+Additionally, you can change whatever filter should check against item data
+(enchantments, damage, color, etc.) of provided items or just check if they have equal type.
+<nl>
+You can also set whatever this filter only allows provided item or only prevents them.
+<nl2>
+To make a block use that filter, you just need to click it while holding it.
+<item 'hopper'> and <item 'polyfactory:funnel'> only allow a single filter, while <item 'polyfactory:item_splitter'>
+can take two (one for the green/left and one for the red/right output).
+To take it out, just click it again (Hopper requires you to hold shift).
+
+### Align: Center
+<u><blue><polydex 'polyfactory:item_filter'>View the Item Filter recipe</>

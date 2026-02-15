@@ -15,6 +15,7 @@ import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.TagLimitedSlot;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.ItemThrower;
 import eu.pb4.polyfactory.util.inventory.SingleStackContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
@@ -206,8 +207,9 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         BlockPos blockPos = pos;
         BlockState stateFront = Blocks.AIR.defaultBlockState();
         int reach = self.reach;
+        var dir = state.getValue(MinerBlock.FACING);
         while (stateFront.isAir() && reach-- > 0) {
-            blockPos = blockPos.relative(state.getValue(MinerBlock.FACING));
+            blockPos = blockPos.relative(dir);
             stateFront = world.getBlockState(blockPos);
         }
 
@@ -316,6 +318,10 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
                         TriggerCriterion.trigger(serverPlayer, FactoryTriggers.MINER_MINES);
                     }
                 }
+            }
+            if (!player.getInventory().isEmpty()) {
+                var thrower = new ItemThrower(world, pos, dir, dir.getAxis().getPlane());
+                thrower.dropContents(player.getInventory());
             }
             self.setChanged();
         }

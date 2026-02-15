@@ -50,11 +50,9 @@ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityT
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Util;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import java.util.ArrayList;
 
 public class FactoryBlockEntities {
     public static final BlockEntityType<ConveyorBlockEntity> CONVEYOR = register("conveyor",
@@ -98,6 +96,8 @@ public class FactoryBlockEntities {
              FabricBlockEntityTypeBuilder.create(ContainerBlockEntity::new, FactoryBlocks.CONTAINER));
     public static final BlockEntityType<DeepStorageContainerBlockEntity> DEEP_STORAGE_CONTAINER = register("deep_storage_container",
             FabricBlockEntityTypeBuilder.create(DeepStorageContainerBlockEntity::new, FactoryBlocks.DEEP_STORAGE_CONTAINER));
+    public static final BlockEntityType<ItemOutputBufferBlockEntity> ITEM_BUFFER = register("item_buffer",
+            FabricBlockEntityTypeBuilder.create(ItemOutputBufferBlockEntity::new, FactoryBlocks.ITEM_OUTPUT_BUFFER));
 
     public static final BlockEntityType<GrinderBlockEntity> GRINDER = register("grinder",
              FabricBlockEntityTypeBuilder.create(GrinderBlockEntity::new, FactoryBlocks.GRINDER));

@@ -91,6 +91,7 @@ public class FactoryBlocks {
     public static final WindmillBlock WINDMILL = register("windmill", BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_OAK_WOOD), settings -> new WindmillBlock(settings.strength(2.5F).noOcclusion()));
     public static final ContainerBlock CONTAINER = register("wooden_container", BlockBehaviour.Properties.ofFullCopy(Blocks.CHEST), settings -> new ContainerBlock(9 * 5, settings.noOcclusion()));
     public static final DeepStorageContainerBlock DEEP_STORAGE_CONTAINER = register("deep_storage_container", BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), DeepStorageContainerBlock::new);
+    public static final ItemOutputBufferBlock ITEM_OUTPUT_BUFFER = register("item_output_buffer", BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), ItemOutputBufferBlock::new);
     public static final ItemPackerBlock ITEM_PACKER = register("item_packer", BlockBehaviour.Properties.ofFullCopy(SPLITTER), ItemPackerBlock::new);
     public static final CableBlock CABLE = register("cable", BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).sound(SoundType.WOOL), settings -> new CableBlock(settings.instabreak().noOcclusion()));
     public static final GatedCableBlock GATED_CABLE = register("gated_cable", BlockBehaviour.Properties.ofFullCopy(SPLITTER).strength(2.2F).sound(SoundType.STONE), GatedCableBlock::new);

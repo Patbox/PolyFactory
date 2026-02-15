@@ -6,7 +6,6 @@ import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.BlockConfigValue;
 import eu.pb4.polyfactory.block.configurable.WrenchModifyBlockValue;
 import eu.pb4.polyfactory.block.other.StatePropertiesCodecPatcher;
-import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +14,6 @@ import java.util.Objects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.FrontAndTop;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -28,10 +26,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 public abstract class OrientableCabledDataBlock extends BaseCabledDataBlock implements StatePropertiesCodecPatcher {
     public static final EnumProperty<FrontAndTop> ORIENTATION = BlockStateProperties.ORIENTATION;
 
-    public final BlockConfig<?> facingAction = BlockConfig.of("orientation", ORIENTATION, (dir, world, pos, side, state) ->
-                    Component.empty().append(FactoryUtil.asText(dir.front())).append(" / ").append(FactoryUtil.asText(dir.top())),
-            WrenchModifyBlockValue.ofProperty(ORIENTATION),
-            BlockConfigValue.ofPropertyCustom(ORIENTATION, (property, value, world, pos, side, state) -> {
+    public final BlockConfig<?> facingAction = BlockConfig.ORIENTATION.withValue(BlockConfigValue.ofPropertyCustom(ORIENTATION, (property, value, world, pos, side, state) -> {
                 var oldDir = state.getValue(property);
                 state = state.setValue(ORIENTATION, value).setValue(FACING_PROPERTIES.get(value.front()), false);
                 return state.getValue(HAS_CABLE) ? state.setValue(FACING_PROPERTIES.get(oldDir.front()),

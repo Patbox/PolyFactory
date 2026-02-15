@@ -7,7 +7,10 @@ import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
+import eu.pb4.polyfactory.block.other.ItemOutputBufferBlock;
+import eu.pb4.polyfactory.block.other.OutputContainerOwner;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
 import eu.pb4.polyfactory.item.FactoryItemTags;
@@ -19,6 +22,7 @@ import eu.pb4.polyfactory.ui.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.inventory.SubContainer;
 import eu.pb4.polyfactory.util.movingitem.SimpleMovingItemContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
@@ -36,6 +40,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
+import net.minecraft.world.Container;
 import net.minecraft.world.inventory.FurnaceResultSlot;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
@@ -51,9 +56,10 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
+public class MSpoutBlockEntity extends TallItemMachineBlockEntity implements OutputContainerOwner {
 
     public static final int OUTPUT_FIRST = 1;
     public static final int INPUT_FIRST = 0;
@@ -63,6 +69,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
             new SimpleMovingItemContainer(0, this::addMoving, this::removeMoving),
             new SimpleMovingItemContainer(1, this::addMoving, this::removeMoving)
     };
+    private final Container outputContainer = new SubContainer(this, OUTPUT_FIRST);
     protected double process = 0;
     protected double speedScale = 0;
     @Nullable
@@ -171,14 +178,29 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
             }
 
             var itemOut = self.currentRecipe.value().assemble(input, world.registryAccess());
-            var currentOutput = self.getItem(OUTPUT_FIRST);
-            if (currentOutput.isEmpty()) {
-                self.setItem(OUTPUT_FIRST, itemOut);
-            } else if (ItemStack.isSameItemSameComponents(itemOut, currentOutput) && currentOutput.getCount() + itemOut.getCount() <= itemOut.getMaxStackSize()) {
-                currentOutput.grow(itemOut.getCount());
-            } else {
-                return;
+            var outputContainer = self.getOutputContainer();
+
+            {
+                var items = new ArrayList<ItemStack>();
+                items.add(itemOut.copy());
+
+                var inv = new net.minecraft.world.SimpleContainer(outputContainer.getContainerSize());
+                for (int i = 0; i < outputContainer.getContainerSize(); i++) {
+                    inv.setItem(i, outputContainer.getItem(i).copy());
+                }
+
+                for (var item : items) {
+                    FactoryUtil.tryInsertingInv(inv, item, null);
+
+                    if (!item.isEmpty()) {
+                        self.state = OUTPUT_FULL_TEXT;
+                        return;
+                    }
+                }
             }
+
+            FactoryUtil.tryInsertingRegular(outputContainer, itemOut);
+
             if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayer serverPlayer) {
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.SPOUT_CRAFT);
                 CriteriaTriggers.RECIPE_CRAFTED.trigger(serverPlayer, self.currentRecipe.id(), List.of(inputStack.copy()));
@@ -235,6 +257,23 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity {
 
             self.state = rot.getStateTextOrElse(TOO_SLOW_TEXT);
         }
+    }
+
+
+    @Override
+    public Container getOwnOutputContainer() {
+        return this.outputContainer;
+    }
+
+    @Override
+    public Container getOutputContainer() {
+        return ItemOutputBufferBlock.getOutputContainer(this.outputContainer, this.level, this.getBlockPos(), this.getBlockState().getValue(MSpoutBlock.INPUT_FACING).getOpposite());
+    }
+
+
+    @Override
+    public boolean isOutputConnectedTo(Direction dir) {
+        return this.getBlockState().getValue(MSpoutBlock.INPUT_FACING).getOpposite() == dir;
     }
 
     protected void updatePosition(int id) {

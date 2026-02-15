@@ -1,0 +1,17 @@
+### Section: PageInfo
+title=<item 'polyfactory:splitter'>
+icon=polyfactory:splitter
+category=polyfactory:item_transport
+### EndSection: PageInfo
+<yellow><item 'polyfactory:splitter'></> is item routing block that works on top of the
+<u><blue><pagelink 'polyfactory:item_transport/20_conveyor'><item 'polyfactory:conveyor'></*>.
+<nl2>
+It has 1 input and 3 outputs. By default, it will split items equally between all 3 outputs (assuming all of them have
+a conveyor or other compatible block). To use it for sorting, left (red) and right (green) outputs can be configured
+with an <u><blue><pagelink 'polyfactory:item_transport/10_item_filter'>Item Filter</*>. Items are prioritized to go
+in direction in which filter matches them. In case of failure of filtered outputs, the item will continue moving forwards.
+
+### Image: polyfactory:item_transport/conveyor_example Example use of <item 'polyfactory:splitter'>, with 2 active outputs.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:splitter'>View the <item 'polyfactory:splitter'> recipe</>

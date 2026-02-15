@@ -1,5 +1,5 @@
 ### Section: PageInfo
-title=Artificial Dye
+title=<item 'polyfactory:artificial_dye'>
 icon=polyfactory:artificial_dye[polyfactory:color=0xee44ee]
 category=polyfactory:misc
 ### EndSection: PageInfo
@@ -8,12 +8,12 @@ dyes in context of crafting/coloring anything that supports dynamic colors, like
 <item 'minecraft:firework_star'>, signs, <item 'polyfactory:colored_lamp'> and more.
 <nl2>
 To craft it, you need to use a <u><blue><pagelink 'polyfactory:basics/50_temperature'>heated</*>
-<item 'polyfactory:mechanical_mixer'>. Then you need to get some <item 'polyfactory:saw_dust'>,
+<item 'polyfactory:mixer'>. Then you need to get some <item 'polyfactory:saw_dust'>,
 vanilla dyes and other controlling ingredients (see below).
 <nl>
 Then, you need to put them in the mixer and start mixing!
 As an extra ingredients you can use:
-- Vanilla dyes, other <item 'polyfactory:artificial_dye'> - Used to get colors for mixins, same logic as leather.
+- Vanilla dyes, other <item 'polyfactory:artificial_dye'> - Used to get colors for mixin, same logic as leather.
 - <item 'polyfactory:saw_dust'> (<blue><u><polydex 'polyfactory:saw_dust'>recipe</*>) - Needed as a base
 (if not mixing with other <item 'polyfactory:artificial_dye'>) and to halve the change of ingredients below (delta=32 without, 16 for 1, 8 for 2 and so on).
 - <item 'redstone'> - Removes blue and green color by *delta*.

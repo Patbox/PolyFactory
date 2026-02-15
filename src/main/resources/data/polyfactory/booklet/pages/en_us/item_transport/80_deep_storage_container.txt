@@ -12,6 +12,7 @@ blocks that interact with the block, such as <item 'polyfactory:funnel'> or <ite
 Buttons of the UI by default display the number of the slot, but they can be replaced with any item
 by holding it in cursor and then right-clicking the select button. It can be cleared by right-clicking
 with empty cursor.
-
+<nl2>
+*This block was inspired by Deep Shelving Unit from Yttr mod*
 ### Align: Center
 <u><blue><polydex 'polyfactory:deep_storage_container'>View the <item 'polyfactory:deep_storage_container'> recipe</>

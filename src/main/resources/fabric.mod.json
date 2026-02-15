@@ -29,7 +29,7 @@
   "mixins": [
     "polyfactory.mixins.json"
   ],
-  "suggests": {
+  "recommends": {
     "polydex": "*"
   },
   "depends": {

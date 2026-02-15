@@ -10,14 +10,11 @@ import eu.pb4.polyfactory.util.language.TextUncenterer;
 import eu.pb4.sgui.api.GuiHelpers;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.dialog.*;
-import net.minecraft.server.dialog.action.StaticAction;
 import net.minecraft.server.dialog.body.DialogBody;
 import net.minecraft.server.dialog.body.ItemBody;
 import net.minecraft.server.dialog.body.PlainMessage;
@@ -34,6 +31,10 @@ public class BookletUtil {
 
     public static Identifier action(String path) {
         return ModInit.id("booklet/" + path);
+    }
+
+    public static ClickEvent.Custom encodeClickEvent(String type) {
+        return new ClickEvent.Custom(action(type), Optional.empty());
     }
 
     public static ClickEvent.Custom encodeClickEvent(String type, Identifier entry, BookletOpenState state) {
@@ -85,9 +86,7 @@ public class BookletUtil {
             }
         }
 
-        player.openDialog(Holder.direct(new NoticeDialog(new CommonDialogData(booklet.title(), Optional.empty(), true, true,
-                state.getCloseAction(), body, List.of()),
-                state.getCloseButton())));
+        player.openDialog(Holder.direct(state.getDialog(booklet.title(), body)));
 
         return true;
     }
@@ -112,7 +111,7 @@ public class BookletUtil {
             return false;
         }
 
-        player.openDialog(Holder.direct(page.toDialog(ParserContext.of(BookletOpenState.KEY, state.pushPage(id)), state.getCloseAction(), state.getCloseButton())));
+        player.openDialog(Holder.direct(page.toDialog(ParserContext.of(BookletOpenState.KEY, state.pushPage(id)), state)));
         return true;
     }
 

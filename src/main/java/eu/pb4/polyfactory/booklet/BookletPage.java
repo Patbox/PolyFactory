@@ -19,9 +19,7 @@ public record BookletPage(Info info, List<Function<ParserContext, DialogBody>> b
         }
     }
 
-    public Dialog toDialog(ParserContext context, DialogAction closeAction, ActionButton button) {
-        return new NoticeDialog(new CommonDialogData(this.info.title, this.info.externalTitle, true, true,
-                closeAction, this.body.stream().map(x -> x.apply(context)).toList(), List.of()),
-                button);
+    public Dialog toDialog(ParserContext context, BookletOpenState state) {
+        return state.getDialog(this.info.title, this.body.stream().map(x -> x.apply(context)).toList());
     }
 }

@@ -15,6 +15,14 @@
   - Pages can be changed by left-clicking the button.
   - Button's looks can be changed by having an item in cursor and then right-clicking it on the button.
   - Hoppers / Funnels / etc do not care about pages, seeing this block as one big inventory.
+- Added Item Output Buffer:
+  - Crafted with 4 Steel Plates and 4 Wooden Plates.
+  - It's directional storage block that acts as an extension of machine block output containers.
+  - It can hold 18 stacks of items.
+  - To connect it to an output of machine block, you sneak and then place it against output point of the machine (for most it's the opposite side of the input/back).
+  - If you use Funnels or Hoppers on it, the output slots of connected block will also be available for them.
+  - However, UI of the block will only show its own slots.
+  - When opened from the front, it will allow you take items, but not place them in. When opened from the back it allows both placing and taking items.
 - Tweaked Fluid Pipe logic to push fluids more evenly in pipes that have more than two neighbors.
 - After locking Copper Pipes with a wrench you can now change which faces they point at.
 - Slot-Aware Funnel will no longer be limited by blocks directionality when inserting items.

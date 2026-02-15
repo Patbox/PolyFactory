@@ -5,6 +5,8 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.fluids.DrainBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
+import eu.pb4.polyfactory.block.other.ItemOutputBufferBlock;
+import eu.pb4.polyfactory.block.other.OutputContainerOwner;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
@@ -12,9 +14,11 @@ import eu.pb4.polyfactory.recipe.input.PressInput;
 import eu.pb4.polyfactory.recipe.press.PressRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.inventory.SubContainer;
 import eu.pb4.polyfactory.util.movingitem.SimpleMovingItemContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.world.Container;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -40,7 +44,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 
-public class PressBlockEntity extends TallItemMachineBlockEntity {
+public class PressBlockEntity extends TallItemMachineBlockEntity implements OutputContainerOwner {
     public static final int INPUT_SLOT = 0;
     public static final int INPUT_2_SLOT = 1;
     public static final int OUTPUT_SLOT = 2;
@@ -52,6 +56,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             new SimpleMovingItemContainer(),
             new SimpleMovingItemContainer(2, this::addMoving, this::removeMoving)
     };
+    private final Container outputContainer = new SubContainer(this, OUTPUT_SLOT);
     protected double process = 0;
     @Nullable
     protected RecipeHolder<PressRecipe> currentRecipe = null;
@@ -145,19 +150,33 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
 
         if (self.process >= 1 || self.delayedOutput != null) {
             var nextOut = self.delayedOutput != null ? self.delayedOutput : self.currentRecipe.value().assemble(input, self.level.registryAccess());
-            var currentOut = self.getItem(OUTPUT_SLOT);
 
-            boolean success = false;
+            boolean success = true;
 
-            if (currentOut.isEmpty()) {
-                success = true;
-                self.setItem(OUTPUT_SLOT, nextOut);
-            } else if (ItemStack.isSameItemSameComponents(currentOut, nextOut) && currentOut.getCount() + nextOut.getCount() <= currentOut.getMaxStackSize()) {
-                success = true;
-                currentOut.grow(nextOut.getCount());
+            var outputContainer = self.getOutputContainer();
+
+            {
+                var items = new ArrayList<ItemStack>();
+                items.add(nextOut.copy());
+
+                var inv = new net.minecraft.world.SimpleContainer(outputContainer.getContainerSize());
+                for (int i = 0; i < outputContainer.getContainerSize(); i++) {
+                    inv.setItem(i, outputContainer.getItem(i).copy());
+                }
+
+                for (var item : items) {
+                    FactoryUtil.tryInsertingInv(inv, item, null);
+
+                    if (!item.isEmpty()) {
+                        self.state = OUTPUT_FULL_TEXT;
+                        success = false;
+                    }
+                }
             }
 
             if (success) {
+                FactoryUtil.tryInsertingRegular(outputContainer, nextOut);
+
                 if (FactoryUtil.getClosestPlayer(world, pos, 32) instanceof ServerPlayer player) {
                     CriteriaTriggers.RECIPE_CRAFTED.trigger(player, self.currentRecipe.id(), List.of(stack.getStack(), stack2.getStack()));
                 }
@@ -231,6 +250,21 @@ public class PressBlockEntity extends TallItemMachineBlockEntity {
             }
         }
         self.model.tick();
+    }
+
+    @Override
+    public Container getOwnOutputContainer() {
+        return this.outputContainer;
+    }
+
+    @Override
+    public Container getOutputContainer() {
+        return ItemOutputBufferBlock.getOutputContainer(this.outputContainer, this.level, this.getBlockPos(), this.getBlockState().getValue(PressBlock.INPUT_FACING).getOpposite());
+    }
+
+    @Override
+    public boolean isOutputConnectedTo(Direction dir) {
+        return this.getBlockState().getValue(PressBlock.INPUT_FACING).getOpposite() == dir;
     }
 
     @Override

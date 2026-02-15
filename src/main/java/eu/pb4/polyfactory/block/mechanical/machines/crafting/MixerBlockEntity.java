@@ -8,6 +8,8 @@ import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.fluids.FluidInputOutput;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
+import eu.pb4.polyfactory.block.other.ItemOutputBufferBlock;
+import eu.pb4.polyfactory.block.other.OutputContainerOwner;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
@@ -24,10 +26,12 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.ContainerList;
+import eu.pb4.polyfactory.util.inventory.SubContainer;
 import eu.pb4.polyfactory.util.movingitem.SimpleMovingItemContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.world.Container;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -61,7 +65,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
-public class MixerBlockEntity extends TallItemMachineBlockEntity implements FluidInputOutput.ContainerBased {
+public class MixerBlockEntity extends TallItemMachineBlockEntity implements FluidInputOutput.ContainerBased, OutputContainerOwner {
 
     public static final int OUTPUT_FIRST = 6;
     public static final int INPUT_FIRST = 0;
@@ -76,6 +80,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
     private boolean active;
     private final SimpleMovingItemContainer[] containers = SimpleMovingItemContainer.createArray(9, this::addMoving, this::removeMoving);
     private final List<ItemStack> stacks = new ContainerList(this, INPUT_FIRST, OUTPUT_FIRST);
+    private final Container outputContainer = new SubContainer(this, OUTPUT_FIRST);
     private final FluidContainerImpl fluidContainer = new FluidContainerImpl(FLUID_CAPACITY, this::setChanged);
     private MixerBlock.Model model;
     private boolean inventoryChanged = false;
@@ -248,6 +253,8 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
                 return;
             }
 
+            var outputContainer = self.getOutputContainer();
+
             {
                 var items = new ArrayList<ItemStack>();
                 items.add(output.copy());
@@ -255,9 +262,9 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
                     items.add(x.copy());
                 }
 
-                var inv = new net.minecraft.world.SimpleContainer(3);
-                for (int i = 0; i < 3; i++) {
-                    inv.setItem(i, self.getItem(OUTPUT_FIRST + i).copy());
+                var inv = new net.minecraft.world.SimpleContainer(outputContainer.getContainerSize());
+                for (int i = 0; i < outputContainer.getContainerSize(); i++) {
+                    inv.setItem(i, outputContainer.getItem(i).copy());
                 }
 
                 for (var item : items) {
@@ -278,9 +285,9 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
                 TriggerCriterion.trigger(player, FactoryTriggers.MIXER_CRAFTS);
             }
 
-            FactoryUtil.insertBetween(self, OUTPUT_FIRST, self.getContainerSize(), output);
+            FactoryUtil.tryInsertingRegular(outputContainer, output);
             for (var x : self.currentRecipe.value().remainders(input)) {
-                FactoryUtil.insertBetween(self, OUTPUT_FIRST, self.getContainerSize(), x);
+                FactoryUtil.tryInsertingRegular(outputContainer, x);
             }
 
             for (var f : outFluid) {
@@ -314,6 +321,21 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
 
             self.state = rot.getStateTextOrElse(TOO_SLOW_TEXT);
         }
+    }
+
+    @Override
+    public Container getOwnOutputContainer() {
+        return this.outputContainer;
+    }
+
+    @Override
+    public Container getOutputContainer() {
+        return ItemOutputBufferBlock.getOutputContainer(this.outputContainer, this.level, this.getBlockPos(), this.getBlockState().getValue(MixerBlock.INPUT_FACING).getOpposite());
+    }
+
+    @Override
+    public boolean isOutputConnectedTo(Direction dir) {
+        return this.getBlockState().getValue(MixerBlock.INPUT_FACING).getOpposite() == dir;
     }
 
     @Override

@@ -1,0 +1,33 @@
+### Section: PageInfo
+title=<item 'polyfactory:conveyor'>
+icon=polyfactory:conveyor
+category=polyfactory:item_transport
+### EndSection: PageInfo
+<yellow><item 'polyfactory:conveyor'></> is as block that allows to transport items and entities.
+It requires <u><blue><pagelink 'polyfactory:rotation/00_about'>rotational energy</*> to work, through relays purely on
+the speed of it (but not directionality of the rotation!), without adding any extra stress to the system. Conveyors can also be used to relay the rotational energy
+further.
+<nl2>
+Conveyors are directional and connect with each other as long as they point in the same direction and are next to each other.
+The conveyor can go straight, diagonally (both up and down) and directly upwards.
+<nl2>
+When entity is on top of the powered <item 'polyfactory:conveyor'>, it will be pushed in direction the conveyor is facing.
+In case of vertical ones, entities won't be affected.
+<nl>
+For item transport, dropping items directly, using <item 'hopper'>s or <item 'polyfactory:funnel'> will allow the
+<item 'polyfactory:conveyor'> to pick it up, with the stack size limit of 16. Then the stack will move in specified
+direction, without being able to despawn. If <item 'polyfactory:conveyor'> points directly into some blocks,
+such as <item 'polyfactory:press'>, <item 'polyfactory:mixer'>, <item 'hopper'> and alike, items will be put into it directly.
+<item 'polyfactory:conveyor'> will also be able to take items out of some of them (for example <item 'polyfactory:mechanical_spout'>
+and <item 'polyfactory:mechanical_drain'>).
+<nl2>
+Regular <item 'polyfactory:conveyor'> do not allow items to go directly up or down, only allowing them to move horizontally and diagonally.
+For that, you need to use <yellow><item 'polyfactory:sticky_conveyor'></>, which functions pretty much the same,
+with bonus of allowing vertical item movement. They don't extend this functionality to entity movement currently through.
+To get a <item 'polyfactory:sticky_conveyor'>, you can either craft <item 'polyfactory:conveyor'> with a <item 'slime_ball'>
+or use it directly in world.
+
+### Image: polyfactory:item_transport/conveyor_example Example use of <item 'polyfactory:conveyor'> and <item 'polyfactory:sticky_conveyor'>.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:conveyor'>View the <item 'polyfactory:conveyor'> recipe</>

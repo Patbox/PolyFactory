@@ -3,7 +3,9 @@ package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.block.other.ItemOutputBufferBlock;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
+import eu.pb4.polyfactory.block.other.OutputContainerOwner;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
@@ -11,7 +13,9 @@ import eu.pb4.polyfactory.recipe.input.GrindingInput;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
+import eu.pb4.polyfactory.util.inventory.SubContainer;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.world.Container;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.advancements.CriteriaTriggers;
@@ -42,7 +46,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 
-public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSidedContainer, MachineInfoProvider {
+public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSidedContainer, MachineInfoProvider, OutputContainerOwner {
     public static final int INPUT_SLOT = 0;
     private static final int[] INPUT_SLOTS = {INPUT_SLOT};
     private static final int[] OUTPUT_SLOTS = {1, 2, 3};
@@ -55,6 +59,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
     private boolean active;
     private double speedScale;
     private Component state = null;
+    private final Container outputContainer = new SubContainer(this, 1);
 
     public GrinderBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.GRINDER, pos, state);
@@ -136,11 +141,12 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
         assert self.currentRecipe != null;
 
         if (self.process >= self.currentRecipe.value().grindTime(input)) {
+            var output = self.getOutputContainer();
             // Check space
             {
-                var inv = new SimpleContainer(3);
-                for (int i = 0; i < 3; i++) {
-                    inv.setItem(i, self.getItem(i + 1).copy());
+                var inv = new SimpleContainer(output.getContainerSize());
+                for (int i = 0; i < output.getContainerSize(); i++) {
+                    inv.setItem(i, output.getItem(i).copy());
                 }
 
                 for (var item : self.currentRecipe.value().output(input, world.registryAccess(), null)) {
@@ -160,12 +166,10 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
             var sound = stack.getItem() instanceof BlockItem blockItem ? blockItem.getBlock().defaultBlockState().getSoundType().getBreakSound() : SoundEvents.STONE_BREAK;
             world.playSound(null, pos, sound, SoundSource.BLOCKS, 0.6f, 0.5f);
             self.process = 0;
-            stack.shrink(1);
-
-            ;
+            stack.shrink(1);;
 
             for (var out : self.currentRecipe.value().output(input, world.registryAccess(), world.random)) {
-                FactoryUtil.insertBetween(self, 1, 4, out.copy());
+                FactoryUtil.tryInsertingRegular(output, out.copy());
             }
 
             self.setChanged();
@@ -214,6 +218,21 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
     @Override
     public @Nullable Component getCurrentState() {
         return this.state;
+    }
+
+    @Override
+    public Container getOwnOutputContainer() {
+        return this.outputContainer;
+    }
+
+    @Override
+    public Container getOutputContainer() {
+        return ItemOutputBufferBlock.getOutputContainer(this.outputContainer, this.level, this.getBlockPos(), this.getBlockState().getValue(GrinderBlock.INPUT_FACING).getOpposite());
+    }
+
+    @Override
+    public boolean isOutputConnectedTo(Direction dir) {
+        return this.getBlockState().getValue(GrinderBlock.INPUT_FACING).getOpposite() == dir;
     }
 
     private class Gui extends SimpleGui {

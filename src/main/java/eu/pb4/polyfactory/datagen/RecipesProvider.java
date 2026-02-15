@@ -440,6 +440,15 @@ class RecipesProvider extends FabricRecipeProvider {
                         .unlockedBy("get_steel", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
                         .save(output);
 
+                this.shaped(RecipeCategory.MISC, FactoryItems.ITEM_OUTPUT_BUFFER, 1)
+                        .pattern("sws")
+                        .pattern("w w")
+                        .pattern("sws")
+                        .define('w', FactoryItems.WOODEN_PLATE).define('s', FactoryItems.STEEL_PLATE)
+                        .unlockedBy("get_steel", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
+                        .save(output);
+
+
                 this.shaped(RecipeCategory.MISC, FactoryItems.DEEP_STORAGE_CONTAINER, 1)
                         .pattern("www")
                         .pattern("wsw")

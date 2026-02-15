@@ -92,6 +92,7 @@ class BlockTagsProvider extends FabricTagProvider.BlockTagProvider {
                 .add(FactoryBlocks.PLACER)
                 .add(FactoryBlocks.STEAM_ENGINE)
                 .add(FactoryBlocks.PRIMITIVE_SMELTERY)
+                .add(FactoryBlocks.ITEM_OUTPUT_BUFFER)
                 .add(FactoryBlocks.SMELTERY)
                 .add(FactoryBlocks.SMELTERY_CORE)
                 .add(FactoryBlocks.CASTING_TABLE)

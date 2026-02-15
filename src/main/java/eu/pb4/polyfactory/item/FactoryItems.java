@@ -96,6 +96,7 @@ public class FactoryItems {
     public static final Item GEARSHIFT = register(FactoryBlocks.GEARSHIFT);
     public static final Item CONTAINER = register( FactoryBlocks.CONTAINER);
     public static final Item DEEP_STORAGE_CONTAINER = register( FactoryBlocks.DEEP_STORAGE_CONTAINER);
+    public static final Item ITEM_OUTPUT_BUFFER = register(FactoryBlocks.ITEM_OUTPUT_BUFFER);
     public static final Item NIXIE_TUBE = register(FactoryBlocks.NIXIE_TUBE);
     public static final WindmillSailItem WINDMILL_SAIL = register("windmill_sail", WindmillSailItem::new);
     public static final Item METAL_GRID = register(FactoryBlocks.METAL_GRID);
@@ -269,6 +270,7 @@ public class FactoryItems {
                     entries.accept(SPLITTER);
                     entries.accept(CONTAINER);
                     entries.accept(DEEP_STORAGE_CONTAINER);
+                    entries.accept(ITEM_OUTPUT_BUFFER);
                     entries.accept(ITEM_PACKER);
                     entries.accept(ITEM_FILTER);
 

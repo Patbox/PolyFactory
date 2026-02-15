@@ -1,0 +1,21 @@
+### Section: PageInfo
+title=<item 'polyfactory:steam_engine'>
+icon=polyfactory:steam_engine
+category=polyfactory:rotation
+### EndSection: PageInfo
+<yellow><item 'polyfactory:steam_engine'></> is a 2x3x2 block that generates rotational energy.
+<nl>
+It's the best way to generate a lot of energy, without requiring a lot of connecting infrastructure,
+at the cost of requiring fuel to work.
+<nl2>
+To power it, you just need to put any furnace-compatible fuel into it.
+<nl>
+Once it has fuel, it requires 10 seconds to get to it's full capacity,
+burning the fuel a lot faster than once it gets going. It consumes fuel 16 times faster
+than a furnace, providing rotational speed of 110 RPM and stress capacity of 100 u.
+<nl2>
+While by default it automatically activates once it has fuel, you can also set it to
+require active redstone signal for it to start.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:steam_engine'>View the <item 'polyfactory:steam_engine'> recipe</><nl>

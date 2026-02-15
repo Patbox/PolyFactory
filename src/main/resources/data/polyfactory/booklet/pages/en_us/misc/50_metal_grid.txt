@@ -1,0 +1,11 @@
+### Section: PageInfo
+title=<item 'polyfactory:metal_grid'>
+icon=polyfactory:metal_grid
+category=polyfactory:misc
+### EndSection: PageInfo
+<yellow><item 'polyfactory:metal_grid'></> is a block, that allows items, experience and projectiles
+to pass through it, while acting like a solid block for other entities and players. It can be waterlogged.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:metal_grid'>View the <item 'polyfactory:metal_grid'> recipe</><nl>
+

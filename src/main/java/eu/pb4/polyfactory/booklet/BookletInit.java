@@ -1,33 +1,17 @@
 package eu.pb4.polyfactory.booklet;
 
-import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.booklet.body.AlignedItemBody;
 import eu.pb4.polyfactory.booklet.body.AlignedMessage;
 import eu.pb4.polyfactory.booklet.body.HeaderMessage;
 import eu.pb4.polyfactory.booklet.body.ImageBody;
-import eu.pb4.polyfactory.polydex.PolydexCompat;
-import eu.pb4.polyfactory.ui.GuiTextures;
-import eu.pb4.polyfactory.ui.UiResourceCreator;
-import eu.pb4.polyfactory.util.language.TextUncenterer;
-import eu.pb4.sgui.api.GuiHelpers;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.dialog.*;
-import net.minecraft.server.dialog.action.StaticAction;
-import net.minecraft.server.dialog.body.DialogBody;
-import net.minecraft.server.dialog.body.ItemBody;
-import net.minecraft.server.dialog.body.PlainMessage;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.io.IOException;
@@ -101,18 +85,16 @@ public class BookletInit {
 
     public static void handleAction(ServerPlayer player, String path, Optional<Tag> payload) {
         var state = BookletOpenState.decode(payload);
-        Identifier entry = null;
+        Identifier entry = Identifier.tryParse("");
         if (payload.isPresent() && payload.get() instanceof CompoundTag tag) {
             entry = Identifier.tryParse(tag.getStringOr("entry", ""));
-        }
-        if (entry == null) {
-            return;
         }
 
         switch (path) {
             case "open_page" -> BookletUtil.openPage(player, entry, state);
             case "polydex/usage" -> BookletUtil.openPolydexUsagePage(player, entry, state);
             case "polydex/result" -> BookletUtil.openPolydexResultPage(player, entry, state);
+            case "close" -> player.closeContainer();
         }
     }
 }

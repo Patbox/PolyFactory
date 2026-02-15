@@ -31,6 +31,7 @@
   "block.polyfactory.gearshift": "Gearshift",
   "block.polyfactory.wooden_container": "Wooden Container",
   "block.polyfactory.deep_storage_container": "Deep Storage Container",
+  "block.polyfactory.item_output_buffer": "Item Output Buffer",
   "block.polyfactory.hologram_projector": "Hologram Projector",
   "block.polyfactory.gauge": "Gauge",
   "block.polyfactory.nixie_tube": "Nixie Tube",

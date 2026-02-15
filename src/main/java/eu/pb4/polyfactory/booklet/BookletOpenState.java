@@ -7,11 +7,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.dialog.ActionButton;
-import net.minecraft.server.dialog.CommonButtonData;
-import net.minecraft.server.dialog.DialogAction;
+import net.minecraft.server.dialog.*;
 import net.minecraft.server.dialog.action.StaticAction;
+import net.minecraft.server.dialog.body.DialogBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,23 +53,23 @@ public record BookletOpenState(List<Identifier> previousPages) {
         return (CompoundTag) rec.build(nbt).getOrThrow();
     }
 
-    public ActionButton getCloseButton() {
+    public Dialog getDialog(Component title, List<DialogBody> body) {
+        var buttonWidth = this.previousPages.isEmpty() ? 200 : 100;
+        var closeButton = new ActionButton(new CommonButtonData(CommonComponents.GUI_DONE, buttonWidth),
+                Optional.of(new StaticAction(BookletUtil.encodeClickEvent("close", null, this))));
+
         if (this.previousPages.isEmpty()) {
-            return new ActionButton(new CommonButtonData(CommonComponents.GUI_DONE, 200), Optional.empty());
+            return new NoticeDialog(new CommonDialogData(title, Optional.empty(), true, true, DialogAction.WAIT_FOR_RESPONSE, body, List.of()),
+                    closeButton);
         } else {
             var pop = this.popPage();
-            return new ActionButton(new CommonButtonData(CommonComponents.GUI_BACK, 200), Optional.of(new StaticAction(BookletUtil.encodeClickEvent("open_page", pop.page, pop.state))));
+            var backButton = new ActionButton(new CommonButtonData(CommonComponents.GUI_BACK, buttonWidth), Optional.of(new StaticAction(BookletUtil.encodeClickEvent("open_page", pop.page, pop.state))));
+
+            return new ConfirmationDialog(new CommonDialogData(title, Optional.empty(), true, true, DialogAction.WAIT_FOR_RESPONSE, body, List.of()),
+                    closeButton,
+                    backButton
+            );
         }
     }
-
-    public DialogAction getCloseAction() {
-        if (this.previousPages.isEmpty()) {
-            return DialogAction.CLOSE;
-        } else {
-            return DialogAction.WAIT_FOR_RESPONSE;
-        }
-    }
-
-    public record PopResult(BookletOpenState state, Identifier page) {
-    }
+    public record PopResult(BookletOpenState state, Identifier page) {}
 }

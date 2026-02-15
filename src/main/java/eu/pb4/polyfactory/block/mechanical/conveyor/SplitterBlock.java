@@ -5,6 +5,7 @@ import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
+import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -260,12 +261,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
         private final FilterIcon rightLockElement = new FilterIcon(this);
 
         private Model(BlockState state) {
-            this.mainElement = new ItemDisplayElement();
-            this.mainElement.setDisplaySize(1, 1);
-            this.mainElement.setItemDisplayContext(ItemDisplayContext.FIXED);
-            this.mainElement.setItem(FactoryItems.SPLITTER.getDefaultInstance());
-            this.mainElement.setInvisible(true);
-            this.mainElement.setViewRange(0.8f);
+            this.mainElement = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
 
             this.updateFacing(state);
             this.addElement(this.mainElement);

@@ -14,6 +14,7 @@ import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.PredicateLimitedSlot;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.ItemThrower;
 import eu.pb4.polyfactory.util.inventory.SingleStackContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
@@ -23,10 +24,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.inventory.MenuType;
@@ -176,6 +174,8 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
             self.process = 0;
             self.stress = 0;
 
+            var thrower = new ItemThrower(world, pos, dir, dir.getAxis().getPlane());
+
             boolean skip = false;
 
             if (!entities.isEmpty()) {
@@ -195,10 +195,17 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                 p.setPosRaw(vec.x, vec.y, vec.z);
 
                 for (var entity : entities) {
-                    var s = entity.interact(p, InteractionHand.MAIN_HAND);
-                    Containers.dropContents(world, pos, p.getInventory());
+                    var interaction = entity.interact(p, InteractionHand.MAIN_HAND);
+                    thrower.dropContents(p.getInventory());
 
-                    if (s.consumesAction()) {
+                    if (interaction instanceof InteractionResult.Success success) {
+                        var newStack = success.heldItemTransformedTo();
+                        if (newStack != null) {
+                            self.setStack(newStack);
+                        }
+                    }
+
+                    if (interaction.consumesAction()) {
                         skip = true;
                         break;
                     }
@@ -227,23 +234,23 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                 var vec = Vec3.atCenterOf(pos).relative(state.getValue(PlacerBlock.FACING), 0.51);
                 p.setPosRaw(vec.x, vec.y, vec.z);
 
-                var actionResult = world.getBlockState(blockPos).useItemOn(self.stack, world, self.getFakePlayer(), InteractionHand.MAIN_HAND, blockHitResult);
-                if (!actionResult.consumesAction()) {
-                    actionResult = world.getBlockState(blockPos).useWithoutItem(world, self.getFakePlayer(), blockHitResult);
-                        if (!actionResult.consumesAction()) {
-                            actionResult = self.stack.useOn(context);
-                            if (!actionResult.consumesAction()) {
-                                actionResult = self.stack.use(world, self.getFakePlayer(), InteractionHand.MAIN_HAND);
+                var interaction = world.getBlockState(blockPos).useItemOn(self.stack, world, self.getFakePlayer(), InteractionHand.MAIN_HAND, blockHitResult);
+                if (!interaction.consumesAction()) {
+                    interaction = world.getBlockState(blockPos).useWithoutItem(world, self.getFakePlayer(), blockHitResult);
+                        if (!interaction.consumesAction()) {
+                            interaction = self.stack.useOn(context);
+                            if (!interaction.consumesAction()) {
+                                interaction = self.stack.use(world, self.getFakePlayer(), InteractionHand.MAIN_HAND);
                             }
                         }
                     }
-                if (actionResult instanceof InteractionResult.Success success) {
+                if (interaction instanceof InteractionResult.Success success) {
                     var newStack = success.heldItemTransformedTo();
                     if (newStack != null) {
                         self.setStack(newStack);
                     }
                 }
-                Containers.dropContents(world, pos, p.getInventory());
+                thrower.dropContents(p.getInventory());
             }
 
             if (self.owner != null && world.getPlayerByUUID(self.owner.id()) instanceof ServerPlayer serverPlayer) {

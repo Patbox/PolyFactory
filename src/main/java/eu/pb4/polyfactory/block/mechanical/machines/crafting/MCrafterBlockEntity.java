@@ -6,13 +6,16 @@ import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.block.other.ItemOutputBufferBlock;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
+import eu.pb4.polyfactory.block.other.OutputContainerOwner;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.CrafterLikeInsertContainer;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
+import eu.pb4.polyfactory.util.inventory.SubContainer;
 import eu.pb4.polyfactory.util.inventory.WrappingInputRecipeInput;
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.gui.SimpleGui;
@@ -31,6 +34,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.StackedItemContents;
@@ -57,7 +61,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
-public class MCrafterBlockEntity extends LockableBlockEntity implements MachineInfoProvider, MinimalSidedContainer, CrafterLikeInsertContainer, CraftingContainer {
+public class MCrafterBlockEntity extends LockableBlockEntity implements MachineInfoProvider, MinimalSidedContainer, CrafterLikeInsertContainer, CraftingContainer, OutputContainerOwner {
     private static final int[] INPUT_SLOTS = IntStream.range(0, 9).toArray();
     private static final int[] OUTPUT_SLOTS = IntStream.range(9, 9 + 9).toArray();
     private static final SoundEvent CRAFT_SOUND_EVENT = SoundEvent.createVariableRangeEvent(Identifier.parse("minecraft:block.crafter.craft"));
@@ -74,6 +78,8 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
     @Nullable
     private Component state;
     private ActiveMode activeMode = ActiveMode.FILLED;
+
+    private final Container outputContainer = new SubContainer(this, 9);
 
     public MCrafterBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.CRAFTER, pos, state);
@@ -168,6 +174,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
         assert self.currentRecipe != null;
 
         if (self.process >= 8) {
+            var outputContainer = self.getOutputContainer();
             // Check space
             var output = self.currentRecipe.value().assemble(input, world.registryAccess());
             var remainder = self.currentRecipe.value().getRemainingItems(input);
@@ -179,9 +186,9 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
                     items.add(stack.copy());
                 }
 
-                var inv = new SimpleContainer(9);
-                for (int i = 0; i < 9; i++) {
-                    inv.setItem(i, self.getItem(i + 9).copy());
+                var inv = new SimpleContainer(outputContainer.getContainerSize());
+                for (int i = 0; i < outputContainer.getContainerSize(); i++) {
+                    inv.setItem(i, outputContainer.getItem(i).copy());
                 }
 
                 for (var item : items) {
@@ -219,22 +226,10 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
             items.add(output);
             items.addAll(remainder);
 
-            for (var out : items) {
-                for (int i = 9; i < 9 + 9; i++) {
-                    var c = self.getItem(i);
-                    if (c.isEmpty()) {
-                        self.setItem(i, out);
-                        break;
-                    } else if (ItemStack.isSameItemSameComponents(c, out)) {
-                        var count = Math.min((c.getMaxStackSize() - c.getCount()), out.getCount());
-                        c.grow(count);
-                        out.shrink(count);
-                    }
 
-                    if (out.isEmpty()) {
-                        break;
-                    }
-                }
+
+            for (var out : items) {
+                FactoryUtil.tryInsertingRegular(outputContainer, out);
             }
 
             self.setChanged();
@@ -263,6 +258,21 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
             }
             self.state = rot.getStateTextOrElse(TOO_SLOW_TEXT);
         }
+    }
+
+    @Override
+    public Container getOwnOutputContainer() {
+        return this.outputContainer;
+    }
+
+    @Override
+    public Container getOutputContainer() {
+        return ItemOutputBufferBlock.getOutputContainer(this.outputContainer, this.level, this.getBlockPos(), this.getBlockState().getValue(MCrafterBlock.FACING));
+    }
+
+    @Override
+    public boolean isOutputConnectedTo(Direction dir) {
+        return this.getBlockState().getValue(MCrafterBlock.FACING) == dir;
     }
 
     private boolean isInputNotFull() {

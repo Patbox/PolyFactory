@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.ui.SimpleInputGui;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.FrontAndTop;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,7 +47,10 @@ public record BlockConfig<T>(String id, Component name, Codec<T> codec, BlockCon
 
     public static <T extends Comparable<T>> BlockConfig<T> of(Property<T> property) {
         return of(property.getName(), property);
-    }
+    }    public static final BlockConfig<FrontAndTop> ORIENTATION = BlockConfig.of("orientation", BlockStateProperties.ORIENTATION, (dir, world, pos, side, state) ->
+                    Component.empty().append(FactoryUtil.asText(dir.front())).append(" / ").append(FactoryUtil.asText(dir.top())),
+            WrenchModifyBlockValue.ofProperty(BlockStateProperties.ORIENTATION),
+            BlockConfigValue.ofProperty(BlockStateProperties.ORIENTATION)).withAlt(WrenchModifyBlockValue.ofAltOrientation(BlockStateProperties.ORIENTATION));
 
     public static <T extends Comparable<T>> BlockConfig<T> of(Property<T> property, BlockValueFormatter<T> textFunction) {
         return new BlockConfig<T>(property.getName(), Component.translatable("item.polyfactory.wrench.action." + property.getName()),
@@ -205,5 +209,9 @@ public record BlockConfig<T>(String id, Component name, Codec<T> codec, BlockCon
 
     public Component getDisplayValue(Level world, BlockPos blockPos, Direction side, BlockState state) {
         return this.formatter.getDisplayValue(this.value.getValue(world, blockPos, side, state), world, blockPos, side, state);
+    }
+
+    public BlockConfig<T> withValue(BlockConfigValue<T> valueSetter) {
+        return new BlockConfig<>(this.id, this.name, this.codec, valueSetter, this.formatter, this.action, alt);
     }
 }

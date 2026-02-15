@@ -1,0 +1,34 @@
+### Section: PageInfo
+title=<item 'polyfactory:funnel'>
+icon=polyfactory:funnel
+category=polyfactory:item_transport
+### EndSection: PageInfo
+<yellow><item 'polyfactory:funnel'></> is as block that to take items in to and out of containers to / from an
+<u><blue><pagelink 'polyfactory:item_transport/20_conveyor'><item 'polyfactory:conveyor'></*>.
+<nl2>
+It can face in all horizontal directions and down. It's facing direction is controlled by block face it's placed again
+or player facing direction if placed on top.
+<nl>
+It also has 2 modes of operation:
+- To Conveyor - pulls items out of containers and puts them on the conveyor.
+- From Conveyor - pulls items from conveyor and puts them in the container.
+<nl>
+By default, the mod is selected depending on how it's placed. If it's placed without a Conveyor below, it will always
+default to "To Conveyor" mode. When placed on conveyor.
+If it's placed in conveyor's facing direction, it will use "From Conveyor" mode.
+When placed in opposite direction it will always use "To Conveyor" mode.
+When placed sideways, it will select a mod that takes from the targeted block to the other one.
+Naturally this can be changed with a <u><blue><pagelink 'polyfactory:basics/10_wrench'><item 'polyfactory:wrench'></*>.
+<nl2>
+You can use the <u><blue><pagelink 'polyfactory:item_transport/10_item_filter'>Item Filter</*> to filter out the items
+that go in/out of the <item 'polyfactory:funnel'>.
+<nl2>
+<yellow><item 'polyfactory:slot_aware_funnel'></> is a "smarter" funnel variant which allows you to specially set
+to which slots items should go. By clicking it, it will open UI allowing you to set it up. It supports up to 9
+slots, each with own place to put an Item Filter in.
+
+### Image: polyfactory:item_transport/funnel_example Placed <item 'polyfactory:funnel'>, on left with "To Conveyor" mode and on right with "From Conveyor".
+
+### Align: Center
+<u><blue><polydex 'polyfactory:funnel'>View the <item 'polyfactory:funnel'> recipe</><nl>
+<u><blue><polydex 'polyfactory:polyfactory:slot_aware_funnel'>View the <item 'polyfactory:polyfactory:slot_aware_funnel'> recipe</>

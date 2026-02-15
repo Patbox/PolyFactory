@@ -78,10 +78,14 @@ public class BookletImageHandler {
                 for (; ix < width / 2; ix += dx) {
                     imageString.append('b');
                 }
+
                 for (var x = 0; x < width; x += dx) {
                     imageString.append(character[0]);
                     imageString.append('a');
                     line.append(character[0]++);
+                    if (character[0] >= 0x0600 && character[0] < 0x0700) {
+                        character[0] = '\u0700';
+                    }
                 }
                 for (; ix < width; ix += dx) {
                     imageString.append('b');
@@ -112,6 +116,7 @@ public class BookletImageHandler {
             }
         });
 
+        System.out.print(Integer.toString(character[0], 16));
         builder.addData("assets/polyfactory/font/image_hack.json", fontBuilder.build());
     }
 

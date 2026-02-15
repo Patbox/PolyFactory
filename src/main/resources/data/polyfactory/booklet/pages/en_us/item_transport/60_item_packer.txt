@@ -1,0 +1,18 @@
+### Section: PageInfo
+title=<item 'polyfactory:item_packer'>
+icon=polyfactory:item_packer
+category=polyfactory:item_transport
+### EndSection: PageInfo
+<yellow><item 'polyfactory:item_packer'></> is as storage interface block, that exposes items stored within
+other items, such as Shulker Boxes and Bundles.
+<nl2>
+It can be interfaced with blocks such as <item 'polyfactory:hopper'> and <item 'polyfactory:funnel'>.
+<nl>
+To interact with item-attached storage, you need to interface with solid side of the <item 'polyfactory:item_packer'>.
+You will be able to take and put items into it.
+<nl>
+To change the held item within the <item 'polyfactory:item_packer'>, you need to interact with "open" sides
+(aka ones where you see the items with). Easiest way to do so would be by using Funnels.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:item_packer'>View the <item 'polyfactory:item_packer'> recipe</>
