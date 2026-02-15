@@ -1,6 +1,0 @@
-### Section: PageInfo
-title=Windmill
-icon=polyfactory:windmill_sail
-category=polyfactory:rotation
-### EndSection: PageInfo
-Todo

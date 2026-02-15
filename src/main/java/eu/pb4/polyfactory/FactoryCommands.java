@@ -6,7 +6,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
-import eu.pb4.polyfactory.booklet.BookletInit;
+import eu.pb4.polyfactory.booklet.BookletOpenState;
+import eu.pb4.polyfactory.booklet.BookletUtil;
 import eu.pb4.polymer.virtualentity.impl.HolderHolder;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.ChatFormatting;
@@ -17,6 +18,7 @@ import net.minecraft.commands.arguments.IdentifierArgument;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,9 +36,9 @@ public class FactoryCommands {
         dispatcher.register(literal("polyfactory")
                 //.executes(FactoryCommands::about)
                 .then(literal("wiki").executes(FactoryCommands::wiki))
-                        .then(literal("booklet_page")
-                                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                                .then(argument("id", IdentifierArgument.id()).executes(FactoryCommands::bookletPage)))
+                .then(literal("booklet_page")
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .then(argument("id", IdentifierArgument.id()).executes(FactoryCommands::bookletPage)))
                 .then(literal("debug")
                         .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(literal("list_models").executes(FactoryCommands::listModels))
@@ -50,7 +52,7 @@ public class FactoryCommands {
     }
 
     private static int bookletPage(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        return BookletInit.openPage(ctx.getSource().getPlayerOrException(), IdentifierArgument.getId(ctx, "id")) ? 1 : 0;
+        return BookletUtil.openPage(ctx.getSource().getPlayerOrException(), IdentifierArgument.getId(ctx, "id"), BookletOpenState.DEFAULT) ? 1 : 0;
     }
 
     private static int about(CommandContext<CommandSourceStack> context) {
@@ -68,7 +70,7 @@ public class FactoryCommands {
     }
 
     private static int enableLod(CommandContext<CommandSourceStack> context) {
-        LodItemDisplayElement.isEnabled = BoolArgumentType.getBool(context, "enable");;
+        LodItemDisplayElement.isEnabled = BoolArgumentType.getBool(context, "enable");
         LodItemDisplayElement.isDisabled = !LodItemDisplayElement.isEnabled;
         context.getSource().sendSuccess(() -> Component.literal("Model LOD: " + LodItemDisplayElement.isEnabled), false);
         return 0;
@@ -94,7 +96,7 @@ public class FactoryCommands {
 
             var x = aClass.getName().split("\\.");
             int finalParts = parts;
-            context.getSource().sendSuccess(() -> Component.literal(x[x.length - 1]).append(" - ").append(list.size() + " Models | " ).append(finalParts + " Parts"), false);
+            context.getSource().sendSuccess(() -> Component.literal(x[x.length - 1]).append(" - ").append(list.size() + " Models | ").append(finalParts + " Parts"), false);
         }));
 
         return 0;

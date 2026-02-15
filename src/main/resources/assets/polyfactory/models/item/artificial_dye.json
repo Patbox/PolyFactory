@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "polyfactory:item/artificial_dye"
+    "layer0": "polyfactory:item/artificial_dye",
+    "layer1": "polyfactory:item/artificial_dye_base"
   }
 }

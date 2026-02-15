@@ -2,7 +2,6 @@
   "schemaVersion": 1,
   "id": "polyfactory",
   "version": "${version}",
-
   "name": "PolyFactory",
   "description": "Let's build a factory! A tech mod for your Minecraft server!",
   "authors": [
@@ -30,11 +29,13 @@
   "mixins": [
     "polyfactory.mixins.json"
   ],
-
+  "suggests": {
+    "polydex": "*"
+  },
   "depends": {
     "fabricloader": ">=0.16.0",
     "fabric-api": ">=0.116.1",
-    "minecraft": ">=1.21.9-",
+    "minecraft": "1.21.11",
     "polymer-core": ">=0.11.0",
     "polymer-resource-pack": ">=0.11.0",
     "polymer-virtual-entity": ">=0.11.0",

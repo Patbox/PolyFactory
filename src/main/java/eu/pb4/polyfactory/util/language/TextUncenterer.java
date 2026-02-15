@@ -49,8 +49,8 @@ public class TextUncenterer {
                 var w = registry.getWidth(Component.empty().append(line).append(comp), 8);
 
                 if (w > width && comp.getContents() instanceof PlainTextContents) {
-                    var parts = text.split(" ");
-                    if (parts.length == 1) {
+                    var spaceIndex = text.indexOf(' ');
+                    if (spaceIndex == -1) {
                         if (!line.getSiblings().isEmpty()
                                 && line.getSiblings().getLast().getContents() instanceof PlainTextContents contents
                                 && contents.text().equals(" ")) {
@@ -61,13 +61,15 @@ public class TextUncenterer {
                         line = Component.empty();
                         line.append(comp);
                     } else {
-                        for (var part : parts) {
-                            accept(style, part);
-                            //noinspection StringEquality
-                            if (!line.getSiblings().isEmpty() && parts[parts.length - 1] != part) {
-                                accept(style, " ");
+                        while (spaceIndex != -1) {
+                            accept(style, text.substring(0, spaceIndex));
+                            if (!line.getSiblings().isEmpty()) {
+                                line.append(Component.literal(" ").setStyle(style));
                             }
+                            text = text.substring(spaceIndex + 1);
+                            spaceIndex = text.indexOf(' ');
                         }
+                        accept(style, text);
                     }
                 } else if (w > width) {
                     if (!line.getSiblings().isEmpty()

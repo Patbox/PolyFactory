@@ -1,0 +1,25 @@
+### Section: PageInfo
+title=<item 'polyfactory:wrench'>
+icon=polyfactory:wrench
+category=polyfactory:basics
+### EndSection: PageInfo
+<yellow><item 'polyfactory:wrench'></> is a tool that can be used to configure and modify select blocks and entities.
+<nl2>
+While you hold it, by looking at configurable block or entity, the sidebar will appear showing all current settings
+and their values. To using the wrench, you will change the settings value to next available now. You can also sneak to
+change the settings to "previous" one.
+<nl2>
+By using the offhand swap button, it will instead try to set the value based on the context. For example when targeting
+block that faces certain direction, it will now point at the face you targeted (and again sneaking might change the result).
+<nl2>
+Attacking the block will allow you to change the currently selected setting to the next one, with sneaking moving it one back.
+The currently selected setting is then remembered per block/entity type.
+
+### Header: Controls
+### Align: Center
+<lang 'item.polyfactory.wrench.tooltip.1' '<key 'key.use'>'><nl>
+<lang 'item.polyfactory.wrench.tooltip.1.alt' '<key 'key.swapOffhand'>'><nl>
+<lang 'item.polyfactory.wrench.tooltip.2' '<key 'key.attack'>'><nl>
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:wrench'>View the <item 'polyfactory:wrench'> recipe</>

@@ -1,44 +1,49 @@
 package eu.pb4.polyfactory.booklet;
 
+import com.mojang.brigadier.StringReader;
 import com.mojang.datafixers.util.Either;
 import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.node.DirectTextNode;
 import eu.pb4.placeholders.api.node.LiteralNode;
 import eu.pb4.placeholders.api.node.TextNode;
-import eu.pb4.placeholders.api.node.parent.StyledNode;
 import eu.pb4.placeholders.api.parsers.NodeParser;
 import eu.pb4.placeholders.api.parsers.tag.TagRegistry;
 import eu.pb4.placeholders.api.parsers.tag.TextTag;
 import eu.pb4.placeholders.impl.StringArgOps;
 import eu.pb4.polyfactory.booklet.body.AlignedMessage;
 import eu.pb4.polyfactory.booklet.body.HeaderMessage;
-import eu.pb4.polyfactory.polydex.PolydexCompat;
+import eu.pb4.polyfactory.booklet.body.ImageBody;
+import eu.pb4.polyfactory.booklet.textnode.OpenPageNode;
+import eu.pb4.polyfactory.booklet.textnode.PolydexNode;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.arguments.item.ItemParser;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.dialog.body.DialogBody;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
+import java.util.function.Function;
 
 
 public class PageParser {
     private final NodeParser parser;
     private final ParserContext ctx;
+    private final ItemParser itemParser;
     private Identifier returnValue = null;
 
     public PageParser(HolderLookup.Provider lookup) {
         this.ctx = ParserContext.of(ParserContext.Key.WRAPPER_LOOKUP, lookup);
+        this.itemParser = new ItemParser(lookup);
         this.parser = NodeParser.builder()
                 .quickText()
                 .markdown()
                 .customTagRegistry(TagRegistry.builderCopyDefault()
                         .add(TextTag.self("nl", "booklet", args -> new LiteralNode("\n")))
+                        .add(TextTag.self("nl2", "booklet", args -> new LiteralNode("\n\n")))
                         .add(TextTag.self("item", "booklet", args -> {
                             ItemStack stack = ItemStack.EMPTY;
                             try {
@@ -46,21 +51,27 @@ public class PageParser {
                             } catch (Throwable e) {
                                 stack = BuiltInRegistries.ITEM.getValue(Identifier.tryParse(args.getNext("item", "stone"))).getDefaultInstance();
                             }
-                            return new DirectTextNode(Component.empty().append(stack.getHoverName())
-                                    .setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowItem(stack))));
+                            return new DirectTextNode(stack.getHoverName());
+                        }))
+                        .add(TextTag.self("citem", "booklet", args -> {
+                            ItemStack stack = ItemStack.EMPTY;
+                            try {
+                                stack = ItemStack.CODEC.decode(lookup.createSerializationContext(StringArgOps.INSTANCE), Either.right(args)).getOrThrow().getFirst();
+                            } catch (Throwable e) {
+                                stack = BuiltInRegistries.ITEM.getValue(Identifier.tryParse(args.getNext("item", "stone"))).getDefaultInstance();
+                            }
+                            return new DirectTextNode(Component.empty().append(stack.getHoverName()).setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)));
                         }))
                         .add(TextTag.enclosing("polydex", "booklet", (node, args, parser) -> {
-                            if (!PolydexCompat.IS_PRESENT) {
-                                return TextNode.empty();
-                            }
-
                             var id = args.getNext("id", "");
                             var type = args.getNext("type", "result");
-                            var nbt = new CompoundTag();
-                            nbt.putString("id", id);
-                            nbt.putString("return", returnValue.toString());
 
-                            return new StyledNode(node, Style.EMPTY.withClickEvent(new ClickEvent.Custom(BookletInit.id("booklet/polydex/" + type), Optional.of(nbt))), (StyledNode.HoverData<?>) null, null, null);
+                            return new PolydexNode(Identifier.tryParse(id), type, node);
+                        }))
+                        .add(TextTag.enclosing("pagelink", "booklet", (node, args, parser) -> {
+                            var id = args.getNext("id", "");
+
+                            return new OpenPageNode(Identifier.tryParse(id), node);
                         }))
                         .build())
                 .build();
@@ -74,9 +85,12 @@ public class PageParser {
         var externalTitle = Optional.<String>empty();
         var categories = new HashSet<Identifier>();
 
-        page = page.replace("\r", "").replace("\n\n", "\n<nl>\n");
+        page = page.replace("\r", "")
+                .replace(' ', ' ')
+                .replace('\u00A0', ' ')
+                .replace("\n\n", "\n<nl>\n");
 
-        var body = new ArrayList<DialogBody>();
+        var body = new ArrayList<Function<ParserContext, DialogBody>>();
 
         var contents = new StringBuilder();
 
@@ -86,7 +100,7 @@ public class PageParser {
 
         var width = 300;
 
-        for (var line : page.split("\n")) {
+        for (var line : page.lines().toList()) {
             var spaceLess = line.replace(" ", "").toLowerCase(Locale.ROOT);
             if (spaceLess.startsWith("###section:")) {
                 var type = spaceLess.substring("###section:".length());
@@ -140,18 +154,39 @@ public class PageParser {
             } else if (spaceLess.startsWith("###header:")) {
                 addBody(body, contents, width, alignment);
                 contents = new StringBuilder();
-                body.add(new HeaderMessage(stripAndParse(line.substring(line.indexOf(':') + 1)), 310));
+                addBody(body, stripAndParse(line.substring(line.indexOf(':') + 1)), x -> new HeaderMessage(x, 310));
+                continue;
+            } else if (spaceLess.startsWith("###image:")) {
+                addBody(body, contents, width, alignment);
+                contents = new StringBuilder();
+                var args = line.substring(line.indexOf(':') + 1).strip();
+                var spaceIndex = args.indexOf(' ');
+                TextNode description = null;
+                if (spaceIndex != -1) {
+                    description = stripAndParse(args.substring(spaceIndex + 1));
+                    args = args.substring(0, spaceIndex);
+                }
+
+                var id = Identifier.tryParse(args);
+                if (id != null) {
+                    if (description != null) {
+                        addBody(body, description, x -> new ImageBody(id, Optional.of(x)));
+                    } else {
+                        var out = new ImageBody(id, Optional.empty());
+                        body.add(x -> out);
+                    }
+                }
                 continue;
             }
 
             if (sectionType == SectionType.BODY) {
-                if (!contents.isEmpty() || !line.strip().equals("<nl>")) {
-                    if (!contents.isEmpty() && !previousLine.endsWith("<nl>")) {
+                if (!contents.isEmpty() || (!line.strip().equals("<nl>") && !line.strip().equals("<nl2>"))) {
+                    if (!spaceLess.isEmpty() && !contents.isEmpty() && spaceLess.charAt(0) == '-') {
+                        contents.append('\n');
+                    } else if (!contents.isEmpty() && (!previousLine.endsWith("<nl>") && !previousLine.endsWith("<nl2>"))) {
                         contents.append(" ");
                     }
-                    if (!spaceLess.isEmpty() && contents.isEmpty() && spaceLess.charAt(0) == '-') {
-                        contents.append('\n');
-                    }
+
                     contents.append(line);
                 }
                 previousLine = line;
@@ -174,8 +209,14 @@ public class PageParser {
                             }
                         }
                     }
-                    case "icon" ->
-                            infoIcon = BuiltInRegistries.ITEM.getValue(Identifier.tryParse(value)).getDefaultInstance();
+                    case "icon" -> {
+                        try {
+                            var res = this.itemParser.parse(new StringReader(value));
+                            infoIcon = new ItemStack(res.item(), 1, res.components());
+                        } catch (Throwable e) {
+                            // Ignore
+                        }
+                    }
                 }
             }
         }
@@ -185,20 +226,33 @@ public class PageParser {
     }
 
 
-    private void addBody(List<DialogBody> body, StringBuilder contents, int width, AlignedMessage.Align align) {
-        if (!contents.isEmpty()) {
-            body.add(new AlignedMessage(stripAndParse(contents.toString()), width, align));
+    private void addBody(List<Function<ParserContext, DialogBody>> body, TextNode node, Function<Component, DialogBody> function) {
+        if (node.isDynamic()) {
+            body.add(x -> function.apply(node.toText(x)));
+        } else {
+            var out = function.apply(node.toText(ctx));
+            body.add(x -> out);
         }
     }
 
-    private Component stripAndParse(String string) {
+    private void addBody(List<Function<ParserContext, DialogBody>> body, StringBuilder contents, int width, AlignedMessage.Align align) {
+        if (!contents.isEmpty()) {
+            var node = stripAndParse(contents.toString());
+
+            addBody(body, node, x -> new AlignedMessage(x, width, align));
+        }
+    }
+
+    private TextNode stripAndParse(String string) {
         while (string.startsWith("<nl>")) {
             string = string.substring("<nl>".length());
         }
         while (string.endsWith("<nl>")) {
             string = string.substring(0, string.length() - "<nl>".length());
         }
-        return parser.parseText(string, ctx);
+        var out = parser.parseNode(string);
+
+        return out;
     }
 
     private enum SectionType {

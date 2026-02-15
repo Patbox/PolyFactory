@@ -886,6 +886,12 @@ class RecipesProvider extends FabricRecipeProvider {
                         .unlockedBy("get_item", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
                         .save(output);
 
+                this.shapeless(RecipeCategory.MISC, FactoryItems.GUIDE_BOOK)
+                        .requires(Items.IRON_NUGGET)
+                        .requires(Items.BOOK)
+                        .unlockedBy("get_item", InventoryChangeTrigger.TriggerInstance.hasItems(Items.IRON_INGOT))
+                        .save(output);
+
                 this.shaped(RecipeCategory.MISC, FactoryItems.TINY_POTATO_SPRING)
                         .pattern(" p ")
                         .pattern(" s ")

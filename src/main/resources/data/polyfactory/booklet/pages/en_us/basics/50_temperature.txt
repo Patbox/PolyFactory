@@ -1,0 +1,28 @@
+### Section: PageInfo
+title=Temperature
+icon=blaze_powder[item_model='polyfactory:-/sgui/elements/gen/flame_13']
+category=polyfactory:basics
+### EndSection: PageInfo
+
+<yellow>Temperature</> is a mechanic used by some machines for crafting, it is determined by things such as biome
+and block under affected machine. The values of temparature are contained between -1 to 1
+(through they all might not be achievable).
+<nl2>
+For biomes, ambient temperature is equal to:
+- Really hot biomes like Nether: 0.15,
+- Hot biomes like desert, badlands and savanna: 0.08,
+- Cold, snowy biomes: -0.08,
+- Really cold / icy biomes like Ice Spikes: -0.15.
+<nl2>
+And for block temperature:
+- Lava: 0.85,
+- Lit Campfires and Fire: 0.45,
+- Torch: 0.15,
+- Snow: -0.08,
+- Ice: -0.1.
+<nl2>
+The final effective temperature is equal to value further from 0 based on both block temperature and biome temperature.
+<nl2>
+Example blocks using this mechanic:
+- Some fluid-containing blocks for fluid change logic.
+- Mechanical Mixer crafting recipes.

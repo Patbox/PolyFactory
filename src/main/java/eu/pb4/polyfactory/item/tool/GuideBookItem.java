@@ -1,6 +1,8 @@
 package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.polyfactory.booklet.BookletInit;
+import eu.pb4.polyfactory.booklet.BookletOpenState;
+import eu.pb4.polyfactory.booklet.BookletUtil;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -25,7 +27,7 @@ public class GuideBookItem extends SimplePolymerItem {
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         if (player instanceof ServerPlayer serverPlayer) {
-            BookletInit.openPage(serverPlayer, id("main_page"));
+            BookletUtil.openPage(serverPlayer, id("main_page"), BookletOpenState.DEFAULT);
         }
         return InteractionResult.SUCCESS_SERVER;
     }

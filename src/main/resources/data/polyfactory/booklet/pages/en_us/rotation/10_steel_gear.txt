@@ -1,0 +1,27 @@
+### Section: PageInfo
+title=Steel Gears
+icon=polyfactory:steel_gear
+category=polyfactory:rotation
+### EndSection: PageInfo
+<yellow><item 'polyfactory:steel_gear'></> is a rotational transmission block and a crafting ingredient.
+It can be connected with other regular steel gears by placing them on the same plane, while pointing in
+the same axis.
+<nl2>
+<yellow><item 'polyfactory:large_steel_gear'></> is a rotational transmission block.
+It can be connected with other large steel gears by placing them perpendicularly to each other,
+so their outer part touch visually (the axles need to be pointing perpendicularly).
+<nl2>
+<item 'polyfactory:steel_gear'> and <item 'polyfactory:large_steel_gear'> can be connected with each other when
+placed diagonally on the same plane. Additionally, depending on which gear is powered, the speed and stress capacity
+will change. For example, when the <item 'polyfactory:steel_gear'> powers the <item 'polyfactory:large_steel_gear'>,
+the rotation speed will be halved on the large gear side, but capacity will double. Swapping which one gets powered]
+will also swap the effected values (halved capacity, but doubled speed).
+<nl2>
+To place any of the gears, you either use them on existing <item 'polyfactory:axle'> block or have at least
+1 <item 'polyfactory:axle'> in inventory.
+
+### Image: polyfactory:rotation/gears_example Example gear connections.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:steel_gear'>View the <item 'polyfactory:steel_gear'> recipe</><nl>
+<u><blue><polydex 'polyfactory:large_steel_gear'>View the <item 'polyfactory:large_steel_gear'> recipe</>

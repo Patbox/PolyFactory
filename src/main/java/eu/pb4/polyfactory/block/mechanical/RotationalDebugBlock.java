@@ -65,13 +65,14 @@ public class RotationalDebugBlock extends RotationalNetworkBlock implements Poly
         protected void onTick() {
             var rotation = RotationUser.getRotation(this.world, this.pos);
 
-            this.mainElement.setText(Component.translatable("""
-                    Speed: %s (%s) 
-                    Speed (rad): %s
+            this.mainElement.setText(Component.literal(String.format("""
+                    Speed: %.4f (%.4f) 
+                    Speed (rad): %.4f
+                    Speed (RPM): %.4f
                     Stress: %s / %s
                     Rotation: %s
-                    Negative: %s""", rotation.speed(), rotation.directSpeed(), rotation.speedRadians(), rotation.directStressUsage(), rotation.directStressCapacity(), rotation.rotation(), rotation.isNegative()
-                    ).withColor(rotation.isOverstressed() ? 0xFFBBBB : 0xFFFFFF)
+                    Negative: %s""", rotation.speed(), rotation.directSpeed(), rotation.speedRadians(), rotation.speed() / 360 * 60 * 20, rotation.directStressUsage(), rotation.directStressCapacity(), rotation.rotation(), rotation.isNegative()
+                    )).withColor(rotation.isOverstressed() ? 0xFFBBBB : 0xFFFFFF)
             )
             ;
         }

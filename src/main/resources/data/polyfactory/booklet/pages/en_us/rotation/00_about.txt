@@ -1,0 +1,32 @@
+### Section: PageInfo
+title=About Rotational Energy
+icon=polyfactory:large_steel_gear
+category=polyfactory:rotation
+### EndSection: PageInfo
+
+<yellow>Rotational Energy</> is the main source of power for most machines added by PolyFactory.
+This means that understanding how it works is important if you don't want to be confused why it doesn't work.
+<nl2>
+The rotational energy is composed of two variables:
+- <yellow>Speed</> - controls how fast elements are rotating or machines are working.
+- <yellow>Capacity</> - sometimes referred as *stress capacity* or *torque*, defines how much energy
+is available to do things.
+<nl>
+Different machines might use these variables differently. Some only care about speed, some require some static capacity,
+while having flexible speed and some change the capacity requirement depending on speed.
+<nl2>
+This also applies when generating the rotational energy, as different sources will have different relations to generated
+speed and capacity. In case of multiple sources, the speed will be averaged out if they don't generate equal amount
+of it. In case of capacity it will be added up instead.
+<nl2>
+To generate it, you can use:
+- Hand Crank (<u><blue><polydex 'polyfactory:hand_crank'>recipe</*>) - simple, but requires player input,
+- <u><blue><pagelink 'polyfactory:rotation/20_windmill'>Windmill</*> - passive source of energy, depending on position and external factors,
+- Steam Engine (<u><blue><polydex 'polyfactory:steam_engine'>recipe</*>) - burns fuel, but works everywhere and generates highest speed and energy/
+<nl2>
+Naturally then you need to connect it to the machine somehow.
+To do this at distance, you can use Axles, Steel Gears, Gearboxes and other blocks (see rest of the Rotational Energy category).
+<nl2>
+All machines that take the rotational energy usually only allow to connect it from one or two points, for example
+with <item 'polyfactory:grinder'> being connectable from top and bottom and any 2 block tall machine being connectable on upper blocks left and right sides.
+

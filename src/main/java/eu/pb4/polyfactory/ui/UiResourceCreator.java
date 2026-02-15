@@ -79,7 +79,7 @@ public class UiResourceCreator {
     private static final Int2CharMap SPACES_BY_WIDTH = new Int2CharOpenHashMap();
     private static final List<FontTexture> FONT_TEXTURES = new ArrayList<>();
     private static final List<NumberTexture> TEXTURES_NUMBERS = new ArrayList<>();
-    private static char character = 'a';
+    private static char character = '\u0100';
 
     private static final char CHEST_SPACE0 = space(-8);
     private static final char CHEST_SPACE1 = space(-168);

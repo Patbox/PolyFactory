@@ -4,17 +4,30 @@ icon=player_head
 category=polyfactory:basics
 ### EndSection: PageInfo
 
-By default, the mod doesn't change anything about the world or player's gameplay experience,
-until they start crafting machines and items provided by this mod.
+PolyFactory is a server side tech-mod adding more ways to automate and create things.
+By default, it doesn't apply any visible changes in the world, as it's players goal to do so.
+<nl2>
+To get started, you first need to craft the <item 'polyfactory:grinder'>, which will allow you to create
+<item 'polyfactory:coal_dust'>, <item 'polyfactory:saw_dust'> and many other items (through the first
+two will be most important for crafting).
+<nl2>
+To power the <item 'polyfactory:grinder'> you need to craft the <item 'polyfactory:hand_crank'>.
+It's most primitive, but only one you can get block you can use to generate the mechanical power.
+Place it on top of the <item 'polyfactory:grinder'> facing downwards. To use it just constantly click it,
+as it will generate enough power to get the <item 'polyfactory:coal_dust'>, which you get from grinding
+<item 'minecraft:coal'> and <item 'minecraft:charcoal'>.
+<nl2>
+After you get enough <item 'polyfactory:coal_dust'>, you will want to get some <item 'polyfactory:steel_ingot'>s.
+You can initially get them by crafting <item 'polyfactory:coal_dust'>, <item 'minecraft:redstone_dust'> and 2 <item 'minecraft:iron_ingot'>
+into <item 'polyfactory:steel_alloy_mixture'> and then smelting it in a <item 'minecraft:furnace'>, <item 'minecraft:blast_furnace'>
+or via smelting with a <item 'polyfactory:primitive_smeltery'>.
+<nl2>
+From there, you can get and craft more and more items, which you can read more about in this guide or by check in their recipes in Polydex.
 
-Player start with the mod by crafting the Grinder which allows them to get Coal Dust,
-which then can be mixed with Redstone and Iron Ingot to create Steel Alloy Mixture. From there, player can smelt Steel Ingots and start crafting other items and blocks from the mod with usage of Mechanical Mixer and Mechanical Press. Items can be moved around with usage of Item Conveyors, sorted with Funnels and Item Splitters and then stored in a Wooden Containers or any other compatible/vanilla form of item storage.
-
-To power most of the machines the player needs to use a Hand Crank for initial machines,
-Windmills for later automation or Steam Engine in case where speed and power is required
-(or it's in place which lacks strong enough wind).
-
-Player then can use things like Cables, Data Sources and blocks manipulating/displaying
-data to allow for more automation or general display information.
-
-By default, PolyFactory doesn't display any recipes. To view them, you need to use the Polydex mod.
+### Align: Center
+<u><blue>
+<polydex 'polyfactory:grinder'>View the <item 'polyfactory:grinder'> recipe</><nl>
+<polydex 'polyfactory:coal_dust'>View the <item 'polyfactory:coal_dust'> recipe</><nl>
+<polydex 'polyfactory:steel_alloy_mixture'>View the <item 'polyfactory:steel_alloy_mixture'> recipe</><nl>
+<polydex 'polyfactory:steel_ingot'>View the <item 'polyfactory:steel_ingot'> recipe</>
+</*>

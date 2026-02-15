@@ -1,0 +1,27 @@
+### Section: PageInfo
+title=<item 'polyfactory:chain_drive'>
+icon=polyfactory:chain_drive
+category=polyfactory:rotation
+### EndSection: PageInfo
+<yellow><item 'polyfactory:chain_drive'></> is a rotational transmission block.
+It allows to transmit rotational energy on higher distance with fewer blocks required.
+It can also be used with <item 'polyfactory:chain_lift'> for transportation.
+<nl2>
+Chain Drives can be placed facing any axis. To connect them together, you need to use some
+<item 'iron_chain'>s. The amount of chains needed is equal to rounded up doubled distance between the Chain Drives.
+The max distance of single connection is 32 blocks, however chain drives can be chained allowing for long-distance lines.
+<nl>
+The connection between the chain drives can't have too big of an angle, with the limit being 33 degrees.
+<nl2>
+By using the <yellow><item 'polyfactory:chain_lift'></> on the <item 'polyfactory:chain_drive'> you will attach it,
+after which it will be moving with the chain. You can think of it as Minecarts. By default, Chain Lifts ridden by player
+will only ride in direction player is looking, but that can be disabled with a <item 'polyfactory:wrench'>.
+Otherwise, it will always pick the first path it can find.
+<nl>
+<item 'polyfactory:chain_lift'>s can be powered by <item 'redstone'>, which makes them drop currently held entity.
+
+### Image: polyfactory:rotation/chain_drive_example Example chain drive setup.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:chain_drive'>View the <item 'polyfactory:chain_drive'> recipe</*><nl>
+<u><blue><polydex 'polyfactory:chain_lift'>View the <item 'polyfactory:chain_lift'> recipe</*>

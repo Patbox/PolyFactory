@@ -19,11 +19,13 @@ public class ServerCommonPacketListenerImplMixin {
             return;
         }
 
+        if (packet.id().getPath().startsWith("booklet/")) {
+            BookletInit.handleAction(connection.getPlayer(), packet.id().getPath().substring("booklet/".length()), packet.payload());
+            return;
+        }
+
         switch (packet.id().getPath()) {
             case "punch_card_store" -> PunchCardItem.handleClickAction(connection.getPlayer(), packet.id(), packet.payload());
-            case "booklet/open_page" -> BookletInit.openPage(connection.getPlayer(), Identifier.parse(packet.payload().orElseThrow().asString().orElseThrow()));
-            case "booklet/polydex/usage" -> BookletInit.openPolydexUsagePage(connection.getPlayer(), packet.payload().orElseThrow().asCompound().orElseThrow());
-            case "booklet/polydex/result" -> BookletInit.openPolydexResultPage(connection.getPlayer(), packet.payload().orElseThrow().asCompound().orElseThrow());
         }
     }
 }

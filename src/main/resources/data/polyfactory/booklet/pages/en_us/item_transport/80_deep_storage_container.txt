@@ -1,0 +1,17 @@
+### Section: PageInfo
+title=<item 'polyfactory:deep_storage_container'>
+icon=polyfactory:deep_storage_container
+category=polyfactory:item_transport
+### EndSection: PageInfo
+<yellow><item 'polyfactory:deep_storage_container'></> is a 2x2x2 item storage block.
+<nl2>
+It can store up to 336 stacks of items (or in other words 12 and 2/5 chests), however only
+42 can be visible at the same time, as the ui is split into 8 pages. This limitation doesn't affect
+blocks that interact with the block, such as <item 'polyfactory:funnel'> or <item 'minecraft:hopper'>.
+<nl2>
+Buttons of the UI by default display the number of the slot, but they can be replaced with any item
+by holding it in cursor and then right-clicking the select button. It can be cleared by right-clicking
+with empty cursor.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:deep_storage_container'>View the <item 'polyfactory:deep_storage_container'> recipe</>

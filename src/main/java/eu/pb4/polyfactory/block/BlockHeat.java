@@ -56,7 +56,11 @@ public final class BlockHeat {
         } else if (state.is(Blocks.LAVA)) {
             return LAVA;
         } else if (state.is(Blocks.TORCH)) {
-            return TORCH;
+            return TORCH;                           
+        } else if (state.is(BlockTags.SNOW)) {
+            return SNOW;
+        } else if (state.is(BlockTags.ICE)) {
+            return ICE;
         } else {
             return NEUTRAL;
         }

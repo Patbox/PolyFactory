@@ -239,6 +239,7 @@ public class FactoryItems {
                 .icon(WINDMILL_SAIL::getDefaultInstance)
                 .title(Component.translatable("itemgroup." + ModInit.ID))
                 .displayItems(((context, entries) -> {
+                    entries.accept(GUIDE_BOOK);
                     entries.accept(WRENCH);
 
                     // Rotational machines (tier 1)
@@ -490,7 +491,6 @@ public class FactoryItems {
                     .title(Component.translatable("itemgroup." + ModInit.ID + ".experimental"))
                     .displayItems(((context, entries) -> {
                         FactoryDebugItems.addItemGroup(context, entries);
-                        entries.accept(GUIDE_BOOK, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                         entries.accept(ELECTRIC_GENERATOR, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                         entries.accept(ELECTRIC_MOTOR, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                         entries.accept(CLIPBOARD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);

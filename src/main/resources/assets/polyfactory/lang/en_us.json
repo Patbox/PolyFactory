@@ -106,8 +106,8 @@
   "block.polyfactory.chain_drive.required_chains": "Cost: %s %s",
 
   "item.polyfactory.mod_icon": "Mod Icon",
-  "item.polyfactory.guidebook": "Into The Factory",
-  "item.polyfactory.guidebook.desc": "Guide for PolyFactory",
+  "item.polyfactory.guidebook": "Factories and You",
+  "item.polyfactory.guidebook.desc": "Guide for PolyFactory (WIP)",
   "item.polyfactory.fluid_model": "Fluid Model",
   "item.polyfactory.windmill_sail": "Windmill Sail",
   "item.polyfactory.dynamite": "Dynamite",
@@ -450,6 +450,7 @@
   "text.polyfactory.state.incorrect_items": "Incorrect ingredients!",
   "text.polyfactory.state.output_full": "Output full!",
 
+  "text.polyfactory.polydex_required_to_work": "Polydex mod is required for this to function!",
   "text.polyfactory.polydex.required_fluids": "Required fluids:",
   "text.polyfactory.polydex.created_fluids": "Created fluids:",
   "text.polyfactory.polydex.drain_required": "Nearby Fluid Drain required!",
@@ -473,9 +474,10 @@
 
   "booklet_category.polyfactory.basics": "The Basics",
   "booklet_category.polyfactory.rotation": "Rotational Energy",
-  "booklet_category.polyfactory.item_transport": "Item Transportation",
+  "booklet_category.polyfactory.item_transport": "Item Transportation and Storage",
   "booklet_category.polyfactory.cable": "Cables and Data",
   "booklet_category.polyfactory.fluids": "Fluids and Smelting",
+  "booklet_category.polyfactory.misc": "Miscellaneous",
 
   "advancements.polyfactory.root.title": "PolyFactory",
   "advancements.polyfactory.root.description": "Welcome to the factory!",

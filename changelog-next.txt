@@ -1,3 +1,8 @@
+- Added the guidebook "Factories and you!":
+  - Crafted with a Book and Iron Nugget.
+  - It's a guidebook to the mod, with main goal of making it easier to pick up for new players.
+  - You use it to open new ui.
+  - It's still a bit early on and doesn't describe everything, but most important basics are already there.
 - Added Gearshift:
   - Crafted with 4 Planks, 2 Copper Plates, 1 Steel Gear and 2 Axles.
   - Similar to Clutch, but instead of disconnecting two sides of a mechanical network, it flips it's direction.
@@ -18,6 +23,8 @@
 - Steam Engine can now be set to require redstone signal to work.
 - Squeezing a Wet Sponge in Mechanical Press can now generate 1 bucket worth of water.
 - Updated texture (and internally model) of Clutch to match style of Gearshift.
+- Updated texture of Artificial Dye to match modern vanilla dye textures.
 - Removed some invisible quads from the Conveyor models.
 - Fixed spelling of Faucet (from Fauced).
+- Fixed Ice and Snow not changing block-based temperature.
 - Fixed Faucet block not giving you output item correctly when using last item of a stack.
