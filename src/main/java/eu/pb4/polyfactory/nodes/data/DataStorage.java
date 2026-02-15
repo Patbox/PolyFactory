@@ -85,6 +85,8 @@ public class DataStorage implements GraphEntity<DataStorage> {
         if (channel == -1) {
             return 0;
         }
+        pos = pos.immutable();
+
         this.currentData.put(channel, new SentData(data, pos, direction, dataId));
         var receivers = this.receivers.get(channel);
 

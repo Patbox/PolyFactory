@@ -10,7 +10,6 @@ import eu.pb4.polyfactory.data.CapacityData;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -27,11 +26,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Level.class)
 public abstract class LevelMixin implements LevelAccessor {
-    @Shadow public abstract BlockState getBlockState(BlockPos pos);
+    @Shadow
+    public abstract BlockState getBlockState(BlockPos pos);
 
-    @Shadow @Nullable public abstract BlockEntity getBlockEntity(BlockPos pos);
+    @Shadow
+    @Nullable
+    public abstract BlockEntity getBlockEntity(BlockPos pos);
 
-    @Shadow public abstract boolean setBlock(BlockPos pos, BlockState state, int flags);
+    @Shadow
+    public abstract boolean setBlock(BlockPos pos, BlockState state, int flags);
+
+    @Shadow
+    public abstract boolean isLoaded(BlockPos pos);
 
     @Inject(method = "updateNeighbourForOutputSignal", at = @At("HEAD"))
     private void polyfactory$onComparatorUpdate(BlockPos pos, Block block, CallbackInfo ci) {
@@ -39,7 +45,6 @@ public abstract class LevelMixin implements LevelAccessor {
         if (((Object) this) instanceof ServerLevel world) {
             this.updateItemCounter(world, pos);
         }
-
     }
 
     @Unique
@@ -70,9 +75,10 @@ public abstract class LevelMixin implements LevelAccessor {
         }
         var data = new CapacityData(count, max);
 
+        var selfPos = new BlockPos.MutableBlockPos();
         for (var dir : Direction.values()) {
-            var selfPos = originalPos.relative(dir);
-            if (this.hasChunk(SectionPos.blockToSectionCoord(selfPos.getX()), SectionPos.blockToSectionCoord(selfPos.getZ()))) {
+            selfPos.set(originalPos).move(dir);
+            if (this.isLoaded(selfPos)) {
                 var selfState = this.getBlockState(selfPos);
                 if (selfState.is(FactoryBlocks.ITEM_COUNTER) && selfState.getValue(DataProviderBlock.FACING) == dir.getOpposite()) {
                     DataProvider.sendData(world, selfPos, data);
