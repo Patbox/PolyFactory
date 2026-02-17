@@ -48,7 +48,7 @@ public abstract class V1460Mixin extends Schema {
         registerInventory(schema, map, mod("smeltery"));
         registerInventory(schema, map, mod("primitive_smeltery"));
         registerInventory(schema, map, mod("casting_table"));
-        registerInventory(schema, map, mod("deep_storage_container"));
+        registerInventory(schema, map, mod("item_output_buffer"));
 
         schema.register(map, mod("deep_storage_container"), (name) -> DSL
                 .optionalFields("Items", DSL.list(References.ITEM_STACK.in(schema)), "icon_override", DSL.list(References.ITEM_STACK.in(schema)))

@@ -108,7 +108,7 @@
 
   "item.polyfactory.mod_icon": "Mod Icon",
   "item.polyfactory.guidebook": "Factories and You",
-  "item.polyfactory.guidebook.desc": "Guide for PolyFactory (WIP)",
+  "item.polyfactory.guidebook.desc": "Early version of Guide for PolyFactory",
   "item.polyfactory.fluid_model": "Fluid Model",
   "item.polyfactory.windmill_sail": "Windmill Sail",
   "item.polyfactory.dynamite": "Dynamite",
@@ -346,7 +346,7 @@
   "data_type.polyfactory.item_stack": "Item",
   "data_type.polyfactory.capacity": "Capacity",
   "data_type.polyfactory.progress": "Progress",
-  "data_type.polyfactory.game_time": "Game Type",
+  "data_type.polyfactory.game_time": "Game Time",
 
   "data_type.polyfactory.invalid": "Error",
   "data_type.polyfactory.empty": "Empty",

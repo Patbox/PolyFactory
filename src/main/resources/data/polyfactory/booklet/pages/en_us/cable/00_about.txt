@@ -1,0 +1,28 @@
+### Section: PageInfo
+title=About The Data System
+icon=polyfactory:cable[polyfactory:color=0x00FF00]
+category=polyfactory:cable
+### EndSection: PageInfo
+
+<yellow>Data System</> is the main way to transfer, process and display information, allowing for better automation
+and visibility of the current state of things. All the data systems are bound to blocks and require them to be
+connected with <item 'polyfactory:cable'>s.
+<nl2>
+Blocks can act as an input, output of mix of both. While block can have multiple inputs and outputs, PolyFactory only
+has blocks that are either 1 input only, 1 output only, 1 input with 1 output and 2 inputs and 1 output.
+<nl2>
+Both input and outputs can operate only on single channel. Channels allow you to reuse single cable line to send data
+that will only be read by inputs that are listening to it. There are only 4 channels available. If you need more separate
+data, you will need to connect more cables.
+<nl2>
+For most blocks, data is only processed at the end of the tick and only the final received message within that tick will
+be actually handled, with the rest being silently ignored. Due to this data handling itself is also bound to the game's
+tick rate.
+<nl2>
+Data itself also always has specified type, which is independent of actual contents of it.
+Aside of basics such as Strings (text), Integers, Decimals and Booleans (true / false), there also is data about
+Capacity, Redstone, Block State, Item Stack, Time and way more.
+<nl>
+Different machines might interpret this data differently, so making sure correct type is sent/received is very important.
+You can use things such as <item 'polyfactory:data_extractor'>, <item 'polyfactory:data_comparator'> and others to convert
+the data from one type to another, which will be read correctly be machines you want to use it for.
