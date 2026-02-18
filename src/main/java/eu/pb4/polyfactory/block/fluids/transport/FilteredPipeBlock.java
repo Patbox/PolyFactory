@@ -4,9 +4,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
-import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
-import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
@@ -21,9 +19,11 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import org.jspecify.annotations.NonNull;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -56,7 +56,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, ConfigurableBlock, PipeConnectable, BarrierBasedWaterloggable, EntityBlock, NetworkComponent.Pipe {
+public class FilteredPipeBlock extends PipeBaseBlock implements FactoryBlock, ConfigurableBlock, PipeConnectable, BarrierBasedWaterloggable, EntityBlock, NetworkComponent.Pipe {
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
     public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
 
@@ -64,19 +64,6 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Con
         super(settings);
         this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false).setValue(INVERTED, false));
         Model.NEGATED.isEmpty();
-    }
-
-    @Override
-    public boolean hasAnalogOutputSignal(BlockState state) {
-        return true;
-    }
-
-    @Override
-    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
-        if (world.getBlockEntity(pos) instanceof FilledStateProvider be) {
-            return (int) ((be.getFilledAmount() * 15) / be.getFillCapacity());
-        }
-        return 0;
     }
 
     @Nullable
@@ -88,21 +75,11 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Con
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(AXIS, INVERTED, WATERLOGGED);
+        builder.add(AXIS, INVERTED);
     }
 
     @Override
-    protected void updateNetworkAt(LevelReader world, BlockPos pos) {
-        Pipe.updatePipeAt(world, pos);
-    }
-
-    @Override
-    protected boolean isSameNetworkType(Block block) {
-        return block instanceof Pipe;
-    }
-
-    @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+    protected @NonNull InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
         var func = FluidBehaviours.ITEM_TO_FLUID.get(stack.getItem());
         if (func != null && world.getBlockEntity(pos) instanceof FilteredPipeBlockEntity be) {
@@ -115,24 +92,25 @@ public class FilteredPipeBlock extends NetworkBlock implements FactoryBlock, Con
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+    protected @NonNull BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         tickWater(state, world, tickView, pos);
         return super.updateShape(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
-    public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
-    }
-
-    @Override
-    public boolean canPipeConnect(LevelReader world, BlockPos pos, BlockState state, Direction dir) {
-        return dir.getAxis() == state.getValue(AXIS);
-    }
-
-    @Override
     public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState, pos);
+    }
+
+    @Override
+    public EnumSet<Direction> getFlowDirections(BlockState state) {
+        var axis = state.getValue(AXIS);
+        return EnumSet.of(axis.getPositive(), axis.getNegative());
+    }
+
+    @Override
+    public boolean checkModelDirection(BlockState state, Direction direction) {
+        return state.getValue(AXIS) == direction.getAxis();
     }
 
     @Override

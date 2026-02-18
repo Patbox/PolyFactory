@@ -105,7 +105,7 @@ public class PipeInWallBlock extends PipeBaseBlock implements ConfigurableBlock,
 
     public EnumSet<Direction> getFlowDirections(BlockState state) {
         var axis = state.getValue(AXIS);
-        return EnumSet.of(Direction.get(Direction.AxisDirection.POSITIVE, axis), Direction.get(Direction.AxisDirection.NEGATIVE, axis));
+        return EnumSet.of(axis.getPositive(), axis.getNegative());
     }
 
     @Override

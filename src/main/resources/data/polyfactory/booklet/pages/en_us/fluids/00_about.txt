@@ -1,0 +1,16 @@
+### Section: PageInfo
+title=About Fluids and Smelting
+icon=minecraft:water_bucket
+category=polyfactory:fluids
+### EndSection: PageInfo
+
+<yellow>Fluids</> are a resource, that represent (in-world) vanilla fluids or PolyFactory's custom fluids.
+They aren't bound directly to an item and use different measuring system.
+<nl2>
+Fluids can be transported with blocks such as <item 'polyfactory:pipe'>, which needs to be powered by a <item 'polyfactory:pump'>.
+Pipes and pumps can pull fluids from fluid storage blocks or from in-world blocks such as Water/Lava sources, Honey/Slime
+blocks, Beehives and so on. Custom PolyFactory fluids might require specific recipes and smeltery to use it.
+<nl2>
+<yellow>Smelting</> is a process of melting metallic items with a Smeltery. PolyFactory adds 2 types of Smelteries:
+- <item 'polyfactory:primitive_smeltery'> - Early-game primitive and slower smeltery.
+- <item 'polyfactory:smeltery'> - Mid-game larger smeltery. It's faster and can smelt 9 items at the same time.

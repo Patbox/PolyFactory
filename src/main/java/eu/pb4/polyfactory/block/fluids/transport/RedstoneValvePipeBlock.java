@@ -91,7 +91,7 @@ public class RedstoneValvePipeBlock extends PipeBaseBlock implements Configurabl
     public EnumSet<Direction> getFlowDirections(BlockState state) {
         if (state.getValue(POWERED) == state.getValue(INVERTED)) {
             var axis = state.getValue(AXIS);
-            return EnumSet.of(Direction.get(Direction.AxisDirection.POSITIVE, axis), Direction.get(Direction.AxisDirection.NEGATIVE, axis));
+            return EnumSet.of(axis.getPositive(), axis.getNegative());
         }
         return EnumSet.noneOf(Direction.class);
     }

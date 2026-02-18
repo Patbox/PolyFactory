@@ -28,6 +28,7 @@ import org.joml.Vector3f;
 import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -57,25 +58,12 @@ import net.minecraft.world.level.material.Fluids;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class PumpBlock extends NetworkBlock implements FactoryBlock, RotationUser, ConfigurableBlock, PipeConnectable, BarrierBasedWaterloggable, EntityBlock,
+public class PumpBlock extends PipeBaseBlock implements FactoryBlock, RotationUser, ConfigurableBlock, PipeConnectable, EntityBlock,
         NetworkComponent.Pipe, NetworkComponent.Rotational, NetworkComponent.RotationalConnector, GearPlacementAligner {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
     public PumpBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false));
-    }
-
-    @Override
-    public boolean hasAnalogOutputSignal(BlockState state) {
-        return true;
-    }
-
-    @Override
-    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
-        if (world.getBlockEntity(pos) instanceof FilledStateProvider be) {
-            return (int) ((be.getFilledAmount() * 15) / be.getFillCapacity());
-        }
-        return 0;
     }
 
     @Nullable
@@ -87,7 +75,7 @@ public class PumpBlock extends NetworkBlock implements FactoryBlock, RotationUse
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(FACING, WATERLOGGED);
+        builder.add(FACING);
     }
 
     @Override
@@ -119,18 +107,19 @@ public class PumpBlock extends NetworkBlock implements FactoryBlock, RotationUse
     }
 
     @Override
-    public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
-    }
-
-    @Override
-    public boolean canPipeConnect(LevelReader world, BlockPos pos, BlockState state, Direction dir) {
-        return dir.getAxis() == state.getValue(FACING).getAxis();
-    }
-
-    @Override
     public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return new Model(initialBlockState, pos);
+    }
+
+    @Override
+    public EnumSet<Direction> getFlowDirections(BlockState state) {
+        var facing = state.getValue(FACING);
+        return EnumSet.of(facing, facing.getOpposite());
+    }
+
+    @Override
+    public boolean checkModelDirection(BlockState state, Direction direction) {
+        return state.getValue(FACING).getAxis() == direction.getAxis();
     }
 
     @Override

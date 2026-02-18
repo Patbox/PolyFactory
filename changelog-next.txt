@@ -36,3 +36,4 @@
 - Fixed spelling of Faucet (from Fauced).
 - Fixed Ice and Snow not changing block-based temperature.
 - Fixed Faucet block not giving you output item correctly when using last item of a stack.
+- Fixed Pipes pulling fluid from waterlogged Mechanical Pumps and Copper Pipes with Redstone Valve.
