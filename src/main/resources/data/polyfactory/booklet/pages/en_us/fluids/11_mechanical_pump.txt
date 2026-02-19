@@ -1,0 +1,23 @@
+### Section: PageInfo
+title=<item 'polyfactory:pump'>
+icon=polyfactory:pump
+category=polyfactory:fluids
+### EndSection: PageInfo
+<yellow><item 'polyfactory:pump'></> is a block that powers the in-pipe fluid transport.
+<nl>
+It's directional block, making its facing direction control where fluids get pumped / pulled form.
+The fluid flow direction is indicated with a blue arrow.
+<nl2>
+The range of the pump that it can push fluids through pipe is always equal to 32 blocks,
+however depending on provided to it speed the strength might vary.
+Additionally, it always pulls 5 units of stress on the connected system,
+independent on the speed of it.
+<nl>
+To connect to it, you need to use a gear on the side.
+<nl2>
+<item 'polyfactory:pump'> act similarly to pipes, being able to pull, push and store fluids within them.
+
+### Image: polyfactory:fluids/pump_example Example Mechanical Pump setup.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:pump'>View the <item 'polyfactory:pump'> recipe</>

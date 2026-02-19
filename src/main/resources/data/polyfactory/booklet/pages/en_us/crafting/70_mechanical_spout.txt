@@ -1,0 +1,18 @@
+### Section: PageInfo
+title=<item 'polyfactory:mechanical_spout'>
+icon=polyfactory:mechanical_spout
+category=polyfactory:fluids
+### EndSection: PageInfo
+<yellow><item 'polyfactory:mechanical_spout'></> is a 1x2x1 machine block that allows you to craft things with liquids.
+<nl>
+This block sources it's fluid from the top, additionally acting as a weaker <item 'polyfactory:mechanical_pump'> with
+effect distance of 8. You can use <item 'polyfactory:fluid_tank'>s, Portable Fluid Tanks or <item 'polyfactory:pipe'>s
+to provide it.
+<nl>
+This block requires rotational energy to work, with its stress requirement being equal to 1 unit when active.
+<nl>
+Conveyors can also directly pull from / push to this block, as long they are oriented correctly.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:mechanical_spout'>View the <item 'polyfactory:mechanical_spout'> recipe</><nl>
+<u><blue><polydex 'polyfactory:recipe_type/spout' 'category'>View the recipes done with this block</>

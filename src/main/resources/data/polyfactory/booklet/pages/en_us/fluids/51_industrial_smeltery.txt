@@ -1,0 +1,20 @@
+### Section: PageInfo
+title=<item 'polyfactory:primitive_smeltery'>
+icon=polyfactory:pump
+category=polyfactory:fluids
+### EndSection: PageInfo
+<yellow><item 'polyfactory:primitive_smeltery'></> is a 1x2x1 that allows you to melt certain materials.
+<nl>
+Mainly allows to get Molten fluids (which usually give higher yield than using Furnace), which then can be used
+with rest of the fluid system, <item 'polyfactory:casting_table'> and <item 'polyfactory:mechanical_spout'>.
+<nl2>
+<item 'polyfactory:primitive_smeltery'> can melt only a single item at the time, while also being
+able to store only a block worth of fluids.
+<nl>
+To work, this block requires Furnace-compatible fuel (such as Coal), which it uses 4 times as fast as a Furnace.
+
+### Image: polyfactory:fluids/primitive_smeltery_example Example <item 'polyfactory:primitive_smeltery'> setup.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:primitive_smeltery'>View the <item 'polyfactory:primitive_smeltery'> recipe</><nl>
+<u><blue><polydex 'polyfactory:recipe_type/smeltery' 'category'>View the recipes done with this block</>
