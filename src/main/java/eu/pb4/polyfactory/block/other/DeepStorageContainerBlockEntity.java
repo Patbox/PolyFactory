@@ -1,6 +1,8 @@
 package eu.pb4.polyfactory.block.other;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
@@ -195,7 +197,7 @@ public class DeepStorageContainerBlockEntity extends LockableBlockEntity impleme
                 }
             }
             this.setSlot(7, GuiUtils.createDynamicButton(this::getSelectedIcon));
-
+            TriggerCriterion.trigger(player, FactoryTriggers.DEEP_STORAGE_CONTAINER);
             this.open();
             startOpen(player);
         }

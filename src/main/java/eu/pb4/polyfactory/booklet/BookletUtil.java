@@ -94,6 +94,9 @@ public class BookletUtil {
     public static boolean openPage(ServerPlayer player, Identifier id, BookletOpenState state) {
         if (id.getPath().equals("main_page")) {
             return openMainPage(player, BookletInit.POLYFACTORY, state);
+        } else if (id.getPath().equals("image_test")) {
+            player.openDialog(Holder.direct(state.getDialog(Component.literal("Image Test"), BookletImageHandler.getAllImages())));
+            return true;
         }
 
         var langBox = BookletInit.PAGES.get(id);
@@ -130,6 +133,17 @@ public class BookletUtil {
         var returnState = state.popPage();
 
         PolydexCompat.openResultPage(player, identifier, () -> {
+            if (GuiHelpers.getCurrentGui(player) != null) {
+                GuiHelpers.getCurrentGui(player).close();
+            }
+            openPage(player, returnState.page(), returnState.state());
+        });
+    }
+
+    public static void openPolydexCategoryPage(ServerPlayer player, Identifier identifier, BookletOpenState state) {
+        var returnState = state.popPage();
+
+        PolydexCompat.openCategoryPage(player, identifier, () -> {
             if (GuiHelpers.getCurrentGui(player) != null) {
                 GuiHelpers.getCurrentGui(player).close();
             }

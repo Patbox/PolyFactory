@@ -1,20 +1,21 @@
 ### Section: PageInfo
-title=<item 'polyfactory:primitive_smeltery'>
-icon=polyfactory:primitive_smeltery
+title=<item 'polyfactory:casting_table'>
+icon=polyfactory:casting_table
 category=polyfactory:fluids
 ### EndSection: PageInfo
-<yellow><item 'polyfactory:primitive_smeltery'></> is a 1x2x1 block that allows you to melt certain materials.
-<nl>
-Mainly allows to get Molten fluids (which usually give higher yield than using Furnace), which then can be used
-with rest of the fluid system, <item 'polyfactory:casting_table'> and <item 'polyfactory:mechanical_spout'>.
+<yellow><item 'polyfactory:casting_table'></> is a block that allows you to craft things with liquids.
 <nl2>
-<item 'polyfactory:primitive_smeltery'> can melt only a single item at the time, while also being
-able to store only a block (9 ingots) worth of fluids.
-<nl>
-To work, this block requires Furnace-compatible fuel (such as Coal), which it uses 4 times as fast as a Furnace.
+It doesn't do anything by itself, as you need to place a <item 'polyfactory:faucet'> connected to some fluid source.
+Then by placing the ingredient item in the <item 'polyfactory:casting_table'>, you can start crafting by
+clicking the <item 'polyfactory:faucet'>. If the ingredient is valid and there was enough fluid, casting process will start,
+which first pulls the fluid out and then waits for it to cool down. Once it cools down you can take out the crafted item.
+<nl2>
+While this setup can be automated by powering the <item 'polyfactory:faucet'> with redstone and using a Hopper below the
+table, you should use <u><blue><pagelink '/crafting/70_mechanical_spout'><item 'polyfactory:mechanical_spout'></*> instead,
+as it is faster. Through it will have slightly different sent of recipes.
 
-### Image: polyfactory:fluids/primitive_smeltery_example Example <item 'polyfactory:primitive_smeltery'> setup.
+### Image: polyfactory:fluids/primitive_smeltery_example Example simple <item 'polyfactory:casting_table'> setup.
 
 ### Align: Center
-<u><blue><polydex 'polyfactory:primitive_smeltery'>View the <item 'polyfactory:primitive_smeltery'> recipe</><nl>
-<u><blue><polydex 'polyfactory:recipe_type/smeltery' 'category'>View the recipes done with this block</>
+<u><blue><polydex 'polyfactory:casting_table'>View the <item 'polyfactory:casting_table'> recipe</><nl>
+<u><blue><polydex 'polyfactory:recipe_type/casting' 'category'>View the recipes done with this block</>

@@ -3,7 +3,7 @@ title=<item 'polyfactory:pump'>
 icon=polyfactory:pump
 category=polyfactory:fluids
 ### EndSection: PageInfo
-<yellow><item 'polyfactory:pump'></> is a block that powers the in-pipe fluid transport.
+<yellow><item 'polyfactory:pump'></> is a block that powers the <u><blue><pagelink './10_copper_pipe'>pipe fluid transport</*>.
 <nl>
 It's directional block, making its facing direction control where fluids get pumped / pulled form.
 The fluid flow direction is indicated with a blue arrow.

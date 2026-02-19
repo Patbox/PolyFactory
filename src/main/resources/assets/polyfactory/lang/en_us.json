@@ -108,7 +108,7 @@
 
   "item.polyfactory.mod_icon": "Mod Icon",
   "item.polyfactory.guidebook": "Factories and You",
-  "item.polyfactory.guidebook.desc": "Early version of Guide for PolyFactory",
+  "item.polyfactory.guidebook.desc": "Guide to the PolyFactory mod!",
   "item.polyfactory.fluid_model": "Fluid Model",
   "item.polyfactory.windmill_sail": "Windmill Sail",
   "item.polyfactory.dynamite": "Dynamite",
@@ -454,7 +454,8 @@
   "text.polyfactory.polydex_required_to_work": "Polydex mod is required for this to function!",
   "text.polyfactory.polydex.required_fluids": "Required fluids:",
   "text.polyfactory.polydex.created_fluids": "Created fluids:",
-  "text.polyfactory.polydex.drain_required": "Nearby Fluid Drain required!",
+  "text.polyfactory.polydex.drain_required": "Nearby Fluid Drain required for crafting!",
+  "text.polyfactory.polydex.drain_required.optional": "Nearby Fluid Drain required for fluid result!",
   "polydex_category.polyfactory.fluids": "Item to Fluid",
   "polydex_category.polyfactory.polyfactory.smeltery": "Smeltery",
   "polydex_category.polyfactory.moldmaking": "Moldmaking",
@@ -475,6 +476,7 @@
 
   "booklet_category.polyfactory.basics": "The Basics",
   "booklet_category.polyfactory.rotation": "Rotational Energy",
+  "booklet_category.polyfactory.crafting": "Crafting Machines",
   "booklet_category.polyfactory.item_transport": "Item Transportation and Storage",
   "booklet_category.polyfactory.cable": "Cables and Data",
   "booklet_category.polyfactory.fluids": "Fluids and Smelting",
@@ -482,6 +484,9 @@
 
   "advancements.polyfactory.root.title": "PolyFactory",
   "advancements.polyfactory.root.description": "Welcome to the factory!",
+
+  "advancements.polyfactory.guidebook.title": "Guided",
+  "advancements.polyfactory.guidebook.description": "Open \"Factories and You!\", the guidebook for PolyFactory",
 
   "advancements.polyfactory.hand_crank.title": "Hand-powered",
   "advancements.polyfactory.hand_crank.description": "Power a machine by using an Hand Crank",
@@ -516,6 +521,12 @@
 
   "advancements.polyfactory.press.title": "Better with Plates",
   "advancements.polyfactory.press.description": "Use Mechanical Press to craft Steel, Copper or Wooden Plate",
+
+  "advancements.polyfactory.deep_storage_container.title": "Deep Storage",
+  "advancements.polyfactory.deep_storage_container.description": "Put some items in Deep Storage Container!",
+
+  "advancements.polyfactory.item_output_buffer.title": "Buffered outputs",
+  "advancements.polyfactory.item_output_buffer.description": "Place the Item Output Buffer in a way that connects with a machine block!",
 
   "advancements.polyfactory.crafter.title": "Automatic Crafting",
   "advancements.polyfactory.crafter.description": "Craft something with Mechanical Crafter",

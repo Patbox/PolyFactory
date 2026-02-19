@@ -47,4 +47,7 @@ public interface FactoryTriggers {
     Identifier INDUSTRIAL_SMELTERY_CREATED = id("industrial_smeltery");
     Identifier CHAIN_DRIVES_CONNECTED = id("chain_drives_connected");
     Identifier CHAIN_LIFT = id("chain_lift");
+    Identifier DEEP_STORAGE_CONTAINER = id("deep_storage_container");
+    Identifier ITEM_OUTPUT_BUFFER = id("item_output_buffer");
+    Identifier GUIDEBOOK = id("guidebook");
 }

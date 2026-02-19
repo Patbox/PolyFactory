@@ -7,7 +7,7 @@ category=polyfactory:item_transport
 of output slots of crafting machines connected to it. It can store up to 18 stacks of items.
 <nl2>
 To connect it to a machine you need to place it at the "output" of it. Usually it is positioned on the opposite side
-of the input / front, through it might differ for other blocks (for example <item 'polyfactory:placer'> can be connected
+of the input / front, through it might differ for other blocks (for example for <item 'polyfactory:placer'> can be connected
 from any non-operative) side.
 </>
 When connected, things such as <item 'hopper'>s and <item 'polyfactory:funnel'>s will also see

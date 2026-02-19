@@ -321,7 +321,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
             }
             if (!player.getInventory().isEmpty()) {
                 var thrower = new ItemThrower(world, pos, dir, dir.getAxis().getPlane());
-                thrower.dropContents(player.getInventory());
+                thrower.dropContentsWithoutTool(player.getInventory());
             }
             self.setChanged();
         }

@@ -58,6 +58,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jspecify.annotations.Nullable;
+
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -325,6 +327,13 @@ public class PolydexCompatImpl {
         var val = PolydexPageUtils.getEntry(entry);
         if (val != null) {
             PolydexPageUtils.openRecipeListUi(player, val, runnable);
+        }
+    }
+
+    public static void openCategoryPage(ServerPlayer player, Identifier category, Runnable runnable) {
+        var val = PolydexImpl.CATEGORY_BY_ID.get(category);
+        if (val != null) {
+            PolydexPageUtils.openCategoryUi(player, val, runnable);
         }
     }
 }

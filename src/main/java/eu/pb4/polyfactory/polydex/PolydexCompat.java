@@ -43,4 +43,12 @@ public class PolydexCompat {
             runnable.run();
         }
     }
+
+    public static void openCategoryPage(ServerPlayer player, Identifier category, Runnable runnable) {
+        if (IS_PRESENT) {
+            PolydexCompatImpl.openCategoryPage(player, category, runnable);
+        } else {
+            runnable.run();
+        }
+    }
 }

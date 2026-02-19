@@ -41,4 +41,8 @@ public interface PressRecipe extends Recipe<PressInput> {
     default PlacementInfo placementInfo() {
         return PlacementInfo.NOT_PLACEABLE;
     }
+
+    default boolean fluidsRequired() {
+        return false;
+    }
 }

@@ -33,7 +33,7 @@ public class PageParser {
     private final NodeParser parser;
     private final ParserContext ctx;
     private final ItemParser itemParser;
-    private Identifier returnValue = null;
+    private Identifier currentPage = null;
 
     public PageParser(HolderLookup.Provider lookup) {
         this.ctx = ParserContext.of(ParserContext.Key.WRAPPER_LOOKUP, lookup);
@@ -69,16 +69,26 @@ public class PageParser {
                             return new PolydexNode(Identifier.tryParse(id), type, node);
                         }))
                         .add(TextTag.enclosing("pagelink", "booklet", (node, args, parser) -> {
-                            var id = args.getNext("id", "");
+                            var page = args.getNext("id", "");
+                            Identifier id;
+                            if (page.startsWith("/")) {
+                                id = currentPage.withPath(page.substring(1));
+                            } else if (page.startsWith("./")) {
+                                var spit = currentPage.getPath().split("/");
+                                spit[spit.length - 1] = page.substring(2);
+                                id = currentPage.withPath(String.join("/", spit));
+                            } else {
+                                id = Identifier.tryParse(page);
+                            }
 
-                            return new OpenPageNode(Identifier.tryParse(id), node);
+                            return new OpenPageNode(id, node);
                         }))
                         .build())
                 .build();
     }
 
     public BookletPage readPage(Identifier identifier, String page) {
-        returnValue = identifier;
+        currentPage = identifier;
         var ctx = ParserContext.of();
         var infoIcon = ItemStack.EMPTY;
         var title = identifier.toString();

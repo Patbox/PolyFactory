@@ -1,11 +1,13 @@
 package eu.pb4.polyfactory.util;
 
+import eu.pb4.factorytools.api.util.FactoryPlayer;
 import eu.pb4.polyfactory.block.other.ItemOutputBufferBlock;
 import eu.pb4.polyfactory.util.inventory.MergedContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -78,5 +80,17 @@ public class ItemThrower {
         }
 
         return this.container;
+    }
+
+    public void dropContentsWithoutTool(Container container) {
+        if (!(container instanceof FactoryPlayer.FakeInventory inventory)) {
+            this.dropContents(container);
+            return;
+        }
+
+        var oldState = inventory.toolWrappingEnabled();
+        inventory.setToolWrapping(false);
+        this.dropContents(inventory);
+        inventory.setToolWrapping(oldState);
     }
 }

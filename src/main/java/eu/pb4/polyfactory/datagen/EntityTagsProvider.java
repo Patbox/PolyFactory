@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.datagen;
 
+import eu.pb4.polyfactory.entity.FactoryEntities;
 import eu.pb4.polyfactory.entity.FactoryEntityTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
@@ -23,6 +24,16 @@ class EntityTagsProvider extends FabricTagProvider.EntityTypeTagProvider {
                 .add(EntityType.EXPERIENCE_BOTTLE)
                 .add(EntityType.LINGERING_POTION)
                 .add(EntityType.SPLASH_POTION)
+                .addOptionalTag(FactoryEntityTags.FLUID_SPLASH)
+        ;
+        this.valueLookupBuilder(FactoryEntityTags.FLUID_SPLASH)
+                .add(FactoryEntities.EXPERIENCE_SPLASH)
+                .add(FactoryEntities.HONEY_SPLASH)
+                .add(FactoryEntities.SLIME_SPLASH)
+                .add(FactoryEntities.LAVA_SPLASH)
+                .add(FactoryEntities.MILK_SPLASH)
+                .add(FactoryEntities.WATER_SPLASH)
+                .add(FactoryEntities.POTION_SPLASH)
         ;
     }
 }

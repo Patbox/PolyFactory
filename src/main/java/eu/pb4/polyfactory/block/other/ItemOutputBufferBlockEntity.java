@@ -178,6 +178,10 @@ public class ItemOutputBufferBlockEntity extends LockableBlockEntity implements 
         return true;
     }
 
+    public boolean isConnected() {
+        return getRedirect() != this.container;
+    }
+
     private class Gui extends SimpleGui {
         public Gui(ServerPlayer player, boolean mayPlace) {
             super(MenuType.GENERIC_9x2, player, false);

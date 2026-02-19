@@ -33,7 +33,12 @@
 - Updated texture (and internally model) of Clutch to match style of Gearshift.
 - Updated texture of Artificial Dye to match modern vanilla dye textures.
 - Removed some invisible quads from the Conveyor models.
+- Mechanical Placer should now act closer to regular player placing behaviour.
+- Improved Mechanical Presses fluid output handling. Fluids can now be set as required (unused by PolyFactory).
 - Fixed spelling of Faucet (from Fauced).
+- Fixed Mechanical Mixer not allowing to craft recipes with fluid output even if there is enough space with input fluids taken.
 - Fixed Ice and Snow not changing block-based temperature.
 - Fixed Faucet block not giving you output item correctly when using last item of a stack.
 - Fixed Pipes pulling fluid from waterlogged Mechanical Pumps and Copper Pipes with Redstone Valve.
+- Fixed Filtered Copper Pipe rendering as a solid block rather than transparently.
+- Fixed advancements not working with when other mod updated Factory Tools library.

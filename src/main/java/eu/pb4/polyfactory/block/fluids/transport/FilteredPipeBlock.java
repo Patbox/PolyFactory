@@ -151,11 +151,11 @@ public class FilteredPipeBlock extends PipeBaseBlock implements FactoryBlock, Co
     }
 
     public static final class Model extends RotationAwareModel {
-        private static final ItemStack NEGATED = ItemDisplayElementUtil.getSolidModel(id("block/filtered_pipe_negated"));
+        private static final ItemStack NEGATED = ItemDisplayElementUtil.getTransparentModel(id("block/filtered_pipe_negated"));
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement fluid;
         private Model(BlockState state, BlockPos pos) {
-            this.mainElement = ItemDisplayElementUtil.createSimple(state.getValue(FilteredPipeBlock.INVERTED) ? NEGATED : ItemDisplayElementUtil.getSolidModel(state.getBlock().asItem()));
+            this.mainElement = ItemDisplayElementUtil.createSimple(state.getValue(FilteredPipeBlock.INVERTED) ? NEGATED : ItemDisplayElementUtil.getTransparentModel(state.getBlock().asItem()));
             this.mainElement.setScale(new Vector3f(2f));
             this.fluid = ItemDisplayElementUtil.createSimple();
             this.fluid.setScale(new Vector3f(2f));

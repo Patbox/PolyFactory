@@ -27,6 +27,7 @@ public class BookletInit {
             List.of(
                     id("basics"),
                     id("rotation"),
+                    id("crafting"),
                     id("item_transport"),
                     id("fluids"),
                     id("cable"),
@@ -94,6 +95,7 @@ public class BookletInit {
             case "open_page" -> BookletUtil.openPage(player, entry, state);
             case "polydex/usage" -> BookletUtil.openPolydexUsagePage(player, entry, state);
             case "polydex/result" -> BookletUtil.openPolydexResultPage(player, entry, state);
+            case "polydex/category" -> BookletUtil.openPolydexCategoryPage(player, entry, state);
             case "close" -> player.closeContainer();
         }
     }

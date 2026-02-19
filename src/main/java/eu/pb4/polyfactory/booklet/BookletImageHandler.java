@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.booklet;
 
+import eu.pb4.polyfactory.booklet.body.ImageBody;
 import eu.pb4.polymer.resourcepack.api.PackResource;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.resourcepack.api.ResourcePackBuilder;
@@ -11,12 +12,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.dialog.body.DialogBody;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class BookletImageHandler {
     private static final Map<Identifier, ComponentWidth> IMAGES = new HashMap<>();
@@ -116,9 +121,13 @@ public class BookletImageHandler {
             }
         });
 
-        System.out.print(Integer.toString(character[0], 16));
         builder.addData("assets/polyfactory/font/image_hack.json", fontBuilder.build());
     }
+
+    public static List<DialogBody> getAllImages() {
+        return IMAGES.keySet().stream().map(x -> (DialogBody) new ImageBody(x, Optional.of(Component.translationArg(x)))).toList();
+    }
+
 
 
     public record ComponentWidth(Component component, int width) {

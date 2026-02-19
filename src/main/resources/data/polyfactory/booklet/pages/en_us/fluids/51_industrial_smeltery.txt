@@ -1,20 +1,33 @@
 ### Section: PageInfo
-title=<item 'polyfactory:primitive_smeltery'>
-icon=polyfactory:pump
+title=<item 'polyfactory:smeltery'>
+icon=polyfactory:smeltery
 category=polyfactory:fluids
 ### EndSection: PageInfo
-<yellow><item 'polyfactory:primitive_smeltery'></> is a 1x2x1 that allows you to melt certain materials.
+<yellow><item 'polyfactory:smeltery'></> is a 3x3x3 multi-block that allows you to melt certain materials.
 <nl>
-Mainly allows to get Molten fluids (which usually give higher yield than using Furnace), which then can be used
-with rest of the fluid system, <item 'polyfactory:casting_table'> and <item 'polyfactory:mechanical_spout'>.
+Similarly to <u><blue><pagelink './50_primitive_smeltery'><item 'polyfactory:primitive_smeltery'></*>, its
+used to get Molten fluids (which usually give higher yield than using Furnace), later used for crafting with
+<item 'polyfactory:casting_table'> and <item 'polyfactory:mechanical_spout'>.
 <nl2>
-<item 'polyfactory:primitive_smeltery'> can melt only a single item at the time, while also being
-able to store only a block worth of fluids.
+<item 'polyfactory:smeltery'> can melt up to 9 items at the same time, while being able to hold up to
+24-blocks worth of fluid
 <nl>
-To work, this block requires Furnace-compatible fuel (such as Coal), which it uses 4 times as fast as a Furnace.
+To work, this block requires Furnace-compatible fuel (such as Coal), while using it 3 times as fast as a Furnace.
+<nl2>
+Unlike most other blocks, to make this block you need to build it in world.
+To do it, first you need <item 'polyfactory:smeltery_core'>, 22 <item 'deepslate_bricks'>
+and 3 <item 'polyfactory:steel_block'>.
 
-### Image: polyfactory:fluids/primitive_smeltery_example Example <item 'polyfactory:primitive_smeltery'> setup.
+Then you just need to build a hollow cube out of them (aka center block is empty).
+Position of the <item 'deepslate_bricks'> and <item 'polyfactory:steel_block'> doesn't matter,
+with only requirement being that <item 'polyfactory:smeltery_core'> is in a middle of one of the walls
+facing outwards. Once you do it, just click the <item 'polyfactory:smeltery_core'> and it will turn into
+the <item 'polyfactory:smeltery'>. If you placed something wrong, it will highlight the incorrect blocks instead.
+
+### Image: polyfactory:fluids/smeltery_building Step by step Smeltery building.
+
+### Image: polyfactory:fluids/smeltery_example Example <item 'polyfactory:smeltery'> setup.
 
 ### Align: Center
-<u><blue><polydex 'polyfactory:primitive_smeltery'>View the <item 'polyfactory:primitive_smeltery'> recipe</><nl>
+<u><blue><polydex 'polyfactory:smeltery_core'>View the <item 'polyfactory:smeltery_core'> recipe</><nl>
 <u><blue><polydex 'polyfactory:recipe_type/smeltery' 'category'>View the recipes done with this block</>

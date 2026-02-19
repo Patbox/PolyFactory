@@ -71,6 +71,21 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 ))
                 .save(exporter, "polyfactory:main/root");
 
+        var guideBook = Advancement.Builder.advancement()
+                .parent(root)
+                .display(
+                        FactoryItems.GUIDE_BOOK,
+                        Component.translatable("advancements.polyfactory.guidebook.title"),
+                        Component.translatable("advancements.polyfactory.guidebook.description"),
+                        null,
+                        AdvancementType.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .addCriterion("use", TriggerCriterion.of(FactoryTriggers.GUIDEBOOK))
+                .save(exporter, "polyfactory:main/guidebook");
+
         this.mainline(registryLookup, root, exporter);
         this.smeltery(registryLookup, root, exporter);
         this.taters(registryLookup, root, exporter);
@@ -431,6 +446,36 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .addCriterion("use3", RecipeCraftedTrigger.TriggerInstance.craftedItem(recipeKey("press/copper_plate")))
                 .requirements(AdvancementRequirements.Strategy.OR)
                 .save(exporter, "polyfactory:main/base/press");
+
+        var deepStorageContainer = Advancement.Builder.advancement()
+                .parent(press)
+                .display(
+                        FactoryItems.DEEP_STORAGE_CONTAINER,
+                        Component.translatable("advancements.polyfactory.deep_storage_container.title"),
+                        Component.translatable("advancements.polyfactory.deep_storage_container.description"),
+                        null,
+                        AdvancementType.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .addCriterion("use", TriggerCriterion.of(FactoryTriggers.DEEP_STORAGE_CONTAINER))
+                .save(exporter, "polyfactory:main/base/deep_storage_container");
+
+        var itemOutputBuffer = Advancement.Builder.advancement()
+                .parent(press)
+                .display(
+                        FactoryItems.ITEM_OUTPUT_BUFFER,
+                        Component.translatable("advancements.polyfactory.item_output_buffer.title"),
+                        Component.translatable("advancements.polyfactory.item_output_buffer.description"),
+                        null,
+                        AdvancementType.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .addCriterion("use", TriggerCriterion.of(FactoryTriggers.ITEM_OUTPUT_BUFFER))
+                .save(exporter, "polyfactory:main/base/item_output_buffer");
 
         var gear = Advancement.Builder.advancement()
                 .parent(steel)

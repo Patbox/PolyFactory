@@ -24,19 +24,24 @@ import java.util.List;
 
 public class PressRecipePage extends PrioritizedRecipePage<GenericPressRecipe> {
     private static final ItemStack ICON = FactoryItems.PRESS.getDefaultInstance();
-    private static final ItemStack DRAIN_ICON = new GuiElementBuilder(FactoryItems.DRAIN).setName(Component.translatable("text.polyfactory.polydex.drain_required")).asStack();
+    private static final ItemStack DRAIN_ICON = new GuiElementBuilder(FactoryItems.DRAIN)
+            .setName(Component.translatable("text.polyfactory.polydex.drain_required")).asStack();
+    private static final ItemStack DRAIN_ICON_OPTIONAL = new GuiElementBuilder(FactoryItems.DRAIN)
+            .setName(Component.translatable("text.polyfactory.polydex.drain_required.optional")).asStack();
     private final List<PolydexIngredient<?>> ingredients;
     private final PolydexStack<?>[] output;
+    private final PolydexStack<?>[] mainOutput;
 
     public PressRecipePage(RecipeHolder<GenericPressRecipe> recipe) {
         super(recipe);
         this.ingredients = PolydexCompatImpl.createIngredients(this.recipe.inputA(), this.recipe.inputB());
+        this.mainOutput = PolydexCompatImpl.createOutput(this.recipe.output());
         this.output = PolydexCompatImpl.createOutput(this.recipe.output(), this.recipe.outputFluids());
     }
 
     @Override
     public ItemStack getOutput(@Nullable PolydexEntry polydexEntry, MinecraftServer minecraftServer) {
-        return this.recipe.output().getFirst().stack().copy();
+        return this.recipe.output().isEmpty() ? ItemStack.EMPTY : this.recipe.output().getFirst().stack().copy();
     }
 
     @Override
@@ -64,7 +69,7 @@ public class PressRecipePage extends PrioritizedRecipePage<GenericPressRecipe> {
 
     @Override
     public ItemStack entryIcon(@Nullable PolydexEntry entry, ServerPlayer player) {
-        return this.recipe.output().get(0).stack();
+        return this.mainOutput.length != 0 ? this.mainOutput[0].toItemStack(player) : ItemStack.EMPTY;
     }
 
     @Override
@@ -81,12 +86,12 @@ public class PressRecipePage extends PrioritizedRecipePage<GenericPressRecipe> {
     public void createPage(@Nullable PolydexEntry entry, ServerPlayer player, PageBuilder layer) {
         layer.setIngredient(3, 1, this.ingredients.get(0));
         layer.setIngredient(5, 1, this.ingredients.get(1));
-        layer.setOutput(4, 3, this.output);
+        layer.setOutput(4, 3, this.mainOutput);
         if (!this.recipe.outputFluids().isEmpty()) {
-            layer.set(5, 2, DRAIN_ICON);
+            layer.set(5, 2, this.recipe.fluidsRequired() ? DRAIN_ICON : DRAIN_ICON_OPTIONAL);
 
             var fluid = GuiTextures.EMPTY_BUILDER.get();
-            fluid.setName(Component.translatable("text.polyfactory.polydex.required_fluids"));
+            fluid.setName(Component.translatable("text.polyfactory.polydex.created_fluids"));
             for (var stack : this.recipe.outputFluids()) {
                 fluid.addLoreLine(stack.toTextRequired().setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY).withItalic(false)));
             }

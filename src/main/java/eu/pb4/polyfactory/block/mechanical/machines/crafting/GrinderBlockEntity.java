@@ -207,10 +207,10 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
             var input = new GrindingInput(this.stacks.getFirst());
 
             return this.currentRecipe != null ?
-                    Mth.clamp(this.currentRecipe.value().optimalSpeed(input) * 0.7 * this.speedScale,
-                            this.currentRecipe.value().minimumSpeed(input) * 0.7,
-                            this.currentRecipe.value().optimalSpeed(input) * 0.7
-                    ) : 1;
+                    Mth.clamp(this.currentRecipe.value().optimalSpeed(input) * this.speedScale,
+                            this.currentRecipe.value().minimumSpeed(input),
+                            this.currentRecipe.value().optimalSpeed(input)
+                    ) * 0.7 : 1;
         }
         return 0;
     }

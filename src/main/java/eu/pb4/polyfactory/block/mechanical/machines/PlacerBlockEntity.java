@@ -24,7 +24,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.*;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.inventory.MenuType;
@@ -41,10 +43,12 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Objects;
+
 public class PlacerBlockEntity extends LockableBlockEntity implements SingleStackContainer, WorldlyContainer, OwnedBlockEntity {
-    private ItemStack stack = ItemStack.EMPTY;
     protected GameProfile owner = null;
     protected double process = 0;
+    private ItemStack stack = ItemStack.EMPTY;
     private float stress = 0;
     private PlacerBlock.Model model;
     private FactoryPlayer player;
@@ -52,53 +56,6 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
 
     public PlacerBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.PLACER, pos, state);
-    }
-
-    @Override
-    protected void saveAdditional(ValueOutput view) {
-        if (!this.stack.isEmpty()) {
-            view.store("stack", ItemStack.OPTIONAL_CODEC, this.stack);
-        }
-        view.putDouble("progress", this.process);
-        if (this.owner != null) {
-            view.store("owner", CompoundTag.CODEC, LegacyNbtHelper.writeGameProfile(new CompoundTag(), this.owner));
-        }
-        view.putInt("reach", this.reach);
-        super.saveAdditional(view);
-    }
-
-    @Override
-    public void loadAdditional(ValueInput view) {
-        this.stack = view.read("stack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
-        this.process = view.getDoubleOr("progress", 0);
-        view.read("owner", CompoundTag.CODEC).ifPresent(x -> this.owner = LegacyNbtHelper.toGameProfile(x));
-
-        this.reach = view.getIntOr("reach", 1);
-        super.loadAdditional(view);
-    }
-
-    @Override
-    public ItemStack getStack() {
-        return this.stack;
-    }
-
-    @Override
-    public void setStack(ItemStack stack) {
-        this.stack = stack;
-        if (this.model != null) {
-            this.model.setItem(stack.copyWithCount(1));
-        }
-        this.setChanged();
-    }
-
-    @Override
-    public int getMaxStackSize() {
-        return 64;
-    }
-
-    @Override
-    protected void createGui(ServerPlayer playerEntity) {
-        new Gui(playerEntity);
     }
 
     public static <T extends BlockEntity> void ticker(Level world, BlockPos pos, BlockState state, T t) {
@@ -135,7 +92,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         }
 
         var dir = state.getValue(PlacerBlock.FACING);
-        var speed = Math.abs(RotationUser.getRotation((ServerLevel) world, pos).speed()) * Mth.DEG_TO_RAD * 2.5f;
+        var speed = Math.abs(RotationUser.getRotation(world, pos).speed()) * Mth.DEG_TO_RAD * 2.5f;
 
 
         var entities = world.getEntitiesOfClass(Entity.class, new AABB(blockPos), Entity::isPickable);
@@ -195,21 +152,13 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                 p.setPosRaw(vec.x, vec.y, vec.z);
 
                 for (var entity : entities) {
-                    var interaction = entity.interact(p, InteractionHand.MAIN_HAND);
-                    thrower.dropContents(p.getInventory());
-
-                    if (interaction instanceof InteractionResult.Success success) {
-                        var newStack = success.heldItemTransformedTo();
-                        if (newStack != null) {
-                            self.setStack(newStack);
-                        }
-                    }
+                    var interaction = p.interactOn(entity, InteractionHand.MAIN_HAND);
+                    thrower.dropContentsWithoutTool(p.getInventory());
 
                     if (interaction.consumesAction()) {
                         skip = true;
                         break;
                     }
-
                 }
             }
 
@@ -234,23 +183,12 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                 var vec = Vec3.atCenterOf(pos).relative(state.getValue(PlacerBlock.FACING), 0.51);
                 p.setPosRaw(vec.x, vec.y, vec.z);
 
-                var interaction = world.getBlockState(blockPos).useItemOn(self.stack, world, self.getFakePlayer(), InteractionHand.MAIN_HAND, blockHitResult);
+                var interaction = p.gameMode.useItemOn(p, world, self.stack, InteractionHand.MAIN_HAND, blockHitResult);
+                thrower.dropContentsWithoutTool(p.getInventory());
                 if (!interaction.consumesAction()) {
-                    interaction = world.getBlockState(blockPos).useWithoutItem(world, self.getFakePlayer(), blockHitResult);
-                        if (!interaction.consumesAction()) {
-                            interaction = self.stack.useOn(context);
-                            if (!interaction.consumesAction()) {
-                                interaction = self.stack.use(world, self.getFakePlayer(), InteractionHand.MAIN_HAND);
-                            }
-                        }
-                    }
-                if (interaction instanceof InteractionResult.Success success) {
-                    var newStack = success.heldItemTransformedTo();
-                    if (newStack != null) {
-                        self.setStack(newStack);
-                    }
+                    p.gameMode.useItem(p, world, self.stack, InteractionHand.MAIN_HAND);
+                    thrower.dropContentsWithoutTool(p.getInventory());
                 }
-                thrower.dropContents(p.getInventory());
             }
 
             if (self.owner != null && world.getPlayerByUUID(self.owner.id()) instanceof ServerPlayer serverPlayer) {
@@ -259,6 +197,53 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
             self.setChanged();
         }
         self.model.rotate((float) self.process);
+    }
+
+    @Override
+    protected void saveAdditional(ValueOutput view) {
+        if (!this.stack.isEmpty()) {
+            view.store("stack", ItemStack.OPTIONAL_CODEC, this.stack);
+        }
+        view.putDouble("progress", this.process);
+        if (this.owner != null) {
+            view.store("owner", CompoundTag.CODEC, LegacyNbtHelper.writeGameProfile(new CompoundTag(), this.owner));
+        }
+        view.putInt("reach", this.reach);
+        super.saveAdditional(view);
+    }
+
+    @Override
+    public void loadAdditional(ValueInput view) {
+        this.stack = view.read("stack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+        this.process = view.getDoubleOr("progress", 0);
+        view.read("owner", CompoundTag.CODEC).ifPresent(x -> this.owner = LegacyNbtHelper.toGameProfile(x));
+
+        this.reach = view.getIntOr("reach", 1);
+        super.loadAdditional(view);
+    }
+
+    @Override
+    public ItemStack getStack() {
+        return this.stack;
+    }
+
+    @Override
+    public void setStack(ItemStack stack) {
+        this.stack = stack;
+        if (this.model != null) {
+            this.model.setItem(stack.copyWithCount(1));
+        }
+        this.setChanged();
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return 64;
+    }
+
+    @Override
+    protected void createGui(ServerPlayer playerEntity) {
+        new Gui(playerEntity);
     }
 
     public float getStress() {
@@ -279,6 +264,12 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         return this.owner;
     }
 
+    @Override
+    public void setOwner(GameProfile profile) {
+        this.owner = profile;
+        this.setChanged();
+    }
+
     public FactoryPlayer getFakePlayer() {
         if (this.player == null) {
             var profile = this.owner == null ? FactoryUtil.GENERIC_PROFILE : this.owner;
@@ -296,12 +287,6 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         }
 
         return this.player;
-    }
-
-    @Override
-    public void setOwner(GameProfile profile) {
-        this.owner = profile;
-        this.setChanged();
     }
 
     private class Gui extends SimpleGui {

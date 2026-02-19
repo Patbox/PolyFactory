@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
+import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.fluids.DrainBlockEntity;
@@ -18,11 +19,6 @@ import eu.pb4.polyfactory.util.inventory.SubContainer;
 import eu.pb4.polyfactory.util.movingitem.SimpleMovingItemContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import net.minecraft.world.Container;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -31,6 +27,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
 import net.minecraft.world.inventory.FurnaceResultSlot;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
@@ -43,6 +40,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PressBlockEntity extends TallItemMachineBlockEntity implements OutputContainerOwner {
     public static final int INPUT_SLOT = 0;
@@ -90,7 +91,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity implements Outp
         var stack2 = self.containers[1];
         self.state = null;
         if (self.process < 0 && stack.isContainerEmpty()) {
-            var speed = Math.max(Math.abs(RotationUser.getRotation((ServerLevel) world, pos.above()).speed()), 0);
+            var speed = Math.max(Math.abs(RotationUser.getRotation(world, pos.above()).speed()), 0);
 
             self.process += speed / 120;
             self.model.updatePiston(self.process);
@@ -174,6 +175,39 @@ public class PressBlockEntity extends TallItemMachineBlockEntity implements Outp
                 }
             }
 
+            var fluids = self.currentRecipe.value().outputFluids(input);
+            var drains = new ArrayList<Pair<DrainBlockEntity, Direction>>();
+            var totalFluidAllowed = 0L;
+
+            if (!fluids.isEmpty()) {
+                for (var dir : Direction.Plane.HORIZONTAL) {
+                    if (world.getBlockEntity(pos.relative(dir)) instanceof DrainBlockEntity be) {
+                        drains.add(new Pair<>(be, dir.getOpposite()));
+                        var c = be.getFluidContainer(dir.getOpposite());
+                        if (c != null) {
+                            totalFluidAllowed += c.empty();
+                        }
+                    }
+                }
+            }
+
+            if (self.currentRecipe.value().fluidsRequired()) {
+                if (fluids.isEmpty()) {
+                    self.state = INCORRECT_ITEMS_TEXT;
+                    success = false;
+                } else {
+                    var fluidTotal = 0l;
+                    for (var x : fluids) {
+                        fluidTotal += x.amount();
+                    }
+
+                    if (totalFluidAllowed < fluidTotal) {
+                        self.state = OUTPUT_FULL_TEXT;
+                        success = false;
+                    }
+                }
+            }
+
             if (success) {
                 FactoryUtil.tryInsertingRegular(outputContainer, nextOut);
 
@@ -181,20 +215,17 @@ public class PressBlockEntity extends TallItemMachineBlockEntity implements Outp
                     CriteriaTriggers.RECIPE_CRAFTED.trigger(player, self.currentRecipe.id(), List.of(stack.getStack(), stack2.getStack()));
                 }
 
-                var fluids = self.currentRecipe.value().outputFluids(input);
                 if (!fluids.isEmpty()) {
                     var copy = new ArrayList<>(fluids);
 
-                    for (var dir : Direction.Plane.HORIZONTAL) {
-                        if (world.getBlockEntity(pos.relative(dir)) instanceof DrainBlockEntity be) {
-                            for (int i = 0; i < copy.size(); i++) {
-                                var fluid = copy.get(i);
-                                if (fluid.isEmpty()) {
-                                    continue;
-                                }
-                                var leftover = be.insertFluid(fluid.instance(), fluid.amount(), dir.getOpposite());
-                                copy.set(i, fluid.withAmount(leftover));
+                    for (var be : drains) {
+                        for (int i = 0; i < copy.size(); i++) {
+                            var fluid = copy.get(i);
+                            if (fluid.isEmpty()) {
+                                continue;
                             }
+                            var leftover = be.getFirst().insertFluid(fluid.instance(), fluid.amount(), be.getSecond());
+                            copy.set(i, fluid.withAmount(leftover));
                         }
                     }
 
@@ -228,7 +259,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity implements Outp
                 self.delayedOutput = nextOut;
             }
         } else {
-            var rot = RotationUser.getRotation((ServerLevel) world, pos.above(1));
+            var rot = RotationUser.getRotation(world, pos.above(1));
             var speed = Math.max(Math.abs(rot.speed()), 0);
 
             if (speed >= self.currentRecipe.value().minimumSpeed()) {

@@ -1,5 +1,7 @@
 package eu.pb4.polyfactory.item.tool;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.booklet.BookletInit;
 import eu.pb4.polyfactory.booklet.BookletOpenState;
 import eu.pb4.polyfactory.booklet.BookletUtil;
@@ -27,6 +29,7 @@ public class GuideBookItem extends SimplePolymerItem {
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         if (player instanceof ServerPlayer serverPlayer) {
+            TriggerCriterion.trigger(serverPlayer, FactoryTriggers.GUIDEBOOK);
             BookletUtil.openPage(serverPlayer, id("main_page"), BookletOpenState.DEFAULT);
         }
         return InteractionResult.SUCCESS_SERVER;

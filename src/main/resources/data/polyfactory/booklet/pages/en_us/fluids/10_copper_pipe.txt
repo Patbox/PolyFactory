@@ -1,24 +1,33 @@
 ### Section: PageInfo
-title=Item Filter
-icon=polyfactory:item_filter
-category=polyfactory:item_transport
+title=<item 'polyfactory:pipe'>
+icon=polyfactory:pipe
+category=polyfactory:fluids
 ### EndSection: PageInfo
-<yellow>Item Filter</> is an item that allows you to limit which items are accepted by
-<item 'hopper'>s, <item 'polyfactory:funnel'>s and <item 'polyfactory:item_splitter'>s.
-<nl2>
-To configure it, use it while not targeting any interactive blocks. It will then open an interface, which allows you to
-put up to 9 different items to filter against. Do note that the filter will only copy the item into itself, without requiring
-the original to be placed there permanently.
-<nl2>
-Additionally, you can change whatever filter should check against item data
-(enchantments, damage, color, etc.) of provided items or just check if they have equal type.
+<yellow><item 'polyfactory:pipe'></> is a block that allows you to transport fluids around, both for storage,
+placement / draining and crafting purposes.
 <nl>
-You can also set whatever this filter only allows provided item or only prevents them.
+Regular <item 'polyfactory:pipe'> can connect directionally with other pipes, allowing it to split and join fluid flow.
+They also will try to connect to any other fluid input/output or pipe, through that functionality can be disabled per
+block with a <u><blue><pagelink '/basics/10_wrench'><item 'polyfactory:wrench'></*>.
+<nl>
+You can put <item 'polyfactory:pipe'> into a wall block, allowing you to compose it in better.
+<nl>
+Pipes by default do not move fluids, as you need to power them with a <u><blue><pagelink './11_mechanical_pump'><item 'polyfactory:pump'></*>.
 <nl2>
-To make a block use that filter, you just need to click it while holding it.
-<item 'hopper'> and <item 'polyfactory:funnel'> only allow a single filter, while <item 'polyfactory:item_splitter'>
-can take two (one for the green/left and one for the red/right output).
-To take it out, just click it again (Hopper requires you to hold shift).
+<yellow><item 'polyfactory:redstone_valve_pipe'></> is a pipe variant, which can be used to connect / disconnect pipe
+network automatically by applying redstone power to it.
+This pipe also can only connect in axis it is facing.
+<nl2>
+<yellow><item 'polyfactory:filtered_pipe'></> is a pipe variant, allows you to filter out fluids passing through it, handling
+it both as whitelist or a blacklist depending on the need. To set the filter you need to use item associated with certain
+fluid on it, for example Bucket of Water to set it to filtering water or Iron Ingot to filter out Molten Iron.
+If not configured, the filter will automatically set itself to first fluid it gets in contact with.
+<nl>
+This pipe also can only connect in axis it is facing.
+
+### Image: polyfactory:fluids/pipe_example Example system using pipes.
 
 ### Align: Center
-<u><blue><polydex 'polyfactory:item_filter'>View the Item Filter recipe</>
+<u><blue><polydex 'polyfactory:pipe'>View the <item 'polyfactory:pipe'> recipe</><nl>
+<u><blue><polydex 'polyfactory:redstone_valve_pipe'>View the <item 'polyfactory:redstone_valve_pipe'> recipe</><nl>
+<u><blue><polydex 'polyfactory:filtered_pipe'>View the <item 'polyfactory:filtered_pipe'> recipe</><nl>

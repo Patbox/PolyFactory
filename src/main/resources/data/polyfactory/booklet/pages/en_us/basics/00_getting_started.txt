@@ -23,6 +23,7 @@ into <item 'polyfactory:steel_alloy_mixture'> and then smelting it in a <item 'm
 or via smelting with a <item 'polyfactory:primitive_smeltery'>.
 <nl2>
 From there, you can get and craft more and more items, which you can read more about in this guide or by check in their recipes in Polydex.
+For the progression line, you can take suggestions from PolyFactory's advancements tab.
 
 ### Align: Center
 <u><blue>

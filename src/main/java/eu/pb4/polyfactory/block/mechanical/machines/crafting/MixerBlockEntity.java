@@ -241,7 +241,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
 
             var emptyFluids = self.fluidContainer.empty();
             for (var x : self.currentRecipe.value().fluidInput(input)) {
-                emptyFluids -= x.used();
+                emptyFluids += x.used();
             }
 
 
@@ -386,10 +386,10 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         if (this.active) {
             var input = new MixingInput(this.stacks, FluidContainerInput.of(fluidContainer), level);
             return this.currentRecipe != null ?
-                    Mth.clamp(this.currentRecipe.value().optimalSpeed(input) * 0.6 * this.speedScale,
-                            this.currentRecipe.value().minimumSpeed(input) * 0.6,
-                            this.currentRecipe.value().optimalSpeed(input) * 0.6
-                    ) : 1;
+                    Mth.clamp(this.currentRecipe.value().optimalSpeed(input) * this.speedScale,
+                            this.currentRecipe.value().minimumSpeed(input),
+                            this.currentRecipe.value().optimalSpeed(input)
+                    ) * 0.6 : 1;
         }
         return 0;
     }
