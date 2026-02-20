@@ -4,7 +4,51 @@ icon=writable_book
 category=polyfactory:basics
 ### EndSection: PageInfo
 ### Header: <yellow><b>0.10.3+1.21.11
-// WIP
+- Added the guidebook "Factories and you!":
+  - Crafted with a Book and Iron Nugget.
+  - It's a guidebook to the mod, with main goal of making it easier to pick up for new players.
+  - You use it to open new ui.
+  - It's still a bit early on and doesn't describe everything, but most important basics are already there.
+- Added Gearshift:
+  - Crafted with 4 Planks, 2 Copper Plates, 1 Steel Gear and 2 Axles.
+  - Similar to Clutch, but instead of disconnecting two sides of a mechanical network, it flips it's direction.
+  - Powering it with Redstone will prevent it from slipping, keeping the rotation direction as is.
+  - This behaviour can be inverted with a Wrench.
+- Added Deep Storage Container:
+  - Crafted with 8 Steel Plates and 1 Steel Block.
+  - It's a 2x2x2 multiblock (like Steam Engine) that can store items.
+  - It stores 338 stacks of items (split into 8 pages of 42 stacks).
+  - Pages can be changed by left-clicking the button.
+  - Button's looks can be changed by having an item in cursor and then right-clicking it on the button.
+  - Hoppers / Funnels / etc. do not care about pages, seeing this block as one big inventory.
+- Added Item Output Buffer:
+  - Crafted with 4 Steel Plates and 4 Wooden Plates.
+  - It's directional storage block that acts as an extension of machine block output containers.
+  - It can hold 18 stacks of items.
+  - To connect it to an output of machine block, you sneak and then place it against output point of the machine (for most it's the opposite side of the input/back).
+  - If you use Funnels or Hoppers on it, the output slots of connected block will also be available for them.
+  - However, UI of the block will only show its own slots.
+  - When opened from the front, it will allow you take items, but not place them in. When opened from the back it allows both placing and taking items.
+- Tweaked Fluid Pipe logic to push fluids more evenly in pipes that have more than two neighbors.
+- After locking Copper Pipes with a wrench you can now change which faces they point at.
+- Slot-Aware Funnel will no longer be limited by blocks directionality when inserting items.
+- Pipe with Redstone Valve will no longer place itself as inverted by default.
+- Fluids are now visible in Polydex.
+- Steam Engine can now be set to require redstone signal to work.
+- Squeezing a Wet Sponge in Mechanical Press can now generate 1 bucket worth of water.
+- Updated texture (and internally model) of Clutch to match style of Gearshift.
+- Updated texture of Artificial Dye to match modern vanilla dye textures.
+- Removed some invisible quads from the Conveyor models.
+- Mechanical Placer should now act closer to regular player placing behaviour.
+- Improved Mechanical Presses fluid output handling. Fluids can now be set as required (unused by PolyFactory).
+- Fixed spelling of Faucet (from Fauced).
+- Fixed Mechanical Mixer not allowing to craft recipes with fluid output even if there is enough space with input fluids taken.
+- Fixed Ice and Snow not changing block-based temperature.
+- Fixed Faucet block not giving you output item correctly when using last item of a stack.
+- Fixed Pipes pulling fluid from waterlogged Mechanical Pumps and Copper Pipes with Redstone Valve.
+- Fixed Filtered Copper Pipe rendering as a solid block rather than transparently.
+- Fixed advancements not working when other mod updated the Factory Tools library.
+- Fixed missing strings for list and game event in Data Extractor.
 
 ### Header: <yellow><b>0.10.2+1.21.11
 - Added Moldmaking Table:

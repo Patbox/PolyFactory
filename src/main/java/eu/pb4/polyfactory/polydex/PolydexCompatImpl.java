@@ -1,6 +1,8 @@
 package eu.pb4.polyfactory.polydex;
 
 import eu.pb4.factorytools.api.block.MultiBlock;
+import eu.pb4.factorytools.api.recipe.CountedIngredient;
+import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polydex.api.v1.hover.HoverDisplayBuilder;
 import eu.pb4.polydex.api.v1.recipe.*;
 import eu.pb4.polydex.impl.PolydexImpl;
@@ -20,26 +22,26 @@ import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.polydex.pages.*;
-import eu.pb4.factorytools.api.recipe.CountedIngredient;
-import eu.pb4.polyfactory.recipe.*;
-import eu.pb4.factorytools.api.recipe.OutputStack;
+import eu.pb4.polyfactory.recipe.ColoringCraftingRecipe;
+import eu.pb4.polyfactory.recipe.CraftingWithLeftoverRecipe;
+import eu.pb4.polyfactory.recipe.ShapelessNbtCopyRecipe;
 import eu.pb4.polyfactory.recipe.casting.SimpleCastingRecipe;
 import eu.pb4.polyfactory.recipe.casting.SimpleCauldronCastingRecipe;
+import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
 import eu.pb4.polyfactory.recipe.grinding.SimpleGrindingRecipe;
 import eu.pb4.polyfactory.recipe.grinding.StrippingGrindingRecipe;
-import eu.pb4.polyfactory.recipe.mixing.TransformMixingRecipe;
-import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
-import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
-import eu.pb4.polyfactory.recipe.spout.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.BrewingMixingRecipe;
-import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
+import eu.pb4.polyfactory.recipe.mixing.TransformMixingRecipe;
+import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
+import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
+import eu.pb4.polyfactory.recipe.spout.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
+import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.polyfactory.util.DebugTextProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import eu.pb4.polyfactory.util.BlockStateNameProvider;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.elements.GuiElement;
 import net.minecraft.core.HolderSet;
@@ -52,21 +54,23 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class PolydexCompatImpl {
+    public static final PolydexCategory MOLDMAKING_CATEGORY = PolydexCategory.of(id("moldmaking"));
     private static final HoverDisplayBuilder.ComponentType MACHINE_STATE = Util.make(() -> {
         //noinspection ResultOfMethodCallIgnored
         HoverDisplayBuilder.NAME.index();
@@ -75,8 +79,6 @@ public class PolydexCompatImpl {
     });
     private static final HoverDisplayBuilder.ComponentType FILLED = HoverDisplayBuilder.ComponentType.of(id("filled_amount"), HoverDisplayBuilder.ComponentType.Visibility.ALWAYS);
     private static final HoverDisplayBuilder.ComponentType DEBUG_DATA = HoverDisplayBuilder.ComponentType.of(id("debug_data"), HoverDisplayBuilder.ComponentType.Visibility.NEVER);
-
-    public static final PolydexCategory MOLDMAKING_CATEGORY = PolydexCategory.of(id("moldmaking"));
 
     public static void register() {
         PolydexPage.registerRecipeViewer(GenericPressRecipe.class, PressRecipePage::new);
@@ -132,7 +134,7 @@ public class PolydexCompatImpl {
         var clay = new PolydexIngredientList<>(PolydexStack.of(Items.CLAY), PolydexStack.of(new ItemStack(Items.CLAY_BALL, 4)), PolydexIngredient.of(Ingredient.of(HolderSet.direct(FactoryUtil.collect(tag)))));
         for (var item : tag) {
             var id = item.unwrapKey().orElseThrow().identifier().withPrefix("moldmaking_table/");
-            polydexPageConsumer.accept(new MoldMakingRecipePage(id, clay,  PolydexStack.of(item.value())));
+            polydexPageConsumer.accept(new MoldMakingRecipePage(id, clay, PolydexStack.of(item.value())));
         }
     }
 
@@ -259,6 +261,7 @@ public class PolydexCompatImpl {
     public static List<PolydexIngredient<?>> createIngredients(CountedIngredient... input) {
         return createIngredients(List.of(input));
     }
+
     public static List<PolydexIngredient<?>> createIngredients(List<CountedIngredient> input) {
         var list = new ArrayList<PolydexIngredient<?>>(input.size());
         for (var x : input) {

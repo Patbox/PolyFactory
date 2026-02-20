@@ -38,9 +38,15 @@ public class BookletUtil {
     }
 
     public static ClickEvent.Custom encodeClickEvent(String type, Identifier entry, BookletOpenState state) {
+        return encodeClickEvent(type, entry, state, false);
+    }
+    public static ClickEvent.Custom encodeClickEvent(String type, Identifier entry, BookletOpenState state, boolean playClickSound) {
         var nbt = state.encode(new CompoundTag());
         if (entry != null) {
             nbt.putString("entry", entry.toString());
+        }
+        if (playClickSound) {
+            nbt.putBoolean("play_click_sound", true);
         }
         return new ClickEvent.Custom(action(type), Optional.of(nbt));
     }
@@ -74,7 +80,7 @@ public class BookletUtil {
                         .append(sideFiller)
                         .append(TextUncenterer.getLeftAligned(page.info().getExternalTitle(), 290 - 8 - 2 * 6 * 2, lang).getFirst())
                         .append(sideFiller)
-                        .setStyle(Style.EMPTY.withClickEvent(encodeClickEvent("open_page", page.info().identifier(), newState))),
+                        .setStyle(Style.EMPTY.withClickEvent(encodeClickEvent("open_page", page.info().identifier(), newState, true))),
                         290);
 
                 body.add(page.info().icon().isEmpty() ? plainBody : new ItemBody(

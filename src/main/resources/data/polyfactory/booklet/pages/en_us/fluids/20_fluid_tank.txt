@@ -1,0 +1,21 @@
+### Section: PageInfo
+title=<item 'polyfactory:fluid_tank'>
+icon=polyfactory:fluid_tank
+category=polyfactory:fluids
+### EndSection: PageInfo
+<yellow><item 'polyfactory:fluid_tank'></> is a block used to store fluids.
+<nl2>
+By itself, it can store up to 6 buckets/blocks worth of fluid. It can store different types of fluid at the same time,
+through some of them might react with each other. Fluid Tank blocks can connect with each other, allowing creation of
+bigger, connected tanks. There is no limit about shape or number of tanks.
+<nl2>
+Fluid can be accessed with a <item 'polyfactory:pipe'> or other fluid blocks with direct access.
+When pulling fluid out of it, ideally you should do it from the bottom layer, as only accessible fluids are ones that
+are visually within the <item 'polyfactory:fluid_tank'>.
+<nl>
+When broken fluids are lost.
+
+### Image: polyfactory:fluids/fluid_tank_example Fluid Tanks.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:fluid_tank'>View the <item 'polyfactory:fluid_tank'> recipe</>

@@ -1,0 +1,16 @@
+### Section: PageInfo
+title=Portable Fluid Tank
+icon=polyfactory:portable_fluid_tank
+category=polyfactory:fluids
+### EndSection: PageInfo
+<yellow>Portable Fluid Tank</> is a portable variant of the <item 'polyfactory:fluid_tank'> block.
+<nl2>
+It can store up to 4 buckets/blocks worth of fluid. It also can store different types of fluid at the same time,
+through some of them might react with each other. Portable Fluid Tank can only be accessed from only a single side,
+as indicated by its opening.
+<nl>
+When broken, fluids will be contained within the item. They can then be placed again or used by items such as
+<item 'polyfactory:pressure_fluid_gun'>.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:portable_fluid_tank'>View the <item 'polyfactory:portable_fluid_tank'> recipe</>

@@ -17,17 +17,14 @@ import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 public class BookletImageHandler {
-    private static final Map<Identifier, ComponentWidth> IMAGES = new HashMap<>();
-    private static final ComponentWidth MISSING = new ComponentWidth(Component.literal("<NO IMAGE>").withStyle(ChatFormatting.DARK_RED), 300);
+    private static final Map<Identifier, ProcessedImage> IMAGES = new HashMap<>();
+    private static final ProcessedImage MISSING = new ProcessedImage(Component.literal("<NO IMAGE>").withStyle(ChatFormatting.DARK_RED), 300, ' ', ' ');
 
-    public static ComponentWidth getImage(Identifier identifier) {
+    public static ProcessedImage getImage(Identifier identifier) {
         return IMAGES.getOrDefault(identifier, MISSING);
     }
 
@@ -77,6 +74,8 @@ public class BookletImageHandler {
             var width = Mth.ceil((double) image.getWidth() / scale / dx) * dx;
             var height = Mth.ceil((double) image.getHeight() / scale / dy) * dy;
 
+            var from = character[0];
+
             for (var y = 0; y < height; y += dy) {
                 var line = new StringBuilder();
                 var ix = 0;
@@ -101,9 +100,11 @@ public class BookletImageHandler {
                     imageString.append("\n");
                 }
             }
+            var to = character[0];
+
             fontBuilder.add(b);
 
-            IMAGES.put(id, new ComponentWidth(Component.literal(imageString.toString()).setStyle(style), width + width / dx + 8));
+            IMAGES.put(id, new ProcessedImage(Component.literal(imageString.toString()).setStyle(style), width + width / dx + 8, from, to));
 
             {
                 var newImage = new BufferedImage(width * scale, height * scale, BufferedImage.TYPE_INT_ARGB);
@@ -125,11 +126,13 @@ public class BookletImageHandler {
     }
 
     public static List<DialogBody> getAllImages() {
-        return IMAGES.keySet().stream().map(x -> (DialogBody) new ImageBody(x, Optional.of(Component.translationArg(x)))).toList();
+        return IMAGES.entrySet().stream().sorted(Comparator.comparing(((Function<Map.Entry<Identifier, ProcessedImage>, ProcessedImage>) Map.Entry::getValue).andThen(ProcessedImage::from)))
+                .map(x -> (DialogBody) new ImageBody(x.getKey(),
+                Optional.of(Component.literal(x.getKey() + " <0x" + Integer.toString(x.getValue().from, 16) + ", 0x" + Integer.toString(x.getValue().to, 16) + ">" )))).toList();
     }
 
 
 
-    public record ComponentWidth(Component component, int width) {
+    public record ProcessedImage(Component component, int width, int from, int to) {
     }
 }

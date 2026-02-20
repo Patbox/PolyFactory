@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.booklet.body.AlignedItemBody;
 import eu.pb4.polyfactory.booklet.body.AlignedMessage;
 import eu.pb4.polyfactory.booklet.body.HeaderMessage;
 import eu.pb4.polyfactory.booklet.body.ImageBody;
+import eu.pb4.polyfactory.ui.GuiUtils;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -89,6 +90,10 @@ public class BookletInit {
         Identifier entry = Identifier.tryParse("");
         if (payload.isPresent() && payload.get() instanceof CompoundTag tag) {
             entry = Identifier.tryParse(tag.getStringOr("entry", ""));
+
+            if (tag.getBooleanOr("play_click_sound", false)) {
+                GuiUtils.playClickSound(player);
+            }
         }
 
         switch (path) {

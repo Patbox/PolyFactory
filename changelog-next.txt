@@ -14,7 +14,7 @@
   - It stores 338 stacks of items (split into 8 pages of 42 stacks).
   - Pages can be changed by left-clicking the button.
   - Button's looks can be changed by having an item in cursor and then right-clicking it on the button.
-  - Hoppers / Funnels / etc do not care about pages, seeing this block as one big inventory.
+  - Hoppers / Funnels / etc. do not care about pages, seeing this block as one big inventory.
 - Added Item Output Buffer:
   - Crafted with 4 Steel Plates and 4 Wooden Plates.
   - It's directional storage block that acts as an extension of machine block output containers.
@@ -41,4 +41,5 @@
 - Fixed Faucet block not giving you output item correctly when using last item of a stack.
 - Fixed Pipes pulling fluid from waterlogged Mechanical Pumps and Copper Pipes with Redstone Valve.
 - Fixed Filtered Copper Pipe rendering as a solid block rather than transparently.
-- Fixed advancements not working with when other mod updated Factory Tools library.
+- Fixed advancements not working when other mod updated the Factory Tools library.
+- Fixed missing strings for list and game event in Data Extractor.

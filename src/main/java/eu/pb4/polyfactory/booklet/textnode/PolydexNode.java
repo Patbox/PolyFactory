@@ -31,7 +31,7 @@ public class PolydexNode extends ParentNode {
                     .withStrikethrough(true).withHoverEvent(new HoverEvent.ShowText(Component.translatable("text.polyfactory.polydex_required_to_work")));
         }
 
-        return style.withClickEvent(BookletUtil.encodeClickEvent("polydex/" + type, entry, context.getOrThrow(BookletOpenState.KEY)));
+        return style.withClickEvent(BookletUtil.encodeClickEvent("polydex/" + type, entry, context.getOrThrow(BookletOpenState.KEY), true));
     }
 
     @Override

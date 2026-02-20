@@ -4,7 +4,8 @@ icon=polyfactory:mixer
 category=polyfactory:crafting
 ### EndSection: PageInfo
 <yellow><item 'polyfactory:mixer'></> is a 1x2x1 item crafting machine block. It required rotational energy to work.
-It has 6 input slots, 2 bucket worth fluid storage and 3 output slot.
+It has 6 input slots, 2 bucket worth fluid storage and 3 output slot. This block depends on the
+<u><blue><pagelink '/basics/50_temperature'>Temperature System</*>.
 <nl2>
 In case of fluidless recipes, recipe output are always put into the output slots. For recipes that generate fluids,
 the fluid output will be put into the same fluid storage as fluids used for inputs.

@@ -3,6 +3,8 @@ package eu.pb4.polyfactory.booklet;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.placeholders.api.ParserContext;
+import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.ui.UiResourceCreator;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -54,18 +56,22 @@ public record BookletOpenState(List<Identifier> previousPages) {
     }
 
     public Dialog getDialog(Component title, List<DialogBody> body) {
-        var buttonWidth = this.previousPages.isEmpty() ? 200 : 100;
+        var buttonWidth = this.previousPages.isEmpty() ? 200 : 96;
         var closeButton = new ActionButton(new CommonButtonData(CommonComponents.GUI_DONE, buttonWidth),
                 Optional.of(new StaticAction(BookletUtil.encodeClickEvent("close", null, this))));
 
+        title = Component.empty().append(Component.literal("" + GuiTextures.NEGATIVE_SPACE_2500
+                + GuiTextures.DARKENER + GuiTextures.NEGATIVE_SPACE_2500
+        ).setStyle(UiResourceCreator.STYLE.withShadowColor(0))).append(title);
+
         if (this.previousPages.isEmpty()) {
-            return new NoticeDialog(new CommonDialogData(title, Optional.empty(), true, true, DialogAction.WAIT_FOR_RESPONSE, body, List.of()),
+            return new NoticeDialog(new CommonDialogData(title, Optional.empty(), true, false, DialogAction.NONE, body, List.of()),
                     closeButton);
         } else {
             var pop = this.popPage();
             var backButton = new ActionButton(new CommonButtonData(CommonComponents.GUI_BACK, buttonWidth), Optional.of(new StaticAction(BookletUtil.encodeClickEvent("open_page", pop.page, pop.state))));
 
-            return new ConfirmationDialog(new CommonDialogData(title, Optional.empty(), true, true, DialogAction.WAIT_FOR_RESPONSE, body, List.of()),
+            return new ConfirmationDialog(new CommonDialogData(title, Optional.empty(), true, false, DialogAction.NONE, body, List.of()),
                     closeButton,
                     backButton
             );

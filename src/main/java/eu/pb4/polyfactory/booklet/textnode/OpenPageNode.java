@@ -24,7 +24,7 @@ public class OpenPageNode extends ParentNode {
 
     @Override
     protected Style applyFormatting(Style style, ParserContext context) {
-        return style.withClickEvent(BookletUtil.encodeClickEvent("open_page", entry, context.getOrThrow(BookletOpenState.KEY)));
+        return style.withClickEvent(BookletUtil.encodeClickEvent("open_page", entry, context.getOrThrow(BookletOpenState.KEY), true));
     }
 
     @Override
