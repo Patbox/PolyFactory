@@ -1,0 +1,27 @@
+### Section: PageInfo
+title=<item 'polyfactory:chain_drive'>
+icon=polyfactory:chain_drive
+category=polyfactory:rotation
+### EndSection: PageInfo
+<yellow><item 'polyfactory:chain_drive'></> ist ein Rotationsübertragungsblock.
+Er ermöglicht die Übertragung von Rotationsenergie über größere Distanzen mit weniger benötigten Blöcken.
+Er kann auch mit <item 'polyfactory:chain_lift'> für den Transport verwendet werden.
+<nl2>
+Kettenantriebe können in jeder Achse platziert werden. Um sie miteinander zu verbinden, musst du einige
+<item 'iron_chain'>s verwenden. Die benötigte Anzahl an Ketten entspricht der aufgerundeten doppelten Distanz zwischen den Kettenantrieben.
+Die maximale Distanz einer einzelnen Verbindung beträgt 32 Blöcke, jedoch können Kettenantriebe verkettet werden, um Langstreckenverbindungen zu ermöglichen.
+<nl>
+Die Verbindung zwischen den Kettenantrieben darf keinen zu großen Winkel haben, wobei das Limit bei 33 Grad liegt.
+<nl2>
+Durch die Verwendung des <yellow><item 'polyfactory:chain_lift'></> auf dem <item 'polyfactory:chain_drive'> befestigst du ihn,
+woraufhin er sich mit der Kette bewegt. Du kannst es dir wie Loren vorstellen. Standardmäßig fahren Kettenlifte mit Spieler
+nur in die Richtung, in die der Spieler schaut, aber das kann mit einem <item 'polyfactory:wrench'> deaktiviert werden.
+Andernfalls wird immer der erste verfügbare Weg gewählt.
+<nl>
+<item 'polyfactory:chain_lift'>s können mit <item 'redstone'> angetrieben werden, wodurch sie die aktuell gehaltene Entität fallen lassen.
+
+### Image: polyfactory:rotation/chain_drive_example Beispiel eines Kettenantrieb-Aufbaus.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:chain_drive'>Zeige das <item 'polyfactory:chain_drive'>-Rezept</*><nl>
+<u><blue><polydex 'polyfactory:chain_lift'>Zeige das <item 'polyfactory:chain_lift'>-Rezept</*>

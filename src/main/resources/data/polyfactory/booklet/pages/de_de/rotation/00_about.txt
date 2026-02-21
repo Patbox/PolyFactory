@@ -1,0 +1,34 @@
+### Section: PageInfo
+title=Über Rotationsenergie
+icon=polyfactory:large_steel_gear
+category=polyfactory:rotation
+### EndSection: PageInfo
+
+<yellow>Rotationsenergie</> ist die Hauptenergiequelle für die meisten von PolyFactory hinzugefügten Maschinen.
+Das bedeutet, dass es wichtig ist zu verstehen, wie sie funktioniert, wenn du nicht verwirrt sein möchtest, warum etwas nicht funktioniert.
+<nl2>
+Die Rotationsenergie besteht aus zwei Variablen:
+- <yellow>Geschwindigkeit</> - steuert, wie schnell sich Elemente drehen oder Maschinen arbeiten.
+- <yellow>Kapazität</> - manchmal als *Belastungskapazität* oder *Drehmoment* bezeichnet, definiert, wie viel Energie
+zur Verfügung steht, um Dinge zu tun.
+<nl>
+Verschiedene Maschinen können diese Variablen unterschiedlich nutzen. Einige achten nur auf die Geschwindigkeit, einige benötigen eine statische Kapazität
+bei flexibler Geschwindigkeit, und einige ändern den Kapazitätsbedarf abhängig von der Geschwindigkeit.
+<nl2>
+Das gilt auch für die Erzeugung der Rotationsenergie, da verschiedene Quellen unterschiedliche Verhältnisse von erzeugter
+Geschwindigkeit und Kapazität haben. Bei mehreren Quellen wird die Geschwindigkeit gemittelt, wenn sie nicht die gleiche Menge
+erzeugen. Bei der Kapazität wird sie stattdessen addiert.
+<nl2>
+Um sie zu erzeugen, kannst du verwenden:
+- Handkurbel (<u><blue><polydex 'polyfactory:hand_crank'>Rezept</*>) - einfach, erfordert aber Spielereingabe,
+- <u><blue><pagelink 'polyfactory:rotation/20_windmill'>Windmühle</*> - passive Energiequelle, abhängig von Position und externen Faktoren,
+- Dampfmaschine (<u><blue><polydex 'polyfactory:steam_engine'>Rezept</*>) - verbrennt Brennstoff, funktioniert aber überall und erzeugt die höchste Geschwindigkeit und Energie.
+<nl2>
+Natürlich musst du sie dann irgendwie mit der Maschine verbinden.
+Um dies über Distanz zu tun, kannst du Achsen, Stahlzahnräder, Getriebe und andere Blöcke verwenden (siehe den Rest der Rotationsenergie-Kategorie und die Rezeptliste).
+<nl2>
+Alle Maschinen, die Rotationsenergie aufnehmen, erlauben normalerweise nur den Anschluss von ein oder zwei Punkten, zum Beispiel
+ist dem <item 'polyfactory:grinder'> von oben und unten anschließbar, und jede 2 Block hohe Maschine ist an den linken und rechten Seiten des oberen Blocks anschließbar.
+<nl2>
+Falls die Belastungskapazität aufgebraucht ist, blockiert sich das gesamte Netzwerk und verhindert, dass alle angeschlossenen Maschinen arbeiten.
+Aus diesem Grund kann es nützlich sein, sie in mehrere getrennte Netzwerke aufzuteilen.

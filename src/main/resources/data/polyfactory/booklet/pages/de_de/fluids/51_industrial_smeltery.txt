@@ -1,0 +1,33 @@
+### Section: PageInfo
+title=<item 'polyfactory:smeltery'>
+icon=polyfactory:smeltery
+category=polyfactory:fluids
+### EndSection: PageInfo
+<yellow><item 'polyfactory:smeltery'></> ist ein 3x3x3-Multiblock, der es dir ermöglicht, bestimmte Materialien einzuschmelzen.
+<nl>
+Ähnlich wie die <u><blue><pagelink './50_primitive_smeltery'><item 'polyfactory:primitive_smeltery'></*>, wird sie
+verwendet, um geschmolzene Flüssigkeiten zu erhalten (die normalerweise eine höhere Ausbeute als der Ofen geben), die später zur Herstellung mit
+<item 'polyfactory:casting_table'> und <item 'polyfactory:mechanical_spout'> verwendet werden.
+<nl2>
+<item 'polyfactory:smeltery'> kann bis zu 9 Gegenstände gleichzeitig schmelzen und dabei bis zu
+24 Blöcke an Flüssigkeit halten.
+<nl>
+Um zu funktionieren, benötigt dieser Block ofenkompatiblen Brennstoff (wie Kohle), den er 3-mal so schnell verbraucht wie ein Ofen.
+<nl2>
+Anders als bei den meisten anderen Blöcken musst du diesen Block in der Welt bauen.
+Dazu brauchst du zuerst einen <item 'polyfactory:smeltery_core'>, 22 <item 'deepslate_bricks'>
+und 3 <item 'polyfactory:steel_block'>.
+
+Dann musst du einfach einen hohlen Würfel daraus bauen (also der mittlere Block ist leer).
+Die Position der <item 'deepslate_bricks'> und <item 'polyfactory:steel_block'> spielt keine Rolle,
+die einzige Bedingung ist, dass der <item 'polyfactory:smeltery_core'> in der Mitte einer der Wände
+nach außen zeigend platziert wird. Sobald du das getan hast, klicke einfach den <item 'polyfactory:smeltery_core'> an und er wird sich in
+die <item 'polyfactory:smeltery'> verwandeln. Wenn du etwas falsch platziert hast, werden stattdessen die falschen Blöcke hervorgehoben.
+
+### Image: polyfactory:fluids/smeltery_building Schrittweiser Schmelze-Bau.
+
+### Image: polyfactory:fluids/smeltery_example Beispiel eines <item 'polyfactory:smeltery'>-Aufbaus.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:smeltery_core'>Zeige das <item 'polyfactory:smeltery_core'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:recipe_type/smeltery' 'category'>Zeige die Rezepte dieses Blocks</>

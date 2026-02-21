@@ -1,0 +1,17 @@
+### Section: PageInfo
+title=<item 'polyfactory:splitter'>
+icon=polyfactory:splitter
+category=polyfactory:item_transport
+### EndSection: PageInfo
+<yellow><item 'polyfactory:splitter'></> ist ein Gegenstandsverteilungsblock, der auf dem
+<u><blue><pagelink 'polyfactory:item_transport/20_conveyor'><item 'polyfactory:conveyor'></*> funktioniert.
+<nl2>
+Er hat 1 Eingang und 3 Ausgänge. Standardmäßig verteilt er Gegenstände gleichmäßig auf alle 3 Ausgänge (vorausgesetzt, alle haben
+ein Förderband oder einen anderen kompatiblen Block). Für die Sortierung können der linke (rote) und rechte (grüne) Ausgang mit
+einem <u><blue><pagelink 'polyfactory:item_transport/10_item_filter'>Gegenstandsfilter</*> konfiguriert werden. Gegenstände werden bevorzugt in
+die Richtung geleitet, deren Filter auf sie passt. Bei Fehlschlag der gefilterten Ausgänge bewegt sich der Gegenstand weiter geradeaus.
+
+### Image: polyfactory:item_transport/conveyor_example Beispiel für die Verwendung von <item 'polyfactory:splitter'>, mit 2 aktiven Ausgängen.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:splitter'>Zeige das <item 'polyfactory:splitter'>-Rezept</>

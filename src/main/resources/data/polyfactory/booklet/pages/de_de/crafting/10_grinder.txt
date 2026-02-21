@@ -1,0 +1,20 @@
+### Section: PageInfo
+title=<item 'polyfactory:grinder'>
+icon=polyfactory:grinder
+category=polyfactory:crafting
+### EndSection: PageInfo
+<yellow><item 'polyfactory:grinder'></> ist ein Gegenstandsherstellungs-Maschinenblock. Er benötigt Rotationsenergie zum Arbeiten.
+Er ist eine der ersten Maschinen, die du herstellen kannst (und musst). Er hat einen Eingabeslot und 3 Ausgabeslots.
+<nl2>
+Diese Maschine ermöglicht es dir, bestimmte Gegenstände zu anderen zu zermahlen, was nötig ist, um bestimmte Materialien zu erhalten.
+Beim Mahlen kann es mehrere resultierende Gegenstände geben, wobei einige von ihnen nur eine Chance haben zu erscheinen.
+<nl2>
+Um diesen Block anzutreiben, musst du ihn entweder oben oder unten mit Rotationsenergie-Übertragungsblöcken verbinden.
+Die von dieser Maschine erzeugte Belastung hängt vom aktuell hergestellten Rezept und der Geschwindigkeit ab, mit der sie derzeit gedreht wird.
+Im Leerlauf benötigt sie immer 1 Belastungseinheit.
+
+### Image: polyfactory:crafting/grinder_example Frühspiel-<item 'polyfactory:grinder'>-Aufbau
+
+### Align: Center
+<u><blue><polydex 'polyfactory:grinder'>Zeige das <item 'polyfactory:grinder'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:recipe_type/grinding' 'category'>Zeige die Rezepte dieses Blocks</>

@@ -1,0 +1,28 @@
+### Section: PageInfo
+title=Über das Datensystem
+icon=polyfactory:cable[polyfactory:color=0x00FF00]
+category=polyfactory:cable
+### EndSection: PageInfo
+
+<yellow>Datensystem</> ist die Hauptmethode zur Übertragung, Verarbeitung und Anzeige von Informationen, die eine bessere Automatisierung
+und Sichtbarkeit des aktuellen Zustands ermöglicht. Alle Datensysteme sind an Blöcke gebunden und erfordern, dass diese
+mit <item 'polyfactory:cable'>s verbunden sind.
+<nl2>
+Blöcke können als Eingang, Ausgang oder beides fungieren. Obwohl ein Block mehrere Ein- und Ausgänge haben kann, hat PolyFactory nur
+Blöcke, die entweder nur 1 Eingang, nur 1 Ausgang, 1 Eingang mit 1 Ausgang oder 2 Eingänge und 1 Ausgang haben.
+<nl2>
+Sowohl Ein- als auch Ausgänge können nur auf einem einzelnen Kanal arbeiten. Kanäle ermöglichen es dir, eine einzelne Kabelleitung wiederzuverwenden, um Daten zu senden,
+die nur von Eingängen gelesen werden, die darauf lauschen. Es gibt nur 4 verfügbare Kanäle. Wenn du mehr separate
+Daten benötigst, musst du mehr Kabel anschließen.
+<nl2>
+Bei den meisten Blöcken werden Daten erst am Ende des Ticks verarbeitet und nur die letzte empfangene Nachricht innerhalb dieses Ticks wird
+tatsächlich behandelt, während der Rest stillschweigend ignoriert wird. Daher ist die Datenverarbeitung selbst auch an die
+Tickrate des Spiels gebunden.
+<nl2>
+Daten haben selbst auch immer einen bestimmten Typ, der unabhängig vom tatsächlichen Inhalt ist.
+Neben den Grundlagen wie Strings (Text), Ganzzahlen, Dezimalzahlen und Booleans (wahr / falsch) gibt es auch Daten über
+Kapazität, Redstone, Blockzustand, Gegenstandsstapel, Zeit und vieles mehr.
+<nl>
+Verschiedene Maschinen interpretieren diese Daten möglicherweise unterschiedlich, daher ist es sehr wichtig, sicherzustellen, dass der richtige Typ gesendet/empfangen wird.
+Du kannst Dinge wie <item 'polyfactory:data_extractor'>, <item 'polyfactory:data_comparator'> und andere verwenden, um
+Daten von einem Typ in einen anderen umzuwandeln, der dann von den gewünschten Maschinen korrekt gelesen wird.

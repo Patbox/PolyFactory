@@ -1,0 +1,21 @@
+### Section: PageInfo
+title=<item 'polyfactory:miner'>
+icon=polyfactory:miner
+category=polyfactory:rotation
+### EndSection: PageInfo
+<yellow><item 'polyfactory:miner'></> ist ein Rotationsblock, der es dir ermöglicht, Blöcke abzubauen und Entitäten anzugreifen.
+<nl2>
+Dazu musst du zuerst ein kompatibles Werkzeug einsetzen. Der Schaden und die Abbaugeschwindigkeit hängen vom verwendeten Werkzeug ab.
+Werkzeuge, die von diesem Block verwendet werden, erleiden Schaden. Abbauen/Angreifen funktioniert genauso, als würde ein Spieler es tun, einschließlich aller Nebeneffekte
+und Boni (wie Drops von Mobs).
+<nl>
+Dieser Block kann mit Blöcken/Entitäten interagieren, die maximal 2 Blöcke entfernt sind.
+<nl>
+Das vom Komparator erzeugte Signal dieses Blocks hängt von der Haltbarkeit des Werkzeugs ab.
+<nl2>
+Um diesen Block anzutreiben, musst du ihn auf der Rückseite anschließen.
+Die von dieser Maschine erzeugte Belastung hängt vom aktuell abgebauten Block und dem aktuellen Werkzeug ab.
+Im Leerlauf erzeugt sie keine Belastung.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:miner'>Zeige das <item 'polyfactory:miner'>-Rezept</*>

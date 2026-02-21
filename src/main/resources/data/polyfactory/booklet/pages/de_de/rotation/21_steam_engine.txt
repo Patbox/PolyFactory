@@ -1,0 +1,21 @@
+### Section: PageInfo
+title=<item 'polyfactory:steam_engine'>
+icon=polyfactory:steam_engine
+category=polyfactory:rotation
+### EndSection: PageInfo
+<yellow><item 'polyfactory:steam_engine'></> ist ein 2x3x2-Block, der Rotationsenergie erzeugt.
+<nl>
+Es ist der beste Weg, viel Energie zu erzeugen, ohne viel verbindende Infrastruktur zu benötigen,
+allerdings auf Kosten von Brennstoff.
+<nl2>
+Um sie anzutreiben, musst du einfach nur einen ofenkompatiblen Brennstoff hineintun.
+<nl>
+Sobald sie Brennstoff hat, benötigt sie 10 Sekunden, um ihre volle Kapazität zu erreichen,
+wobei der Brennstoff anfangs viel schneller verbrannt wird. Sie verbraucht Brennstoff 16-mal schneller
+als ein Ofen und liefert eine Rotationsgeschwindigkeit von 110 RPM und eine Belastungskapazität von 100 u.
+<nl2>
+Während sie standardmäßig automatisch aktiviert wird, sobald sie Brennstoff hat, kannst du sie auch so einstellen,
+dass sie ein aktives Redstone-Signal zum Starten benötigt.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:steam_engine'>Zeige das <item 'polyfactory:steam_engine'>-Rezept</><nl>

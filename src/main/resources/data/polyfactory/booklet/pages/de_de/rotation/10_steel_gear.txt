@@ -1,0 +1,27 @@
+### Section: PageInfo
+title=Stahlzahnräder
+icon=polyfactory:steel_gear
+category=polyfactory:rotation
+### EndSection: PageInfo
+<yellow><item 'polyfactory:steel_gear'></> ist ein Rotationsübertragungsblock und eine Herstellungszutat.
+Es kann mit anderen regulären Stahlzahnrädern verbunden werden, indem man sie auf derselben Ebene platziert und dabei in
+dieselbe Achse zeigt.
+<nl2>
+<yellow><item 'polyfactory:large_steel_gear'></> ist ein Rotationsübertragungsblock.
+Es kann mit anderen großen Stahlzahnrädern verbunden werden, indem man sie senkrecht zueinander platziert,
+sodass sich ihre Außenteile visuell berühren (die Achsen müssen senkrecht zueinander zeigen).
+<nl2>
+<item 'polyfactory:steel_gear'> und <item 'polyfactory:large_steel_gear'> können miteinander verbunden werden, wenn
+sie diagonal auf derselben Ebene platziert werden. Zusätzlich ändern sich je nachdem, welches Zahnrad angetrieben wird, die Geschwindigkeit und Belastungskapazität.
+Zum Beispiel, wenn das <item 'polyfactory:steel_gear'> das <item 'polyfactory:large_steel_gear'> antreibt,
+wird die Rotationsgeschwindigkeit auf der Seite des großen Zahnrads halbiert, aber die Kapazität verdoppelt. Das Vertauschen, welches angetrieben wird,
+kehrt auch die betroffenen Werte um (halbierte Kapazität, aber verdoppelte Geschwindigkeit).
+<nl2>
+Um eines der Zahnräder zu platzieren, verwendest du es entweder auf einem vorhandenen <item 'polyfactory:axle'>-Block oder hast mindestens
+1 <item 'polyfactory:axle'> im Inventar.
+
+### Image: polyfactory:rotation/gears_example Beispiel für Zahnradverbindungen.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:steel_gear'>Zeige das <item 'polyfactory:steel_gear'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:large_steel_gear'>Zeige das <item 'polyfactory:large_steel_gear'>-Rezept</>

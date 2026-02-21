@@ -1,0 +1,21 @@
+### Section: PageInfo
+title=<item 'polyfactory:casting_table'>
+icon=polyfactory:casting_table
+category=polyfactory:fluids
+### EndSection: PageInfo
+<yellow><item 'polyfactory:casting_table'></> ist ein Block, der es dir ermöglicht, Dinge mit Flüssigkeiten herzustellen.
+<nl2>
+Er tut allein nichts, da du einen <item 'polyfactory:faucet'> platzieren musst, der mit einer Flüssigkeitsquelle verbunden ist.
+Dann kannst du durch Platzieren des Zutatengegenstands im <item 'polyfactory:casting_table'> die Herstellung starten, indem du
+den <item 'polyfactory:faucet'> anklickst. Wenn die Zutat gültig ist und genug Flüssigkeit vorhanden war, beginnt der Gießprozess,
+der zuerst die Flüssigkeit herauszieht und dann wartet, bis sie abkühlt. Sobald sie abgekühlt ist, kannst du den hergestellten Gegenstand herausnehmen.
+<nl2>
+Obwohl dieser Aufbau automatisiert werden kann, indem man den <item 'polyfactory:faucet'> mit Redstone antreibt und einen Trichter unter dem
+Tisch verwendet, solltest du stattdessen den <u><blue><pagelink '/crafting/70_mechanical_spout'><item 'polyfactory:mechanical_spout'></*> verwenden,
+da er schneller ist. Allerdings hat er einen etwas anderen Satz an Rezepten.
+
+### Image: polyfactory:fluids/primitive_smeltery_example Beispiel eines einfachen <item 'polyfactory:casting_table'>-Aufbaus.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:casting_table'>Zeige das <item 'polyfactory:casting_table'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:recipe_type/casting' 'category'>Zeige die Rezepte dieses Blocks</>

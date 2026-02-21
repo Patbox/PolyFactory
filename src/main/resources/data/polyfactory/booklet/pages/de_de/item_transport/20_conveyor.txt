@@ -1,0 +1,33 @@
+### Section: PageInfo
+title=<item 'polyfactory:conveyor'>
+icon=polyfactory:conveyor
+category=polyfactory:item_transport
+### EndSection: PageInfo
+<yellow><item 'polyfactory:conveyor'></> ist ein Block, der den Transport von Gegenständen und Entitäten ermöglicht.
+Es benötigt <u><blue><pagelink 'polyfactory:rotation/00_about'>Rotationsenergie</*> zum Arbeiten, nutzt aber rein die
+Geschwindigkeit davon (nicht die Drehrichtung!), ohne zusätzliche Belastung auf das System auszuüben. Förderbänder können auch verwendet werden, um die Rotationsenergie
+weiterzuleiten.
+<nl2>
+Förderbänder sind gerichtet und verbinden sich miteinander, solange sie in dieselbe Richtung zeigen und nebeneinander liegen.
+Das Förderband kann gerade, diagonal (sowohl hoch als auch runter) und direkt nach oben verlaufen.
+<nl2>
+Wenn eine Entität auf einem angetriebenen <item 'polyfactory:conveyor'> steht, wird sie in die Richtung geschoben, in die das Förderband zeigt.
+Bei vertikalen Förderbändern werden Entitäten nicht beeinflusst.
+<nl>
+Für den Gegenstandstransport ermöglicht das direkte Fallenlassen von Gegenständen, die Verwendung von <item 'hopper'>n oder <item 'polyfactory:funnel'>n dem
+<item 'polyfactory:conveyor'>, diese aufzunehmen, mit einer Stapelgrößenbegrenzung von 16. Der Stapel bewegt sich dann in die festgelegte
+Richtung, ohne despawnen zu können. Wenn das <item 'polyfactory:conveyor'> direkt auf bestimmte Blöcke zeigt,
+wie <item 'polyfactory:press'>, <item 'polyfactory:mixer'>, <item 'hopper'> und ähnliche, werden Gegenstände direkt hineingelegt.
+<item 'polyfactory:conveyor'> können auch Gegenstände aus einigen von ihnen herausnehmen (zum Beispiel <item 'polyfactory:mechanical_spout'>
+und <item 'polyfactory:mechanical_drain'>).
+<nl2>
+Reguläre <item 'polyfactory:conveyor'> erlauben es Gegenständen nicht, direkt hoch oder runter zu fahren, nur horizontal und diagonal.
+Dafür musst du <yellow><item 'polyfactory:sticky_conveyor'></> verwenden, das praktisch genauso funktioniert,
+mit dem Bonus, vertikalen Gegenstandstransport zu ermöglichen. Diese Funktionalität erstreckt sich derzeit jedoch nicht auf die Entitätsbewegung.
+Um ein <item 'polyfactory:sticky_conveyor'> zu bekommen, kannst du entweder <item 'polyfactory:conveyor'> mit einem <item 'slime_ball'>
+herstellen oder es direkt in der Welt verwenden.
+
+### Image: polyfactory:item_transport/conveyor_example Beispiel für die Verwendung von <item 'polyfactory:conveyor'> und <item 'polyfactory:sticky_conveyor'>.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:conveyor'>Zeige das <item 'polyfactory:conveyor'>-Rezept</>

@@ -1,0 +1,20 @@
+### Section: PageInfo
+title=<item 'polyfactory:primitive_smeltery'>
+icon=polyfactory:primitive_smeltery
+category=polyfactory:fluids
+### EndSection: PageInfo
+<yellow><item 'polyfactory:primitive_smeltery'></> ist ein 1x2x1-Block, der es dir ermöglicht, bestimmte Materialien einzuschmelzen.
+<nl>
+Ermöglicht hauptsächlich das Erhalten von geschmolzenen Flüssigkeiten (die normalerweise eine höhere Ausbeute als der Ofen geben), die dann mit
+dem restlichen Flüssigkeitssystem, dem <item 'polyfactory:casting_table'> und dem <item 'polyfactory:mechanical_spout'> verwendet werden können.
+<nl2>
+<item 'polyfactory:primitive_smeltery'> kann nur einen einzelnen Gegenstand gleichzeitig schmelzen und dabei
+nur einen Block (9 Barren) an Flüssigkeit speichern.
+<nl>
+Um zu funktionieren, benötigt dieser Block ofenkompatiblen Brennstoff (wie Kohle), den er 4-mal so schnell verbraucht wie ein Ofen.
+
+### Image: polyfactory:fluids/primitive_smeltery_example Beispiel eines <item 'polyfactory:primitive_smeltery'>-Aufbaus.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:primitive_smeltery'>Zeige das <item 'polyfactory:primitive_smeltery'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:recipe_type/smeltery' 'category'>Zeige die Rezepte dieses Blocks</>

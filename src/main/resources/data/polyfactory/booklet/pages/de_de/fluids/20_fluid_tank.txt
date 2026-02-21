@@ -1,0 +1,21 @@
+### Section: PageInfo
+title=<item 'polyfactory:fluid_tank'>
+icon=polyfactory:fluid_tank
+category=polyfactory:fluids
+### EndSection: PageInfo
+<yellow><item 'polyfactory:fluid_tank'></> ist ein Block zur Lagerung von Flüssigkeiten.
+<nl2>
+Allein kann er bis zu 6 Eimer/Blöcke an Flüssigkeit speichern. Er kann verschiedene Flüssigkeitstypen gleichzeitig speichern,
+obwohl einige von ihnen miteinander reagieren können. Flüssigkeitstank-Blöcke können sich miteinander verbinden und die Erstellung von
+größeren, verbundenen Tanks ermöglichen. Es gibt keine Begrenzung für Form oder Anzahl der Tanks.
+<nl2>
+Auf Flüssigkeit kann mit einem <item 'polyfactory:pipe'> oder anderen Flüssigkeitsblöcken mit direktem Zugriff zugegriffen werden.
+Beim Herausziehen von Flüssigkeit solltest du dies idealerweise von der untersten Schicht tun, da nur die Flüssigkeiten zugänglich sind, die
+sich visuell innerhalb des <item 'polyfactory:fluid_tank'> befinden.
+<nl>
+Beim Abbauen gehen Flüssigkeiten verloren.
+
+### Image: polyfactory:fluids/fluid_tank_example Flüssigkeitstanks.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:fluid_tank'>Zeige das <item 'polyfactory:fluid_tank'>-Rezept</>

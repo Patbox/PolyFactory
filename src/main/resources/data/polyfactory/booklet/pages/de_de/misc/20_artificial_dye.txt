@@ -1,0 +1,24 @@
+### Section: PageInfo
+title=<item 'polyfactory:artificial_dye'>
+icon=polyfactory:artificial_dye[polyfactory:color=0xee44ee]
+category=polyfactory:misc
+### EndSection: PageInfo
+<yellow><item 'polyfactory:artificial_dye'></> ist ein benutzerdefinierter Farbstoffgegenstand, der als Ersatz für Vanilla-
+Farbstoffe beim Herstellen/Färben von allem verwendet werden kann, das dynamische Farben unterstützt, wie Lederrüstung,
+<item 'minecraft:firework_star'>, Schilder, <item 'polyfactory:colored_lamp'> und mehr.
+<nl2>
+Um ihn herzustellen, musst du einen <u><blue><pagelink 'polyfactory:basics/50_temperature'>erhitzten</*>
+<item 'polyfactory:mixer'> verwenden. Dann brauchst du etwas <item 'polyfactory:saw_dust'>,
+Vanilla-Farbstoffe und andere steuernde Zutaten (siehe unten).
+<nl>
+Dann musst du sie in den Mischer legen und mit dem Mischen beginnen!
+Als zusätzliche Zutaten kannst du verwenden:
+- Vanilla-Farbstoffe, andere <item 'polyfactory:artificial_dye'> - Werden für die Farbmischung verwendet, gleiche Logik wie bei Leder.
+- <item 'polyfactory:saw_dust'> (<blue><u><polydex 'polyfactory:saw_dust'>Rezept</*>) - Wird als Basis benötigt
+(wenn nicht mit anderen <item 'polyfactory:artificial_dye'> gemischt) und um die Änderung der unteren Zutaten zu halbieren (Delta=32 ohne, 16 für 1, 8 für 2 und so weiter).
+- <item 'redstone'> - Entfernt Blau und Grün um *Delta*.
+- <item 'slime_ball'> - Entfernt Rot und Blau um *Delta*.
+- <item 'lapis_lazuli'> - Entfernt Rot und Grün um *Delta*.
+- <item 'bone_meal'> - Erhöht alle Farben um *Delta* (macht heller).
+- <item 'polyfactory:coal_dust'> - Verringert alle Farben um *Delta* (macht dunkler).
+
