@@ -3,14 +3,14 @@ title=Tragbarer Flüssigkeitstank
 icon=polyfactory:portable_fluid_tank
 category=polyfactory:fluids
 ### EndSection: PageInfo
-<yellow>Tragbarer Flüssigkeitstank</> ist eine tragbare Variante des <item 'polyfactory:fluid_tank'>-Blocks.
+Der <yellow>Tragbare Flüssigkeitstank</> ist eine tragbare Variante des <item 'polyfactory:fluid_tank'>.
 <nl2>
-Er kann bis zu 4 Eimer/Blöcke an Flüssigkeit speichern. Er kann auch verschiedene Flüssigkeitstypen gleichzeitig speichern,
-obwohl einige von ihnen miteinander reagieren können. Der Tragbare Flüssigkeitstank kann nur von einer einzelnen Seite aus zugänglich sein,
-wie durch seine Öffnung angezeigt.
+Er kann bis zu 4 Eimer an Flüssigkeit speichern und auch verschiedene Flüssigkeitstypen gleichzeitig enthalten,
+wobei einige miteinander reagieren können. Der Zugriff ist nur von einer Seite möglich,
+erkennbar an der Öffnung.
 <nl>
-Beim Abbauen bleiben die Flüssigkeiten im Gegenstand erhalten. Sie können dann erneut platziert oder von Gegenständen wie
-<item 'polyfactory:pressure_fluid_gun'> verwendet werden.
+Beim Abbauen bleiben die Flüssigkeiten im Gegenstand erhalten. Er kann dann erneut platziert oder von Gegenständen wie
+der <item 'polyfactory:pressure_fluid_gun'> verwendet werden.
 
 ### Align: Center
 <u><blue><polydex 'polyfactory:portable_fluid_tank'>Zeige das <item 'polyfactory:portable_fluid_tank'>-Rezept</>

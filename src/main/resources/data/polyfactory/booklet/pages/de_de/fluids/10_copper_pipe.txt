@@ -3,27 +3,27 @@ title=<item 'polyfactory:pipe'>
 icon=polyfactory:pipe
 category=polyfactory:fluids
 ### EndSection: PageInfo
-<yellow><item 'polyfactory:pipe'></> ist ein Block, der es dir ermöglicht, Flüssigkeiten zu transportieren, sowohl für Lagerung,
-Platzierung / Entwässerung als auch für Herstellungszwecke.
+Das <yellow><item 'polyfactory:pipe'></> ist ein Block zum Transport von Flüssigkeiten – für Lagerung,
+Platzierung/Entwässerung und Herstellungszwecke.
 <nl>
-Reguläre <item 'polyfactory:pipe'> können sich richtungsabhängig mit anderen Rohren verbinden, wodurch der Flüssigkeitsstrom geteilt und zusammengeführt werden kann.
-Sie versuchen auch, sich mit jedem anderen Flüssigkeitsein-/ausgang oder Rohr zu verbinden, wobei diese Funktionalität pro
-Block mit einem <u><blue><pagelink '/basics/10_wrench'><item 'polyfactory:wrench'></*> deaktiviert werden kann.
+Reguläre <item 'polyfactory:pipe'> können sich richtungsabhängig mit anderen Rohren verbinden, um den Flüssigkeitsstrom zu teilen und zusammenzuführen.
+Sie verbinden sich außerdem automatisch mit Flüssigkeitsein-/-ausgängen und anderen Rohren. Diese Funktion kann pro
+Block mit dem <u><blue><pagelink '/basics/10_wrench'><item 'polyfactory:wrench'></*> deaktiviert werden.
 <nl>
-Du kannst <item 'polyfactory:pipe'> in einen Wandblock einsetzen, um es besser zu integrieren.
+Du kannst das <item 'polyfactory:pipe'> in einen Wandblock einsetzen, um es besser zu integrieren.
 <nl>
-Rohre bewegen standardmäßig keine Flüssigkeiten, da du sie mit einer <u><blue><pagelink './11_mechanical_pump'><item 'polyfactory:pump'></*> antreiben musst.
+Rohre bewegen standardmäßig keine Flüssigkeiten – dazu brauchst du eine <u><blue><pagelink './11_mechanical_pump'><item 'polyfactory:pump'></*>.
 <nl2>
-<yellow><item 'polyfactory:redstone_valve_pipe'></> ist eine Rohrvariante, die verwendet werden kann, um das Rohrnetzwerk
-automatisch durch Anlegen von Redstone-Energie zu verbinden / trennen.
-Dieses Rohr kann sich auch nur in der Achse verbinden, in die es zeigt.
+Das <yellow><item 'polyfactory:redstone_valve_pipe'></> ist eine Rohrvariante, die das Rohrnetzwerk
+durch Redstone-Energie automatisch verbinden oder trennen kann.
+Dieses Rohr verbindet sich nur entlang seiner Ausrichtungsachse.
 <nl2>
-<yellow><item 'polyfactory:filtered_pipe'></> ist eine Rohrvariante, die es dir ermöglicht, durchfließende Flüssigkeiten zu filtern, und es
-sowohl als Whitelist als auch als Blacklist je nach Bedarf handhabt. Um den Filter einzustellen, musst du einen der Flüssigkeit zugeordneten
-Gegenstand darauf verwenden, zum Beispiel einen Wassereimer, um auf Wasserfilterung einzustellen, oder einen Eisenbarren, um geschmolzenes Eisen zu filtern.
-Wenn nicht konfiguriert, stellt sich der Filter automatisch auf die erste Flüssigkeit ein, mit der er in Kontakt kommt.
+Das <yellow><item 'polyfactory:filtered_pipe'></> ist eine Rohrvariante, die durchfließende Flüssigkeiten filtert –
+sowohl als Whitelist als auch als Blacklist. Um den Filter einzustellen, verwende einen der Flüssigkeit zugeordneten
+Gegenstand darauf, z.B. einen Wassereimer für Wasser oder einen Eisenbarren für geschmolzenes Eisen.
+Ohne Konfiguration stellt sich der Filter automatisch auf die erste Flüssigkeit ein, mit der er in Kontakt kommt.
 <nl>
-Dieses Rohr kann sich auch nur in der Achse verbinden, in die es zeigt.
+Dieses Rohr verbindet sich nur entlang seiner Ausrichtungsachse.
 
 ### Image: polyfactory:fluids/pipe_example Beispielsystem mit Rohren.
 

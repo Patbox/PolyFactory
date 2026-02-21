@@ -3,31 +3,30 @@ title=<item 'polyfactory:funnel'>
 icon=polyfactory:funnel
 category=polyfactory:item_transport
 ### EndSection: PageInfo
-<yellow><item 'polyfactory:funnel'></> ist ein Block, der Gegenstände aus und in Behälter zum / vom
+Der <yellow><item 'polyfactory:funnel'></> ist ein Block, der Gegenstände zwischen Behältern und dem
 <u><blue><pagelink 'polyfactory:item_transport/20_conveyor'><item 'polyfactory:conveyor'></*> transportiert.
 <nl2>
-Er kann in alle horizontalen Richtungen und nach unten zeigen. Seine Ausrichtung wird durch die Blockseite gesteuert, an der er platziert wird,
-oder durch die Blickrichtung des Spielers, wenn er oben platziert wird.
+Er kann in alle horizontalen Richtungen und nach unten zeigen. Die Ausrichtung wird durch die Blockseite bestimmt, an der er platziert wird,
+oder durch die Blickrichtung des Spielers bei Platzierung von oben.
 <nl>
-Er hat auch 2 Betriebsmodi:
-- Zum Förderband - zieht Gegenstände aus Behältern und legt sie auf das Förderband.
-- Vom Förderband - zieht Gegenstände vom Förderband und legt sie in den Behälter.
+Er hat 2 Betriebsmodi:
+- Zum Förderband – zieht Gegenstände aus Behältern und legt sie auf das Förderband.
+- Vom Förderband – nimmt Gegenstände vom Förderband und legt sie in den Behälter.
 <nl>
-Standardmäßig wird der Modus je nach Platzierung ausgewählt. Wenn er ohne ein Förderband darunter platziert wird, wird er immer
-auf den Modus "Zum Förderband" zurückfallen. Wenn er auf einem Förderband platziert wird:
-Wenn er in die Richtung des Förderbands zeigt, wird der Modus "Vom Förderband" verwendet.
-Wenn er in die entgegengesetzte Richtung platziert wird, wird immer "Zum Förderband" verwendet.
-Bei seitlicher Platzierung wird ein Modus gewählt, der vom anvisierten Block zum anderen transportiert.
-Natürlich kann dies mit einem <u><blue><pagelink 'polyfactory:basics/10_wrench'><item 'polyfactory:wrench'></*> geändert werden.
+Standardmäßig wird der Modus anhand der Platzierung gewählt. Ohne Förderband darunter ist der Standard
+"Zum Förderband". Auf einem Förderband platziert:
+In Förderbandrichtung wird "Vom Förderband" gewählt.
+In entgegengesetzter Richtung wird "Zum Förderband" verwendet.
+Bei seitlicher Platzierung wird der Modus gewählt, der vom anvisierten Block zum anderen transportiert.
+All dies kann mit dem <u><blue><pagelink 'polyfactory:basics/10_wrench'><item 'polyfactory:wrench'></*> geändert werden.
 <nl2>
-Du kannst den <u><blue><pagelink 'polyfactory:item_transport/10_item_filter'>Gegenstandsfilter</*> verwenden, um die Gegenstände zu filtern,
-die in/aus dem <item 'polyfactory:funnel'> gehen.
+Mit dem <u><blue><pagelink 'polyfactory:item_transport/10_item_filter'>Gegenstandsfilter</*> können die ein-/ausgehenden Gegenstände gefiltert werden.
 <nl2>
-<yellow><item 'polyfactory:slot_aware_funnel'></> ist eine "intelligentere" Trichtervariante, die es dir ermöglicht, speziell festzulegen,
-in welche Slots Gegenstände gehen sollen. Durch Anklicken öffnet sich eine Oberfläche zur Einrichtung. Es werden bis zu 9
+Der <yellow><item 'polyfactory:slot_aware_funnel'></> ist eine "intelligentere" Variante, bei der du gezielt festlegen kannst,
+in welche Slots Gegenstände gehen. Per Klick öffnet sich eine Einrichtungsoberfläche. Es werden bis zu 9
 Slots unterstützt, jeder mit eigenem Platz für einen Gegenstandsfilter.
 
-### Image: polyfactory:item_transport/funnel_example Platzierte <item 'polyfactory:funnel'>, links mit "Zum Förderband"-Modus und rechts mit "Vom Förderband".
+### Image: polyfactory:item_transport/funnel_example Platzierter <item 'polyfactory:funnel'>: links im Modus "Zum Förderband", rechts "Vom Förderband".
 
 ### Align: Center
 <u><blue><polydex 'polyfactory:funnel'>Zeige das <item 'polyfactory:funnel'>-Rezept</><nl>

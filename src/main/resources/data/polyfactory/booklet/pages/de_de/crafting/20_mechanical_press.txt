@@ -3,20 +3,20 @@ title=<item 'polyfactory:press'>
 icon=polyfactory:press
 category=polyfactory:crafting
 ### EndSection: PageInfo
-<yellow><item 'polyfactory:press'></> ist ein 1x2x1-Gegenstandsherstellungs-Maschinenblock. Er benötigt Rotationsenergie zum Arbeiten.
-Er hat 2 Eingänge (Haupt- und Kopfeingang) und 1 Ausgabeslot. Er kann auch Flüssigkeiten ausgeben, wenn du einen <item 'polyfactory:drain'>
-daneben platzierst.
+Die <yellow><item 'polyfactory:press'></> ist ein 1x2x1-Herstellungs-Maschinenblock, der Rotationsenergie benötigt.
+Sie hat 2 Eingänge (Haupt- und Kopfeingang) und 1 Ausgabeslot. Sie kann auch Flüssigkeiten ausgeben, wenn ein <item 'polyfactory:drain'>
+daneben platziert wird.
 <nl2>
-Die meisten Rezepte erfordern nur den Haupteingabeslot, um den Gegenstand in etwas anderes zu pressen.
-Bei den meisten Rezepten ist die Ausgabe nur ein anderer Gegenstand, aber einige können (optional) zusätzliche Flüssigkeiten ausgeben.
-Nach jedem Pressen gibt es eine kurze Abklingzeit, angezeigt durch das Zurückfahren der Presse.
+Die meisten Rezepte nutzen nur den Haupteingabeslot und pressen den Gegenstand in etwas anderes.
+Meistens ist die Ausgabe ein anderer Gegenstand, aber einige Rezepte erzeugen (optional) zusätzliche Flüssigkeiten.
+Nach jedem Pressvorgang gibt es eine kurze Pause, während die Presse zurückfährt.
 <nl>
-Für den Zugriff per Trichter/Lager wird der Hauptslot über die Vorderseite
-des Blocks befüllt, während der Kopfslot über die Seite zugänglich ist. Der Ausgabeslot ist von der Rückseite zugänglich.
-Dieser Block kann direkt von Förderbändern angesteuert werden.
+Für Trichter-/Lagerzugriff wird der Hauptslot über die Vorderseite befüllt,
+der Kopfslot über die Seite. Die Ausgabe ist von der Rückseite zugänglich.
+Förderbänder können diesen Block direkt ansteuern.
 <nl2>
-Um diesen Block anzutreiben, musst du ihn an der linken oder rechten Seite des oberen Teils anschließen.
-Die von dieser Maschine erzeugte Belastung hängt vom aktuell hergestellten Rezept ab.
+Der Antrieb erfolgt an der linken oder rechten Seite des oberen Teils.
+Die Belastung hängt vom aktuellen Rezept ab.
 Im Leerlauf erzeugt sie keine Belastung.
 
 ### Image: polyfactory:crafting/mechanical_press_example <item 'polyfactory:grinder'> mit Förderbändern und <item 'polyfactory:drain'>.

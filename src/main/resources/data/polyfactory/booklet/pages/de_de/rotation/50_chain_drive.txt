@@ -3,22 +3,22 @@ title=<item 'polyfactory:chain_drive'>
 icon=polyfactory:chain_drive
 category=polyfactory:rotation
 ### EndSection: PageInfo
-<yellow><item 'polyfactory:chain_drive'></> ist ein Rotationsübertragungsblock.
-Er ermöglicht die Übertragung von Rotationsenergie über größere Distanzen mit weniger benötigten Blöcken.
-Er kann auch mit <item 'polyfactory:chain_lift'> für den Transport verwendet werden.
+Der <yellow><item 'polyfactory:chain_drive'></> ist ein Rotationsübertragungsblock.
+Er ermöglicht die Übertragung von Rotationsenergie über größere Distanzen mit weniger Blöcken.
+Er kann auch zusammen mit dem <item 'polyfactory:chain_lift'> für den Transport genutzt werden.
 <nl2>
-Kettenantriebe können in jeder Achse platziert werden. Um sie miteinander zu verbinden, musst du einige
-<item 'iron_chain'>s verwenden. Die benötigte Anzahl an Ketten entspricht der aufgerundeten doppelten Distanz zwischen den Kettenantrieben.
-Die maximale Distanz einer einzelnen Verbindung beträgt 32 Blöcke, jedoch können Kettenantriebe verkettet werden, um Langstreckenverbindungen zu ermöglichen.
+Kettenantriebe können in jeder Achse platziert werden. Zum Verbinden brauchst du
+<item 'iron_chain'>. Die benötigte Menge entspricht der aufgerundeten doppelten Distanz zwischen den Kettenantrieben.
+Die maximale Distanz einer einzelnen Verbindung beträgt 32 Blöcke, allerdings können Kettenantriebe verkettet werden, um Langstreckenverbindungen zu ermöglichen.
 <nl>
-Die Verbindung zwischen den Kettenantrieben darf keinen zu großen Winkel haben, wobei das Limit bei 33 Grad liegt.
+Die Verbindung darf keinen zu großen Winkel haben – das Limit liegt bei 33 Grad.
 <nl2>
-Durch die Verwendung des <yellow><item 'polyfactory:chain_lift'></> auf dem <item 'polyfactory:chain_drive'> befestigst du ihn,
-woraufhin er sich mit der Kette bewegt. Du kannst es dir wie Loren vorstellen. Standardmäßig fahren Kettenlifte mit Spieler
-nur in die Richtung, in die der Spieler schaut, aber das kann mit einem <item 'polyfactory:wrench'> deaktiviert werden.
+Durch Verwenden des <yellow><item 'polyfactory:chain_lift'></> auf dem <item 'polyfactory:chain_drive'> befestigst du ihn,
+woraufhin er sich mit der Kette bewegt – vergleichbar mit Loren. Standardmäßig fahren Kettenlifte mit Spieler
+nur in Blickrichtung, was aber mit dem <item 'polyfactory:wrench'> deaktiviert werden kann.
 Andernfalls wird immer der erste verfügbare Weg gewählt.
 <nl>
-<item 'polyfactory:chain_lift'>s können mit <item 'redstone'> angetrieben werden, wodurch sie die aktuell gehaltene Entität fallen lassen.
+Der <item 'polyfactory:chain_lift'> kann mit <item 'redstone'> angetrieben werden, wodurch er die gehaltene Entität fallen lässt.
 
 ### Image: polyfactory:rotation/chain_drive_example Beispiel eines Kettenantrieb-Aufbaus.
 

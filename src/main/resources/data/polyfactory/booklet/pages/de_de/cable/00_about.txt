@@ -4,25 +4,24 @@ icon=polyfactory:cable[polyfactory:color=0x00FF00]
 category=polyfactory:cable
 ### EndSection: PageInfo
 
-<yellow>Datensystem</> ist die Hauptmethode zur Übertragung, Verarbeitung und Anzeige von Informationen, die eine bessere Automatisierung
-und Sichtbarkeit des aktuellen Zustands ermöglicht. Alle Datensysteme sind an Blöcke gebunden und erfordern, dass diese
-mit <item 'polyfactory:cable'>s verbunden sind.
+Das <yellow>Datensystem</> ist die Hauptmethode zur Übertragung, Verarbeitung und Anzeige von Informationen und ermöglicht eine bessere Automatisierung
+sowie Sichtbarkeit des aktuellen Zustands. Alle Datensystem-Blöcke müssen
+mit <item 'polyfactory:cable'> verbunden werden.
 <nl2>
-Blöcke können als Eingang, Ausgang oder beides fungieren. Obwohl ein Block mehrere Ein- und Ausgänge haben kann, hat PolyFactory nur
-Blöcke, die entweder nur 1 Eingang, nur 1 Ausgang, 1 Eingang mit 1 Ausgang oder 2 Eingänge und 1 Ausgang haben.
+Blöcke können als Eingang, Ausgang oder beides fungieren. PolyFactory bietet Blöcke mit
+nur 1 Eingang, nur 1 Ausgang, 1 Eingang mit 1 Ausgang sowie 2 Eingängen und 1 Ausgang.
 <nl2>
-Sowohl Ein- als auch Ausgänge können nur auf einem einzelnen Kanal arbeiten. Kanäle ermöglichen es dir, eine einzelne Kabelleitung wiederzuverwenden, um Daten zu senden,
-die nur von Eingängen gelesen werden, die darauf lauschen. Es gibt nur 4 verfügbare Kanäle. Wenn du mehr separate
-Daten benötigst, musst du mehr Kabel anschließen.
+Sowohl Ein- als auch Ausgänge arbeiten auf einem einzelnen Kanal. Kanäle ermöglichen die Wiederverwendung einer Kabelleitung für Daten,
+die nur von den richtigen Eingängen gelesen werden. Es gibt 4 verfügbare Kanäle. Für mehr separate
+Daten brauchst du zusätzliche Kabel.
 <nl2>
-Bei den meisten Blöcken werden Daten erst am Ende des Ticks verarbeitet und nur die letzte empfangene Nachricht innerhalb dieses Ticks wird
-tatsächlich behandelt, während der Rest stillschweigend ignoriert wird. Daher ist die Datenverarbeitung selbst auch an die
-Tickrate des Spiels gebunden.
+Bei den meisten Blöcken werden Daten erst am Tickende verarbeitet – nur die letzte Nachricht des Ticks wird
+tatsächlich behandelt, der Rest wird ignoriert. Die Datenverarbeitung ist daher an die Tickrate gebunden.
 <nl2>
-Daten haben selbst auch immer einen bestimmten Typ, der unabhängig vom tatsächlichen Inhalt ist.
-Neben den Grundlagen wie Strings (Text), Ganzzahlen, Dezimalzahlen und Booleans (wahr / falsch) gibt es auch Daten über
-Kapazität, Redstone, Blockzustand, Gegenstandsstapel, Zeit und vieles mehr.
+Daten haben immer einen bestimmten Typ, unabhängig vom Inhalt.
+Neben Grundtypen wie Text, Ganzzahlen, Dezimalzahlen und Booleans gibt es auch Daten über
+Kapazität, Redstone, Blockzustand, Gegenstandsstapel, Zeit und mehr.
 <nl>
-Verschiedene Maschinen interpretieren diese Daten möglicherweise unterschiedlich, daher ist es sehr wichtig, sicherzustellen, dass der richtige Typ gesendet/empfangen wird.
-Du kannst Dinge wie <item 'polyfactory:data_extractor'>, <item 'polyfactory:data_comparator'> und andere verwenden, um
-Daten von einem Typ in einen anderen umzuwandeln, der dann von den gewünschten Maschinen korrekt gelesen wird.
+Verschiedene Maschinen interpretieren Daten unterschiedlich, daher ist der richtige Typ wichtig.
+Mit dem <item 'polyfactory:data_extractor'>, <item 'polyfactory:data_comparator'> und anderen kannst du
+Daten von einem Typ in einen anderen umwandeln.

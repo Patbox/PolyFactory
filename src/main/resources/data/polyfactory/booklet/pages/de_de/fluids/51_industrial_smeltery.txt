@@ -3,26 +3,26 @@ title=<item 'polyfactory:smeltery'>
 icon=polyfactory:smeltery
 category=polyfactory:fluids
 ### EndSection: PageInfo
-<yellow><item 'polyfactory:smeltery'></> ist ein 3x3x3-Multiblock, der es dir ermöglicht, bestimmte Materialien einzuschmelzen.
+Die <yellow><item 'polyfactory:smeltery'></> ist ein 3x3x3-Multiblock zum Einschmelzen bestimmter Materialien.
 <nl>
-Ähnlich wie die <u><blue><pagelink './50_primitive_smeltery'><item 'polyfactory:primitive_smeltery'></*>, wird sie
-verwendet, um geschmolzene Flüssigkeiten zu erhalten (die normalerweise eine höhere Ausbeute als der Ofen geben), die später zur Herstellung mit
-<item 'polyfactory:casting_table'> und <item 'polyfactory:mechanical_spout'> verwendet werden.
+Ähnlich wie die <u><blue><pagelink './50_primitive_smeltery'><item 'polyfactory:primitive_smeltery'></*> dient sie
+zum Gewinnen von geschmolzenen Flüssigkeiten (die üblicherweise mehr Ertrag als ein Ofen liefern), die dann zur Herstellung mit
+dem <item 'polyfactory:casting_table'> und dem <item 'polyfactory:mechanical_spout'> verwendet werden.
 <nl2>
-<item 'polyfactory:smeltery'> kann bis zu 9 Gegenstände gleichzeitig schmelzen und dabei bis zu
+Die <item 'polyfactory:smeltery'> kann bis zu 9 Gegenstände gleichzeitig schmelzen und bis zu
 24 Blöcke an Flüssigkeit halten.
 <nl>
-Um zu funktionieren, benötigt dieser Block ofenkompatiblen Brennstoff (wie Kohle), den er 3-mal so schnell verbraucht wie ein Ofen.
+Sie benötigt ofenkompatiblen Brennstoff (z.B. Kohle), den sie 3-mal so schnell verbraucht wie ein Ofen.
 <nl2>
-Anders als bei den meisten anderen Blöcken musst du diesen Block in der Welt bauen.
-Dazu brauchst du zuerst einen <item 'polyfactory:smeltery_core'>, 22 <item 'deepslate_bricks'>
+Anders als die meisten Blöcke muss dieser Block in der Welt gebaut werden.
+Dazu brauchst du einen <item 'polyfactory:smeltery_core'>, 22 <item 'deepslate_bricks'>
 und 3 <item 'polyfactory:steel_block'>.
 
-Dann musst du einfach einen hohlen Würfel daraus bauen (also der mittlere Block ist leer).
-Die Position der <item 'deepslate_bricks'> und <item 'polyfactory:steel_block'> spielt keine Rolle,
-die einzige Bedingung ist, dass der <item 'polyfactory:smeltery_core'> in der Mitte einer der Wände
-nach außen zeigend platziert wird. Sobald du das getan hast, klicke einfach den <item 'polyfactory:smeltery_core'> an und er wird sich in
-die <item 'polyfactory:smeltery'> verwandeln. Wenn du etwas falsch platziert hast, werden stattdessen die falschen Blöcke hervorgehoben.
+Dann baust du einen hohlen Würfel daraus (die Mitte bleibt leer).
+Die Position der <item 'deepslate_bricks'> und <item 'polyfactory:steel_block'> ist beliebig –
+einzige Bedingung ist, dass der <item 'polyfactory:smeltery_core'> in der Mitte einer Wand
+nach außen zeigend platziert wird. Klicke dann den <item 'polyfactory:smeltery_core'> an, und er verwandelt sich in
+die <item 'polyfactory:smeltery'>. Bei falscher Platzierung werden stattdessen die fehlerhaften Blöcke hervorgehoben.
 
 ### Image: polyfactory:fluids/smeltery_building Schrittweiser Schmelze-Bau.
 

@@ -7,22 +7,22 @@ category=polyfactory:basics
 PolyFactory ist eine serverseitige Tech-Mod, die weitere Möglichkeiten zur Automatisierung und Herstellung von Dingen hinzufügt.
 Standardmäßig verändert sie nichts sichtbar in der Welt, da es das Ziel des Spielers ist, dies zu tun.
 <nl2>
-Um zu beginnen, musst du zuerst dem <item 'polyfactory:grinder'> herstellen, mit dem du
+Zu Beginn musst du das <item 'polyfactory:grinder'> herstellen, mit dem du
 <item 'polyfactory:coal_dust'>, <item 'polyfactory:saw_dust'> und viele andere Gegenstände erzeugen kannst (wobei die ersten
-beiden am wichtigsten für die Herstellung sind).
+beiden für die weitere Herstellung am wichtigsten sind).
 <nl2>
-Um dem <item 'polyfactory:grinder'> anzutreiben, musst du die <item 'polyfactory:hand_crank'> herstellen.
-Es ist der einfachste, aber einzige Block, den du anfangs nutzen kannst, um mechanische Energie zu erzeugen.
-Platziere sie oben auf dem <item 'polyfactory:grinder'> nach unten zeigend. Um sie zu benutzen, klicke sie einfach ständig an,
-da sie genug Energie erzeugt, um den <item 'polyfactory:coal_dust'> zu bekommen, den du durch das Mahlen
-von <item 'minecraft:coal'> und <item 'minecraft:charcoal'> erhältst.
+Um das <item 'polyfactory:grinder'> anzutreiben, musst du die <item 'polyfactory:hand_crank'> herstellen.
+Sie ist der einfachste, aber auch einzige Block, mit dem du anfangs mechanische Energie erzeugen kannst.
+Platziere sie oben auf dem <item 'polyfactory:grinder'>, nach unten zeigend. Klicke sie einfach ständig an,
+um genug Energie zu erzeugen und so <item 'polyfactory:coal_dust'> zu erhalten, den du durch das Mahlen
+von <item 'minecraft:coal'> und <item 'minecraft:charcoal'> bekommst.
 <nl2>
-Nachdem du genug <item 'polyfactory:coal_dust'> hast, wirst du einige <item 'polyfactory:steel_ingot'> benötigen.
-Du kannst sie anfangs herstellen, indem du <item 'polyfactory:coal_dust'>, <item 'minecraft:redstone_dust'> und 2 <item 'minecraft:iron_ingot'>
-zu einer <item 'polyfactory:steel_alloy_mixture'> verarbeitest und dieses dann in einem <item 'minecraft:furnace'>, <item 'minecraft:blast_furnace'>
-oder über das Schmelzen mit einer <item 'polyfactory:primitive_smeltery'> einschmelzt.
+Sobald du genug <item 'polyfactory:coal_dust'> hast, brauchst du einige <item 'polyfactory:steel_ingot'>.
+Diese erhältst du, indem du <item 'polyfactory:coal_dust'>, <item 'minecraft:redstone_dust'> und 2 <item 'minecraft:iron_ingot'>
+zu <item 'polyfactory:steel_alloy_mixture'> verarbeitest und diese dann in einem <item 'minecraft:furnace'>, <item 'minecraft:blast_furnace'>
+oder mit einer <item 'polyfactory:primitive_smeltery'> einschmelzt.
 <nl2>
-Von dort aus kannst du immer mehr Gegenstände bekommen und herstellen, worüber du in diesem Handbuch mehr erfahren oder deren Rezepte in Polydex nachschlagen kannst.
+Von dort aus kannst du immer mehr Gegenstände herstellen. Mehr dazu findest du in diesem Handbuch oder in den Rezepten bei Polydex.
 Für den Fortschrittsverlauf kannst du dich an den Fortschritten im PolyFactory-Tab orientieren.
 
 ### Align: Center

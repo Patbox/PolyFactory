@@ -3,22 +3,22 @@ title=Gegenstandsfilter
 icon=polyfactory:item_filter
 category=polyfactory:item_transport
 ### EndSection: PageInfo
-<yellow>Gegenstandsfilter</> ist ein Gegenstand, der es dir ermöglicht, einzuschränken, welche Gegenstände von
-<item 'hopper'>n, <item 'polyfactory:funnel'>n und <item 'polyfactory:item_splitter'>n akzeptiert werden.
+Der <yellow>Gegenstandsfilter</> ist ein Gegenstand, mit dem du einschränken kannst, welche Gegenstände von
+<item 'hopper'>, <item 'polyfactory:funnel'> und <item 'polyfactory:item_splitter'> akzeptiert werden.
 <nl2>
-Um ihn zu konfigurieren, verwende ihn, während du keinen interaktiven Block anvisierst. Es öffnet sich dann eine Oberfläche, in der du
-bis zu 9 verschiedene Gegenstände zum Filtern einstellen kannst. Beachte, dass der Filter den Gegenstand nur in sich kopiert, ohne dass
-das Original dauerhaft dort platziert werden muss.
+Zum Konfigurieren benutze ihn, ohne auf einen interaktiven Block zu zielen. Es öffnet sich eine Oberfläche, in der du
+bis zu 9 verschiedene Gegenstände als Filter einstellen kannst. Der Filter kopiert den Gegenstand nur hinein, ohne dass
+das Original dauerhaft dort verbleiben muss.
 <nl2>
-Zusätzlich kannst du ändern, ob der Filter die Gegenstandsdaten
-(Verzauberungen, Schaden, Farbe, etc.) der eingestellten Gegenstände prüfen oder nur den Typ vergleichen soll.
+Zusätzlich kannst du einstellen, ob der Filter die Gegenstandsdaten
+(Verzauberungen, Schaden, Farbe etc.) prüfen oder nur den Typ abgleichen soll.
 <nl>
-Du kannst auch einstellen, ob dieser Filter nur die eingestellten Gegenstände durchlässt oder nur diese verhindert.
+Du kannst auch festlegen, ob der Filter nur die eingestellten Gegenstände durchlässt oder nur diese blockiert.
 <nl2>
-Damit ein Block diesen Filter verwendet, musst du einfach darauf klicken, während du ihn hältst.
-<item 'hopper'> und <item 'polyfactory:funnel'> erlauben nur einen einzelnen Filter, während der <item 'polyfactory:item_splitter'>
+Um einen Block mit dem Filter zu versehen, klicke ihn einfach an, während du den Filter hältst.
+<item 'hopper'> und <item 'polyfactory:funnel'> nehmen nur einen einzelnen Filter auf, während der <item 'polyfactory:item_splitter'>
 zwei aufnehmen kann (einen für den grünen/linken und einen für den roten/rechten Ausgang).
-Um ihn herauszunehmen, klicke einfach erneut darauf (beim Trichter musst du die Shift-Taste halten).
+Zum Herausnehmen klicke erneut (beim Trichter mit gedrückter Shift-Taste).
 
 ### Align: Center
 <u><blue><polydex 'polyfactory:item_filter'>Zeige das Gegenstandsfilter-Rezept</>

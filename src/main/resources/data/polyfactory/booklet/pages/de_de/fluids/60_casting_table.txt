@@ -3,16 +3,16 @@ title=<item 'polyfactory:casting_table'>
 icon=polyfactory:casting_table
 category=polyfactory:fluids
 ### EndSection: PageInfo
-<yellow><item 'polyfactory:casting_table'></> ist ein Block, der es dir ermöglicht, Dinge mit Flüssigkeiten herzustellen.
+Der <yellow><item 'polyfactory:casting_table'></> ist ein Block, mit dem du Dinge mithilfe von Flüssigkeiten herstellen kannst.
 <nl2>
-Er tut allein nichts, da du einen <item 'polyfactory:faucet'> platzieren musst, der mit einer Flüssigkeitsquelle verbunden ist.
-Dann kannst du durch Platzieren des Zutatengegenstands im <item 'polyfactory:casting_table'> die Herstellung starten, indem du
-den <item 'polyfactory:faucet'> anklickst. Wenn die Zutat gültig ist und genug Flüssigkeit vorhanden war, beginnt der Gießprozess,
-der zuerst die Flüssigkeit herauszieht und dann wartet, bis sie abkühlt. Sobald sie abgekühlt ist, kannst du den hergestellten Gegenstand herausnehmen.
+Allein tut er nichts – du brauchst einen <item 'polyfactory:faucet'>, der mit einer Flüssigkeitsquelle verbunden ist.
+Platziere dann die Zutat im <item 'polyfactory:casting_table'> und klicke den <item 'polyfactory:faucet'> an, um den Gießvorgang zu starten.
+Bei gültiger Zutat und ausreichend Flüssigkeit beginnt der Prozess: Zuerst wird die Flüssigkeit eingezogen, dann muss sie abkühlen.
+Sobald sie abgekühlt ist, kannst du den fertigen Gegenstand entnehmen.
 <nl2>
-Obwohl dieser Aufbau automatisiert werden kann, indem man den <item 'polyfactory:faucet'> mit Redstone antreibt und einen Trichter unter dem
-Tisch verwendet, solltest du stattdessen den <u><blue><pagelink '/crafting/70_mechanical_spout'><item 'polyfactory:mechanical_spout'></*> verwenden,
-da er schneller ist. Allerdings hat er einen etwas anderen Satz an Rezepten.
+Dieser Aufbau lässt sich automatisieren, indem man den <item 'polyfactory:faucet'> mit Redstone antreibt und einen Trichter unter dem
+Tisch platziert. Für höhere Geschwindigkeit empfiehlt sich jedoch der <u><blue><pagelink '/crafting/70_mechanical_spout'><item 'polyfactory:mechanical_spout'></*>,
+der allerdings einen leicht abweichenden Rezeptsatz hat.
 
 ### Image: polyfactory:fluids/primitive_smeltery_example Beispiel eines einfachen <item 'polyfactory:casting_table'>-Aufbaus.
 

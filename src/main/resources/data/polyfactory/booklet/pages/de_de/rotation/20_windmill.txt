@@ -3,27 +3,27 @@ title=Windmühle
 icon=polyfactory:windmill_sail
 category=polyfactory:rotation
 ### EndSection: PageInfo
-<yellow>Windmühle</> ist eine der einfacheren stromerzeugenden Strukturen, die du bauen kannst.
+Die <yellow>Windmühle</> ist eine der einfacheren stromerzeugenden Strukturen, die du bauen kannst.
 <nl>
-Um sie zu bauen, brauchst du eine einzelne <item 'polyfactory:axle'> und 2-8 <item 'polyfactory:windmill_sail'>s.
-Zuerst musst du die <item 'polyfactory:axle'> platzieren. Dann verwendest du <item 'polyfactory:windmill_sail'> auf der Achse,
-um sie in eine Windmühle umzuwandeln. Windmühlen haben nur einen einzigen Energieausgang, bestimmt durch die Achse der Achse und die Blickrichtung
+Dafür brauchst du eine einzelne <item 'polyfactory:axle'> und 2-8 <item 'polyfactory:windmill_sail'>.
+Zuerst platzierst du die <item 'polyfactory:axle'>. Dann verwendest du <item 'polyfactory:windmill_sail'> auf der Achse,
+um sie in eine Windmühle umzuwandeln. Windmühlen haben nur einen einzelnen Energieausgang, bestimmt durch die Achsenausrichtung und die Blickrichtung
 des Spielers. Beachte, dass Windmühlen nur horizontal platziert werden können.
 <nl2>
-Die von der Windmühle erzeugte Geschwindigkeit hängt von der Dimension, dem Biom, der Höhe und dem Wetter ab.
-In der Oberwelt gilt: je höher, desto mehr Geschwindigkeit und Kapazität wird erzeugt, im Nether wird das meiste um y=64 erzeugt,
+Die erzeugte Geschwindigkeit hängt von der Dimension, dem Biom, der Höhe und dem Wetter ab.
+In der Oberwelt gilt: je höher, desto mehr Geschwindigkeit und Kapazität. Im Nether wird das meiste um y=64 erzeugt
 und im Ende ist es überall gleich.
 <nl>
 In Ozeanbiomen wird die Geschwindigkeit mit 1,35 multipliziert, an Strand- und Bergbiomen mit 1,2 und in Altbestandsbiomen mit 1,1.
 <nl>
-Wenn es regnet, wird die Geschwindigkeit zusätzlich mit 1,1 multipliziert.
+Bei Regen wird die Geschwindigkeit zusätzlich mit 1,1 multipliziert.
 <nl2>
-Die Belastungskapazität der Windmühle leitet sich sowohl von der Geschwindigkeit als auch von der Anzahl der Segel ab. Je mehr Segel du hast und je schneller
-sie sich dreht, desto mehr Kapazität steht dir zur Verfügung.
+Die Belastungskapazität leitet sich sowohl von der Geschwindigkeit als auch von der Segelanzahl ab. Je mehr Segel und je schneller
+die Drehung, desto mehr Kapazität steht zur Verfügung.
 <nl2>
-Die Höchstgeschwindigkeit der Windmühle in der Oberwelt ohne Biom- und Wetterboni beträgt 35 RPM und die erzeugte Belastungskapazität (bei 8 Segeln) 15 Einheiten.
+Die Höchstgeschwindigkeit in der Oberwelt ohne Biom- und Wetterboni beträgt 35 RPM, die erzeugte Belastungskapazität (bei 8 Segeln) 15 Einheiten.
 <nl2>
-Wenn du die Windmühle etwas mehr anpassen möchtest, kann das Segel sowohl mit Vanilla-Farbstoffen als auch mit <u><blue><pagelink 'polyfactory:misc/20_artificial_dye'><item 'polyfactory:artificial_dye'></*> gefärbt werden.
+Das Segel kann sowohl mit Vanilla-Farbstoffen als auch mit <u><blue><pagelink 'polyfactory:misc/20_artificial_dye'><item 'polyfactory:artificial_dye'></*> gefärbt werden.
 
 ### Image: polyfactory:rotation/windmill_example Beispiel einer Windmühle.
 

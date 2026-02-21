@@ -3,15 +3,15 @@ title=<item 'polyfactory:mechanical_spout'>
 icon=polyfactory:mechanical_spout
 category=polyfactory:crafting
 ### EndSection: PageInfo
-<yellow><item 'polyfactory:mechanical_spout'></> ist ein 1x2x1-Maschinenblock, der es dir ermöglicht, Dinge mit Flüssigkeiten herzustellen.
+Der <yellow><item 'polyfactory:mechanical_spout'></> ist ein 1x2x1-Maschinenblock, mit dem du Dinge mithilfe von Flüssigkeiten herstellen kannst.
 <nl2>
-Dieser Block bezieht seine Flüssigkeit von oben und fungiert zusätzlich als schwächere <item 'polyfactory:mechanical_pump'> mit
-einer Wirkreichweite von 8. Du kannst <item 'polyfactory:fluid_tank'>s, Tragbare Flüssigkeitstanks oder <item 'polyfactory:pipe'>s
-verwenden, um ihn zu versorgen.
+Er bezieht seine Flüssigkeit von oben und fungiert zusätzlich als schwächere <item 'polyfactory:mechanical_pump'> mit
+einer Reichweite von 8. Zur Versorgung kannst du <item 'polyfactory:fluid_tank'>, Tragbare Flüssigkeitstanks oder <item 'polyfactory:pipe'>
+verwenden.
 <nl2>
-Dieser Block benötigt Rotationsenergie zum Arbeiten, wobei sein Belastungsbedarf bei Aktivität 1 Einheit beträgt.
+Dieser Block benötigt Rotationsenergie; seine Belastung beträgt bei Aktivität 1 Einheit.
 <nl>
-Förderbänder können auch direkt von diesem Block ziehen / zu diesem Block schieben, solange sie korrekt ausgerichtet sind.
+Förderbänder können direkt von diesem Block ziehen oder zu ihm schieben, sofern sie korrekt ausgerichtet sind.
 
 ### Align: Center
 <u><blue><polydex 'polyfactory:mechanical_spout'>Zeige das <item 'polyfactory:mechanical_spout'>-Rezept</><nl>

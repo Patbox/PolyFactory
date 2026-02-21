@@ -3,16 +3,16 @@ title=<item 'polyfactory:item_packer'>
 icon=polyfactory:item_packer
 category=polyfactory:item_transport
 ### EndSection: PageInfo
-<yellow><item 'polyfactory:item_packer'></> ist ein Lagerschnittstellenblock, der Gegenstände offenlegt, die in
-anderen Gegenständen gespeichert sind, wie Shulker-Kisten und Bündel.
+Der <yellow><item 'polyfactory:item_packer'></> ist ein Lagerschnittstellenblock, der den Inhalt von
+Gegenständen mit eigenem Inventar zugänglich macht, z.B. Shulker-Kisten und Bündel.
 <nl2>
 Er kann mit Blöcken wie <item 'polyfactory:hopper'> und <item 'polyfactory:funnel'> verbunden werden.
 <nl>
-Um mit dem gegenstandsgebundenen Lager zu interagieren, musst du die solide Seite des <item 'polyfactory:item_packer'> ansteuern.
-Du kannst Gegenstände hinein- und herausnehmen.
+Um auf das gegenstandsgebundene Inventar zuzugreifen, nutze die solide Seite des <item 'polyfactory:item_packer'>.
+Von dort kannst du Gegenstände ein- und ausladen.
 <nl>
-Um den gehaltenen Gegenstand im <item 'polyfactory:item_packer'> zu wechseln, musst du mit den "offenen" Seiten interagieren
-(also denen, wo du die Gegenstände siehst). Am einfachsten geht das mit Trichtern.
+Um den gehaltenen Gegenstand zu wechseln, nutze die offenen Seiten
+(die, durch die der Inhalt sichtbar ist). Am einfachsten geht das mit Trichtern.
 
 ### Align: Center
 <u><blue><polydex 'polyfactory:item_packer'>Zeige das <item 'polyfactory:item_packer'>-Rezept</>
