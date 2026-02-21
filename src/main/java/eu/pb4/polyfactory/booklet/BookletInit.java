@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.booklet;
 
+import com.mojang.datafixers.util.Pair;
 import eu.pb4.polyfactory.booklet.body.AlignedItemBody;
 import eu.pb4.polyfactory.booklet.body.AlignedMessage;
 import eu.pb4.polyfactory.booklet.body.HeaderMessage;
@@ -24,17 +25,6 @@ import static eu.pb4.polyfactory.util.FactoryUtil.id;
 public class BookletInit {
     public static final HashMap<Identifier, Map<String, BookletPage>> PAGES = new HashMap<>();
     public static final Map<Identifier, List<Identifier>> CATEGORIES = new HashMap<>();
-    public static final Booklet POLYFACTORY = new Booklet(Component.translatable("item.polyfactory.guidebook"),
-            List.of(
-                    id("basics"),
-                    id("rotation"),
-                    id("crafting"),
-                    id("item_transport"),
-                    id("fluids"),
-                    id("cable"),
-                    id("misc")
-            )
-    );
 
     public static void init() {
         Registry.register(BuiltInRegistries.DIALOG_BODY_TYPE, id("aligned_message"), AlignedMessage.MAP_CODEC);

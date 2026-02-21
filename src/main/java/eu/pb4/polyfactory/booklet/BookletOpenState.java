@@ -21,6 +21,7 @@ import java.util.Optional;
 
 public record BookletOpenState(List<Identifier> previousPages) {
     public static final ParserContext.Key<BookletOpenState> KEY = ParserContext.Key.of("booklet_open_state");
+
     public static final BookletOpenState DEFAULT = new BookletOpenState(List.of());
     public static MapCodec<BookletOpenState> MAP_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Identifier.CODEC.listOf().fieldOf("previous_pages").forGetter(BookletOpenState::previousPages)

@@ -98,21 +98,22 @@ public class FlowData implements GraphEntity<FlowData> {
         }
 
         var totalVals = 0l;
+        var hasNonZeroVals = false;
 
         for (int i = 0; i < 6; i++) {
             vals[i] = (long) (maxFlow * amount[i] / total);
             totalVals += vals[i];
+            hasNonZeroVals |= vals[i] != 0;
         }
 
         if (totalVals < maxFlow) {
             for (int i = 0; i < 6; i++) {
-                if (vals[i] != 0) {
+                if (hasNonZeroVals ? vals[i] != 0 : amount[i] != 0) {
                     vals[i] += maxFlow - totalVals;
                     break;
                 }
             }
         }
-
         return vals;
     }
 

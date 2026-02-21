@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.booklet;
 import com.mojang.brigadier.StringReader;
 import com.mojang.datafixers.util.Either;
 import eu.pb4.placeholders.api.ParserContext;
+import eu.pb4.placeholders.api.arguments.SimpleArguments;
 import eu.pb4.placeholders.api.node.DirectTextNode;
 import eu.pb4.placeholders.api.node.LiteralNode;
 import eu.pb4.placeholders.api.node.TextNode;
@@ -13,6 +14,7 @@ import eu.pb4.placeholders.impl.StringArgOps;
 import eu.pb4.polyfactory.booklet.body.AlignedMessage;
 import eu.pb4.polyfactory.booklet.body.HeaderMessage;
 import eu.pb4.polyfactory.booklet.body.ImageBody;
+import eu.pb4.polyfactory.booklet.textnode.LangCheckNode;
 import eu.pb4.polyfactory.booklet.textnode.OpenPageNode;
 import eu.pb4.polyfactory.booklet.textnode.PolydexNode;
 import net.minecraft.ChatFormatting;
@@ -21,6 +23,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.dialog.body.DialogBody;
 import net.minecraft.world.item.ItemStack;
@@ -41,6 +44,7 @@ public class PageParser {
         this.parser = NodeParser.builder()
                 .quickText()
                 .markdown()
+                .globalPlaceholders()
                 .customTagRegistry(TagRegistry.builderCopyDefault()
                         .add(TextTag.self("nl", "booklet", args -> new LiteralNode("\n")))
                         .add(TextTag.self("nl2", "booklet", args -> new LiteralNode("\n\n")))
@@ -83,6 +87,9 @@ public class PageParser {
 
                             return new OpenPageNode(id, node);
                         }))
+                        .add(TextTag.enclosing("iflang", "booklet", (node, args, parser) -> new LangCheckNode(
+                                args.getNext("language", "en_us"), SimpleArguments.bool(args.getNext("equals", "true"), true),
+                                node)))
                         .build())
                 .build();
     }
@@ -93,6 +100,7 @@ public class PageParser {
         var infoIcon = ItemStack.EMPTY;
         var title = identifier.toString();
         var externalTitle = Optional.<String>empty();
+        var description = Optional.<String>empty();
         var categories = new HashSet<Identifier>();
 
         page = page.replace("\r", "")
@@ -100,7 +108,7 @@ public class PageParser {
                 .replace('\u00A0', ' ')
                 .replace("\n\n", "\n<nl>\n");
 
-        var body = new ArrayList<Function<ParserContext, DialogBody>>();
+        var body = new BodyBuilder(this, new ArrayList<>());
 
         var contents = new StringBuilder();
 
@@ -132,7 +140,7 @@ public class PageParser {
                 }
 
                 if (newAlign != alignment) {
-                    addBody(body, contents, width, alignment);
+                    body.add(contents, width, alignment);
                     contents = new StringBuilder();
                     alignment = newAlign;
                 }
@@ -145,46 +153,54 @@ public class PageParser {
                     //
                 }
                 if (width != newWidth) {
-                    addBody(body, contents, width, alignment);
+                    body.add(contents, width, alignment);
                     contents = new StringBuilder();
                     width = newWidth;
                 }
                 continue;
             } else if (spaceLess.startsWith("###body")) {
-                addBody(body, contents, width, alignment);
+                body.add(contents, width, alignment);
                 contents = new StringBuilder();
                 continue;
             } else if (spaceLess.startsWith("###reset")) {
-                addBody(body, contents, width, alignment);
+                body.add(contents, width, alignment);
                 contents = new StringBuilder();
                 width = 300;
                 alignment = AlignedMessage.Align.LEFT;
                 previousLine = "";
                 continue;
             } else if (spaceLess.startsWith("###header:")) {
-                addBody(body, contents, width, alignment);
+                body.add(contents, width, alignment);
                 contents = new StringBuilder();
-                addBody(body, stripAndParse(line.substring(line.indexOf(':') + 1)), x -> new HeaderMessage(x, 310));
+                body.add(stripAndParse(line.substring(line.indexOf(':') + 1)), x -> new HeaderMessage(x, 310));
                 continue;
             } else if (spaceLess.startsWith("###image:")) {
-                addBody(body, contents, width, alignment);
+                body.add(contents, width, alignment);
                 contents = new StringBuilder();
                 var args = line.substring(line.indexOf(':') + 1).strip();
                 var spaceIndex = args.indexOf(' ');
-                TextNode description = null;
+                TextNode imageDescription = null;
                 if (spaceIndex != -1) {
-                    description = stripAndParse(args.substring(spaceIndex + 1));
+                    imageDescription = stripAndParse(args.substring(spaceIndex + 1));
                     args = args.substring(0, spaceIndex);
                 }
 
                 var id = Identifier.tryParse(args);
                 if (id != null) {
-                    if (description != null) {
-                        addBody(body, description, x -> new ImageBody(id, Optional.of(x)));
+                    if (imageDescription != null) {
+                        body.add(imageDescription, x -> new ImageBody(id, Optional.of(x)));
                     } else {
                         var out = new ImageBody(id, Optional.empty());
                         body.add(x -> out);
                     }
+                }
+                continue;
+            } else if (spaceLess.startsWith("###categoryentries:")) {
+                var id = Identifier.tryParse(spaceLess.substring(spaceLess.indexOf(':') + 1));
+                body.add(contents, width, alignment);
+                contents = new StringBuilder();
+                if (id != null) {
+                    body.addDynamicMulti(x -> BookletUtil.getCategoryBodyList(id, x));
                 }
                 continue;
             }
@@ -211,6 +227,7 @@ public class PageParser {
                 switch (key) {
                     case "title" -> title = value;
                     case "external_title" -> externalTitle = Optional.of(value);
+                    case "description" -> description = Optional.of(value);
                     case "category" -> {
                         for (var val : value.toLowerCase(Locale.ROOT).replace(" ", "").split(",")) {
                             var parsed = Identifier.tryParse(val);
@@ -231,26 +248,9 @@ public class PageParser {
             }
         }
 
-        addBody(body, contents, width, alignment);
-        return new BookletPage(new BookletPage.Info(identifier, infoIcon, parser.parseText(title, ctx), externalTitle.map(x -> parser.parseText(x, ctx)), categories), body);
-    }
-
-
-    private void addBody(List<Function<ParserContext, DialogBody>> body, TextNode node, Function<Component, DialogBody> function) {
-        if (node.isDynamic()) {
-            body.add(x -> function.apply(node.toText(x)));
-        } else {
-            var out = function.apply(node.toText(ctx));
-            body.add(x -> out);
-        }
-    }
-
-    private void addBody(List<Function<ParserContext, DialogBody>> body, StringBuilder contents, int width, AlignedMessage.Align align) {
-        if (!contents.isEmpty()) {
-            var node = stripAndParse(contents.toString());
-
-            addBody(body, node, x -> new AlignedMessage(x, width, align));
-        }
+        body.add(contents, width, alignment);
+        return new BookletPage(new BookletPage.Info(identifier, infoIcon, parser.parseText(title, ctx), externalTitle.map(x -> parser.parseText(x, ctx)),
+                description.map(x -> parser.parseText(x, ctx)), categories), body.list);
     }
 
     private TextNode stripAndParse(String string) {
@@ -268,5 +268,44 @@ public class PageParser {
     private enum SectionType {
         BODY,
         PAGE_INFO
+    }
+
+    public record BodyBuilder(PageParser pageParser, List<Function<ParserContext, List<DialogBody>>> list) {
+        public void addDynamicMulti(Function<ParserContext, List<DialogBody>> function) {
+            this.list.add(function);
+        }
+
+        public void add(Function<ParserContext, DialogBody> function) {
+            this.list.add(function.andThen(List::of));
+        }
+
+        public void add(TextNode node, Function<Component, DialogBody> function) {
+            if (node.isDynamic()) {
+                list.add(x -> List.of(function.apply(node.toText(x))));
+            } else {
+                var out = List.of(function.apply(node.toText(pageParser.ctx)));
+                list.add(x -> out);
+            }
+        }
+
+        public void add(StringBuilder contents, int width, AlignedMessage.Align align) {
+            if (!contents.isEmpty()) {
+                var node = pageParser.stripAndParse(contents.toString());
+                if (node.isDynamic()) {
+                    list.add(x -> {
+                        var y = node.toText(x);
+                        return y.getSiblings().isEmpty() && y.getContents() instanceof PlainTextContents plainTextContents && plainTextContents.text().isEmpty()
+                                ? List.of()
+                                : List.of(new AlignedMessage(y, width, align));
+                    });
+                } else {
+                    var y = node.toText(this.pageParser.ctx);
+                    if (!y.getSiblings().isEmpty() || !(y.getContents() instanceof PlainTextContents plainTextContents && plainTextContents.text().isEmpty())) {
+                        List<DialogBody> z = List.of(new AlignedMessage(y, width, align));
+                        this.list.add(x -> z);
+                    }
+                }
+            }
+        }
     }
 }

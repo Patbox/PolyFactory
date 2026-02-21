@@ -65,7 +65,8 @@ public class FactoryItems {
     public static final Item FLUID_MODEL = register("fluid_model", FluidModelItem::new);
     // Actual items
     public static final WrenchItem WRENCH = register("wrench", settings -> new WrenchItem(settings.stacksTo(1)));
-    public static final GuideBookItem GUIDE_BOOK = register("guidebook", settings -> new GuideBookItem(settings.stacksTo(1)));
+    public static final GuideBookItem GUIDE_BOOK = register("guidebook", settings -> new GuideBookItem(settings.stacksTo(1)
+            .component(FactoryDataComponents.BOOKLET_PAGE, id("main_page"))));
     public static final Item CLIPBOARD = register("clipboard", settings -> new ClipboardItem(settings.stacksTo(1)));
     public static final Item CONVEYOR = register(FactoryBlocks.CONVEYOR);
     public static final Item STICKY_CONVEYOR = register(FactoryBlocks.STICKY_CONVEYOR);

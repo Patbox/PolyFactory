@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.booklet;
 
 import eu.pb4.placeholders.api.ParserContext;
+import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.booklet.body.HeaderMessage;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
@@ -19,9 +20,11 @@ import net.minecraft.server.dialog.body.DialogBody;
 import net.minecraft.server.dialog.body.ItemBody;
 import net.minecraft.server.dialog.body.PlainMessage;
 import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class BookletUtil {
@@ -51,56 +54,45 @@ public class BookletUtil {
         return new ClickEvent.Custom(action(type), Optional.of(nbt));
     }
 
-    public static boolean openMainPage(ServerPlayer player, Booklet booklet, BookletOpenState state) {
+    public static List<DialogBody> getCategoryBodyList(Identifier category, ParserContext ctx) {
+        var player = Objects.requireNonNull(ctx.getOrThrow(PlaceholderContext.KEY).player());
+        var state = ctx.getOrThrow(BookletOpenState.KEY);
         var body = new ArrayList<DialogBody>();
         var lang = player.clientInformation().language();
 
         var sideFiller = Component.literal(("" + GuiTextures.INVIS_LINE_RAW).repeat(6)).setStyle(UiResourceCreator.STYLE);
+        var entries = BookletInit.CATEGORIES.getOrDefault(category, List.of());
 
-        var newState = state.pushPage(id("main_page"));
-
-        for (var car : booklet.categories()) {
-            var entries = BookletInit.CATEGORIES.getOrDefault(car, List.of());
-            if (entries.isEmpty()) {
-                continue;
-            }
-            body.add(new HeaderMessage(Component.translatable(car.toLanguageKey("booklet_category")), 310));
-
-            for (var id : entries) {
-                var langBox = BookletInit.PAGES.get(id);
-                var page = langBox.get(lang);
+        for (var id : entries) {
+            var langBox = BookletInit.PAGES.get(id);
+            var page = langBox.get(lang);
+            if (page == null) {
+                page = langBox.get("en_us");
                 if (page == null) {
-                    page = langBox.get("en_us");
-                    if (page == null) {
-                        continue;
-                    }
+                    continue;
                 }
-
-                var plainBody = new PlainMessage(Component.empty()
-                        .append(sideFiller)
-                        .append(TextUncenterer.getLeftAligned(page.info().getExternalTitle(), 290 - 8 - 2 * 6 * 2, lang).getFirst())
-                        .append(sideFiller)
-                        .setStyle(Style.EMPTY.withClickEvent(encodeClickEvent("open_page", page.info().identifier(), newState, true))),
-                        290);
-
-                body.add(page.info().icon().isEmpty() ? plainBody : new ItemBody(
-                        page.info().icon(),
-                        Optional.of(plainBody),
-                        false, false,
-                        1, 17
-                ));
             }
+
+            var plainBody = new PlainMessage(Component.empty()
+                    .append(sideFiller)
+                    .append(TextUncenterer.getLeftAligned(page.info().getExternalTitle(), 290 - 8 - 2 * 6 * 2, lang).getFirst())
+                    .append(sideFiller)
+                    .setStyle(Style.EMPTY.withClickEvent(encodeClickEvent("open_page", page.info().identifier(), state, true))),
+                    290);
+
+            body.add(page.info().icon().isEmpty() ? plainBody : new ItemBody(
+                    page.info().icon(),
+                    Optional.of(plainBody),
+                    false, false,
+                    1, 17
+            ));
         }
 
-        player.openDialog(Holder.direct(state.getDialog(booklet.title(), body)));
-
-        return true;
+        return body;
     }
 
     public static boolean openPage(ServerPlayer player, Identifier id, BookletOpenState state) {
-        if (id.getPath().equals("main_page")) {
-            return openMainPage(player, BookletInit.POLYFACTORY, state);
-        } else if (id.getPath().equals("image_test")) {
+        if (id.getPath().equals("image_test")) {
             player.openDialog(Holder.direct(state.getDialog(Component.literal("Image Test"), BookletImageHandler.getAllImages())));
             return true;
         }
@@ -117,10 +109,9 @@ public class BookletUtil {
             if (page == null) {
                 return false;
             }
-            return false;
         }
-
-        player.openDialog(Holder.direct(page.toDialog(ParserContext.of(BookletOpenState.KEY, state.pushPage(id)), state)));
+        var ctx = ParserContext.of(BookletOpenState.KEY, state.pushPage(id)).with(PlaceholderContext.KEY, PlaceholderContext.of(player));
+        player.openDialog(Holder.direct(page.toDialog(ctx, state)));
         return true;
     }
 
@@ -155,5 +146,12 @@ public class BookletUtil {
             }
             openPage(player, returnState.page(), returnState.state());
         });
+    }
+
+    @Nullable
+    public static BookletPage getPage(Identifier id, String language) {
+        var page = BookletInit.PAGES.get(id);
+        if (page == null) return null;
+        return page.getOrDefault(language, page.get("en_us"));
     }
 }
