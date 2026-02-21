@@ -1,0 +1,28 @@
+### Section: PageInfo
+title=Temperatur
+icon=blaze_powder[item_model='polyfactory:-/sgui/elements/gen/flame_13']
+category=polyfactory:basics
+### EndSection: PageInfo
+
+<yellow>Temperatur</> ist eine Mechanik, die von einigen Maschinen bei der Herstellung genutzt wird. Sie wird durch das Biom
+und den Block unter der betroffenen Maschine bestimmt. Die Temperaturwerte liegen zwischen -1 und 1
+(wobei nicht alle Werte erreichbar sein müssen).
+<nl2>
+Für Biome gelten folgende Umgebungstemperaturen:
+- Sehr heiße Biome wie der Nether: 0,15,
+- Heiße Biome wie Wüste, Tafelberge und Savanne: 0,08,
+- Kalte, verschneite Biome: -0,08,
+- Sehr kalte / eisige Biome wie Eisstacheln: -0,15.
+<nl2>
+Für Blocktemperatur gilt:
+- Lava: 0,85,
+- Brennende Lagerfeuer und Feuer: 0,45,
+- Fackel: 0,15,
+- Schnee: -0,08,
+- Eis: -0,1.
+<nl2>
+Die endgültige Temperatur entspricht dem Wert, der weiter von 0 entfernt ist – basierend auf Block- und Biomtemperatur.
+<nl2>
+Beispielblöcke, die diese Mechanik verwenden:
+- Einige flüssigkeitsenthaltende Blöcke für die Flüssigkeitsänderungslogik.
+- Rezepte des Mechanischen Mischers.

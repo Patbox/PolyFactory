@@ -1,0 +1,22 @@
+### Section: PageInfo
+title=<item 'polyfactory:mixer'>
+icon=polyfactory:mixer
+category=polyfactory:crafting
+### EndSection: PageInfo
+Der <yellow><item 'polyfactory:mixer'></> ist ein 1x2x1-Herstellungs-Maschinenblock, der Rotationsenergie benötigt.
+Er hat 6 Eingabeslots, 2 Eimer Flüssigkeitsspeicher und 3 Ausgabeslots. Dieser Block nutzt das
+<u><blue><pagelink '/basics/50_temperature'>Temperatursystem</*>.
+<nl2>
+Bei flüssigkeitslosen Rezepten landen die Ergebnisse in den Ausgabeslots. Bei Rezepten mit Flüssigkeitsausgabe
+wird die erzeugte Flüssigkeit in denselben Speicher wie die Eingabeflüssigkeiten gelegt.
+<nl>
+Für Trichter-/Lagerzugriff werden die Eingabeslots über die Vorderseite befüllt. Förderbänder können die Eingabeslots direkt ansteuern.
+Die Ausgabe ist von der Rückseite zugänglich. Förderbänder benötigen einen <item 'polyfactory:funnel'>, um auf die Ausgabe zuzugreifen.
+<nl2>
+Der Antrieb erfolgt an der linken oder rechten Seite des oberen Teils.
+Die Belastung hängt vom aktuellen Rezept ab.
+Im Leerlauf erzeugt er keine Belastung.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:mixer'>Zeige das <item 'polyfactory:mixer'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:recipe_type/mixer' 'category'>Zeige die Rezepte dieses Blocks</>

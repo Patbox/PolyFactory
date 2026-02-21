@@ -1,0 +1,19 @@
+### Section: PageInfo
+title=<item 'polyfactory:item_output_buffer'>
+icon=polyfactory:item_output_buffer
+category=polyfactory:item_transport
+### EndSection: PageInfo
+Der <yellow><item 'polyfactory:item_output_buffer'></> ist ein Lagerblock, der als Erweiterung
+der Ausgabeslots angeschlossener Herstellungsmaschinen dient. Er kann bis zu 18 Stapel speichern.
+<nl2>
+Zum Verbinden mit einer Maschine platziere ihn an deren "Ausgang". Üblicherweise ist das die gegenüberliegende Seite
+des Eingangs, bei manchen Blöcken kann es abweichen (z.B. kann der <item 'polyfactory:placer'> von
+jeder nicht-operativen Seite angeschlossen werden).
+</>
+Im verbundenen Zustand sehen <item 'hopper'> und <item 'polyfactory:funnel'> auch
+die Ausgabeslots der angeschlossenen Maschine zusätzlich zu den eigenen Slots des Puffers. Diese sind für den Spieler nicht sichtbar.
+
+### Image: polyfactory:item_transport/item_output_buffer_example Beispiel für Verbindungen des <item 'polyfactory:item_output_buffer'>.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:item_output_buffer'>Zeige das <item 'polyfactory:item_output_buffer'>-Rezept</>

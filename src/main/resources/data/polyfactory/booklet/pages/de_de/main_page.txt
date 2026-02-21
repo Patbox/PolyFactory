@@ -1,0 +1,27 @@
+### Section: PageInfo
+title=<lang 'item.polyfactory.guidebook'>
+description=<lang 'item.polyfactory.guidebook.desc'>
+icon=polyfactory:guidebook
+### EndSection: PageInfo
+### Header: <lang booklet_category.polyfactory.basics>
+### Category Entries: polyfactory:basics
+
+### Header: <lang booklet_category.polyfactory.rotation>
+### Category Entries: polyfactory:rotation
+
+### Header: <lang booklet_category.polyfactory.crafting>
+### Category Entries: polyfactory:crafting
+
+### Header: <lang booklet_category.polyfactory.item_transport>
+### Category Entries: polyfactory:item_transport
+
+### Header: <lang booklet_category.polyfactory.fluids>
+### Category Entries: polyfactory:fluids
+
+### Header: <lang booklet_category.polyfactory.cable>
+### Category Entries: polyfactory:cable
+
+### Header: <lang booklet_category.polyfactory.misc>
+### Category Entries: polyfactory:misc
+
+<u><blue><polydex '' >

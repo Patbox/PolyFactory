@@ -1,0 +1,27 @@
+### Section: PageInfo
+title=Über das Datensystem
+icon=polyfactory:cable[polyfactory:color=0x00FF00]
+category=polyfactory:cable
+### EndSection: PageInfo
+
+Das <yellow>Datensystem</> ist die Hauptmethode zur Übertragung, Verarbeitung und Anzeige von Informationen und ermöglicht eine bessere Automatisierung
+sowie Sichtbarkeit des aktuellen Zustands. Alle Datensystem-Blöcke müssen
+mit <item 'polyfactory:cable'> verbunden werden.
+<nl2>
+Blöcke können als Eingang, Ausgang oder beides fungieren. PolyFactory bietet Blöcke mit
+nur 1 Eingang, nur 1 Ausgang, 1 Eingang mit 1 Ausgang sowie 2 Eingängen und 1 Ausgang.
+<nl2>
+Sowohl Ein- als auch Ausgänge arbeiten auf einem einzelnen Kanal. Kanäle ermöglichen die Wiederverwendung einer Kabelleitung für Daten,
+die nur von den richtigen Eingängen gelesen werden. Es gibt 4 verfügbare Kanäle. Für mehr separate
+Daten brauchst du zusätzliche Kabel.
+<nl2>
+Bei den meisten Blöcken werden Daten erst am Tickende verarbeitet – nur die letzte Nachricht des Ticks wird
+tatsächlich behandelt, der Rest wird ignoriert. Die Datenverarbeitung ist daher an die Tickrate gebunden.
+<nl2>
+Daten haben immer einen bestimmten Typ, unabhängig vom Inhalt.
+Neben Grundtypen wie Text, Ganzzahlen, Dezimalzahlen und Booleans gibt es auch Daten über
+Kapazität, Redstone, Blockzustand, Gegenstandsstapel, Zeit und mehr.
+<nl>
+Verschiedene Maschinen interpretieren Daten unterschiedlich, daher ist der richtige Typ wichtig.
+Mit dem <item 'polyfactory:data_extractor'>, <item 'polyfactory:data_comparator'> und anderen kannst du
+Daten von einem Typ in einen anderen umwandeln.

@@ -1,0 +1,26 @@
+### Section: PageInfo
+title=<item 'polyfactory:press'>
+icon=polyfactory:press
+category=polyfactory:crafting
+### EndSection: PageInfo
+Die <yellow><item 'polyfactory:press'></> ist ein 1x2x1-Herstellungs-Maschinenblock, der Rotationsenergie benötigt.
+Sie hat 2 Eingänge (Haupt- und Kopfeingang) und 1 Ausgabeslot. Sie kann auch Flüssigkeiten ausgeben, wenn ein <item 'polyfactory:drain'>
+daneben platziert wird.
+<nl2>
+Die meisten Rezepte nutzen nur den Haupteingabeslot und pressen den Gegenstand in etwas anderes.
+Meistens ist die Ausgabe ein anderer Gegenstand, aber einige Rezepte erzeugen (optional) zusätzliche Flüssigkeiten.
+Nach jedem Pressvorgang gibt es eine kurze Pause, während die Presse zurückfährt.
+<nl>
+Für Trichter-/Lagerzugriff wird der Hauptslot über die Vorderseite befüllt,
+der Kopfslot über die Seite. Die Ausgabe ist von der Rückseite zugänglich.
+Förderbänder können diesen Block direkt ansteuern.
+<nl2>
+Der Antrieb erfolgt an der linken oder rechten Seite des oberen Teils.
+Die Belastung hängt vom aktuellen Rezept ab.
+Im Leerlauf erzeugt sie keine Belastung.
+
+### Image: polyfactory:crafting/mechanical_press_example <item 'polyfactory:grinder'> mit Förderbändern und <item 'polyfactory:drain'>.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:press'>Zeige das <item 'polyfactory:press'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:recipe_type/press' 'category'>Zeige die Rezepte dieses Blocks</>
