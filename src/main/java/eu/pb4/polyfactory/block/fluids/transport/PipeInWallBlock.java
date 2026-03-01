@@ -3,9 +3,15 @@ package eu.pb4.polyfactory.block.fluids.transport;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
+import eu.pb4.polyfactory.block.data.WallWithCableBlock;
+import eu.pb4.polyfactory.block.other.ProxyAttachement;
 import eu.pb4.polyfactory.block.other.TagRedirector;
 import eu.pb4.polyfactory.block.other.XInWallBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
+import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
+import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
@@ -13,6 +19,8 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.function.Function;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -130,5 +138,57 @@ public class PipeInWallBlock extends PipeBaseBlock implements ConfigurableBlock,
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return this.convertToBacking(state);
+    }
+
+    @Override
+    public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
+        var converted = this.convertToBacking(initialBlockState);
+        var elementHolder = BlockWithElementHolder.get(converted) instanceof BlockWithElementHolder holder ? holder.createElementHolder(world, pos, converted) : null;
+        return new Model(initialBlockState, elementHolder, this::convertToBacking, world);
+    }
+
+    public static class Model extends PipeModel {
+        @Nullable
+        private final ProxyAttachement proxied;
+
+        public Model(BlockState state, @Nullable ElementHolder elementHolder, Function<BlockState, BlockState> convertToBacking, ServerLevel level) {
+            super(state);
+            if (elementHolder != null) {
+                this.proxied = new ProxyAttachement(elementHolder, () -> this.currentPos, () -> convertToBacking.apply(blockStateOr(state)), level);
+            } else {
+                proxied = null;
+            }
+        }
+
+        private BlockState blockStateOr(BlockState state) {
+            if (this.inWorld()) {
+                return this.blockState();
+            } else {
+                return state;
+            }
+        }
+
+        @Override
+        public void setAttachment(@Nullable HolderAttachment attachment) {
+            if (this.proxied != null) {
+                if (attachment == null) {
+                    this.removeElement(this.proxied);
+                    this.proxied.holder().setAttachment(null);
+                } else {
+                    this.proxied.holder().setAttachment(this.proxied);
+                    this.addElement(proxied);
+                }
+            }
+            super.setAttachment(attachment);
+        }
+
+
+        @Override
+        public void notifyUpdate(HolderAttachment.UpdateType updateType) {
+            super.notifyUpdate(updateType);
+            if (this.proxied != null) {
+                this.proxied.holder().notifyUpdate(updateType);
+            }
+        }
     }
 }

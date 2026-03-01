@@ -31,6 +31,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
@@ -53,6 +54,7 @@ import xyz.nucleoid.packettweaker.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import static eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras.bridgeModel;
 
@@ -93,6 +95,15 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
             return be.getSails().isEmpty() ? FactoryItems.WINDMILL_SAIL.getDefaultInstance() : be.getSails().get(0).copyWithCount(1);
         }
         return FactoryItems.WINDMILL_SAIL.getDefaultInstance();
+    }
+
+    @Override
+    protected void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
+        if (explosion.canTriggerBlocks() && level.getBlockEntity(pos) instanceof WindmillBlockEntity be) {
+            be.handleWindChargeBonus(explosion.center(), explosion.radius());
+        }
+
+        super.onExplosionHit(state, level, pos, explosion, dropConsumer);
     }
 
     @Nullable

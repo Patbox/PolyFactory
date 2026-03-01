@@ -19,11 +19,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 public class WindmillBlockEntity extends BlockEntity {
     private static final double LOG_BASE = Math.log(2);
     private final NonNullList<ItemStack> sails = NonNullList.create();
     private int sample = Integer.MIN_VALUE;
+    private int windChargeBonusTimer = 0;
+    private int windChargeBonusTimerStart = 1;
+    private float windChargeBonus = 0;
 
     public WindmillBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.WINDMILL, pos, state);
@@ -40,6 +44,10 @@ public class WindmillBlockEntity extends BlockEntity {
         for (var sail : this.sails) {
             list.add(sail);
         }
+
+        view.putInt("wind_charge_bonus_timer", this.windChargeBonusTimer);
+        view.putInt("wind_charge_bonus_timer_start", this.windChargeBonusTimerStart);
+        view.putFloat("wind_charge_bonus", this.windChargeBonus);
     }
 
 
@@ -50,6 +58,10 @@ public class WindmillBlockEntity extends BlockEntity {
         for (var sail : view.listOrEmpty("Sails", ItemStack.OPTIONAL_CODEC)) {
             this.sails.add(sail);
         }
+
+        this.windChargeBonusTimer = view.getIntOr("wind_charge_bonus_timer", 0);
+        this.windChargeBonusTimerStart = Math.max(view.getIntOr("wind_charge_bonus_timer_start", 1), 1);
+        this.windChargeBonus = view.getFloatOr("wind_charge_bonus", 0);
     }
 
     public boolean addSail(int i, ItemStack stack) {
@@ -102,7 +114,7 @@ public class WindmillBlockEntity extends BlockEntity {
                     .getFirstFreeHeight(pos.getX(), pos.getZ(), Heightmap.Types.MOTION_BLOCKING, serverWorld, serverWorld.getChunkSource().randomState());
             this.sample = baseHeight;
         }
-        var sails = state.getValue(WindmillBlock.SAIL_COUNT);
+        var sails = state.getValue(WindmillBlock.SAIL_COUNT).intValue();
 
         double x;
 
@@ -137,6 +149,11 @@ public class WindmillBlockEntity extends BlockEntity {
             speed *= 1.1;
         }
 
+        if (this.windChargeBonusTimer > 0) {
+            speed += this.windChargeBonus * Mth.square((double) this.windChargeBonusTimer / this.windChargeBonusTimerStart);
+            this.windChargeBonusTimer--;
+        }
+
         modifier.provide(speed, Mth.clamp(speed * 0.15 * sails * 1.2, 0.5, 18), false);
     }
 
@@ -146,5 +163,13 @@ public class WindmillBlockEntity extends BlockEntity {
         if (this.level != null) {
             Containers.dropContents(level, pos, this.getSails());
         }
+    }
+
+    public void handleWindChargeBonus(Vec3 center, float radius) {
+        var distance = Math.max(center.distanceTo(this.getBlockPos().getCenter()) / 5, 1);
+
+        this.windChargeBonus = (float) (radius * 12 / distance * this.getBlockState().getValue(WindmillBlock.SAIL_COUNT) / 8f);
+        this.windChargeBonusTimer = (int) (radius * 200);
+        this.windChargeBonusTimerStart = this.windChargeBonusTimer;
     }
 }

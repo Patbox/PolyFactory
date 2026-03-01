@@ -3,7 +3,6 @@ package eu.pb4.polyfactory;
 import eu.pb4.polyfactory.advancement.PolyFactoryAdvancementCriteria;
 import eu.pb4.polyfactory.advancement.FactoryItemPredicates;
 import eu.pb4.polyfactory.block.FactoryPoi;
-import eu.pb4.polyfactory.booklet.BookletInit;
 import eu.pb4.polyfactory.effects.FactoryEffects;
 import eu.pb4.polyfactory.entity.FactoryEntities;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
@@ -60,12 +59,6 @@ public class ModInit implements ModInitializer {
 			LOGGER.warn("You are on your own!");
 			LOGGER.warn("=====================================================");
 		}
-		if (PolydexCompat.IS_PRESENT) {
-			// Polydex does the same thing, so just reuse that.
-			VanillaLanguageDownloader.markReady();
-		} else {
-			VanillaLanguageDownloader.setup();
-		}
 
 		FactoryRegistries.setup();
 		FactoryBlocks.register();
@@ -108,7 +101,6 @@ public class ModInit implements ModInitializer {
 
 		ServerPlayConnectionEvents.JOIN.register(FactorySecrets::onJoin);
 
-		BookletInit.init();
 		//for (var block : Registries.BLOCK) {
 		//	SoundPatcher.convertIntoServerSound(block.getDefaultState().getSoundGroup());
 		//}

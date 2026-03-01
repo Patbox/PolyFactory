@@ -93,6 +93,7 @@ dependencies {
 	modImplementation "eu.pb4:polymer-autohost:${project.polymer_version}"
 	modImplementation "eu.pb4:polymer-virtual-entity:${project.polymer_version}"
 	modImplementation "eu.pb4:polymer-sound-patcher:${project.polymer_version}"
+	modImplementation include('eu.pb4:booklet:0.1.0+1.21.11')
 	modImplementation include('eu.pb4:map-canvas-api:0.7.0+1.21.11')
 	modImplementation include('eu.pb4:common-protection-api:1.0.0')
 	modImplementation include('eu.pb4:sidebar-api:0.5.1+1.21.1')

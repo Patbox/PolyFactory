@@ -6,8 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
-import eu.pb4.polyfactory.booklet.BookletOpenState;
-import eu.pb4.polyfactory.booklet.BookletUtil;
 import eu.pb4.polymer.virtualentity.impl.HolderHolder;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.ChatFormatting;
@@ -36,9 +34,6 @@ public class FactoryCommands {
         dispatcher.register(literal("polyfactory")
                 //.executes(FactoryCommands::about)
                 .then(literal("wiki").executes(FactoryCommands::wiki))
-                .then(literal("booklet_page")
-                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                        .then(argument("id", IdentifierArgument.id()).executes(FactoryCommands::bookletPage)))
                 .then(literal("debug")
                         .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(literal("list_models").executes(FactoryCommands::listModels))
@@ -49,10 +44,6 @@ public class FactoryCommands {
                         )
                 )
         );
-    }
-
-    private static int bookletPage(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        return BookletUtil.openPage(ctx.getSource().getPlayerOrException(), IdentifierArgument.getId(ctx, "id"), BookletOpenState.DEFAULT) ? 1 : 0;
     }
 
     private static int about(CommandContext<CommandSourceStack> context) {
