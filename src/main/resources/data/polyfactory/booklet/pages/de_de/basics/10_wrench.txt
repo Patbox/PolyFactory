@@ -1,0 +1,25 @@
+### Section: PageInfo
+title=<item 'polyfactory:wrench'>
+icon=polyfactory:wrench
+category=polyfactory:basics
+### EndSection: PageInfo
+Der <yellow><item 'polyfactory:wrench'></> ist ein Werkzeug zum Konfigurieren und Verändern bestimmter Blöcke und Entitäten.
+<nl2>
+Wenn du ihn hältst und auf einen konfigurierbaren Block oder eine Entität schaust, erscheint eine Seitenleiste mit allen aktuellen Einstellungen
+und deren Werten. Durch Benutzen des Schraubenschlüssels wechselst du den Einstellungswert zum nächsten verfügbaren. Mit Schleichen
+wechselst du stattdessen zum vorherigen Wert.
+<nl2>
+Über die Nebenhand-Tauschtaste wird versucht, den Wert kontextabhängig zu setzen. Bei einem Block,
+der in eine bestimmte Richtung zeigt, wird er nun auf die anvisierte Seite ausgerichtet (Schleichen kann das Ergebnis ändern).
+<nl2>
+Das Angreifen des Blocks wechselt die aktuell ausgewählte Einstellung zur nächsten; mit Schleichen geht es eine zurück.
+Die gewählte Einstellung wird pro Block-/Entitätstyp gespeichert.
+
+### Header: Steuerung
+### Align: Center
+<lang 'item.polyfactory.wrench.tooltip.1' '<key 'key.use'>'><nl>
+<lang 'item.polyfactory.wrench.tooltip.1.alt' '<key 'key.swapOffhand'>'><nl>
+<lang 'item.polyfactory.wrench.tooltip.2' '<key 'key.attack'>'><nl>
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:wrench'>Zeige das <item 'polyfactory:wrench'>-Rezept</>

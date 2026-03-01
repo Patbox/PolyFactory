@@ -1,0 +1,17 @@
+### Section: PageInfo
+title=<item 'polyfactory:deep_storage_container'>
+icon=polyfactory:deep_storage_container
+category=polyfactory:item_transport
+### EndSection: PageInfo
+Der <yellow><item 'polyfactory:deep_storage_container'></> ist ein 2x2x2-Lagerblock.
+<nl2>
+Er kann bis zu 336 Stapel speichern (das entspricht 12 2/5 Truhen), allerdings sind nur
+42 gleichzeitig sichtbar, da die Oberfläche in 8 Seiten aufgeteilt ist. Diese Einschränkung gilt nicht für
+Blöcke, die mit ihm interagieren, wie <item 'polyfactory:funnel'> oder <item 'minecraft:hopper'>.
+<nl2>
+Die Schaltflächen der Oberfläche zeigen standardmäßig die Seitennummer an. Sie können durch einen beliebigen Gegenstand ersetzt werden,
+indem man ihn im Cursor hält und die gewünschte Schaltfläche rechtsklickt. Rechtsklick mit leerem Cursor setzt sie zurück.
+<nl2>
+*Dieser Block wurde von der Deep Shelving Unit aus der Yttr-Mod inspiriert.*
+### Align: Center
+<u><blue><polydex 'polyfactory:deep_storage_container'>Zeige das <item 'polyfactory:deep_storage_container'>-Rezept</>

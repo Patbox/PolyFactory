@@ -1,0 +1,23 @@
+### Section: PageInfo
+title=<item 'polyfactory:pump'>
+icon=polyfactory:pump
+category=polyfactory:fluids
+### EndSection: PageInfo
+Die <yellow><item 'polyfactory:pump'></> ist ein Block, der den <u><blue><pagelink './10_copper_pipe'>Rohr-Flüssigkeitstransport</*> antreibt.
+<nl>
+Sie ist ein gerichteter Block, dessen Ausrichtung die Pump-/Zugrichtung der Flüssigkeit steuert.
+Die Fließrichtung wird durch einen blauen Pfeil angezeigt.
+<nl2>
+Die Reichweite, über die die Pumpe Flüssigkeiten durch Rohre drücken kann, beträgt immer 32 Blöcke.
+Die Stärke variiert jedoch je nach bereitgestellter Geschwindigkeit.
+Die Pumpe erzeugt immer 5 Belastungseinheiten auf dem angeschlossenen System,
+unabhängig von der Geschwindigkeit.
+<nl>
+Der Anschluss erfolgt über ein Zahnrad an der Seite.
+<nl2>
+Die <item 'polyfactory:pump'> verhält sich ähnlich wie Rohre und kann Flüssigkeiten ziehen, drücken und in sich speichern.
+
+### Image: polyfactory:fluids/pump_example Beispiel eines Pumpen-Aufbaus.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:pump'>Zeige das <item 'polyfactory:pump'>-Rezept</>

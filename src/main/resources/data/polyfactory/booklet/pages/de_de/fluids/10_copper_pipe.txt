@@ -1,0 +1,33 @@
+### Section: PageInfo
+title=<item 'polyfactory:pipe'>
+icon=polyfactory:pipe
+category=polyfactory:fluids
+### EndSection: PageInfo
+Das <yellow><item 'polyfactory:pipe'></> ist ein Block zum Transport von Flüssigkeiten – für Lagerung,
+Platzierung/Entwässerung und Herstellungszwecke.
+<nl>
+Reguläre <item 'polyfactory:pipe'> können sich richtungsabhängig mit anderen Rohren verbinden, um den Flüssigkeitsstrom zu teilen und zusammenzuführen.
+Sie verbinden sich außerdem automatisch mit Flüssigkeitsein-/-ausgängen und anderen Rohren. Diese Funktion kann pro
+Block mit dem <u><blue><pagelink '/basics/10_wrench'><item 'polyfactory:wrench'></*> deaktiviert werden.
+<nl>
+Du kannst das <item 'polyfactory:pipe'> in einen Wandblock einsetzen, um es besser zu integrieren.
+<nl>
+Rohre bewegen standardmäßig keine Flüssigkeiten – dazu brauchst du eine <u><blue><pagelink './11_mechanical_pump'><item 'polyfactory:pump'></*>.
+<nl2>
+Das <yellow><item 'polyfactory:redstone_valve_pipe'></> ist eine Rohrvariante, die das Rohrnetzwerk
+durch Redstone-Energie automatisch verbinden oder trennen kann.
+Dieses Rohr verbindet sich nur entlang seiner Ausrichtungsachse.
+<nl2>
+Das <yellow><item 'polyfactory:filtered_pipe'></> ist eine Rohrvariante, die durchfließende Flüssigkeiten filtert –
+sowohl als Whitelist als auch als Blacklist. Um den Filter einzustellen, verwende einen der Flüssigkeit zugeordneten
+Gegenstand darauf, z.B. einen Wassereimer für Wasser oder einen Eisenbarren für geschmolzenes Eisen.
+Ohne Konfiguration stellt sich der Filter automatisch auf die erste Flüssigkeit ein, mit der er in Kontakt kommt.
+<nl>
+Dieses Rohr verbindet sich nur entlang seiner Ausrichtungsachse.
+
+### Image: polyfactory:fluids/pipe_example Beispielsystem mit Rohren.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:pipe'>Zeige das <item 'polyfactory:pipe'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:redstone_valve_pipe'>Zeige das <item 'polyfactory:redstone_valve_pipe'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:filtered_pipe'>Zeige das <item 'polyfactory:filtered_pipe'>-Rezept</><nl>

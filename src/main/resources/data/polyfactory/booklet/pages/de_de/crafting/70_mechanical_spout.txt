@@ -1,0 +1,18 @@
+### Section: PageInfo
+title=<item 'polyfactory:mechanical_spout'>
+icon=polyfactory:mechanical_spout
+category=polyfactory:crafting
+### EndSection: PageInfo
+Der <yellow><item 'polyfactory:mechanical_spout'></> ist ein 1x2x1-Maschinenblock, mit dem du Dinge mithilfe von Flüssigkeiten herstellen kannst.
+<nl2>
+Er bezieht seine Flüssigkeit von oben und fungiert zusätzlich als schwächere <item 'polyfactory:mechanical_pump'> mit
+einer Reichweite von 8. Zur Versorgung kannst du <item 'polyfactory:fluid_tank'>, Tragbare Flüssigkeitstanks oder <item 'polyfactory:pipe'>
+verwenden.
+<nl2>
+Dieser Block benötigt Rotationsenergie; seine Belastung beträgt bei Aktivität 1 Einheit.
+<nl>
+Förderbänder können direkt von diesem Block ziehen oder zu ihm schieben, sofern sie korrekt ausgerichtet sind.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:mechanical_spout'>Zeige das <item 'polyfactory:mechanical_spout'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:recipe_type/spout' 'category'>Zeige die Rezepte dieses Blocks</>

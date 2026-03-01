@@ -1,0 +1,31 @@
+### Section: PageInfo
+title=<item 'polyfactory:conveyor'>
+icon=polyfactory:conveyor
+category=polyfactory:item_transport
+### EndSection: PageInfo
+Das <yellow><item 'polyfactory:conveyor'></> ist ein Block zum Transport von Gegenständen und Entitäten.
+Es benötigt <u><blue><pagelink 'polyfactory:rotation/00_about'>Rotationsenergie</*>, nutzt aber nur die
+Geschwindigkeit (nicht die Drehrichtung!) und erzeugt keine zusätzliche Belastung. Förderbänder können die Rotationsenergie auch weiterleiten.
+<nl2>
+Förderbänder sind gerichtet und verbinden sich, solange sie in dieselbe Richtung zeigen und nebeneinander liegen.
+Sie können gerade, diagonal (hoch und runter) sowie direkt nach oben verlaufen.
+<nl2>
+Entitäten auf einem angetriebenen <item 'polyfactory:conveyor'> werden in Förderbandrichtung geschoben.
+Bei vertikalen Förderbändern werden Entitäten nicht beeinflusst.
+<nl>
+Für den Gegenstandstransport können Gegenstände direkt aufgelegt, per <item 'hopper'> oder <item 'polyfactory:funnel'> zugeführt werden,
+mit einer Stapelgrenze von 16. Der Stapel bewegt sich dann in die festgelegte Richtung, ohne despawnen zu können.
+Zeigt das <item 'polyfactory:conveyor'> direkt auf bestimmte Blöcke wie <item 'polyfactory:press'>, <item 'polyfactory:mixer'>, <item 'hopper'>
+und ähnliche, werden Gegenstände direkt hineingelegt.
+Ebenso können Gegenstände aus einigen Blöcken entnommen werden (z.B. <item 'polyfactory:mechanical_spout'> und <item 'polyfactory:mechanical_drain'>).
+<nl2>
+Reguläre <item 'polyfactory:conveyor'> erlauben keinen direkten vertikalen Transport – nur horizontal und diagonal.
+Dafür brauchst du das <yellow><item 'polyfactory:sticky_conveyor'></>, das genauso funktioniert,
+aber zusätzlich vertikalen Gegenstandstransport ermöglicht. Entitäten werden davon derzeit nicht vertikal bewegt.
+Ein <item 'polyfactory:sticky_conveyor'> erhältst du, indem du ein <item 'polyfactory:conveyor'> mit einem <item 'slime_ball'>
+herstellst oder ihn direkt in der Welt verwendest.
+
+### Image: polyfactory:item_transport/conveyor_example Beispiel für <item 'polyfactory:conveyor'> und <item 'polyfactory:sticky_conveyor'>.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:conveyor'>Zeige das <item 'polyfactory:conveyor'>-Rezept</>

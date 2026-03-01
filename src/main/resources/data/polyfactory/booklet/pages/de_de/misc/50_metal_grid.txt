@@ -1,0 +1,12 @@
+### Section: PageInfo
+title=<item 'polyfactory:metal_grid'>
+icon=polyfactory:metal_grid
+category=polyfactory:misc
+### EndSection: PageInfo
+Das <yellow><item 'polyfactory:metal_grid'></> ist ein Block, der Gegenstände, Erfahrung und Projektile
+durchlässt, aber für andere Entitäten und Spieler wie ein solider Block wirkt. Es kann mit Wasser gefüllt werden.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:metal_grid'>Zeige das <item 'polyfactory:metal_grid'>-Rezept</><nl>
+
+

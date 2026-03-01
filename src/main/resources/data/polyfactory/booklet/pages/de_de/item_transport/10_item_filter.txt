@@ -1,0 +1,24 @@
+### Section: PageInfo
+title=Gegenstandsfilter
+icon=polyfactory:item_filter
+category=polyfactory:item_transport
+### EndSection: PageInfo
+Der <yellow>Gegenstandsfilter</> ist ein Gegenstand, mit dem du einschränken kannst, welche Gegenstände von
+<item 'hopper'>, <item 'polyfactory:funnel'> und <item 'polyfactory:item_splitter'> akzeptiert werden.
+<nl2>
+Zum Konfigurieren benutze ihn, ohne auf einen interaktiven Block zu zielen. Es öffnet sich eine Oberfläche, in der du
+bis zu 9 verschiedene Gegenstände als Filter einstellen kannst. Der Filter kopiert den Gegenstand nur hinein, ohne dass
+das Original dauerhaft dort verbleiben muss.
+<nl2>
+Zusätzlich kannst du einstellen, ob der Filter die Gegenstandsdaten
+(Verzauberungen, Schaden, Farbe etc.) prüfen oder nur den Typ abgleichen soll.
+<nl>
+Du kannst auch festlegen, ob der Filter nur die eingestellten Gegenstände durchlässt oder nur diese blockiert.
+<nl2>
+Um einen Block mit dem Filter zu versehen, klicke ihn einfach an, während du den Filter hältst.
+<item 'hopper'> und <item 'polyfactory:funnel'> nehmen nur einen einzelnen Filter auf, während der <item 'polyfactory:item_splitter'>
+zwei aufnehmen kann (einen für den grünen/linken und einen für den roten/rechten Ausgang).
+Zum Herausnehmen klicke erneut (beim Trichter mit gedrückter Shift-Taste).
+
+### Align: Center
+<u><blue><polydex 'polyfactory:item_filter'>Zeige das Gegenstandsfilter-Rezept</>

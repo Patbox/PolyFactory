@@ -1,0 +1,16 @@
+### Section: PageInfo
+title=Über Flüssigkeiten und Schmelzen
+icon=minecraft:water_bucket
+category=polyfactory:fluids
+### EndSection: PageInfo
+
+<yellow>Flüssigkeiten</> sind eine Ressource, die (in der Welt) Vanilla-Flüssigkeiten oder eigene Flüssigkeiten von PolyFactory darstellen.
+Sie sind nicht direkt an einen Gegenstand gebunden und verwenden ein eigenes Maßsystem.
+<nl2>
+Flüssigkeiten können mit Blöcken wie dem <item 'polyfactory:pipe'> transportiert werden, das von einer <item 'polyfactory:pump'> angetrieben werden muss.
+Rohre und Pumpen können Flüssigkeiten aus Flüssigkeitsspeichern oder aus Weltblöcken wie Wasser-/Lavaquellen, Honig-/Schleimblöcken,
+Bienenstöcken usw. ziehen. Eigene PolyFactory-Flüssigkeiten benötigen möglicherweise spezifische Rezepte und eine Schmelze.
+<nl2>
+<yellow>Schmelzen</> ist der Vorgang des Einschmelzens metallischer Gegenstände mit einer Schmelze. PolyFactory fügt 2 Typen hinzu:
+- <item 'polyfactory:primitive_smeltery'> - Frühspiel-primitive, langsamere Schmelze.
+- <item 'polyfactory:smeltery'> - Mittelspiel-Schmelze. Schneller und kann 9 Gegenstände gleichzeitig schmelzen.
