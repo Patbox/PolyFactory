@@ -1139,6 +1139,7 @@ class RecipesProvider extends FabricRecipeProvider {
                             .unlockedBy("get", InventoryChangeTrigger.TriggerInstance.hasItems(Items.GLOWSTONE));
                     x.save(output, recipeKey("colored_lamp/glass/regular_b"));
                 }
+                this.dyedItem(FactoryItems.WINDMILL_SAIL, "");
 
                 for (var dye : dyes) {
                     var dyeColor = DyeColor.byName(dye.builtInRegistryHolder().key().identifier().getPath().replace("_dye", ""), null);
@@ -1178,7 +1179,6 @@ class RecipesProvider extends FabricRecipeProvider {
                                 .save(output, recipeKey("windmill_sail/wool/" + dyeColor));
                     }
 
-                    this.dyedItem(FactoryItems.WINDMILL_SAIL, "");
 
                     {
                         var bundle = BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace(dyeColor.getSerializedName() + "_bundle"));
