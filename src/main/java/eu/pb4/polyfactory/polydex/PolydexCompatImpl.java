@@ -303,7 +303,7 @@ public class PolydexCompatImpl {
     public static PolydexStack<?>[] createOutput(List<OutputStack> output) {
         var list = new ArrayList<PolydexStack<?>>(output.size());
         for (var x : output) {
-            list.add(PolydexStack.of(x.stack().copyWithCount(x.stack().getCount() * x.roll()), x.chance()));
+            list.add(PolydexStack.of(x.stack().create().copyWithCount(x.stack().count() * x.roll()), x.chance()));
         }
         return list.toArray(new PolydexStack[0]);
     }
@@ -311,7 +311,7 @@ public class PolydexCompatImpl {
     public static PolydexStack<?>[] createOutput(List<OutputStack> output, List<FluidStack<?>> fluids) {
         var list = new ArrayList<PolydexStack<?>>(output.size());
         for (var x : output) {
-            list.add(PolydexStack.of(x.stack().copyWithCount(x.stack().getCount() * x.roll()), x.chance()));
+            list.add(PolydexStack.of(x.stack().create().copyWithCount(x.stack().count() * x.roll()), x.chance()));
         }
         for (var x : fluids) {
             list.add(new PolydexFluidStack(x.instance(), x.amount(), 1));

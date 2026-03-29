@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.polydex.pages;
 
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polydex.api.v1.recipe.*;
 import eu.pb4.polyfactory.block.fluids.DrainBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
@@ -23,11 +24,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class PressRecipePage extends PrioritizedRecipePage<GenericPressRecipe> {
-    private static final ItemStack ICON = FactoryItems.PRESS.getDefaultInstance();
-    private static final ItemStack DRAIN_ICON = new GuiElementBuilder(FactoryItems.DRAIN)
-            .setName(Component.translatable("text.polyfactory.polydex.drain_required")).asStack();
-    private static final ItemStack DRAIN_ICON_OPTIONAL = new GuiElementBuilder(FactoryItems.DRAIN)
-            .setName(Component.translatable("text.polyfactory.polydex.drain_required.optional")).asStack();
+    private static final GuiElementBuilder DRAIN_ICON = new GuiElementBuilder(FactoryItems.DRAIN)
+            .setName(Component.translatable("text.polyfactory.polydex.drain_required"));
+    private static final GuiElementBuilder DRAIN_ICON_OPTIONAL = new GuiElementBuilder(FactoryItems.DRAIN)
+            .setName(Component.translatable("text.polyfactory.polydex.drain_required.optional"));
     private final List<PolydexIngredient<?>> ingredients;
     private final PolydexStack<?>[] output;
     private final PolydexStack<?>[] mainOutput;
@@ -41,7 +41,7 @@ public class PressRecipePage extends PrioritizedRecipePage<GenericPressRecipe> {
 
     @Override
     public ItemStack getOutput(@Nullable PolydexEntry polydexEntry, MinecraftServer minecraftServer) {
-        return this.recipe.output().isEmpty() ? ItemStack.EMPTY : this.recipe.output().getFirst().stack().copy();
+        return this.recipe.output().isEmpty() ? ItemStack.EMPTY : this.recipe.output().getFirst().stack().create();
     }
 
     @Override
@@ -74,7 +74,7 @@ public class PressRecipePage extends PrioritizedRecipePage<GenericPressRecipe> {
 
     @Override
     public ItemStack typeIcon(ServerPlayer player) {
-        return ICON;
+        return FactoryItems.PRESS.getDefaultInstance();
     }
 
     @Override

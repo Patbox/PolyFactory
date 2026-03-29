@@ -11,6 +11,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
+import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -91,7 +92,7 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
             stacks.add(filter.icon().isEmpty() ? ItemStack.EMPTY : filter.icon().getFirst());
         }
         var input = CraftingInput.of(3, 3, stacks);
-        this.outputPreview = this.recipe.getRecipeFor(input, (ServerLevel) this.level).map(x -> x.value().assemble(input, this.level.registryAccess())).orElse(ItemStack.EMPTY);
+        this.outputPreview = this.recipe.getRecipeFor(input, (ServerLevel) this.level).map(x -> x.value().assemble(input)).orElse(ItemStack.EMPTY);
         if (this.model != null) {
             this.model.setResult(this.outputPreview.copy());
         }
@@ -127,7 +128,7 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
             return;
         }
         var recipe = optional.get().value();
-        var result = recipe.assemble(input, player.level().registryAccess());
+        var result = recipe.assemble(input);
         if (result.isEmpty()) {
             return;
         }
@@ -205,10 +206,20 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
             this.setTitle(Component.empty().append(Component.literal("" + GuiTextures.BLUEPRINT_WORKSTATION_EXTRA_OFFSET).setStyle(UiResourceCreator.STYLE))
                     .append(GuiTextures.BLUEPRINT_WORKBENCH.apply(be.getBlockState().getBlock().getName())));
 
-            this.setSlot(0, () -> be.outputPreview.copy());
+            this.setSlot(0, new GuiElement() {
+                @Override
+                public ItemStack getItemStack() {
+                    return be.outputPreview.copy();
+                }
+
+                @Override
+                public ClickCallback getGuiCallback() {
+                    return GuiElement.EMPTY_CALLBACK;
+                }
+            });
 
             for (int i = 0; i < 9; i++) {
-                this.setSlotRedirect(i + 1, new Slot(be, i, 0, 0));
+                this.setSlot(i + 1, new Slot(be, i, 0, 0));
             }
             this.open();
         }
@@ -233,7 +244,7 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
                 public boolean recipeMatches(RecipeHolder<CraftingRecipe> entry) {
                     return entry.value().matches(CraftingInput.of(3, 3, be.stacks), player.level());
                 }
-            }, 3, 3, this.screenHandler.slots.subList(1, 10), this.screenHandler.slots.subList(1, 10), player.getInventory(), (RecipeHolder<CraftingRecipe>) recipe.parent(), false, false);
+            }, 3, 3, this.wrappedMenu.slots.subList(1, 10), this.wrappedMenu.slots.subList(1, 10), player.getInventory(), (RecipeHolder<CraftingRecipe>) recipe.parent(), false, false);
 
             if (post == RecipeBookMenu.PostPlaceAction.PLACE_GHOST_RECIPE) {
                 this.player.connection.send(new ClientboundPlaceGhostRecipePacket(this.player.containerMenu.containerId, recipe.display().display()));

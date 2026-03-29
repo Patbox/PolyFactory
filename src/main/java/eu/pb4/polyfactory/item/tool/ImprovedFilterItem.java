@@ -5,12 +5,10 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
 import eu.pb4.polyfactory.util.filter.*;
 import eu.pb4.sgui.api.ClickType;
-import eu.pb4.sgui.api.GuiHelpers;
+import eu.pb4.sgui.api.SguiUtils;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
-import eu.pb4.sgui.api.elements.GuiElementInterface;
-import eu.pb4.sgui.api.gui.GuiInterface;
+import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import eu.pb4.sgui.api.gui.SlotGuiInterface;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -22,6 +20,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackLinkedSet;
@@ -99,7 +98,7 @@ public class ImprovedFilterItem extends AbstractFilterItem {
             for (int x = 0; x < 3; x++) {
                 for (int y = 0; y < 3; y++) {
                     int i = x + y * 3;
-                    this.setSlot(x + 2 + y * 9, new GuiElementInterface() {
+                    this.setSlot(x + 2 + y * 9, new GuiElement() {
                         @Override
                         public ItemStack getItemStack() {
                             var strict = stack.get(FactoryDataComponents.ITEM_FILTER_MATCH) == Match.STRICT;
@@ -124,8 +123,8 @@ public class ImprovedFilterItem extends AbstractFilterItem {
             this.open();
         }
 
-        private <T extends Enum<T>> GuiElementInterface createButton(DataComponentType<T> type, T[] values, Function<T, GuiElementBuilder> builderFunction) {
-            return new GuiElementInterface() {
+        private <T extends Enum<T>> GuiElement createButton(DataComponentType<T> type, T[] values, Function<T, GuiElementBuilder> builderFunction) {
+            return new GuiElement() {
                 @Override
                 public ItemStack getItemStack() {
                     return builderFunction.apply(stack.getOrDefault(type, values[0])).asStack();
@@ -143,16 +142,16 @@ public class ImprovedFilterItem extends AbstractFilterItem {
 
         private void onSetSlot(int i, ClickType type) {
             var stacks = new ArrayList<>(getStacks(stack));
-            if (this.screenHandler.getCarried().isEmpty()) {
+            if (this.wrappedMenu.getCarried().isEmpty()) {
                 if (i < stacks.size()) {
                     stacks.remove(i);
                 } else {
                     return;
                 }
             } else if (i < stacks.size()) {
-                stacks.set(i, this.screenHandler.getCarried().copyWithCount(1));
+                stacks.set(i, this.wrappedMenu.getCarried().copyWithCount(1));
             } else {
-                stacks.add(this.screenHandler.getCarried().copyWithCount(1));
+                stacks.add(this.wrappedMenu.getCarried().copyWithCount(1));
             }
             var dedupe = ItemStackLinkedSet.createTypeAndComponentsSet();
             dedupe.addAll(stacks);
@@ -164,13 +163,13 @@ public class ImprovedFilterItem extends AbstractFilterItem {
         }
 
         @Override
-        public boolean onAnyClick(int index, ClickType type, net.minecraft.world.inventory.ClickType action) {
+        public boolean onAnyClick(int index, ClickType type, ContainerInput action) {
             if (index == -999 || index == -1) {
                 return true;
             }
             var stacks = new ArrayList<>(getStacks(stack));
             if (stacks.size() < 9 && type.shift && index > this.getVirtualSize()) {
-                stacks.add(this.screenHandler.getSlot(index).getItem().copyWithCount(1));
+                stacks.add(this.wrappedMenu.getSlot(index).getItem().copyWithCount(1));
                 var dedupe = ItemStackLinkedSet.createTypeAndComponentsSet();
                 dedupe.addAll(stacks);
                 stacks.clear();
@@ -179,8 +178,8 @@ public class ImprovedFilterItem extends AbstractFilterItem {
                 GuiUtils.playClickSound(player);
             }
 
-            if (this.screenHandler.getSlot(index).getItem() == stack) {
-                GuiHelpers.sendSlotUpdate(player, this.screenHandler.containerId, index, stack, 0);
+            if (this.wrappedMenu.getSlot(index).getItem() == stack) {
+                SguiUtils.sendSlotUpdate(player, this.wrappedMenu.containerId, index, stack, 0);
                 return false;
             }
 

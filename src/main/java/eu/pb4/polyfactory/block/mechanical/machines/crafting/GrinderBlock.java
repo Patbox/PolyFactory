@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.AbovePlacingLimiter;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
@@ -18,7 +19,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -52,7 +53,6 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
     public GrinderBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(this.defaultBlockState());
-        Model.MODEL_STONE_WHEEL.isEmpty();
     }
 
     @Override
@@ -163,15 +163,15 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack MODEL_STONE_WHEEL = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/grindstone_wheel"));
+        public static final LazyItemStack MODEL_STONE_WHEEL = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/grindstone_wheel"));
 
         private final ItemDisplayElement stoneWheel;
         private final ItemDisplayElement main;
 
         private Model(ServerLevel world, BlockState state) {
 
-            this.main = ItemDisplayElementUtil.createSolid(FactoryItems.GRINDER);
-            this.stoneWheel = LodItemDisplayElement.createSimple(MODEL_STONE_WHEEL, this.getUpdateRate(), 0.6f, 0.6f);
+            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.GRINDER);
+            this.stoneWheel = LodItemDisplayElement.createSimple(MODEL_STONE_WHEEL.get(), this.getUpdateRate(), 0.6f, 0.6f);
 
             this.updateAnimation(0, state.getValue(INPUT_FACING));
             this.addElement(this.main);

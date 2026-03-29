@@ -32,6 +32,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStackTemplate;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -236,7 +237,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         self.model.tick();
 
         if (self.process >= self.currentRecipe.value().time(input)) {
-            var output = self.currentRecipe.value().assemble(input, world.registryAccess());
+            var output = self.currentRecipe.value().assemble(input);
             var outFluid = self.currentRecipe.value().fluidOutput(input);
 
             var emptyFluids = self.fluidContainer.empty();
@@ -302,12 +303,14 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
                 self.process += speed;
                 setChanged(world, pos, self.getBlockState());
 
-                var stack = self.getItem(world.random.nextIntBetweenInclusive(0, OUTPUT_FIRST));
+                var stack = self.getItem(world.getRandom().nextIntBetweenInclusive(0, OUTPUT_FIRST));
                 if (!stack.isEmpty()) {
-                    ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, stack.copy()),
+                    var te = ItemStackTemplate.fromNonEmptyStack(stack);
+
+                    ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, te),
                             pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0,
                             (Math.random() - 0.5) * 0.2, 0.8, (Math.random() - 0.5) * 0.2, 2);
-                    ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, stack.copy()),
+                    ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, te),
                             pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0,
                             (Math.random() - 0.5) * 0.2, 0, (Math.random() - 0.5) * 0.2, 2);
                 }
@@ -457,18 +460,18 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
             this.setSlot(1 + 9, fluidSlot);
             this.setSlot(1 + 9 * 2, fluidSlot);
 
-            this.setSlotRedirect(2, new Slot(MixerBlockEntity.this, 0, 0, 0));
-            this.setSlotRedirect(3, new Slot(MixerBlockEntity.this, 1, 1, 0));
-            this.setSlotRedirect(2 + 9, new Slot(MixerBlockEntity.this, 2, 2, 0));
-            this.setSlotRedirect(3 + 9, new Slot(MixerBlockEntity.this, 3, 3, 0));
-            this.setSlotRedirect(2 + 18, new Slot(MixerBlockEntity.this, 4, 4, 0));
-            this.setSlotRedirect(3 + 18, new Slot(MixerBlockEntity.this, 5, 5, 0));
+            this.setSlot(2, new Slot(MixerBlockEntity.this, 0, 0, 0));
+            this.setSlot(3, new Slot(MixerBlockEntity.this, 1, 1, 0));
+            this.setSlot(2 + 9, new Slot(MixerBlockEntity.this, 2, 2, 0));
+            this.setSlot(3 + 9, new Slot(MixerBlockEntity.this, 3, 3, 0));
+            this.setSlot(2 + 18, new Slot(MixerBlockEntity.this, 4, 4, 0));
+            this.setSlot(3 + 18, new Slot(MixerBlockEntity.this, 5, 5, 0));
             this.setSlot(4 + 9, GuiTextures.PROGRESS_HORIZONTAL_OFFSET_RIGHT.get(progress()));
             this.setSlot(4 + 9 + 9, GuiTextures.TEMPERATURE_OFFSET_RIGHT.getNamed(Mth.clamp(MixerBlockEntity.this.temperature, -1, 1), CURRENT_HEAT));
-            this.setSlot(5 + 9 + 9, GuiElementBuilder.from(GuiTextures.EMPTY.getItemStack()).setName(CURRENT_HEAT));
-            this.setSlotRedirect(6, new FurnaceResultSlot(player, MixerBlockEntity.this, 6, 3, 0));
-            this.setSlotRedirect(6 + 9, new FurnaceResultSlot(player, MixerBlockEntity.this, 7, 3, 0));
-            this.setSlotRedirect(6 + 18, new FurnaceResultSlot(player, MixerBlockEntity.this, 8, 3, 0));
+            this.setSlot(5 + 9 + 9, GuiElementBuilder.from(GuiTextures.EMPTY.asStack()).setName(CURRENT_HEAT));
+            this.setSlot(6, new FurnaceResultSlot(player, MixerBlockEntity.this, 6, 3, 0));
+            this.setSlot(6 + 9, new FurnaceResultSlot(player, MixerBlockEntity.this, 7, 3, 0));
+            this.setSlot(6 + 18, new FurnaceResultSlot(player, MixerBlockEntity.this, 8, 3, 0));
             this.open();
         }
 

@@ -72,7 +72,7 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
 
     @Override
     protected void saveAdditional(ValueOutput view) {
-        this.storage.writeData(view);
+        this.storage.writeValue(view);
         // amount -> long
         // variant -> { item -> string/id, tag -> compound/null }
         super.saveAdditional(view);
@@ -99,7 +99,7 @@ public class ContainerBlockEntity extends LockableBlockEntity implements BlockEn
             }
         }
 
-        this.storage.readData(view);
+        this.storage.readValue(view);
     }
 
     private void updateStack() {

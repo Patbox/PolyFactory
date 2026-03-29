@@ -73,7 +73,7 @@ public class FanBlockEntity extends BlockEntity {
                 var pSpeed = 0d;
 
                 if (airFluid.is(Fluids.EMPTY) && liquidFluid.is(FluidTags.WATER)) {
-                    effect = new ItemParticleOption(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE.getDefaultInstance());
+                    effect = new ItemParticleOption(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE);
                     pSpeed = speed * 0.8f;
                 } else if (airFluid.is(Fluids.EMPTY) && liquidFluid.is(FluidTags.LAVA)) {
                     effect = ParticleTypes.FLAME;
@@ -82,7 +82,7 @@ public class FanBlockEntity extends BlockEntity {
 
                 if (effect != null && (world.getGameTime() + pos.getX() * 3L + pos.getY() * 7L + pos.getZ() * 5L) % Mth.clamp(Math.round(2 / speed), 4, 8) == 0) {
                     var a = Vec3.atCenterOf(mut).relative(dir, -0.5f);
-                    ((ServerLevel) world).sendParticles(effect, a.x + world.random.nextFloat() - 0.5, a.y + world.random.nextFloat() - 0.5, a.z + world.random.nextFloat() - 0.5, 0, dir.getStepX(), dir.getStepY(), dir.getStepZ(), reverse ? -pSpeed : pSpeed);
+                    ((ServerLevel) world).sendParticles(effect, a.x + world.getRandom().nextFloat() - 0.5, a.y + world.getRandom().nextFloat() - 0.5, a.z + world.getRandom().nextFloat() - 0.5, 0, dir.getStepX(), dir.getStepY(), dir.getStepZ(), reverse ? -pSpeed : pSpeed);
                 }
             }
 
@@ -114,7 +114,7 @@ public class FanBlockEntity extends BlockEntity {
                 var alt = Vec3.atCenterOf(mut);
                 a = center.distanceToSqr(a) < center.distanceToSqr(alt) ? a : alt;
             }
-            ((ServerLevel) world).sendParticles(ParticleTypes.CLOUD, a.x + world.random.nextFloat() - 0.5, a.y + world.random.nextFloat() - 0.5, a.z + world.random.nextFloat() - 0.5, 0, dir.getStepX(), dir.getStepY(), dir.getStepZ(), reverse ? -speed : speed);
+            ((ServerLevel) world).sendParticles(ParticleTypes.CLOUD, a.x + world.getRandom().nextFloat() - 0.5, a.y + world.getRandom().nextFloat() - 0.5, a.z + world.getRandom().nextFloat() - 0.5, 0, dir.getStepX(), dir.getStepY(), dir.getStepZ(), reverse ? -speed : speed);
         }
 
         for (var entity : world.getEntitiesOfClass(Entity.class, box, EntitySelector.NO_SPECTATORS)) {

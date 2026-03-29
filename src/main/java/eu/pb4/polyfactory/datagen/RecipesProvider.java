@@ -11,7 +11,9 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.SpoutMolds;
+import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.mixin.PotionBrewingAccessor;
+import eu.pb4.polyfactory.mixin.ShapedRecipeBuilderAccessor;
 import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
 import eu.pb4.polyfactory.recipe.*;
@@ -33,13 +35,14 @@ import eu.pb4.polyfactory.recipe.spout.RepairSpoutRecipe;
 import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
 import eu.pb4.polyfactory.recipe.spout.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.advancements.criterion.InventoryChangeTrigger;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -58,18 +61,11 @@ import net.minecraft.util.Tuple;
 import net.minecraft.util.Unit;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.flag.FeatureFlags;
-import net.minecraft.world.item.DyeItem;
-import net.minecraft.world.item.HoneycombItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.component.DyedItemColor;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SmeltingRecipe;
+import net.minecraft.world.item.crafting.*;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -77,7 +73,7 @@ import java.util.concurrent.CompletableFuture;
 import static eu.pb4.polyfactory.util.FactoryUtil.recipeKey;
 
 class RecipesProvider extends FabricRecipeProvider {
-    public RecipesProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+    public RecipesProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
         super(output, registriesFuture);
     }
 
@@ -106,12 +102,12 @@ class RecipesProvider extends FabricRecipeProvider {
                         .save(output);
 
                 SimpleCookingRecipeBuilder.smelting(
-                                Ingredient.of(FactoryItems.STEEL_ALLOY_MIXTURE), RecipeCategory.MISC, FactoryItems.STEEL_INGOT, 0.4f, 80)
+                                Ingredient.of(FactoryItems.STEEL_ALLOY_MIXTURE), RecipeCategory.MISC, CookingBookCategory.MISC, FactoryItems.STEEL_INGOT, 0.4f, 80)
                         .unlockedBy("get_steel_mixture", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_ALLOY_MIXTURE))
                         .save(output);
 
                 SimpleCookingRecipeBuilder.blasting(
-                                Ingredient.of(FactoryItems.STEEL_ALLOY_MIXTURE), RecipeCategory.MISC, FactoryItems.STEEL_INGOT, 0.4f, 40)
+                                Ingredient.of(FactoryItems.STEEL_ALLOY_MIXTURE), RecipeCategory.MISC, CookingBookCategory.MISC, FactoryItems.STEEL_INGOT, 0.4f, 40)
                         .unlockedBy("get_steel_mixture", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_ALLOY_MIXTURE))
                         .save(output, recipeKey("steel_ingot_blasting"));
 
@@ -954,8 +950,8 @@ class RecipesProvider extends FabricRecipeProvider {
                         SimpleGrindingRecipe.of("granite_to_gravel", Ingredient.of(Items.GRANITE), 4, 6, 15, OutputStack.of(Items.GRAVEL), OutputStack.of(Items.QUARTZ, 0.1f, 1)),
                         SimpleGrindingRecipe.of("gravel_to_sand", Ingredient.of(Items.GRAVEL), 4, 3, 15, Items.SAND),
 
-                        SimpleGrindingRecipe.of("iron_ingot_to_nuggets", Ingredient.of(Items.IRON_INGOT), 2, 5, 10, new ItemStack(Items.IRON_NUGGET, 9)),
-                        SimpleGrindingRecipe.of("gold_ingot_to_nuggets", Ingredient.of(Items.GOLD_INGOT), 1.8, 5, 10, new ItemStack(Items.GOLD_NUGGET, 9)),
+                        SimpleGrindingRecipe.of("iron_ingot_to_nuggets", Ingredient.of(Items.IRON_INGOT), 2, 5, 10, new ItemStackTemplate(Items.IRON_NUGGET, 9)),
+                        SimpleGrindingRecipe.of("gold_ingot_to_nuggets", Ingredient.of(Items.GOLD_INGOT), 1.8, 5, 10, new ItemStackTemplate(Items.GOLD_NUGGET, 9)),
                         SimpleGrindingRecipe.of("nether_wart", Ingredient.of(Items.NETHER_WART_BLOCK), 1.8, 5, 10,
                                 OutputStack.of(Items.NETHER_WART), OutputStack.of(Items.NETHER_WART, 0.4f, 5)
                         ),
@@ -972,7 +968,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         SimpleGrindingRecipe.of("bone_to_bone_meal", Ingredient.of(Items.BONE), 1, 5, 10, OutputStack.of(Items.BONE_MEAL, 1, 3), OutputStack.of(Items.BONE_MEAL, 0.5f, 2)),
                         SimpleGrindingRecipe.of("blaze_rod_to_powder", Ingredient.of(Items.BLAZE_ROD), 2, 5, 10, OutputStack.of(Items.BLAZE_POWDER, 1, 2), OutputStack.of(Items.BLAZE_POWDER, 0.5f, 2)),
                         SimpleGrindingRecipe.of("breeze_rod_to_charge", Ingredient.of(Items.BREEZE_ROD), 2, 5, 10, OutputStack.of(Items.WIND_CHARGE, 1, 4), OutputStack.of(Items.WIND_CHARGE, 0.5f, 2)),
-                        SimpleGrindingRecipe.of("glowstone_to_powder", Ingredient.of(Items.GLOWSTONE), 1, 5, 10, new ItemStack(Items.GLOWSTONE_DUST, 4)),
+                        SimpleGrindingRecipe.of("glowstone_to_powder", Ingredient.of(Items.GLOWSTONE), 1, 5, 10, new ItemStackTemplate(Items.GLOWSTONE_DUST, 4)),
                         SimpleGrindingRecipe.of("sugar", Ingredient.of(Items.SUGAR_CANE), 1, 5, OutputStack.of(Items.SUGAR, 1f, 1), OutputStack.of(Items.SUGAR, 0.4f, 1)),
 
                         // Crushed raw metals
@@ -988,38 +984,38 @@ class RecipesProvider extends FabricRecipeProvider {
                         ),
 
                         // Flower to Dye
-                        SimpleGrindingRecipe.of("dandelion_to_dye", "dye", Ingredient.of(Items.DANDELION), 1, 6, new ItemStack(Items.YELLOW_DYE, 3)),
-                        SimpleGrindingRecipe.of("torch_flower_to_dye", "dye", Ingredient.of(Items.TORCHFLOWER), 1, 6, new ItemStack(Items.ORANGE_DYE, 3)),
-                        SimpleGrindingRecipe.of("orchid_to_dye", "dye", Ingredient.of(Items.BLUE_ORCHID), 1, 6, new ItemStack(Items.LIGHT_BLUE_DYE, 3)),
-                        SimpleGrindingRecipe.of("allium_to_dye", "dye", Ingredient.of(Items.ALLIUM), 1, 6, new ItemStack(Items.MAGENTA_DYE, 3)),
-                        SimpleGrindingRecipe.of("azure_bluet_to_dye", "dye", Ingredient.of(Items.AZURE_BLUET), 1, 6, new ItemStack(Items.LIGHT_GRAY_DYE, 3)),
-                        SimpleGrindingRecipe.of("daisy_to_dye", "dye", Ingredient.of(Items.OXEYE_DAISY), 1, 6, new ItemStack(Items.LIGHT_GRAY_DYE, 3)),
-                        SimpleGrindingRecipe.of("red_tulip_to_dye", "dye", Ingredient.of(Items.RED_TULIP), 1, 6, new ItemStack(Items.RED_DYE, 3)),
-                        SimpleGrindingRecipe.of("orange_tulip_to_dye", "dye", Ingredient.of(Items.ORANGE_TULIP), 1, 6, new ItemStack(Items.ORANGE_DYE, 3)),
-                        SimpleGrindingRecipe.of("white_tulip_to_dye", "dye", Ingredient.of(Items.WHITE_TULIP), 1, 6, new ItemStack(Items.LIGHT_GRAY_DYE, 3)),
-                        SimpleGrindingRecipe.of("pink_tulip_to_dye", "dye", Ingredient.of(Items.PINK_TULIP), 1, 6, new ItemStack(Items.PINK_DYE, 3)),
-                        SimpleGrindingRecipe.of("cornflower_to_dye", "dye", Ingredient.of(Items.CORNFLOWER), 1, 6, new ItemStack(Items.BLUE_DYE, 3)),
-                        SimpleGrindingRecipe.of("lily_to_dye", "dye", Ingredient.of(Items.LILY_OF_THE_VALLEY), 1, 6, new ItemStack(Items.WHITE_DYE, 3)),
-                        SimpleGrindingRecipe.of("wither_rose_to_dye", "dye", Ingredient.of(Items.WITHER_ROSE), 1, 6, new ItemStack(Items.BLACK_DYE, 3)),
-                        SimpleGrindingRecipe.of("sunflower_to_dye", "dye", Ingredient.of(Items.SUNFLOWER), 1, 6, new ItemStack(Items.YELLOW_DYE, 6)),
-                        SimpleGrindingRecipe.of("lilac_to_dye", "dye", Ingredient.of(Items.LILAC), 1, 6, new ItemStack(Items.MAGENTA_DYE, 6)),
-                        SimpleGrindingRecipe.of("peony_to_dye", "dye", Ingredient.of(Items.PEONY), 1, 6, new ItemStack(Items.PINK_DYE, 6)),
-                        SimpleGrindingRecipe.of("rose_to_dye", "dye", Ingredient.of(Items.ROSE_BUSH), 1, 6, new ItemStack(Items.RED_DYE, 6)),
-                        SimpleGrindingRecipe.of("pitcher_to_dye", "dye", Ingredient.of(Items.PITCHER_PLANT), 1, 6, new ItemStack(Items.CYAN_DYE, 6)),
-                        SimpleGrindingRecipe.of("cactus_to_dye", "dye", Ingredient.of(Items.CACTUS), 1, 6, new ItemStack(Items.GREEN_DYE, 3)),
-                        SimpleGrindingRecipe.of("closed_eyeblossom_to_dye", "dye", Ingredient.of(Items.CLOSED_EYEBLOSSOM), 1, 6, new ItemStack(Items.GRAY_DYE, 3)),
-                        SimpleGrindingRecipe.of("open_eyeblossom_to_dye", "dye", Ingredient.of(Items.OPEN_EYEBLOSSOM), 1, 6, new ItemStack(Items.ORANGE_DYE, 3)),
-                        SimpleGrindingRecipe.of("cactus_flower_to_dye", "dye", Ingredient.of(Items.CACTUS_FLOWER), 1, 6, new ItemStack(Items.PINK_DYE, 3)),
-                        SimpleGrindingRecipe.of("wildflowers_to_dye", "dye", Ingredient.of(Items.WILDFLOWERS), 1, 6, new ItemStack(Items.YELLOW_DYE, 3)),
+                        SimpleGrindingRecipe.of("dandelion_to_dye", "dye", Ingredient.of(Items.DANDELION), 1, 6, new ItemStackTemplate(Items.YELLOW_DYE, 3)),
+                        SimpleGrindingRecipe.of("torch_flower_to_dye", "dye", Ingredient.of(Items.TORCHFLOWER), 1, 6, new ItemStackTemplate(Items.ORANGE_DYE, 3)),
+                        SimpleGrindingRecipe.of("orchid_to_dye", "dye", Ingredient.of(Items.BLUE_ORCHID), 1, 6, new ItemStackTemplate(Items.LIGHT_BLUE_DYE, 3)),
+                        SimpleGrindingRecipe.of("allium_to_dye", "dye", Ingredient.of(Items.ALLIUM), 1, 6, new ItemStackTemplate(Items.MAGENTA_DYE, 3)),
+                        SimpleGrindingRecipe.of("azure_bluet_to_dye", "dye", Ingredient.of(Items.AZURE_BLUET), 1, 6, new ItemStackTemplate(Items.LIGHT_GRAY_DYE, 3)),
+                        SimpleGrindingRecipe.of("daisy_to_dye", "dye", Ingredient.of(Items.OXEYE_DAISY), 1, 6, new ItemStackTemplate(Items.LIGHT_GRAY_DYE, 3)),
+                        SimpleGrindingRecipe.of("red_tulip_to_dye", "dye", Ingredient.of(Items.RED_TULIP), 1, 6, new ItemStackTemplate(Items.RED_DYE, 3)),
+                        SimpleGrindingRecipe.of("orange_tulip_to_dye", "dye", Ingredient.of(Items.ORANGE_TULIP), 1, 6, new ItemStackTemplate(Items.ORANGE_DYE, 3)),
+                        SimpleGrindingRecipe.of("white_tulip_to_dye", "dye", Ingredient.of(Items.WHITE_TULIP), 1, 6, new ItemStackTemplate(Items.LIGHT_GRAY_DYE, 3)),
+                        SimpleGrindingRecipe.of("pink_tulip_to_dye", "dye", Ingredient.of(Items.PINK_TULIP), 1, 6, new ItemStackTemplate(Items.PINK_DYE, 3)),
+                        SimpleGrindingRecipe.of("cornflower_to_dye", "dye", Ingredient.of(Items.CORNFLOWER), 1, 6, new ItemStackTemplate(Items.BLUE_DYE, 3)),
+                        SimpleGrindingRecipe.of("lily_to_dye", "dye", Ingredient.of(Items.LILY_OF_THE_VALLEY), 1, 6, new ItemStackTemplate(Items.WHITE_DYE, 3)),
+                        SimpleGrindingRecipe.of("wither_rose_to_dye", "dye", Ingredient.of(Items.WITHER_ROSE), 1, 6, new ItemStackTemplate(Items.BLACK_DYE, 3)),
+                        SimpleGrindingRecipe.of("sunflower_to_dye", "dye", Ingredient.of(Items.SUNFLOWER), 1, 6, new ItemStackTemplate(Items.YELLOW_DYE, 6)),
+                        SimpleGrindingRecipe.of("lilac_to_dye", "dye", Ingredient.of(Items.LILAC), 1, 6, new ItemStackTemplate(Items.MAGENTA_DYE, 6)),
+                        SimpleGrindingRecipe.of("peony_to_dye", "dye", Ingredient.of(Items.PEONY), 1, 6, new ItemStackTemplate(Items.PINK_DYE, 6)),
+                        SimpleGrindingRecipe.of("rose_to_dye", "dye", Ingredient.of(Items.ROSE_BUSH), 1, 6, new ItemStackTemplate(Items.RED_DYE, 6)),
+                        SimpleGrindingRecipe.of("pitcher_to_dye", "dye", Ingredient.of(Items.PITCHER_PLANT), 1, 6, new ItemStackTemplate(Items.CYAN_DYE, 6)),
+                        SimpleGrindingRecipe.of("cactus_to_dye", "dye", Ingredient.of(Items.CACTUS), 1, 6, new ItemStackTemplate(Items.GREEN_DYE, 3)),
+                        SimpleGrindingRecipe.of("closed_eyeblossom_to_dye", "dye", Ingredient.of(Items.CLOSED_EYEBLOSSOM), 1, 6, new ItemStackTemplate(Items.GRAY_DYE, 3)),
+                        SimpleGrindingRecipe.of("open_eyeblossom_to_dye", "dye", Ingredient.of(Items.OPEN_EYEBLOSSOM), 1, 6, new ItemStackTemplate(Items.ORANGE_DYE, 3)),
+                        SimpleGrindingRecipe.of("cactus_flower_to_dye", "dye", Ingredient.of(Items.CACTUS_FLOWER), 1, 6, new ItemStackTemplate(Items.PINK_DYE, 3)),
+                        SimpleGrindingRecipe.of("wildflowers_to_dye", "dye", Ingredient.of(Items.WILDFLOWERS), 1, 6, new ItemStackTemplate(Items.YELLOW_DYE, 3)),
                         SimpleGrindingRecipe.of("leaf_litter_to_dye", "dye", Ingredient.of(Items.LEAF_LITTER), 1, 6, OutputStack.of(Items.BROWN_DYE, 0.3f))
                 );
 
-                oreSmelting(List.of(FactoryItems.CRUSHED_RAW_IRON), RecipeCategory.MISC, Items.IRON_INGOT, 0.5F, 180, "iron_ingot");
-                oreSmelting(List.of(FactoryItems.CRUSHED_RAW_COPPER), RecipeCategory.MISC, Items.COPPER_INGOT, 0.5F, 180, "copper_ingot");
-                oreSmelting(List.of(FactoryItems.CRUSHED_RAW_GOLD), RecipeCategory.MISC, Items.GOLD_INGOT, 0.7F, 180, "gold_ingot");
-                oreBlasting(List.of(FactoryItems.CRUSHED_RAW_IRON), RecipeCategory.MISC, Items.IRON_INGOT, 0.5F, 100, "iron_ingot");
-                oreBlasting(List.of(FactoryItems.CRUSHED_RAW_COPPER), RecipeCategory.MISC, Items.COPPER_INGOT, 0.5F, 100, "copper_ingot");
-                oreBlasting(List.of(FactoryItems.CRUSHED_RAW_GOLD), RecipeCategory.MISC, Items.GOLD_INGOT, 0.7F, 100, "gold_ingot");
+                oreSmelting(List.of(FactoryItems.CRUSHED_RAW_IRON), RecipeCategory.MISC, CookingBookCategory.MISC, Items.IRON_INGOT, 0.5F, 180, "iron_ingot");
+                oreSmelting(List.of(FactoryItems.CRUSHED_RAW_COPPER), RecipeCategory.MISC, CookingBookCategory.MISC, Items.COPPER_INGOT, 0.5F, 180, "copper_ingot");
+                oreSmelting(List.of(FactoryItems.CRUSHED_RAW_GOLD), RecipeCategory.MISC, CookingBookCategory.MISC, Items.GOLD_INGOT, 0.7F, 180, "gold_ingot");
+                oreBlasting(List.of(FactoryItems.CRUSHED_RAW_IRON), RecipeCategory.MISC, CookingBookCategory.MISC, Items.IRON_INGOT, 0.5F, 100, "iron_ingot");
+                oreBlasting(List.of(FactoryItems.CRUSHED_RAW_COPPER), RecipeCategory.MISC, CookingBookCategory.MISC, Items.COPPER_INGOT, 0.5F, 100, "copper_ingot");
+                oreBlasting(List.of(FactoryItems.CRUSHED_RAW_GOLD), RecipeCategory.MISC, CookingBookCategory.MISC, Items.GOLD_INGOT, 0.7F, 100, "gold_ingot");
 
                 nineBlockStorageRecipesWithCustomPacking(RecipeCategory.MISC, Items.COPPER_NUGGET, RecipeCategory.MISC, Items.COPPER_INGOT, "copper_ingot_from_nugget", null);
                 nineBlockStorageRecipesWithCustomPacking(RecipeCategory.MISC, FactoryItems.STEEL_NUGGET, RecipeCategory.MISC, FactoryItems.STEEL_INGOT, "steel_ingot_from_nugget", null);
@@ -1030,34 +1026,34 @@ class RecipesProvider extends FabricRecipeProvider {
                     for (int i = 1; i <= 4; i++) {
                         of(output,
                                 GenericPressRecipe.of(name + "_" + i, "press/copper_waxing",
-                                        CountedIngredient.ofItems(i, entry.getKey()), CountedIngredient.ofItems(1, Items.HONEYCOMB), 2f, new OutputStack(new ItemStack(entry.getValue(), i), 1, 1)));
+                                        CountedIngredient.ofItems(i, entry.getKey()), CountedIngredient.ofItems(1, Items.HONEYCOMB), 2f, new OutputStack(new ItemStackTemplate(entry.getValue().asItem(), i), 1, 1)));
                     }
                 }
 
                 of(output,
-                        GenericPressRecipe.of("purpur_block", Ingredient.of(Items.POPPED_CHORUS_FRUIT), 4, 5f, new ItemStack(Items.PURPUR_BLOCK, 1)),
-                        GenericPressRecipe.of("sponge", Ingredient.of(Items.WET_SPONGE), 1, 5f, new ItemStack(Items.SPONGE, 1), FactoryFluids.WATER.ofBucket()),
-                        GenericPressRecipe.of("sand", Ingredient.of(Items.SAND), 4, 5f, new ItemStack(Items.SANDSTONE, 1)),
-                        GenericPressRecipe.of("honeycomb", Ingredient.of(Items.HONEYCOMB), 4, 4f, new ItemStack(Items.HONEYCOMB_BLOCK, 1)),
-                        GenericPressRecipe.of("snow_block", Ingredient.of(Items.SNOWBALL), 4, 3f, new ItemStack(Items.SNOW_BLOCK, 1)),
-                        GenericPressRecipe.of("red_sand", Ingredient.of(Items.RED_SAND), 4, 5f, new ItemStack(Items.RED_SANDSTONE, 1)),
-                        GenericPressRecipe.of("dripstone", Ingredient.of(Items.POINTED_DRIPSTONE), 4, 5f, new ItemStack(Items.DRIPSTONE_BLOCK, 1)),
-                        GenericPressRecipe.of("dried_kelp_block", Ingredient.of(Items.DRIED_KELP), 9, 5f, new ItemStack(Items.DRIED_KELP_BLOCK, 1)),
-                        GenericPressRecipe.of("slime_block", Ingredient.of(Items.SLIME_BALL), 9, 5f, new ItemStack(Items.SLIME_BLOCK, 1)),
-                        GenericPressRecipe.of("bamboo_block", Ingredient.of(Items.BAMBOO), 9, 5f, new ItemStack(Items.BAMBOO_BLOCK, 1)),
-                        GenericPressRecipe.of("hay_block", Ingredient.of(Items.WHEAT), 9, 5f, new ItemStack(Items.HAY_BLOCK, 1)),
-                        GenericPressRecipe.of("packed_ice", Ingredient.of(Items.ICE), 8, 8f, new ItemStack(Items.PACKED_ICE, 1)),
-                        GenericPressRecipe.of("blue_ice", Ingredient.of(Items.PACKED_ICE), 8, 8f, new ItemStack(Items.BLUE_ICE, 1)),
+                        GenericPressRecipe.of("purpur_block", Ingredient.of(Items.POPPED_CHORUS_FRUIT), 4, 5f, new ItemStackTemplate(Items.PURPUR_BLOCK, 1)),
+                        GenericPressRecipe.of("sponge", Ingredient.of(Items.WET_SPONGE), 1, 5f, new ItemStackTemplate(Items.SPONGE, 1), FactoryFluids.WATER.ofBucket()),
+                        GenericPressRecipe.of("sand", Ingredient.of(Items.SAND), 4, 5f, new ItemStackTemplate(Items.SANDSTONE, 1)),
+                        GenericPressRecipe.of("honeycomb", Ingredient.of(Items.HONEYCOMB), 4, 4f, new ItemStackTemplate(Items.HONEYCOMB_BLOCK, 1)),
+                        GenericPressRecipe.of("snow_block", Ingredient.of(Items.SNOWBALL), 4, 3f, new ItemStackTemplate(Items.SNOW_BLOCK, 1)),
+                        GenericPressRecipe.of("red_sand", Ingredient.of(Items.RED_SAND), 4, 5f, new ItemStackTemplate(Items.RED_SANDSTONE, 1)),
+                        GenericPressRecipe.of("dripstone", Ingredient.of(Items.POINTED_DRIPSTONE), 4, 5f, new ItemStackTemplate(Items.DRIPSTONE_BLOCK, 1)),
+                        GenericPressRecipe.of("dried_kelp_block", Ingredient.of(Items.DRIED_KELP), 9, 5f, new ItemStackTemplate(Items.DRIED_KELP_BLOCK, 1)),
+                        GenericPressRecipe.of("slime_block", Ingredient.of(Items.SLIME_BALL), 9, 5f, new ItemStackTemplate(Items.SLIME_BLOCK, 1)),
+                        GenericPressRecipe.of("bamboo_block", Ingredient.of(Items.BAMBOO), 9, 5f, new ItemStackTemplate(Items.BAMBOO_BLOCK, 1)),
+                        GenericPressRecipe.of("hay_block", Ingredient.of(Items.WHEAT), 9, 5f, new ItemStackTemplate(Items.HAY_BLOCK, 1)),
+                        GenericPressRecipe.of("packed_ice", Ingredient.of(Items.ICE), 8, 8f, new ItemStackTemplate(Items.PACKED_ICE, 1)),
+                        GenericPressRecipe.of("blue_ice", Ingredient.of(Items.PACKED_ICE), 8, 8f, new ItemStackTemplate(Items.BLUE_ICE, 1)),
                         GenericPressRecipe.of("experience_bottle", CountedIngredient.ofItems(1, Items.GLASS_BOTTLE),
                                 CountedIngredient.ofItems(8, Items.SCULK), 10f, OutputStack.of(Items.EXPERIENCE_BOTTLE)),
                         GenericPressRecipe.of("book", CountedIngredient.ofItems(1, Items.LEATHER),
                                 CountedIngredient.ofItems(3, Items.PAPER), 6f, OutputStack.of(Items.BOOK)),
-                        GenericPressRecipe.of("paper", Ingredient.of(Items.SUGAR_CANE), 3, 5f, new ItemStack(Items.PAPER, 4)),
+                        GenericPressRecipe.of("paper", Ingredient.of(Items.SUGAR_CANE), 3, 5f, new ItemStackTemplate(Items.PAPER, 4)),
                         GenericPressRecipe.of("iron_ingot", Ingredient.of(Items.IRON_NUGGET), 9, 10f, Items.IRON_INGOT),
                         GenericPressRecipe.of("gold_ingot", Ingredient.of(Items.GOLD_NUGGET), 9, 8f, Items.GOLD_INGOT),
-                        GenericPressRecipe.of("steel_plate", Ingredient.of(FactoryItems.STEEL_INGOT), 1, 8.5f, new ItemStack(FactoryItems.STEEL_PLATE, 1)),
-                        GenericPressRecipe.of("copper_plate", Ingredient.of(Items.COPPER_INGOT), 2, 8.5f, new ItemStack(FactoryItems.COPPER_PLATE, 1)),
-                        GenericPressRecipe.of("wooden_plate", Ingredient.of(FactoryItems.SAW_DUST), 2, 5f, new ItemStack(FactoryItems.WOODEN_PLATE, 1)),
+                        GenericPressRecipe.of("steel_plate", Ingredient.of(FactoryItems.STEEL_INGOT), 1, 8.5f, new ItemStackTemplate(FactoryItems.STEEL_PLATE, 1)),
+                        GenericPressRecipe.of("copper_plate", Ingredient.of(Items.COPPER_INGOT), 2, 8.5f, new ItemStackTemplate(FactoryItems.COPPER_PLATE, 1)),
+                        GenericPressRecipe.of("wooden_plate", Ingredient.of(FactoryItems.SAW_DUST), 2, 5f, new ItemStackTemplate(FactoryItems.WOODEN_PLATE, 1)),
                         GenericPressRecipe.of("golden_carrot", CountedIngredient.ofItems(1, Items.CARROT), CountedIngredient.ofItems(8, Items.GOLD_NUGGET),
                                 5, OutputStack.of(Items.GOLDEN_CARROT)),
                         GenericPressRecipe.of("glistening_melon_slice", CountedIngredient.ofItems(1, Items.MELON_SLICE), CountedIngredient.ofItems(8, Items.GOLD_NUGGET),
@@ -1079,44 +1075,47 @@ class RecipesProvider extends FabricRecipeProvider {
 
                 for (var i = 0; i < 5; i++) {
                     of(output, GenericPressRecipe.of("throwable_glass_bottle_" + i, "throwable_glass_bottle", CountedIngredient.ofItems(5 - i, Items.GLASS_BOTTLE),
-                            CountedIngredient.ofItems(1, Items.GUNPOWDER), 7 - i, new OutputStack(new ItemStack(FactoryItems.THROWABLE_GLASS_BOTTLE, 5 - i), 1, 1)));
+                            CountedIngredient.ofItems(1, Items.GUNPOWDER), 7 - i, new OutputStack(new ItemStackTemplate(FactoryItems.THROWABLE_GLASS_BOTTLE, 5 - i), 1, 1)));
                     of(output, GenericPressRecipe.of("lingering_throwable_glass_bottle_" + i, "lingering_throwable_glass_bottle", CountedIngredient.ofItems(5 - i, FactoryItems.THROWABLE_GLASS_BOTTLE),
-                            CountedIngredient.ofItemsRemainder(1, Items.DRAGON_BREATH, Items.GLASS_BOTTLE), 7 - i, new OutputStack(new ItemStack(FactoryItems.LINGERING_THROWABLE_GLASS_BOTTLE, 5 - i), 1, 1)));
+                            CountedIngredient.ofItemsRemainder(1, Items.DRAGON_BREATH, Items.GLASS_BOTTLE), 7 - i, new OutputStack(new ItemStackTemplate(FactoryItems.LINGERING_THROWABLE_GLASS_BOTTLE, 5 - i), 1, 1)));
                 }
 
-                of(output,
-                        new RecipeHolder<>(recipeKey("crafting/spray_can_fill"), new FillSprayCanCraftingRecipe(CraftingBookCategory.MISC)),
-                        new RecipeHolder<>(recipeKey("crafting/inverted_colored_lamp"),
-                                new ShapelessNbtCopyRecipe("lamp_invertion", CraftingBookCategory.REDSTONE,
-                                        FactoryItems.INVERTED_LAMP.getDefaultInstance(),
-                                        Ingredient.of(FactoryItems.LAMP),
-                                        List.of(Ingredient.of(Items.REDSTONE_TORCH)))),
-                        new RecipeHolder<>(recipeKey("crafting/inverted_caged_lamp"),
-                                new ShapelessNbtCopyRecipe("lamp_invertion", CraftingBookCategory.REDSTONE,
-                                        FactoryItems.INVERTED_CAGED_LAMP.getDefaultInstance(),
-                                        Ingredient.of(FactoryItems.CAGED_LAMP),
-                                        List.of(Ingredient.of(Items.REDSTONE_TORCH)))),
-                        new RecipeHolder<>(recipeKey("crafting/caged_lamp"),
-                                new ShapelessNbtCopyRecipe("", CraftingBookCategory.REDSTONE,
-                                        FactoryItems.CAGED_LAMP.getDefaultInstance(),
-                                        Ingredient.of(FactoryItems.LAMP),
-                                        List.of(Ingredient.of(FactoryItems.METAL_GRID)))),
-                        new RecipeHolder<>(recipeKey("crafting/inverted_fixture_lamp"),
-                                new ShapelessNbtCopyRecipe("lamp_invertion", CraftingBookCategory.REDSTONE,
-                                        FactoryItems.INVERTED_FIXTURE_LAMP.getDefaultInstance(),
-                                        Ingredient.of(FactoryItems.FIXTURE_LAMP),
-                                        List.of(Ingredient.of(Items.REDSTONE_TORCH)))),
-                        new RecipeHolder<>(recipeKey("crafting/fixture_lamp"),
-                                new ShapelessNbtCopyRecipe("", CraftingBookCategory.REDSTONE,
-                                        FactoryItems.FIXTURE_LAMP.getDefaultInstance().copyWithCount(3),
-                                        Ingredient.of(FactoryItems.LAMP),
-                                        List.of(Ingredient.of(FactoryItems.WOODEN_PLATE))))
-                );
-
-
                 {
-                    var x = new CompShapedRecipeJsonBuilder(itemWrap, RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
-                            .setComponent(FactoryDataComponents.COLOR, -2)
+                    var info = new Recipe.CommonInfo(true);
+                    var lampInvertion = new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.REDSTONE, "lamp_invertion");
+                    var none = new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.REDSTONE, "");
+                    of(output,
+                            new RecipeHolder<>(recipeKey("crafting/spray_can_fill"), new FillSprayCanCraftingRecipe(CraftingBookCategory.MISC)),
+                            new RecipeHolder<>(recipeKey("crafting/inverted_colored_lamp"),
+                                    new ShapelessNbtCopyRecipe(info, lampInvertion,
+                                            new ItemStackTemplate(FactoryItems.INVERTED_LAMP),
+                                            Ingredient.of(FactoryItems.LAMP),
+                                            List.of(Ingredient.of(Items.REDSTONE_TORCH)))),
+                            new RecipeHolder<>(recipeKey("crafting/inverted_caged_lamp"),
+                                    new ShapelessNbtCopyRecipe(info, lampInvertion,
+                                            new ItemStackTemplate(FactoryItems.INVERTED_CAGED_LAMP),
+                                            Ingredient.of(FactoryItems.CAGED_LAMP),
+                                            List.of(Ingredient.of(Items.REDSTONE_TORCH)))),
+                            new RecipeHolder<>(recipeKey("crafting/caged_lamp"),
+                                    new ShapelessNbtCopyRecipe(info, none,
+                                            new ItemStackTemplate(FactoryItems.CAGED_LAMP),
+                                            Ingredient.of(FactoryItems.LAMP),
+                                            List.of(Ingredient.of(FactoryItems.METAL_GRID)))),
+                            new RecipeHolder<>(recipeKey("crafting/inverted_fixture_lamp"),
+                                    new ShapelessNbtCopyRecipe(info, lampInvertion,
+                                            new ItemStackTemplate(FactoryItems.INVERTED_FIXTURE_LAMP),
+                                            Ingredient.of(FactoryItems.FIXTURE_LAMP),
+                                            List.of(Ingredient.of(Items.REDSTONE_TORCH)))),
+                            new RecipeHolder<>(recipeKey("crafting/fixture_lamp"),
+                                    new ShapelessNbtCopyRecipe(info, none,
+                                            new ItemStackTemplate(FactoryItems.FIXTURE_LAMP, 3),
+                                            Ingredient.of(FactoryItems.LAMP),
+                                            List.of(Ingredient.of(FactoryItems.WOODEN_PLATE))))
+                    );
+                }
+                
+                {
+                    var x = ShapedRecipeBuilderAccessor.createShapedRecipeBuilder(itemWrap, RecipeCategory.REDSTONE, ColoredItem.template(FactoryItems.LAMP, 1, -2))
                             .pattern("dps")
                             .pattern("rgr")
                             .pattern("sps")
@@ -1129,8 +1128,7 @@ class RecipesProvider extends FabricRecipeProvider {
                     x.save(output, recipeKey("colored_lamp/glass/regular_a"));
                 }
                 {
-                    var x = new CompShapedRecipeJsonBuilder(itemWrap, RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
-                            .setComponent(FactoryDataComponents.COLOR, -2)
+                    var x = ShapedRecipeBuilderAccessor.createShapedRecipeBuilder(itemWrap, RecipeCategory.REDSTONE, ColoredItem.template(FactoryItems.LAMP, 1, -2))
                             .pattern("sps")
                             .pattern("rgr")
                             .pattern("dps")
@@ -1143,51 +1141,57 @@ class RecipesProvider extends FabricRecipeProvider {
                 }
 
                 for (var dye : dyes) {
-                    {
-                        var x = new CompShapedRecipeJsonBuilder(itemWrap, RecipeCategory.REDSTONE, FactoryItems.LAMP, 1)
-                                .setComponent(FactoryDataComponents.COLOR, DyeColorExtra.getColor(dye.getDyeColor()))
+                    var dyeColor = DyeColor.byName(dye.builtInRegistryHolder().key().identifier().getPath().replace("_dye", ""), null);
+                    if (dyeColor == null) {
+                        throw new NullPointerException("dyeColor can't be null!");
+                    }
 
+                    {
+                        var x = ShapedRecipeBuilderAccessor.createShapedRecipeBuilder(itemWrap, RecipeCategory.REDSTONE, ColoredItem.template(FactoryItems.LAMP, 1, -2))
                                 .pattern("sps")
                                 .pattern("rgr")
                                 .pattern("sps")
                                 .define('r', Items.REDSTONE).define('g', Items.GLOWSTONE)
                                 .define('s', FactoryItems.SAW_DUST)
-                                .define('p', BuiltInRegistries.ITEM.getValue(Identifier.parse(dye.getDyeColor().getSerializedName() + "_stained_glass")))
+                                .define('p', BuiltInRegistries.ITEM.getValue(Identifier.parse(dyeColor.getSerializedName() + "_stained_glass")))
                                 .group("polyfactory:colored_lamp")
                                 .unlockedBy("get", InventoryChangeTrigger.TriggerInstance.hasItems(Items.GLOWSTONE));
 
-                        x.save(output, recipeKey("colored_lamp/glass/" + dye.getDyeColor()));
+                        x.save(output, recipeKey("colored_lamp/glass/" + dyeColor));
                     }
 
                     {
-                        var x = new CompShapedRecipeJsonBuilder(itemWrap, RecipeCategory.REDSTONE, FactoryItems.WINDMILL_SAIL, 1);
+                        var comp = DataComponentPatch.builder();
 
                         if (dye != Items.WHITE_DYE) {
-                            x.setComponent(DataComponents.DYED_COLOR, new DyedItemColor(DyeColorExtra.getColor(dye.getDyeColor())));
+                            comp.set(DataComponents.DYED_COLOR, new DyedItemColor(DyeColorExtra.getColor(dyeColor)));
                         }
 
-                        x.pattern(" sw")
+                        ShapedRecipeBuilderAccessor.createShapedRecipeBuilder(itemWrap, RecipeCategory.REDSTONE, new ItemStackTemplate(FactoryItems.WINDMILL_SAIL,  comp.build()))
+                        .pattern(" sw")
                                 .pattern(" ws")
                                 .pattern("wsc")
                                 .define('w', FactoryItems.WOODEN_PLATE).define('s', Items.STICK)
-                                .define('c', BuiltInRegistries.ITEM.getValue(Identifier.parse(dye.getDyeColor().getSerializedName() + "_wool")))
+                                .define('c', BuiltInRegistries.ITEM.getValue(Identifier.parse(dyeColor.getSerializedName() + "_wool")))
                                 .group("polyfactory:windmill_sail")
                                 .unlockedBy("get_axle", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.WOODEN_PLATE))
-                                .save(output, recipeKey("windmill_sail/wool/" + dye.getDyeColor()));
+                                .save(output, recipeKey("windmill_sail/wool/" + dyeColor));
                     }
 
+                    this.dyedItem(FactoryItems.WINDMILL_SAIL, "");
+
                     {
-                        var bundle = BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace(dye.getDyeColor().getSerializedName() + "_bundle"));
-                        var shulker = BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace(dye.getDyeColor().getSerializedName() + "_shulker_box"));
-                        of(output, TransformMixingRecipe.of(dye.getDyeColor().getSerializedName() + "_bundle", "bundle_coloring",
-                                        this.tag(ItemTags.BUNDLES), List.of(Ingredient.of(dye)), 2, 2, 5, bundle.getDefaultInstance()),
-                                TransformMixingRecipe.of(dye.getDyeColor().getSerializedName() + "_shulker", "shulker_coloring",
-                                        this.tag(ItemTags.SHULKER_BOXES), List.of(Ingredient.of(dye)), 2, 2, 5, shulker.getDefaultInstance()
+                        var bundle = BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace(dyeColor.getSerializedName() + "_bundle"));
+                        var shulker = BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace(dyeColor.getSerializedName() + "_shulker_box"));
+                        of(output, TransformMixingRecipe.of(dyeColor.getSerializedName() + "_bundle", "bundle_coloring",
+                                        this.tag(ItemTags.BUNDLES), List.of(Ingredient.of(dye)), 2, 2, 5, new ItemStackTemplate(bundle)),
+                                TransformMixingRecipe.of(dyeColor.getSerializedName() + "_shulker", "shulker_coloring",
+                                        this.tag(ItemTags.SHULKER_BOXES), List.of(Ingredient.of(dye)), 2, 2, 5, new ItemStackTemplate(shulker)
                                 ));
                     }
 
                     {
-                        var nameSolid = dye.getDyeColor().getSerializedName() + "_concrete";
+                        var nameSolid = dyeColor.getSerializedName() + "_concrete";
                         var namePowder = nameSolid + "_powder";
 
                         var powder = BuiltInRegistries.ITEM.getValue(Identifier.parse(namePowder));
@@ -1198,18 +1202,18 @@ class RecipesProvider extends FabricRecipeProvider {
 
                         of(output, GenericMixingRecipe.ofCounted(namePowder, "concrete_powder",
                                 List.of(CountedIngredient.ofTag(4, itemWrap.getOrThrow(ItemTags.SMELTS_TO_GLASS)), CountedIngredient.ofItems(4, Items.GRAVEL), CountedIngredient.ofItems(1, dye)),
-                                4, 1, 13, new ItemStack(powder, 8)));
+                                4, 1, 13, new ItemStackTemplate(powder, 8)));
 
                         of(output, GenericMixingRecipe.ofCounted(nameSolid + "_direct", "concrete_direct",
                                 List.of(CountedIngredient.ofTag(4, itemWrap.getOrThrow(ItemTags.SMELTS_TO_GLASS)),
                                         CountedIngredient.ofItems(4, Items.GRAVEL),
                                         CountedIngredient.ofItems(0, Items.WATER_BUCKET),
                                         CountedIngredient.ofItems(1, dye)),
-                                5, 1, 15, new ItemStack(solid, 8)));
+                                5, 1, 15, new ItemStackTemplate(solid, 8)));
 
                         of(output, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder", "concrete_water",
                                 List.of(CountedIngredient.ofItems(1, powder), CountedIngredient.ofItems(0, Items.WATER_BUCKET)),
-                                1, 1, 4, new ItemStack(solid, 1)));
+                                1, 1, 4, new ItemStackTemplate(solid, 1)));
 
 
                         of(output, GenericMixingRecipe.ofCounted(nameSolid + "_direct_new", "concrete_direct",
@@ -1217,12 +1221,12 @@ class RecipesProvider extends FabricRecipeProvider {
                                         CountedIngredient.ofItems(4, Items.GRAVEL),
                                         CountedIngredient.ofItems(1, dye)),
                                 List.of(new FluidInputStack(FactoryFluids.WATER.defaultInstance(), FluidConstants.BOTTLE, FluidConstants.BOTTLE / 10)),
-                                5, 1, 15, 0f, new ItemStack(solid, 8)));
+                                5, 1, 15, 0f, new ItemStackTemplate(solid, 8)));
 
                         of(output, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder_new", "concrete_water",
                                 List.of(CountedIngredient.ofItems(1, powder)),
                                 List.of(new FluidInputStack(FactoryFluids.WATER.defaultInstance(), FluidConstants.BOTTLE, FluidConstants.BOTTLE / 10)),
-                                1, 1, 4, 0f, new ItemStack(solid, 1)));
+                                1, 1, 4, 0f, new ItemStackTemplate(solid, 1)));
                     }
                 }
 
@@ -1244,100 +1248,100 @@ class RecipesProvider extends FabricRecipeProvider {
                         .save(output);
 
                 of(output,
-                        GenericMixingRecipe.ofCounted("treated_dried_kelp", List.of(CountedIngredient.ofItems(16, Items.DRIED_KELP), CountedIngredient.ofItems(1, Items.BLACK_DYE)), 2, 1, 6f, 0.2f, new ItemStack(FactoryItems.TREATED_DRIED_KELP, 16)),
+                        GenericMixingRecipe.ofCounted("treated_dried_kelp", List.of(CountedIngredient.ofItems(16, Items.DRIED_KELP), CountedIngredient.ofItems(1, Items.BLACK_DYE)), 2, 1, 6f, 0.2f, new ItemStackTemplate(FactoryItems.TREATED_DRIED_KELP, 16)),
                         GenericMixingRecipe.ofCounted("fermented_spider_eye", List.of(CountedIngredient.ofItems(1, Items.SPIDER_EYE),
                                         CountedIngredient.ofItems(1, Items.SUGAR),
                                         CountedIngredient.ofItems(1, Items.BROWN_MUSHROOM)), 3, 4, 8f,
-                                new ItemStack(Items.FERMENTED_SPIDER_EYE, 1)),
+                                new ItemStackTemplate(Items.FERMENTED_SPIDER_EYE, 1)),
 
                         GenericMixingRecipe.ofCounted("fire_charge", List.of(CountedIngredient.ofItems(1, Items.GUNPOWDER),
                                         CountedIngredient.ofTag(1, itemWrap.getOrThrow(ItemTags.COALS)),
                                         CountedIngredient.ofItems(1, Items.BLAZE_POWDER)), 3, 4, 8f,
-                                new ItemStack(Items.FIRE_CHARGE, 1)),
+                                new ItemStackTemplate(Items.FIRE_CHARGE, 1)),
                         GenericMixingRecipe.ofCounted("magma_cream", List.of(CountedIngredient.ofItems(1, Items.SLIME_BALL),
                                         CountedIngredient.ofItems(1, Items.BLAZE_POWDER)), 3, 4, 8f,
-                                new ItemStack(Items.MAGMA_CREAM, 1)),
+                                new ItemStackTemplate(Items.MAGMA_CREAM, 1)),
                         GenericMixingRecipe.of("coarse_dirt",
-                                List.of(Ingredient.of(Items.DIRT), Ingredient.of(Items.GRAVEL)), 2, 4, 10, new ItemStack(Items.COARSE_DIRT, 2)),
+                                List.of(Ingredient.of(Items.DIRT), Ingredient.of(Items.GRAVEL)), 2, 4, 10, new ItemStackTemplate(Items.COARSE_DIRT, 2)),
                         GenericMixingRecipe.of("packed_mud",
-                                List.of(Ingredient.of(Items.WHEAT), Ingredient.of(Items.MUD)), 2, 4, 10, new ItemStack(Items.PACKED_MUD)),
+                                List.of(Ingredient.of(Items.WHEAT), Ingredient.of(Items.MUD)), 2, 4, 10, new ItemStackTemplate(Items.PACKED_MUD)),
                         GenericMixingRecipe.ofCounted("cake",
                                 List.of(CountedIngredient.ofItems(2, Items.WHEAT), CountedIngredient.ofItems(2, Items.SUGAR),
                                         CountedIngredient.ofItems(1, Items.EGG),
                                         CountedIngredient.ofItemsRemainder(2, Items.MILK_BUCKET, Items.BUCKET)),
-                                3, 4, 10, new ItemStack(Items.CAKE)),
+                                3, 4, 10, new ItemStackTemplate(Items.CAKE)),
                         GenericMixingRecipe.ofCounted("pumpkin_pie",
                                 List.of(CountedIngredient.ofItems(1, Items.PUMPKIN), CountedIngredient.ofItems(1, Items.SUGAR),
                                         CountedIngredient.ofItems(1, Items.EGG)),
-                                3, 4, 10, new ItemStack(Items.PUMPKIN_PIE, 2)),
+                                3, 4, 10, new ItemStackTemplate(Items.PUMPKIN_PIE, 2)),
                         GenericMixingRecipe.ofCounted("mushroom_stew",
                                 List.of(CountedIngredient.ofItems(1, Items.RED_MUSHROOM), CountedIngredient.ofItems(1, Items.BROWN_MUSHROOM),
                                         CountedIngredient.ofItems(2, Items.BOWL)),
-                                2, 4, 10, new ItemStack(Items.MUSHROOM_STEW, 2)),
+                                2, 4, 10, new ItemStackTemplate(Items.MUSHROOM_STEW, 2)),
                         GenericMixingRecipe.ofCounted("beetroot_soup",
                                 List.of(CountedIngredient.ofItems(3, Items.BEETROOT),
                                         CountedIngredient.ofItems(1, Items.BOWL)),
-                                2, 4, 10, new ItemStack(Items.BEETROOT_SOUP, 1)),
+                                2, 4, 10, new ItemStackTemplate(Items.BEETROOT_SOUP, 1)),
                         GenericMixingRecipe.ofCounted("rabbit_stew",
                                 List.of(CountedIngredient.ofItems(1, Items.COOKED_RABBIT),
                                         CountedIngredient.ofItems(2, Items.BAKED_POTATO),
                                         CountedIngredient.ofItems(2, Items.CARROT),
                                         CountedIngredient.ofItems(2, Items.BROWN_MUSHROOM),
                                         CountedIngredient.ofItems(3, Items.BOWL)),
-                                2, 4, 10, new ItemStack(Items.RABBIT_STEW, 3)),
+                                2, 4, 10, new ItemStackTemplate(Items.RABBIT_STEW, 3)),
                         GenericMixingRecipe.ofCounted("cookie",
                                 List.of(CountedIngredient.ofItems(2, Items.WHEAT), CountedIngredient.ofItems(1, Items.COCOA_BEANS)),
-                                2, 4, 10, new ItemStack(Items.COOKIE, 10)),
+                                2, 4, 10, new ItemStackTemplate(Items.COOKIE, 10)),
                         GenericMixingRecipe.ofCounted("bread",
                                 List.of(CountedIngredient.ofItems(2, Items.WHEAT)),
-                                2, 4, 10, new ItemStack(Items.BREAD, 1)),
+                                2, 4, 10, new ItemStackTemplate(Items.BREAD, 1)),
                         GenericMixingRecipe.ofCounted("steel_alloy_mixture",
                                 List.of(CountedIngredient.ofItems(3, Items.IRON_INGOT), CountedIngredient.ofItems(2, FactoryItems.COAL_DUST),
                                         CountedIngredient.ofItems(1, Items.REDSTONE)),
-                                2, 4, 15, new ItemStack(FactoryItems.STEEL_ALLOY_MIXTURE, 2)),
+                                2, 4, 15, new ItemStackTemplate(FactoryItems.STEEL_ALLOY_MIXTURE, 2)),
                         GenericMixingRecipe.ofCounted("tnt",
                                 List.of(CountedIngredient.ofTag(4, itemWrap.getOrThrow(ItemTags.SMELTS_TO_GLASS)), CountedIngredient.ofItems(5, Items.GUNPOWDER)),
-                                2, 4, 16, new ItemStack(Items.TNT)),
+                                2, 4, 16, new ItemStackTemplate(Items.TNT)),
                         GenericMixingRecipe.ofCounted("redstone_to_glowstone",
                                 List.of(CountedIngredient.ofItems(8, Items.REDSTONE), CountedIngredient.ofItems(1, Items.BLAZE_POWDER)),
-                                8, 4, 16, new ItemStack(Items.GLOWSTONE_DUST, 12)),
+                                8, 4, 16, new ItemStackTemplate(Items.GLOWSTONE_DUST, 12)),
                         GenericMixingRecipe.ofCounted("redstone_to_glowstone_2",
                                 List.of(CountedIngredient.ofItems(8, Items.REDSTONE), CountedIngredient.ofItems(3, FactoryItems.NETHERRACK_DUST)),
-                                8, 5, 16, new ItemStack(Items.GLOWSTONE_DUST, 8)),
+                                8, 5, 16, new ItemStackTemplate(Items.GLOWSTONE_DUST, 8)),
                         GenericMixingRecipe.ofCounted("dynamite",
                                 List.of(CountedIngredient.ofItems(1, Items.PAPER), CountedIngredient.ofItems(1, FactoryItems.SAW_DUST), CountedIngredient.ofTag(1, itemWrap.getOrThrow(ItemTags.SAND)), CountedIngredient.ofItems(2, Items.GUNPOWDER)),
-                                2, 1, 6f, new ItemStack(FactoryItems.DYNAMITE, 1)),
+                                2, 1, 6f, new ItemStackTemplate(FactoryItems.DYNAMITE, 1)),
                         GenericMixingRecipe.ofCounted("gunpowder",
                                 List.of(CountedIngredient.ofItems(2, FactoryItems.NETHERRACK_DUST),
                                         CountedIngredient.ofItems(1, FactoryItems.COAL_DUST),
                                         CountedIngredient.ofItems(1, FactoryItems.SAW_DUST)
                                 ),
-                                2, 1, 15f, 0.3f, new ItemStack(Items.GUNPOWDER)),
+                                2, 1, 15f, 0.3f, new ItemStackTemplate(Items.GUNPOWDER)),
                         GenericMixingRecipe.ofCounted("ender_infused_amethyst_shard",
                                 List.of(CountedIngredient.ofItems(2, FactoryItems.ENDER_DUST),
                                         CountedIngredient.ofItems(1, Items.AMETHYST_SHARD)
                                 ),
-                                5, 5, 10f, 0.6f, new ItemStack(FactoryItems.ENDER_INFUSED_AMETHYST_SHARD)),
+                                5, 5, 10f, 0.6f, new ItemStackTemplate(FactoryItems.ENDER_INFUSED_AMETHYST_SHARD)),
                         GenericMixingRecipe.ofCounted("honey_block_to_liquid", "",
                                 List.of(CountedIngredient.ofItems(1, Items.HONEY_BLOCK)),
                                 null,
-                                6, 3, 10f, 0.3f, ItemStack.EMPTY, List.of(FactoryFluids.HONEY.ofBucket())),
+                                6, 3, 10f, 0.3f, Optional.empty(), List.of(FactoryFluids.HONEY.ofBucket())),
                         GenericMixingRecipe.ofCounted("slime_block_to_liquid", "slime_to_liquid",
                                 List.of(CountedIngredient.ofItems(1, Items.SLIME_BLOCK)),
                                 null,
-                                8, 3, 10f, 0.3f, ItemStack.EMPTY, List.of(FactoryFluids.SLIME.ofBucket())),
+                                8, 3, 10f, 0.3f, Optional.empty(), List.of(FactoryFluids.SLIME.ofBucket())),
                         GenericMixingRecipe.ofCounted("slime_ball_to_liquid", "slime_to_liquid",
                                 List.of(CountedIngredient.ofItems(1, Items.SLIME_BALL)),
                                 null,
-                                1, 3, 10f, 0.3f, ItemStack.EMPTY, List.of(FactoryFluids.SLIME.of(FluidConstants.BLOCK / 9))),
+                                1, 3, 10f, 0.3f, Optional.empty(), List.of(FactoryFluids.SLIME.of(FluidConstants.BLOCK / 9))),
                         GenericMixingRecipe.ofCounted("mud", "",
                                 List.of(CountedIngredient.ofItems(1, Items.DIRT)),
                                 List.of(FluidInputStack.from(FactoryFluids.WATER.ofBottle())),
-                                1, 6, 18f, 0f, Items.MUD.getDefaultInstance(), List.of()),
+                                1, 6, 18f, 0f, new ItemStackTemplate(Items.MUD), List.of()),
                         GenericMixingRecipe.ofCounted("snow_fluid", "",
                                 List.of(),
                                 List.of(FluidInputStack.from(FactoryFluids.WATER.of(800))),
-                                1, 1, 3f, Float.NEGATIVE_INFINITY, -0.05f, ItemStack.EMPTY, List.of(FactoryFluids.SNOW.of(1000)))
+                                1, 1, 3f, Float.NEGATIVE_INFINITY, -0.05f, Optional.empty(), List.of(FactoryFluids.SNOW.of(1000)))
                 );
 
                 for (var recipe : ((PotionBrewingAccessor) PotionBrewing.bootstrap(FeatureFlagSet.of(FeatureFlags.VANILLA))).getPotionMixes()) {
@@ -1556,8 +1560,8 @@ class RecipesProvider extends FabricRecipeProvider {
             }
 
             private void spoutMolds(TagKey<Item> tag, SpoutMolds mold) {
-                SimpleCookingRecipeBuilder.generic(Ingredient.of(mold.clay()), RecipeCategory.TOOLS, mold.hardened(),
-                        0, 40, RecipeSerializer.SMELTING_RECIPE, SmeltingRecipe::new)
+                SimpleCookingRecipeBuilder.generic(Ingredient.of(mold.clay()), RecipeCategory.TOOLS, CookingBookCategory.MISC, mold.hardened(),
+                        0, 40, SmeltingRecipe::new)
                         .unlockedBy("steel_ingot", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CLAY))
                         .group("polyfactory:hardened_molds")
                         .save(output);
@@ -1576,8 +1580,8 @@ class RecipesProvider extends FabricRecipeProvider {
             }
 
             private void spoutMolds(Item tag, SpoutMolds mold) {
-                SimpleCookingRecipeBuilder.generic(Ingredient.of(mold.clay()), RecipeCategory.TOOLS, mold.hardened(),
-                                0, 40, RecipeSerializer.SMELTING_RECIPE, SmeltingRecipe::new)
+                SimpleCookingRecipeBuilder.generic(Ingredient.of(mold.clay()), RecipeCategory.TOOLS, CookingBookCategory.MISC, mold.hardened(),
+                                0, 40, SmeltingRecipe::new)
                         .unlockedBy("steel_ingot", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CLAY))
                         .group("polyfactory:hardened_molds")
                         .save(output);

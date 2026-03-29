@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.polydex;
 
 import eu.pb4.sgui.api.elements.GuiElement;
+import eu.pb4.sgui.api.elements.SimpleGuiElement;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
@@ -9,7 +10,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import static eu.pb4.polyfactory.ModInit.LOGGER;
 
 public class PolydexCompat {
-    public static final boolean IS_PRESENT = FabricLoader.getInstance().isModLoaded("polydex2");
+    public static final boolean IS_PRESENT = FabricLoader.getInstance().isModLoaded("polydex");
 
 
     public static void register() {
@@ -25,7 +26,7 @@ public class PolydexCompat {
         if (IS_PRESENT) {
             return PolydexCompatImpl.getButton(type);
         }
-        return GuiElement.EMPTY;
+        return SimpleGuiElement.EMPTY;
     }
 
     public static void openUsagePage(ServerPlayer player, Identifier entry, Runnable runnable) {

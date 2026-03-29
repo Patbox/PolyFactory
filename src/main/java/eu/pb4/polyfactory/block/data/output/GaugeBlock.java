@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.data.output;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.block.QuickWaterloggable;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
@@ -28,7 +29,7 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -168,7 +169,7 @@ public class GaugeBlock extends DataNetworkBlock implements FactoryBlock, Config
     }
 
     public static class Model extends BlockModel implements ChanneledDataBlockEntity.InitDataListener {
-        private static final ItemStack HAND = ItemDisplayElementUtil.getSolidModel(id("block/gauge_hand"));
+        private static final LazyItemStack HAND = ItemDisplayElementUtil.getModel(id("block/gauge_hand"));
         private final ItemDisplayElement base;
         private final ItemDisplayElement hand = ItemDisplayElementUtil.createSimple(HAND);
         private ValueModifier modifier;
@@ -182,10 +183,10 @@ public class GaugeBlock extends DataNetworkBlock implements FactoryBlock, Config
             super();
             this.base = ItemDisplayElementUtil.createSimple();
             this.base.setScale(new Vector3f(2));
-            this.base.setTranslation(new Vector3f(0, 0,-7 / 16f));
+            this.base.setTranslation(new Vector3f(0, 0, -7 / 16f));
             this.hand.setTranslation(this.base.getTranslation());
             this.hand.setInterpolationDuration(1);
-            this.hand.setItem(HAND);
+            this.hand.setItem(HAND.get());
             this.position = state.getValue(HAND_POSITION).value();
             this.modifier = state.getValue(VALUE_MODIFIER);
             this.updateStatePos(state);
@@ -196,7 +197,7 @@ public class GaugeBlock extends DataNetworkBlock implements FactoryBlock, Config
         }
 
         protected void updateStatePos(BlockState state) {
-            this.base.setItem(state.getValue(STYLE).model);
+            this.base.setItem(state.getValue(STYLE).model.get());
             var orientation = state.getValue(ORIENTATION);
             var dir = orientation.front();
             float p = -90;
@@ -228,7 +229,7 @@ public class GaugeBlock extends DataNetworkBlock implements FactoryBlock, Config
         }
 
         private float calculateAngle(float progress) {
-            return (Mth.clamp( -this.modifier.apply(progress) - this.position, -0.5f, 0.5f) * 2 * 125 * Mth.DEG_TO_RAD);
+            return (Mth.clamp(-this.modifier.apply(progress) - this.position, -0.5f, 0.5f) * 2 * 125 * Mth.DEG_TO_RAD);
         }
 
         @Override
@@ -295,11 +296,11 @@ public class GaugeBlock extends DataNetworkBlock implements FactoryBlock, Config
         ;
 
         private final String name;
-        private final ItemStack model;
+        private final LazyItemStack model;
 
         Style(String name) {
             this.name = name;
-            this.model = ItemDisplayElementUtil.getSolidModel(id("block/gauge" + (name.equals("default") ? "" : "_" + name)));
+            this.model = ItemDisplayElementUtil.getModel(id("block/gauge" + (name.equals("default") ? "" : "_" + name)));
         }
 
         @Override

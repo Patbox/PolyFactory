@@ -45,8 +45,8 @@ public class SimpleInputGui extends AnvilInputGui {
     public void onInput(String input) {
         super.onInput(input);
         this.updateDone();
-        if (this.screenHandler != null) {
-            this.screenHandler.setRemoteSlot(2, ItemStack.EMPTY);
+        if (this.wrappedMenu != null) {
+            this.wrappedMenu.setRemoteSlot(2, ItemStack.EMPTY);
         }
     }
 
@@ -68,10 +68,10 @@ public class SimpleInputGui extends AnvilInputGui {
         if (this.consumer != null) {
             updateDone();
         }
-        var itemStack = GuiTextures.EMPTY.getItemStack().copy();
+        var itemStack = GuiTextures.EMPTY.asStack();
         itemStack.set(DataComponents.CUSTOM_NAME, Component.literal(input));
         itemStack.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, ReferenceSortedSets.emptySet()));
-        this.setSlot(0, itemStack, Objects.requireNonNull(this.getSlot(0)).getGuiCallback());
+        this.setSlot(0, itemStack, Objects.requireNonNull(this.getGuiElement(0)).getGuiCallback());
     }
 
     @Override

@@ -17,16 +17,17 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
 public record SimpleCastingRecipe(Optional<CountedIngredient> item, FluidStack<?> fluidInput,
-                                  ItemStack output, boolean copyComponents, int itemDamage, Holder<SoundEvent> soundEvent,
+                                  ItemStackTemplate output, boolean copyComponents, int itemDamage, Holder<SoundEvent> soundEvent,
                                   double time, double coolingTime) implements CastingRecipe {
     public static final MapCodec<SimpleCastingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     CountedIngredient.CODEC.optionalFieldOf("item").forGetter(SimpleCastingRecipe::item),
                     FluidStack.CODEC.fieldOf("fluid_input").forGetter(SimpleCastingRecipe::fluidInput),
-                    ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(SimpleCastingRecipe::output),
+                    ItemStackTemplate.CODEC.fieldOf("result").forGetter(SimpleCastingRecipe::output),
                     Codec.BOOL.optionalFieldOf("copy_components", false).forGetter(SimpleCastingRecipe::copyComponents),
                     Codec.INT.optionalFieldOf("item_damage", 0).forGetter(SimpleCastingRecipe::itemDamage),
                     SoundEvent.CODEC.optionalFieldOf("sound", FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED).forGetter(SimpleCastingRecipe::soundEvent),
@@ -36,27 +37,27 @@ public record SimpleCastingRecipe(Optional<CountedIngredient> item, FluidStack<?
     );
 
     public static SimpleCastingRecipe fluid(FluidStack<?> stack, Item out, SoundEvent sound, int coolingTime) {
-        return new SimpleCastingRecipe(Optional.empty(), stack, out.getDefaultInstance(), false, 0,
+        return new SimpleCastingRecipe(Optional.empty(), stack, new ItemStackTemplate(out), false, 0,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
     }
 
     public static SimpleCastingRecipe toItem(Item item, FluidStack<?> stack, Item out, SoundEvent sound, int coolingTime) {
-        return new SimpleCastingRecipe(Optional.of(CountedIngredient.ofItems(1, item)), stack, out.getDefaultInstance(), false, 0,
+        return new SimpleCastingRecipe(Optional.of(CountedIngredient.ofItems(1, item)), stack, new ItemStackTemplate(out), false, 0,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
     }
 
     public static SimpleCastingRecipe toItem(TagKey<Item> item, FluidStack<?> stack, Item out, SoundEvent sound, int coolingTime) {
-        return new SimpleCastingRecipe(Optional.of(CountedIngredient.fromTag(1, FactoryUtil.fakeTagList(item))), stack, out.getDefaultInstance(), false, 0,
+        return new SimpleCastingRecipe(Optional.of(CountedIngredient.fromTag(1, FactoryUtil.fakeTagList(item))), stack, new ItemStackTemplate(out), false, 0,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
     }
 
     public static SimpleCastingRecipe templateDamaged(TagKey<Item> template, FluidStack<?> stack, Item out, SoundEvent sound, double coolingTicks) {
-        return new SimpleCastingRecipe(Optional.of(CountedIngredient.fromTag(0, FactoryUtil.fakeTagList(template))), stack, out.getDefaultInstance(), false, 1,
+        return new SimpleCastingRecipe(Optional.of(CountedIngredient.fromTag(0, FactoryUtil.fakeTagList(template))), stack, new ItemStackTemplate(out), false, 1,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), CastingRecipe.getTime(stack.instance(), stack.amount()),coolingTicks);
     }
 
     public static SimpleCastingRecipe templateDamaged(Item template, FluidStack<?> stack, Item out, SoundEvent sound, double coolingTicks) {
-        return new SimpleCastingRecipe(Optional.of(CountedIngredient.ofItems(0, template)), stack, out.getDefaultInstance(), false, 1,
+        return new SimpleCastingRecipe(Optional.of(CountedIngredient.ofItems(0, template)), stack, new ItemStackTemplate(out), false, 1,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTicks);
     }
 
@@ -90,8 +91,8 @@ public record SimpleCastingRecipe(Optional<CountedIngredient> item, FluidStack<?
     }
 
     @Override
-    public ItemStack assemble(SingleItemWithFluid input, HolderLookup.Provider lookup) {
-        var out = output.copy();
+    public ItemStack assemble(SingleItemWithFluid input) {
+        var out = output.create();
         if (this.copyComponents) {
             out.applyComponentsAndValidate(input.stack().getComponentsPatch());
         }

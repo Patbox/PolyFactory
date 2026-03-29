@@ -6,6 +6,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -15,14 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShapelessNbtCopyRecipe extends ShapelessRecipe {
-    private final ItemStack result;
+    private final ItemStackTemplate result;
     private final Ingredient source;
     private final List<Ingredient> ingredientsOg;
     public static MapCodec<ShapelessNbtCopyRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) -> {
         return instance.group(
-                        Codec.STRING.optionalFieldOf("group", "").forGetter(ShapelessNbtCopyRecipe::group),
-                        CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter(ShapelessNbtCopyRecipe::category),
-                        ItemStack.CODEC.fieldOf("result").forGetter(t -> t.result),
+                        CommonInfo.MAP_CODEC.forGetter(t -> t.commonInfo),
+                        CraftingBookInfo.MAP_CODEC.forGetter(t -> t.bookInfo),
+                        ItemStackTemplate.CODEC.fieldOf("result").forGetter(t -> t.result),
                         Ingredient.CODEC.fieldOf("source").forGetter(t -> t.source),
                         Ingredient.CODEC.listOf().fieldOf("ingredients").flatXmap((ingredients) -> {
                             return ingredients.size() > 8 ? DataResult.error(() -> {
@@ -32,8 +33,8 @@ public class ShapelessNbtCopyRecipe extends ShapelessRecipe {
                 .apply(instance, ShapelessNbtCopyRecipe::new);
     });
 
-    public ShapelessNbtCopyRecipe(String group, CraftingBookCategory category, ItemStack result, Ingredient source, List<Ingredient> ingredients) {
-        super(group, category, result, merge(ingredients, source));
+    public ShapelessNbtCopyRecipe(CommonInfo info, CraftingBookInfo craftingBookInfo, ItemStackTemplate result, Ingredient source, List<Ingredient> ingredients) {
+        super(info, craftingBookInfo, result, merge(ingredients, source));
         this.ingredientsOg = ingredients;
         this.result = result;
         this.source = source;
@@ -47,8 +48,8 @@ public class ShapelessNbtCopyRecipe extends ShapelessRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput recipeInputInventory, HolderLookup.Provider dynamicRegistryManager) {
-        var stack = super.assemble(recipeInputInventory, dynamicRegistryManager);
+    public ItemStack assemble(CraftingInput recipeInputInventory) {
+        var stack = super.assemble(recipeInputInventory);
         for (var tmp : recipeInputInventory.items()) {
             if (this.source.test(tmp)) {
                 stack.applyComponents(tmp.getComponents());

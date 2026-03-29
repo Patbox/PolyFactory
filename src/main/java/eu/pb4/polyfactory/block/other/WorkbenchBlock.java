@@ -10,6 +10,7 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -42,7 +43,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
 
 public class WorkbenchBlock extends Block implements FactoryBlock, EntityBlock, BarrierBasedWaterloggable {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -132,7 +132,7 @@ public class WorkbenchBlock extends Block implements FactoryBlock, EntityBlock, 
         protected final ItemDisplayElement[] items = new ItemDisplayElement[9];
 
         public Model(BlockState state) {
-            this.base = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
             for (int i = 0; i < 9; i++) {
                 var element = ItemDisplayElementUtil.createSimple();

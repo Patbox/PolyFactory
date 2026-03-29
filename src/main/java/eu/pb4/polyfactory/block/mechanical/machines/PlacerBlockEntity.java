@@ -23,6 +23,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.NameAndId;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -85,8 +86,8 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         }
 
 
-        if (!CommonProtection.canPlaceBlock(world, blockPos, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner, null) ||
-                !CommonProtection.canInteractBlock(world, blockPos, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner, null)) {
+        if (!CommonProtection.canPlaceBlock(world, blockPos, new NameAndId(self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner), null) ||
+                !CommonProtection.canInteractBlock(world, blockPos, new NameAndId(self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner), null)) {
             self.stress = 0;
             return;
         }
@@ -152,7 +153,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
                 p.setPosRaw(vec.x, vec.y, vec.z);
 
                 for (var entity : entities) {
-                    var interaction = p.interactOn(entity, InteractionHand.MAIN_HAND);
+                    var interaction = p.interactOn(entity, InteractionHand.MAIN_HAND, Vec3.ZERO);
                     thrower.dropContentsWithoutTool(p.getInventory());
 
                     if (interaction.consumesAction()) {
@@ -293,13 +294,13 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
         public Gui(ServerPlayer player) {
             super(MenuType.HOPPER, player, false);
             this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(PlacerBlockEntity.this.getBlockState().getBlock().getName()));
-            this.setSlotRedirect(2, new PredicateLimitedSlot(PlacerBlockEntity.this, 0, s -> s.getItem() instanceof BlockItem || s.is(FactoryItemTags.PLACER_USABLE)));
+            this.setSlot(2, new PredicateLimitedSlot(PlacerBlockEntity.this, 0, s -> s.getItem() instanceof BlockItem || s.is(FactoryItemTags.PLACER_USABLE)));
             this.open();
         }
 
         @Override
-        public void onClose() {
-            super.onClose();
+        public void onManualClose() {
+            super.onManualClose();
         }
 
         @Override

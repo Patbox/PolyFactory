@@ -46,4 +46,14 @@ public interface DrainRecipe extends Recipe<DrainInput> {
     default PlacementInfo placementInfo() {
         return PlacementInfo.NOT_PLACEABLE;
     }
+
+    @Override
+    default boolean showNotification() {
+        return false;
+    }
+
+    @Override
+    default String group() {
+        return "";
+    }
 }

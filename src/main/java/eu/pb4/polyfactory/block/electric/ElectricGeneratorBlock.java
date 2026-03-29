@@ -19,7 +19,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -120,8 +120,8 @@ public class ElectricGeneratorBlock extends AxisAndFacingNetworkBlock implements
         private final ItemDisplayElement base;
 
         public Model(BlockState state) {
-            this.axle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
-            this.base = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
+            this.axle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL.get(), this.getUpdateRate(), 0.3f, 0.6f);
+            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);

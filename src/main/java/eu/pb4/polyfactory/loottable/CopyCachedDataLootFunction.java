@@ -1,23 +1,19 @@
 package eu.pb4.polyfactory.loottable;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import eu.pb4.polyfactory.block.data.util.DataCache;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
-import eu.pb4.polyfactory.item.util.ColoredItem;
-import eu.pb4.polyfactory.util.ColorProvider;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
 public class CopyCachedDataLootFunction implements LootItemFunction {
     public static final CopyCachedDataLootFunction INSTANCE = new CopyCachedDataLootFunction();
-    public static final LootItemFunctionType<CopyCachedDataLootFunction> TYPE = new LootItemFunctionType<>(MapCodec.unit(INSTANCE));
+    public static final MapCodec<CopyCachedDataLootFunction> TYPE = MapCodec.unit(INSTANCE);
 
     @Override
-    public LootItemFunctionType<CopyCachedDataLootFunction> getType() {
+    public MapCodec<? extends LootItemFunction> codec() {
         return TYPE;
     }
 

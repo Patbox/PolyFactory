@@ -8,6 +8,8 @@ import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
+
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -24,7 +26,7 @@ public class SimpleDrainRecipePage extends DrainRecipePage<SimpleDrainRecipe> {
 
     @Override
     protected ItemStack getResultStack() {
-        return this.recipe.output();
+        return this.recipe.output().create();
     }
 
     @Override
@@ -42,7 +44,7 @@ public class SimpleDrainRecipePage extends DrainRecipePage<SimpleDrainRecipe> {
         if (this.recipe.catalyst().isPresent()) {
             return List.of(
                     this.recipe.item(),
-                    new CountedIngredient(this.recipe.catalyst(), ItemComponentPredicate.EMPTY, 0, ItemStack.EMPTY)
+                    new CountedIngredient(this.recipe.catalyst(), ItemComponentPredicate.EMPTY, 0, Optional.empty())
             );
         }
 

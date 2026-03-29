@@ -78,7 +78,7 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
         }
         var goodDir = nozzle.getBlockState().getValue(NozzleBlock.FACING);
 
-        if (!nozzle.world().getChunkSource().chunkMap.getDistanceManager().inEntityTickingRange(ChunkPos.asLong(pos.relative(goodDir)))) {
+        if (!nozzle.world().getChunkSource().chunkMap.getDistanceManager().inEntityTickingRange(ChunkPos.pack(pos.relative(goodDir)))) {
             return;
         }
 
@@ -161,7 +161,7 @@ public class NozzleBlockEntity extends BlockEntity implements FluidInput.Contain
 
     @Override
     public RandomSource random() {
-        return this.level.random;
+        return this.level.getRandom();
     }
 
     @Override

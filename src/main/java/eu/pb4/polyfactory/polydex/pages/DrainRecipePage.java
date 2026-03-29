@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.polydex.pages;
 
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polydex.api.v1.recipe.PageBuilder;
 import eu.pb4.polydex.api.v1.recipe.PolydexEntry;
 import eu.pb4.polydex.api.v1.recipe.PolydexIngredient;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class DrainRecipePage<T extends DrainRecipe> extends PrioritizedRecipePage<T> {
-    private static final ItemStack ICON = FactoryItems.DRAIN.getDefaultInstance();
+    private final ItemStack ICON = FactoryItems.DRAIN.getDefaultInstance();
     private final List<PolydexIngredient<?>> ingredients;
     private final List<PolydexStack<?>> output = new ArrayList<>();
     private final PolydexStack<ItemStack> displayResult;
@@ -46,9 +47,13 @@ public abstract class DrainRecipePage<T extends DrainRecipe> extends Prioritized
     }
 
     protected abstract ItemStack getResultStack();
+
     protected abstract List<FluidStack<?>> getBaseFluids();
+
     protected abstract List<FluidStack<?>> getResultFluids();
+
     protected abstract List<CountedIngredient> getBaseIngredient();
+
     @Override
     public @Nullable Component texture(ServerPlayer player) {
         return Component.empty()
@@ -61,6 +66,7 @@ public abstract class DrainRecipePage<T extends DrainRecipe> extends Prioritized
                 }))
                 .append(Component.literal("" + GuiTextures.DRAIN_POLYDEX_FLUID_OFFSET_N + GuiTextures.POLYDEX_OFFSET).setStyle(UiResourceCreator.STYLE));
     }
+
     @Override
     public boolean isOwner(MinecraftServer server, PolydexEntry entry) {
         for (var i : this.output) {

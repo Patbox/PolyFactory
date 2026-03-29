@@ -162,7 +162,7 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
                 this.lines = list.toArray(new String[0]);
             }
         } else if (this.stack.has(DataComponents.JUKEBOX_PLAYABLE)) {
-            var song = JukeboxSong.fromStack(this.level.registryAccess(), this.stack);
+            var song = JukeboxSong.fromStack(this.stack);
             this.lines = song.map(jukeboxSongRegistryEntry -> new String[]{jukeboxSongRegistryEntry.value().description().getString()}).orElseGet(() -> new String[]{this.stack.getHoverName().getString()});
         } else if (!this.stack.isEmpty()) {
             this.lines = new String[]{this.stack.getHoverName().getString()};
@@ -218,13 +218,13 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
         public Gui(ServerPlayer player) {
             super(MenuType.HOPPER, player, false);
             this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(ItemReaderBlockEntity.this.getBlockState().getBlock().getName()));
-            this.setSlotRedirect(2, new Slot(ItemReaderBlockEntity.this, 0, 0, 0));
+            this.setSlot(2, new Slot(ItemReaderBlockEntity.this, 0, 0, 0));
             this.open();
         }
 
         @Override
-        public void onClose() {
-            super.onClose();
+        public void onManualClose() {
+            super.onManualClose();
         }
 
         @Override

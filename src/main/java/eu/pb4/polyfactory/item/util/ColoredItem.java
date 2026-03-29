@@ -4,10 +4,13 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryColors;
 import java.util.Locale;
+
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 
 public interface ColoredItem {
     static ItemStack stack(Item input, int count, DyeColor color) {
@@ -17,6 +20,14 @@ public interface ColoredItem {
         var stack = new ItemStack(input, count);
         setColor(stack, color);
         return stack;
+    }
+
+    static ItemStackTemplate template(Item input, int count, int color) {
+        return new ItemStackTemplate(input.builtInRegistryHolder(), count, DataComponentPatch.builder().set(FactoryDataComponents.COLOR, color).build());
+    }
+
+    static ItemStackTemplate template(Item input, int count, DyeColor dyeColor) {
+        return template(input, count, DyeColorExtra.getColor(dyeColor));
     }
 
     static ItemStack stackCrafting(Item input, int count, int color) {

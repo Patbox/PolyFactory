@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
@@ -46,7 +47,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.*;
 
@@ -122,7 +123,7 @@ public class ChainDriveBlock extends AxleBlock implements EntityBlock {
 
         var delta = 0.5d / entry.distance;
 
-        player.displayClientMessage((switch (cost) {
+        player.sendSystemMessage((switch (cost) {
             case -2 -> Component.translatable("block.polyfactory.chain_drive.invalid_too_far");
             case -1 -> Component.translatable("block.polyfactory.chain_drive.invalid_angle");
             default -> Component.translatable("block.polyfactory.chain_drive.required_chains", cost, stack.getHoverName());
@@ -244,15 +245,15 @@ public class ChainDriveBlock extends AxleBlock implements EntityBlock {
     }
 
     public static final class Model extends RotationAwareModel {
-        private static final ItemStack CHAIN = ItemDisplayElementUtil.getSolidModel(id("block/chain_drive_chain"));
-        private static final ItemStack CHAIN_1 = ItemDisplayElementUtil.getSolidModel(id("block/chain_drive_chain_1"));
-        private static final ItemStack CHAIN_2 = ItemDisplayElementUtil.getSolidModel(id("block/chain_drive_chain_2"));
+        private static final LazyItemStack CHAIN = ItemDisplayElementUtil.getModel(id("block/chain_drive_chain"));
+        private static final LazyItemStack CHAIN_1 = ItemDisplayElementUtil.getModel(id("block/chain_drive_chain_1"));
+        private static final LazyItemStack CHAIN_2 = ItemDisplayElementUtil.getModel(id("block/chain_drive_chain_2"));
         private final ItemDisplayElement mainElement;
         private final Map<BlockPos, Entry> entries = new HashMap<>();
         private float lastRotation = 0;
 
         private Model(ServerLevel world, BlockState state, BlockPos pos) {
-            this.mainElement = LodItemDisplayElement.createSimple(ItemDisplayElementUtil.getSolidModel(state.getBlock().asItem()),
+            this.mainElement = LodItemDisplayElement.createSimple(ItemDisplayElementUtil.getModel(state.getBlock().asItem()).get(),
                     this.getUpdateRate(), 0.3f, 0.6f);
             this.mainElement.setViewRange(0.7f);
             this.updateAnimation(0, state.getValue(AXIS), pos);
@@ -359,7 +360,7 @@ public class ChainDriveBlock extends AxleBlock implements EntityBlock {
 
             int i = 0;
             for (var x = 0d; x <= doubleDistance; x += 0.5f) {
-                var item = ChainItemDisplayElement.create(i++ % 2 == 0 ? CHAIN_1 : CHAIN_2, 4, this.getPos(), middle, otherPos);
+                var item = ChainItemDisplayElement.create((i++ % 2 == 0 ? CHAIN_1 : CHAIN_2).get(), 4, this.getPos(), middle, otherPos);
                 //item.setDisplaySize(0, 0);
                 item.setViewRange(0.65f);
                 item.setScale(new Vector3f(2));

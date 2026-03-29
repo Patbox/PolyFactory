@@ -3,9 +3,9 @@ package eu.pb4.polyfactory.datagen;
 import com.mojang.serialization.Codec;
 import eu.pb4.polyfactory.item.FactoryEnchantmentEffectComponents;
 import eu.pb4.polyfactory.item.FactoryEnchantments;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricCodecDataProvider;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -21,7 +21,7 @@ import java.util.function.BiConsumer;
 
 public class EnchantmentProvider extends FabricCodecDataProvider<Enchantment> {
 
-    protected EnchantmentProvider(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+    protected EnchantmentProvider(FabricPackOutput dataOutput, CompletableFuture<HolderLookup.Provider> registriesFuture) {
         super(dataOutput, registriesFuture, Registries.ENCHANTMENT, Enchantment.DIRECT_CODEC);
     }
 
@@ -40,8 +40,8 @@ public class EnchantmentProvider extends FabricCodecDataProvider<Enchantment> {
         return "factory ench";
     }
 
-    public static class Tags extends FabricTagProvider<Enchantment> {
-        public Tags(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+    public static class Tags extends FabricTagsProvider<Enchantment> {
+        public Tags(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
             super(output, Registries.ENCHANTMENT, registriesFuture);
         }
 

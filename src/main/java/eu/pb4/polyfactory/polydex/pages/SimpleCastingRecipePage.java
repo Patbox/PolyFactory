@@ -15,7 +15,7 @@ public class SimpleCastingRecipePage extends CastingRecipePage<SimpleCastingReci
 
     @Override
     protected ItemStack getResultStack() {
-        return this.recipe.output();
+        return this.recipe.output().create();
     }
 
     @Override

@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical.source;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.block.MultiBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
@@ -49,7 +50,7 @@ import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Overwrite;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -60,7 +61,6 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, Entity
 
     public SteamEngineBlock(Properties settings) {
         super(2, 3, 2, settings);
-        Model.AXLE.getItem();
         this.registerDefaultState(this.defaultBlockState().setValue(LIT, false));
     }
 
@@ -193,9 +193,9 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, Entity
     }
 
     public final class Model extends RotationAwareModel {
-        public static final ItemStack AXLE = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/steam_engine_axle"));
-        public static final ItemStack LIT = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/steam_engine_lit"));
-        public static final ItemStack LINK = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/steam_engine_link"));
+        public static final LazyItemStack AXLE = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/steam_engine_axle"));
+        public static final LazyItemStack LIT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/steam_engine_lit"));
+        public static final LazyItemStack LINK = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/steam_engine_link"));
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement main;
@@ -204,8 +204,8 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, Entity
         private final LodItemDisplayElement axle;
 
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.getValue(SteamEngineBlock.LIT) ? LIT
-                    : ItemDisplayElementUtil.getSolidModel(FactoryItems.STEAM_ENGINE));
+            this.main = ItemDisplayElementUtil.createSimple((state.getValue(SteamEngineBlock.LIT) ? LIT
+                    : ItemDisplayElementUtil.getModel(FactoryItems.STEAM_ENGINE)).get());
             this.main.setScale(new Vector3f(2));
             var facing = state.getValue(FACING);
             var offset = new Vec3(
@@ -216,14 +216,14 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, Entity
             this.main.setOffset(offset);
             this.main.setDisplaySize(3, 3);
             offset = offset.add(0, 2, 0);
-            this.axle = LodItemDisplayElement.createSimple(AXLE, 4);
+            this.axle = LodItemDisplayElement.createSimple(AXLE.get(), 4);
             this.axle.setOffset(offset);
             this.axle.setScale(new Vector3f(2));
             this.axle.setDisplaySize(3,3);
-            this.rotatingA = LodItemDisplayElement.createSimple(LINK, 4);
+            this.rotatingA = LodItemDisplayElement.createSimple(LINK.get(), 4);
             this.rotatingA.setOffset(offset);
             this.rotatingA.setDisplaySize(3, 3);
-            this.rotatingB = LodItemDisplayElement.createSimple(LINK, 4);
+            this.rotatingB = LodItemDisplayElement.createSimple(LINK.get(), 4);
             this.rotatingB.setOffset(offset);
             this.rotatingB.setDisplaySize(3, 3);
 
@@ -241,8 +241,8 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, Entity
             var direction = state.getValue(FACING);
 
             this.main.setYaw(direction.toYRot());
-            this.main.setItem(state.getValue(SteamEngineBlock.LIT) ? LIT
-                    : ItemDisplayElementUtil.getSolidModel(FactoryItems.STEAM_ENGINE));
+            this.main.setItem((state.getValue(SteamEngineBlock.LIT) ? LIT
+                    : ItemDisplayElementUtil.getModel(FactoryItems.STEAM_ENGINE)).get());
             this.axle.setYaw(direction.toYRot());
             this.rotatingA.setYaw(direction.toYRot());
             this.rotatingB.setYaw(direction.toYRot());

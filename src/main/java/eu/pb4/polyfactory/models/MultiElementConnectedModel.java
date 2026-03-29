@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.models;
 
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.property.ConnectablePart;
 import eu.pb4.polyfactory.block.property.FactoryProperties;
@@ -17,7 +18,7 @@ public class MultiElementConnectedModel {
     private final EnumProperty<ConnectablePart> PART_X = FactoryProperties.CONNECTABLE_PART_X;
     private static final EnumProperty<ConnectablePart> PART_Y = FactoryProperties.CONNECTABLE_PART_Y;
     private static final EnumProperty<ConnectablePart> PART_Z = FactoryProperties.CONNECTABLE_PART_Z;
-    private final ItemStack[] models = new ItemStack[64];
+    private final LazyItemStack[] models = new LazyItemStack[64];
 
     public static final Identifier WITH_INNER = id("block/directional_cube_inner");
     private static final Identifier EMPTY = id("block/empty");
@@ -45,14 +46,16 @@ public class MultiElementConnectedModel {
         this.side = side;
         this.bottom = bottom;
         this.parent = parent;
-        this.models[index(ConnectablePart.MIDDLE, ConnectablePart.MIDDLE, ConnectablePart.MIDDLE)] = ItemStack.EMPTY;
+        var lazyEmpty = new LazyItemStack(() -> ItemStack.EMPTY);
+
+        this.models[index(ConnectablePart.MIDDLE, ConnectablePart.MIDDLE, ConnectablePart.MIDDLE)] = lazyEmpty;
 
         for (var x : ConnectablePart.values()) {
             for (var y : ConnectablePart.values()) {
                 for (var z : ConnectablePart.values()) {
                     var i = index(x, y, z);
                     if (this.models[i] == null) {
-                        this.models[i] = ItemDisplayElementUtil.getSolidModel(base.withSuffix("/" + x.getSerializedName() + "_" + y.getSerializedName() + "_" + z.getSerializedName()));
+                        this.models[i] = ItemDisplayElementUtil.getModel(base.withSuffix("/" + x.getSerializedName() + "_" + y.getSerializedName() + "_" + z.getSerializedName()));
                     }
                 }
             }
@@ -111,7 +114,7 @@ public class MultiElementConnectedModel {
     }
 
     public ItemStack get(ConnectablePart x, ConnectablePart y, ConnectablePart z) {
-        return this.models[index(x, y, z)];
+        return this.models[index(x, y, z)].get();
     }
 
     private static int index(ConnectablePart x, ConnectablePart y, ConnectablePart z) {

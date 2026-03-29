@@ -12,6 +12,7 @@ import eu.pb4.polyfactory.recipe.input.SingleItemWithFluid;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
+import net.minecraft.world.item.ItemStackTemplate;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.Nullable;
 
@@ -129,7 +130,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
                 return;
             }
 
-            var itemOut = self.currentRecipe.value().assemble(input, world.registryAccess());
+            var itemOut = self.currentRecipe.value().assemble(input);
             self.setItem(OUTPUT_FIRST, itemOut);
 
             if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayer serverPlayer) {
@@ -149,7 +150,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
                     if (x.has(DataComponents.BREAK_SOUND)) {
                         world.playSound(null, pos, x.get(DataComponents.BREAK_SOUND).value(), SoundSource.BLOCKS);
                     }
-                    ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, x),
+                    ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(x)),
                             pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.51, 5,
                             0.2, 0, 0.2, 0.5);
                 }

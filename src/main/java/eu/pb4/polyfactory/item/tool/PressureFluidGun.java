@@ -11,8 +11,13 @@ import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.PolymerItem;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.Consumable;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +32,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ChargedProjectiles;
 import net.minecraft.world.level.Level;
 
@@ -156,10 +157,10 @@ public class PressureFluidGun extends Item implements PolymerItem {
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context) {
-        var out = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, context);
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context, HolderLookup.Provider lookup) {
+        var out = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, context, lookup);
         if (this.useCrossbowModel(itemStack)) {
-            out.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.of(Items.ARROW.getDefaultInstance()));
+            out.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.of(new ItemStackTemplate(Items.ARROW)));
             /*out.set(DataComponentTypes.ATTRIBUTE_MODIFIERS, out.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT)
                     .with(
                             EntityAttributes.GENERIC_ATTACK_SPEED,
@@ -183,7 +184,8 @@ public class PressureFluidGun extends Item implements PolymerItem {
     }
 
     private boolean useCrossbowModel(ItemStack itemStack) {
-        return useActiveModel(itemStack) && PacketContext.get().getEncodedPacket() instanceof ClientboundSetEquipmentPacket;
+        // Todo?
+        return false /*useActiveModel(itemStack) /*&& PacketContext.get().getEncodedPacket() instanceof ClientboundSetEquipmentPacket*/;
     }
 
     private boolean useActiveModel(ItemStack itemStack) {

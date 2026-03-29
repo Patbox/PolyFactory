@@ -45,4 +45,14 @@ public interface PressRecipe extends Recipe<PressInput> {
     default boolean fluidsRequired() {
         return false;
     }
+
+    @Override
+    default boolean showNotification() {
+        return false;
+    }
+
+    @Override
+    default String group() {
+        return "";
+    }
 }

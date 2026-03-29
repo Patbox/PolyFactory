@@ -1,8 +1,11 @@
 package eu.pb4.polyfactory.ui;
 
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
+import eu.pb4.sgui.api.elements.GuiElementBuilderCreator;
+import eu.pb4.sgui.api.elements.ItemStackBuilder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
@@ -37,7 +40,7 @@ public class GuiTextures {
     public static final Function<Component, Component> TEXT_INPUT = backgroundAnvil("text_input");
     public static final Function<Component, Component> DATA_EXTRACTOR = backgroundAnvil("data_extractor");
     public static final Supplier<GuiElementBuilder> EMPTY_BUILDER = icon16("empty");
-    public static final GuiElement EMPTY = EMPTY_BUILDER.get().hideTooltip().build();
+    public static final GuiElementBuilder EMPTY = EMPTY_BUILDER.get().hideTooltip();
     public static final Supplier<GuiElementBuilder> POLYDEX_BUTTON = icon32("polydex");
     public static final Supplier<GuiElementBuilder> PLUS_BUTTON = icon32("button/plus");
     public static final Supplier<GuiElementBuilder> MINUS_BUTTON = icon32("button/minus");
@@ -65,10 +68,10 @@ public class GuiTextures {
         }
     });
 
-    public static final ItemStack ITEM_FILTER_BLOCKED = icon16("item_filter_blocked").get().asStack();
+    public static final LazyItemStack ITEM_FILTER_BLOCKED = new LazyItemStack(icon16("item_filter_blocked").get()::asStack);
 
-    public static final ItemStack LEFT_SHIFTED_3_BARS = new GuiElementBuilder(Items.TRIAL_KEY).hideTooltip().model(id("-/sgui/left_shifted_3_bars")).asStack();
-    public static final ItemStack DEEP_STORAGE_UNIT_SELECTED = new GuiElementBuilder(Items.TRIAL_KEY).hideTooltip().model(id("-/sgui/deep_storage_unit_selected")).asStack();
+    public static final LazyItemStack LEFT_SHIFTED_3_BARS = new LazyItemStack(new GuiElementBuilder(Items.TRIAL_KEY).hideTooltip().model(id("-/sgui/left_shifted_3_bars"))::asStack);
+    public static final LazyItemStack DEEP_STORAGE_UNIT_SELECTED = new LazyItemStack(new GuiElementBuilder(Items.TRIAL_KEY).hideTooltip().model(id("-/sgui/deep_storage_unit_selected"))::asStack);
     public static final Progress FLAME = Progress.createVertical("flame", 1, 14, true);
     public static final Progress ICE = Progress.createVertical("ice", 1, 14, true);
     public static final Progress FLAME_OFFSET_RIGHT = Progress.createVertical32Right("flame_offset_right", 9, 22, true);
@@ -81,49 +84,48 @@ public class GuiTextures {
     public static final Temperature TEMPERATURE_OFFSET_RIGHT = new Temperature(FLAME_OFFSET_RIGHT, ICE_OFFSET_RIGHT);
     public static final IntFunction<GuiElementBuilder>[] NUMBERS_FLAT_24 = createNumbers(8 * 3, false, 0);
     public static final IntFunction<GuiElementBuilder>[] NUMBERS_SHADOW_8 = createNumbers(8, true, 0);
-    public static final char SPACE_1 = UiResourceCreator.space(1);
-    public static final char SPACE_5 = UiResourceCreator.space(5);
-    public static final char SPACE_10 = UiResourceCreator.space(10);
-    public static final char SPACE_20 = UiResourceCreator.space(20);
-    public static final char SPACE_50 = UiResourceCreator.space(50);
-    public static final char SPACE_100 = UiResourceCreator.space(100);
-    public static final char BLUEPRINT_WORKSTATION_EXTRA_OFFSET = UiResourceCreator.space(-29 + 8);
-    public static final char POLYDEX_OFFSET = UiResourceCreator.space(168);
-    public static final char POLYDEX_OFFSET_N = UiResourceCreator.space(-168);
-    public static final char MIXER_FLUID_OFFSET = UiResourceCreator.space(28 - 8);
-    public static final char MIXER_FLUID_OFFSET_N = UiResourceCreator.space(-28 + 8);
-    public static final char MECHANICAL_DRAIN_FLUID_OFFSET = UiResourceCreator.space(118 - 8);
-    public static final char MECHANICAL_DRAIN_FLUID_OFFSET_N = UiResourceCreator.space(-118 + 8);
-    public static final char MECHANICAL_SPOUT_FLUID_OFFSET = UiResourceCreator.space(46 - 8);
-    public static final char MECHANICAL_SPOUT_FLUID_OFFSET_N = UiResourceCreator.space(-46 + 8);
-    public static final char SMELTERY_FLUID_OFFSET = UiResourceCreator.space(99 - 8);
-    public static final char SMELTERY_FLUID_OFFSET_N = UiResourceCreator.space(-99 + 8);
-    public static final char DRAIN_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(110 + 7);
-    public static final char DRAIN_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-110 - 7);
-    public static final char SPOUT_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(38 + 7);
-    public static final char SPOUT_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-38 - 7);
-    public static final char MIXER_POLYDEX_FLUID_OFFSET_1 = UiResourceCreator.space(28 - 8 + 7);
-    public static final char MIXER_POLYDEX_FLUID_OFFSET_2 = UiResourceCreator.space(108);
-    public static final char MIXER_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-28 + 8 - 7 - 108);
-    public static final char SMELTERY_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(91 + 7);
-    public static final char SMELTERY_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-91 - 7);
-    public static final char PRESS_POLYDEX_FLUID_OFFSET = UiResourceCreator.space(107 - 8);
-    public static final char PRESS_POLYDEX_FLUID_OFFSET_N = UiResourceCreator.space(-107 + 8);
-    public static final char NEGATIVE_SPACE_1 = UiResourceCreator.space(-1);
-    public static final char NEGATIVE_SPACE_5000 = UiResourceCreator.space(-5000);
-    public static final char NEGATIVE_SPACE_2500 = UiResourceCreator.space(-2500);
-    public static final char NEGATIVE_SPACE_1024 = UiResourceCreator.space(-1024);
-    public static final char NEGATIVE_SPACE_100 = UiResourceCreator.space(-100);
-    public static final char NEGATIVE_SPACE_50 = UiResourceCreator.space(-50);
-    public static final char NEGATIVE_SPACE_20 = UiResourceCreator.space(-20);
-    public static final char NEGATIVE_SPACE_10 = UiResourceCreator.space(-10);
-    public static final char SPACE_2500 = UiResourceCreator.space(2500);
-    public static final char SPACE_5000 = UiResourceCreator.space(5000);
+    public static final char SPACE_1 = space(1);
+    public static final char SPACE_5 = space(5);
+    public static final char SPACE_10 = space(10);
+    public static final char SPACE_20 = space(20);
+    public static final char SPACE_50 = space(50);
+    public static final char SPACE_100 = space(100);
+    public static final char BLUEPRINT_WORKSTATION_EXTRA_OFFSET = space(-29 + 8);
+    public static final char POLYDEX_OFFSET = space(168);
+    public static final char POLYDEX_OFFSET_N = space(-168);
+    public static final char MIXER_FLUID_OFFSET = space(28 - 8);
+    public static final char MIXER_FLUID_OFFSET_N = space(-28 + 8);
+    public static final char MECHANICAL_DRAIN_FLUID_OFFSET = space(118 - 8);
+    public static final char MECHANICAL_DRAIN_FLUID_OFFSET_N = space(-118 + 8);
+    public static final char MECHANICAL_SPOUT_FLUID_OFFSET = space(46 - 8);
+    public static final char MECHANICAL_SPOUT_FLUID_OFFSET_N = space(-46 + 8);
+    public static final char SMELTERY_FLUID_OFFSET = space(99 - 8);
+    public static final char SMELTERY_FLUID_OFFSET_N = space(-99 + 8);
+    public static final char DRAIN_POLYDEX_FLUID_OFFSET = space(110 + 7);
+    public static final char DRAIN_POLYDEX_FLUID_OFFSET_N = space(-110 - 7);
+    public static final char SPOUT_POLYDEX_FLUID_OFFSET = space(38 + 7);
+    public static final char SPOUT_POLYDEX_FLUID_OFFSET_N = space(-38 - 7);
+    public static final char MIXER_POLYDEX_FLUID_OFFSET_1 = space(28 - 8 + 7);
+    public static final char MIXER_POLYDEX_FLUID_OFFSET_2 = space(108);
+    public static final char MIXER_POLYDEX_FLUID_OFFSET_N = space(-28 + 8 - 7 - 108);
+    public static final char SMELTERY_POLYDEX_FLUID_OFFSET = space(91 + 7);
+    public static final char SMELTERY_POLYDEX_FLUID_OFFSET_N = space(-91 - 7);
+    public static final char PRESS_POLYDEX_FLUID_OFFSET = space(107 - 8);
+    public static final char PRESS_POLYDEX_FLUID_OFFSET_N = space(-107 + 8);
+    public static final char NEGATIVE_SPACE_1 = space(-1);
+    public static final char NEGATIVE_SPACE_5000 = space(-5000);
+    public static final char NEGATIVE_SPACE_2500 = space(-2500);
+    public static final char NEGATIVE_SPACE_1024 = space(-1024);
+    public static final char NEGATIVE_SPACE_100 = space(-100);
+    public static final char NEGATIVE_SPACE_50 = space(-50);
+    public static final char NEGATIVE_SPACE_20 = space(-20);
+    public static final char NEGATIVE_SPACE_10 = space(-10);
+    public static final char SPACE_2500 = space(2500);
+    public static final char SPACE_5000 = space(5000);
 
-    public static final char INVIS_LINE_RAW = UiResourceCreator.font(id("sgui/invis_line"), 7, 8);
+    public static final char INVIS_LINE_RAW = font(id("sgui/invis_line"), 7, 8);
 
-    public static final char DARKENER = UiResourceCreator.font(id("sgui/darkener"), 200, 5000);
-
+    public static final char DARKENER = font(id("sgui/darkener"), 200, 5000);
 
 
     public static void register() {
@@ -132,10 +134,10 @@ public class GuiTextures {
         Progress.createHorizontal("generic_bar", 1, 15, false, -18);
         Progress.createHorizontal("generic_bar", 1, 15, false, -18 * 2);
         Progress.createHorizontal("generic_bar", 1, 15, false, -18 * 3);
-        UiResourceCreator.icon16Offset("generic_bar_background", 0);
-        UiResourceCreator.icon16Offset("generic_bar_background", -18);
-        UiResourceCreator.icon16Offset("generic_bar_background", -18 * 2);
-        UiResourceCreator.icon16Offset("generic_bar_background", -18 * 3);
+        icon16Offset("generic_bar_background", 0);
+        icon16Offset("generic_bar_background", -18);
+        icon16Offset("generic_bar_background", -18 * 2);
+        icon16Offset("generic_bar_background", -18 * 3);
     }
 
     public record Temperature(Progress fire, Progress ice) {
@@ -146,6 +148,7 @@ public class GuiTextures {
 
             return fire.get(progress);
         }
+
         public ItemStack getNamed(float progress, Component text) {
             if (progress < 0) {
                 return ice.getNamed(-progress, text);
@@ -155,31 +158,31 @@ public class GuiTextures {
         }
     }
 
-    public record Progress(GuiElement[] elements, ItemStack[] withTooltip) {
+    public record Progress(GuiElementBuilder[] elements,  GuiElementBuilder[] withTooltip) {
         public GuiElement get(float progress) {
-            return elements[Math.min((int) (progress * elements.length), elements.length - 1)];
+            return elements[Math.min((int) (progress * elements.length), elements.length - 1)].build();
         }
 
         public GuiElement getCeil(float progress) {
-            return elements[Math.min((int) Math.ceil(progress * elements.length), elements.length - 1)];
+            return elements[Math.min((int) Math.ceil(progress * elements.length), elements.length - 1)].build();
         }
 
         public ItemStack getNamed(float progress, Component text) {
-            var base = withTooltip[Math.min((int) (progress * withTooltip.length), withTooltip.length - 1)].copy();
+            var base = withTooltip[Math.min((int) (progress * withTooltip.length), withTooltip.length - 1)].asStack();
             base.set(DataComponents.ITEM_NAME, text);
             return base;
         }
 
         private static Progress create(int size, IntFunction<GuiElementBuilder> function) {
-            var elements = new GuiElement[size + 1];
-            var withTooltip = new ItemStack[size + 1];
+            var elements = new GuiElementBuilder[size + 1];
+            var withTooltip = new GuiElementBuilder[size + 1];
 
             elements[0] = EMPTY;
-            withTooltip[0] = EMPTY.getItemStack().copy();
+            withTooltip[0] = EMPTY_BUILDER.get();
 
             for (var i = 1; i <= size; i++) {
-                elements[i] = function.apply(i - 1).hideTooltip().build();
-                withTooltip[i] = function.apply(i - 1).asStack();
+                elements[i] = function.apply(i - 1).hideTooltip();
+                withTooltip[i] = function.apply(i - 1);
             }
             return new Progress(elements, withTooltip);
         }
@@ -218,6 +221,7 @@ public class GuiTextures {
 
             return create(size, function);
         }
+
         public static Progress createVertical32Right(String path, int start, int stop, boolean reverse) {
             var size = stop - start;
             var function = verticalProgress32Right(path, start, stop, reverse);

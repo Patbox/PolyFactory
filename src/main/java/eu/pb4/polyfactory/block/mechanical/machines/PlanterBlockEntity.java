@@ -16,6 +16,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import net.minecraft.server.players.NameAndId;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.IntStream;
@@ -143,7 +144,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
                 var targetState = world.getBlockState(mut);
                 if ((targetState.isAir() || (targetState.canBeReplaced() && targetState.getFluidState().isEmpty()))
                         && placableState.canSurvive(world, mut)
-                        && CommonProtection.canPlaceBlock(world, mut, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner, null)) {
+                        && CommonProtection.canPlaceBlock(world, mut, new NameAndId(self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner), null)) {
                     place = mut.immutable();
                     break;
                 }
@@ -219,14 +220,14 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalSi
             super(MenuType.GENERIC_3x3, player, false);
             this.setTitle(PlanterBlockEntity.this.getBlockState().getBlock().getName());
             for (int i = 0; i < 9; i++) {
-                this.setSlotRedirect(i, new TagLimitedSlot(PlanterBlockEntity.this, i, FactoryItemTags.ALLOWED_IN_PLANTER));
+                this.setSlot(i, new TagLimitedSlot(PlanterBlockEntity.this, i, FactoryItemTags.ALLOWED_IN_PLANTER));
             }
             this.open();
         }
 
         @Override
-        public void onClose() {
-            super.onClose();
+        public void onManualClose() {
+            super.onManualClose();
         }
 
         @Override

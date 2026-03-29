@@ -12,7 +12,7 @@ import eu.pb4.polyfactory.util.ColorProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Objects;
 import net.minecraft.core.BlockPos;

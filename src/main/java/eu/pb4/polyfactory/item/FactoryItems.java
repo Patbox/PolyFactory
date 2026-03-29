@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.other.BlockWithTooltip;
 import eu.pb4.polyfactory.item.configuration.ClipboardItem;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polymer.core.api.item.PolymerCreativeModeTabUtils;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.factorytools.api.item.MultiBlockItem;
 import eu.pb4.factorytools.api.block.MultiBlock;
@@ -20,7 +21,6 @@ import eu.pb4.polyfactory.item.tool.*;
 import eu.pb4.polyfactory.item.util.*;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.configuration.WrenchItem;
@@ -28,7 +28,7 @@ import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
-import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
+import net.fabricmc.fabric.api.registry.FuelValueEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -226,7 +226,7 @@ public class FactoryItems {
     public static final List<SpoutMolds> MOLDS = List.of(INGOT_MOLD, NUGGET_MOLD, PIPE_MOLD, BOTTLE_MOLD, THROWABLE_BOTTLE_MOLD, BRITTLE_BOTTLE_MOLD, CHAIN_MOLD);
 
     public static void register() {
-        FuelRegistryEvents.BUILD.register(((builder, context) -> {
+        FuelValueEvents.BUILD.register(((builder, context) -> {
             builder.add(SAW_DUST, (int) (context.baseSmeltTime() * 0.3));
             builder.add(WOODEN_PLATE, (int) (context.baseSmeltTime() * 0.6));
             builder.add(COAL_DUST, (int) (context.baseSmeltTime() * 0.8));
@@ -236,7 +236,7 @@ public class FactoryItems {
         BuiltInRegistries.ITEM.addAlias(id("fauced"), id("faucet"));
 
 
-        PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.fromNamespaceAndPath(ModInit.ID, "a_group"), CreativeModeTab.builder(CreativeModeTab.Row.BOTTOM, -1)
+        PolymerCreativeModeTabUtils.registerPolymerCreativeModeTab(Identifier.fromNamespaceAndPath(ModInit.ID, "a_group"), CreativeModeTab.builder(CreativeModeTab.Row.BOTTOM, -1)
                 .icon(WINDMILL_SAIL::getDefaultInstance)
                 .title(Component.translatable("itemgroup." + ModInit.ID))
                 .displayItems(((context, entries) -> {
@@ -422,7 +422,7 @@ public class FactoryItems {
                 })).build()
         );
 
-        PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.fromNamespaceAndPath(ModInit.ID, "variants"), CreativeModeTab.builder(CreativeModeTab.Row.BOTTOM, -1)
+        PolymerCreativeModeTabUtils.registerPolymerCreativeModeTab(Identifier.fromNamespaceAndPath(ModInit.ID, "variants"), CreativeModeTab.builder(CreativeModeTab.Row.BOTTOM, -1)
                 .icon(() -> ColoredItem.stack(CABLE, 1, DyeColor.RED))
                 .title(Component.translatable("itemgroup." + ModInit.ID + ".variants"))
                 .displayItems(((context, entries) -> {
@@ -488,7 +488,7 @@ public class FactoryItems {
         );
 
         if (ModInit.DEV_MODE) {
-            PolymerItemGroupUtils.registerPolymerItemGroup(Identifier.fromNamespaceAndPath(ModInit.ID, "experimental"), CreativeModeTab.builder(CreativeModeTab.Row.BOTTOM, -1)
+            PolymerCreativeModeTabUtils.registerPolymerCreativeModeTab(Identifier.fromNamespaceAndPath(ModInit.ID, "experimental"), CreativeModeTab.builder(CreativeModeTab.Row.BOTTOM, -1)
                     .icon(FactoryDebugItems.DEBUG_PIPE_FLOW::getDefaultInstance)
                     .title(Component.translatable("itemgroup." + ModInit.ID + ".experimental"))
                     .displayItems(((context, entries) -> {
@@ -562,6 +562,6 @@ public class FactoryItems {
     }
 
     static {
-        FactoryDebugItems.DEBUG_PIPE_FLOW.getName();
+        FactoryDebugItems.DEBUG_PIPE_FLOW.asItem();
     }
 }

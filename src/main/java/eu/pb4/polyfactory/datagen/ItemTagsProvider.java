@@ -3,8 +3,8 @@ package eu.pb4.polyfactory.datagen;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,9 +17,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
-public class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
-    public ItemTagsProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture, @Nullable FabricTagProvider.BlockTagProvider blockTagProvider) {
-        super(output, registriesFuture, blockTagProvider);
+public class ItemTagsProvider extends FabricTagsProvider.ItemTagsProvider {
+    public ItemTagsProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture, @Nullable FabricTagsProvider.BlockTagsProvider blockTagsProvider) {
+        super(output, registriesFuture, blockTagsProvider);
     }
 
     @Override
@@ -58,9 +58,8 @@ public class ItemTagsProvider extends FabricTagProvider.ItemTagProvider {
                 .add(FactoryItems.PRESSURE_FLUID_GUN)
         ;
 
-        this.getOrCreateTagBuilder(ItemTags.DYEABLE)
-                .add(FactoryItems.WINDMILL_SAIL)
-        ;
+        this.getOrCreateTagBuilder(ItemTags.CAULDRON_CAN_REMOVE_DYE)
+                .add(FactoryItems.WINDMILL_SAIL);
 
         var x = this.getOrCreateTagBuilder(FactoryItemTags.ROOT_ADVANCEMENT);
         for (var item : BuiltInRegistries.ITEM.keySet()) {

@@ -11,7 +11,7 @@ import eu.pb4.polymer.core.api.item.PolymerItem;
 import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import eu.pb4.sgui.api.GuiHelpers;
+import eu.pb4.sgui.api.SguiUtils;
 import eu.pb4.sgui.api.ScreenProperty;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.core.BlockPos;
@@ -55,7 +55,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,7 +119,7 @@ public class MoldMakingTableBlock extends Block implements FactoryBlock, Barrier
         private final ItemDisplayElement base;
 
         public Model(BlockState state) {
-            this.base = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
             this.addElement(this.base);
         }
@@ -144,8 +144,8 @@ public class MoldMakingTableBlock extends Block implements FactoryBlock, Barrier
             super(MenuType.STONECUTTER, player, false);
             this.setTitle(getName());
             this.items = FactoryUtil.collect(player.registryAccess().lookupOrThrow(Registries.ITEM).getTagOrEmpty(FactoryItemTags.SHAPEABLE_CLAY_MOLDS));
-            this.setSlotRedirect(0, this.inputSlot = new Slot(input, 0, 0, 0));
-            this.setSlotRedirect(1, this.resultSlot = new Slot(result, 0, 0, 0) {
+            this.setSlot(0, this.inputSlot = new Slot(input, 0, 0, 0));
+            this.setSlot(1, this.resultSlot = new Slot(result, 0, 0, 0) {
                 private long lastSoundTime;
 
                 public boolean mayPlace(ItemStack stack) {
@@ -179,15 +179,15 @@ public class MoldMakingTableBlock extends Block implements FactoryBlock, Barrier
         }
 
         @Override
-        public void onClose() {
+        public void onManualClose() {
             var recipeManager = this.player.level().recipeAccess();
             this.player.connection.send(new ClientboundUpdateRecipesPacket(recipeManager.getSynchronizedItemProperties(), recipeManager.getSynchronizedStonecutterRecipes()));
         }
 
         @Override
         public void onPlayerClose(boolean success) {
-            AbstractContainerMenuAccessor.callDropOrPlaceInInventory(this.player, this.screenHandler.getCarried());
-            this.screenHandler.setCarried(ItemStack.EMPTY);
+            AbstractContainerMenuAccessor.callDropOrPlaceInInventory(this.player, this.wrappedMenu.getCarried());
+            this.wrappedMenu.setCarried(ItemStack.EMPTY);
             AbstractContainerMenuAccessor.callDropOrPlaceInInventory(this.player, this.input.getItem(0));
             this.input.clearContent();
             this.result.clearContent();
@@ -204,7 +204,7 @@ public class MoldMakingTableBlock extends Block implements FactoryBlock, Barrier
         @Override
         public ItemStack quickMove(int index) {
             var resultStack = ItemStack.EMPTY;
-            var slot = this.screenHandler.slots.get(index);
+            var slot = this.wrappedMenu.slots.get(index);
             if (slot != null && slot.hasItem()) {
                 ItemStack slotStack = slot.getItem();
                 resultStack = slotStack.copy();
@@ -254,7 +254,7 @@ public class MoldMakingTableBlock extends Block implements FactoryBlock, Barrier
             if (isCorrectItem) {
                 var ingredient = Ingredient.of(
                         this.inputSlot.getItem().getItem() instanceof PolymerItem polymerItem
-                                ? PolymerItemUtils.getItemSafely(polymerItem, this.inputSlot.getItem(), PacketContext.create(this.player)).item()
+                                ? PolymerItemUtils.getItemSafely(polymerItem, this.inputSlot.getItem(), this.player.getPacketContext()).item()
                                 : this.inputSlot.getItem().getItem()
                 );
 
@@ -268,8 +268,8 @@ public class MoldMakingTableBlock extends Block implements FactoryBlock, Barrier
                     var recipeManager = this.player.level().recipeAccess();
                     this.player.connection.send(new ClientboundUpdateRecipesPacket(recipeManager.getSynchronizedItemProperties(), new SelectableRecipe.SingleInputSet<>(fakeRecipes)));
 
-                    GuiHelpers.sendSlotUpdate(player, this.syncId, 0, ItemStack.EMPTY);
-                    GuiHelpers.sendSlotUpdate(player, this.syncId, 0, this.inputSlot.getItem());
+                    SguiUtils.sendSlotUpdate(player, this.syncId, 0, ItemStack.EMPTY);
+                    SguiUtils.sendSlotUpdate(player, this.syncId, 0, this.inputSlot.getItem());
                     this.sendProperty(ScreenProperty.SELECTED, this.selectedItem);
                 }
             } else if (this.previousItem != Items.AIR) {
@@ -277,8 +277,8 @@ public class MoldMakingTableBlock extends Block implements FactoryBlock, Barrier
                 this.player.connection.send(new ClientboundUpdateRecipesPacket(recipeManager.getSynchronizedItemProperties(), new SelectableRecipe.SingleInputSet<>(List.of())));
                 this.previousItem = Items.AIR;
 
-                GuiHelpers.sendSlotUpdate(player, this.syncId, 0, ItemStack.EMPTY);
-                GuiHelpers.sendSlotUpdate(player, this.syncId, 0, this.inputSlot.getItem());
+                SguiUtils.sendSlotUpdate(player, this.syncId, 0, ItemStack.EMPTY);
+                SguiUtils.sendSlotUpdate(player, this.syncId, 0, this.inputSlot.getItem());
                 this.sendProperty(ScreenProperty.SELECTED, this.selectedItem);
             }
 

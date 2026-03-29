@@ -45,6 +45,7 @@ import net.minecraft.world.inventory.FurnaceResultSlot;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -177,7 +178,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity implements Out
                 return;
             }
 
-            var itemOut = self.currentRecipe.value().assemble(input, world.registryAccess());
+            var itemOut = self.currentRecipe.value().assemble(input);
             var outputContainer = self.getOutputContainer();
 
             {
@@ -215,7 +216,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity implements Out
                     if (x.has(DataComponents.BREAK_SOUND)) {
                         world.playSound(null, pos, x.get(DataComponents.BREAK_SOUND).value(), SoundSource.BLOCKS);
                     }
-                    ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, x),
+                    ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(x)),
                             pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.51, 5,
                             0.2, 0, 0.2, 0.5);
                 }
@@ -238,7 +239,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity implements Out
             if (speed > 0 || self.isCooling) {
                 self.process += self.isCooling ? 1 : speed;
                 setChanged(world, pos, self.getBlockState());
-                var fluid = Util.getRandomSafe(self.currentRecipe.value().fluidInput(input), world.random);
+                var fluid = Util.getRandomSafe(self.currentRecipe.value().fluidInput(input), world.getRandom());
                 if (fluid.isPresent()) {
                     var progress = self.process / time;
                     if (!self.isCooling) {
@@ -405,8 +406,8 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity implements Out
             this.updateTitleAndFluid();
             this.setSlot(9, PolydexCompat.getButton(FactoryRecipeTypes.SPOUT));
 
-            this.setSlotRedirect(9 + 3, new Slot(MSpoutBlockEntity.this, 0, 0, 0));
-            this.setSlotRedirect(9 + 6, new FurnaceResultSlot(player, MSpoutBlockEntity.this, 1, 1, 0));
+            this.setSlot(9 + 3, new Slot(MSpoutBlockEntity.this, 0, 0, 0));
+            this.setSlot(9 + 6, new FurnaceResultSlot(player, MSpoutBlockEntity.this, 1, 1, 0));
             this.setSlot(9 + 4, GuiTextures.PROGRESS_HORIZONTAL_OFFSET_RIGHT.get(progress()));
             this.open();
         }

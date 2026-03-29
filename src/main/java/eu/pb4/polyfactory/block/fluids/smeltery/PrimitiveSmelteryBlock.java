@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.fluids.smeltery;
 
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.block.MultiBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.FactoryBlocks;
@@ -39,7 +40,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.ArrayList;
 
@@ -127,13 +128,13 @@ public class PrimitiveSmelteryBlock extends MultiBlock implements FactoryBlock, 
     }
 
     public static final class Model extends BlockModel {
-        private static final ItemStack REGULAR = ItemDisplayElementUtil.getSolidModel(id("block/primitive_smeltery"));
-        private static final ItemStack LIT = ItemDisplayElementUtil.getSolidModel(id("block/primitive_smeltery_lit"));
+        private static final LazyItemStack REGULAR = ItemDisplayElementUtil.getModel(id("block/primitive_smeltery"));
+        private static final LazyItemStack LIT = ItemDisplayElementUtil.getModel(id("block/primitive_smeltery_lit"));
 
         private final ItemDisplayElement main;
 
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.getValue(PrimitiveSmelteryBlock.LIT) ? LIT : REGULAR);
+            this.main = ItemDisplayElementUtil.createSimple((state.getValue(PrimitiveSmelteryBlock.LIT) ? LIT : REGULAR).get());
             this.main.setScale(new Vector3f(2f));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.main.setDisplaySize(3, 3);
@@ -160,7 +161,7 @@ public class PrimitiveSmelteryBlock extends MultiBlock implements FactoryBlock, 
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.main.setItem(this.blockState().getValue(PrimitiveSmelteryBlock.LIT) ? LIT : REGULAR);
+                this.main.setItem((this.blockState().getValue(PrimitiveSmelteryBlock.LIT) ? LIT : REGULAR).get());
                 updateStatePos(this.blockState());
                 this.tick();
             }

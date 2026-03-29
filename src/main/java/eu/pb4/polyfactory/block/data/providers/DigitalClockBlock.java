@@ -66,7 +66,7 @@ public class DigitalClockBlock extends OrientableCabledDataProviderBlock {
             this.time.setTransformation(mat);
 
 
-            this.updateTime(level.getGameTime(), level.getDayTime(), level.getGameRules().get(GameRules.ADVANCE_TIME));
+            this.updateTime(level.getGameTime(), level.getOverworldClockTime(), level.getGameRules().get(GameRules.ADVANCE_TIME));
             this.addElement(this.time);
         }
 
@@ -92,7 +92,7 @@ public class DigitalClockBlock extends OrientableCabledDataProviderBlock {
         protected void onTick() {
             super.onTick();
             var level = this.getAttachment().getWorld();
-            this.updateTime(level.getGameTime(), level.getDayTime(), level.getGameRules().get(GameRules.ADVANCE_TIME));
+            this.updateTime(level.getGameTime(), level.getOverworldClockTime(), level.getGameRules().get(GameRules.ADVANCE_TIME));
         }
 
         @Override

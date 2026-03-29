@@ -15,6 +15,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
@@ -83,7 +84,12 @@ public record ColoringCraftingRecipe(String group, Item input, Ingredient dye, i
     }
 
     @Override
-    public ItemStack assemble(CraftingInput inventory, HolderLookup.Provider registryManager) {
+    public boolean showNotification() {
+        return false;
+    }
+
+    @Override
+    public ItemStack assemble(CraftingInput inventory) {
         int color = -1;
         int count = 0;
         ItemStack og = ItemStack.EMPTY;
@@ -117,7 +123,7 @@ public record ColoringCraftingRecipe(String group, Item input, Ingredient dye, i
 
         var anyColorBase = new ArrayList<SlotDisplay>();
         for (var dye : this.dye.items().toList()) {
-            anyColorBase.add(new SlotDisplay.ItemStackSlotDisplay(ColoredItem.stackCrafting(this.input, 1, DyeColorExtra.getColor(dye.value().getDefaultInstance()))));
+            anyColorBase.add(new SlotDisplay.ItemStackSlotDisplay(ItemStackTemplate.fromNonEmptyStack(ColoredItem.stackCrafting(this.input, 1, DyeColorExtra.getColor(dye.value().getDefaultInstance())))));
         }
 
         for (int count : this.maxCount != 1 ? new int[] {1, this.maxCount} : new int[] { 1 } ) {
@@ -128,7 +134,7 @@ public record ColoringCraftingRecipe(String group, Item input, Ingredient dye, i
                     t.add(new SlotDisplay.Composite(anyColorBase));
                 }
                 list.add(new ShapelessCraftingRecipeDisplay(t,
-                        new SlotDisplay.ItemStackSlotDisplay(ColoredItem.stackCrafting(this.input, count, DyeColorExtra.getColor(dye.value().getDefaultInstance()))),
+                        new SlotDisplay.ItemStackSlotDisplay(ItemStackTemplate.fromNonEmptyStack(ColoredItem.stackCrafting(this.input, count, DyeColorExtra.getColor(dye.value().getDefaultInstance())))),
                         new SlotDisplay.ItemSlotDisplay(Items.CRAFTING_TABLE)));
             }
         }

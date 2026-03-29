@@ -24,7 +24,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 
 public class HoneySplashEntity extends SplashEntity<Unit> {
-    private static final ParticleOptions PARTICLE = new ItemParticleOption(ParticleTypes.ITEM, Items.HONEY_BLOCK.getDefaultInstance());
+    private static final ParticleOptions PARTICLE = new ItemParticleOption(ParticleTypes.ITEM, Items.HONEY_BLOCK);
 
     public HoneySplashEntity(EntityType<? extends Projectile> entityType, Level world) {
         super(entityType, world, FactoryFluids.HONEY);

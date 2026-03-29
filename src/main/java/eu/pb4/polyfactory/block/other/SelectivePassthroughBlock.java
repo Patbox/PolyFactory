@@ -6,7 +6,7 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.entity.FactoryEntityTags;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.tracker.EntityTrackedData;
+import eu.pb4.polymer.virtualentity.api.data.EntityData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -31,7 +31,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 public class SelectivePassthroughBlock extends Block implements FactoryBlock, BarrierBasedWaterloggable {
     public SelectivePassthroughBlock(Properties settings) {
@@ -69,7 +69,7 @@ public class SelectivePassthroughBlock extends Block implements FactoryBlock, Ba
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        if (context instanceof EntityCollisionContext entityShapeContext && entityShapeContext.getEntity() != null && entityShapeContext.getEntity().getType().is(FactoryEntityTags.GRID_PASSABLE)) {
+        if (context instanceof EntityCollisionContext entityShapeContext && entityShapeContext.getEntity() != null && entityShapeContext.getEntity().is(FactoryEntityTags.GRID_PASSABLE)) {
             return Shapes.empty();
         }
 
@@ -78,8 +78,8 @@ public class SelectivePassthroughBlock extends Block implements FactoryBlock, Ba
 
     @Override
     protected void entityInside(BlockState state, Level world, BlockPos pos, Entity entity, InsideBlockEffectApplier handler, boolean bl) {
-        if (entity.getType().is(FactoryEntityTags.GRID_PASSABLE)) {
-            entity.getEntityData().set(EntityTrackedData.SILENT, entity.isSilent(), true);
+        if (entity.is(FactoryEntityTags.GRID_PASSABLE)) {
+            entity.getEntityData().set(EntityData.SILENT, entity.isSilent(), true);
         }
         super.entityInside(state, world, pos, entity, handler, bl);
     }
@@ -87,15 +87,15 @@ public class SelectivePassthroughBlock extends Block implements FactoryBlock, Ba
 
     @Deprecated(forRemoval = true)
     protected void onEntityCollision(BlockState state, Level world, BlockPos pos, Entity entity, InsideBlockEffectApplier handler) {
-        if (entity.getType().is(FactoryEntityTags.GRID_PASSABLE)) {
-            entity.getEntityData().set(EntityTrackedData.SILENT, entity.isSilent(), true);
+        if (entity.is(FactoryEntityTags.GRID_PASSABLE)) {
+            entity.getEntityData().set(EntityData.SILENT, entity.isSilent(), true);
         }
     }
 
     @Override
     public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         var model = new BlockModel();
-        var element = ItemDisplayElementUtil.createSolid(this.asItem());
+        var element = ItemDisplayElementUtil.createSimple(this.asItem());
         element.setScale(new Vector3f(1.9995f));
         model.addElement(element);
         return model;

@@ -17,6 +17,7 @@ import java.util.Optional;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.util.TriState;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -45,7 +46,7 @@ public record GenericPressRecipe(String group, CountedIngredient inputA, Counted
     }
 
     public static RecipeHolder<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, OutputStack... outputs) {
-        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY),
+        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, Optional.empty()),
                 CountedIngredient.EMPTY, List.of(outputs), minimumSpeed, List.of(), TriState.DEFAULT));
     }
 
@@ -54,23 +55,23 @@ public record GenericPressRecipe(String group, CountedIngredient inputA, Counted
     }
 
     public static RecipeHolder<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, List<OutputStack> outputs, List<FluidStack<?>> outputFluids) {
-        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY),
+        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, Optional.empty()),
                 CountedIngredient.EMPTY,outputs, minimumSpeed, outputFluids, TriState.DEFAULT));
     }
 
-    public static RecipeHolder<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, ItemStack output) {
-        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY),
+    public static RecipeHolder<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, ItemStackTemplate output) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, Optional.empty()),
                 CountedIngredient.EMPTY, List.of(new OutputStack(output, 1, 1)),  minimumSpeed, List.of(), TriState.DEFAULT));
     }
 
-    public static RecipeHolder<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, ItemStack output, FluidStack<?> fluidOutput) {
-        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY),
+    public static RecipeHolder<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, ItemStackTemplate output, FluidStack<?> fluidOutput) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, Optional.empty()),
                 CountedIngredient.EMPTY, List.of(new OutputStack(output, 1, 1)),  minimumSpeed, List.of(fluidOutput), TriState.DEFAULT));
     }
 
     public static RecipeHolder<GenericPressRecipe> of(String string, Ingredient ingredient, int inputCount, double minimumSpeed, ItemLike output) {
-        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, ItemStack.EMPTY), CountedIngredient.EMPTY,
-                List.of(new OutputStack(output.asItem().getDefaultInstance(), 1, 1)), minimumSpeed, List.of(), TriState.DEFAULT));
+        return new RecipeHolder<>(FactoryUtil.recipeKey("press/" + string), new GenericPressRecipe("", new CountedIngredient(Optional.of(ingredient), ItemComponentPredicate.EMPTY, inputCount, Optional.empty()), CountedIngredient.EMPTY,
+                List.of(new OutputStack(new ItemStackTemplate(output.asItem()), 1, 1)), minimumSpeed, List.of(), TriState.DEFAULT));
     }
 
     @Override
@@ -96,10 +97,10 @@ public record GenericPressRecipe(String group, CountedIngredient inputA, Counted
     }
 
     @Override
-    public ItemStack assemble(PressInput input, HolderLookup.Provider registryManager) {
+    public ItemStack assemble(PressInput input) {
         for (var out : output) {
             if (Math.random() <= out.chance()) {
-                return out.stack().copy();
+                return out.stack().create();
             }
         }
 

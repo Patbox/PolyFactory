@@ -1,10 +1,11 @@
 package eu.pb4.polyfactory.item;
 
 import eu.pb4.polyfactory.item.util.ColoredItem;
-import eu.pb4.factorytools.api.item.FireworkStarColoredItem;
+
 import eu.pb4.polyfactory.util.SimpleColoredItem;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
+import net.minecraft.world.item.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -17,11 +18,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SignApplicator;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
@@ -59,9 +55,8 @@ public class ArtificialDyeItem extends Item implements SignApplicator, SimpleCol
     }
 
     @Override
-    public boolean tryApplyToSign(Level world, SignBlockEntity signBlockEntity, boolean front, Player player) {
+    public boolean tryApplyToSign(Level world, SignBlockEntity signBlockEntity, boolean front, ItemStack itemInHand, Player player) {
         if (signBlockEntity.updateText((text) -> {
-            var itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND).is(FactoryItems.ARTIFICIAL_DYE) ? player.getMainHandItem() : player.getOffhandItem();
             var color = ColoredItem.getColor(itemInHand);
             {
                 var current = text.getMessage(0, false).getStyle().getColor();

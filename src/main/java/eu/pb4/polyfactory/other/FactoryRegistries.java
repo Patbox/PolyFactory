@@ -11,7 +11,7 @@ import static eu.pb4.polyfactory.ModInit.id;
 
 public interface FactoryRegistries {
     ResourceKey<Registry<FluidType<?>>> FLUID_TYPES_KEY = ResourceKey.createRegistryKey(id("fluid_type"));
-    Registry<FluidType<?>> FLUID_TYPES = FabricRegistryBuilder.createSimple(FLUID_TYPES_KEY).attribute(RegistryAttribute.OPTIONAL).buildAndRegister();
+    Registry<FluidType<?>> FLUID_TYPES = FabricRegistryBuilder.create(FLUID_TYPES_KEY).attribute(RegistryAttribute.OPTIONAL).buildAndRegister();
 
     static void setup() {
         PolymerUtils.markAsServerOnlyRegistry(FLUID_TYPES_KEY);

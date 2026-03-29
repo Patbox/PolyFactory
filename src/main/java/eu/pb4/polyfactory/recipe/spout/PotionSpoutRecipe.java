@@ -15,24 +15,25 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
-public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, Holder<SoundEvent> soundEvent, double time) implements SpoutRecipe {
+public record PotionSpoutRecipe(Ingredient item, long amount, ItemStackTemplate output, Holder<SoundEvent> soundEvent, double time) implements SpoutRecipe {
     public static final MapCodec<PotionSpoutRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Ingredient.CODEC.fieldOf("item").forGetter(PotionSpoutRecipe::item),
                     Codec.LONG.fieldOf("amount").forGetter(PotionSpoutRecipe::amount),
-                    ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(PotionSpoutRecipe::output),
+                    ItemStackTemplate.CODEC.fieldOf("result").forGetter(PotionSpoutRecipe::output),
                     SoundEvent.CODEC.fieldOf("sound").forGetter(PotionSpoutRecipe::soundEvent),
                     Codec.DOUBLE.fieldOf("time").forGetter(PotionSpoutRecipe::time)
             ).apply(x, PotionSpoutRecipe::new)
     );
 
     public static PotionSpoutRecipe of(Item item, long amount, Item result, SoundEvent sound) {
-        return new PotionSpoutRecipe(Ingredient.of(item), amount, result.getDefaultInstance(), BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound),
+        return new PotionSpoutRecipe(Ingredient.of(item), amount, new ItemStackTemplate(result), BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound),
                 SpoutRecipe.getTime(FactoryFluids.POTION.defaultInstance(), amount));
     }
 
@@ -52,10 +53,10 @@ public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, 
     }
 
     @Override
-    public ItemStack assemble(SingleItemWithFluid input, HolderLookup.Provider lookup) {
+    public ItemStack assemble(SingleItemWithFluid input) {
         for (var key : input.fluids()) {
             if ((key.type() == FactoryFluids.POTION || key.type() == FactoryFluids.WATER) && input.getFluid(key) >= amount) {
-                var stack = this.output.copy();
+                var stack = this.output.create();
                 stack.set(DataComponents.POTION_CONTENTS, key.type() == FactoryFluids.POTION
                         ? (PotionContents) key.data()
                         : PotionContents.EMPTY.withPotion(Potions.WATER));
@@ -63,7 +64,7 @@ public record PotionSpoutRecipe(Ingredient item, long amount, ItemStack output, 
             }
         }
 
-        return output.copy();
+        return output.create();
     }
 
     @Override

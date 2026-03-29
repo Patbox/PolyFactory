@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.polydex.pages;
 
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.polyfactory.recipe.GrindingRecipe;
@@ -10,8 +11,6 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class GrindingRecipePage<T extends GrindingRecipe> extends PrioritizedRecipePage<T> {
-    private static final ItemStack ICON = FactoryItems.GRINDER.getDefaultInstance();
-
     public GrindingRecipePage(RecipeHolder<T> recipe) {
         super(recipe);
     }
@@ -23,6 +22,6 @@ public abstract class GrindingRecipePage<T extends GrindingRecipe> extends Prior
 
     @Override
     public ItemStack typeIcon(ServerPlayer player) {
-        return ICON;
+        return FactoryItems.GRINDER.getDefaultInstance();
     }
 }

@@ -14,7 +14,7 @@ public class SimpleSpoutRecipePage extends SpoutRecipePage<SimpleSpoutRecipe> {
 
     @Override
     protected ItemStack getResultStack() {
-        return this.recipe.output();
+        return this.recipe.output().create();
     }
 
     @Override

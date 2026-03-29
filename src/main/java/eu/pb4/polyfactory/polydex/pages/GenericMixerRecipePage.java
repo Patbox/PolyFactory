@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +36,7 @@ public class GenericMixerRecipePage extends MixerRecipePage<GenericMixingRecipe>
 
     @Override
     protected ItemStack getItemOutput() {
-        return this.recipe.output();
+        return this.recipe.output().map(ItemStackTemplate::create).orElse(ItemStack.EMPTY);
     }
 
     @Override

@@ -7,15 +7,14 @@ import eu.pb4.polyfactory.item.component.FluidComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
 public class CopyFluidsLootFunction implements LootItemFunction {
-    public static final LootItemFunction INSTANCE = new CopyFluidsLootFunction();
-    public static final LootItemFunctionType TYPE = new LootItemFunctionType(MapCodec.unit(INSTANCE));
+    public static final CopyFluidsLootFunction INSTANCE = new CopyFluidsLootFunction();
+    public static final MapCodec<CopyFluidsLootFunction> TYPE = MapCodec.unit(INSTANCE);
 
     @Override
-    public LootItemFunctionType getType() {
+    public MapCodec<? extends LootItemFunction> codec() {
         return TYPE;
     }
 

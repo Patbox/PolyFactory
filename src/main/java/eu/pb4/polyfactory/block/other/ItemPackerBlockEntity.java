@@ -13,7 +13,7 @@ import eu.pb4.polyfactory.util.storage.WrappingStorage;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -52,7 +52,7 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
 
     private ItemStack itemStack = ItemStack.EMPTY;
     private ItemPackerBlock.Model model;
-    private final InventoryStorage inventoryStorage = InventoryStorage.of(this, null);
+    private final ContainerStorage inventoryStorage = ContainerStorage.of(this, null);
     @Nullable
     private Storage<ItemVariant> cachedItemStorage;
 
@@ -114,7 +114,7 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     @Override
     public long getFilledAmount() {
         if (this.itemStack.getItem() instanceof BundleItem bundleItem) {
-            var oc = this.itemStack.getOrDefault(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY).weight();
+            var oc = this.itemStack.getOrDefault(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY).weight().getOrThrow();
             return oc.getNumerator() * 64L / oc.getDenominator();
         }
 
@@ -207,7 +207,7 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
         float progress;
 
         if (this.itemStack.has(DataComponents.BUNDLE_CONTENTS)) {
-            progress = this.itemStack.getOrDefault(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY).weight().floatValue();
+            progress = this.itemStack.getOrDefault(DataComponents.BUNDLE_CONTENTS, BundleContents.EMPTY).weight().getOrThrow().floatValue();
         } else {
             progress = this.getFilledAmount() / Math.max(this.getFillCapacity(), 1f);
         }
@@ -219,13 +219,13 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
         public Gui(ServerPlayer player) {
             super(MenuType.HOPPER, player, false);
             this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(ItemPackerBlockEntity.this.getBlockState().getBlock().getName()));
-            this.setSlotRedirect(2, new PredicateLimitedSlot(ItemPackerBlockEntity.this, 0, stack -> ItemStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack)) != null));
+            this.setSlot(2, new PredicateLimitedSlot(ItemPackerBlockEntity.this, 0, stack -> ItemStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack)) != null));
             this.open();
         }
 
         @Override
-        public void onClose() {
-            super.onClose();
+        public void onManualClose() {
+            super.onManualClose();
         }
 
         @Override

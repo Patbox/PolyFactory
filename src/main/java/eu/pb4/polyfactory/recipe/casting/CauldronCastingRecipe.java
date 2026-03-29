@@ -41,4 +41,14 @@ public interface CauldronCastingRecipe extends Recipe<FluidContainerInput> {
     default boolean isSpecial() {
         return true;
     }
+
+    @Override
+    default String group() {
+        return "";
+    }
+
+    @Override
+    default boolean showNotification() {
+        return false;
+    }
 }

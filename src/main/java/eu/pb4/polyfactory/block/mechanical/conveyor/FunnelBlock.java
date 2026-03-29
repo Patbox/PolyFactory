@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical.conveyor;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
@@ -23,7 +24,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
+import eu.pb4.polymer.virtualentity.api.data.DisplayEntityData;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
@@ -62,7 +63,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.List;
 
@@ -78,7 +79,6 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
     public FunnelBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(this.defaultBlockState().setValue(ENABLED, true));
-        Model.MODEL_OUT.isEmpty();
         this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false));
     }
 
@@ -326,8 +326,8 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
     }
 
     public static class Model extends BlockModel implements WrenchHandler.ExtraModelCallbacks {
-        private static final ItemStack MODEL_IN = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/funnel_in"));
-        private static final ItemStack MODEL_OUT = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/funnel_out"));
+        private static final LazyItemStack MODEL_IN = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/funnel_in"));
+        private static final LazyItemStack MODEL_OUT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/funnel_out"));
         final FilterIcon filterElement = new FilterIcon(this);
         private final ItemDisplayElement mainElement;
         private final float offset;
@@ -386,7 +386,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         }
 
         protected ItemStack getModel(boolean outModel) {
-            return outModel ? MODEL_OUT : MODEL_IN;
+            return (outModel ? MODEL_OUT : MODEL_IN).get();
         }
 
         @Override
@@ -399,14 +399,14 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         @Override
         public void startTargetting(ServerPlayer player) {
             player.connection.send(new ClientboundSetEntityDataPacket(this.countElement.getEntityId(), List.of(
-                    SynchedEntityData.DataValue.create(DisplayTrackedData.VIEW_RANGE, 1f)
+                    SynchedEntityData.DataValue.create(DisplayEntityData.VIEW_RANGE, 1f)
             )));
         }
 
         @Override
         public void stopTargetting(ServerPlayer player) {
             player.connection.send(new ClientboundSetEntityDataPacket(this.countElement.getEntityId(), List.of(
-                    SynchedEntityData.DataValue.create(DisplayTrackedData.VIEW_RANGE, 0f)
+                    SynchedEntityData.DataValue.create(DisplayEntityData.VIEW_RANGE, 0f)
             )));
         }
     }

@@ -16,7 +16,7 @@ public class XpBucketItem extends SimplePolymerItem {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         for (int i = 0; i < 3; i++) {
-            int xp = 3 + context.getLevel().random.nextInt(5) + context.getLevel().random.nextInt(5);
+            int xp = 3 + context.getLevel().getRandom().nextInt(5) + context.getLevel().getRandom().nextInt(5);
             ExperienceOrb.award((ServerLevel)context.getLevel(), context.getClickLocation(), xp);
         }
 

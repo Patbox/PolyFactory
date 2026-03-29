@@ -4,8 +4,9 @@ import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.fluid.FluidInteractionMode;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -58,8 +59,8 @@ public class UniversalFluidContainerItem extends SimplePolymerItem {
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context) {
-        var out = super.getPolymerItemStack(itemStack, tooltipType, context);
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context, HolderLookup.Provider lookup) {
+        var out = super.getPolymerItemStack(itemStack, tooltipType, context, lookup);
         var fluids = itemStack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
         out.set(DataComponents.MAX_DAMAGE, 1000);
         out.set(DataComponents.DAMAGE, 1000 - (int) ((fluids.stored() / (double) this.capacity) * 999));

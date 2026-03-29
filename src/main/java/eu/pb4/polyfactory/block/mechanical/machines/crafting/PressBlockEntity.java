@@ -150,7 +150,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity implements Outp
         self.active = true;
 
         if (self.process >= 1 || self.delayedOutput != null) {
-            var nextOut = self.delayedOutput != null ? self.delayedOutput : self.currentRecipe.value().assemble(input, self.level.registryAccess());
+            var nextOut = self.delayedOutput != null ? self.delayedOutput : self.currentRecipe.value().assemble(input);
 
             boolean success = true;
 
@@ -397,10 +397,10 @@ public class PressBlockEntity extends TallItemMachineBlockEntity implements Outp
             super(MenuType.GENERIC_9x3, player, false);
             this.setTitle(GuiTextures.PRESS.apply(PressBlockEntity.this.getBlockState().getBlock().getName()));
             this.setSlot(9, PolydexCompat.getButton(FactoryRecipeTypes.PRESS));
-            this.setSlotRedirect(3, new Slot(PressBlockEntity.this, INPUT_SLOT, 0, 0));
-            this.setSlotRedirect(5, new Slot(PressBlockEntity.this, INPUT_2_SLOT, 0, 0));
+            this.setSlot(3, new Slot(PressBlockEntity.this, INPUT_SLOT, 0, 0));
+            this.setSlot(5, new Slot(PressBlockEntity.this, INPUT_2_SLOT, 0, 0));
             this.setSlot(13, GuiTextures.PROGRESS_VERTICAL.get(progress()));
-            this.setSlotRedirect(22, new FurnaceResultSlot(player, PressBlockEntity.this, OUTPUT_SLOT, 1, 0));
+            this.setSlot(22, new FurnaceResultSlot(player, PressBlockEntity.this, OUTPUT_SLOT, 1, 0));
 
             this.open();
         }

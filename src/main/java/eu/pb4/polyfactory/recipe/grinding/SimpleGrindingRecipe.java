@@ -12,6 +12,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -50,20 +51,20 @@ public record SimpleGrindingRecipe(String group, Ingredient input, List<OutputSt
         return new RecipeHolder<>(FactoryUtil.recipeKey("grinding/" + string), new SimpleGrindingRecipe( group, ingredient, List.of(outputs), grindTime, minimumSpeed, optimalSpeed));
     }
 
-    public static RecipeHolder<SimpleGrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double optimalSpeed, ItemStack... outputs) {
+    public static RecipeHolder<SimpleGrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double optimalSpeed, ItemStackTemplate... outputs) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("grinding/" + string), new SimpleGrindingRecipe( "", ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x, 1, 1)).toList(), grindTime, 0, optimalSpeed));
     }
 
-    public static RecipeHolder<SimpleGrindingRecipe> of(String string, String group, Ingredient ingredient, double grindTime, double optimalSpeed, ItemStack... outputs) {
+    public static RecipeHolder<SimpleGrindingRecipe> of(String string, String group, Ingredient ingredient, double grindTime, double optimalSpeed, ItemStackTemplate... outputs) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("grinding/" + string), new SimpleGrindingRecipe( group, ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x, 1, 1)).toList(), grindTime, 0, optimalSpeed));
     }
 
-    public static RecipeHolder<SimpleGrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double minimumSpeed, double optimalSpeed, ItemStack... outputs) {
+    public static RecipeHolder<SimpleGrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double minimumSpeed, double optimalSpeed, ItemStackTemplate... outputs) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("grinding/" + string), new SimpleGrindingRecipe( "", ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x, 1, 1)).toList(), grindTime, minimumSpeed, optimalSpeed));
     }
 
     public static RecipeHolder<SimpleGrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double minimumSpeed, double optimalSpeed, ItemLike... outputs) {
-        return new RecipeHolder<>(FactoryUtil.recipeKey("grinding/" + string), new SimpleGrindingRecipe( "", ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x.asItem().getDefaultInstance(), 1, 1)).toList(), grindTime, minimumSpeed, optimalSpeed));
+        return new RecipeHolder<>(FactoryUtil.recipeKey("grinding/" + string), new SimpleGrindingRecipe( "", ingredient, Arrays.stream(outputs).map(x -> new OutputStack(new ItemStackTemplate(x.asItem()), 1, 1)).toList(), grindTime, minimumSpeed, optimalSpeed));
     }
 
     public static RecipeHolder<SimpleGrindingRecipe> of(String string, Ingredient ingredient, double grindTime, double optimalSpeed, ItemLike... outputs) {
@@ -71,7 +72,7 @@ public record SimpleGrindingRecipe(String group, Ingredient input, List<OutputSt
     }
 
     public static RecipeHolder<SimpleGrindingRecipe> of(String string, String group, Ingredient ingredient, double grindTime, double optimalSpeed, ItemLike... outputs) {
-        return new RecipeHolder<>(FactoryUtil.recipeKey("grinding/" + string), new SimpleGrindingRecipe( group, ingredient, Arrays.stream(outputs).map(x -> new OutputStack(x.asItem().getDefaultInstance(), 1, 1)).toList(), grindTime, 0, optimalSpeed));
+        return new RecipeHolder<>(FactoryUtil.recipeKey("grinding/" + string), new SimpleGrindingRecipe( group, ingredient, Arrays.stream(outputs).map(x -> new OutputStack(new ItemStackTemplate(x.asItem()), 1, 1)).toList(), grindTime, 0, optimalSpeed));
     }
 
     @Override
@@ -86,8 +87,8 @@ public record SimpleGrindingRecipe(String group, Ingredient input, List<OutputSt
 
     @Deprecated
     @Override
-    public ItemStack assemble(GrindingInput inventory, HolderLookup.Provider registryManager) {
-        return this.output.isEmpty() ? ItemStack.EMPTY : this.output.getFirst().stack();
+    public ItemStack assemble(GrindingInput inventory) {
+        return this.output.isEmpty() ? ItemStack.EMPTY : this.output.getFirst().stack().create();
     }
 
     @Override
@@ -96,13 +97,13 @@ public record SimpleGrindingRecipe(String group, Ingredient input, List<OutputSt
     }
 
     @Override
-    public List<ItemStack> output(GrindingInput input, HolderLookup.Provider registryManager, @Nullable RandomSource random) {
+    public List<ItemStack> output(GrindingInput input, @Nullable RandomSource random) {
         var items = new ArrayList<ItemStack>();
 
         for (var out : this.output) {
             for (int a = 0; a < out.roll(); a++) {
                 if (random == null || random.nextFloat() < out.chance()) {
-                    items.add(out.stack().copy());
+                    items.add(out.stack().create());
                 }
             }
         }

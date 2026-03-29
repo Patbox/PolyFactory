@@ -16,14 +16,15 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
-public record SimpleCauldronCastingRecipe(FluidStack<?> fluidInput, ItemStack output, Holder<SoundEvent> soundEvent,
+public record SimpleCauldronCastingRecipe(FluidStack<?> fluidInput, ItemStackTemplate output, Holder<SoundEvent> soundEvent,
                                           double time, double coolingTime) implements CauldronCastingRecipe {
     public static final MapCodec<SimpleCauldronCastingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     FluidStack.CODEC.fieldOf("fluid_input").forGetter(SimpleCauldronCastingRecipe::fluidInput),
-                    ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(SimpleCauldronCastingRecipe::output),
+                    ItemStackTemplate.CODEC.fieldOf("result").forGetter(SimpleCauldronCastingRecipe::output),
                     SoundEvent.CODEC.optionalFieldOf("sound", FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED).forGetter(SimpleCauldronCastingRecipe::soundEvent),
                     Codec.DOUBLE.fieldOf("time").forGetter(SimpleCauldronCastingRecipe::time),
                     Codec.DOUBLE.fieldOf("cooling_ticks").forGetter(SimpleCauldronCastingRecipe::coolingTime)
@@ -31,7 +32,7 @@ public record SimpleCauldronCastingRecipe(FluidStack<?> fluidInput, ItemStack ou
     );
 
     public static SimpleCauldronCastingRecipe toItem(FluidStack<?> stack, Item out, SoundEvent sound, int coolingTime) {
-        return new SimpleCauldronCastingRecipe(stack, out.getDefaultInstance(),
+        return new SimpleCauldronCastingRecipe(stack, new ItemStackTemplate(out),
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
     }
 
@@ -50,8 +51,8 @@ public record SimpleCauldronCastingRecipe(FluidStack<?> fluidInput, ItemStack ou
     }
 
     @Override
-    public ItemStack assemble(FluidContainerInput input, HolderLookup.Provider lookup) {
-        return output.copy();
+    public ItemStack assemble(FluidContainerInput input) {
+        return output.create();
     }
 
 

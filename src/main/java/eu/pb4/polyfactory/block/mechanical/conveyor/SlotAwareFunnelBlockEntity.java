@@ -141,7 +141,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements B
             var pseudoInv = be.asInventory();
             this.setTitle(GuiTextures.SLOT_AWARE_FUNNEL.apply(be.getBlockState().getBlock().getName()));
             for (int i = 0; i < 9; i++) {
-                this.setSlotRedirect(i, new Slot(pseudoInv, i, 0, 0));
+                this.setSlot(i, new Slot(pseudoInv, i, 0, 0));
                 final int index = i;
                 this.setSlot(9 + i, GuiUtils.createDynamicButton(() -> getSlotButtonIcon(be.slotTargets[index]),
                         (i1, clickType, slotActionType, slotGuiInterface) -> {
@@ -198,8 +198,8 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements B
         public void onInput(String input) {
             super.onInput(input);
             this.updateDone();
-            if (this.screenHandler != null) {
-                this.screenHandler.setRemoteSlot(2, ItemStack.EMPTY);
+            if (this.wrappedMenu != null) {
+                this.wrappedMenu.setRemoteSlot(2, ItemStack.EMPTY);
             }
         }
 
@@ -233,10 +233,10 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements B
             if (this.gui != null) {
                 updateDone();
             }
-            var itemStack = GuiTextures.EMPTY.getItemStack().copy();
+            var itemStack = GuiTextures.EMPTY.asStack();
             itemStack.set(DataComponents.CUSTOM_NAME, Component.literal(input));
             itemStack.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, ReferenceSortedSets.emptySet()));
-            this.setSlot(0, itemStack, Objects.requireNonNull(this.getSlot(0)).getGuiCallback());
+            this.setSlot(0, itemStack, Objects.requireNonNull(this.getGuiElement(0)).getGuiCallback());
         }
 
         @Override

@@ -15,7 +15,7 @@ import net.minecraft.world.level.Level;
 
 public interface SmelteryRecipe extends Recipe<SingleRecipeInput> {
     @Override
-    default ItemStack assemble(SingleRecipeInput input, HolderLookup.Provider registries) {
+    default ItemStack assemble(SingleRecipeInput input) {
         return ItemStack.EMPTY;
     }
 
@@ -36,6 +36,11 @@ public interface SmelteryRecipe extends Recipe<SingleRecipeInput> {
     @Override
     default RecipeBookCategory recipeBookCategory() {
         return RecipeBookCategories.CAMPFIRE;
+    }
+
+    @Override
+    default boolean showNotification() {
+        return false;
     }
 
     @Override

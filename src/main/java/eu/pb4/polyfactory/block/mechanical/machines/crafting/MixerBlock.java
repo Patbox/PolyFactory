@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
@@ -33,12 +34,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 public class MixerBlock extends TallItemMachineBlock implements PipeConnectable {
     public MixerBlock(Properties settings) {
         super(settings);
-        Model.MODEL_PISTON.isEmpty();
     }
 
     @Override
@@ -112,7 +112,7 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
 
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack MODEL_PISTON = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/mixer_whisk"));
+        public static final LazyItemStack MODEL_PISTON = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/mixer_whisk"));
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement whisk;
@@ -125,12 +125,12 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
 
         private Model(BlockState state) {
             this.fluid = new TopFluidViewModel(this, -4f / 16f, 10f / 16f, 0.5f);
-            this.main = ItemDisplayElementUtil.createSolid(FactoryItems.MIXER);
+            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.MIXER);
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
-            this.whisk = LodItemDisplayElement.createSimple(MODEL_PISTON, 2, 0.4f, 0.8f);
-            this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, this.getUpdateRate(), 0.3f, 0.5f);
-            this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, this.getUpdateRate(), 0.3f, 0.5f);
+            this.whisk = LodItemDisplayElement.createSimple(MODEL_PISTON.get(), 2, 0.4f, 0.8f);
+            this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR.get(), this.getUpdateRate(), 0.3f, 0.5f);
+            this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR.get(), this.getUpdateRate(), 0.3f, 0.5f);
 
             this.whisk.setViewRange(0.4f);
             this.gearA.setViewRange(0.4f);

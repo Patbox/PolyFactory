@@ -147,7 +147,7 @@ public class SpeakerBlock extends DirectionalCabledDataBlock implements DataRece
         }
 
         public void playSound(Holder<SoundEvent> sound, float volume, float pitch, long seed) {
-            this.sendPacket(VirtualEntityUtils.createPlaySoundFromEntityPacket(this.soundSource.getEntityId(), sound, SoundSource.RECORDS, volume, pitch, seed));
+            this.sendPacket(VirtualEntityUtils.createClientboundSoundEntityPacket(this.soundSource.getEntityId(), sound, SoundSource.RECORDS, volume, pitch, seed));
         }
     }
 }

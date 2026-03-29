@@ -33,7 +33,7 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
 
     private final Storage<ItemVariant> storage = new FilteredRedirectedStorage<>(ItemStorage.SIDED,
             this::getLevel, this::getBlockPos, () -> this.getBlockState().getValue(FunnelBlock.FACING), (t) -> this.matches(t.toStack()),
-            (t) -> Math.min(t.getComponentMap().getOrDefault(DataComponents.MAX_STACK_SIZE, 1), this.maxStackSize));
+            (t) -> Math.min(t.getOrDefault(DataComponents.MAX_STACK_SIZE, 1), this.maxStackSize));
 
     public FunnelBlockEntity(BlockPos pos, BlockState state) {
         super(FactoryBlockEntities.FUNNEL, pos, state);

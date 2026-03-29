@@ -1,9 +1,9 @@
 package eu.pb4.polyfactory.datagen;
 
 import eu.pb4.polyfactory.other.FactoryDamageTypes;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricCodecDataProvider;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 public class DamageTypeProvider extends FabricCodecDataProvider<DamageType> {
-    protected DamageTypeProvider(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+    protected DamageTypeProvider(FabricPackOutput dataOutput, CompletableFuture<HolderLookup.Provider> registriesFuture) {
         super(dataOutput, registriesFuture, Registries.DAMAGE_TYPE, DamageType.DIRECT_CODEC);
     }
 
@@ -28,8 +28,8 @@ public class DamageTypeProvider extends FabricCodecDataProvider<DamageType> {
         return "damage_type";
     }
 
-    public static class Tags extends FabricTagProvider<DamageType> {
-        public Tags(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+    public static class Tags extends FabricTagsProvider<DamageType> {
+        public Tags(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
             super(output, Registries.DAMAGE_TYPE, registriesFuture);
         }
 

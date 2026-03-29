@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.data;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
@@ -18,7 +19,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -156,18 +157,18 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
     }
 
     public static class Model extends BlockModel {
-        public static final ItemStack INPUT = ItemDisplayElementUtil.getSolidModel(id("block/data_cube_connector_input"));
-        public static final ItemStack OUTPUT = ItemDisplayElementUtil.getSolidModel(id("block/data_cube_connector_output"));
+        public static final LazyItemStack INPUT = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_input"));
+        public static final LazyItemStack OUTPUT = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_output"));
         private final ItemDisplayElement base;
         private final ItemDisplayElement input;
         private final ItemDisplayElement output;
 
         private Model(BlockState state) {
-            this.base = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 
-            this.input = ItemDisplayElementUtil.createSimple(INPUT);
-            this.output = ItemDisplayElementUtil.createSimple(OUTPUT);
+            this.input = ItemDisplayElementUtil.createSimple(INPUT.get());
+            this.output = ItemDisplayElementUtil.createSimple(OUTPUT.get());
 
             updateStatePos(state, FACING_INPUT, input);
             updateStatePos(state, FACING_OUTPUT, output);

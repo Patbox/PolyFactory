@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.polydex.pages;
 
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polydex.api.v1.recipe.*;
 import eu.pb4.polydex.impl.book.InternalPageTextures;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -14,8 +15,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public record MoldMakingRecipePage(Identifier identifier, PolydexIngredient<?> input, PolydexStack<?> output) implements PolydexPage {
-    private static final ItemStack TYPE_ICON = FactoryItems.MOLDMAKING_TABLE.getDefaultInstance();
+public record MoldMakingRecipePage(Identifier identifier, PolydexIngredient<?> input,
+                                   PolydexStack<?> output) implements PolydexPage {
 
 
     public @Nullable Component texture(ServerPlayer player) {
@@ -43,7 +44,7 @@ public record MoldMakingRecipePage(Identifier identifier, PolydexIngredient<?> i
     }
 
     public ItemStack typeIcon(ServerPlayer player) {
-        return TYPE_ICON;
+        return FactoryItems.MOLDMAKING_TABLE.getDefaultInstance();
     }
 
     @Override

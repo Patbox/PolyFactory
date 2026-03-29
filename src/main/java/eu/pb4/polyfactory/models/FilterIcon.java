@@ -42,7 +42,7 @@ public class FilterIcon {
             this.elements.get(i).setItem(data.icon().get(i));
         }
         for (; i < count; i++) {
-            this.elements.get(i).setItem(GuiTextures.ITEM_FILTER_BLOCKED);
+            this.elements.get(i).setItem(GuiTextures.ITEM_FILTER_BLOCKED.get());
         }
 
         this.applyTransforms();

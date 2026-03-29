@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
@@ -53,7 +54,7 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -273,9 +274,9 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack BASE_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/ejector_base"));
-        public static final ItemStack PLATE_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/ejector_plate"));
-        public static final ItemStack LINK_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/ejector_link"));
+        public static final LazyItemStack BASE_MODEL = ItemDisplayElementUtil.getModel(id("block/ejector_base"));
+        public static final LazyItemStack PLATE_MODEL = ItemDisplayElementUtil.getModel(id("block/ejector_plate"));
+        public static final LazyItemStack LINK_MODEL = ItemDisplayElementUtil.getModel(id("block/ejector_link"));
 
         private final ItemDisplayElement base;
         private final ItemDisplayElement plate;
@@ -284,10 +285,10 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
 
 
         private Model(BlockState state) {
-            this.base = ItemDisplayElementUtil.createSimple(BASE_MODEL);
-            this.plate = ItemDisplayElementUtil.createSimple(PLATE_MODEL);
+            this.base = ItemDisplayElementUtil.createSimple(BASE_MODEL.get());
+            this.plate = ItemDisplayElementUtil.createSimple(PLATE_MODEL.get());
             this.plate.setInterpolationDuration(3);
-            this.link = ItemDisplayElementUtil.createSimple(LINK_MODEL);
+            this.link = ItemDisplayElementUtil.createSimple(LINK_MODEL.get());
             this.link.setInterpolationDuration(3);
             this.updateStatePos(state);
             this.updateProgress(0);

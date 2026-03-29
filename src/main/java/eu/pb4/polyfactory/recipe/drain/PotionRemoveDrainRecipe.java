@@ -17,19 +17,20 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
-public record PotionRemoveDrainRecipe(Ingredient item, Optional<Ingredient> catalyst, long amount, ItemStack output, Holder<SoundEvent> soundEvent,
+public record PotionRemoveDrainRecipe(Ingredient item, Optional<Ingredient> catalyst, long amount, ItemStackTemplate output, Holder<SoundEvent> soundEvent,
                                       boolean requirePlayer, double time) implements DrainRecipe {
     public static final MapCodec<PotionRemoveDrainRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Ingredient.CODEC.fieldOf("item").forGetter(PotionRemoveDrainRecipe::item),
                     Ingredient.CODEC.optionalFieldOf("catalyst").forGetter(PotionRemoveDrainRecipe::catalyst),
                     Codec.LONG.fieldOf("amount").forGetter(PotionRemoveDrainRecipe::amount),
-                    ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(PotionRemoveDrainRecipe::output),
+                    ItemStackTemplate.CODEC.fieldOf("result").forGetter(PotionRemoveDrainRecipe::output),
                     SoundEvent.CODEC.fieldOf("sound").forGetter(PotionRemoveDrainRecipe::soundEvent),
                     Codec.BOOL.optionalFieldOf("require_player", false).forGetter(PotionRemoveDrainRecipe::requirePlayer),
                     Codec.DOUBLE.fieldOf("time").forGetter(PotionRemoveDrainRecipe::time)
@@ -37,7 +38,7 @@ public record PotionRemoveDrainRecipe(Ingredient item, Optional<Ingredient> cata
     );
 
     public static PotionRemoveDrainRecipe of(Item item, long amount, Item result, SoundEvent sound) {
-        return new PotionRemoveDrainRecipe(Ingredient.of(item), Optional.empty(), amount, result.getDefaultInstance(), BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound),
+        return new PotionRemoveDrainRecipe(Ingredient.of(item), Optional.empty(), amount, new ItemStackTemplate(result), BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound),
                 true, SpoutRecipe.getTime(FactoryFluids.POTION.defaultInstance(), amount));
     }
 
@@ -57,10 +58,10 @@ public record PotionRemoveDrainRecipe(Ingredient item, Optional<Ingredient> cata
     }
 
     @Override
-    public ItemStack assemble(DrainInput input, HolderLookup.Provider lookup) {
+    public ItemStack assemble(DrainInput input) {
         for (var key : input.fluids()) {
             if ((key.type() == FactoryFluids.POTION || key.type() == FactoryFluids.WATER) && input.getFluid(key) >= amount) {
-                var stack = this.output.copy();
+                var stack = this.output.create();
                 stack.set(DataComponents.POTION_CONTENTS, key.type() == FactoryFluids.POTION
                         ? (PotionContents) key.data()
                         : PotionContents.EMPTY.withPotion(Potions.WATER));
@@ -68,7 +69,7 @@ public record PotionRemoveDrainRecipe(Ingredient item, Optional<Ingredient> cata
             }
         }
 
-        return output.copy();
+        return output.create();
     }
 
     @Override

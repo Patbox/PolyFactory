@@ -61,11 +61,11 @@ public class ItemThrower {
         double z = this.pos.getZ() + 0.5 + throwDirection.getStepZ() / 2f;
 
         ItemEntity itemEntity = new ItemEntity(level, x, y, z, stack);
-        double g = level.random.nextDouble() * 0.1 + 0.2;
+        double g = level.getRandom().nextDouble() * 0.1 + 0.2;
         itemEntity.setDeltaMovement(
-                level.random.triangle(throwDirection.getStepX() * g * 0.1, 0.0172275),
-                level.random.triangle(0.2, 0.0172275),
-                level.random.triangle(throwDirection.getStepZ() * g * 0.1, 0.0172275)
+                level.getRandom().triangle(throwDirection.getStepX() * g * 0.1, 0.0172275),
+                level.getRandom().triangle(0.2, 0.0172275),
+                level.getRandom().triangle(throwDirection.getStepZ() * g * 0.1, 0.0172275)
         );
         level.addFreshEntity(itemEntity);
     }

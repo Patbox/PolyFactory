@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
@@ -16,7 +17,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -144,13 +145,13 @@ public class AxleWithGearBlock extends AxleBlock implements RotationalConnector,
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack ITEM_MODEL_1 = ItemDisplayElementUtil.getSolidModel( id("block/axle_with_gear_1"));
-        public static final ItemStack ITEM_MODEL_2 = ItemDisplayElementUtil.getSolidModel( id("block/axle_with_gear_2"));
+        public static final LazyItemStack ITEM_MODEL_1 = ItemDisplayElementUtil.getModel( id("block/axle_with_gear_1"));
+        public static final LazyItemStack ITEM_MODEL_2 = ItemDisplayElementUtil.getModel( id("block/axle_with_gear_2"));
 
         private final ItemDisplayElement mainElement;
         private Model(ServerLevel world, BlockState state, BlockPos pos) {
             this.mainElement = LodItemDisplayElement.createSimple(
-                    ((pos.getX() + pos.getY() + pos.getZ()) % 2 == 0) ? ITEM_MODEL_2 : ITEM_MODEL_1,
+                    (((pos.getX() + pos.getY() + pos.getZ()) % 2 == 0) ? ITEM_MODEL_2 : ITEM_MODEL_1).get(),
                     this.getUpdateRate(), 0.3f, 0.6f);
             this.mainElement.setViewRange(0.7f);
             this.updateAnimation(0,  state.getValue(AXIS));
@@ -174,7 +175,7 @@ public class AxleWithGearBlock extends AxleBlock implements RotationalConnector,
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 var pos = this.blockAware().getBlockPos();
-                this.mainElement.setItem(((pos.getX() + pos.getY() + pos.getZ()) % 2 == 0) ? ITEM_MODEL_2 : ITEM_MODEL_1);
+                this.mainElement.setItem((((pos.getX() + pos.getY() + pos.getZ()) % 2 == 0) ? ITEM_MODEL_2 : ITEM_MODEL_1).get());
             }
         }
 

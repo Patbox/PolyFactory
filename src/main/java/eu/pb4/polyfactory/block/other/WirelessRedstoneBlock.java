@@ -62,7 +62,7 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.List;
 
@@ -242,7 +242,7 @@ public class WirelessRedstoneBlock extends Block implements FactoryBlock, Redsto
         private final ItemDisplayElement key2;
 
         private Model(ServerLevel world, BlockPos pos, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSolid(WirelessRedstoneBlock.this.asItem());
+            this.main = ItemDisplayElementUtil.createSimple(WirelessRedstoneBlock.this.asItem());
             this.main.setScale(new Vector3f(2));
 
             this.key1 = ItemDisplayElementUtil.createSimple();

@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.fluids;
 
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.fluids.transport.PipeConnectable;
@@ -19,7 +20,7 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.List;
 import net.minecraft.core.BlockPos;
@@ -53,7 +54,6 @@ public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeC
     public PortableFluidTankBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false));
-        PortableFluidTankBlock.Model.BASE_MODEL.isEmpty();
     }
 
     @Override
@@ -140,13 +140,13 @@ public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeC
     }
 
     public static final class Model extends BlockModel {
-        public static final ItemStack BASE_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/portable_fluid_tank"));
-        public static final ItemStack WATERLOGGED_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/portable_fluid_tank_waterlogged"));
+        public static final LazyItemStack BASE_MODEL = ItemDisplayElementUtil.getModel(id("block/portable_fluid_tank"));
+        public static final LazyItemStack WATERLOGGED_MODEL = ItemDisplayElementUtil.getModel(id("block/portable_fluid_tank_waterlogged"));
         private final ItemDisplayElement main;
         private final SimpleMultiFluidViewModel fluid = new SimpleMultiFluidViewModel(this, FactoryModels.FLUID_PORTABLE_FLUID_TANK_VERTICAL, 16);
 
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(state.getValue(WATERLOGGED) ? WATERLOGGED_MODEL : BASE_MODEL);
+            this.main = ItemDisplayElementUtil.createSimple((state.getValue(WATERLOGGED) ? WATERLOGGED_MODEL : BASE_MODEL).get());
             this.main.setScale(new Vector3f(2f));
             this.main.setRightRotation(new Quaternionf().rotateX(Mth.HALF_PI));
             updateStatePos(state);
@@ -187,7 +187,7 @@ public class PortableFluidTankBlock extends Block implements FactoryBlock, PipeC
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             super.notifyUpdate(updateType);
             if (updateType == BlockAwareAttachment.BLOCK_STATE_UPDATE) {
-                this.main.setItem(this.blockState().getValue(WATERLOGGED) ? WATERLOGGED_MODEL : BASE_MODEL);
+                this.main.setItem((this.blockState().getValue(WATERLOGGED) ? WATERLOGGED_MODEL : BASE_MODEL).get());
                 updateStatePos(this.blockState());
             }
         }

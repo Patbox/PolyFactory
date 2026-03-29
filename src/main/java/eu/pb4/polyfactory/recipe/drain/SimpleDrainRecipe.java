@@ -16,18 +16,19 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
 public record SimpleDrainRecipe(CountedIngredient item, Optional<Ingredient> catalyst, List<FluidStack<?>> fluidInput, List<FluidStack<?>> fluidOutput,
-                                ItemStack output, Holder<SoundEvent> soundEvent, boolean requirePlayer, double time) implements DrainRecipe {
+                                ItemStackTemplate output, Holder<SoundEvent> soundEvent, boolean requirePlayer, double time) implements DrainRecipe {
     public static final MapCodec<SimpleDrainRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     CountedIngredient.CODEC.fieldOf("item").forGetter(SimpleDrainRecipe::item),
                     Ingredient.CODEC.optionalFieldOf("catalyst").forGetter(SimpleDrainRecipe::catalyst),
                     FluidStack.CODEC.listOf().optionalFieldOf("fluid_input", List.of()).forGetter(SimpleDrainRecipe::fluidInput),
                     FluidStack.CODEC.listOf().optionalFieldOf("fluid_output", List.of()).forGetter(SimpleDrainRecipe::fluidOutput),
-                    ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(SimpleDrainRecipe::output),
+                    ItemStackTemplate.CODEC.fieldOf("result").forGetter(SimpleDrainRecipe::output),
                     SoundEvent.CODEC.fieldOf("sound").forGetter(SimpleDrainRecipe::soundEvent),
                     Codec.BOOL.optionalFieldOf("require_player", false).forGetter(SimpleDrainRecipe::requirePlayer),
                     Codec.DOUBLE.fieldOf("time").forGetter(SimpleDrainRecipe::time)
@@ -35,12 +36,12 @@ public record SimpleDrainRecipe(CountedIngredient item, Optional<Ingredient> cat
     );
 
     public static SimpleDrainRecipe fromItem(Item item, FluidStack<?> stack, Item out, SoundEvent sound) {
-        return new SimpleDrainRecipe(CountedIngredient.ofItems(1, item),Optional.empty(), List.of(), List.of(stack), out.getDefaultInstance(),
+        return new SimpleDrainRecipe(CountedIngredient.ofItems(1, item),Optional.empty(), List.of(), List.of(stack), new ItemStackTemplate(out),
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), false, SpoutRecipe.getTime(stack.instance(), stack.amount()));
     }
 
     public static SimpleDrainRecipe toItem(Item item, FluidStack<?> stack, Item out, SoundEvent sound) {
-        return new SimpleDrainRecipe(CountedIngredient.ofItems(1, item),Optional.empty(), List.of(stack), List.of(), out.getDefaultInstance(),
+        return new SimpleDrainRecipe(CountedIngredient.ofItems(1, item),Optional.empty(), List.of(stack), List.of(), new ItemStackTemplate(out),
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), true, SpoutRecipe.getTime(stack.instance(), stack.amount()));
     }
 
@@ -69,8 +70,8 @@ public record SimpleDrainRecipe(CountedIngredient item, Optional<Ingredient> cat
     }
 
     @Override
-    public ItemStack assemble(DrainInput input, HolderLookup.Provider lookup) {
-        return output.copy();
+    public ItemStack assemble(DrainInput input) {
+        return output.create();
     }
 
     @Override

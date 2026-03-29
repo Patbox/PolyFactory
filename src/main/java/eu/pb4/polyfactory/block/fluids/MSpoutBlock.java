@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.fluids;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
@@ -38,7 +39,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -167,8 +168,8 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
     }
 
     public static final class Model extends RotationAwareModel {
-        private final ItemStack DEFAULT_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/mechanical_spout"));
-        private final ItemStack ALT_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/mechanical_spout_alt"));
+        private final LazyItemStack DEFAULT_MODEL = ItemDisplayElementUtil.getModel(id("block/mechanical_spout"));
+        private final LazyItemStack ALT_MODEL = ItemDisplayElementUtil.getModel(id("block/mechanical_spout_alt"));
         private final ItemDisplayElement main;
         private final ItemDisplayElement gearA;
         private final ItemDisplayElement gearB;
@@ -179,11 +180,11 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
         private boolean isCooling = false;
 
         private Model(ServerLevel world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSimple(DEFAULT_MODEL);
+            this.main = ItemDisplayElementUtil.createSimple(DEFAULT_MODEL.get());
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
-            this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, this.getUpdateRate(), 0.3f, 0.5f);
-            this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, this.getUpdateRate(), 0.3f, 0.5f);
+            this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR.get(), this.getUpdateRate(), 0.3f, 0.5f);
+            this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR.get(), this.getUpdateRate(), 0.3f, 0.5f);
             this.fluid = LodItemDisplayElement.createSimple();
             this.gearA.setViewRange(0.4f);
             this.gearB.setViewRange(0.4f);
@@ -255,7 +256,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
                 setProgress(false, 0, null);
             }
             this.altModel = b;
-            this.main.setItem(b ? ALT_MODEL : DEFAULT_MODEL);
+            this.main.setItem((b ? ALT_MODEL : DEFAULT_MODEL).get());
             this.main.tick();
         }
 

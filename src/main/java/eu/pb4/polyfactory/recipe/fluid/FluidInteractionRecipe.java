@@ -39,9 +39,19 @@ public interface FluidInteractionRecipe extends Recipe<FluidContainerInput> {
     }
 
     @Override
-    default ItemStack assemble(FluidContainerInput input, HolderLookup.Provider lookup) {
+    default ItemStack assemble(FluidContainerInput input) {
         return ItemStack.EMPTY;
     };
+
+    @Override
+    default boolean showNotification() {
+        return false;
+    }
+
+    @Override
+    default String group() {
+        return "";
+    }
 
     @Override
     default RecipeBookCategory recipeBookCategory() {

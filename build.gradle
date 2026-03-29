@@ -1,13 +1,10 @@
 plugins {
-	id 'fabric-loom' version '1.14.+'
+	id 'net.fabricmc.fabric-loom' version '1.15.+'
 	id "com.modrinth.minotaur" version "2.+"
 	id 'maven-publish'
 }
 
-//sourceCompatibility = JavaVersion.VERSION_21
-//targetCompatibility = JavaVersion.VERSION_21
 
-//archivesBaseName = project.archives_base_name
 group = project.maven_group
 base {
 	archivesName = project.archives_base_name
@@ -32,7 +29,7 @@ loom {
 			name = "Data Generation"
 			runDir = "build/datagen"
 			vmArg("-Dfabric-api.datagen")
-			vmArg("-Dfabric-api.datagen.modid=polyfactory")
+			vmArg("-Dfabric-api.datagen.id=polyfactory")
 			vmArg("-Dfabric-api.datagen.output-dir=${file("src/main/generated")}")
 		}
 	}
@@ -77,43 +74,38 @@ repositories {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.layered {
-		officialMojangMappings()
-		parchment("org.parchmentmc.data:parchment-1.21.10:2025.10.12@zip")
-	}
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-	modImplementation "eu.pb4:polymer-core:${project.polymer_version}"
-	modImplementation "eu.pb4:polymer-blocks:${project.polymer_version}"
-	modImplementation "eu.pb4:polymer-resource-pack:${project.polymer_version}"
-	modImplementation "eu.pb4:polymer-resource-pack-extras:${project.polymer_version}"
-	modImplementation "eu.pb4:polymer-autohost:${project.polymer_version}"
-	modImplementation "eu.pb4:polymer-virtual-entity:${project.polymer_version}"
-	modImplementation "eu.pb4:polymer-sound-patcher:${project.polymer_version}"
-	modImplementation include('eu.pb4:booklet:0.1.0+1.21.11')
-	modImplementation include('eu.pb4:map-canvas-api:0.7.0+1.21.11')
-	modImplementation include('eu.pb4:common-protection-api:1.0.0')
-	modImplementation include('eu.pb4:sidebar-api:0.5.1+1.21.1')
-	modImplementation include('eu.pb4:sgui:1.12.0+1.21.11')
-	modImplementation include('eu.pb4:factorytools:0.9.5+1.21.11')
-	modImplementation include("eu.pb4:placeholder-api:2.8.2+1.21.10")
-	modImplementation include('xyz.nucleoid:server-translations-api:2.5.2+1.21.9-pre3')
-	//modImplementation include('com.kneelawk.graphlib:graphlib-core-fabric:2.0.3-beta.1+1.21.5')
-	modImplementation include('com.kneelawk.graphlib:graphlib-core-fabric:2.0.3-beta.0.patbox+1.21.11')
+	implementation "eu.pb4:polymer-core:${project.polymer_version}"
+	implementation "eu.pb4:polymer-blocks:${project.polymer_version}"
+	implementation "eu.pb4:polymer-resource-pack:${project.polymer_version}"
+	implementation "eu.pb4:polymer-resource-pack-extras:${project.polymer_version}"
+	implementation "eu.pb4:polymer-autohost:${project.polymer_version}"
+	implementation "eu.pb4:polymer-virtual-entity:${project.polymer_version}"
+	implementation "eu.pb4:polymer-sound-patcher:${project.polymer_version}"
+	implementation include('eu.pb4:booklet:0.2.0+26.1')
+	implementation include('eu.pb4:map-canvas-api:0.8.0+26.1')
+	implementation include('eu.pb4:common-protection-api:2.0.0')
+	implementation include('eu.pb4:sidebar-api:0.6.0+26.1')
+	implementation include('eu.pb4:sgui:2.0.0+26.1')
+	implementation include('eu.pb4:factorytools:0.10.0+26.1')
+	implementation include("eu.pb4:placeholder-api:3.0.0-beta.2+26.1")
+	implementation 'xyz.nucleoid:server-translations-api:3.0.1+26.1'
+	implementation include('com.kneelawk.graphlib:graphlib-core-fabric:2.0.3-beta.0.matti+26.1')
 
 	// Temp hack to allow development
-	//modImplementation include('com.kneelawk:graphlib:1.99.99+1.20.local')
-	//modImplementation include('alexiil.mc.lib:libnetworkstack-base:0.11.0-aaa.patbox')
+	//implementation include('com.kneelawk:graphlib:1.99.99+1.20.local')
+	//implementation include('alexiil.mc.lib:libnetworkstack-base:0.11.0-aaa.patbox')
 
-	modCompileOnly 'maven.modrinth:polydex:1.8.1+1.21.11'
+	compileOnly 'maven.modrinth:polydex:1.9.2+26.1-rc-3'
 	//modCompileOnly 'eu.pb4:polydex:1.2.3-dev2+1.21'
 	// Uncomment the following line to enable the deprecated Fabric API modules.
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 
-	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
+	// implementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 }
 
 processResources {
@@ -132,7 +124,7 @@ classes {
 	}
 }
 
-remapJar {
+jar {
 	doLast {
 		fileTree(dir: outputs.files.asPath, include: ["**/*.json", "**/*.mcmeta"]).each {
 			File file -> file.text = com.google.gson.JsonParser.parseString(file.text).toString()
@@ -150,7 +142,7 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
 	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	it.options.release = 21
+	it.options.release = 25
 }
 
 java {
@@ -189,10 +181,10 @@ if (System.getenv("MODRINTH")) {
 		projectId = 'MikpSrAF'// The ID of your modrinth project, slugs will not work.
 		versionNumber = "" + version // The version of the mod to upload.
 		versionType = "release"
-		uploadFile = remapJar // This links to a task that builds your mod jar and sets "uploadFile" to the mod jar.
+		uploadFile = jar // This links to a task that builds your mod jar and sets "uploadFile" to the mod jar.
 		gameVersions = [((String) project.minecraft_version)]
 		changelog = System.getenv("CHANGELOG")
-		loaders = ["fabric", "quilt"]
+		loaders = ["fabric"]
 
 		dependencies {
 			required.project "polymer"
@@ -200,7 +192,7 @@ if (System.getenv("MODRINTH")) {
 		}
 	}
 
-	remapJar {
+	jar {
 		finalizedBy project.tasks.modrinth
 	}
 }

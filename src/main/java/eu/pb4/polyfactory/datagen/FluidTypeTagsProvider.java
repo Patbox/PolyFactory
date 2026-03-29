@@ -4,13 +4,13 @@ import eu.pb4.polyfactory.fluid.FactoryFluidTags;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.other.FactoryRegistries;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.minecraft.core.HolderLookup;
 import java.util.concurrent.CompletableFuture;
 
-class FluidTypeTagsProvider extends FabricTagProvider.FabricValueLookupTagProvider<FluidType<?>> {
-    public FluidTypeTagsProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
+class FluidTypeTagsProvider extends FabricTagsProvider.FabricIntrinsicHolderTagsProvider<FluidType<?>> {
+    public FluidTypeTagsProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
         super(output, FactoryRegistries.FLUID_TYPES_KEY, completableFuture, x -> FactoryRegistries.FLUID_TYPES.getResourceKey(x).orElseThrow());
     }
 

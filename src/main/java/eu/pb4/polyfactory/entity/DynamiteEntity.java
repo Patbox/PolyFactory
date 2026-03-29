@@ -2,10 +2,10 @@ package eu.pb4.polyfactory.entity;
 
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
+import eu.pb4.polymer.virtualentity.api.data.DisplayEntityData;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.List;
 import net.minecraft.core.BlockPos;
@@ -95,7 +95,7 @@ public class DynamiteEntity extends Projectile implements PolymerEntity {
         }
         if (this.tickCount == 6 && this.getOwner() instanceof ServerPlayer player) {
             player.connection.send(new ClientboundSetEntityDataPacket(this.getId(),
-                    List.of(SynchedEntityData.DataValue.create(DisplayTrackedData.Item.ITEM, this.itemStack))));
+                    List.of(SynchedEntityData.DataValue.create(DisplayEntityData.Item.ITEM, this.itemStack))));
         }
 
         if (this.stickToBlock == null) {
@@ -139,7 +139,8 @@ public class DynamiteEntity extends Projectile implements PolymerEntity {
             }
             this.particlePos = this.particlePos.lerp(this.position().add(0, getBbHeight(), 0),  1 / 5f);
 
-            this.updateInWaterStateAndDoFluidPushing();
+            // Todo?
+            //this.updateInWaterStateAndDoFluidPushing();
             world.sendParticles(ParticleTypes.SMOKE, this.particlePos.x, this.particlePos.y, this.particlePos.z, 0, 0.0, 0.0, 0.0, 0);
         }
     }
@@ -161,11 +162,11 @@ public class DynamiteEntity extends Projectile implements PolymerEntity {
     @Override
     public void modifyRawTrackedData(List<SynchedEntityData.DataValue<?>> data, ServerPlayer player, boolean initial) {
         if (initial) {
-            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.TELEPORTATION_DURATION, 3));
-            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.SCALE, new Vector3f(0.6f)));
-            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.BILLBOARD, (byte) Display.BillboardConstraints.CENTER.ordinal()));
-            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.Item.ITEM, this.tickCount < 4 && this.ownedBy(player) ? ItemStack.EMPTY : this.itemStack));
-            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.Item.ITEM_DISPLAY, ItemDisplayContext.FIXED.getId()));
+            data.add(SynchedEntityData.DataValue.create(DisplayEntityData.TELEPORTATION_DURATION, 3));
+            data.add(SynchedEntityData.DataValue.create(DisplayEntityData.SCALE, new Vector3f(0.6f)));
+            data.add(SynchedEntityData.DataValue.create(DisplayEntityData.BILLBOARD, (byte) Display.BillboardConstraints.CENTER.ordinal()));
+            data.add(SynchedEntityData.DataValue.create(DisplayEntityData.Item.ITEM, this.tickCount < 4 && this.ownedBy(player) ? ItemStack.EMPTY : this.itemStack));
+            data.add(SynchedEntityData.DataValue.create(DisplayEntityData.Item.ITEM_DISPLAY, ItemDisplayContext.FIXED.getId()));
         }
     }
 

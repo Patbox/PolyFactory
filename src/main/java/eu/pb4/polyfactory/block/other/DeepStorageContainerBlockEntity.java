@@ -8,7 +8,7 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
 import eu.pb4.polyfactory.util.ContainerSavingHelper;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
-import eu.pb4.sgui.api.GuiHelpers;
+import eu.pb4.sgui.api.SguiUtils;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
@@ -66,7 +66,7 @@ public class DeepStorageContainerBlockEntity extends LockableBlockEntity impleme
         }
 
         public boolean isOwnContainer(Player player) {
-            if (player instanceof ServerPlayer serverPlayer && GuiHelpers.getCurrentGui(serverPlayer) instanceof Gui gui) {
+            if (player instanceof ServerPlayer serverPlayer && SguiUtils.getCurrentGui(serverPlayer) instanceof Gui gui) {
                 return gui.getContainer() == DeepStorageContainerBlockEntity.this;
             } else {
                 return false;
@@ -136,7 +136,7 @@ public class DeepStorageContainerBlockEntity extends LockableBlockEntity impleme
         double x = this.worldPosition.getX() + 1 + vec3i.getX();
         double y = this.worldPosition.getY() + 1 + vec3i.getY();
         double z = this.worldPosition.getZ() + 1 + vec3i.getZ();
-        this.level.playSound(null, x, y, z, sound, SoundSource.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 1.1F);
+        this.level.playSound(null, x, y, z, sound, SoundSource.BLOCKS, 0.5F, this.level.getRandom().nextFloat() * 0.1F + 1.1F);
     }
 
     @Override
@@ -179,7 +179,7 @@ public class DeepStorageContainerBlockEntity extends LockableBlockEntity impleme
                     int i = x + y * 2;
                     this.setSlot(x + y * 9 + 7 + 9, GuiUtils.createDynamicButton(() -> getButtonIcon(i), clickType -> {
                         if (clickType.isMiddle || clickType.isRight) {
-                            var carried = screenHandler.getCarried();
+                            var carried = wrappedMenu.getCarried();
                             var oldOverride = iconOverrides.get(i);
                             if (!ItemStack.isSameItemSameComponents(carried, oldOverride)) {
                                 carried = carried.copyWithCount(1);
@@ -211,7 +211,7 @@ public class DeepStorageContainerBlockEntity extends LockableBlockEntity impleme
         }
 
         private ItemStack getSelectedIcon() {
-            var stack = GuiTextures.DEEP_STORAGE_UNIT_SELECTED.copy();
+            var stack = GuiTextures.DEEP_STORAGE_UNIT_SELECTED.get().copy();
             var selected = new BooleanArrayList(8);
             for (int i = 0; i < PAGE_COUNT; i++) {
                 selected.add(i == this.page);
@@ -228,7 +228,7 @@ public class DeepStorageContainerBlockEntity extends LockableBlockEntity impleme
 
             for (int x = 0; x < 7; x++) {
                 for (int y = 0; y < 6; y++) {
-                    this.setSlotRedirect(x + y * 9, new Slot(DeepStorageContainerBlockEntity.this, x + y * 7 + page * PAGE, x, y));
+                    this.setSlot(x + y * 9, new Slot(DeepStorageContainerBlockEntity.this, x + y * 7 + page * PAGE, x, y));
                 }
             }
 
@@ -242,8 +242,8 @@ public class DeepStorageContainerBlockEntity extends LockableBlockEntity impleme
         }
 
         @Override
-        public void onScreenHandlerClosed() {
-            super.onScreenHandlerClosed();
+        public void onRemoved() {
+            super.onRemoved();
             stopOpen(player);
         }
 

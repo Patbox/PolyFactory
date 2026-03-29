@@ -21,7 +21,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -156,7 +156,7 @@ public class HandCrankBlock extends RotationalNetworkBlock implements FactoryBlo
         private final ItemDisplayElement mainElement;
 
         private Model(ServerLevel world, BlockState state) {
-            this.mainElement = LodItemDisplayElement.createSolid(FactoryItems.HAND_CRANK, this.getUpdateRate());
+            this.mainElement = LodItemDisplayElement.createSimple(FactoryItems.HAND_CRANK, this.getUpdateRate());
             this.updateAnimation(0, state.getValue(FACING));
             this.addElement(this.mainElement);
         }

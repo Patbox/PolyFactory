@@ -73,7 +73,7 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
     }
 
     @Override
-    public ItemStack assemble(MixingInput inventory, HolderLookup.Provider registryManager) {
+    public ItemStack assemble(MixingInput inventory) {
         int color = -1;
         int count = 0;
 

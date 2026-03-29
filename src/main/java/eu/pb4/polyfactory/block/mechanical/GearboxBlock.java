@@ -12,7 +12,7 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -90,13 +90,13 @@ public class GearboxBlock extends RotationalNetworkBlock implements FactoryBlock
         private final ItemDisplayElement zAxle;
 
         private Model() {
-            this.mainElement = ItemDisplayElementUtil.createSolid(FactoryItems.GEARBOX);
+            this.mainElement = ItemDisplayElementUtil.createSimple(FactoryItems.GEARBOX);
             this.mainElement.setScale(new Vector3f(2));
             this.addElement(this.mainElement);
 
-            this.xAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
-            this.yAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
-            this.zAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
+            this.xAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL.get(), this.getUpdateRate(), 0.3f, 0.6f);
+            this.yAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL.get(), this.getUpdateRate(), 0.3f, 0.6f);
+            this.zAxle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL.get(), this.getUpdateRate(), 0.3f, 0.6f);
             this.xAxle.setViewRange(0.5f);
             this.yAxle.setViewRange(0.5f);
             this.zAxle.setViewRange(0.5f);

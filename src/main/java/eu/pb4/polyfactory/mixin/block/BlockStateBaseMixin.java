@@ -4,16 +4,28 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import eu.pb4.polyfactory.block.other.TagRedirector;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.TypedInstance;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(BlockBehaviour.BlockStateBase.class)
-public abstract class BlockStateBaseMixin {
+public abstract class BlockStateBaseMixin implements TypedInstance<Block> {
     @Shadow public abstract Block getBlock();
+
+    @Intrinsic
+    public boolean is(TagKey<Block> tag) {
+        return TypedInstance.super.is(tag);
+    }
+
+    @Intrinsic
+    public boolean is(HolderSet<Block> set) {
+        return TypedInstance.super.is(set);
+    }
 
     @ModifyReturnValue(method = "is(Lnet/minecraft/tags/TagKey;)Z", at = @At("TAIL"))
     private boolean extendedIsIn(boolean original, @Local(argsOnly = true) TagKey<Block> tagKey) {

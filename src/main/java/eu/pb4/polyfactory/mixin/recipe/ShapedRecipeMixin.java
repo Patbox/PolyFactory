@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(ShapedRecipe.class)
 public class ShapedRecipeMixin {
-    @ModifyReturnValue(method = "assemble(Lnet/minecraft/world/item/crafting/CraftingInput;Lnet/minecraft/core/HolderLookup$Provider;)Lnet/minecraft/world/item/ItemStack;", at = @At("RETURN"))
+    @ModifyReturnValue(method = "assemble(Lnet/minecraft/world/item/crafting/CraftingInput;)Lnet/minecraft/world/item/ItemStack;", at = @At("RETURN"))
     private ItemStack modifyColors(ItemStack stack, CraftingInput recipeInputInventory) {
         if (stack.has(FactoryDataComponents.COLOR)
                 && stack.getOrDefault(FactoryDataComponents.COLOR, -1) == -2) {

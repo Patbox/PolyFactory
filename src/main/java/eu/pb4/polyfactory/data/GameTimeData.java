@@ -14,7 +14,7 @@ public record GameTimeData(long day, long dayTime, long gameTime) implements Dat
 
 
     public static GameTimeData now(ServerLevel level) {
-        return new GameTimeData(level.getDayCount(), level.getDayTime() % 24000, level.getGameTime());
+        return new GameTimeData(level.getOverworldClockTime(), level.getOverworldClockTime() % 24000, level.getGameTime());
     }
 
     @Override

@@ -88,7 +88,7 @@ public class WorkbenchScreenHandler extends RecipeBookMenu {
             RecipeHolder<CraftingRecipe> recipeEntry = optional.get();
             CraftingRecipe craftingRecipe = recipeEntry.value();
             if (resultInventory.setRecipeUsed(serverPlayerEntity, recipeEntry)) {
-                ItemStack itemStack2 = craftingRecipe.assemble(craftingRecipeInput, world.registryAccess());
+                ItemStack itemStack2 = craftingRecipe.assemble(craftingRecipeInput);
                 if (itemStack2.isItemEnabled(world.enabledFeatures())) {
                     itemStack = itemStack2;
                 }

@@ -180,8 +180,8 @@ public class FactoryBlocks {
                 var cableWall = register("wall_with_cable/" + id.getNamespace() + "/" + id.getPath(), BlockBehaviour.Properties.ofFullCopy(wallBlock).noLootTable(), settings -> new WallWithCableBlock(settings, wallBlock));
                 var pipeWall = register("wall_with_pipe/" + id.getNamespace() + "/" + id.getPath(), BlockBehaviour.Properties.ofFullCopy(wallBlock).noLootTable(), settings -> new PipeInWallBlock(settings, wallBlock));
 
-                FactoryBlockEntities.CABLE.addSupportedBlock(cableWall);
-                FactoryBlockEntities.PIPE.addSupportedBlock(pipeWall);
+                FactoryBlockEntities.CABLE.addValidBlock(cableWall);
+                FactoryBlockEntities.PIPE.addValidBlock(pipeWall);
             }
         });
 

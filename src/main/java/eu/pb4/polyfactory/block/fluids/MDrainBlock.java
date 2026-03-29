@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.fluids;
 
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
@@ -30,14 +31,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable {
     public MDrainBlock(Properties settings) {
         super(settings);
-        Model.AXLE_MODEL.isEmpty();
     }
 
     @Override
@@ -146,8 +146,8 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
 
 
     public static final class Model extends RotationAwareModel {
-        private static final ItemStack BASE_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/mechanical_drain"));
-        private static final ItemStack AXLE_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/mechanical_drain_axle"));
+        private static final LazyItemStack BASE_MODEL = ItemDisplayElementUtil.getModel(id("block/mechanical_drain"));
+        private static final LazyItemStack AXLE_MODEL = ItemDisplayElementUtil.getModel(id("block/mechanical_drain_axle"));
         private final ItemDisplayElement catalyst;
         private final ItemDisplayElement main;
         private final ItemDisplayElement axle;
@@ -157,7 +157,7 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
 
         private Model(BlockState state) {
             this.fluid = new TopFluidViewModel(this, -7f / 16f + 0.1f, 11f / 16f, 0.5f);
-            this.main = ItemDisplayElementUtil.createSimple(BASE_MODEL);
+            this.main = ItemDisplayElementUtil.createSimple(BASE_MODEL.get());
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.catalyst = ItemDisplayElementUtil.createSimple();
@@ -166,7 +166,7 @@ public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable
             this.catalyst.setScale(new Vector3f(12 / 16f));
             this.catalyst.setViewRange(0.4f);
 
-            this.axle = LodItemDisplayElement.createSimple(AXLE_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
+            this.axle = LodItemDisplayElement.createSimple(AXLE_MODEL.get(), this.getUpdateRate(), 0.3f, 0.6f);
             this.axle.setOffset(new Vec3(0, 1, 0));
             this.axle.setViewRange(0.6f);
             this.updateStatePos(state);

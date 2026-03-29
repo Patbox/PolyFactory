@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
@@ -21,7 +22,7 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -52,15 +53,15 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty INVERTED = BlockStateProperties.INVERTED;
-    private final ItemStack model;
-    private final ItemStack modelPowered;
+    private final LazyItemStack model;
+    private final LazyItemStack modelPowered;
 
     public ClutchBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false).setValue(POWERED, false).setValue(INVERTED, false));
         var model = ((PropertiesAccessor) settings).getId().identifier().withPrefix("block/");
-        this.model = ItemDisplayElementUtil.getSolidModel(model);
-        this.modelPowered = ItemDisplayElementUtil.getSolidModel(model.withSuffix("_on"));
+        this.model = ItemDisplayElementUtil.getModel(model);
+        this.modelPowered = ItemDisplayElementUtil.getModel(model.withSuffix("_on"));
     }
 
     @Override
@@ -155,11 +156,11 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
             this.main = ItemDisplayElementUtil.createSimple();
             this.main.setScale(new Vector3f(2));
 
-            this.left = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, this.getUpdateRate(), 0.3f, 0.6f);
+            this.left = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT.get(), this.getUpdateRate(), 0.3f, 0.6f);
             this.left.setViewRange(0.5f);
             this.left.setScale(new Vector3f(2));
 
-            this.right = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, this.getUpdateRate(), 0.3f, 0.6f);
+            this.right = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT.get(), this.getUpdateRate(), 0.3f, 0.6f);
             this.right.setViewRange(0.5f);
             this.right.setScale(new Vector3f(2));
 
@@ -171,7 +172,7 @@ public class ClutchBlock extends RotationalNetworkBlock implements FactoryBlock,
         }
 
         private void updateStatePos(BlockState state) {
-            this.main.setItem(state.getValue(POWERED) ? modelPowered : model);
+            this.main.setItem((state.getValue(POWERED) ? modelPowered : model).get());
             var dir = state.getValue(AXIS);
             float p = 0;
             float y = 0;

@@ -44,7 +44,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 
 public class ContainerBlock extends Block implements FactoryBlock, EntityBlock, AttackableBlock, SneakBypassingBlock, BarrierBasedWaterloggable {
@@ -195,7 +195,7 @@ public class ContainerBlock extends Block implements FactoryBlock, EntityBlock, 
         private final TextDisplayElement countElement;
 
         private Model(ServerLevel world, BlockPos pos, BlockState state) {
-            this.mainElement = ItemDisplayElementUtil.createSolid(ContainerBlock.this.asItem());
+            this.mainElement = ItemDisplayElementUtil.createSimple(ContainerBlock.this.asItem());
 
             this.itemElement = ItemDisplayElementUtil.createSimple();
             this.itemElement.setDisplaySize(1, 1);

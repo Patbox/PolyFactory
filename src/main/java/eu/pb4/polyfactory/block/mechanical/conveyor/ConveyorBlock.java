@@ -61,7 +61,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -549,11 +549,11 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
         }
 
         private ItemStack getModelForSpeed(double speed, DirectionValue directionValue, boolean sticky, BlockState state) {
-            return (switch (directionValue) {
+            return ((switch (directionValue) {
                 case POSITIVE -> sticky ? ConveyorModels.ANIMATION_UP_STICKY : ConveyorModels.ANIMATION_UP;
                 case NEGATIVE -> sticky ? ConveyorModels.ANIMATION_DOWN_STICKY : ConveyorModels.ANIMATION_DOWN;
                 default -> sticky ? ConveyorModels.ANIMATION_REGULAR_STICKY : ConveyorModels.ANIMATION_REGULAR;
-            })[getModelId(state)][(int) Math.ceil(Mth.clamp(speed * ConveyorModels.FRAMES * 15, 0, ConveyorModels.FRAMES))];
+            })[getModelId(state)][(int) Math.ceil(Mth.clamp(speed * ConveyorModels.FRAMES * 15, 0, ConveyorModels.FRAMES))]).get();
         }
 
         private ItemStack getFastModel(DirectionValue directionValue, boolean sticky, BlockState state) {
@@ -561,7 +561,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
                 case POSITIVE -> sticky ? ConveyorModels.STICKY_UP_FAST : ConveyorModels.UP_FAST;
                 case NEGATIVE -> sticky ? ConveyorModels.STICKY_DOWN_FAST : ConveyorModels.DOWN_FAST;
                 default -> sticky ? ConveyorModels.STICKY_REGULAR_FAST : ConveyorModels.REGULAR_FAST;
-            });
+            }).get();
         }
 
         private void updateAnimation(Direction dir, DirectionValue value) {

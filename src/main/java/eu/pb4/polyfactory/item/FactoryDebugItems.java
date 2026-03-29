@@ -24,16 +24,16 @@ public class FactoryDebugItems {
         var world = ctx.getLevel();
         var pos = ctx.getClickedPos();
         assert player != null;
-        player.displayClientMessage(Component.literal("# Push: ").withStyle(ChatFormatting.YELLOW), false);
+        player.sendSystemMessage(Component.literal("# Push: ").withStyle(ChatFormatting.YELLOW));
         NetworkComponent.Pipe.getLogic((ServerLevel) world, pos).runPushFlows(pos, () -> true, (direction, strength) -> {
-            player.displayClientMessage(Component.literal(direction.getSerializedName() + "=" + strength), false);
+            player.sendSystemMessage(Component.literal(direction.getSerializedName() + "=" + strength));
         });
-        player.displayClientMessage(Component.literal("["
+        player.sendSystemMessage(Component.literal("["
                 + Arrays.stream(NetworkComponent.Pipe.getLogic((ServerLevel) world, pos).getWeightedMaxFlow(pos, true, 1000)).mapToObj(String::valueOf).collect(Collectors.joining(", "))
-                + "]"), false);
-        player.displayClientMessage(Component.literal("# Pull: ").withStyle(ChatFormatting.YELLOW), false);
+                + "]"));
+        player.sendSystemMessage(Component.literal("# Pull: ").withStyle(ChatFormatting.YELLOW));
         NetworkComponent.Pipe.getLogic((ServerLevel) world, pos).runPullFlows(pos, () -> true, (direction, strength) -> {
-            player.displayClientMessage(Component.literal(direction.getSerializedName() + "=" + strength), false);
+            player.sendSystemMessage(Component.literal(direction.getSerializedName() + "=" + strength));
         });
     }));
 
@@ -43,12 +43,12 @@ public class FactoryDebugItems {
         var pos = ctx.getClickedPos();
         assert player != null;
         GraphLibImpl.UNIVERSE.forEach((id, universe) -> {
-            player.displayClientMessage(Component.literal("# " + id + ": ").withStyle(ChatFormatting.YELLOW), false);
+            player.sendSystemMessage(Component.literal("# " + id + ": ").withStyle(ChatFormatting.YELLOW));
             universe.getGraphWorld((ServerLevel) world).getNodesAt(pos).forEach((holder) -> {
-                player.displayClientMessage(Component.literal("G: " + holder.getGraphId() + " | " + holder.getNode()), false);
+                player.sendSystemMessage(Component.literal("G: " + holder.getGraphId() + " | " + holder.getNode()));
                 if (universe == FactoryNodes.DATA) {
                     var data = holder.getGraph().getGraphEntity(DataStorage.TYPE);
-                    player.displayClientMessage(Component.literal("  > DataStorage: " + System.identityHashCode(data)), false);
+                    player.sendSystemMessage(Component.literal("  > DataStorage: " + System.identityHashCode(data)));
                 }
             });
         });
@@ -60,22 +60,22 @@ public class FactoryDebugItems {
         var pos = ctx.getClickedPos();
         assert player != null;
         FactoryNodes.DATA.getGraphWorld((ServerLevel) world).getNodesAt(pos).forEach((holder) -> {
-            player.displayClientMessage(Component.literal("G: " + holder.getGraphId() + " (" + holder.getNode() + ")"), false);
+            player.sendSystemMessage(Component.literal("G: " + holder.getGraphId() + " (" + holder.getNode() + ")"));
             var data = holder.getGraph().getGraphEntity(DataStorage.TYPE);
-            player.displayClientMessage(Component.literal("> Receivers: "), false);
+            player.sendSystemMessage(Component.literal("> Receivers: "));
             for (var rec : data.receivers().int2ObjectEntrySet()) {
-                player.displayClientMessage(Component.literal(">> Channel: " + rec.getIntKey()), false);
+                player.sendSystemMessage(Component.literal(">> Channel: " + rec.getIntKey()));
 
                 for (var node : rec.getValue()) {
-                    player.displayClientMessage(Component.literal("   " + node.pos().toShortString() + " | " + node.node().toString()), false);
+                    player.sendSystemMessage(Component.literal("   " + node.pos().toShortString() + " | " + node.node().toString()));
                 }
             }
-            player.displayClientMessage(Component.literal("> Providers: "), false);
+            player.sendSystemMessage(Component.literal("> Providers: "));
             for (var rec : data.providers().int2ObjectEntrySet()) {
-                player.displayClientMessage(Component.literal(">> Channel: " + rec.getIntKey()), false);
+                player.sendSystemMessage(Component.literal(">> Channel: " + rec.getIntKey()));
 
                 for (var node : rec.getValue()) {
-                    player.displayClientMessage(Component.literal("   " + node.pos().toShortString() + " | " + node.node().toString()), false);
+                    player.sendSystemMessage(Component.literal("   " + node.pos().toShortString() + " | " + node.node().toString()));
                 }
             }
 

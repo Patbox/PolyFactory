@@ -14,7 +14,7 @@ public class SimpleCauldronCastingRecipePage extends CauldronCastingRecipePage<S
 
     @Override
     protected ItemStack getResultStack() {
-        return this.recipe.output();
+        return this.recipe.output().create();
     }
 
     @Override

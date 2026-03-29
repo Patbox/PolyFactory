@@ -10,7 +10,7 @@ import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.elements.GuiElement;
-import eu.pb4.sgui.api.elements.GuiElementInterface;
+import eu.pb4.sgui.api.elements.SimpleGuiElement;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -37,7 +37,7 @@ public interface FluidContainerUtil {
     }
     static void tick(FluidContainer container, ServerLevel world, Vec3 pos, float temperature, Consumer<ItemStack> stackConsumer) {
         var input = FluidContainerInput.of(container, temperature);
-        var random = world.random;
+        var random = world.getRandom();
         var list = new ArrayList<Tuple<ResourceKey<Recipe<?>>, List<ItemStack>>>();
         for (var entry : ((RecipeManagerAccessor) world.recipeAccess()).getRecipes().byType(FactoryRecipeTypes.FLUID_INTERACTION)) {
             var recipe = entry.value();
@@ -71,8 +71,9 @@ public interface FluidContainerUtil {
                 for (var stack : outputItems) {
                     for (var r = 0; r < stack.roll(); r++) {
                         if (stack.chance() < random.nextFloat()) {
-                            item.add(stack.stack());
-                            stackConsumer.accept(stack.stack().copy());
+                            var t = stack.stack().create();
+                            item.add(t);
+                            stackConsumer.accept(t.copy());
                         }
                     }
                 }
@@ -123,7 +124,7 @@ public interface FluidContainerUtil {
             return null;
         }
         var recipe = optional.get().value();
-        var itemOut = recipe.assemble(input, player.registryAccess());
+        var itemOut = recipe.assemble(input);
         for (var fluid : recipe.fluidInput(input)) {
             container.extract(fluid, false);
         }
@@ -135,11 +136,11 @@ public interface FluidContainerUtil {
         return itemOut;
     }
 
-    static GuiElementInterface guiElement(@Nullable FluidContainer container, boolean interactable) {
+    static GuiElement guiElement(@Nullable FluidContainer container, boolean interactable) {
         if (container == null) {
-            return GuiElement.EMPTY;
+            return SimpleGuiElement.EMPTY;
         }
-        return new GuiElementInterface() {
+        return new GuiElement() {
             @Override
             public ClickCallback getGuiCallback() {
                 return interactable ? (index, type, action, gui) -> {
@@ -159,7 +160,7 @@ public interface FluidContainerUtil {
                             gui.getPlayer().getInventory().placeItemBackInInventory(out);
                         }
                     }
-                } : GuiElementInterface.EMPTY_CALLBACK;
+                } : GuiElement.EMPTY_CALLBACK;
             }
 
             @Override

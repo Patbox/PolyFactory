@@ -52,7 +52,7 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.List;
 
@@ -261,7 +261,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
         private final FilterIcon rightLockElement = new FilterIcon(this);
 
         private Model(BlockState state) {
-            this.mainElement = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
+            this.mainElement = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
 
             this.updateFacing(state);
             this.addElement(this.mainElement);

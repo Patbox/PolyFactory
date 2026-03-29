@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.item.block;
 
 import eu.pb4.polyfactory.item.util.ColoredItem;
-import eu.pb4.factorytools.api.item.FireworkStarColoredItem;
+
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.SimpleColoredItem;

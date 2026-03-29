@@ -70,8 +70,13 @@ public record CraftingWithLeftoverRecipe<T extends CraftingRecipe>(RecipeSeriali
     }
 
     @Override
-    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
-        return this.backingRecipe.assemble(input, registries);
+    public boolean showNotification() {
+        return this.backingRecipe.showNotification();
+    }
+
+    @Override
+    public ItemStack assemble(CraftingInput input) {
+        return this.backingRecipe.assemble(input);
     }
 
     @Override

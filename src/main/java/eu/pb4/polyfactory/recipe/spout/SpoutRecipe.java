@@ -58,6 +58,16 @@ public interface SpoutRecipe extends Recipe<SingleItemWithFluid> {
     }
 
     @Override
+    default String group() {
+        return "";
+    }
+
+    @Override
+    default boolean showNotification() {
+        return false;
+    }
+
+    @Override
     default boolean isSpecial() {
         return true;
     }

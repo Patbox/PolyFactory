@@ -3,14 +3,17 @@ package eu.pb4.polyfactory.models;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.mechanical.conveyor.ConveyorBlock;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -28,12 +31,12 @@ import static eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras.bridgeMo
 public class ConveyorModels {
     public static final int FRAMES = 20;
 
-    public static final ItemStack[][] ANIMATION_REGULAR_STICKY = new ItemStack[16][1 + FRAMES];
-    public static final ItemStack[][] ANIMATION_REGULAR = new ItemStack[16][1 + FRAMES];
-    public static final ItemStack[][] ANIMATION_UP = new ItemStack[16][1 + FRAMES];
-    public static final ItemStack[][] ANIMATION_UP_STICKY = new ItemStack[16][1 + FRAMES];
-    public static final ItemStack[][] ANIMATION_DOWN = new ItemStack[16][1 + FRAMES];
-    public static final ItemStack[][] ANIMATION_DOWN_STICKY = new ItemStack[16][1 + FRAMES];
+    public static final LazyItemStack[][] ANIMATION_REGULAR_STICKY = new LazyItemStack[16][1 + FRAMES];
+    public static final LazyItemStack[][] ANIMATION_REGULAR = new LazyItemStack[16][1 + FRAMES];
+    public static final LazyItemStack[][] ANIMATION_UP = new LazyItemStack[16][1 + FRAMES];
+    public static final LazyItemStack[][] ANIMATION_UP_STICKY = new LazyItemStack[16][1 + FRAMES];
+    public static final LazyItemStack[][] ANIMATION_DOWN = new LazyItemStack[16][1 + FRAMES];
+    public static final LazyItemStack[][] ANIMATION_DOWN_STICKY = new LazyItemStack[16][1 + FRAMES];
     private static final String MODEL_JSON = """
             {
               "parent": "polyfactory:block/|SUBTYPE|conveyor|TYPE|",
@@ -59,26 +62,19 @@ public class ConveyorModels {
             }
             """;
     private static int currentItemIndex;
-    public static final ItemStack REGULAR_FAST = new ItemStack(Items.STONE);
-    public static final ItemStack UP_FAST = new ItemStack(Items.STONE);
-    public static final ItemStack DOWN_FAST = new ItemStack(Items.STONE);
-    public static final ItemStack STICKY_REGULAR_FAST = new ItemStack(Items.STONE);
-    public static final ItemStack STICKY_UP_FAST = new ItemStack(Items.STONE);
-    public static final ItemStack STICKY_DOWN_FAST = new ItemStack(Items.STONE);
+    public static final LazyItemStack REGULAR_FAST = createFast("", "");
+    public static final LazyItemStack UP_FAST = createFast("", "_up");
+    public static final LazyItemStack DOWN_FAST = createFast("", "_down");
+    public static final LazyItemStack STICKY_REGULAR_FAST = createFast("sticky_", "");
+    public static final LazyItemStack STICKY_UP_FAST = createFast("sticky_", "_up");
+    public static final LazyItemStack STICKY_DOWN_FAST = createFast("sticky_", "_down");
 
-    private static void createItemModel(ItemStack[] array, String path, int i) {
-        var model = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id(path));
+    private static void createItemModel(LazyItemStack[] array, String path, int i) {
+        var model = ItemDisplayElementUtil.getModel(FactoryUtil.id(path));
         array[i == 0 ? 0 : (array.length - i)] = model;
     }
 
     public static void registerAssetsEvents() {
-        createFast(REGULAR_FAST, "", "");
-        createFast(UP_FAST, "", "_up");
-        createFast(DOWN_FAST, "", "_down");
-        createFast(STICKY_REGULAR_FAST, "sticky_", "");
-        createFast(STICKY_UP_FAST, "sticky_", "_up");
-        createFast(STICKY_DOWN_FAST, "sticky_", "_down");
-
         for (int i = 0; i <= FRAMES; i++) {
             for (var a = 0; a < 16; a++) {
                 String addition = i == 0 ? (a == 0 ? "" : "_" + a) : ("_" + a + "/" + i);
@@ -98,8 +94,9 @@ public class ConveyorModels {
         }
     }
 
-    private static void createFast(ItemStack stack, String prefix, String suffix) {
-        stack.set(DataComponents.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/" + prefix + "conveyor" + suffix + "_fast")));
+    private static LazyItemStack createFast(String prefix, String suffix) {
+        return new LazyItemStack(new ItemStackTemplate(Items.STONE, DataComponentPatch.builder()
+                .set(DataComponents.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/" + prefix + "conveyor" + suffix + "_fast"))).build()));
     }
 
     public static void generateModels(BiConsumer<String, byte[]> dataWriter) {
@@ -208,7 +205,7 @@ public class ConveyorModels {
 
             dataWriter.accept("assets/polyfactory/models/block/gen/" + prefix + "conveyor" + addition + ".json", MODEL_JSON.
                     replace("|PREFIX|", prefix).replace("|ID|", "" + i)
-                    .replace("|TYPE|", base).replace("|SUBTYPE|", a == 0  ? "" : "gen/")
+                    .replace("|TYPE|", base).replace("|SUBTYPE|", a == 0 ? "" : "gen/")
                     .getBytes(StandardCharsets.UTF_8));
             dataWriter.accept("assets/polyfactory/models/block/gen/" + prefix + "conveyor_up" + addition + ".json", MODEL_JSON_UP
                     .replace("|PREFIX|", prefix).replace("|ID|", "" + i)

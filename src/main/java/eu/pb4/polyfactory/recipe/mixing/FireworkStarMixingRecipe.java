@@ -8,16 +8,21 @@ import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.input.MixingInput;
 import java.util.Collections;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.FireworkStarRecipe;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
 public record FireworkStarMixingRecipe(double time,
                                        double minimumSpeed,
                                        double optimalSpeed) implements MixingRecipe {
-    public static final FireworkStarRecipe VANILLA = new FireworkStarRecipe(CraftingBookCategory.BUILDING);
+    public static final ResourceKey<Recipe<?>> VANILLA = ResourceKey.create(Registries.RECIPE, Identifier.withDefaultNamespace("firework_star"));
 
     public static final MapCodec<FireworkStarMixingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.DOUBLE.fieldOf("time").forGetter(FireworkStarMixingRecipe::time),
@@ -59,12 +64,13 @@ public record FireworkStarMixingRecipe(double time,
         if (!inventory.fluids().isEmpty()) {
             return false;
         }
-        return VANILLA.matches(inventory.asCraftingRecipeInput(), world);
+
+        return ((FireworkStarRecipe) ((ServerLevel) inventory.world()).recipeAccess().byKey(VANILLA).orElseThrow().value()).matches(inventory.asCraftingRecipeInput(), world);
     }
 
     @Override
-    public ItemStack assemble(MixingInput inventory, HolderLookup.Provider registryManager) {
-        return VANILLA.assemble(inventory.asCraftingRecipeInput(), registryManager);
+    public ItemStack assemble(MixingInput inventory) {
+        return ((FireworkStarRecipe) ((ServerLevel) inventory.world()).recipeAccess().byKey(VANILLA).orElseThrow().value()).assemble(inventory.asCraftingRecipeInput());
     }
 
     @Override

@@ -19,8 +19,8 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
+import eu.pb4.sgui.api.containerwrappers.slot.WrappingSlot;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import eu.pb4.sgui.virtual.inventory.VirtualSlot;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -161,7 +161,7 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
                 if (!stack.isEmpty()) {
                     var value = world.fuelValues().burnDuration(stack);
                     if (value > 0) {
-                        var remainder = stack.getRecipeRemainder();
+                        var remainder = stack.getCraftingRemainder();
                         stack.shrink(1);
                         self.fuelTicks = value;
                         self.fuelInitial = self.fuelTicks;
@@ -170,10 +170,11 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
                             self.setItem(1, ItemStack.EMPTY);
                         }
 
-                        if (!remainder.isEmpty()) {
-                            FactoryUtil.insertBetween(self, 9, 12, remainder);
-                            if (!remainder.isEmpty()) {
-                                Containers.dropItemStack(world, pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, remainder);
+                        if (remainder != null) {
+                            var remainderStack = remainder.create();
+                            FactoryUtil.insertBetween(self, 9, 12,remainderStack);
+                            if (!remainderStack.isEmpty()) {
+                                Containers.dropItemStack(world, pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, remainderStack);
                             }
                         }
 
@@ -274,8 +275,8 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
             super(MenuType.GENERIC_9x3, player, false);
             this.inputSlot = new Slot(PrimitiveSmelteryBlockEntity.this, 0, 0, 0);
             this.fuelSlot = new FuelSlot(PrimitiveSmelteryBlockEntity.this, 1, player.level().fuelValues());
-            this.setSlotRedirect(2, this.inputSlot);
-            this.setSlotRedirect(9 * 2 + 2, this.fuelSlot);
+            this.setSlot(2, this.inputSlot);
+            this.setSlot(9 * 2 + 2, this.fuelSlot);
 
             for (int x = 0; x < 3; x++) {
                 var fluid = FluidContainerUtil.guiElement(fluidContainer, false);
@@ -349,7 +350,7 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
         public ItemStack quickMove(int index) {
             ItemStack itemStack = ItemStack.EMPTY;
             Slot slot = this.getSlotRedirectOrPlayer(index);
-            if (slot != null && slot.hasItem() && !(slot instanceof VirtualSlot)) {
+            if (slot != null && slot.hasItem() && !(slot instanceof WrappingSlot)) {
                 ItemStack itemStack2 = slot.getItem();
                 itemStack = itemStack2.copy();
                 if (index < this.getVirtualSize()) {
@@ -371,7 +372,7 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
                 } else {
                     slot.setChanged();
                 }
-            } else if (slot instanceof VirtualSlot) {
+            } else if (slot instanceof WrappingSlot) {
                 return slot.getItem();
             }
 

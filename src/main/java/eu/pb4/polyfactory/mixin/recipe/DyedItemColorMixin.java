@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import eu.pb4.polyfactory.item.ArtificialDyeItem;
 import eu.pb4.polyfactory.item.util.ColoredItem;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,8 +18,8 @@ import net.minecraft.world.item.component.DyedItemColor;
 
 @Mixin(DyedItemColor.class)
 public class DyedItemColorMixin {
-    @Inject(method = "applyDyes", at = @At(value = "INVOKE", target = "Ljava/util/List;iterator()Ljava/util/Iterator;"))
-    private static void blendAndSetCustomColor(ItemStack stack, List<DyeItem> colors, CallbackInfoReturnable<ItemStack> cir,
+    @Inject(method = "applyDyes(Lnet/minecraft/world/item/component/DyedItemColor;Ljava/util/List;)Lnet/minecraft/world/item/component/DyedItemColor;", at = @At(value = "INVOKE", target = "Ljava/util/List;iterator()Ljava/util/Iterator;"))
+    private static void blendAndSetCustomColor(@Nullable DyedItemColor currentDye, List<DyeItem> colors, CallbackInfoReturnable<DyedItemColor> cir,
                                                @Local(ordinal = 0) LocalIntRef rx,
                                                @Local(ordinal = 1) LocalIntRef gx,
                                                @Local(ordinal = 2) LocalIntRef bx,

@@ -39,7 +39,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 public class CastingTableBlock extends Block implements FactoryBlock, EntityBlock {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -129,7 +129,7 @@ public class CastingTableBlock extends Block implements FactoryBlock, EntityBloc
         private boolean isCooling;
 
         private Model(ServerLevel world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
+            this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.main.setScale(new Vector3f(2));
             this.mold = ItemDisplayElementUtil.createSimple();
             this.mold.setScale(new Vector3f(12 / 16f));

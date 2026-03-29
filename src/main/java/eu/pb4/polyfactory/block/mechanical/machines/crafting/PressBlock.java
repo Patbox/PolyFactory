@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.mechanical.machines.crafting;
 
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
@@ -29,12 +30,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 public class PressBlock extends TallItemMachineBlock {
     public PressBlock(Properties settings) {
         super(settings);
-        Model.MODEL_PISTON.isEmpty();
     }
 
     @Override
@@ -141,7 +141,7 @@ public class PressBlock extends TallItemMachineBlock {
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack MODEL_PISTON =  ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/press_piston"));
+        public static final LazyItemStack MODEL_PISTON = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/press_piston"));
 
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
@@ -154,13 +154,13 @@ public class PressBlock extends TallItemMachineBlock {
         private float value;
 
         private Model(ServerLevel world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSolid(FactoryItems.PRESS);
+            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.PRESS);
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
-            this.piston = LodItemDisplayElement.createSimple(MODEL_PISTON, 2, 0.4f, 0.8f);
+            this.piston = LodItemDisplayElement.createSimple(MODEL_PISTON.get(), 2, 0.4f, 0.8f);
             this.pistonItem = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 2, 0.4f, 0.8f);
-            this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, this.getUpdateRate(), 0.3f, 0.5f);
-            this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR, this.getUpdateRate(), 0.3f, 0.5f);
+            this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR.get(), this.getUpdateRate(), 0.3f, 0.5f);
+            this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR.get(), this.getUpdateRate(), 0.3f, 0.5f);
             this.piston.setViewRange(0.4f);
             this.pistonItem.setViewRange(0.4f);
             this.gearA.setViewRange(0.4f);

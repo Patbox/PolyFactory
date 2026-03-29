@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
@@ -36,7 +37,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,15 +48,15 @@ import java.util.function.Consumer;
 public class ItemOutputBufferBlock extends Block implements FactoryBlock, EntityBlock, ConfigurableBlock {
     public static EnumProperty<FrontAndTop> ORIENTATION = BlockStateProperties.ORIENTATION;
     public static BooleanProperty OPEN = BlockStateProperties.OPEN;
-    private final ItemStack model;
-    private final ItemStack modelOpen;
+    private final LazyItemStack model;
+    private final LazyItemStack modelOpen;
 
     public ItemOutputBufferBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(this.defaultBlockState().setValue(OPEN, false));
         var modelId = ((PropertiesAccessor) settings).getId().identifier().withPrefix("block/");
-        this.model = ItemDisplayElementUtil.getSolidModel(modelId);
-        this.modelOpen = ItemDisplayElementUtil.getSolidModel(modelId.withSuffix("_open"));
+        this.model = ItemDisplayElementUtil.getModel(modelId);
+        this.modelOpen = ItemDisplayElementUtil.getModel(modelId.withSuffix("_open"));
     }
 
     public static Container getOutputContainer(Container original, Level level, BlockPos pos, Iterable<Direction> directions) {
@@ -183,7 +184,7 @@ public class ItemOutputBufferBlock extends Block implements FactoryBlock, Entity
         }
 
         private void updateStatePos(BlockState state) {
-            this.main.setItem(state.getValue(OPEN) ? ItemOutputBufferBlock.this.modelOpen : ItemOutputBufferBlock.this.model);
+            this.main.setItem((state.getValue(OPEN) ? ItemOutputBufferBlock.this.modelOpen : ItemOutputBufferBlock.this.model).get());
             var orientation = state.getValue(ORIENTATION);
             var dir = orientation.front();
             float p = -90;

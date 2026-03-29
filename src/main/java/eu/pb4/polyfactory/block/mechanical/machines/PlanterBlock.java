@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
@@ -20,7 +21,7 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -164,8 +165,8 @@ public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack OUTPUT_1 = ItemDisplayElementUtil.getSolidModel(id("block/planter_output"));
-        public static final ItemStack OUTPUT_2 = ItemDisplayElementUtil.getSolidModel(id("block/planter_output_2"));
+        public static final LazyItemStack OUTPUT_1 = ItemDisplayElementUtil.getModel(id("block/planter_output"));
+        public static final LazyItemStack OUTPUT_2 = ItemDisplayElementUtil.getModel(id("block/planter_output_2"));
 
         private final ItemDisplayElement output1;
         private final ItemDisplayElement output2;
@@ -173,9 +174,9 @@ public class PlanterBlock extends RotationalNetworkBlock implements FactoryBlock
         private BlockPos target = null;
 
         private Model(ServerLevel world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSolid(FactoryItems.PLANTER);
-            this.output1 = LodItemDisplayElement.createSimple(OUTPUT_1, 5, 0.3f);
-            this.output2 = LodItemDisplayElement.createSimple(OUTPUT_2, 5, 0.3f);
+            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.PLANTER);
+            this.output1 = LodItemDisplayElement.createSimple(OUTPUT_1.get(), 5, 0.3f);
+            this.output2 = LodItemDisplayElement.createSimple(OUTPUT_2.get(), 5, 0.3f);
             this.output1.setViewRange(0.5f);
             this.output2.setViewRange(0.5f);
 

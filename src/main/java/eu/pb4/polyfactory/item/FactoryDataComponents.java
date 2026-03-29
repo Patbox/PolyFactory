@@ -11,7 +11,7 @@ import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.item.configuration.ConfigurationData;
 import eu.pb4.polyfactory.item.tool.ImprovedFilterItem;
 import eu.pb4.polymer.core.api.other.PolymerComponent;
-import net.fabricmc.fabric.api.item.v1.ComponentTooltipAppenderRegistry;
+import net.fabricmc.fabric.api.item.v1.ItemComponentTooltipProviderRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -24,7 +24,7 @@ import java.util.List;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class FactoryDataComponents {
-    private static final Codec<ItemStack> UNCOUNTED_ITEM_STACK_WITH_AIR = ItemStack.SINGLE_ITEM_CODEC.orElse(ItemStack.EMPTY);
+    private static final Codec<ItemStack> UNCOUNTED_ITEM_STACK_WITH_AIR = ItemStack.CODEC.orElse(ItemStack.EMPTY);
 
     public static final DataComponentType<Integer> COLOR = register("color", DataComponentType.<Integer>builder().persistent(ExtraCodecs.RGB_COLOR_CODEC).build());
     public static final DataComponentType<Integer> USES_LEFT = register("uses_left", DataComponentType.<Integer>builder().persistent(Codec.INT).build());
@@ -57,9 +57,9 @@ public class FactoryDataComponents {
     public static final DataComponentType<List<String>> PUNCH_CARD_DATA = register("punch_card_data", DataComponentType.<List<String>>builder().persistent(Codec.STRING.listOf()).build());
 
     public static void register() {
-        ComponentTooltipAppenderRegistry.addFirst(FLUID);
-        ComponentTooltipAppenderRegistry.addFirst(STORED_DATA);
-        ComponentTooltipAppenderRegistry.addFirst(CONFIGURATION_DATA);
+        ItemComponentTooltipProviderRegistry.addFirst(FLUID);
+        ItemComponentTooltipProviderRegistry.addFirst(STORED_DATA);
+        ItemComponentTooltipProviderRegistry.addFirst(CONFIGURATION_DATA);
         BuiltInRegistries.DATA_COMPONENT_TYPE.addAlias(id("clipboard_data"), id("configuration_data"));
     }
 

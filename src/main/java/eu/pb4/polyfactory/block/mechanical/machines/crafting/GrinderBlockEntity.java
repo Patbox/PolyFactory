@@ -16,6 +16,7 @@ import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
 import eu.pb4.polyfactory.util.inventory.SubContainer;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStackTemplate;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.advancements.CriteriaTriggers;
@@ -149,7 +150,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
                     inv.setItem(i, output.getItem(i).copy());
                 }
 
-                for (var item : self.currentRecipe.value().output(input, world.registryAccess(), null)) {
+                for (var item : self.currentRecipe.value().output(input, null)) {
                     FactoryUtil.tryInsertingInv(inv, item, null);
 
                     if (!item.isEmpty()) {
@@ -168,7 +169,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
             self.process = 0;
             stack.shrink(1);;
 
-            for (var out : self.currentRecipe.value().output(input, world.registryAccess(), world.random)) {
+            for (var out : self.currentRecipe.value().output(input, world.getRandom())) {
                 FactoryUtil.tryInsertingRegular(output, out.copy());
             }
 
@@ -180,7 +181,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
             self.speedScale = speed;
             if (speed > 0) {
                 if (world.getGameTime() % Mth.clamp(Math.round(1 / speed), 2, 5) == 0) {
-                    ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, stack.copy()),
+                    ((ServerLevel) world).sendParticles(new ItemParticleOption(ParticleTypes.ITEM, ItemStackTemplate.fromNonEmptyStack(stack)),
                             pos.getX() + 0.5, pos.getY() + 1.15, pos.getZ() + 0.5, 0,
                             (Math.random() - 0.5) * 0.2, 0.02, (Math.random() - 0.5) * 0.2, 2);
                 }
@@ -241,11 +242,11 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
             this.setTitle(GuiTextures.GRINDER.apply(GrinderBlockEntity.this.getBlockState().getBlock().getName()));
             this.setSlot(9, PolydexCompat.getButton(FactoryRecipeTypes.GRINDING));
 
-            this.setSlotRedirect(4, new Slot(GrinderBlockEntity.this, 0, 0, 0));
+            this.setSlot(4, new Slot(GrinderBlockEntity.this, 0, 0, 0));
             this.setSlot(13, GuiTextures.PROGRESS_VERTICAL.get(progress()));
-            this.setSlotRedirect(21, new FurnaceResultSlot(player, GrinderBlockEntity.this, 1, 1, 0));
-            this.setSlotRedirect(22, new FurnaceResultSlot(player, GrinderBlockEntity.this, 2, 2, 0));
-            this.setSlotRedirect(23, new FurnaceResultSlot(player, GrinderBlockEntity.this, 3, 3, 0));
+            this.setSlot(21, new FurnaceResultSlot(player, GrinderBlockEntity.this, 1, 1, 0));
+            this.setSlot(22, new FurnaceResultSlot(player, GrinderBlockEntity.this, 2, 2, 0));
+            this.setSlot(23, new FurnaceResultSlot(player, GrinderBlockEntity.this, 3, 3, 0));
             this.open();
         }
 

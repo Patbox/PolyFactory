@@ -30,7 +30,7 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.CustomModelDataTi
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.PotionTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.model.ModelAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.model.ModelTransformation;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
@@ -63,7 +63,7 @@ import static eu.pb4.polyfactory.ModInit.id;
 class AssetProvider implements DataProvider {
     private final PackOutput output;
 
-    public AssetProvider(FabricDataOutput output) {
+    public AssetProvider(FabricPackOutput output) {
         this.output = output;
     }
 
@@ -94,7 +94,7 @@ class AssetProvider implements DataProvider {
 
             assetWriter.accept("assets/polyfactory/models/block/gauge_" + style.getSerializedName() +".json", ModelAsset.builder()
                     .parent(id("block/gauge"))
-                    .texture("front_inner", "polyfactory:block/gauge/front_inner_" + style.getSerializedName())
+                    .texture("front_inner", id("block/gauge/front_inner_" + style.getSerializedName()))
                     .build().toBytes()
             );
         }
@@ -117,7 +117,7 @@ class AssetProvider implements DataProvider {
             var id = BuiltInRegistries.ITEM.getKey(mold.mold());
             assetWriter.accept(AssetPaths.itemModel(id),
                     ModelAsset.builder().parent(Identifier.parse("item/generated"))
-                            .texture("layer0", id.withPrefix("item/").toString())
+                            .texture("layer0", id.withPrefix("item/"))
                             .build().toBytes()
             );
             createStencilTexture(id.withPrefix("item/"), moldTexture.steelBase, moldTexture.steelBorder, stencil, assetWriter);
@@ -127,7 +127,7 @@ class AssetProvider implements DataProvider {
             var id = BuiltInRegistries.ITEM.getKey(mold.clay());
             assetWriter.accept(AssetPaths.itemModel(id),
                     ModelAsset.builder().parent(Identifier.parse("item/generated"))
-                            .texture("layer0", id.withPrefix("item/").toString())
+                            .texture("layer0", id.withPrefix("item/"))
                             .build().toBytes()
             );
             createStencilTexture(id.withPrefix("item/"), moldTexture.clayBase, moldTexture.clayBorder, stencil, assetWriter);
@@ -139,7 +139,7 @@ class AssetProvider implements DataProvider {
             var id = BuiltInRegistries.ITEM.getKey(mold.hardened());
             assetWriter.accept(AssetPaths.itemModel(id),
                     ModelAsset.builder().parent(Identifier.parse("item/generated"))
-                            .texture("layer0", id.withPrefix("item/").toString())
+                            .texture("layer0", id.withPrefix("item/"))
                             .build().toBytes()
             );
             createStencilTexture(id.withPrefix("item/"), moldTexture.hardenedBase, moldTexture.hardenedBorder, stencil, assetWriter);
@@ -296,7 +296,7 @@ class AssetProvider implements DataProvider {
                 }
             }
 
-            consumer.accept(GuiTextures.LEFT_SHIFTED_3_BARS.get(DataComponents.ITEM_MODEL), new ItemAsset(new CompositeItemModel(list), new ItemAsset.Properties(false, true)));
+            consumer.accept(id("-/sgui/left_shifted_3_bars"), new ItemAsset(new CompositeItemModel(list), new ItemAsset.Properties(false, true)));
         }
         var baseDeepStorageUnitId = id("sgui/elements/gen/deep_storage_unit/");
 
@@ -310,7 +310,7 @@ class AssetProvider implements DataProvider {
                 {
                     var model = ModelAsset.builder();
                     model.parent(Identifier.withDefaultNamespace("item/generated"));
-                    model.texture("layer0", "polyfactory:sgui/elements/button/mini/base_selected");
+                    model.texture("layer0", id("sgui/elements/button/mini/base_selected"));
                     //noinspection IntegerDivisionInFloatingPointContext
                     model.transformation(ItemDisplayContext.GUI, new ModelTransformation(
                             Vec3.ZERO, new Vec3(18 * (i % 2), -18 * (1 + i / 2), 0), new Vec3(1, 1, 1)
@@ -320,7 +320,7 @@ class AssetProvider implements DataProvider {
                 {
                     var model = ModelAsset.builder();
                     model.parent(Identifier.withDefaultNamespace("item/generated"));
-                    model.texture("layer0", "polyfactory:sgui/elements/button/mini/base");
+                    model.texture("layer0", id("sgui/elements/button/mini/base"));
                     //noinspection IntegerDivisionInFloatingPointContext
                     model.transformation(ItemDisplayContext.GUI, new ModelTransformation(
                             Vec3.ZERO, new Vec3(18 * (i % 2), -18 * (1 + i / 2), 0), new Vec3(1, 1, 1)
@@ -331,7 +331,7 @@ class AssetProvider implements DataProvider {
                 listSelected.add(new ConditionItemModel(new CustomModelDataFlagProperty(i), new BasicItemModel(selectedId), new BasicItemModel(buttonId)));
             }
 
-            consumer.accept(GuiTextures.DEEP_STORAGE_UNIT_SELECTED.get(DataComponents.ITEM_MODEL),
+            consumer.accept(id("-/sgui/deep_storage_unit_selected"),
                     new ItemAsset(new CompositeItemModel(listSelected), new ItemAsset.Properties(false, true)));
         }
     }

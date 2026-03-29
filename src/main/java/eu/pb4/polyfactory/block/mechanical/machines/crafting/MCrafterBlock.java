@@ -19,7 +19,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -181,7 +181,7 @@ public class MCrafterBlock extends RotationalNetworkBlock implements FactoryBloc
         private final ItemDisplayElement base;
 
         private Model(BlockState state) {
-            this.base = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);

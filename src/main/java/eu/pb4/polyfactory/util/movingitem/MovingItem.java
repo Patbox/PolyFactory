@@ -146,7 +146,7 @@ public class MovingItem implements VirtualElement, SlotAccess {
         for (var x : itemDisplay) {
             x.startWatching(player, packetConsumer);
         }
-        packetConsumer.accept(VirtualEntityUtils.createRidePacket(this.riddenBase.getEntityId(), IntList.of(this.itemDisplay[1].getEntityId(), this.itemDisplay[2].getEntityId(), this.itemDisplay[3].getEntityId())));
+        packetConsumer.accept(VirtualEntityUtils.createClientboundSetPassengersPacket(this.riddenBase.getEntityId(), IntList.of(this.itemDisplay[1].getEntityId(), this.itemDisplay[2].getEntityId(), this.itemDisplay[3].getEntityId())));
     }
 
     @Override

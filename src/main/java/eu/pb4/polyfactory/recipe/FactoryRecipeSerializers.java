@@ -1,7 +1,6 @@
 package eu.pb4.polyfactory.recipe;
 
 import com.mojang.serialization.MapCodec;
-import eu.pb4.factorytools.api.recipe.LazyRecipeSerializer;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.recipe.casting.SimpleCastingRecipe;
 import eu.pb4.polyfactory.recipe.casting.SimpleCauldronCastingRecipe;
@@ -16,13 +15,10 @@ import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
 import eu.pb4.polyfactory.recipe.spout.*;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.world.item.crafting.ShapelessRecipe;
+import net.minecraft.world.item.crafting.*;
 import eu.pb4.polyfactory.recipe.mixing.*;
 import eu.pb4.polyfactory.recipe.press.FillSprayCanPressRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
@@ -30,41 +26,41 @@ import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class FactoryRecipeSerializers {
-    public static final LazyRecipeSerializer<SimpleGrindingRecipe> GRINDING_SIMPLE = register("grinding/simple", SimpleGrindingRecipe.CODEC);
-    public static final LazyRecipeSerializer<StrippingGrindingRecipe> GRINDING_STRIPPING = register("grinding/stripping", StrippingGrindingRecipe.CODEC);
-    public static final LazyRecipeSerializer<GenericPressRecipe> PRESS_GENERIC = register("press/generic", GenericPressRecipe.CODEC);
-    public static final LazyRecipeSerializer<ColoringMixingRecipe> MIXING_COLORING = register("mixing/coloring", ColoringMixingRecipe.CODEC);
+    public static final RecipeSerializer<SimpleGrindingRecipe> GRINDING_SIMPLE = register("grinding/simple", SimpleGrindingRecipe.CODEC);
+    public static final RecipeSerializer<StrippingGrindingRecipe> GRINDING_STRIPPING = register("grinding/stripping", StrippingGrindingRecipe.CODEC);
+    public static final RecipeSerializer<GenericPressRecipe> PRESS_GENERIC = register("press/generic", GenericPressRecipe.CODEC);
+    public static final RecipeSerializer<ColoringMixingRecipe> MIXING_COLORING = register("mixing/coloring", ColoringMixingRecipe.CODEC);
 
-    public static final LazyRecipeSerializer<GenericMixingRecipe> MIXING_GENERIC = register("mixing/generic", GenericMixingRecipe.CODEC);
-    public static final LazyRecipeSerializer<TransformMixingRecipe> MIXING_TRANSFORM = register("mixing/transform", TransformMixingRecipe.CODEC);
-    public static final LazyRecipeSerializer<FireworkStarMixingRecipe> MIXING_FIREWORK = register("mixing/firework", FireworkStarMixingRecipe.CODEC);
-    public static final LazyRecipeSerializer<ArtificialDyeMixingRecipe> MIXING_ARTIFICIAL_DYE = register("mixing/artificial_dye", ArtificialDyeMixingRecipe.CODEC);
-    public static final LazyRecipeSerializer<BrewingMixingRecipe> MIXING_BREWING = register("mixing/brewing", BrewingMixingRecipe.CODEC);
-    public static final LazyRecipeSerializer<ColoringCraftingRecipe> CRAFTING_COLORING = register("crafting/coloring", ColoringCraftingRecipe.CODEC);
-    public static final LazyRecipeSerializer<ShapelessNbtCopyRecipe> CRAFTING_SHAPELESS_NBT_COPY = register("crafting/shapeless_nbt_copy", ShapelessNbtCopyRecipe.CODEC);
-    public static final LazyRecipeSerializer<PRTKeySetterCraftingRecipe> CRAFTING_PRT_KEY_SETTER = register("crafting/prt_key_setter", PRTKeySetterCraftingRecipe.CODEC);
-    public static final LazyRecipeSerializer<CraftingWithLeftoverRecipe<ShapedRecipe>> CRAFTING_SHAPED_LEFTOVER = register("crafting/shaped_leftover",
-            CraftingWithLeftoverRecipe.createCodec(RecipeSerializer.SHAPED_RECIPE.codec(), () -> FactoryRecipeSerializers.CRAFTING_SHAPED_LEFTOVER));
-    public static final LazyRecipeSerializer<CraftingWithLeftoverRecipe<ShapelessRecipe>> CRAFTING_SHAPELESS_LEFTOVER = register("crafting/shapeless_leftover",
-            CraftingWithLeftoverRecipe.createCodec(RecipeSerializer.SHAPELESS_RECIPE.codec(), () -> FactoryRecipeSerializers.CRAFTING_SHAPELESS_LEFTOVER));
+    public static final RecipeSerializer<GenericMixingRecipe> MIXING_GENERIC = register("mixing/generic", GenericMixingRecipe.CODEC);
+    public static final RecipeSerializer<TransformMixingRecipe> MIXING_TRANSFORM = register("mixing/transform", TransformMixingRecipe.CODEC);
+    public static final RecipeSerializer<FireworkStarMixingRecipe> MIXING_FIREWORK = register("mixing/firework", FireworkStarMixingRecipe.CODEC);
+    public static final RecipeSerializer<ArtificialDyeMixingRecipe> MIXING_ARTIFICIAL_DYE = register("mixing/artificial_dye", ArtificialDyeMixingRecipe.CODEC);
+    public static final RecipeSerializer<BrewingMixingRecipe> MIXING_BREWING = register("mixing/brewing", BrewingMixingRecipe.CODEC);
+    public static final RecipeSerializer<ColoringCraftingRecipe> CRAFTING_COLORING = register("crafting/coloring", ColoringCraftingRecipe.CODEC);
+    public static final RecipeSerializer<ShapelessNbtCopyRecipe> CRAFTING_SHAPELESS_NBT_COPY = register("crafting/shapeless_nbt_copy", ShapelessNbtCopyRecipe.CODEC);
+    public static final RecipeSerializer<PRTKeySetterCraftingRecipe> CRAFTING_PRT_KEY_SETTER = register("crafting/prt_key_setter", PRTKeySetterCraftingRecipe.CODEC);
+    public static final RecipeSerializer<CraftingWithLeftoverRecipe<ShapedRecipe>> CRAFTING_SHAPED_LEFTOVER = register("crafting/shaped_leftover",
+            CraftingWithLeftoverRecipe.createCodec(ShapedRecipe.SERIALIZER.codec(), () -> FactoryRecipeSerializers.CRAFTING_SHAPED_LEFTOVER));
+    public static final RecipeSerializer<CraftingWithLeftoverRecipe<ShapelessRecipe>> CRAFTING_SHAPELESS_LEFTOVER = register("crafting/shapeless_leftover",
+            CraftingWithLeftoverRecipe.createCodec(ShapelessRecipe.SERIALIZER.codec(), () -> FactoryRecipeSerializers.CRAFTING_SHAPELESS_LEFTOVER));
 
-    public static final LazyRecipeSerializer<FillSprayCanCraftingRecipe> CRAFTING_FILL_SPRAY_CAN = register("crafting/fill_spray_can",
+    public static final RecipeSerializer<FillSprayCanCraftingRecipe> CRAFTING_FILL_SPRAY_CAN = register("crafting/fill_spray_can",
             CraftingBookCategory.CODEC.xmap(FillSprayCanCraftingRecipe::new, FillSprayCanCraftingRecipe::category).fieldOf("category"));
-    public static final LazyRecipeSerializer<FillSprayCanPressRecipe> PRESS_FILL_SPRAY_CAN = register("press/fill_spray_can",
+    public static final RecipeSerializer<FillSprayCanPressRecipe> PRESS_FILL_SPRAY_CAN = register("press/fill_spray_can",
             ExtraCodecs.POSITIVE_INT.xmap(FillSprayCanPressRecipe::new, FillSprayCanPressRecipe::amount).fieldOf("amount"));
 
-    public static final LazyRecipeSerializer<SimpleDrainRecipe> DRAIN_SIMPLE = register("drain/simple", SimpleDrainRecipe.CODEC);
-    public static final LazyRecipeSerializer<PotionAddDrainRecipe> DRAIN_POTION_ADD = register("drain/potion_add", PotionAddDrainRecipe.CODEC);
-    public static final LazyRecipeSerializer<PotionRemoveDrainRecipe> DRAIN_POTION_REMOVE = register("drain/potion_remove", PotionRemoveDrainRecipe.CODEC);
-    public static final LazyRecipeSerializer<SimpleSpoutRecipe> SPOUT_SIMPLE = register("spout/simple", SimpleSpoutRecipe.CODEC);
-    public static final LazyRecipeSerializer<PotionSpoutRecipe> SPOUT_POTION = register("spout/potion", PotionSpoutRecipe.CODEC);
-    public static final LazyRecipeSerializer<RepairSpoutRecipe> SPOUT_EXPERIENCE_REPAIR = register("spout/experience_repair", RepairSpoutRecipe.CODEC);
-    public static final LazyRecipeSerializer<SimpleSmelteryRecipe> SMELTERY = register("smeltery/simple", SimpleSmelteryRecipe.CODEC);
-    public static final LazyRecipeSerializer<SimpleCastingRecipe> CASTING_SIMPLE = register("casting/simple", SimpleCastingRecipe.CODEC);
-    public static final LazyRecipeSerializer<SimpleCauldronCastingRecipe> CASTING_CAULDRON_SIMPLE = register("casting/cauldron/simple", SimpleCauldronCastingRecipe.CODEC);
+    public static final RecipeSerializer<SimpleDrainRecipe> DRAIN_SIMPLE = register("drain/simple", SimpleDrainRecipe.CODEC);
+    public static final RecipeSerializer<PotionAddDrainRecipe> DRAIN_POTION_ADD = register("drain/potion_add", PotionAddDrainRecipe.CODEC);
+    public static final RecipeSerializer<PotionRemoveDrainRecipe> DRAIN_POTION_REMOVE = register("drain/potion_remove", PotionRemoveDrainRecipe.CODEC);
+    public static final RecipeSerializer<SimpleSpoutRecipe> SPOUT_SIMPLE = register("spout/simple", SimpleSpoutRecipe.CODEC);
+    public static final RecipeSerializer<PotionSpoutRecipe> SPOUT_POTION = register("spout/potion", PotionSpoutRecipe.CODEC);
+    public static final RecipeSerializer<RepairSpoutRecipe> SPOUT_EXPERIENCE_REPAIR = register("spout/experience_repair", RepairSpoutRecipe.CODEC);
+    public static final RecipeSerializer<SimpleSmelteryRecipe> SMELTERY = register("smeltery/simple", SimpleSmelteryRecipe.CODEC);
+    public static final RecipeSerializer<SimpleCastingRecipe> CASTING_SIMPLE = register("casting/simple", SimpleCastingRecipe.CODEC);
+    public static final RecipeSerializer<SimpleCauldronCastingRecipe> CASTING_CAULDRON_SIMPLE = register("casting/cauldron/simple", SimpleCauldronCastingRecipe.CODEC);
 
-    public static final LazyRecipeSerializer<SimpleFluidInteractionRecipe> FLUID_INTERACTION_SIMPLE = register("fluid_interaction/simple", SimpleFluidInteractionRecipe.CODEC);
-    public static final LazyRecipeSerializer<RemovingFluidInteractionRecipe> FLUID_INTERACTION_REMOVING = register("fluid_interaction/removing", RemovingFluidInteractionRecipe.CODEC);
+    public static final RecipeSerializer<SimpleFluidInteractionRecipe> FLUID_INTERACTION_SIMPLE = register("fluid_interaction/simple", SimpleFluidInteractionRecipe.CODEC);
+    public static final RecipeSerializer<RemovingFluidInteractionRecipe> FLUID_INTERACTION_REMOVING = register("fluid_interaction/removing", RemovingFluidInteractionRecipe.CODEC);
 
     public static void register() {
         BuiltInRegistries.RECIPE_SERIALIZER.addAlias(id("grinding"), id("grinding/simple"));
@@ -74,7 +70,7 @@ public class FactoryRecipeSerializers {
         return Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath(ModInit.ID, path), recipeSerializer);
     }
 
-    public static <T extends Recipe<?>> LazyRecipeSerializer<T> register(String path, MapCodec<T> codec) {
-        return Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath(ModInit.ID, path), new LazyRecipeSerializer<>(codec));
+    public static <T extends Recipe<?>> RecipeSerializer<T> register(String path, MapCodec<T> codec) {
+        return Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath(ModInit.ID, path), new RecipeSerializer<>(codec, ByteBufCodecs.fromCodecWithRegistries(codec.codec())));
     }
 }

@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.models.fluid;
 
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidType;
@@ -12,10 +13,13 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.CustomModelDataTintSource;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomModelData;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,49 +43,50 @@ public class FluidModel {
 
     protected final Identifier baseModel;
     protected final List<Texture> textures = new ArrayList<>();
-    protected final Map<FluidType<?>, ItemStack> model = new IdentityHashMap<>();
-    private final Function<ModelRenderType, Item> function;
+    protected final Map<FluidType<?>, LazyItemStack> model = new IdentityHashMap<>();
+    protected final Map<FluidType<?>, ItemStackTemplate> template = new IdentityHashMap<>();
     protected boolean alwaysColored;
 
     public FluidModel(Identifier model) {
-        this(model, FactoryUtil::requestModelBase);
+        this(model, false);
     }
-    public FluidModel(Identifier model, Function<ModelRenderType, Item> function) {
-        this(model, function, false);
-    }
-    public FluidModel(Identifier model, Function<ModelRenderType, Item> function, boolean alwaysColored) {
+
+    public FluidModel(Identifier model, boolean alwaysColored) {
         this.baseModel = model;
         this.alwaysColored = alwaysColored;
-        this.function = function;
 
         this.runStuff();
     }
 
     protected void runStuff() {
         for (var fluid : FactoryRegistries.FLUID_TYPES.keySet()) {
-            this.handleFluidTexture(fluid, Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.getValue(fluid)), function);
+            this.handleFluidTexture(fluid, Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.getValue(fluid)));
         }
 
         RegistryEntryAddedCallback.event(FactoryRegistries.FLUID_TYPES).register((rawId, id, object) -> {
-            this.handleFluidTexture(id, object, function);
+            this.handleFluidTexture(id, object);
         });
 
         PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register((b) -> generateAssets(b::addData));
     }
 
-    protected void handleFluidTexture(Identifier id, FluidType<?> fluidType, Function<ModelRenderType, Item> function) {
-        this.addTextures(id, fluidType, function);
+    protected void handleFluidTexture(Identifier id, FluidType<?> fluidType) {
+        this.addTextures(id, fluidType);
     }
 
     public <T> ItemStack get(FluidType<T> fluid, T data) {
-        var stack = this.model.getOrDefault(fluid, ItemStack.EMPTY);
-        if (fluid.color().isEmpty() && !this.alwaysColored) {
-            return stack;
+        var stack = this.model.get(fluid);
+        if (stack == null) {
+            return ItemStack.EMPTY;
         }
-        stack = stack.copy();
+
+        if (fluid.color().isEmpty() && !this.alwaysColored) {
+            return stack.get();
+        }
+        var stackk = stack.get();
         //noinspection unchecked
-        stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), IntList.of((fluid.color().get()).getColor(data))));
-        return stack;
+        stackk.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), IntList.of((fluid.color().get()).getColor(data))));
+        return stackk;
     }
 
     public <T> ItemStack get(@Nullable FluidInstance<T> type) {
@@ -91,11 +96,14 @@ public class FluidModel {
         return get(type.type(), type.data());
     }
 
-    protected void addTextures(Identifier id, FluidType<?> object, Function<ModelRenderType, Item> function) {
+    protected void addTextures(Identifier id, FluidType<?> object) {
         this.textures.add(new Texture(id, object.texture(), object.color().isPresent() || this.alwaysColored));
-        var stack = new ItemStack(function.apply(object.modelRenderType()));
-        stack.set(DataComponents.ITEM_MODEL, bridgeModelNoItem(this.baseModel.withSuffix("/" + id.getNamespace() + "/" + id.getPath())));
-        this.model.put(object, stack);
+        var stack = new ItemStackTemplate(Items.STONE, DataComponentPatch.builder()
+                .set(DataComponents.ITEM_MODEL, bridgeModelNoItem(this.baseModel.withSuffix("/" + id.getNamespace() + "/" + id.getPath())))
+                .build());
+
+        this.template.put(object, stack);
+        this.model.put(object, new LazyItemStack(stack));
     }
 
     protected void generateAssets(BiConsumer<String, byte[]> assetWriter) {
@@ -119,11 +127,15 @@ public class FluidModel {
     }
 
     public ItemStack getRaw(FluidInstance<?> x) {
-        return this.model.get(x.type());
+        return this.model.get(x.type()).get();
     }
 
     public Identifier getModelId(Identifier type) {
         return bridgeModelNoItem(baseModel.withSuffix("/" + type.getNamespace() + "/" + type.getPath()));
+    }
+
+    public <T> ItemStackTemplate getTemplate(FluidInstance<T> x) {
+        return this.template.get(x.type());
     }
 
     protected record Texture(Identifier id, Identifier texture, boolean colored) {}

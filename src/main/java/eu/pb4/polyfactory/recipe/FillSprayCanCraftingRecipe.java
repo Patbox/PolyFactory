@@ -48,7 +48,7 @@ public record FillSprayCanCraftingRecipe(CraftingBookCategory category) implemen
     }
 
     @Override
-    public ItemStack assemble(CraftingInput inventory, HolderLookup.Provider registryManager) {
+    public ItemStack assemble(CraftingInput inventory) {
         ItemStack can = ItemStack.EMPTY;
         int dye = -1;
         int dyeCount = 0;
@@ -82,6 +82,16 @@ public record FillSprayCanCraftingRecipe(CraftingBookCategory category) implemen
     @Override
     public boolean isSpecial() {
         return true;
+    }
+
+    @Override
+    public boolean showNotification() {
+        return false;
+    }
+
+    @Override
+    public String group() {
+        return "";
     }
 
     @Override

@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
@@ -20,7 +21,7 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -57,7 +58,6 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
     public FanBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(ENABLED, true).setValue(REVERSE, false));
-        Model.ITEM_MODEL.getItem();
     }
 
     @Nullable
@@ -149,7 +149,7 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack ITEM_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/fan_rotating"));
+        public static final LazyItemStack ITEM_MODEL = ItemDisplayElementUtil.getModel(id("block/fan_rotating"));
 
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement fan;
@@ -157,12 +157,12 @@ public class FanBlock extends RotationalNetworkBlock implements FactoryBlock, Ro
         private boolean reverse;
 
         private Model(BlockState state) {
-            this.mainElement = ItemDisplayElementUtil.createSolid(FactoryItems.FAN);
+            this.mainElement = ItemDisplayElementUtil.createSimple(FactoryItems.FAN);
             this.mainElement.setScale(new Vector3f(2f));
             var rot = new Quaternionf().rotateX(Mth.HALF_PI);
             this.mainElement.setRightRotation(rot);
 
-            this.fan = LodItemDisplayElement.createSimple(ITEM_MODEL, 2, 0.2f, 0.4f);
+            this.fan = LodItemDisplayElement.createSimple(ITEM_MODEL.get(), 2, 0.2f, 0.4f);
             this.fan.setViewRange(0.3f);
             this.updateStatePos(state);
             this.updateAnimation(0);

@@ -106,7 +106,7 @@ public record BrewingMixingRecipe(String group,
     }
 
     @Override
-    public ItemStack assemble(MixingInput inventory, HolderLookup.Provider registryManager) {
+    public ItemStack assemble(MixingInput inventory) {
         return ItemStack.EMPTY;
     }
 

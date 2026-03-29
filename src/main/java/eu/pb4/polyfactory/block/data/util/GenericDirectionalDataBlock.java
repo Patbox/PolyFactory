@@ -14,7 +14,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.List;
 import net.minecraft.core.BlockPos;
@@ -100,7 +100,7 @@ public abstract class GenericDirectionalDataBlock extends DataNetworkBlock imple
         private final boolean oppositeFacing;
 
         protected Model(BlockState state, boolean oppositeFacing) {
-            this.base = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.base.setScale(new Vector3f(2));
             this.oppositeFacing = oppositeFacing;
 

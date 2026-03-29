@@ -45,4 +45,14 @@ public interface CastingRecipe extends Recipe<SingleItemWithFluid> {
     default boolean isSpecial() {
         return true;
     }
+
+    @Override
+    default String group() {
+        return "";
+    }
+
+    @Override
+    default boolean showNotification() {
+        return false;
+    }
 }

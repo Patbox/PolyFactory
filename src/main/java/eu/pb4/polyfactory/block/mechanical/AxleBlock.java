@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.block.QuickWaterloggable;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
@@ -37,7 +38,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -116,11 +117,11 @@ public class AxleBlock extends RotationalNetworkBlock implements FactoryBlock, C
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack ITEM_MODEL = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/axle"));
-        public static final ItemStack ITEM_MODEL_SHORT = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/axle_short"));
+        public static final LazyItemStack ITEM_MODEL = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/axle"));
+        public static final LazyItemStack ITEM_MODEL_SHORT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/axle_short"));
         private final ItemDisplayElement mainElement;
         private Model(ServerLevel world, BlockState state) {
-            this.mainElement = LodItemDisplayElement.createSimple(ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
+            this.mainElement = LodItemDisplayElement.createSimple(ITEM_MODEL.get(), this.getUpdateRate(), 0.3f, 0.6f);
             this.mainElement.setViewRange(0.7f);
             this.mainElement.setTeleportDuration(1);
             this.updateAnimation(0,  state.getValue(AXIS));

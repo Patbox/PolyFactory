@@ -4,6 +4,7 @@ import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.mojang.serialization.MapCodec;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
@@ -29,7 +30,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -98,7 +99,6 @@ public final class DataMemoryBlock extends DataNetworkBlock implements EntityBlo
         return x;
     }
 
-    // Todo
     @Override
     public void playerDestroy(Level world, Player player1, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         if (blockEntity instanceof DataCache cache && cache.getCachedData() != null && !cache.getCachedData().isEmpty()
@@ -221,15 +221,16 @@ public final class DataMemoryBlock extends DataNetworkBlock implements EntityBlo
     }
 
     public static class Model extends BlockModel {
-        public static final ItemStack BASE = ItemDisplayElementUtil.getSolidModel(id("block/data_memory"));
-        public static final ItemStack COVER = ItemDisplayElementUtil.getSolidModel(id("block/data_memory_cover"));
-        public static final ItemStack COVER_POWERED = ItemDisplayElementUtil.getSolidModel(id("block/data_memory_cover_powered"));
-        public static final ItemStack INPUT = ItemDisplayElementUtil.getSolidModel(id("block/data_cube_connector_input"));
-        public static final ItemStack OUTPUT = ItemDisplayElementUtil.getSolidModel(id("block/data_cube_connector_output"));
+        public static final LazyItemStack BASE = ItemDisplayElementUtil.getModel(id("block/data_memory"));
+        public static final LazyItemStack COVER = ItemDisplayElementUtil.getModel(id("block/data_memory_cover"));
+        public static final LazyItemStack COVER_POWERED = ItemDisplayElementUtil.getModel(id("block/data_memory_cover_powered"));
+        public static final LazyItemStack INPUT = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_input"));
+        public static final LazyItemStack OUTPUT = ItemDisplayElementUtil.getModel(id("block/data_cube_connector_output"));
         private final ItemDisplayElement base;
         private final ItemDisplayElement input;
         private final ItemDisplayElement output;
         private final ItemDisplayElement[] covers = new ItemDisplayElement[6];
+
         protected Model(BlockState state) {
             super();
             this.base = ItemDisplayElementUtil.createSimple(BASE);
@@ -283,12 +284,13 @@ public final class DataMemoryBlock extends DataNetworkBlock implements EntityBlo
             element.setYaw(y);
             element.setPitch(p);
         }
+
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 var powered = this.blockState().getValue(POWERED) ? COVER_POWERED : COVER;
                 for (var i = 0; i < 6; i++) {
-                    this.covers[i].setItem(powered);
+                    this.covers[i].setItem(powered.get());
                 }
                 updateStatePos(this.blockState().getValue(FACING_OUTPUT), output);
                 this.covers[this.blockState().getValue(FACING_OUTPUT).get3DDataValue()].setItem(ItemStack.EMPTY);
@@ -298,7 +300,7 @@ public final class DataMemoryBlock extends DataNetworkBlock implements EntityBlo
                     this.input.setItem(ItemStack.EMPTY);
                 } else {
                     this.covers[input.direction().get3DDataValue()].setItem(ItemStack.EMPTY);
-                    this.input.setItem(INPUT);
+                    this.input.setItem(INPUT.get());
                     updateStatePos(input.direction(), this.input);
                 }
                 this.tick();

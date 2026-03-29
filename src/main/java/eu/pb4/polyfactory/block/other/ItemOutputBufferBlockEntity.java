@@ -4,7 +4,7 @@ import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.util.ContainerSavingHelper;
 import eu.pb4.polyfactory.util.inventory.RedirectingWorldlyfiedContainer;
-import eu.pb4.sgui.api.GuiHelpers;
+import eu.pb4.sgui.api.SguiUtils;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -52,7 +52,7 @@ public class ItemOutputBufferBlockEntity extends LockableBlockEntity implements 
         }
 
         public boolean isOwnContainer(Player player) {
-            if (player instanceof ServerPlayer serverPlayer && GuiHelpers.getCurrentGui(serverPlayer) instanceof Gui gui) {
+            if (player instanceof ServerPlayer serverPlayer && SguiUtils.getCurrentGui(serverPlayer) instanceof Gui gui) {
                 return gui.getContainer() == ItemOutputBufferBlockEntity.this;
             } else {
                 return false;
@@ -113,7 +113,7 @@ public class ItemOutputBufferBlockEntity extends LockableBlockEntity implements 
         double x = this.worldPosition.getX() + 1 + vec3i.getX();
         double y = this.worldPosition.getY() + 1 + vec3i.getY();
         double z = this.worldPosition.getZ() + 1 + vec3i.getZ();
-        this.level.playSound(null, x, y, z, sound, SoundSource.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 1.1F);
+        this.level.playSound(null, x, y, z, sound, SoundSource.BLOCKS, 0.5F, this.level.getRandom().nextFloat() * 0.1F + 1.1F);
     }
 
     @Override
@@ -188,7 +188,7 @@ public class ItemOutputBufferBlockEntity extends LockableBlockEntity implements 
             this.setTitle(ItemOutputBufferBlockEntity.this.getContainerName());
 
             for (int i = 0; i < SIZE; i++) {
-                this.setSlotRedirect(i, new Slot(ItemOutputBufferBlockEntity.this.container, i, i, 0) {
+                this.setSlot(i, new Slot(ItemOutputBufferBlockEntity.this.container, i, i, 0) {
                     @Override
                     public boolean mayPlace(ItemStack stack) {
                         return mayPlace;
@@ -201,8 +201,8 @@ public class ItemOutputBufferBlockEntity extends LockableBlockEntity implements 
         }
 
         @Override
-        public void onScreenHandlerClosed() {
-            super.onScreenHandlerClosed();
+        public void onRemoved() {
+            super.onRemoved();
             stopOpen(player);
         }
 

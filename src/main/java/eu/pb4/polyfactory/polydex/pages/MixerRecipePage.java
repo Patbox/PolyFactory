@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.polydex.pages;
 
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polydex.api.v1.recipe.*;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.fluid.FluidStack;
@@ -27,7 +28,7 @@ import java.util.List;
 
 public abstract class MixerRecipePage<T extends MixingRecipe> extends PrioritizedRecipePage<T> {
     private static final Component REQUIRED_HEAT = Component.translatable("text.polyfactory.required_heat").withStyle(x -> x.withItalic(false));
-    private static final ItemStack ICON = FactoryItems.MIXER.getDefaultInstance();
+    private final ItemStack ICON = FactoryItems.MIXER.getDefaultInstance();
     private final List<PolydexIngredient<?>> ingredients;
     private final PolydexStack<?>[] outputFluids;
     private final List<PolydexIngredient<?>> ingredientsVisual;
@@ -57,10 +58,15 @@ public abstract class MixerRecipePage<T extends MixingRecipe> extends Prioritize
     }
 
     protected abstract List<FluidInputStack> getFluidInput();
+
     protected abstract List<CountedIngredient> getItemInput();
+
     protected abstract List<FluidStack<?>> getFluidOutput();
+
     protected abstract ItemStack getItemOutput();
+
     protected abstract float getMaxTemperature();
+
     protected abstract float getMinimumTemperature();
 
     public MixerRecipePage(RecipeHolder<T> recipe) {
@@ -69,6 +75,7 @@ public abstract class MixerRecipePage<T extends MixingRecipe> extends Prioritize
         this.ingredientsVisual = PolydexCompatImpl.createIngredients(getItemInput());
         this.outputFluids = PolydexCompatImpl.createFluids(getFluidOutput()).toArray(new PolydexStack[0]);
     }
+
     @Override
     public ItemStack typeIcon(ServerPlayer player) {
         return ICON;
@@ -134,10 +141,10 @@ public abstract class MixerRecipePage<T extends MixingRecipe> extends Prioritize
         }
 
         layer.setOutput(6, 2, getItemOutput());
-        layer.set(5, 3, GuiElementBuilder.from(GuiTextures.EMPTY.getItemStack()).setName(REQUIRED_HEAT).asStack());
+        layer.set(5, 3, GuiElementBuilder.from(GuiTextures.EMPTY.asStack()).setName(REQUIRED_HEAT).asStack());
         layer.set(4, 3,
                 GuiTextures.TEMPERATURE_OFFSET_RIGHT.getNamed(Mth.clamp(getMinimumTemperature(), -1, 1), REQUIRED_HEAT),
-                GuiTextures.TEMPERATURE_OFFSET_RIGHT.getNamed(Mth.clamp(getMaxTemperature(), -1, 1),  REQUIRED_HEAT));
+                GuiTextures.TEMPERATURE_OFFSET_RIGHT.getNamed(Mth.clamp(getMaxTemperature(), -1, 1), REQUIRED_HEAT));
 
     }
 }

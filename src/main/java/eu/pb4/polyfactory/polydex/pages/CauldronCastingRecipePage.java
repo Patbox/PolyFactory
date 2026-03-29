@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.polydex.pages;
 
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polydex.api.v1.recipe.PageBuilder;
 import eu.pb4.polydex.api.v1.recipe.PolydexEntry;
 import eu.pb4.polydex.api.v1.recipe.PolydexIngredient;
@@ -30,7 +31,7 @@ import java.util.List;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public abstract class CauldronCastingRecipePage<T extends CauldronCastingRecipe> extends PrioritizedRecipePage<T> {
-    private static final ItemStack ICON = new GuiElementBuilder(id("-/block/casting_cauldron")).setName(Component.translatable("block.polyfactory.casting_cauldron")).asStack();
+    private final ItemStack ICON = new GuiElementBuilder(id("-/block/casting_cauldron")).setName(Component.translatable("block.polyfactory.casting_cauldron")).asStack();
     private final List<PolydexIngredient<?>> ingredients;
     private final PolydexStack<?> output;
 
@@ -46,7 +47,9 @@ public abstract class CauldronCastingRecipePage<T extends CauldronCastingRecipe>
     }
 
     protected abstract ItemStack getResultStack();
+
     protected abstract FluidStack<?> getBaseFluid();
+
     @Override
     public @Nullable Component texture(ServerPlayer player) {
         return Component.empty()
@@ -58,6 +61,7 @@ public abstract class CauldronCastingRecipePage<T extends CauldronCastingRecipe>
                 }))
                 .append(Component.literal("" + GuiTextures.SPOUT_POLYDEX_FLUID_OFFSET_N + GuiTextures.POLYDEX_OFFSET).setStyle(UiResourceCreator.STYLE));
     }
+
     @Override
     public boolean isOwner(MinecraftServer server, PolydexEntry entry) {
         return entry.isPartOf(this.output);

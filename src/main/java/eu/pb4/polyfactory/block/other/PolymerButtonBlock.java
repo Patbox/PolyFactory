@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.other;
 
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -16,18 +17,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class PolymerButtonBlock extends ButtonBlock implements FactoryBlock {
-    private final ItemStack modelNormal;
-    private final ItemStack modelPressed;
+    private final LazyItemStack modelNormal;
+    private final LazyItemStack modelPressed;
 
     public PolymerButtonBlock(String name, BlockSetType blockSetType, int pressTicks, Properties settings) {
         super(blockSetType, pressTicks, settings);
-        this.modelNormal = ItemDisplayElementUtil.getSolidModel(id("block/" + name + "_button"));
-        this.modelPressed = ItemDisplayElementUtil.getSolidModel(id("block/" + name + "_button_pressed"));
+        this.modelNormal = ItemDisplayElementUtil.getModel(id("block/" + name + "_button"));
+        this.modelPressed = ItemDisplayElementUtil.getModel(id("block/" + name + "_button_pressed"));
     }
 
     @Override
@@ -60,7 +61,7 @@ public class PolymerButtonBlock extends ButtonBlock implements FactoryBlock {
         }
 
         private void updateState(BlockState blockState) {
-            this.base.setItem(blockState.getValue(ButtonBlock.POWERED) ? modelPressed : modelNormal);
+            this.base.setItem((blockState.getValue(ButtonBlock.POWERED) ? modelPressed : modelNormal).get());
             float p = switch (blockState.getValue(ButtonBlock.FACE)) {
                 case WALL -> -90;
                 case FLOOR -> 0;

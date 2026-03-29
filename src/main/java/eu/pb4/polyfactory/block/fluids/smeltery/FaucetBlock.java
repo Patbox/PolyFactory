@@ -48,7 +48,7 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.function.BooleanSupplier;
 
@@ -139,7 +139,7 @@ public class FaucetBlock extends Block implements FactoryBlock, PolymerTexturedB
         }
 
         var recipe = optional.get().value();
-        var itemOut = recipe.assemble(input, player.registryAccess());
+        var itemOut = recipe.assemble(input);
         for (var fluid : recipe.fluidInput(input)) {
             output.extract(fluid);
         }
@@ -209,7 +209,7 @@ public class FaucetBlock extends Block implements FactoryBlock, PolymerTexturedB
         private FluidInstance<?> fluidType;
 
         private Model(ServerLevel world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
+            this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0, -5 / 16f));
             this.fluid = ItemDisplayElementUtil.createSimple();

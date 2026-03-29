@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 public abstract class SimpleFastBlock extends Block implements PolymerBlock {
     public SimpleFastBlock(Properties settings) {
@@ -60,7 +60,7 @@ public abstract class SimpleFastBlock extends Block implements PolymerBlock {
         @Override
         public @Nullable ElementHolder createElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
             var model = new BlockModel();
-            var element = ItemDisplayElementUtil.createSolid(this.asItem());
+            var element = ItemDisplayElementUtil.createSimple(this.asItem());
             element.setScale(new Vector3f(2));
             model.addElement(element);
             return model;

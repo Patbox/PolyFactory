@@ -26,7 +26,7 @@ public record RepairSpoutRecipe() implements SpoutRecipe {
     }
 
     @Override
-    public ItemStack assemble(SingleItemWithFluid input, HolderLookup.Provider lookup) {
+    public ItemStack assemble(SingleItemWithFluid input) {
         var stack = input.stack().copy();
         int i = EnchantmentHelper.modifyDurabilityToRepairFromXp(input.world(), stack, (int) (input.getFluid(FactoryFluids.EXPERIENCE.defaultInstance()) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID));
         int j = Math.min(i, stack.getDamageValue());

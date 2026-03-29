@@ -28,6 +28,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.NameAndId;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Mth;
 import net.minecraft.world.WorldlyContainer;
@@ -266,7 +267,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
             return;
         }
 
-        if (!CommonProtection.canBreakBlock(world, blockPos, self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner, null)) {
+        if (!CommonProtection.canBreakBlock(world, blockPos, new NameAndId(self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner), null)) {
             self.stress = 0;
             return;
         }
@@ -348,13 +349,13 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         public Gui(ServerPlayer player) {
             super(MenuType.HOPPER, player, false);
             this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(MinerBlockEntity.this.getBlockState().getBlock().getName()));
-            this.setSlotRedirect(2, new TagLimitedSlot(MinerBlockEntity.this, 0, FactoryItemTags.ALLOWED_IN_MINER));
+            this.setSlot(2, new TagLimitedSlot(MinerBlockEntity.this, 0, FactoryItemTags.ALLOWED_IN_MINER));
             this.open();
         }
 
         @Override
-        public void onClose() {
-            super.onClose();
+        public void onManualClose() {
+            super.onManualClose();
         }
 
         @Override

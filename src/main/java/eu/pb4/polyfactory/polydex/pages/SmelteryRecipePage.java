@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.polydex.pages;
 
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polydex.api.v1.recipe.PageBuilder;
 import eu.pb4.polydex.api.v1.recipe.PolydexEntry;
 import eu.pb4.polydex.api.v1.recipe.PolydexIngredient;
@@ -28,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public abstract class SmelteryRecipePage<T extends SmelteryRecipe> extends PrioritizedRecipePage<T> {
-    private static final ItemStack ICON = new GuiElementBuilder(FactoryItems.SMELTERY).setName(Component.translatable("polydex_category.polyfactory.polyfactory.smeltery")).asStack();
+    private final ItemStack ICON = new GuiElementBuilder(FactoryItems.SMELTERY).setName(Component.translatable("polydex_category.polyfactory.polyfactory.smeltery")).asStack();
     private final PolydexIngredient<?> ingredient;
     private final PolydexStack<?>[] outputFluids;
 
@@ -52,6 +53,7 @@ public abstract class SmelteryRecipePage<T extends SmelteryRecipe> extends Prior
     }
 
     protected abstract Ingredient getInput();
+
     protected abstract List<FluidStack<?>> getFluidOutput();
 
     public SmelteryRecipePage(RecipeHolder<T> recipe) {
@@ -59,6 +61,7 @@ public abstract class SmelteryRecipePage<T extends SmelteryRecipe> extends Prior
         this.ingredient = PolydexIngredient.of(getInput());
         this.outputFluids = PolydexCompatImpl.createFluids(getFluidOutput()).toArray(new PolydexStack[0]);
     }
+
     @Override
     public ItemStack typeIcon(ServerPlayer player) {
         return ICON;

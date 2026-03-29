@@ -78,7 +78,7 @@ public record ArtificialDyeMixingRecipe(double time,
     }
 
     @Override
-    public ItemStack assemble(MixingInput inventory, HolderLookup.Provider registryManager) {
+    public ItemStack assemble(MixingInput inventory) {
         int[] rgb = new int[3];
         int[] rgbDye = new int[3];
         int maxColor = 0;

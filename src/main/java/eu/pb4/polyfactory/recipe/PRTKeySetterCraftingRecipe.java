@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
 public class PRTKeySetterCraftingRecipe extends CustomRecipe {
     public static final MapCodec<PRTKeySetterCraftingRecipe> CODEC = MapCodec.unit(() -> new PRTKeySetterCraftingRecipe(CraftingBookCategory.MISC));
     public PRTKeySetterCraftingRecipe(CraftingBookCategory category) {
-        super(category);
+
     }
 
     @Override
@@ -53,7 +53,7 @@ public class PRTKeySetterCraftingRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput inventory, HolderLookup.Provider registryManager) {
+    public ItemStack assemble(CraftingInput inventory) {
         ItemStack transmitter = ItemStack.EMPTY;
         ItemStack key1 = ItemStack.EMPTY;
         ItemStack key2 = ItemStack.EMPTY;

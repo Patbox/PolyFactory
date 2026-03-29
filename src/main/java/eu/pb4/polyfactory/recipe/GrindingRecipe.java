@@ -31,12 +31,17 @@ public interface GrindingRecipe extends Recipe<GrindingInput> {
     }
 
     @Override
-    default ItemStack assemble(GrindingInput input, HolderLookup.Provider registries) {
-        var x = this.output(input, registries, null);
+    default ItemStack assemble(GrindingInput input) {
+        var x = this.output(input,  null);
         return x != null ? x.getFirst() : ItemStack.EMPTY;
     }
 
-    List<ItemStack> output(GrindingInput input, HolderLookup.Provider registryManager, @Nullable RandomSource random);
+    @Override
+    default boolean showNotification() {
+        return false;
+    }
+
+    List<ItemStack> output(GrindingInput input, @Nullable RandomSource random);
 
     double grindTime(GrindingInput input);
 

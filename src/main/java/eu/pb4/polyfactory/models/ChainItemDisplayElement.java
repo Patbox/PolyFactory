@@ -2,8 +2,7 @@ package eu.pb4.polyfactory.models;
 
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
-import java.util.function.Consumer;
+import eu.pb4.polymer.virtualentity.api.data.DisplayEntityData;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket;
@@ -29,7 +28,7 @@ public class ChainItemDisplayElement extends LodItemDisplayElement {
         this.start = start;
         this.middle = middle;
         this.end = end;
-        this.addLodData(DisplayTrackedData.TELEPORTATION_DURATION);
+        this.addLodData(DisplayEntityData.TELEPORTATION_DURATION);
     }
 
     public void forceSync() {

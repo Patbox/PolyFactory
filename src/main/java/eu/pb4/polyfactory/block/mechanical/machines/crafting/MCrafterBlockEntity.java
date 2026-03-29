@@ -38,10 +38,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.StackedItemContents;
-import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.FurnaceResultSlot;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -176,7 +173,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
         if (self.process >= 8) {
             var outputContainer = self.getOutputContainer();
             // Check space
-            var output = self.currentRecipe.value().assemble(input, world.registryAccess());
+            var output = self.currentRecipe.value().assemble(input);
             var remainder = self.currentRecipe.value().getRemainingItems(input);
 
             {
@@ -355,7 +352,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
             for (int y = 0; y < 3; y++) {
                 for (int x = 0; x < 3; x++) {
                     this.setLockableSlot(x + y * 9 + 1, x + y * 3, x, y);
-                    this.setSlotRedirect(x + y * 9 + 5, new FurnaceResultSlot(player, MCrafterBlockEntity.this, 9 + x + y * 3, x, y + 3));
+                    this.setSlot(x + y * 9 + 5, new FurnaceResultSlot(player, MCrafterBlockEntity.this, 9 + x + y * 3, x, y + 3));
                 }
             }
 
@@ -367,12 +364,12 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
             if (this.lockedSlots.get(slot)) {
                 this.setSlot(uiIndex, GuiTextures.LOCKED_SLOT.get().hideTooltip());
             } else {
-                this.setSlotRedirect(uiIndex, new Slot(MCrafterBlockEntity.this, x + y * 3, x, y));
+                this.setSlot(uiIndex, new Slot(MCrafterBlockEntity.this, x + y * 3, x, y));
             }
         }
 
         @Override
-        public boolean onAnyClick(int index, ClickType type, net.minecraft.world.inventory.ClickType action) {
+        public boolean onAnyClick(int index, ClickType type, ContainerInput action) {
             var x = index % 9 - 1;
             var y = index / 9;
             if ((type == ClickType.MOUSE_LEFT || type == ClickType.MOUSE_RIGHT) && x >= 0 && y >= 0 && x < 3 && y < 3) {

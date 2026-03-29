@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.models;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polyfactory.util.ResourceUtils;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
@@ -14,9 +15,11 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -25,7 +28,7 @@ import static eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras.bridgeMo
 public class DirectionConnectingModel {
     public static final int SIZE = (int) Math.pow(2, 6);
     private final Identifier baseModel;
-    private final ItemStack[] models = new ItemStack[SIZE];
+    private final LazyItemStack[] models = new LazyItemStack[SIZE];
     private final boolean colored;
 
     public DirectionConnectingModel(Identifier baseModel, boolean colored) {
@@ -33,8 +36,7 @@ public class DirectionConnectingModel {
         this.colored = colored;
 
         for (var i = 0; i < SIZE; i++) {
-            this.models[i] = Items.STONE.getDefaultInstance();
-            this.models[i].set(DataComponents.ITEM_MODEL, bridgeModel(baseModel.withSuffix("/" + i)));
+            this.models[i] = new LazyItemStack(new ItemStackTemplate(Items.STONE, DataComponentPatch.builder().set(DataComponents.ITEM_MODEL, bridgeModel(baseModel.withSuffix("/" + i))).build()));
         }
     }
 
@@ -73,7 +75,7 @@ public class DirectionConnectingModel {
     }
 
     public ItemStack get(int i) {
-        return this.models[i];
+        return this.models[i].get();
     }
     public static boolean hasDirection(int i, Direction direction) {
         if (direction == null) {

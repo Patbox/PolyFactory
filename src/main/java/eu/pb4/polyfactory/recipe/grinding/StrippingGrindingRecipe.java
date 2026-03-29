@@ -39,7 +39,7 @@ public record StrippingGrindingRecipe(String group, Optional<Ingredient> input, 
     }
     
     @Override
-    public List<ItemStack> output(GrindingInput input, HolderLookup.Provider registryManager, @Nullable RandomSource random) {
+    public List<ItemStack> output(GrindingInput input, @Nullable RandomSource random) {
         var items = new ArrayList<ItemStack>();
 
         var stripped = input.stack().getItem() instanceof BlockItem blockItem ? StrippableBlockRegistry.getStrippedBlockState(blockItem.getBlock().defaultBlockState()) : null;
@@ -50,7 +50,7 @@ public record StrippingGrindingRecipe(String group, Optional<Ingredient> input, 
         for (var out : this.output) {
             for (int a = 0; a < out.roll(); a++) {
                 if (random == null || random.nextFloat() < out.chance()) {
-                    items.add(out.stack().copy());
+                    items.add(out.stack().create());
                 }
             }
         }

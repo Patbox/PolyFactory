@@ -25,7 +25,7 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 public class ItemReaderBlock extends OrientableCabledDataProviderBlock {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
@@ -109,7 +109,7 @@ public class ItemReaderBlock extends OrientableCabledDataProviderBlock {
 
         @Override
         protected ItemDisplayElement createBaseModel(BlockState state) {
-            return ItemDisplayElementUtil.createTransparent(state.getBlock().asItem());
+            return ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
         }
 
         @Override

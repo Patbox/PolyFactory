@@ -18,7 +18,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -186,7 +186,7 @@ public class MinerBlock extends RotationalNetworkBlock implements FactoryBlock, 
         private float rotation = 0;
 
         private Model(ServerLevel world, BlockState state) {
-            this.main = ItemDisplayElementUtil.createSolid(FactoryItems.MINER);
+            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.MINER);
             this.item = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 1, 0.5f);
 
             this.updateAnimation(state.getValue(FACING));

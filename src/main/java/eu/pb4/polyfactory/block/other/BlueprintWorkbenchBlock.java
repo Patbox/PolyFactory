@@ -65,8 +65,9 @@ public class BlueprintWorkbenchBlock extends WorkbenchBlock {
             this.result = new SimpleEntityElement(EntityType.ITEM);
             this.result.setOffset(new Vec3(0, 0.5, 0));
             this.clickable = new InteractionElement(new VirtualElement.InteractionHandler() {
+
                 @Override
-                public void interact(ServerPlayer player, InteractionHand hand) {
+                public void interact(ServerPlayer player, InteractionHand hand, Vec3 pos, boolean usingSecondaryAction) {
                     BlueprintWorkbenchBlock.clickForCrafting(player, blockPos());
                 }
             });
@@ -85,7 +86,7 @@ public class BlueprintWorkbenchBlock extends WorkbenchBlock {
             this.removeElement(this.result);
             this.removeElement(this.clickable);
             if (!stack.isEmpty()) {
-                this.result.getDataTracker().set(ItemEntityAccessor.getDATA_ITEM(), stack.copy());
+                this.result.getSyncedData().set(ItemEntityAccessor.getDATA_ITEM(), stack.copy());
                 this.addElement(this.result);
                 this.addElement(this.clickable);
             }

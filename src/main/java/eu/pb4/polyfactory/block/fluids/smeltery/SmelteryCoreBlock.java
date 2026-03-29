@@ -14,7 +14,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -232,7 +232,7 @@ public class SmelteryCoreBlock extends Block implements FactoryBlock, BlockWithT
         private int highlightTimer = -1;
 
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
+            this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.main.setScale(new Vector3f(2f));
             this.updateStatePos(state);
             this.addElement(this.main);

@@ -43,7 +43,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.List;
 
@@ -101,7 +101,7 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
                 CriteriaTriggers.RECIPE_CRAFTED.trigger(serverPlayer, optional.get().id(), List.of(stack.copy(), be.catalyst()));
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.DRAIN_USE);
             }
-            var itemOut = recipe.assemble(input, player.registryAccess());
+            var itemOut = recipe.assemble(input);
             for (var fluid : recipe.fluidInput(input)) {
                 container.extract(fluid, false);
             }
@@ -174,7 +174,7 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
         private final ItemDisplayElement catalyst;
         private final TopFluidViewModel fluid;
         private Model(BlockState state) {
-            this.main = ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
+            this.main = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
             this.main.setScale(new Vector3f(2f));
             this.fluid = new TopFluidViewModel(this, -7f / 16f + 0.1f, 11f / 16f, 0.5f);
             this.catalyst = ItemDisplayElementUtil.createSimple();

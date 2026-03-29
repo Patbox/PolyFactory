@@ -18,7 +18,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractCandleBlock;
 import net.minecraft.world.level.block.CampfireBlock;
-import net.minecraft.world.level.block.FarmBlock;
+import net.minecraft.world.level.block.FarmlandBlock;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -28,7 +28,7 @@ import org.joml.Vector3f;
 public class WaterSplashEntity extends SplashEntity<Unit> {
     private static final int WATER_COLOR = -13083194;
     //private static final ParticleEffect PARTICLE = EntityEffectParticleEffect.create(ParticleTypes.ENTITY_EFFECT, WATER_COLOR);
-    private static final ParticleOptions PARTICLE = new ItemParticleOption(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE.asItem().getDefaultInstance());
+    private static final ParticleOptions PARTICLE = new ItemParticleOption(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE);
     //private static final ParticleEffect PARTICLE = new DustParticleEffect(new Vector3f(56 / 255f, 93/ 255f, 199/ 255f), 0.5f);
     public WaterSplashEntity(EntityType<? extends Projectile> entityType, Level world) {
         super(entityType, world, FactoryFluids.WATER);
@@ -40,8 +40,8 @@ public class WaterSplashEntity extends SplashEntity<Unit> {
             Direction direction = blockHitResult.getDirection();
             BlockPos targetBlockPos = blockHitResult.getBlockPos();
             var state = level().getBlockState(targetBlockPos);
-            if (state.getBlock() instanceof FarmBlock && random.nextFloat() < 0.1) {
-                level().setBlockAndUpdate(targetBlockPos, state.setValue(FarmBlock.MOISTURE, FarmBlock.MAX_MOISTURE));
+            if (state.getBlock() instanceof FarmlandBlock && random.nextFloat() < 0.1) {
+                level().setBlockAndUpdate(targetBlockPos, state.setValue(FarmlandBlock.MOISTURE, FarmlandBlock.MAX_MOISTURE));
             }
 
             BlockPos sidePos = targetBlockPos.relative(direction);

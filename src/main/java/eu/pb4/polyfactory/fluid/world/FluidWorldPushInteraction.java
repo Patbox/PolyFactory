@@ -63,9 +63,9 @@ public final class FluidWorldPushInteraction {
         }
         var fluid = container.topFluid();
 
-        if (pushedBlockState.isAir() && fluid != null && fluid.type() == FactoryFluids.EXPERIENCE && container.get(fluid) >= FluidBehaviours.EXPERIENCE_ORB_TO_FLUID && world.random.nextBoolean()) {
+        if (pushedBlockState.isAir() && fluid != null && fluid.type() == FactoryFluids.EXPERIENCE && container.get(fluid) >= FluidBehaviours.EXPERIENCE_ORB_TO_FLUID && world.getRandom().nextBoolean()) {
             var max = (int) Math.min(container.get(fluid) / FluidBehaviours.EXPERIENCE_ORB_TO_FLUID, 30);
-            var amount = max <= 1 ? 1 : world.random.nextIntBetweenInclusive(1, max);
+            var amount = max <= 1 ? 1 : world.getRandom().nextIntBetweenInclusive(1, max);
             container.extract(fluid, amount * FluidBehaviours.EXPERIENCE_ORB_TO_FLUID, false);
             var x = new ExperienceOrb(world, pos.getX() + 0.5 + direction.getStepX() * 0.7,
                     pos.getY() + 0.5 + direction.getStepY() * 0.7,

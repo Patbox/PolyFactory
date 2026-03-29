@@ -67,7 +67,7 @@ public class RecordPlayerBlockEntity extends ChanneledDataBlockEntity implements
         var song = stack.get(DataComponents.JUKEBOX_PLAYABLE);
         this.stopPlaying();
         if (song != null) {
-            this.startPlaying(song.song().unwrap(this.level.registryAccess()).get());
+            this.startPlaying(song.song());
         } else {
             DataProvider.sendData(this.level, worldPosition, CapacityData.ZERO);
         }
@@ -85,7 +85,7 @@ public class RecordPlayerBlockEntity extends ChanneledDataBlockEntity implements
         this.stack = newStack;
 
         if (view.getIntOr("ticks_since_song_started", -999) != -999) {
-            JukeboxSong.fromStack(view.lookup(), this.stack).ifPresent((song) -> {
+            JukeboxSong.fromStack(this.stack).ifPresent((song) -> {
                 this.setValues(song, view.getLongOr("ticks_since_song_started", 0));
             });
         }

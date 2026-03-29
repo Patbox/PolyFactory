@@ -15,7 +15,7 @@ import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryColors;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
@@ -27,12 +27,15 @@ import net.minecraft.advancements.criterion.ItemUsedOnLocationTrigger;
 import net.minecraft.advancements.criterion.LocationPredicate;
 import net.minecraft.advancements.criterion.RecipeCraftedTrigger;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.storage.loot.predicates.AnyOfCondition;
@@ -48,7 +51,7 @@ import static eu.pb4.polyfactory.util.FactoryUtil.recipeKey;
 class AdvancementsProvider extends FabricAdvancementProvider {
 
 
-    protected AdvancementsProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registryLookup) {
+    protected AdvancementsProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registryLookup) {
         super(output, registryLookup);
     }
 
@@ -279,7 +282,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
         var coloredLamp = Advancement.Builder.advancement()
                 .parent(grinder)
                 .display(
-                        ColoredItem.stack(FactoryItems.LAMP, 1, FactoryColors.YTTR_TEAL),
+                        ColoredItem.template(FactoryItems.LAMP, 1, FactoryColors.YTTR_TEAL),
                         Component.translatable("advancements.polyfactory.colored_lamp.title"),
                         Component.translatable("advancements.polyfactory.colored_lamp.description"),
                         null,
@@ -396,7 +399,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
         var dye = Advancement.Builder.advancement()
                 .parent(mixer)
                 .display(
-                        ColoredItem.stack(FactoryItems.ARTIFICIAL_DYE, 1, 0x42f5a4),
+                        ColoredItem.template(FactoryItems.ARTIFICIAL_DYE, 1, 0x42f5a4),
                         Component.translatable("advancements.polyfactory.artificial_dye.title"),
                         Component.translatable("advancements.polyfactory.artificial_dye.description"),
                         null,
@@ -546,10 +549,10 @@ class AdvancementsProvider extends FabricAdvancementProvider {
         var sprayCan = Advancement.Builder.advancement()
                 .parent(grinder)
                 .display(
-                        new GuiElementBuilder(FactoryItems.SPRAY_CAN)
-                                .setComponent(FactoryDataComponents.COLOR, DyeColorExtra.getColor(DyeColor.BLUE))
-                                .setComponent(FactoryDataComponents.USES_LEFT, DyeSprayItem.MAX_USES)
-                                .asStack(),
+                        new ItemStackTemplate(FactoryItems.SPRAY_CAN, DataComponentPatch.builder()
+                                .set(FactoryDataComponents.COLOR, DyeColorExtra.getColor(DyeColor.BLUE))
+                                .set(FactoryDataComponents.USES_LEFT, DyeSprayItem.MAX_USES)
+                                .build()),
                         Component.translatable("advancements.polyfactory.spray_can.title"),
                         Component.translatable("advancements.polyfactory.spray_can.description"),
                         null,
@@ -579,7 +582,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
         var crafter2 = Advancement.Builder.advancement()
                 .parent(crafter)
                 .display(
-                        new GuiElementBuilder(FactoryItems.CRAFTER).glow().asStack(),
+                        new ItemStackTemplate(FactoryItems.CRAFTER, DataComponentPatch.builder().set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true).build()),
                         Component.translatable("advancements.polyfactory.crafter2.title"),
                         Component.translatable("advancements.polyfactory.crafter2.description"),
                         null,
@@ -855,7 +858,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
         var brittleGlassBottle = Advancement.Builder.advancement()
                 .parent(mechanicalSpout)
                 .display(
-                        FactoryItems.BRITTLE_POTION.getDefaultInstance(),
+                        FactoryItems.BRITTLE_POTION,
                         Component.translatable("advancements.polyfactory.brittle_glass_bottle.title"),
                         Component.translatable("advancements.polyfactory.brittle_glass_bottle.description"),
                         null,
@@ -949,7 +952,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
         var pressureFluidGunHealing = Advancement.Builder.advancement()
                 .parent(pressureFluidGun)
                 .display(
-                        new GuiElementBuilder(FactoryItems.PRESSURE_FLUID_GUN).glow().asStack(),
+                        new ItemStackTemplate(FactoryItems.PRESSURE_FLUID_GUN, DataComponentPatch.builder().set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true).build()),
                         Component.translatable("advancements.polyfactory.pressure_fluid_gun_healing.title"),
                         Component.translatable("advancements.polyfactory.pressure_fluid_gun_healing.description"),
                         null,
@@ -971,7 +974,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
         var nozzleLava = Advancement.Builder.advancement()
                 .parent(nozzle)
                 .display(
-                        new GuiElementBuilder(FactoryItems.NOZZLE).glow().asStack(),
+                        new ItemStackTemplate(FactoryItems.NOZZLE, DataComponentPatch.builder().set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true).build()),
                         Component.translatable("advancements.polyfactory.nozzle_lava.title"),
                         Component.translatable("advancements.polyfactory.nozzle_lava.description"),
                         null,
@@ -990,7 +993,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
         var cable = Advancement.Builder.advancement()
                 .parent(mixer)
                 .display(
-                        ColoredItem.stack(FactoryItems.CABLE, 1, DyeColor.RED),
+                        ColoredItem.template(FactoryItems.CABLE, 1, DyeColor.RED),
                         Component.translatable("advancements.polyfactory.cable.title"),
                         Component.translatable("advancements.polyfactory.cable.description"),
                         null,

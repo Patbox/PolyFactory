@@ -105,7 +105,7 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
                 return;
             }
 
-            var output = self.currentRecipe.value().assemble(input, world.registryAccess());
+            var output = self.currentRecipe.value().assemble(input);
             self.setStack(output);
 
             if (FactoryUtil.getClosestPlayer(world, pos, 16) instanceof ServerPlayer serverPlayer) {

@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.mechanical.conveyor;
 
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.util.WorldPointer;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -25,7 +26,7 @@ import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 public class SlotAwareFunnelBlock extends FunnelBlock {
     public SlotAwareFunnelBlock(Properties settings) {
@@ -187,15 +188,15 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
     }
 
     public static final class Model extends FunnelBlock.Model {
-        private static final ItemStack MODEL_IN = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/slot_aware_funnel_in"));
-        private static final ItemStack MODEL_OUT = ItemDisplayElementUtil.getSolidModel(FactoryUtil.id("block/slot_aware_funnel_out"));
+        private static final LazyItemStack MODEL_IN = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/slot_aware_funnel_in"));
+        private static final LazyItemStack MODEL_OUT = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/slot_aware_funnel_out"));
         private Model(BlockState state, BlockPos pos) {
             super(state, pos);
         }
 
         @Override
         protected ItemStack getModel(boolean outModel) {
-            return outModel ? MODEL_OUT : MODEL_IN;
+            return (outModel ? MODEL_OUT : MODEL_IN).get();
         }
     }
 }

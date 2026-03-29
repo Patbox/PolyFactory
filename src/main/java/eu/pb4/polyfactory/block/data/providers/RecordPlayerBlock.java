@@ -124,7 +124,7 @@ public class RecordPlayerBlock extends DirectionalCabledDataProviderBlock {
         }
 
         public void playSoundIfActive(Holder<SoundEvent> event) {
-            this.sendPacket(VirtualEntityUtils.createPlaySoundFromEntityPacket(this.soundSource.getEntityId(), event, SoundSource.RECORDS, 4F + 1 / 16f, 1, 0));
+            this.sendPacket(VirtualEntityUtils.createClientboundSoundEntityPacket(this.soundSource.getEntityId(), event, SoundSource.RECORDS, 4F + 1 / 16f, 1, 0));
         }
 
 

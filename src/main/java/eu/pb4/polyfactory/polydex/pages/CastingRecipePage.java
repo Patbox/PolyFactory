@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.polydex.pages;
 
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polydex.api.v1.recipe.PageBuilder;
 import eu.pb4.polydex.api.v1.recipe.PolydexEntry;
 import eu.pb4.polydex.api.v1.recipe.PolydexIngredient;
@@ -27,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public abstract class CastingRecipePage<T extends CastingRecipe> extends PrioritizedRecipePage<T> {
-    private static final ItemStack ICON = FactoryItems.CASTING_TABLE.getDefaultInstance();
+    private final ItemStack ICON = FactoryItems.CASTING_TABLE.getDefaultInstance();
     private final List<PolydexIngredient<?>> ingredients;
     private final PolydexStack<?> output;
 
@@ -43,8 +44,11 @@ public abstract class CastingRecipePage<T extends CastingRecipe> extends Priorit
     }
 
     protected abstract ItemStack getResultStack();
+
     protected abstract FluidStack<?> getBaseFluid();
+
     protected abstract CountedIngredient getBaseIngredient();
+
     @Override
     public @Nullable Component texture(ServerPlayer player) {
         return Component.empty()
@@ -56,6 +60,7 @@ public abstract class CastingRecipePage<T extends CastingRecipe> extends Priorit
                 }))
                 .append(Component.literal("" + GuiTextures.SPOUT_POLYDEX_FLUID_OFFSET_N + GuiTextures.POLYDEX_OFFSET).setStyle(UiResourceCreator.STYLE));
     }
+
     @Override
     public boolean isOwner(MinecraftServer server, PolydexEntry entry) {
         return entry.isPartOf(this.output);

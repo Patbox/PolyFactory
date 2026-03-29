@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.mapcanvas.api.font.DefaultFonts;
@@ -66,7 +67,7 @@ import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -138,7 +139,6 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
         super(settings);
         this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false).setValue(ACTIVE, false));
         //noinspection ResultOfMethodCallIgnored
-        Model.ACTIVE_MODEL.getCount();
     }
 
     @Override
@@ -247,7 +247,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
     }
 
     public static class Model extends BlockModel {
-        private static final ItemStack ACTIVE_MODEL = ItemDisplayElementUtil.getTransparentModel(id("block/hologram_projector_active"));
+        private static final LazyItemStack ACTIVE_MODEL = ItemDisplayElementUtil.getModel(id("block/hologram_projector_active"));
         private static final ParticleOptions EFFECT = new DustColorTransitionOptions(
                 ARGB.color(0, 153, 250, 255),
                 ARGB.color(0, 235, 254, 255),
@@ -272,7 +272,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
         private float extraOffset;
 
         public Model(BlockState state) {
-            this.base = ItemDisplayElementUtil.createSimple(state.getValue(ACTIVE) ? ACTIVE_MODEL : ItemDisplayElementUtil.getTransparentModel(state.getBlock().asItem()));
+            this.base = ItemDisplayElementUtil.createSimple((state.getValue(ACTIVE) ? ACTIVE_MODEL : ItemDisplayElementUtil.getModel(state.getBlock().asItem())).get());
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);
@@ -340,7 +340,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
                 var state = this.blockState();
-                this.base.setItem(state.getValue(ACTIVE) ? ACTIVE_MODEL : ItemDisplayElementUtil.getTransparentModel(state.getBlock().asItem()));
+                this.base.setItem((state.getValue(ACTIVE) ? ACTIVE_MODEL : ItemDisplayElementUtil.getModel(state.getBlock().asItem())).get());
                 updateStatePos(state);
                 this.base.tick();
                 if (this.currentDisplay != null) {
@@ -381,7 +381,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                     e.tick();
                     return;
                 } else if (this.currentDisplay instanceof ItemDisplayElement e && asItem) {
-                    e.setItem(ItemDisplayElementUtil.getSolidModel(blockStateData.state().getBlock().asItem()));
+                    e.setItem(ItemDisplayElementUtil.getModel(blockStateData.state().getBlock().asItem()).get());
                     e.tick();
                     this.extraScale = 2;
                     return;
@@ -390,7 +390,7 @@ public class HologramProjectorBlock extends DataNetworkBlock implements FactoryB
                 this.customCenter = 0;
                 this.extraOffset = 0;
                 if (asItem) {
-                    var i = new ItemDisplayElement(ItemDisplayElementUtil.getTransparentModel(blockStateData.state().getBlock().asItem()));
+                    var i = new ItemDisplayElement(ItemDisplayElementUtil.getModel(blockStateData.state().getBlock().asItem()).get());
                     i.setItemDisplayContext(ItemDisplayContext.FIXED);
                     this.extraScale = 2;
                     newDisplay = i;

@@ -10,7 +10,7 @@ import eu.pb4.polyfactory.util.movingitem.MovingItemContainerHolder;
 import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polymer.blocks.api.BlockModelType;
 import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
-import eu.pb4.sgui.api.GuiHelpers;
+import eu.pb4.sgui.api.SguiUtils;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -96,17 +96,17 @@ public class FactoryUtil {
             DyeColor.MAGENTA,
             DyeColor.PINK);
 
-    public static final Map<Direction, BlockState> TRAPDOOR_REGULAR = Util.makeEnumMap(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
+    public static final Map<Direction, BlockState> TRAPDOOR_REGULAR = Util.makeEnumMap(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf("TRAPDOOR_" + switch (x) {
         case UP -> "BOTTOM";
         case DOWN -> "TOP";
         default -> x.getSerializedName().toUpperCase(Locale.ROOT);
-    } + "_TRAPDOOR")));
+    })));
 
-    public static final Map<Direction, BlockState> TRAPDOOR_WATERLOGGED = Util.makeEnumMap(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf(switch (x) {
+    public static final Map<Direction, BlockState> TRAPDOOR_WATERLOGGED = Util.makeEnumMap(Direction.class, x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf("TRAPDOOR_" + switch (x) {
         case UP -> "BOTTOM";
         case DOWN -> "TOP";
         default -> x.getSerializedName().toUpperCase(Locale.ROOT);
-    } + "_TRAPDOOR_WATERLOGGED")));
+    } + "_WATERLOGGED")));
 
 
     public static final Map<Direction.Axis, BlockState> LIGHTNING_ROD_REGULAR = Util.makeEnumMap(Direction.Axis.class,
@@ -116,13 +116,6 @@ public class FactoryUtil {
             x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf( "LIGHTNING_ROD_" + x.name() + "_WATERLOGGED")));
 
     private static final List<Runnable> RUN_NEXT_TICK = new ArrayList<>();
-
-    public static Item requestModelBase(ModelRenderType type) {
-        return switch (type) {
-            case SOLID -> Items.STONE;
-            case TRANSPARENT -> Items.FEATHER;
-        };
-    }
 
     public static void runNextTick(Runnable runnable) {
         RUN_NEXT_TICK.add(runnable);
@@ -572,7 +565,7 @@ public class FactoryUtil {
 
     public static void sendSlotUpdate(Entity entity, InteractionHand hand) {
         if (entity instanceof ServerPlayer player) {
-            GuiHelpers.sendSlotUpdate(player, player.inventoryMenu.containerId, hand == InteractionHand.MAIN_HAND
+            SguiUtils.sendSlotUpdate(player, player.inventoryMenu.containerId, hand == InteractionHand.MAIN_HAND
                             ? InventoryMenu.USE_ROW_SLOT_START + player.getInventory().getSelectedSlot()
                             : InventoryMenu.SHIELD_SLOT,
                     player.getItemInHand(hand), player.inventoryMenu.incrementStateId());

@@ -144,7 +144,7 @@ public class WorkbenchBlockEntity extends LockableBlockEntity implements Minimal
             RecipeHolder<CraftingRecipe> recipeEntry = optional.get();
             CraftingRecipe craftingRecipe = recipeEntry.value();
             //if (result.shouldCraftRecipe(world, null, recipeEntry)) {
-            ItemStack itemStack2 = craftingRecipe.assemble(this.asCraftInput(), level.registryAccess());
+            ItemStack itemStack2 = craftingRecipe.assemble(this.asCraftInput());
             if (itemStack2.isItemEnabled(level.enabledFeatures())) {
                 itemStack = itemStack2;
             }

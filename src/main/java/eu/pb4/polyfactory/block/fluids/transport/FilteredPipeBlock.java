@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.fluids.transport;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
@@ -20,7 +21,7 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.jspecify.annotations.NonNull;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.EnumSet;
@@ -63,7 +64,6 @@ public class FilteredPipeBlock extends PipeBaseBlock implements FactoryBlock, Co
     public FilteredPipeBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false).setValue(INVERTED, false));
-        Model.NEGATED.isEmpty();
     }
 
     @Nullable
@@ -151,11 +151,11 @@ public class FilteredPipeBlock extends PipeBaseBlock implements FactoryBlock, Co
     }
 
     public static final class Model extends RotationAwareModel {
-        private static final ItemStack NEGATED = ItemDisplayElementUtil.getTransparentModel(id("block/filtered_pipe_negated"));
+        private static final LazyItemStack NEGATED = ItemDisplayElementUtil.getModel(id("block/filtered_pipe_negated"));
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement fluid;
         private Model(BlockState state, BlockPos pos) {
-            this.mainElement = ItemDisplayElementUtil.createSimple(state.getValue(FilteredPipeBlock.INVERTED) ? NEGATED : ItemDisplayElementUtil.getTransparentModel(state.getBlock().asItem()));
+            this.mainElement = ItemDisplayElementUtil.createSimple(state.getValue(FilteredPipeBlock.INVERTED) ? NEGATED.get() : ItemDisplayElementUtil.getModel(state.getBlock().asItem()).get());
             this.mainElement.setScale(new Vector3f(2f));
             this.fluid = ItemDisplayElementUtil.createSimple();
             this.fluid.setScale(new Vector3f(2f));
@@ -187,7 +187,7 @@ public class FilteredPipeBlock extends PipeBaseBlock implements FactoryBlock, Co
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.mainElement.setItem(this.blockState().getValue(FilteredPipeBlock.INVERTED) ? NEGATED : ItemDisplayElementUtil.getSolidModel(this.blockState().getBlock().asItem()));
+                this.mainElement.setItem(this.blockState().getValue(FilteredPipeBlock.INVERTED) ? NEGATED.get() : ItemDisplayElementUtil.getModel(this.blockState().getBlock().asItem()).get());
                 updateStatePos(this.blockState());
             }
         }

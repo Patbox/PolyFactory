@@ -186,7 +186,7 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         private Optional<ColorProvider<T>> color = Optional.empty();
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         private Optional<BiFunction<FluidType<T>, T, Component>> name = Optional.empty();
-        private Function<FluidInstance<T>, ParticleOptions> particleGetter = (x) -> new ItemParticleOption(ParticleTypes.ITEM, FactoryModels.FLUID_FLAT_FULL.get(x));
+        private Function<FluidInstance<T>, ParticleOptions> particleGetter = (x) -> new ItemParticleOption(ParticleTypes.ITEM, FactoryModels.FLUID_FLAT_FULL.getTemplate(x));
         private MaxFlowProvider<T> maxFlow = (w, x) -> FluidConstants.BOTTLE;
         private FlowSpeedProvider<T> flowSpeedMultiplier = (w, x) -> 1;
         private FluidShootingBehavior<T> shootingBehavior = new NoOpFluidShootingBehavior<>();

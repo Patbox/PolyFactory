@@ -18,8 +18,9 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.model.*;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.select.CustomModelDataStringProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.CustomModelDataTintSource;
 import it.unimi.dsi.fastutil.ints.IntList;
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -66,7 +67,8 @@ public class PortableFluidTankBlockItem extends FactoryBlockItem {
         builder.addData(AssetPaths.itemAsset(id), new ItemAsset(new CompositeItemModel(List.of(new BasicItemModel(id.withPrefix("block/")),
                 new SelectItemModel<>(
                         new SelectItemModel.Switch<>(new CustomModelDataStringProperty(0), list),
-                        Optional.of(EmptyItemModel.INSTANCE)
+                        Optional.of(EmptyItemModel.INSTANCE),
+                        Optional.empty()
                 )
         )), ItemAsset.Properties.DEFAULT).toJson().getBytes(StandardCharsets.UTF_8));
     }
@@ -105,8 +107,8 @@ public class PortableFluidTankBlockItem extends FactoryBlockItem {
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context) {
-        var base = super.getPolymerItemStack(itemStack, tooltipType, context);
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context, HolderLookup.Provider lookup) {
+        var base = super.getPolymerItemStack(itemStack, tooltipType, context, lookup);
         if (itemStack.has(FactoryDataComponents.FLUID)) {
             var fluids = itemStack.get(FactoryDataComponents.FLUID);
             if (fluids != null && fluids.capacity() != -1) {

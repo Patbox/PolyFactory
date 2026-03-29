@@ -165,7 +165,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
         self.model.tick();
 
         if (self.process >= self.currentRecipe.value().time(input)) {
-            var itemOut = self.currentRecipe.value().assemble(input, world.registryAccess());
+            var itemOut = self.currentRecipe.value().assemble(input);
 
             var outputContainer = self.getOutputContainer();
 
@@ -218,7 +218,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
                 self.visualProgress = (float) (self.process / self.currentRecipe.value().time(input));
                 setChanged(world, pos, self.getBlockState());
                 var ppos = self.containers[0].getPos();
-                var fluid = Util.getRandomSafe(self.currentRecipe.value().fluidOutput(input), world.random);
+                var fluid = Util.getRandomSafe(self.currentRecipe.value().fluidOutput(input), world.getRandom());
 
                 if (fluid.isPresent() && ppos != null) {
                     ((ServerLevel) world).sendParticles(fluid.get().instance().particle(),
@@ -381,7 +381,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             }
 
             var recipe = optional.get().value();
-            var itemOut = recipe.assemble(input, player.registryAccess());
+            var itemOut = recipe.assemble(input);
             for (var fluid : recipe.fluidInput(input)) {
                 container.extract(fluid, false);
             }
@@ -485,9 +485,9 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
             this.setSlot(6 + 1 * 9, fluidSlot);
             this.setSlot(6 + 2 * 9, fluidSlot);
 
-            this.setSlotRedirect(2, new Slot(MDrainBlockEntity.this, 0, 0, 0));
-            this.setSlotRedirect(9 + 5, new FurnaceResultSlot(player, MDrainBlockEntity.this, 1, 1, 0));
-            this.setSlotRedirect(9 * 2 + 2, new TagLimitedSlot(MDrainBlockEntity.this, 2, FactoryItemTags.DRAIN_CATALYST) {
+            this.setSlot(2, new Slot(MDrainBlockEntity.this, 0, 0, 0));
+            this.setSlot(9 + 5, new FurnaceResultSlot(player, MDrainBlockEntity.this, 1, 1, 0));
+            this.setSlot(9 * 2 + 2, new TagLimitedSlot(MDrainBlockEntity.this, 2, FactoryItemTags.DRAIN_CATALYST) {
                 @Override
                 public int getMaxStackSize() {
                     return 1;

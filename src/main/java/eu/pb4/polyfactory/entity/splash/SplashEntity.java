@@ -8,7 +8,7 @@ import eu.pb4.polyfactory.mixin.ProjectileAccessor;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
+import eu.pb4.polymer.virtualentity.api.data.DisplayEntityData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -16,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.NameAndId;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
@@ -35,7 +36,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ public abstract class SplashEntity<T> extends Projectile implements PolymerEntit
     private T data;
     protected int existenceTime = 5;
     @Nullable
-    private GameProfile profile;
+    private NameAndId profile;
     public SplashEntity(EntityType<? extends Projectile> entityType, Level world, FluidType<T> fluidInstance) {
         super(entityType, world);
         this.fluid = fluidInstance;
@@ -156,13 +157,13 @@ public abstract class SplashEntity<T> extends Projectile implements PolymerEntit
     public void modifyRawTrackedData(List<SynchedEntityData.DataValue<?>> data, ServerPlayer player, boolean initial) {
         PolymerEntity.super.modifyRawTrackedData(data, player, initial);
         if (initial) {
-            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.TELEPORTATION_DURATION, 2));
+            data.add(SynchedEntityData.DataValue.create(DisplayEntityData.TELEPORTATION_DURATION, 2));
             if (!this.forceParticles()) {
-                data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.BILLBOARD, (byte) Display.BillboardConstraints.CENTER.ordinal()));
+                data.add(SynchedEntityData.DataValue.create(DisplayEntityData.BILLBOARD, (byte) Display.BillboardConstraints.CENTER.ordinal()));
                 if (this.fluid.brightness().isPresent()) {
-                    data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.BRIGHTNESS, this.fluid.brightness().get().pack()));
+                    data.add(SynchedEntityData.DataValue.create(DisplayEntityData.BRIGHTNESS, this.fluid.brightness().get().pack()));
                 }
-                data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.Item.ITEM, getParticleItem()));
+                data.add(SynchedEntityData.DataValue.create(DisplayEntityData.Item.ITEM, getParticleItem()));
             }
         }
     }
@@ -231,12 +232,12 @@ public abstract class SplashEntity<T> extends Projectile implements PolymerEntit
         return SoundEvents.EMPTY;
     }
 
-    protected GameProfile getProfile() {
+    protected NameAndId getProfile() {
         if (this.getOwner() instanceof Player player) {
-            this.profile = player.getGameProfile();
+            this.profile = player.nameAndId();
         } else if (this.profile == null) {
             var x = ((ProjectileAccessor) this).getOwner();
-            this.profile = new GameProfile(x != null ? x.getUUID() : this.getUUID(), "Splash");
+            this.profile = new NameAndId(x != null ? x.getUUID() : this.getUUID(), "Splash");
         }
         return this.profile;
     }

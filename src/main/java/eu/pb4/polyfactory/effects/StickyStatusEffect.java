@@ -3,7 +3,7 @@ package eu.pb4.polyfactory.effects;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polymer.core.api.other.PolymerStatusEffect;
+import eu.pb4.polymer.core.api.other.PolymerMobEffect;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -20,7 +20,7 @@ import net.minecraft.world.phys.Vec3;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class StickyStatusEffect extends MobEffect implements PolymerStatusEffect {
+public class StickyStatusEffect extends MobEffect implements PolymerMobEffect {
     //private final Multimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> wallEffects;
     public StickyStatusEffect(String type, MobEffectCategory category, int color, ParticleOptions particleEffect) {
         super(category, color, particleEffect);
@@ -74,7 +74,7 @@ public class StickyStatusEffect extends MobEffect implements PolymerStatusEffect
                 TriggerCriterion.trigger(player, FactoryTriggers.STICKY_WALL_SLIDING);
             }
 
-            if (entity.level().random.nextInt(5) == 0) {
+            if (entity.level().getRandom().nextInt(5) == 0) {
                 entity.playSound(SoundEvents.HONEY_BLOCK_SLIDE, 1.0F, 1.0F);
                 if (!entity.isSilent()) {
                     entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.HONEY_BLOCK_SLIDE, entity.getSoundSource(), 1.0F, 1.0F);

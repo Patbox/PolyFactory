@@ -28,7 +28,7 @@ public class SimpleGrindingRecipePage extends GrindingRecipePage<SimpleGrindingR
 
     @Override
     public ItemStack getOutput(@Nullable PolydexEntry polydexEntry, MinecraftServer minecraftServer) {
-        return this.recipe.output().getFirst().stack().copy();
+        return this.recipe.output().getFirst().stack().create();
     }
 
     @Override
@@ -43,7 +43,7 @@ public class SimpleGrindingRecipePage extends GrindingRecipePage<SimpleGrindingR
 
     @Override
     public ItemStack entryIcon(@Nullable PolydexEntry entry, ServerPlayer player) {
-        return this.recipe.output().getFirst().stack();
+        return this.recipe.output().getFirst().stack().create();
     }
 
     @Override

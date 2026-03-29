@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.ui;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.CanvasImage;
@@ -11,12 +12,14 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.util.ResourceUtils;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
+import eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import it.unimi.dsi.fastutil.chars.*;
 import javax.imageio.ImageIO;
 
 import it.unimi.dsi.fastutil.ints.Int2CharMap;
 import it.unimi.dsi.fastutil.ints.Int2CharOpenHashMap;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
@@ -25,6 +28,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.DyedItemColor;
 import java.awt.image.BufferedImage;
@@ -109,7 +113,7 @@ public class UiResourceCreator {
     }
 
     public static IntFunction<GuiElementBuilder> icon16(String path, int size) {
-        var models = new ItemStack[size];
+        var models = new ItemStackTemplate[size];
 
         for (var i = 0; i < size; i++) {
             models[i] = genericIconRaw(Items.ALLIUM, path + "_" + i, BASE_MODEL, 0);
@@ -143,7 +147,7 @@ public class UiResourceCreator {
 
     public static IntFunction<GuiElementBuilder> genericProgress(String path, int start, int stop, boolean reverse, String base, List<SlicedTexture> progressType, int offset) {
 
-        var models = new ItemStack[stop - start];
+        var models = new ItemStackTemplate[stop - start];
 
         progressType.add(new SlicedTexture(path, start, stop, reverse));
 
@@ -167,13 +171,15 @@ public class UiResourceCreator {
     }
 
 
-    public static ItemStack genericIconRaw(Item item, String path, String base, int offset) {
+    public static ItemStackTemplate genericIconRaw(Item item, String path, String base, int offset) {
         var extra = offset == 0 ? "" : "_offset_" + offset;
 
         var texturePath = elementPath(path);
         var modelPath = elementPath(path + extra);
         SIMPLE_MODEL.add(new SimpleModel(texturePath, modelPath, base, offset));
-        return ItemDisplayElementUtil.getSolidModel(texturePath);
+        return new ItemStackTemplate(Items.TRIAL_KEY, DataComponentPatch.builder()
+                .set(DataComponents.ITEM_MODEL, ResourcePackExtras.bridgeModel(texturePath))
+                .build());
     }
 
     private static Identifier elementPath(String path) {

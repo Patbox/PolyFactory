@@ -24,7 +24,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 
 public class SlimeSplashEntity extends SplashEntity<Unit> {
-    private static final ParticleOptions PARTICLE = new ItemParticleOption(ParticleTypes.ITEM, Items.SLIME_BLOCK.getDefaultInstance());
+    private static final ParticleOptions PARTICLE = new ItemParticleOption(ParticleTypes.ITEM, Items.SLIME_BLOCK);
 
     public SlimeSplashEntity(EntityType<? extends Projectile> entityType, Level world) {
         super(entityType, world, FactoryFluids.HONEY);

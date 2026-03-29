@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.entity;
 
 import com.mojang.serialization.Codec;
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.mechanical.ChainDriveBlock;
@@ -15,7 +16,7 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.InteractionElement;
 import eu.pb4.polymer.virtualentity.api.elements.VirtualElement;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
+import eu.pb4.polymer.virtualentity.api.data.DisplayEntityData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -56,7 +57,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -64,7 +65,7 @@ import java.util.function.Consumer;
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, ConfigurableEntity<ChainLiftEntity>, EntityCatchingVehicle {
-    private static final ItemStack MODEL = ItemDisplayElementUtil.getSolidModel(id("entity/chain_lift"));
+    private static final LazyItemStack MODEL = ItemDisplayElementUtil.getModel(id("entity/chain_lift"));
     private static final EntityConfig<Boolean, ChainLiftEntity> PLAYER_CONTROL_CONFIG = EntityConfig.of("player_control", Codec.BOOL,
             EntityConfigValue.of(x -> x.playerControllable, (x, y) -> x.playerControllable = y),
             EntityValueFormatter.text(CommonComponents::optionStatus),
@@ -140,7 +141,7 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
     }
 
     @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
+    public InteractionResult interact(Player player, InteractionHand hand, Vec3 pos) {
         if (this.isVehicle() && !this.hasExactlyOnePlayerPassenger()) {
             this.ejectPassengers();
             this.shakeAnimationTimer = 10;
@@ -527,17 +528,17 @@ public class ChainLiftEntity extends VehicleEntity implements PolymerEntity, Con
         for (int i = 0; i < data.size(); i++) {
             var entry = data.get(i);
             if (entry.id() == ROTATION.id()) {
-                data.set(i, SynchedEntityData.DataValue.create(DisplayTrackedData.LEFT_ROTATION, (Quaternionf) entry.value()));
+                data.set(i, SynchedEntityData.DataValue.create(DisplayEntityData.LEFT_ROTATION, (Quaternionf) entry.value()));
                 interpolate = true;
             }
         }
         if (initial) {
-            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.TELEPORTATION_DURATION, 3));
-            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.INTERPOLATION_DURATION, 2));
-            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.TRANSLATION, new Vector3f(0, 13 / 16f, 0)));
-            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.Item.ITEM, MODEL));
+            data.add(SynchedEntityData.DataValue.create(DisplayEntityData.TELEPORTATION_DURATION, 3));
+            data.add(SynchedEntityData.DataValue.create(DisplayEntityData.INTERPOLATION_DURATION, 2));
+            data.add(SynchedEntityData.DataValue.create(DisplayEntityData.TRANSLATION, new Vector3f(0, 13 / 16f, 0)));
+            data.add(SynchedEntityData.DataValue.create(DisplayEntityData.Item.ITEM, MODEL.get()));
         } else if (interpolate) {
-            data.add(SynchedEntityData.DataValue.create(DisplayTrackedData.START_INTERPOLATION, 0));
+            data.add(SynchedEntityData.DataValue.create(DisplayEntityData.START_INTERPOLATION, 0));
         }
 
         PolymerEntity.super.modifyRawTrackedData(data, player, initial);

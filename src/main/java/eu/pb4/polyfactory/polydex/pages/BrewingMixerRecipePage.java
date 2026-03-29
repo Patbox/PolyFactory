@@ -28,7 +28,7 @@ public class BrewingMixerRecipePage extends MixerRecipePage<BrewingMixingRecipe>
 
     @Override
     protected List<CountedIngredient> getItemInput() {
-        return List.of(new CountedIngredient(Optional.of(this.recipe.ingredient()), ItemComponentPredicate.EMPTY, 1, ItemStack.EMPTY));
+        return List.of(new CountedIngredient(Optional.of(this.recipe.ingredient()), ItemComponentPredicate.EMPTY, 1, Optional.empty()));
     }
 
     @Override

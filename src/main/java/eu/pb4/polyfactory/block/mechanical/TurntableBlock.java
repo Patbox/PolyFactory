@@ -19,7 +19,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -148,7 +148,7 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
         private BlockCollection blocks;
 
         private Model(ServerLevel world, BlockState state) {
-            this.mainElement = LodItemDisplayElement.createSimple(ItemDisplayElementUtil.getSolidModel(state.getBlock().asItem()), this.getUpdateRate(), 0.3f, 0.6f);
+            this.mainElement = LodItemDisplayElement.createSimple(ItemDisplayElementUtil.getModel(state.getBlock().asItem()).get(), this.getUpdateRate(), 0.3f, 0.6f);
             this.updateAnimation(0, state.getValue(FACING));
             this.addElement(this.mainElement);
             if (false) {

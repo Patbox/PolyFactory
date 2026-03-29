@@ -11,8 +11,8 @@ import eu.pb4.polyfactory.loottable.CopyCachedDataLootFunction;
 import eu.pb4.polyfactory.loottable.CopyColorLootFunction;
 import eu.pb4.polyfactory.loottable.CopyFluidsLootFunction;
 import eu.pb4.polyfactory.loottable.CopyReadOnlyLootFunction;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootSubProvider;
 import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.Item;
@@ -28,9 +28,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-class LootTables extends FabricBlockLootTableProvider {
+class LootTables extends FabricBlockLootSubProvider {
 
-    protected LootTables(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
+    protected LootTables(FabricPackOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
         super(dataOutput, registryLookup);
     }
 

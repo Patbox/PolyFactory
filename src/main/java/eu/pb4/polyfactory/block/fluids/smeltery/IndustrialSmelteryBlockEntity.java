@@ -22,7 +22,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import eu.pb4.sgui.virtual.inventory.VirtualSlot;
+import eu.pb4.sgui.api.containerwrappers.slot.WrappingSlot;
 import it.unimi.dsi.fastutil.booleans.BooleanList;
 import it.unimi.dsi.fastutil.floats.FloatList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -185,7 +185,7 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                     if (!stack.isEmpty()) {
                         var value = world.fuelValues().burnDuration(stack);
                         if (value > 0) {
-                            var remainder = stack.getRecipeRemainder();
+                            var remainder = stack.getCraftingRemainder();
                             stack.shrink(1);
                             self.fuelTicks = value;
                             self.fuelInitial = self.fuelTicks;
@@ -194,10 +194,11 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                                 self.setItem(i, ItemStack.EMPTY);
                             }
 
-                            if (!remainder.isEmpty()) {
-                                FactoryUtil.insertBetween(self, 9, 12, remainder);
-                                if (!remainder.isEmpty()) {
-                                    Containers.dropItemStack(world, pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, remainder);
+                            if (remainder != null) {
+                                var remainderStack = remainder.create();
+                                FactoryUtil.insertBetween(self, 9, 12, remainderStack);
+                                if (!remainderStack.isEmpty()) {
+                                    Containers.dropItemStack(world, pos.getX() + 0.5, pos.getY() + 2, pos.getZ() + 0.5, remainderStack);
                                 }
                             }
 
@@ -354,7 +355,7 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                 for (int x = 0; x < 3; x++) {
                     var slot = new Slot(IndustrialSmelteryBlockEntity.this, y * 3 + x, x, y);
                     this.inputSlots.add(slot);
-                    this.setSlotRedirect(9 * y + 1 + x, slot);
+                    this.setSlot(9 * y + 1 + x, slot);
                 }
             }
             for (int x = 0; x < 3; x++) {
@@ -364,7 +365,7 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                 }
                 var slot = new FuelSlot(IndustrialSmelteryBlockEntity.this, 9 + x, player.level().fuelValues());
 
-                this.setSlotRedirect(9 * 4 + 1 + x, slot);
+                this.setSlot(9 * 4 + 1 + x, slot);
                 this.fuelSlots.add(slot);
 
             }
@@ -407,7 +408,7 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                     color[x] = ARGB.srgbLerp(progress[x], 0xFFFFFF, 0xFF2200);
                 }
                 enabled[3] = true;
-                this.setSlot(y * 9 + 4, new GuiElementBuilder(GuiTextures.LEFT_SHIFTED_3_BARS)
+                this.setSlot(y * 9 + 4, new GuiElementBuilder(GuiTextures.LEFT_SHIFTED_3_BARS.get())
                         .hideTooltip()
                         .setCustomModelData(FloatList.of(progress), BooleanList.of(enabled), List.of(), IntList.of(color)));
             }
@@ -446,7 +447,7 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
         public ItemStack quickMove(int index) {
             ItemStack itemStack = ItemStack.EMPTY;
             Slot slot = this.getSlotRedirectOrPlayer(index);
-            if (slot != null && slot.hasItem() && !(slot instanceof VirtualSlot)) {
+            if (slot != null && slot.hasItem() && !(slot instanceof WrappingSlot)) {
                 ItemStack itemStack2 = slot.getItem();
                 itemStack = itemStack2.copy();
                 if (index < this.getVirtualSize()) {
@@ -468,7 +469,7 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                 } else {
                     slot.setChanged();
                 }
-            } else if (slot instanceof VirtualSlot) {
+            } else if (slot instanceof WrappingSlot) {
                 return slot.getItem();
             }
 

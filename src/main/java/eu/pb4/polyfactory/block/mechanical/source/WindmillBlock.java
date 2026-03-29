@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical.source;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.BarrierBasedWaterloggable;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
@@ -21,6 +22,7 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,6 +30,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.Util;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -50,7 +53,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fStack;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -67,7 +70,6 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
     public WindmillBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(this.defaultBlockState().setValue(SAIL_COUNT, 4).setValue(BIG, false));
-        Model.MODEL.getItem();
         this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false));
     }
 
@@ -167,8 +169,8 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
     }
 
     public final class Model extends RotationAwareModel {
-        public static final ItemStack MODEL = Util.make(new ItemStack(Items.LEATHER_HORSE_ARMOR), x -> x.set(DataComponents.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/windmill_sail"))));
-        public static final ItemStack MODEL_FLIP = Util.make(new ItemStack(Items.LEATHER_HORSE_ARMOR), x -> x.set(DataComponents.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/windmill_sail_flip"))));
+        public static final ItemStackTemplate MODEL = new ItemStackTemplate(Items.LEATHER_HORSE_ARMOR, DataComponentPatch.builder().set(DataComponents.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/windmill_sail"))).build() );
+        public static final ItemStackTemplate MODEL_FLIP = new ItemStackTemplate(Items.LEATHER_HORSE_ARMOR, DataComponentPatch.builder().set(DataComponents.ITEM_MODEL, bridgeModel(FactoryUtil.id("block/windmill_sail_flip"))).build());
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement center;
         private boolean big;
@@ -179,7 +181,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
             this.big = state.getValue(BIG);
             this.updateSails(state.getValue(SAIL_COUNT), state.getValue(FACING).getAxisDirection() == Direction.AxisDirection.NEGATIVE);
 
-            this.center = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT, this.getUpdateRate());
+            this.center = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL_SHORT.get(), this.getUpdateRate());
             this.center.setDisplaySize(3, 3);
             this.addElement(this.center);
             this.updateAnimation(0, state.getValue(WindmillBlock.FACING), state.getValue(FACING).getAxisDirection() == Direction.AxisDirection.NEGATIVE);
@@ -193,7 +195,7 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
             if (this.sails != null) {
                 if (this.sails.length == count) {
                     for (var i = 0; i < count; i++) {
-                        this.sails[i].setItem(colored(i, model));
+                        this.sails[i].setItem(colored(i, model.create()));
                     }
                     return;
                 } else if (this.sails.length > count) {
@@ -227,12 +229,12 @@ public class WindmillBlock extends RotationalNetworkBlock implements FactoryBloc
 
             this.sails = sails;
             for (var i = 0; i < count; i++) {
-                this.sails[i].setItem(colored(i, model));
+                this.sails[i].setItem(colored(i, model.create()));
             }
         }
 
         private ItemStack colored(int i, ItemStack model) {
-            var c = model.copy();
+            var c = model;
             int color = 0xFFFFFF;
 
             if (this.blockEntity != null) {

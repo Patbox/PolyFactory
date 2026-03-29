@@ -7,15 +7,18 @@ import eu.pb4.polyfactory.util.filter.ExactItemFilter;
 import eu.pb4.polyfactory.util.filter.FilterData;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.sgui.api.ClickType;
-import eu.pb4.sgui.api.GuiHelpers;
-import eu.pb4.sgui.api.elements.GuiElementInterface;
+import eu.pb4.sgui.api.SguiUtils;
+import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import eu.pb4.sgui.api.gui.SlotGuiInterface;
 import java.util.List;
+
+import eu.pb4.sgui.api.gui.SlotBasedGui;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -84,7 +87,7 @@ public class SimpleFilterItem extends AbstractFilterItem {
             super(MenuType.HOPPER, player, false);
             this.stack = stack;
             this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(Component.translatable(stack.getItem().getDescriptionId())));
-            this.setSlot(2, new GuiElementInterface() {
+            this.setSlot(2, new GuiElement() {
                 @Override
                 public ItemStack getItemStack() {
                     return getStack(stack);
@@ -98,18 +101,18 @@ public class SimpleFilterItem extends AbstractFilterItem {
             this.open();
         }
 
-        private void onSetSlot(int i, ClickType type, net.minecraft.world.inventory.ClickType slotActionType, SlotGuiInterface guiInterface) {
-            setStack(stack, this.screenHandler.getCarried());
+        private void onSetSlot(int i, ClickType type, ContainerInput slotActionType, SlotBasedGui guiInterface) {
+            setStack(stack, this.wrappedMenu.getCarried());
         }
 
         @Override
-        public boolean onAnyClick(int index, ClickType type, net.minecraft.world.inventory.ClickType action) {
+        public boolean onAnyClick(int index, ClickType type, ContainerInput action) {
             if (index == -999) {
                 return true;
             }
 
-            if (this.screenHandler.getSlot(index).getItem() == stack) {
-                GuiHelpers.sendSlotUpdate(player, this.screenHandler.containerId, index, stack, 0);
+            if (this.wrappedMenu.getSlot(index).getItem() == stack) {
+                SguiUtils.sendSlotUpdate(player, this.wrappedMenu.containerId, index, stack, 0);
                 return false;
             }
 

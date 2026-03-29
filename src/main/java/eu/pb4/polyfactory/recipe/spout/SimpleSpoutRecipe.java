@@ -16,17 +16,18 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import java.util.List;
 
 public record SimpleSpoutRecipe(CountedIngredient item, List<FluidStack<?>> fluidInput,
-                                ItemStack output, boolean copyComponents, int itemDamage, Holder<SoundEvent> soundEvent,
+                                ItemStackTemplate output, boolean copyComponents, int itemDamage, Holder<SoundEvent> soundEvent,
                                 double time, double coolingTime) implements SpoutRecipe {
     public static final MapCodec<SimpleSpoutRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     CountedIngredient.CODEC.fieldOf("item").forGetter(SimpleSpoutRecipe::item),
                     FluidStack.CODEC.listOf().optionalFieldOf("fluid_input", List.of()).forGetter(SimpleSpoutRecipe::fluidInput),
-                    ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(SimpleSpoutRecipe::output),
+                    ItemStackTemplate.CODEC.fieldOf("result").forGetter(SimpleSpoutRecipe::output),
                     Codec.BOOL.optionalFieldOf("copy_components", false).forGetter(SimpleSpoutRecipe::copyComponents),
                     Codec.INT.optionalFieldOf("item_damage", 0).forGetter(SimpleSpoutRecipe::itemDamage),
                     SoundEvent.CODEC.fieldOf("sound").forGetter(SimpleSpoutRecipe::soundEvent),
@@ -37,53 +38,53 @@ public record SimpleSpoutRecipe(CountedIngredient item, List<FluidStack<?>> flui
     
 
     public static SimpleSpoutRecipe toItem(Item item, FluidStack<?> stack, Item out, SoundEvent sound) {
-        return new SimpleSpoutRecipe(CountedIngredient.ofItems(1, item), List.of(stack), out.getDefaultInstance(), false, 0,
+        return new SimpleSpoutRecipe(CountedIngredient.ofItems(1, item), List.of(stack), new ItemStackTemplate(out), false, 0,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()), 0);
     }
 
     public static SimpleSpoutRecipe toItemCopy(Item item, FluidStack<?> stack, Item out, SoundEvent sound) {
-        return new SimpleSpoutRecipe(CountedIngredient.ofItems(1, item), List.of(stack), out.getDefaultInstance(), true, 0,
+        return new SimpleSpoutRecipe(CountedIngredient.ofItems(1, item), List.of(stack), new ItemStackTemplate(out), true, 0,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()), 0);
     }
 
     public static SimpleSpoutRecipe toItem(Item item, FluidStack<?> stack, Item out, SoundEvent sound, int coolingTime ) {
-        return new SimpleSpoutRecipe(CountedIngredient.ofItems(1, item), List.of(stack), out.getDefaultInstance(), false, 0,
+        return new SimpleSpoutRecipe(CountedIngredient.ofItems(1, item), List.of(stack), new ItemStackTemplate(out), false, 0,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
     }
 
     public static SimpleSpoutRecipe toItemCopy(Item item, FluidStack<?> stack, Item out, SoundEvent sound, int coolingTime ) {
-        return new SimpleSpoutRecipe(CountedIngredient.ofItems(1, item), List.of(stack), out.getDefaultInstance(), true, 0,
+        return new SimpleSpoutRecipe(CountedIngredient.ofItems(1, item), List.of(stack), new ItemStackTemplate(out), true, 0,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()), coolingTime  );
     }
 
 
     public static SimpleSpoutRecipe template(Item template, FluidStack<Unit> stack, Item out, SoundEvent sound) {
-        return new SimpleSpoutRecipe(CountedIngredient.ofItems(0, template), List.of(stack), out.getDefaultInstance(), false, 0,
+        return new SimpleSpoutRecipe(CountedIngredient.ofItems(0, template), List.of(stack), new ItemStackTemplate(out), false, 0,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()), 0);
     }
 
     public static SimpleSpoutRecipe template(Item template, FluidStack<Unit> stack, Item out, SoundEvent sound, int coolingTime) {
-        return new SimpleSpoutRecipe(CountedIngredient.ofItems(0, template), List.of(stack), out.getDefaultInstance(), false, 0,
+        return new SimpleSpoutRecipe(CountedIngredient.ofItems(0, template), List.of(stack), new ItemStackTemplate(out), false, 0,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
     }
 
     public static SimpleSpoutRecipe templateDamaged(TagKey<Item> template, FluidStack<?> stack, Item out, SoundEvent sound, double coolingTicks) {
-        return new SimpleSpoutRecipe(CountedIngredient.fromTag(0, FactoryUtil.fakeTagList(template)), List.of(stack), out.getDefaultInstance(), false, 1,
+        return new SimpleSpoutRecipe(CountedIngredient.fromTag(0, FactoryUtil.fakeTagList(template)), List.of(stack), new ItemStackTemplate(out), false, 1,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()),coolingTicks);
     }
 
     public static SimpleSpoutRecipe templateDamaged(Item template, FluidStack<?> stack, Item out, SoundEvent sound, double coolingTicks) {
-        return new SimpleSpoutRecipe(CountedIngredient.ofItems(0, template), List.of(stack), out.getDefaultInstance(), false, 1,
+        return new SimpleSpoutRecipe(CountedIngredient.ofItems(0, template), List.of(stack), new ItemStackTemplate(out), false, 1,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()), coolingTicks);
     }
 
     public static SimpleSpoutRecipe templateDamaged(TagKey<Item> template, FluidStack<?> stack, Item out, SoundEvent sound) {
-        return new SimpleSpoutRecipe(CountedIngredient.fromTag(0, FactoryUtil.fakeTagList(template)), List.of(stack), out.getDefaultInstance(), false, 1,
+        return new SimpleSpoutRecipe(CountedIngredient.fromTag(0, FactoryUtil.fakeTagList(template)), List.of(stack), new ItemStackTemplate(out), false, 1,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()),0);
     }
 
     public static SimpleSpoutRecipe templateDamaged(Item template, FluidStack<?> stack, Item out, SoundEvent sound) {
-        return new SimpleSpoutRecipe(CountedIngredient.ofItems(0, template), List.of(stack), out.getDefaultInstance(), false, 1,
+        return new SimpleSpoutRecipe(CountedIngredient.ofItems(0, template), List.of(stack), new ItemStackTemplate(out), false, 1,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()), 0);
     }
 
@@ -117,8 +118,9 @@ public record SimpleSpoutRecipe(CountedIngredient item, List<FluidStack<?>> flui
     }
 
     @Override
-    public ItemStack assemble(SingleItemWithFluid input, HolderLookup.Provider lookup) {
-        var out = output.copy();
+    public ItemStack assemble(SingleItemWithFluid input) {
+
+        var out = output.create();
         if (this.copyComponents) {
             out.applyComponentsAndValidate(input.stack().getComponentsPatch());
         }

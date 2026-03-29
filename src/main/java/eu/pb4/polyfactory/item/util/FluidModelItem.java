@@ -5,8 +5,9 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.core.api.item.PolymerItem;
+import net.minecraft.core.HolderLookup;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.List;
 import net.minecraft.core.component.DataComponents;
@@ -29,7 +30,7 @@ public class FluidModelItem extends Item implements PolymerItem {
     }
 
     @Override
-    public Identifier getPolymerItemModel(ItemStack itemStack, PacketContext context) {
+    public Identifier getPolymerItemModel(ItemStack itemStack, PacketContext context, HolderLookup.Provider provider) {
         var x = getFluid(itemStack);
         if (x != null) {
             //noinspection DataFlowIssue
@@ -44,8 +45,8 @@ public class FluidModelItem extends Item implements PolymerItem {
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context) {
-        var base = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, context);
+    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context, HolderLookup.Provider lookup) {
+        var base = PolymerItem.super.getPolymerItemStack(itemStack, tooltipType, context, lookup);
 
         //noinspection unchecked
         var x = (FluidInstance<Object>) getFluid(itemStack);

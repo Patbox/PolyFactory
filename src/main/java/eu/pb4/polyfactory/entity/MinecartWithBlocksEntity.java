@@ -5,7 +5,7 @@ import eu.pb4.polyfactory.block.collection.BlockCollectionData;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.EntityAttachment;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Optional;
 import net.minecraft.server.level.ServerLevel;

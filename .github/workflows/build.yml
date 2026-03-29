@@ -15,7 +15,7 @@ jobs:
       matrix:
         # Use these Java versions
         java: [
-          21    # Latest version
+          25    # Latest version
         ]
         # and run on both Linux and Windows
         os: [ubuntu-latest]

@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.block;
 
 import eu.pb4.polymer.core.api.utils.PolymerSyncedObject;
-import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
+import net.fabricmc.fabric.api.object.builder.v1.world.poi.PoiHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -32,7 +32,7 @@ public class FactoryPoi {
         return register(key, blockStates, ticketCount, 1);
     }
     public static PoiType register(ResourceKey<PoiType> key, Set<BlockState> blockStates, int ticketCount, int searchDistance) {
-        var type = PointOfInterestHelper.register(key.identifier(), ticketCount, searchDistance, blockStates);
+        var type = PoiHelper.register(key.identifier(), ticketCount, searchDistance, blockStates);
         var rep = BuiltInRegistries.POINT_OF_INTEREST_TYPE.getValue(PoiTypes.HOME);
         PolymerSyncedObject.setSyncedObject(BuiltInRegistries.POINT_OF_INTEREST_TYPE, type, (obj, context) -> rep);
         return type;

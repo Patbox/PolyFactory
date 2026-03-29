@@ -39,7 +39,7 @@ import static eu.pb4.polyfactory.ModInit.id;
 public class FactoryFluids {
     public static final FluidType<Unit> WATER = register(Identifier.withDefaultNamespace("water"),
             FluidType.of().density(100).fluid(Fluids.WATER).color(0x385dc6).transparent()
-                    .particle(new ItemParticleOption(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE.getDefaultInstance()))
+                    .particle(new ItemParticleOption(ParticleTypes.ITEM, Items.BLUE_STAINED_GLASS_PANE))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.WATER_SPLASH, 10,300, FactorySoundEvents.FLUID_SHOOT_WATER))
                     .build());
     public static final FluidType<Unit> LAVA = register(Identifier.withDefaultNamespace("lava"),

@@ -34,7 +34,7 @@ public record FillSprayCanPressRecipe(int amount) implements PressRecipe {
     }
 
     @Override
-    public ItemStack assemble(PressInput inventory, HolderLookup.Provider registryManager) {
+    public ItemStack assemble(PressInput inventory) {
         var can = inventory.input().copy();
         var dye = inventory.pattern();
         ColoredItem.setColor(can, DyeColorExtra.getColor(dye));

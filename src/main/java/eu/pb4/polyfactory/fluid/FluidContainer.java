@@ -1,20 +1,10 @@
 package eu.pb4.polyfactory.fluid;
 
-import eu.pb4.polyfactory.item.FactoryDataComponents;
-import eu.pb4.polyfactory.item.component.FluidComponent;
-import eu.pb4.polyfactory.item.tool.UniversalFluidContainerItem;
-import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
-import eu.pb4.polyfactory.recipe.input.DrainInput;
-import eu.pb4.polyfactory.ui.GuiTextures;
-import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.sgui.api.elements.GuiElementInterface;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
-import net.fabricmc.fabric.api.entity.FakePlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public interface FluidContainer {
     long get(FluidInstance<?> type);

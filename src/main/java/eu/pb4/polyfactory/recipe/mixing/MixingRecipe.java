@@ -42,8 +42,18 @@ public interface MixingRecipe extends Recipe<MixingInput> {
     }
 
     @Override
+    default boolean showNotification() {
+        return false;
+    }
+
+    @Override
     default boolean isSpecial() {
         return true;
+    }
+
+    @Override
+    default String group() {
+        return "";
     }
 
     @Override

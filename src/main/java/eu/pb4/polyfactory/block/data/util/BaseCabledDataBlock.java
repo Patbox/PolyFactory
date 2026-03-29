@@ -12,7 +12,7 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.List;
 import net.minecraft.core.BlockPos;
@@ -114,7 +114,7 @@ public abstract class BaseCabledDataBlock extends AbstractCableBlock implements 
         }
 
         protected ItemDisplayElement createBaseModel(BlockState state) {
-            return ItemDisplayElementUtil.createSolid(state.getBlock().asItem());
+            return ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
         }
 
         protected abstract void updateStatePos(BlockState state);

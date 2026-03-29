@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.fluids.transport;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.block.mechanical.GearPlacementAligner;
@@ -22,7 +23,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.EnumSet;
@@ -175,7 +176,7 @@ public class PumpBlock extends PipeBaseBlock implements FactoryBlock, RotationUs
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack BLOCK_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/pump"));
+        public static final LazyItemStack BLOCK_MODEL = ItemDisplayElementUtil.getModel(id("block/pump"));
         private final ItemDisplayElement mainElement;
         private final ItemDisplayElement gear;
         private final boolean offset;
@@ -185,7 +186,7 @@ public class PumpBlock extends PipeBaseBlock implements FactoryBlock, RotationUs
             this.mainElement = ItemDisplayElementUtil.createSimple(BLOCK_MODEL);
             this.mainElement.setScale(new Vector3f(2f));
             this.offset = (pos.getX() + pos.getY() + pos.getZ()) % 2 == 0;
-            this.gear = LodItemDisplayElement.createSimple(GenericParts.REGULAR_GEAR, this.getUpdateRate(), 0.3f, 0.6f);
+            this.gear = LodItemDisplayElement.createSimple(GenericParts.REGULAR_GEAR.get(), this.getUpdateRate(), 0.3f, 0.6f);
             this.gear.setViewRange(0.7f);
             this.updateStatePos(state);
             this.updateAnimation(0);

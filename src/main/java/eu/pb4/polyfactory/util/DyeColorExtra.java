@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.item.util.ColoredItem;
 import eu.pb4.polyfactory.item.FactoryItems;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
@@ -26,6 +27,6 @@ public interface DyeColorExtra {
             return ColoredItem.getColor(stack);
         }
 
-        return stack.getItem() instanceof DyeItem dyeItem ? getColor(dyeItem.getDyeColor()) : -1;
+        return stack.has(DataComponents.DYE) ? getColor(stack.get(DataComponents.DYE)) : -1;
     }
 }

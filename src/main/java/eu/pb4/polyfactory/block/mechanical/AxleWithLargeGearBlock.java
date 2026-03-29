@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
 import eu.pb4.polyfactory.item.FactoryItems;
@@ -48,19 +49,20 @@ public class AxleWithLargeGearBlock extends AxleWithGearBlock {
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack GEAR_MODEL = ItemDisplayElementUtil.getSolidModel(id("block/large_gear"));
+        public static final LazyItemStack GEAR_MODEL = ItemDisplayElementUtil.getModel(id("block/large_gear"));
 
         private final Matrix4fStack mat = new Matrix4fStack(2);
         private final ItemDisplayElement mainElement;
         private final LodItemDisplayElement gear;
         private boolean offset;
+
         private Model(ServerLevel world, BlockState state, BlockPos pos) {
-            this.mainElement = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
+            this.mainElement = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL.get(), this.getUpdateRate(), 0.3f, 0.6f);
             this.mainElement.setViewRange(0.7f);
-            this.gear = LodItemDisplayElement.createSimple(GEAR_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
+            this.gear = LodItemDisplayElement.createSimple(GEAR_MODEL.get(), this.getUpdateRate(), 0.3f, 0.6f);
             this.gear.setViewRange(0.7f);
             this.offset = ((pos.getX() + pos.getY() + pos.getZ()) % 2 == 0);
-            this.updateAnimation(0,  state.getValue(AXIS));
+            this.updateAnimation(0, state.getValue(AXIS));
             this.addElement(this.mainElement);
             this.addElement(this.gear);
         }
@@ -80,6 +82,7 @@ public class AxleWithLargeGearBlock extends AxleWithGearBlock {
             mat.rotateY(!this.offset ? Mth.HALF_PI / 8 : 0);
             this.gear.setTransformation(mat);
         }
+
         @Override
         protected void onTick() {
             var tick = this.blockAware().getWorld().getGameTime();

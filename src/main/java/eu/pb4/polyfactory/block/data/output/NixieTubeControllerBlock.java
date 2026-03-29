@@ -12,7 +12,7 @@ import eu.pb4.polyfactory.nodes.data.ChannelReceiverSelectiveSideNode;
 import eu.pb4.polyfactory.nodes.data.DataReceiverNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;

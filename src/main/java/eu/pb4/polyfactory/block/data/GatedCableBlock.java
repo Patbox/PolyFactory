@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.data;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
+import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
@@ -14,7 +15,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import xyz.nucleoid.packettweaker.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
@@ -127,10 +128,11 @@ public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, 
     }
 
     public static final class Model extends RotationAwareModel {
-        public static final ItemStack OFF = ItemDisplayElementUtil.getSolidModel(id("block/gated_cable"));
-        public static final ItemStack ON = ItemDisplayElementUtil.getSolidModel(id("block/gated_cable_on"));
+        public static final LazyItemStack OFF = ItemDisplayElementUtil.getModel(id("block/gated_cable"));
+        public static final LazyItemStack ON = ItemDisplayElementUtil.getModel(id("block/gated_cable_on"));
 
         private final ItemDisplayElement main;
+
         private Model(ServerLevel world, BlockState state) {
             this.main = ItemDisplayElementUtil.createSimple(state.getValue(POWERED) ? ON : OFF);
             this.main.setScale(new Vector3f(2));
@@ -160,7 +162,7 @@ public class GatedCableBlock extends CableNetworkBlock implements FactoryBlock, 
         @Override
         public void notifyUpdate(HolderAttachment.UpdateType updateType) {
             if (updateType == BlockBoundAttachment.BLOCK_STATE_UPDATE) {
-                this.main.setItem(this.blockState().getValue(POWERED) ? ON : OFF);
+                this.main.setItem((this.blockState().getValue(POWERED) ? ON : OFF).get());
                 updateStatePos(this.blockState());
             }
         }
