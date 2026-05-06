@@ -1,5 +1,5 @@
 plugins {
-	id 'net.fabricmc.fabric-loom' version '1.15.+'
+	id 'net.fabricmc.fabric-loom' version '1.16.+'
 	id "com.modrinth.minotaur" version "2.+"
 	id 'maven-publish'
 }
@@ -92,8 +92,8 @@ dependencies {
 	implementation include('eu.pb4:sidebar-api:0.6.0+26.1')
 	implementation include('eu.pb4:sgui:2.0.0+26.1')
 	implementation include('eu.pb4:factorytools:0.10.0+26.1')
-	implementation include("eu.pb4:placeholder-api:3.0.0-beta.2+26.1")
-	implementation 'xyz.nucleoid:server-translations-api:3.0.1+26.1'
+	implementation include("eu.pb4:placeholder-api:3.0.0+26.1")
+	implementation 'xyz.nucleoid:server-translations-api:3.0.3+26.1'
 	implementation include('com.kneelawk.graphlib:graphlib-core-fabric:2.0.3-beta.0.matti+26.1')
 
 	// Temp hack to allow development
