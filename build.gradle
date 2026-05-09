@@ -86,7 +86,7 @@ dependencies {
 	implementation "eu.pb4:polymer-autohost:${project.polymer_version}"
 	implementation "eu.pb4:polymer-virtual-entity:${project.polymer_version}"
 	implementation "eu.pb4:polymer-sound-patcher:${project.polymer_version}"
-	implementation include('eu.pb4:booklet:0.2.0+26.1')
+	implementation include('eu.pb4:booklet:0.2.1+26.1')
 	implementation include('eu.pb4:map-canvas-api:0.8.0+26.1')
 	implementation include('eu.pb4:common-protection-api:2.0.0')
 	implementation include('eu.pb4:sidebar-api:0.6.0+26.1')

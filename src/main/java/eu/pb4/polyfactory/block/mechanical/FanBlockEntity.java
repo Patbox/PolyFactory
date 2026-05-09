@@ -22,6 +22,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.FallingBlockEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.FallingBlock;
@@ -118,6 +119,10 @@ public class FanBlockEntity extends BlockEntity {
         }
 
         for (var entity : world.getEntitiesOfClass(Entity.class, box, EntitySelector.NO_SPECTATORS)) {
+            if (entity instanceof ServerPlayer player && player.getAbilities().flying) {
+                continue;
+            }
+
             float mult = 1;
 
             if (entity instanceof LivingEntity livingEntity) {

@@ -1,3 +1,3 @@
-- Wind Charges now affect Windmills by giving them temporary speed boost.
-- Moved the guidebook implementation into separate library/mod: https://github.com/Patbox/booklet
-- Fixed Pipe and Cable in walls breaking in case of Polymer-based custom wall blocks.
+- Fixed polydex links not working in guide.
+- Fixed fluids in Fluid Tanks causing z-fighting in not too far distances.
+- Creative flying players are no longer effected by Fans
