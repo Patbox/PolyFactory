@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.item;
 
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.item.FactoryBlockItem;
+import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.other.BlockWithTooltip;
 import eu.pb4.polyfactory.item.configuration.ClipboardItem;
@@ -29,6 +30,7 @@ import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.registry.FuelValueEvents;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -41,15 +43,12 @@ import net.minecraft.util.*;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.component.Consumables;
 import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.consume_effects.RemoveStatusEffectsConsumeEffect;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -100,29 +99,29 @@ public class FactoryItems {
     public static final Item NIXIE_TUBE = register(FactoryBlocks.NIXIE_TUBE);
     public static final WindmillSailItem WINDMILL_SAIL = register("windmill_sail", WindmillSailItem::new);
     public static final Item METAL_GRID = register(FactoryBlocks.METAL_GRID);
-    public static final Item STRING_MESH = register("string_mesh", SimplePolymerItem::new);
-    public static final Item SAW_DUST = register("saw_dust", SimplePolymerItem::new);
-    public static final Item COAL_DUST = register("coal_dust", SimplePolymerItem::new);
-    public static final Item NETHERRACK_DUST = register("netherrack_dust", SimplePolymerItem::new);
-    public static final Item ENDER_DUST = register("ender_dust", SimplePolymerItem::new);
-    public static final Item ENDER_INFUSED_AMETHYST_SHARD = register("ender_infused_amethyst_shard", SimplePolymerItem::new);
-    public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture", SimplePolymerItem::new);
-    public static final Item STEEL_INGOT = register("steel_ingot", SimplePolymerItem::new);
-    public static final Item STEEL_NUGGET = register("steel_nugget", SimplePolymerItem::new);
+    public static final Item STRING_MESH = register("string_mesh");
+    public static final Item SAW_DUST = register("saw_dust");
+    public static final Item COAL_DUST = register("coal_dust");
+    public static final Item NETHERRACK_DUST = register("netherrack_dust");
+    public static final Item ENDER_DUST = register("ender_dust");
+    public static final Item ENDER_INFUSED_AMETHYST_SHARD = register("ender_infused_amethyst_shard");
+    public static final Item STEEL_ALLOY_MIXTURE = register("steel_alloy_mixture");
+    public static final Item STEEL_INGOT = register("steel_ingot");
+    public static final Item STEEL_NUGGET = register("steel_nugget");
     public static final Item STEEL_BLOCK = register(FactoryBlocks.STEEL_BLOCK);
-    public static final Item STEEL_PLATE = register("steel_plate", SimplePolymerItem::new);
-    public static final Item COPPER_PLATE = register("copper_plate", SimplePolymerItem::new);
-    public static final Item BRITTLE_GLASS_BOTTLE = register("brittle_glass_bottle", SimplePolymerItem::new);
+    public static final Item STEEL_PLATE = register("steel_plate");
+    public static final Item COPPER_PLATE = register("copper_plate");
+    public static final Item BRITTLE_GLASS_BOTTLE = register("brittle_glass_bottle");
     public static final Item BRITTLE_POTION = register("brittle_potion", settings -> new BrittlePotionItem(settings.component(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).component(DataComponents.CONSUMABLE, Consumables.defaultDrink().soundAfterConsume(SoundEvents.OMINOUS_BOTTLE_DISPOSE).build()).stacksTo(1)));
-    public static final Item THROWABLE_GLASS_BOTTLE = register("throwable_glass_bottle", SimplePolymerItem::new);
-    public static final Item LINGERING_THROWABLE_GLASS_BOTTLE = register("lingering_throwable_glass_bottle", SimplePolymerItem::new);
+    public static final Item THROWABLE_GLASS_BOTTLE = register("throwable_glass_bottle");
+    public static final Item LINGERING_THROWABLE_GLASS_BOTTLE = register("lingering_throwable_glass_bottle");
     public static final Item STEEL_GEAR = register("steel_gear", (settings) -> new GearItem(FactoryBlocks.AXLE_WITH_GEAR, settings));
     public static final Item LARGE_STEEL_GEAR = register("large_steel_gear", (settings) -> new GearItem(FactoryBlocks.AXLE_WITH_LARGE_GEAR, settings));
-    public static final Item STEEL_MACHINE_GEARBOX = register("generic_machine_part", SimplePolymerItem::new);
-    public static final Item WOODEN_PLATE = register("wooden_plate", SimplePolymerItem::new);
-    public static final Item TREATED_DRIED_KELP = register("treated_dried_kelp", SimplePolymerItem::new);
-    public static final Item INTEGRATED_CIRCUIT = register("integrated_circuit", SimplePolymerItem::new);
-    public static final Item REDSTONE_CHIP = register("redstone_chip", SimplePolymerItem::new);
+    public static final Item STEEL_MACHINE_GEARBOX = register("generic_machine_part");
+    public static final Item WOODEN_PLATE = register("wooden_plate");
+    public static final Item TREATED_DRIED_KELP = register("treated_dried_kelp");
+    public static final Item INTEGRATED_CIRCUIT = register("integrated_circuit");
+    public static final Item REDSTONE_CHIP = register("redstone_chip");
     public static final Item CHAIN_LIFT = register("chain_lift", s -> new SimplePolymerItem(s.stacksTo(1)));
 
     public static final Item ITEM_FILTER = register("item_filter", ImprovedFilterItem::new);
@@ -192,10 +191,15 @@ public class FactoryItems {
             .food(new FoodProperties.Builder().nutrition(4).saturationModifier(0.6F).build(), Consumables.defaultFood().consumeSeconds(0.8F).build())));
     public static final Item HONEYED_APPLE = register("honeyed_apple", settings -> new SimplePolymerItem(settings
             .food(new FoodProperties.Builder().nutrition(7).saturationModifier(1.5f).build())));
-    public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron", SimplePolymerItem::new);
-    public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper", SimplePolymerItem::new);
-    public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold", SimplePolymerItem::new);
+    public static final Item CRUSHED_RAW_IRON = register("crushed_raw_iron");
+    public static final Item CRUSHED_RAW_COPPER = register("crushed_raw_copper");
+    public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold");
     public static final Item SPRAY_CAN = register("spray_can", settings -> new DyeSprayItem(settings.stacksTo(1)));
+
+    public static final Item IRON_DRILL_HEAD = register("iron_drill_head", drillHeadProperties(ToolMaterial.IRON));
+    public static final Item COPPER_DRILL_HEAD = register("copper_drill_head", drillHeadProperties(ToolMaterial.COPPER));
+    public static final Item GOLDEN_DRILL_HEAD = register("golden_drill_head", drillHeadProperties(ToolMaterial.GOLD));
+
     public static final Item PIPE = register("pipe", settings -> new PipeItem(FactoryBlocks.PIPE, settings.useBlockDescriptionPrefix()));
     public static final Item FILTERED_PIPE = register(FactoryBlocks.FILTERED_PIPE);
     public static final Item REDSTONE_VALVE_PIPE = register(FactoryBlocks.REDSTONE_VALVE_PIPE);
@@ -224,6 +228,17 @@ public class FactoryItems {
 
 
     public static final List<SpoutMolds> MOLDS = List.of(INGOT_MOLD, NUGGET_MOLD, PIPE_MOLD, BOTTLE_MOLD, THROWABLE_BOTTLE_MOLD, BRITTLE_BOTTLE_MOLD, CHAIN_MOLD);
+
+    public static Item.Properties drillHeadProperties(ToolMaterial material) {
+        HolderGetter<Block> registrationLookup = BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK);
+
+        return new Item.Properties()
+                .durability((int) (material.durability() * 1.4)).repairable(material.repairItems()).enchantable((int) (material.enchantmentValue() * 0.6f))
+                .component(FactoryDataComponents.DRILL_HEAD_TOOL, new Tool(List.of(Tool.Rule.deniesDrops(
+                        registrationLookup.getOrThrow(material.incorrectBlocksForDrops())),
+                        Tool.Rule.minesAndDrops(registrationLookup.getOrThrow(FactoryBlockTags.MINEABLE_WITH_DRILL),
+                                material.speed() * 1.25f)), 1.1F, 1, true));
+    }
 
     public static void register() {
         FuelValueEvents.BUILD.register(((builder, context) -> {
@@ -516,6 +531,20 @@ public class FactoryItems {
             item.set(DataComponents.STORED_ENCHANTMENTS, b.toImmutable());
             entries.accept(item);
         });
+    }
+
+    public static SimplePolymerItem register(String path, Item.Properties properties) {
+        var id = ModInit.id(path);
+        var item = new SimplePolymerItem(properties.setId(ResourceKey.create(Registries.ITEM, id)));
+        Registry.register(BuiltInRegistries.ITEM, id, item);
+        return item;
+    }
+
+    public static SimplePolymerItem register(String path) {
+        var id = ModInit.id(path);
+        var item = new SimplePolymerItem(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)));
+        Registry.register(BuiltInRegistries.ITEM, id, item);
+        return item;
     }
 
     public static <T extends Item> T register(Identifier id, Function<Item.Properties, T> function) {

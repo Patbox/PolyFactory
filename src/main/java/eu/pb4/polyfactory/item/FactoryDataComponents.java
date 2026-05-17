@@ -19,6 +19,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.Tool;
+
 import java.util.List;
 
 import static eu.pb4.polyfactory.ModInit.id;
@@ -55,6 +57,8 @@ public class FactoryDataComponents {
 
     public static final DataComponentType<ConfigurationData> CONFIGURATION_DATA = register("configuration_data", DataComponentType.<ConfigurationData>builder().persistent(ConfigurationData.CODEC).build());
     public static final DataComponentType<List<String>> PUNCH_CARD_DATA = register("punch_card_data", DataComponentType.<List<String>>builder().persistent(Codec.STRING.listOf()).build());
+
+    public static final DataComponentType<Tool> DRILL_HEAD_TOOL = register("drill_head_tool", DataComponentType.<Tool>builder().persistent(Tool.CODEC).build());
 
     public static void register() {
         ItemComponentTooltipProviderRegistry.addFirst(FLUID);

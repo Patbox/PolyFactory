@@ -156,6 +156,10 @@
   "item.polyfactory.honeyed_apple": "Honeyed Apple",
   "item.polyfactory.chain_lift": "Chain Lift",
 
+  "item.polyfactory.copper_drill_head": "Copper Drill Head",
+  "item.polyfactory.iron_drill_head": "Iron Drill Head",
+  "item.polyfactory.golden_drill_head": "Golden Drill Head",
+
   "item.polyfactory.mold.ingot": "Ingot Mold",
   "item.polyfactory.mold.ingot_clay": "Unfired Clay Ingot Mold",
   "item.polyfactory.mold.ingot_hardened": "Hardened Clay Ingot Mold",
@@ -177,6 +181,7 @@
   "item.polyfactory.mold.chain": "Chain Mold",
   "item.polyfactory.mold.chain_clay": "Unfired Clay Chain Mold",
   "item.polyfactory.mold.chain_hardened": "Hardened Clay Chain Mold",
+
   "block.polyfactory.colored_lamp": "Colored Lamp",
   "block.polyfactory.colored_lamp.colored": "%s Lamp",
   "block.polyfactory.colored_lamp.colored.full": "%s Lamp (%s)",

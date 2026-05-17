@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.RotationalNetworkBlock;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
@@ -182,16 +183,20 @@ public class MinerBlock extends RotationalNetworkBlock implements FactoryBlock, 
 
     public final class Model extends RotationAwareModel {
         private final ItemDisplayElement item;
+        private final ItemDisplayElement item2;
         private final ItemDisplayElement main;
         private float rotation = 0;
+        private float distance;
 
         private Model(ServerLevel world, BlockState state) {
             this.main = ItemDisplayElementUtil.createSimple(FactoryItems.MINER);
             this.item = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 1, 0.5f);
+            this.item2 = LodItemDisplayElement.createSimple(ItemStack.EMPTY, 1, 0.5f);
 
             this.updateAnimation(state.getValue(FACING));
             this.addElement(this.main);
             this.addElement(this.item);
+            this.addElement(this.item2);
         }
 
         private void updateAnimation(Direction direction) {
@@ -202,6 +207,7 @@ public class MinerBlock extends RotationalNetworkBlock implements FactoryBlock, 
 
             mat.rotateY(Mth.HALF_PI);
             mat.scale(0.5f);
+            //mat.translate(-Math.max(this.distance - 1, 0), 0, 0);
 
 
             if (this.item.getItem().has(DataComponents.TOOL)) {
@@ -209,6 +215,16 @@ public class MinerBlock extends RotationalNetworkBlock implements FactoryBlock, 
                 mat.translate(-0.25f, -0.25f, 0);
                 mat.rotateZ(this.rotation);
                 mat.translate(0.25f, 0.25f, 0);
+            } else if (this.item.getItem().has(FactoryDataComponents.DRILL_HEAD_TOOL)) {
+                mat.translate(-0.65f, 0, 0);
+                mat.rotateX(this.rotation);
+                mat.rotateZ(Mth.PI / 4);
+
+                this.item2.setTransformation(mat);
+
+                mat.rotateZ(-Mth.PI / 4);
+                mat.rotateX(Mth.HALF_PI);
+                mat.rotateZ(Mth.PI / 4);
             } else {
                 mat.translate(-0.3f, 0, 0);
                 mat.rotateZ(this.rotation);
@@ -221,17 +237,20 @@ public class MinerBlock extends RotationalNetworkBlock implements FactoryBlock, 
         protected void onTick() {
             this.updateAnimation(this.blockState().getValue(FACING));
             this.item.startInterpolationIfDirty();
+            this.item2.startInterpolationIfDirty();
         }
 
         public void setItem(ItemStack stack) {
             this.item.setItem(stack);
+            this.item2.setItem(stack.has(FactoryDataComponents.DRILL_HEAD_TOOL) ? stack : ItemStack.EMPTY);
         }
 
-        public void rotate(float value) {
+        public void rotate(float value, float distance) {
             this.rotation += value;
             if (this.rotation > Mth.TWO_PI) {
                 this.rotation -= Mth.TWO_PI;
             }
+            this.distance = distance;
         }
     }
 }

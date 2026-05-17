@@ -11,6 +11,7 @@ import eu.pb4.factorytools.api.util.VirtualDestroyStage;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.TagLimitedSlot;
@@ -23,6 +24,7 @@ import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -55,6 +57,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class MinerBlockEntity extends LockableBlockEntity implements SingleStackContainer, WorldlyContainer, OwnedBlockEntity {
     private ItemStack currentTool = ItemStack.EMPTY;
+    private ItemStack activeTool = ItemStack.EMPTY;
     private BlockState targetState = Blocks.AIR.defaultBlockState();
     protected GameProfile owner = null;
     protected MinerPlayer player = null;
@@ -97,6 +100,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
 
         super.loadAdditional(view);
         this.updateAttackCooldownPerTick();
+        this.updateActiveToolStack();
     }
 
     @Override
@@ -118,12 +122,39 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
     @Override
     public void setStack(ItemStack stack) {
         this.currentTool = stack;
+        this.updateActiveToolStack();
+
         this.lastAttackedTicks = 0;
         this.updateAttackCooldownPerTick();
         if (this.model != null) {
             this.model.setItem(stack);
         }
         this.setChanged();
+    }
+
+    private void updateActiveToolStack() {
+        if (this.currentTool.has(FactoryDataComponents.DRILL_HEAD_TOOL)) {
+            this.activeTool = this.currentTool.copy();
+            this.activeTool.set(DataComponents.TOOL, this.currentTool.get(FactoryDataComponents.DRILL_HEAD_TOOL));
+        } else {
+            this.activeTool = this.currentTool;
+        }
+    }
+
+    private void syncActiveTool(ItemStack stack) {
+        if (this.currentTool == this.activeTool) {
+            this.setStack(stack);
+        } else if (!ItemStack.isSameItemSameComponents(this.activeTool, stack)) {
+            this.activeTool = stack;
+            this.syncActiveToolData();
+        }
+    }
+
+    private void syncActiveToolData() {
+        if (this.currentTool != this.activeTool) {
+            this.currentTool = this.activeTool.copy();
+            this.currentTool.remove(DataComponents.TOOL);
+        }
     }
 
     private void updateAttackCooldownPerTick() {
@@ -164,7 +195,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         if (this.player == null) {
             var profile = this.owner == null ? FactoryUtil.GENERIC_PROFILE : this.owner;
 
-            this.player = new MinerPlayer(SlotAccess.of(this::getStack, this::setStack), (ServerLevel) this.level, this.worldPosition,
+            this.player = new MinerPlayer(SlotAccess.of(() -> this.activeTool, stack -> this.syncActiveTool(stack)), (ServerLevel) this.level, this.worldPosition,
                     new GameProfile(profile.id(), "Miner (" + profile.name() + ")"));
             this.player.setPosRaw(this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 0.5f, this.worldPosition.getZ() + 0.5f);
         }
@@ -204,7 +235,6 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
             self.model.setItem(self.currentTool);
         }
 
-
         BlockPos blockPos = pos;
         BlockState stateFront = Blocks.AIR.defaultBlockState();
         int reach = self.reach;
@@ -229,7 +259,8 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
             if (self.getAttackCooldownProgress() != 1) {
                 self.lastAttackedTicks += speed;
                 self.stress = 15;
-                self.model.rotate((float) speed / 3);
+                self.model.rotate((float) speed / 3,
+                        (float) Math.abs(entities.getFirst().position().get(dir.getAxis()) - pos.get(dir.getAxis())) - 0.25f);
                 return;
             }
             var player = self.getFakePlayer();
@@ -248,6 +279,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
                 });
             }
             player.attack(entities.getFirst());
+            self.syncActiveToolData();
             self.lastAttackedTicks = 0;
             return;
         }
@@ -262,7 +294,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
 
         var player = self.getFakePlayer();
 
-        if (self.currentTool.isEmpty() || !self.currentTool.getItem().canDestroyBlock(self.currentTool, stateFront, world, blockPos, player)) {
+        if (self.activeTool.isEmpty() || !self.activeTool.getItem().canDestroyBlock(self.activeTool, stateFront, world, blockPos, player)) {
             self.stress = 0;
             return;
         }
@@ -281,7 +313,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
 
         if (stateFront.isAir() || stateFront.getShape(world, blockPos).isEmpty()) {
             self.stress = 0;
-            self.model.rotate((float) speed);
+            self.model.rotate((float) speed, 0);
             return;
         }
         self.stress = Math.min(0.2f / delta, player.hasCorrectToolForDrops(stateFront) ? 20 : 99999);
@@ -292,7 +324,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
 
         self.process += delta * speed;
 
-        self.model.rotate((float) speed);
+        self.model.rotate((float) speed, Math.abs(pos.get(dir.getAxis()) - blockPos.get(dir.getAxis())) - 0.5f);
 
         var value = (int) (self.process * 10.0F);
         world.destroyBlockProgress(player.getId(), blockPos, value);
@@ -310,9 +342,9 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
                     stateFront.getBlock().destroy(world, blockPos, stateFront);
                 }
 
-                ItemStack itemStack2 = self.currentTool.copy();
+                ItemStack itemStack2 = self.activeTool.copy();
                 boolean bl2 = player.hasCorrectToolForDrops(stateFront);
-                self.currentTool.mineBlock(world, stateFront, blockPos, player);
+                self.activeTool.mineBlock(world, stateFront, blockPos, player);
                 if (bl && bl2) {
                     stateFront.getBlock().playerDestroy(world, player, blockPos, stateFront, blockEntity, itemStack2);
                     if (self.owner != null && world.getPlayerByUUID(self.owner.id()) instanceof ServerPlayer serverPlayer) {
@@ -324,6 +356,8 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
                 var thrower = new ItemThrower(world, pos, dir, dir.getAxis().getPlane());
                 thrower.dropContentsWithoutTool(player.getInventory());
             }
+
+            self.syncActiveToolData();
             self.setChanged();
         }
     }
@@ -334,6 +368,12 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         if (this.player != null) {
             VirtualDestroyStage.destroy(this.player);
         }
+    }
+
+    @Override
+    public void setChanged() {
+        this.syncActiveToolData();
+        super.setChanged();
     }
 
     public float getStress() {

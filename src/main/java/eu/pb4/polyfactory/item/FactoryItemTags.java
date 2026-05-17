@@ -21,6 +21,7 @@ public class FactoryItemTags {
     public static final TagKey<Item> MOLD_SHAPE_THROWABLE_BOTTLE = of("mold_shape/throwable_bottle");
     public static final TagKey<Item> MOLD_SHAPE_BRITTLE_BOTTLE = of("mold_shape/brittle_bottle");
     public static final TagKey<Item> GLASS_BOTTLE_MELTABLE = of("glass_bottle_meltable");
+    public static final TagKey<Item> DRILL_HEADS = of("drill_heads");
 
     private static TagKey<Item> of(String path) {
         return TagKey.create(Registries.ITEM, ModInit.id(path));

@@ -181,6 +181,11 @@ class BlockTagsProvider extends FabricTagsProvider.BlockTagsProvider {
                 .add(FactoryBlocks.BLUEPRINT_WORKBENCH)
         ;
 
+        this.builder(FactoryBlockTags.MINEABLE_WITH_DRILL)
+                .addOptionalTag(BlockTags.MINEABLE_WITH_PICKAXE)
+                .addOptionalTag(BlockTags.MINEABLE_WITH_SHOVEL)
+        ;
+
         //this.valueLookupBuilder(BlockTags.WALLS)
         //        .add(FactoryBlocks.WALL_WITH_CABLE.values().toArray(new Block[0]));
 

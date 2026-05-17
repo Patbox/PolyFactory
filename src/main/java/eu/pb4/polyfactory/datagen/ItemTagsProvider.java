@@ -27,6 +27,13 @@ public class ItemTagsProvider extends FabricTagsProvider.ItemTagsProvider {
         this.getOrCreateTagBuilder(FactoryItemTags.ALLOWED_IN_MINER)
                 .addOptionalTag(ConventionalItemTags.TOOLS)
                 .add(FactoryItems.STEEL_GEAR)
+                .addOptionalTag(FactoryItemTags.DRILL_HEADS)
+        ;
+
+        this.getOrCreateTagBuilder(FactoryItemTags.DRILL_HEADS)
+                .add(FactoryItems.IRON_DRILL_HEAD)
+                .add(FactoryItems.COPPER_DRILL_HEAD)
+                .add(FactoryItems.GOLDEN_DRILL_HEAD)
         ;
 
         this.getOrCreateTagBuilder(FactoryItemTags.ALLOWED_IN_PLANTER)
