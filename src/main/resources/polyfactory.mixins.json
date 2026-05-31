@@ -59,6 +59,8 @@
     "util.BucketItemAccessor",
     "util.DyeColorMixin",
     "util.DyeItemMixin",
+    "util.GrindstoneMenuMixin",
+    "util.ItemStackMixin",
     "util.WallBlockAccessor",
     "wrench.ArmorStandMixin",
     "wrench.CatchingVehicleWrenchActionsMixin",

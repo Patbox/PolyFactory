@@ -1,7 +1,6 @@
 package eu.pb4.polyfactory.polydex.pages;
 
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
-import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polydex.api.v1.recipe.*;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.fluid.FluidStack;
@@ -54,7 +53,8 @@ public abstract class MixerRecipePage<T extends MixingRecipe> extends Prioritize
 
     @Override
     public ItemStack getOutput(@Nullable PolydexEntry polydexEntry, MinecraftServer minecraftServer) {
-        return getItemOutput();
+        var out = getItemOutput();
+        return out.isEmpty() ? ItemStack.EMPTY : out.getFirst().getBacking().copy();
     }
 
     protected abstract List<FluidInputStack> getFluidInput();
@@ -63,11 +63,15 @@ public abstract class MixerRecipePage<T extends MixingRecipe> extends Prioritize
 
     protected abstract List<FluidStack<?>> getFluidOutput();
 
-    protected abstract ItemStack getItemOutput();
+    protected abstract List<PolydexStack<ItemStack>> getItemOutput();
 
     protected abstract float getMaxTemperature();
 
     protected abstract float getMinimumTemperature();
+
+    protected abstract double getOptimalSpeed();
+
+    protected abstract double getMinimumSpeed();
 
     public MixerRecipePage(RecipeHolder<T> recipe) {
         super(recipe);
@@ -140,7 +144,12 @@ public abstract class MixerRecipePage<T extends MixingRecipe> extends Prioritize
             layer.set(7, 3, fluid);
         }
 
-        layer.setOutput(6, 2, getItemOutput());
+        var out = this.getItemOutput();
+        for (var i = 0; i < Math.min(out.size(), 6); i++) {
+            layer.setOutput(6 + i % 2, 2 + i / 2, out.get(i));
+        }
+
+        layer.set(8, 2, PolydexCompatImpl.requiredRotation(this.getMinimumSpeed(), this.getOptimalSpeed(), MixerBlockEntity::getActiveStress));
         layer.set(5, 3, GuiElementBuilder.from(GuiTextures.EMPTY.asStack()).setName(REQUIRED_HEAT).asStack());
         layer.set(4, 3,
                 GuiTextures.TEMPERATURE_OFFSET_RIGHT.getNamed(Mth.clamp(getMinimumTemperature(), -1, 1), REQUIRED_HEAT),

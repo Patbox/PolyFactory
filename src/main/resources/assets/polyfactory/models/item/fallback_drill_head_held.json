@@ -1,0 +1,6 @@
+{
+  "parent": "polyfactory:item/handheld_drill",
+  "textures": {
+    "layer0": "polyfactory:item/fallback_drill_head"
+  }
+}

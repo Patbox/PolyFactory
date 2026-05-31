@@ -123,10 +123,10 @@ public class DataExtractorBlockEntity extends InputTransformerBlockEntity {
                 this.setSlot(i++, b);
             }
             for (var x : DataType.types()) {
-                if (x.fields().isEmpty()) {
+                if (x.fields().isEmpty() || x.icon() == Items.AIR) {
                     continue;
                 }
-                var b = new GuiElementBuilder(Items.PAPER).setName(x.name());
+                var b = new GuiElementBuilder(x.icon()).setName(x.name());
                 if (x == this.blockEntity.lastInput().type()) {
                     b.glow();
                 }

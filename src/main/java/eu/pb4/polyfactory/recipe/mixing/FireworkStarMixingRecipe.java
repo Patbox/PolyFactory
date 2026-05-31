@@ -7,11 +7,14 @@ import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.input.MixingInput;
 import java.util.Collections;
+import java.util.List;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.FireworkStarRecipe;
@@ -71,6 +74,11 @@ public record FireworkStarMixingRecipe(double time,
     @Override
     public ItemStack assemble(MixingInput inventory) {
         return ((FireworkStarRecipe) ((ServerLevel) inventory.world()).recipeAccess().byKey(VANILLA).orElseThrow().value()).assemble(inventory.asCraftingRecipeInput());
+    }
+
+    @Override
+    public List<ItemStack> assembleStacks(MixingInput input, RandomSource randomSource, boolean applyChance) {
+        return List.of(assemble(input));
     }
 
     @Override

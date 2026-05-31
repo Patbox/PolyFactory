@@ -4,6 +4,7 @@ import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polydex.api.v1.recipe.*;
 import eu.pb4.polyfactory.block.fluids.DrainBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
@@ -87,6 +88,7 @@ public class PressRecipePage extends PrioritizedRecipePage<GenericPressRecipe> {
         layer.setIngredient(3, 1, this.ingredients.get(0));
         layer.setIngredient(5, 1, this.ingredients.get(1));
         layer.setOutput(4, 3, this.mainOutput);
+        layer.set(7, 2, PolydexCompatImpl.requiredRotation(this.recipe.minimumSpeed(), PressBlockEntity::getActiveStress));
         if (!this.recipe.outputFluids().isEmpty()) {
             layer.set(5, 2, this.recipe.fluidsRequired() ? DRAIN_ICON : DRAIN_ICON_OPTIONAL);
 

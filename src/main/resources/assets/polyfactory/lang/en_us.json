@@ -156,9 +156,13 @@
   "item.polyfactory.honeyed_apple": "Honeyed Apple",
   "item.polyfactory.chain_lift": "Chain Lift",
 
+  "item.polyfactory.drill": "Pocket Drill",
+  "item.polyfactory.drill.title": "Pocket Drill (%s)",
   "item.polyfactory.copper_drill_head": "Copper Drill Head",
   "item.polyfactory.iron_drill_head": "Iron Drill Head",
   "item.polyfactory.golden_drill_head": "Golden Drill Head",
+  "item.polyfactory.diamond_drill_head": "Diamond Drill Head",
+  "item.polyfactory.netherite_drill_head": "Netherite Drill Head",
 
   "item.polyfactory.mold.ingot": "Ingot Mold",
   "item.polyfactory.mold.ingot_clay": "Unfired Clay Ingot Mold",
@@ -410,6 +414,12 @@
   "fluid_type.minecraft.potion.long": "Long %s",
   "fluid_type.minecraft.potion.strong": "Strong %s",
 
+  "material.polyfactory.copper": "Copper",
+  "material.polyfactory.iron": "Iron",
+  "material.polyfactory.golden": "Golden",
+  "material.polyfactory.diamond": "Diamond",
+  "material.polyfactory.netherite": "Netherite",
+
   "entity.polyfactory.dynamite": "Dynamite",
   "entity.polyfactory.chain_lift": "Chain Lift",
   "entity.polyfactory.splash": "Splash of %s",
@@ -462,6 +472,12 @@
   "text.polyfactory.polydex.created_fluids": "Created fluids:",
   "text.polyfactory.polydex.drain_required": "Nearby Fluid Drain required for crafting!",
   "text.polyfactory.polydex.drain_required.optional": "Nearby Fluid Drain required for fluid result!",
+  "text.polyfactory.polydex.minimal_speed": "Minimal Speed: %s RPM",
+  "text.polyfactory.polydex.optimal_speed": "Optimal Speed: %s RPM",
+  "text.polyfactory.polydex.minimal_speed_with_stress": "Minimal Speed: %s RPM, Stress: %s su",
+  "text.polyfactory.polydex.optimal_speed_with_stress": "Optimal Speed: %s RPM, Stress: %s su",
+  "text.polyfactory.polydex.required_stress": "Required Torque: %s su",
+
   "polydex_category.polyfactory.fluids": "Item to Fluid",
   "polydex_category.polyfactory.polyfactory.smeltery": "Smeltery",
   "polydex_category.polyfactory.moldmaking": "Moldmaking",

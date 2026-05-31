@@ -34,7 +34,16 @@ public class ItemTagsProvider extends FabricTagsProvider.ItemTagsProvider {
                 .add(FactoryItems.IRON_DRILL_HEAD)
                 .add(FactoryItems.COPPER_DRILL_HEAD)
                 .add(FactoryItems.GOLDEN_DRILL_HEAD)
+                .add(FactoryItems.DIAMOND_DRILL_HEAD)
+                .add(FactoryItems.NETHERITE_DRILL_HEAD)
         ;
+
+        this.getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
+                .addOptionalTag(FactoryItemTags.DRILL_HEADS);
+        this.getOrCreateTagBuilder(ItemTags.MINING_ENCHANTABLE)
+                .addOptionalTag(FactoryItemTags.DRILL_HEADS);
+        this.getOrCreateTagBuilder(ItemTags.MINING_LOOT_ENCHANTABLE)
+                .addOptionalTag(FactoryItemTags.DRILL_HEADS);
 
         this.getOrCreateTagBuilder(FactoryItemTags.ALLOWED_IN_PLANTER)
                 .addOptionalTag(ItemTags.VILLAGER_PLANTABLE_SEEDS)

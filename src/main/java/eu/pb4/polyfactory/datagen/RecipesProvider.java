@@ -1277,7 +1277,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         GenericMixingRecipe.ofCounted("mushroom_stew",
                                 List.of(CountedIngredient.ofItems(1, Items.RED_MUSHROOM), CountedIngredient.ofItems(1, Items.BROWN_MUSHROOM),
                                         CountedIngredient.ofItems(2, Items.BOWL)),
-                                2, 4, 10, new ItemStackTemplate(Items.MUSHROOM_STEW, 2)),
+                                2, 4, 10, OutputStack.of(Items.MUSHROOM_STEW, 1, 2)),
                         GenericMixingRecipe.ofCounted("beetroot_soup",
                                 List.of(CountedIngredient.ofItems(3, Items.BEETROOT),
                                         CountedIngredient.ofItems(1, Items.BOWL)),
@@ -1288,7 +1288,7 @@ class RecipesProvider extends FabricRecipeProvider {
                                         CountedIngredient.ofItems(2, Items.CARROT),
                                         CountedIngredient.ofItems(2, Items.BROWN_MUSHROOM),
                                         CountedIngredient.ofItems(3, Items.BOWL)),
-                                2, 4, 10, new ItemStackTemplate(Items.RABBIT_STEW, 3)),
+                                2, 4, 10, OutputStack.of(Items.RABBIT_STEW, 1, 3)),
                         GenericMixingRecipe.ofCounted("cookie",
                                 List.of(CountedIngredient.ofItems(2, Items.WHEAT), CountedIngredient.ofItems(1, Items.COCOA_BEANS)),
                                 2, 4, 10, new ItemStackTemplate(Items.COOKIE, 10)),
@@ -1325,15 +1325,15 @@ class RecipesProvider extends FabricRecipeProvider {
                         GenericMixingRecipe.ofCounted("honey_block_to_liquid", "",
                                 List.of(CountedIngredient.ofItems(1, Items.HONEY_BLOCK)),
                                 null,
-                                6, 3, 10f, 0.3f, Optional.empty(), List.of(FactoryFluids.HONEY.ofBucket())),
+                                6, 3, 10f, 0.3f, List.of(), List.of(FactoryFluids.HONEY.ofBucket())),
                         GenericMixingRecipe.ofCounted("slime_block_to_liquid", "slime_to_liquid",
                                 List.of(CountedIngredient.ofItems(1, Items.SLIME_BLOCK)),
                                 null,
-                                8, 3, 10f, 0.3f, Optional.empty(), List.of(FactoryFluids.SLIME.ofBucket())),
+                                8, 3, 10f, 0.3f, List.of(), List.of(FactoryFluids.SLIME.ofBucket())),
                         GenericMixingRecipe.ofCounted("slime_ball_to_liquid", "slime_to_liquid",
                                 List.of(CountedIngredient.ofItems(1, Items.SLIME_BALL)),
                                 null,
-                                1, 3, 10f, 0.3f, Optional.empty(), List.of(FactoryFluids.SLIME.of(FluidConstants.BLOCK / 9))),
+                                1, 3, 10f, 0.3f, List.of(), List.of(FactoryFluids.SLIME.of(FluidConstants.BLOCK / 9))),
                         GenericMixingRecipe.ofCounted("mud", "",
                                 List.of(CountedIngredient.ofItems(1, Items.DIRT)),
                                 List.of(FluidInputStack.from(FactoryFluids.WATER.ofBottle())),
@@ -1341,7 +1341,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         GenericMixingRecipe.ofCounted("snow_fluid", "",
                                 List.of(),
                                 List.of(FluidInputStack.from(FactoryFluids.WATER.of(800))),
-                                1, 1, 3f, Float.NEGATIVE_INFINITY, -0.05f, Optional.empty(), List.of(FactoryFluids.SNOW.of(1000)))
+                                1, 1, 3f, Float.NEGATIVE_INFINITY, -0.05f, List.of(), List.of(FactoryFluids.SNOW.of(1000)))
                 );
 
                 for (var recipe : ((PotionBrewingAccessor) PotionBrewing.bootstrap(FeatureFlagSet.of(FeatureFlags.VANILLA))).getPotionMixes()) {

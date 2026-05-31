@@ -92,6 +92,8 @@ public abstract class SpoutRecipePage<T extends SpoutRecipe> extends Prioritized
             fluid.addLoreLine(stack.toTextRequired().setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY).withItalic(false)));
         }
 
+        layer.set(7, 2, PolydexCompatImpl.requiredRotationStress(1));
+
         layer.set(2, 1, fluid);
         layer.set(2, 2, fluid);
         layer.set(2, 3, fluid);

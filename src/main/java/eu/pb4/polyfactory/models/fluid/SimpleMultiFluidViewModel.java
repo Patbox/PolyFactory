@@ -68,9 +68,10 @@ public class SimpleMultiFluidViewModel {
     }
 
     private void setValues(ItemDisplayElement layer, FluidInstance<?> instance, float amount) {
+        var offset = 0.0015f;
         var scale = this.height / 16f;
-        layer.setTranslation(new Vector3f(0, ((-8 / 16f + (position + amount / 2) * 15.9f / 16f) + 0.003f) * scale, 0));
-        layer.setScale(new Vector3f(1, amount, 1));
+        layer.setTranslation(new Vector3f(0, ((-8 / 16f + (position + amount / 2) * 15.9f / 16f) + offset) * scale, 0));
+        layer.setScale(new Vector3f(1 - offset, amount - offset, 1 - offset));
         layer.setItem(this.models[textureId(amount)].get(instance));
         this.position += amount + 0.001f;
     }

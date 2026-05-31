@@ -305,9 +305,13 @@ public class PressBlockEntity extends TallItemMachineBlockEntity implements Outp
 
     public double getStress() {
         if (this.active) {
-            return this.currentRecipe != null ? this.currentRecipe.value().minimumSpeed() * 0.8 : 4;
+            return this.currentRecipe != null ? getActiveStress(this.currentRecipe.value().minimumSpeed()) : 4;
         }
         return 0;
+    }
+
+    public static double getActiveStress(double minimumSpeed) {
+        return minimumSpeed * 0.8;
     }
 
     @Override

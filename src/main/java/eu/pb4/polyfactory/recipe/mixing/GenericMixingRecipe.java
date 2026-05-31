@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
+import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.factorytools.api.util.ItemComponentPredicate;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.fluid.FluidStack;
@@ -17,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -26,14 +29,14 @@ import net.minecraft.world.level.Level;
 
 public record GenericMixingRecipe(String group, List<CountedIngredient> input,
                                   Optional<List<FluidInputStack>> fluidInputs,
-                                  Optional<ItemStackTemplate> output, List<FluidStack<?>> fluidOutput, double time,
+                                  List<OutputStack> output, List<FluidStack<?>> fluidOutput, double time,
                                   double minimumSpeed,
                                   double optimalSpeed, float minimumTemperature, float maxTemperature) implements MixingRecipe {
     public static final MapCodec<GenericMixingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.STRING.optionalFieldOf("group", "").forGetter(GenericMixingRecipe::group),
                     CountedIngredient.LIST_CODEC.fieldOf("input").forGetter(GenericMixingRecipe::input),
                     FluidInputStack.CODEC.listOf().optionalFieldOf("fluid_input").forGetter(GenericMixingRecipe::fluidInputs),
-                    ItemStackTemplate.CODEC.optionalFieldOf("output").forGetter(GenericMixingRecipe::output),
+                    ExtraCodecs.compactListCodec(OutputStack.CODEC).optionalFieldOf("output", List.of()).forGetter(GenericMixingRecipe::output),
                     FluidStack.CODEC.listOf().fieldOf("output_fluid").forGetter(GenericMixingRecipe::fluidOutput),
                     Codec.DOUBLE.fieldOf("time").forGetter(GenericMixingRecipe::time),
                     Codec.DOUBLE.optionalFieldOf("minimum_speed", 1d).forGetter(GenericMixingRecipe::minimumSpeed),
@@ -43,94 +46,70 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
             ).apply(x, GenericMixingRecipe::new)
     );
 
-    public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, Optional<ItemStackTemplate> output) {
-        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe("", ingredient,
-                Optional.of(List.of()),
-                output, List.of(), mixingTime, minimumSpeed, optimalSpeed, -0.1f, Float.POSITIVE_INFINITY));
-    }
-
-    public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, Optional<ItemStackTemplate> output) {
-        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe("", ingredient,
-                Optional.of(List.of()),
-                output, List.of(), mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
-    }
-
-    public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, Optional<ItemStackTemplate> output) {
-        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, ingredient,
-                Optional.of(List.of()),
-                output, List.of(), mixingTime, minimumSpeed, optimalSpeed, -0.1f, Float.POSITIVE_INFINITY));
-    }
-
-    public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, List<FluidInputStack> fluids, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, Optional<ItemStackTemplate> output) {
-        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, ingredient,
-                Optional.ofNullable(fluids),
-                output, List.of(), mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
-    }
-
-    public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, Optional<ItemStackTemplate> output, List<FluidStack<?>> fluidOutput) {
+    public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, List<ItemStackTemplate> output, List<FluidStack<?>> fluidOutput) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, ingredient,
                 Optional.ofNullable(fluidInput),
-                output, fluidOutput, mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
+                output.stream().map(t -> new OutputStack(t, 1, 1)).toList(), fluidOutput, mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
     }
 
-    public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, float maxTemperature, Optional<ItemStackTemplate> output, List<FluidStack<?>> fluidOutput) {
+    public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, float maxTemperature, List<ItemStackTemplate> output, List<FluidStack<?>> fluidOutput) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, ingredient,
                 Optional.ofNullable(fluidInput),
-                output, fluidOutput, mixingTime, minimumSpeed, optimalSpeed, minTemperature, maxTemperature));
+                output.stream().map(t -> new OutputStack(t, 1, 1)).toList(), fluidOutput, mixingTime, minimumSpeed, optimalSpeed, minTemperature, maxTemperature));
     }
 
-    public static RecipeHolder<GenericMixingRecipe> of(String string, List<Ingredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, Optional<ItemStackTemplate> output) {
+    public static RecipeHolder<GenericMixingRecipe> of(String string, List<Ingredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, List<ItemStackTemplate> output) {
         List<CountedIngredient> list = new ArrayList<>();
         for (Ingredient x : ingredient) {
             CountedIngredient countedIngredient = new CountedIngredient(Optional.of(x), ItemComponentPredicate.EMPTY, 1, CountedIngredient.tryGettingLeftover(x));
             list.add(countedIngredient);
         }
-        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe("", list, Optional.of(List.of()), output, List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe("", list, Optional.of(List.of()), output.stream().map(t -> new OutputStack(t, 1, 1)).toList(), List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
     }
 
-    public static RecipeHolder<GenericMixingRecipe> of(String string, String group, List<Ingredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, Optional<ItemStackTemplate> output) {
+    public static RecipeHolder<GenericMixingRecipe> of(String string, String group, List<Ingredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, List<ItemStackTemplate> output) {
         List<CountedIngredient> list = new ArrayList<>();
         for (Ingredient x : ingredient) {
             CountedIngredient countedIngredient = new CountedIngredient(Optional.of(x), ItemComponentPredicate.EMPTY, 1, CountedIngredient.tryGettingLeftover(x));
             list.add(countedIngredient);
         }
-        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, list, Optional.of(List.of()), output, List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, list, Optional.of(List.of()), output.stream().map(t -> new OutputStack(t, 1, 1)).toList(), List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
     }
     
     public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStackTemplate output) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe("", ingredient,
                 Optional.of(List.of()),
-                Optional.of(output), List.of(), mixingTime, minimumSpeed, optimalSpeed, -0.1f, Float.POSITIVE_INFINITY));
+                List.of(new OutputStack(output, 1, 1)), List.of(), mixingTime, minimumSpeed, optimalSpeed, -0.1f, Float.POSITIVE_INFINITY));
     }
 
     public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStackTemplate output) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe("", ingredient,
                 Optional.of(List.of()),
-                Optional.of(output), List.of(), mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
+                List.of(new OutputStack(output, 1, 1)), List.of(), mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
     }
 
     public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStackTemplate output) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, ingredient,
                 Optional.of(List.of()),
-                Optional.of(output), List.of(), mixingTime, minimumSpeed, optimalSpeed, -0.1f, Float.POSITIVE_INFINITY));
+                List.of(new OutputStack(output, 1, 1)), List.of(), mixingTime, minimumSpeed, optimalSpeed, -0.1f, Float.POSITIVE_INFINITY));
     }
 
     public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, List<FluidInputStack> fluids, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStackTemplate output) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, ingredient,
                 Optional.ofNullable(fluids),
-                Optional.of(output), List.of(), mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
+                List.of(new OutputStack(output, 1, 1)), List.of(), mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
     }
 
     public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, ItemStackTemplate output, List<FluidStack<?>> fluidOutput) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, ingredient,
                 Optional.ofNullable(fluidInput),
-                Optional.of(output), fluidOutput, mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
+                List.of(new OutputStack(output, 1, 1)), fluidOutput, mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
     }
 
     public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, float maxTemperature, ItemStackTemplate output, List<FluidStack<?>> fluidOutput) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, ingredient,
                 Optional.ofNullable(fluidInput),
-                Optional.of(output), fluidOutput, mixingTime, minimumSpeed, optimalSpeed, minTemperature, maxTemperature));
+                List.of(new OutputStack(output, 1, 1)), fluidOutput, mixingTime, minimumSpeed, optimalSpeed, minTemperature, maxTemperature));
     }
 
     public Iterable<ItemStack> remainders(MixingInput input) {
@@ -143,7 +122,7 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
             CountedIngredient countedIngredient = new CountedIngredient(Optional.of(x), ItemComponentPredicate.EMPTY, 1, CountedIngredient.tryGettingLeftover(x));
             list.add(countedIngredient);
         }
-        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe("", list, Optional.of(List.of()), Optional.of(output), List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe("", list, Optional.of(List.of()), List.of(new OutputStack(output, 1, 1)), List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
     }
 
     public static RecipeHolder<GenericMixingRecipe> of(String string, String group, List<Ingredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, ItemStackTemplate output) {
@@ -152,7 +131,42 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
             CountedIngredient countedIngredient = new CountedIngredient(Optional.of(x), ItemComponentPredicate.EMPTY, 1, CountedIngredient.tryGettingLeftover(x));
             list.add(countedIngredient);
         }
-        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, list, Optional.of(List.of()), Optional.of(output), List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, list, Optional.of(List.of()), List.of(new OutputStack(output, 1, 1)), List.of(), mixingTime, minimumSpeed, optimalSpeed, -1f, 2f));
+    }
+    public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, OutputStack output) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe("", ingredient,
+                Optional.of(List.of()),
+                List.of(output), List.of(), mixingTime, minimumSpeed, optimalSpeed, -0.1f, Float.POSITIVE_INFINITY));
+    }
+
+    public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, OutputStack... output) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe("", ingredient,
+                Optional.of(List.of()),
+                List.of(output), List.of(), mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
+    }
+
+    public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, double mixingTime, double minimumSpeed, double optimalSpeed, OutputStack... output) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, ingredient,
+                Optional.of(List.of()),
+                List.of(output), List.of(), mixingTime, minimumSpeed, optimalSpeed, -0.1f, Float.POSITIVE_INFINITY));
+    }
+
+    public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, List<FluidInputStack> fluids, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, OutputStack... output) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, ingredient,
+                Optional.ofNullable(fluids),
+                List.of(output), List.of(), mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
+    }
+
+    public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, OutputStack output, List<FluidStack<?>> fluidOutput) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, ingredient,
+                Optional.ofNullable(fluidInput),
+                List.of(output), fluidOutput, mixingTime, minimumSpeed, optimalSpeed, minTemperature, Float.POSITIVE_INFINITY));
+    }
+
+    public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, float maxTemperature, OutputStack output, List<FluidStack<?>> fluidOutput) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, ingredient,
+                Optional.ofNullable(fluidInput),
+                List.of(output), fluidOutput, mixingTime, minimumSpeed, optimalSpeed, minTemperature, maxTemperature));
     }
 
     @Override
@@ -253,9 +267,22 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
     }
 
     @Override
-    public ItemStack assemble(MixingInput inventory) {
-        return this.output.map(ItemStackTemplate::create).orElse(ItemStack.EMPTY);
+    public List<ItemStack> assembleStacks(MixingInput input, RandomSource randomSource, boolean applyChance) {
+        if (output.isEmpty()) {
+            return List.of();
+        }
+        var list = new ArrayList<ItemStack>();
+
+        for (var out : this.output) {
+            for (int i = 0; i < out.roll(); i++) {
+                if (!applyChance || out.roll() >= randomSource.nextFloat()) {
+                    list.add(out.stack().create());
+                }
+            }
+        }
+        return list;
     }
+
     @Override
     public RecipeSerializer<GenericMixingRecipe> getSerializer() {
         return FactoryRecipeSerializers.MIXING_GENERIC;

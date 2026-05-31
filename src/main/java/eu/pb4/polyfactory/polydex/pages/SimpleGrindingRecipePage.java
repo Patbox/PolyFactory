@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.polydex.pages;
 
 import eu.pb4.polydex.api.v1.recipe.*;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
 import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.recipe.grinding.SimpleGrindingRecipe;
 import net.minecraft.server.MinecraftServer;
@@ -49,6 +50,7 @@ public class SimpleGrindingRecipePage extends GrindingRecipePage<SimpleGrindingR
     @Override
     public void createPage(@Nullable PolydexEntry entry, ServerPlayer player, PageBuilder layer) {
         layer.setIngredient(4, 1, this.recipe.input());
+        layer.set(7, 2, PolydexCompatImpl.requiredRotation(this.recipe.minimumSpeed(), this.recipe.optimalSpeed(), GrinderBlockEntity::getActiveStress));
 
         var i = 0;
         for (; i < this.output.length; i++) {

@@ -4,6 +4,7 @@ import eu.pb4.polydex.api.v1.recipe.PageBuilder;
 import eu.pb4.polydex.api.v1.recipe.PolydexEntry;
 import eu.pb4.polydex.api.v1.recipe.PolydexIngredient;
 import eu.pb4.polydex.api.v1.recipe.PolydexStack;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
 import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.recipe.grinding.StrippingGrindingRecipe;
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
@@ -126,6 +127,7 @@ public class StrippingGrindingRecipePage extends GrindingRecipePage<StrippingGri
             layer.setOutput(3, 3, this.output);
         }
 
+        layer.set(7, 2, PolydexCompatImpl.requiredRotation(this.recipe.minimumSpeed(), this.recipe.optimalSpeed(), GrinderBlockEntity::getActiveStress));
 
         var i = 1;
         for (; i < this.outputExtra.length + 1; i++) {

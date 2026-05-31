@@ -44,6 +44,7 @@ import eu.pb4.polyfactory.util.DebugTextProvider;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.elements.GuiElement;
+import eu.pb4.sgui.api.elements.ItemStackBuilder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -60,11 +61,11 @@ import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.text.DecimalFormat;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.DoubleBinaryOperator;
+import java.util.function.DoubleUnaryOperator;
 import java.util.stream.Collectors;
 
 import static eu.pb4.polyfactory.ModInit.id;
@@ -300,7 +301,7 @@ public class PolydexCompatImpl {
         return list;
     }
 
-    public static PolydexStack<?>[] createOutput(List<OutputStack> output) {
+    public static PolydexStack<ItemStack>[] createOutput(List<OutputStack> output) {
         var list = new ArrayList<PolydexStack<?>>(output.size());
         for (var x : output) {
             list.add(PolydexStack.of(x.stack().create().copyWithCount(x.stack().count() * x.roll()), x.chance()));
@@ -338,5 +339,56 @@ public class PolydexCompatImpl {
         if (val != null) {
             PolydexPageUtils.openCategoryUi(player, val, runnable);
         }
+    }
+
+    public static ItemStack requiredRotation(double minSpeed, double optSpeed, double stress) {
+        var format = DecimalFormat.getInstance(Locale.ROOT);
+        format.setMaximumFractionDigits(2);
+
+        return new ItemStackBuilder(FactoryItems.STEEL_GEAR.builtInRegistryHolder().key().identifier())
+                .hideDefaultTooltip()
+                .setItemName(Component.translatable("text.polyfactory.polydex.required_stress", format.format(stress)))
+                .addLoreLine(Component.translatable("text.polyfactory.polydex.minimal_speed", format.format(minSpeed / 360 * 60 * 20)))
+                .addLoreLine(Component.translatable("text.polyfactory.polydex.optimal_speed", format.format(optSpeed / 360 * 60 * 20)))
+                .asStack();
+    }
+
+    public static ItemStack requiredRotation(double minSpeed, double optSpeed, DoubleTrinaryOperator stressOperation) {
+        var format = DecimalFormat.getInstance(Locale.ROOT);
+        format.setMaximumFractionDigits(2);
+
+        return new ItemStackBuilder(FactoryItems.STEEL_GEAR.builtInRegistryHolder().key().identifier())
+                .hideDefaultTooltip()
+                .setName(Component.translatable("text.polyfactory.polydex.minimal_speed_with_stress",
+                        format.format(minSpeed / 360 * 60 * 20), format.format(stressOperation.apply(minSpeed, optSpeed, 0))))
+                .addLoreLine(Component.translatable("text.polyfactory.polydex.optimal_speed_with_stress",
+                        format.format(optSpeed / 360 * 60 * 20), format.format(stressOperation.apply(minSpeed, optSpeed, 1))))
+                .asStack();
+    }
+
+    public static ItemStack requiredRotation(double minSpeed, DoubleUnaryOperator stressOperation) {
+        var format = DecimalFormat.getInstance(Locale.ROOT);
+        format.setMaximumFractionDigits(2);
+
+        return new ItemStackBuilder(FactoryItems.STEEL_GEAR.builtInRegistryHolder().key().identifier())
+                .hideDefaultTooltip()
+                .setName(Component.translatable("text.polyfactory.polydex.minimal_speed_with_stress",
+                        format.format(minSpeed / 360 * 60 * 20), format.format(stressOperation.applyAsDouble(minSpeed))))
+                .asStack();
+    }
+
+
+    public static ItemStack requiredRotationStress(double stress) {
+        var format = DecimalFormat.getInstance(Locale.ROOT);
+        format.setMaximumFractionDigits(2);
+
+        return new ItemStackBuilder(FactoryItems.STEEL_GEAR.builtInRegistryHolder().key().identifier())
+                .hideDefaultTooltip()
+                .setName(Component.translatable("text.polyfactory.polydex.required_stress", format.format(1)))
+                .asStack();
+    }
+
+    public interface DoubleTrinaryOperator {
+        double apply(double minSpeed, double optSpeed, double range);
     }
 }

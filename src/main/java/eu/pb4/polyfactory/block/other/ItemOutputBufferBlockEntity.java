@@ -59,7 +59,12 @@ public class ItemOutputBufferBlockEntity extends LockableBlockEntity implements 
             }
         }
     };
-    private final SimpleContainer container = new SimpleContainer(SIZE);
+    private final SimpleContainer container = new SimpleContainer(SIZE) {
+        @Override
+        public void setChanged() {
+            ItemOutputBufferBlockEntity.this.setChanged();
+        }
+    };
     private int[] slots = new int[0];
     private boolean isActive = true;
 

@@ -48,6 +48,7 @@ import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.component.Consumables;
 import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.consume_effects.RemoveStatusEffectsConsumeEffect;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -196,9 +197,13 @@ public class FactoryItems {
     public static final Item CRUSHED_RAW_GOLD = register("crushed_raw_gold");
     public static final Item SPRAY_CAN = register("spray_can", settings -> new DyeSprayItem(settings.stacksTo(1)));
 
-    public static final Item IRON_DRILL_HEAD = register("iron_drill_head", drillHeadProperties(ToolMaterial.IRON));
-    public static final Item COPPER_DRILL_HEAD = register("copper_drill_head", drillHeadProperties(ToolMaterial.COPPER));
-    public static final Item GOLDEN_DRILL_HEAD = register("golden_drill_head", drillHeadProperties(ToolMaterial.GOLD));
+    public static final Item DRILL = register("drill", new Item.Properties().stacksTo(1), DrillItem::new);
+
+    public static final Item COPPER_DRILL_HEAD = register("copper_drill_head", drillHeadProperties("copper", ToolMaterial.COPPER, 2f));
+    public static final Item IRON_DRILL_HEAD = register("iron_drill_head", drillHeadProperties("iron", ToolMaterial.IRON, 2f));
+    public static final Item GOLDEN_DRILL_HEAD = register("golden_drill_head", drillHeadProperties("gold", ToolMaterial.GOLD, 2f));
+    public static final Item DIAMOND_DRILL_HEAD = register("diamond_drill_head", drillHeadProperties("diamond", ToolMaterial.DIAMOND, 1.2f));
+    public static final Item NETHERITE_DRILL_HEAD = register("netherite_drill_head", drillHeadProperties("netherite", ToolMaterial.NETHERITE, 1.2f));
 
     public static final Item PIPE = register("pipe", settings -> new PipeItem(FactoryBlocks.PIPE, settings.useBlockDescriptionPrefix()));
     public static final Item FILTERED_PIPE = register(FactoryBlocks.FILTERED_PIPE);
@@ -229,11 +234,11 @@ public class FactoryItems {
 
     public static final List<SpoutMolds> MOLDS = List.of(INGOT_MOLD, NUGGET_MOLD, PIPE_MOLD, BOTTLE_MOLD, THROWABLE_BOTTLE_MOLD, BRITTLE_BOTTLE_MOLD, CHAIN_MOLD);
 
-    public static Item.Properties drillHeadProperties(ToolMaterial material) {
+    public static Item.Properties drillHeadProperties(String materialName, ToolMaterial material, float durabilityMultiplier) {
         HolderGetter<Block> registrationLookup = BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK);
-
         return new Item.Properties()
-                .durability((int) (material.durability() * 1.4)).repairable(material.repairItems()).enchantable((int) (material.enchantmentValue() * 0.6f))
+                .component(FactoryDataComponents.MATERIAL_NAME, Component.translatable("material.polyfactory." + materialName))
+                .durability((int) (material.durability() * durabilityMultiplier)).repairable(material.repairItems()).enchantable((int) (material.enchantmentValue() * 0.6f))
                 .component(FactoryDataComponents.DRILL_HEAD_TOOL, new Tool(List.of(Tool.Rule.deniesDrops(
                         registrationLookup.getOrThrow(material.incorrectBlocksForDrops())),
                         Tool.Rule.minesAndDrops(registrationLookup.getOrThrow(FactoryBlockTags.MINEABLE_WITH_DRILL),
@@ -512,6 +517,12 @@ public class FactoryItems {
                         entries.accept(ELECTRIC_MOTOR, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                         entries.accept(CLIPBOARD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                         entries.accept(SMELTERY, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
+                        entries.accept(DRILL, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
+                        entries.accept(COPPER_DRILL_HEAD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
+                        entries.accept(IRON_DRILL_HEAD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
+                        entries.accept(GOLDEN_DRILL_HEAD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
+                        entries.accept(DIAMOND_DRILL_HEAD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
+                        entries.accept(NETHERITE_DRILL_HEAD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                     })).build()
             );
         }
@@ -553,13 +564,24 @@ public class FactoryItems {
         return item;
     }
 
+    public static <T extends Item> T register(Identifier id, Item.Properties properties, Function<Item.Properties, T> function) {
+        var item = function.apply(properties.setId(ResourceKey.create(Registries.ITEM, id)));
+        Registry.register(BuiltInRegistries.ITEM, id, item);
+        return item;
+    }
+
     public static <T extends Item> T register(String path, Function<Item.Properties, T> function) {
         return register(Identifier.fromNamespaceAndPath(ModInit.ID, path), function);
     }
 
+    public static <T extends Item> T register(String path, Item.Properties properties, Function<Item.Properties, T> function) {
+        return register(Identifier.fromNamespaceAndPath(ModInit.ID, path), properties, function);
+    }
+
     public static <E extends Block & PolymerBlock> ColoredDownsampledBlockItem registerColored(E block, int color) {
         var id = BuiltInRegistries.BLOCK.getKey(block);
-        var item = new ColoredDownsampledBlockItem(block, color, new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)).useBlockDescriptionPrefix());
+        var item = new ColoredDownsampledBlockItem(block, color & 0xFFFFFF, new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))
+                .useBlockDescriptionPrefix().component(FactoryDataComponents.COLOR, color & 0xFFFFFF));
         Registry.register(BuiltInRegistries.ITEM, id, item);
         return item;
     }

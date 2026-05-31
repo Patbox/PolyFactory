@@ -14,6 +14,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -87,6 +88,11 @@ public record ColoringMixingRecipe(String group, Item input, int maxCount, doubl
         }
 
         return ColoredItem.stackCrafting(this.input, count, color);
+    }
+
+    @Override
+    public List<ItemStack> assembleStacks(MixingInput input, RandomSource randomSource, boolean applyChance) {
+        return List.of(assemble(input));
     }
 
     @Override

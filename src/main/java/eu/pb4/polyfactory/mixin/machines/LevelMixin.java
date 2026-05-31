@@ -11,6 +11,8 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -59,9 +61,17 @@ public abstract class LevelMixin implements LevelAccessor {
             pos = multiBlock.getCenter(state, pos);
         }
 
-        if (world.getBlockEntity(pos) instanceof FilledStateProvider provider) {
+        var be = world.getBlockEntity(pos);
+
+        if (be instanceof FilledStateProvider provider) {
             count = provider.getFilledAmount();
             max = provider.getFillCapacity();
+        } else if (be instanceof Container container) {
+            for (var i = 0; i < container.getContainerSize(); i++) {
+                var stack = container.getItem(i);
+                count += stack.getCount();
+                max += container.getMaxStackSize(stack);
+            }
         } else {
             var storage = ItemStorage.SIDED.find(world, pos, null);
             if (storage == null) {

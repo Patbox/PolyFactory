@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.recipe.input.MixingInput;
 import java.util.List;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -108,6 +109,11 @@ public record BrewingMixingRecipe(String group,
     @Override
     public ItemStack assemble(MixingInput inventory) {
         return ItemStack.EMPTY;
+    }
+
+    @Override
+    public List<ItemStack> assembleStacks(MixingInput input, RandomSource randomSource, boolean applyChance) {
+        return List.of();
     }
 
     @Override

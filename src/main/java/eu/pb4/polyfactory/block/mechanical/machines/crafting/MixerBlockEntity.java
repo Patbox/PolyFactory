@@ -237,7 +237,6 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         self.model.tick();
 
         if (self.process >= self.currentRecipe.value().time(input)) {
-            var output = self.currentRecipe.value().assemble(input);
             var outFluid = self.currentRecipe.value().fluidOutput(input);
 
             var emptyFluids = self.fluidContainer.empty();
@@ -258,8 +257,10 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
 
             {
                 var items = new ArrayList<ItemStack>();
-                items.add(output.copy());
                 for (var x : self.currentRecipe.value().remainders(input)) {
+                    items.add(x.copy());
+                }
+                for (var x : self.currentRecipe.value().assembleStacks(input, world.getRandom(), false)) {
                     items.add(x.copy());
                 }
 
@@ -286,7 +287,9 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
                 TriggerCriterion.trigger(player, FactoryTriggers.MIXER_CRAFTS);
             }
 
-            FactoryUtil.tryInsertingRegular(outputContainer, output);
+            for (var output : self.currentRecipe.value().assembleStacks(input, world.getRandom(), true)) {
+                FactoryUtil.tryInsertingRegular(outputContainer, output);
+            }
             for (var x : self.currentRecipe.value().remainders(input)) {
                 FactoryUtil.tryInsertingRegular(outputContainer, x);
             }
@@ -388,13 +391,19 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
     public double getStress() {
         if (this.active) {
             var input = new MixingInput(this.stacks, FluidContainerInput.of(fluidContainer), level);
-            return this.currentRecipe != null ?
-                    Mth.clamp(this.currentRecipe.value().optimalSpeed(input) * this.speedScale,
-                            this.currentRecipe.value().minimumSpeed(input),
-                            this.currentRecipe.value().optimalSpeed(input)
-                    ) * 0.6 : 1;
+            return this.currentRecipe != null ? getActiveStress(
+                    this.currentRecipe.value().minimumSpeed(input),
+                    this.currentRecipe.value().optimalSpeed(input),
+                    this.speedScale) : 1;
         }
         return 0;
+    }
+
+    public static double getActiveStress(double minimalSpeed, double optimalSpeed, double speedScale) {
+        return Mth.clamp(optimalSpeed * speedScale,
+                minimalSpeed,
+                optimalSpeed
+        ) * 0.6;
     }
 
     @Override

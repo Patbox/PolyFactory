@@ -1,11 +1,14 @@
 package eu.pb4.polyfactory.recipe.mixing;
 
+import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.input.MixingInput;
 import java.util.List;
+
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.item.crafting.Recipe;
@@ -60,4 +63,12 @@ public interface MixingRecipe extends Recipe<MixingInput> {
     default PlacementInfo placementInfo() {
         return PlacementInfo.NOT_PLACEABLE;
     }
+
+    @Deprecated
+    @Override
+    default ItemStack assemble(MixingInput input) {
+        return assembleStacks(input, RandomSource.createThreadLocalInstance(), false).getFirst();
+    }
+
+    List<ItemStack> assembleStacks(MixingInput input, RandomSource randomSource, boolean applyChance);
 }

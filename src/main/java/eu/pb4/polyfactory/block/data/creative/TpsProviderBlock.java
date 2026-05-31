@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.block.data.DataProvider;
 import eu.pb4.polyfactory.block.data.providers.DataProviderBlock;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataCache;
 import eu.pb4.polyfactory.data.DataContainer;
+import eu.pb4.polyfactory.data.DoubleCapacityData;
 import eu.pb4.polyfactory.data.DoubleData;
 import eu.pb4.polyfactory.nodes.data.DataProviderNode;
 import net.minecraft.core.BlockPos;
@@ -21,12 +22,13 @@ public class TpsProviderBlock extends DataProviderBlock {
 
     @Override
     protected void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
-        world.scheduleTick(pos, this, 40);
+        world.scheduleTick(pos, this, 10);
     }
 
     @Override
     protected void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
-        DataProvider.sendData(world, pos, new DoubleData(Math.min((double) TimeUtil.NANOSECONDS_PER_SECOND / world.getServer().getAverageTickTimeNanos(), world.getServer().tickRateManager().tickrate())));
-        world.scheduleTick(pos, this, 40);
+        DataProvider.sendData(world, pos, new DoubleCapacityData(Math.min((double) TimeUtil.NANOSECONDS_PER_SECOND / world.getServer().getAverageTickTimeNanos(),
+                world.getServer().tickRateManager().tickrate()), 20) );
+        world.scheduleTick(pos, this, 10);
     }
 }

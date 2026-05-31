@@ -208,14 +208,20 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalSi
             var input = new GrindingInput(this.stacks.getFirst());
 
             return this.currentRecipe != null ?
-                    Mth.clamp(this.currentRecipe.value().optimalSpeed(input) * this.speedScale,
+                    getActiveStress(
                             this.currentRecipe.value().minimumSpeed(input),
-                            this.currentRecipe.value().optimalSpeed(input)
-                    ) * 0.7 : 1;
+                            this.currentRecipe.value().optimalSpeed(input),
+                            this.speedScale) : 1;
         }
         return 0;
     }
 
+    public static double getActiveStress(double minimalSpeed, double optimalSpeed, double speedScale) {
+        return Mth.clamp(optimalSpeed * speedScale,
+                minimalSpeed,
+                optimalSpeed
+        ) * 0.7;
+    }
     @Override
     public @Nullable Component getCurrentState() {
         return this.state;

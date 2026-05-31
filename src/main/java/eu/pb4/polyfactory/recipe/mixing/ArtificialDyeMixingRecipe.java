@@ -11,12 +11,14 @@ import eu.pb4.polyfactory.recipe.input.MixingInput;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import java.util.Collections;
+import java.util.List;
 
 public record ArtificialDyeMixingRecipe(double time,
                                         double minimumSpeed,
@@ -146,6 +148,11 @@ public record ArtificialDyeMixingRecipe(double time,
         color = (color << 8) + Math.min(b, 0xFF);
 
         return ArtificialDyeItem.of(color);
+    }
+
+    @Override
+    public List<ItemStack> assembleStacks(MixingInput input, RandomSource randomSource, boolean applyChance) {
+        return List.of(assemble(input));
     }
 
     @Override

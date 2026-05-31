@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -234,6 +235,12 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
 
         return this.output.create();
     }
+
+    @Override
+    public List<ItemStack> assembleStacks(MixingInput input, RandomSource randomSource, boolean applyChance) {
+        return List.of(assemble(input));
+    }
+
     @Override
     public RecipeSerializer<TransformMixingRecipe> getSerializer() {
         return FactoryRecipeSerializers.MIXING_TRANSFORM;

@@ -4,6 +4,7 @@ import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
+import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlock;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
 import eu.pb4.polyfactory.util.ContainerSavingHelper;
@@ -164,7 +165,18 @@ public class DeepStorageContainerBlockEntity extends LockableBlockEntity impleme
         if (!this.remove) {
             this.openersCounter.recheckOpeners(this.getLevel(), this.getBlockPos(), this.getBlockState());
         }
+    }
 
+    @Override
+    public void setChanged() {
+        super.setChanged();
+
+        for (var pos : BlockPos.betweenClosed(this.getBlockPos(), this.getBlockPos().offset(1, 1, 1))) {
+            if (pos.equals(this.getBlockPos())) {
+                continue;
+            }
+            this.level.updateNeighbourForOutputSignal(pos, this.getBlockState().getBlock());
+        }
     }
 
     private class Gui extends SimpleGui {
