@@ -72,8 +72,12 @@ public class DrillItem extends Item implements PolymerItem {
             return true;
         }
 
-        if (other.has(FactoryDataComponents.DRILL_HEAD_TOOL) && !self.has(FactoryDataComponents.DRILL_HEAD)) {
-            carriedItem.set(ItemStack.EMPTY);
+        if (other.has(FactoryDataComponents.DRILL_HEAD_TOOL)) {
+            if (self.has(FactoryDataComponents.DRILL_HEAD)) {
+                carriedItem.set(self.get(FactoryDataComponents.DRILL_HEAD).create());
+            } else {
+                carriedItem.set(ItemStack.EMPTY);
+            }
             self.set(FactoryDataComponents.DRILL_HEAD, ItemStackTemplate.fromNonEmptyStack(other));
             self.set(DataComponents.TOOL, other.get(FactoryDataComponents.DRILL_HEAD_TOOL));
             self.set(DataComponents.ENCHANTMENTS, other.get(DataComponents.ENCHANTMENTS));

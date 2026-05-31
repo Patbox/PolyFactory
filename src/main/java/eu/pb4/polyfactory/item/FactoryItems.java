@@ -242,7 +242,7 @@ public class FactoryItems {
                 .component(FactoryDataComponents.DRILL_HEAD_TOOL, new Tool(List.of(Tool.Rule.deniesDrops(
                         registrationLookup.getOrThrow(material.incorrectBlocksForDrops())),
                         Tool.Rule.minesAndDrops(registrationLookup.getOrThrow(FactoryBlockTags.MINEABLE_WITH_DRILL),
-                                material.speed() * 1.25f)), 1.1F, 1, true));
+                                material.speed() * 1.3f)), 1.1F, 1, true));
     }
 
     public static void register() {
