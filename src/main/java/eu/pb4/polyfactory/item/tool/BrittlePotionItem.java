@@ -9,13 +9,16 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.context.UseOnContext;
 
-public class BrittlePotionItem extends Item implements PolymerItem {
+public class BrittlePotionItem extends PotionItem implements PolymerItem {
     public BrittlePotionItem(Properties settings) {
         super(settings);
     }
@@ -25,6 +28,11 @@ public class BrittlePotionItem extends Item implements PolymerItem {
         ItemStack itemStack = super.getDefaultInstance();
         itemStack.set(DataComponents.POTION_CONTENTS, new PotionContents(Potions.WATER));
         return itemStack;
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        return InteractionResult.PASS;
     }
 
     @Override

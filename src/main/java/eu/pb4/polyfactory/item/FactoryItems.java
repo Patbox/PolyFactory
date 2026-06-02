@@ -29,6 +29,7 @@ import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.fabricmc.fabric.api.registry.FabricPotionBrewingBuilder;
 import net.fabricmc.fabric.api.registry.FuelValueEvents;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.Registry;
@@ -112,7 +113,7 @@ public class FactoryItems {
     public static final Item STEEL_BLOCK = register(FactoryBlocks.STEEL_BLOCK);
     public static final Item STEEL_PLATE = register("steel_plate");
     public static final Item COPPER_PLATE = register("copper_plate");
-    public static final Item BRITTLE_GLASS_BOTTLE = register("brittle_glass_bottle");
+    public static final Item BRITTLE_GLASS_BOTTLE = register("brittle_glass_bottle", BrittleBottleItem::new);
     public static final Item BRITTLE_POTION = register("brittle_potion", settings -> new BrittlePotionItem(settings.component(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).component(DataComponents.CONSUMABLE, Consumables.defaultDrink().soundAfterConsume(SoundEvents.OMINOUS_BOTTLE_DISPOSE).build()).stacksTo(1)));
     public static final Item THROWABLE_GLASS_BOTTLE = register("throwable_glass_bottle");
     public static final Item LINGERING_THROWABLE_GLASS_BOTTLE = register("lingering_throwable_glass_bottle");
@@ -251,6 +252,10 @@ public class FactoryItems {
             builder.add(WOODEN_PLATE, (int) (context.baseSmeltTime() * 0.6));
             builder.add(COAL_DUST, (int) (context.baseSmeltTime() * 0.8));
         }));
+
+        FabricPotionBrewingBuilder.BUILD.register(builder -> {
+            builder.addContainer(BRITTLE_POTION);
+        });
 
         BuiltInRegistries.ITEM.addAlias(id("copper_nugget"), Identifier.parse("copper_nugget"));
         BuiltInRegistries.ITEM.addAlias(id("fauced"), id("faucet"));

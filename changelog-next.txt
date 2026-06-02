@@ -2,6 +2,8 @@
 - Polydex now shows required RPM and stress units for recipes.
 - Gauge and Item Counter should now work with more regular storage blocks.
 - Generic Mixer recipes now support a list of output items with chance and rolls.
+- Brittle Glass Bottle can now be used to pick up water.
+- Brittle Potions can now be used directly in the Brewing Stand.
 - Fixed Deep Storage Container not causing comparator updates for all it's blocks.
 - Fixed polydex links not working in the guide.
 - Fixed fluids in Fluid Tanks causing z-fighting in not too far distances.
