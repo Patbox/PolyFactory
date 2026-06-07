@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.other.BlockWithTooltip;
 import eu.pb4.polyfactory.item.configuration.ClipboardItem;
+import eu.pb4.polyfactory.mixin.ToolMaterialAccessor;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.PolymerCreativeModeTabUtils;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
@@ -43,14 +44,14 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.*;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.item.component.Consumables;
-import net.minecraft.world.item.component.DyedItemColor;
-import net.minecraft.world.item.component.SwingAnimation;
-import net.minecraft.world.item.component.Tool;
+import net.minecraft.world.item.component.*;
 import net.minecraft.world.item.consume_effects.RemoveStatusEffectsConsumeEffect;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -200,9 +201,9 @@ public class FactoryItems {
 
     public static final Item DRILL = register("drill", new Item.Properties().stacksTo(1), DrillItem::new);
 
-    public static final Item COPPER_DRILL_HEAD = register("copper_drill_head", drillHeadProperties("copper", ToolMaterial.COPPER, 2f));
-    public static final Item IRON_DRILL_HEAD = register("iron_drill_head", drillHeadProperties("iron", ToolMaterial.IRON, 2f));
-    public static final Item GOLDEN_DRILL_HEAD = register("golden_drill_head", drillHeadProperties("gold", ToolMaterial.GOLD, 2f));
+    public static final Item COPPER_DRILL_HEAD = register("copper_drill_head", drillHeadProperties("copper", ToolMaterial.COPPER, 2.2f));
+    public static final Item IRON_DRILL_HEAD = register("iron_drill_head", drillHeadProperties("iron", ToolMaterial.IRON, 2.2f));
+    public static final Item GOLDEN_DRILL_HEAD = register("golden_drill_head", drillHeadProperties("gold", ToolMaterial.GOLD, 2.2f));
     public static final Item DIAMOND_DRILL_HEAD = register("diamond_drill_head", drillHeadProperties("diamond", ToolMaterial.DIAMOND, 1.2f));
     public static final Item NETHERITE_DRILL_HEAD = register("netherite_drill_head", drillHeadProperties("netherite", ToolMaterial.NETHERITE, 1.2f));
 
@@ -240,10 +241,15 @@ public class FactoryItems {
         return new Item.Properties()
                 .component(FactoryDataComponents.MATERIAL_NAME, Component.translatable("material.polyfactory." + materialName))
                 .durability((int) (material.durability() * durabilityMultiplier)).repairable(material.repairItems()).enchantable((int) (material.enchantmentValue() * 0.6f))
+                .component(FactoryDataComponents.DRILL_HEAD_ATTRIBUTE_MODIFIERS, ((ToolMaterialAccessor) (Object) material)
+                        .callCreateToolAttributes(1.0F, -3.0F)
+                        .withModifierAdded(Attributes.BLOCK_INTERACTION_RANGE, new AttributeModifier(id("range_limit"), -1,
+                                AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND))
+                .component(DataComponents.WEAPON, new Weapon(2, 0))
                 .component(FactoryDataComponents.DRILL_HEAD_TOOL, new Tool(List.of(Tool.Rule.deniesDrops(
                         registrationLookup.getOrThrow(material.incorrectBlocksForDrops())),
                         Tool.Rule.minesAndDrops(registrationLookup.getOrThrow(FactoryBlockTags.MINEABLE_WITH_DRILL),
-                                material.speed() * 1.3f)), 1.1F, 1, true));
+                                material.speed() * 1.4f)), 1.1F, 1, true));
     }
 
     public static void register() {

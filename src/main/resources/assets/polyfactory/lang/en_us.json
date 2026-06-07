@@ -703,5 +703,6 @@
   "advancements.polyfactory.tater_1024.description": "Click Potato on a Spring 1024 times. The End! Nothing more",
 
   "text.polyfactory.color_simple": "%s (%s)",
-  "color.polyfactory.teal": "Teal"
+  "color.polyfactory.teal": "Teal",
+  "text.polyfactory.attached": "Attached: %s"
 }

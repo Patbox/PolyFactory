@@ -18,6 +18,7 @@
     "ShapedRecipeBuilderAccessor",
     "SimpleBlockGraphAccessor",
     "TagValueInputAccessor",
+    "ToolMaterialAccessor",
     "TranslatableContentsAccessor",
     "block.BlockMixin",
     "block.BlockStateBaseMixin",

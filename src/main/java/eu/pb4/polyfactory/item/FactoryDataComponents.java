@@ -24,6 +24,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.Tool;
 
 import java.util.List;
@@ -65,6 +66,7 @@ public class FactoryDataComponents {
     public static final DataComponentType<List<String>> PUNCH_CARD_DATA = register("punch_card_data", DataComponentType.<List<String>>builder().persistent(Codec.STRING.listOf()).build());
 
     public static final DataComponentType<Tool> DRILL_HEAD_TOOL = register("drill_head_tool", DataComponentType.<Tool>builder().persistent(Tool.CODEC).build());
+    public static final DataComponentType<ItemAttributeModifiers> DRILL_HEAD_ATTRIBUTE_MODIFIERS = register("drill_head_attribute_modifiers", DataComponentType.<ItemAttributeModifiers>builder().persistent(ItemAttributeModifiers.CODEC).build());
     public static final DataComponentType<ItemStackTemplate> DRILL_HEAD = register("drill_head", DataComponentType.<ItemStackTemplate>builder().persistent(ItemStackTemplate.CODEC).build());
     public static final DataComponentType<Component> MATERIAL_NAME = register("material_name", DataComponentType.<Component>builder().persistent(ComponentSerialization.CODEC).build());
 

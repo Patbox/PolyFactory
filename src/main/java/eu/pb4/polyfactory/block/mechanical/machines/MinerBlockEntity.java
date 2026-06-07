@@ -136,6 +136,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         if (this.currentTool.has(FactoryDataComponents.DRILL_HEAD_TOOL)) {
             this.activeTool = this.currentTool.copy();
             this.activeTool.set(DataComponents.TOOL, this.currentTool.get(FactoryDataComponents.DRILL_HEAD_TOOL));
+            this.activeTool.set(DataComponents.ATTRIBUTE_MODIFIERS, this.currentTool.get(FactoryDataComponents.DRILL_HEAD_ATTRIBUTE_MODIFIERS));
         } else {
             this.activeTool = this.currentTool;
         }
@@ -154,6 +155,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         if (this.currentTool != this.activeTool) {
             this.currentTool = this.activeTool.copy();
             this.currentTool.remove(DataComponents.TOOL);
+            this.currentTool.remove(DataComponents.ATTRIBUTE_MODIFIERS);
         }
     }
 

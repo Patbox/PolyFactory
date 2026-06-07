@@ -28,9 +28,7 @@ import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.CustomModelData;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.item.component.TooltipDisplay;
-import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 
@@ -68,6 +66,7 @@ public class DrillItem extends Item implements PolymerItem {
             carriedItem.set(self.get(FactoryDataComponents.DRILL_HEAD).create());
             self.remove(FactoryDataComponents.DRILL_HEAD);
             self.remove(DataComponents.TOOL);
+            self.remove(DataComponents.ATTRIBUTE_MODIFIERS);
             self.remove(DataComponents.ENCHANTMENTS);
             return true;
         }
@@ -80,6 +79,7 @@ public class DrillItem extends Item implements PolymerItem {
             }
             self.set(FactoryDataComponents.DRILL_HEAD, ItemStackTemplate.fromNonEmptyStack(other));
             self.set(DataComponents.TOOL, other.get(FactoryDataComponents.DRILL_HEAD_TOOL));
+            self.set(DataComponents.ATTRIBUTE_MODIFIERS, other.get(FactoryDataComponents.DRILL_HEAD_ATTRIBUTE_MODIFIERS));
             self.set(DataComponents.ENCHANTMENTS, other.get(DataComponents.ENCHANTMENTS));
             return true;
         }
@@ -92,8 +92,7 @@ public class DrillItem extends Item implements PolymerItem {
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
         if (display.shows(FactoryDataComponents.DRILL_HEAD) && itemStack.has(FactoryDataComponents.DRILL_HEAD)) {
             var head = Objects.requireNonNull(itemStack.get(FactoryDataComponents.DRILL_HEAD));
-            builder.accept(Component.literal(" ")
-                    .append(head.getOrDefault(DataComponents.CUSTOM_NAME, head.getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY)))
+            builder.accept(Component.translatable("text.polyfactory.attached", head.getOrDefault(DataComponents.CUSTOM_NAME, head.getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY)))
                     .withStyle(ChatFormatting.GRAY)
             );
 

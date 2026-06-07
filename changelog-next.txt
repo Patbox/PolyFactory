@@ -4,8 +4,11 @@
 - Generic Mixer recipes now support a list of output items with chance and rolls.
 - Brittle Glass Bottle can now be used to pick up water.
 - Brittle Potions can now be used directly in the Brewing Stand.
+- Fixer Mixer recipes not working sometimes when they should (stray small ItemStack blockage).
 - Fixed Deep Storage Container not causing comparator updates for all it's blocks.
 - Fixed polydex links not working in the guide.
 - Fixed fluids in Fluid Tanks causing z-fighting in not too far distances.
 - Fixed Rabbit Stew and Mushroom Stew mixing recipes.
+- Fixed Fans causing player to always be detected as no on ground even if they should be.
+- Fixed Gauge not having breaking particles.
 - Creative flying players are no longer effected by Fans

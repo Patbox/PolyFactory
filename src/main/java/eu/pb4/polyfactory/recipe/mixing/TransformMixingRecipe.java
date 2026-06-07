@@ -142,7 +142,7 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
                 }
                 var notFound = true;
                 for (var ig : this.input) {
-                    if (ig.test(stack)) {
+                    if (ig.testUncounted(stack)) {
                         map.put(ig, map.getInt(ig) + stack.getCount());
                         notFound = false;
                         break;
@@ -202,7 +202,7 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
                     continue;
                 }
 
-                if (ig.test(stack)) {
+                if (ig.testUncounted(stack)) {
                     if (stack.getCount() >= count) {
                         stack.shrink(count);
                         inventory.setItem(i, stack);

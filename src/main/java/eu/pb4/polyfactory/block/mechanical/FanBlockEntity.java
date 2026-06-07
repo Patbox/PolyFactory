@@ -167,7 +167,7 @@ public class FanBlockEntity extends BlockEntity {
                         new ClientboundTeleportEntityPacket(entity.getId(),
                                 new PositionMoveRotation(Vec3.ZERO, vec, 0, 0),
                                 set,
-                                false
+                                player.onGround()
                         )
                 );
 

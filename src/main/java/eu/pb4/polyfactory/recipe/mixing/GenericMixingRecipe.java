@@ -184,8 +184,7 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
             }
         }
 
-
-        if (!this.input.isEmpty() && !this.input.getFirst().ingredient().isEmpty()) {
+        if (!this.input.isEmpty() && this.input.getFirst().ingredient().isPresent()) {
             var map = new Object2IntArrayMap<CountedIngredient>();
 
             for (int i = MixerBlockEntity.INPUT_FIRST; i < MixerBlockEntity.OUTPUT_FIRST; i++) {
@@ -195,7 +194,7 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
                 }
                 var notFound = true;
                 for (var ig : this.input) {
-                    if (ig.test(stack)) {
+                    if (ig.testUncounted(stack)) {
                         map.put(ig, map.getInt(ig) + stack.getCount());
                         notFound = false;
                         break;
@@ -244,7 +243,7 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
                     continue;
                 }
 
-                if (ig.test(stack)) {
+                if (ig.testUncounted(stack)) {
                     if (stack.getCount() >= count) {
                         stack.shrink(count);
                         inventory.setItem(i, stack);

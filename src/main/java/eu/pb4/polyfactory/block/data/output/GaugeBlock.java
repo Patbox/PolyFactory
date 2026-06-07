@@ -26,6 +26,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.BlockAwareAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.minecraft.world.level.block.TrapDoorBlock;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -102,6 +103,11 @@ public class GaugeBlock extends DataNetworkBlock implements FactoryBlock, Config
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         return (state.getValue(WATERLOGGED) ? FactoryUtil.TRAPDOOR_WATERLOGGED : FactoryUtil.TRAPDOOR_REGULAR).get(state.getValue(ORIENTATION).front());
+    }
+
+    @Override
+    public BlockState getPolymerBreakEventBlockState(BlockState state, PacketContext context) {
+        return getPolymerBlockState(state, context).setValue(TrapDoorBlock.POWERED, false);
     }
 
     @Override
