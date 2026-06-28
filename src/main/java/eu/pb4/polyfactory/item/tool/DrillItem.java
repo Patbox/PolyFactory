@@ -17,12 +17,13 @@ import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
@@ -47,6 +48,38 @@ public class DrillItem extends Item implements PolymerItem {
         PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(builder -> setupModel(builder, model));
     }
 
+    private static void setupModel(ResourcePackBuilder builder, Identifier identifier) {
+        // Todo: replace this with something dynamic
+        var head = List.of(
+                FactoryItems.COPPER_DRILL_HEAD.builtInRegistryHolder().key().identifier(),
+                FactoryItems.IRON_DRILL_HEAD.builtInRegistryHolder().key().identifier(),
+                FactoryItems.GOLDEN_DRILL_HEAD.builtInRegistryHolder().key().identifier(),
+                FactoryItems.DIAMOND_DRILL_HEAD.builtInRegistryHolder().key().identifier(),
+                FactoryItems.NETHERITE_DRILL_HEAD.builtInRegistryHolder().key().identifier()
+        );
+
+        var headModel = SelectItemModel.builder(new CustomModelDataStringProperty(0));
+        for (var type : head) {
+            var modelId = type.withPrefix("item/").withSuffix("_held");
+            headModel.withCase(type.toString(), new BasicItemModel(modelId));
+
+            builder.addData("assets/" + modelId.getNamespace() + "/models/" + modelId.getPath() + ".json",
+                    new ModelAsset(id("item/handheld_drill"), Map.of("layer0", new ModelAsset.TextureValue(type.withPrefix("item/"), false))));
+        }
+        headModel.fallback(new BasicItemModel(id("item/fallback_drill_head_held")));
+        headModel.transformation(new Matrix4f().translate(-2 / 16f, 2 / 16f, 0).scale(1, 1, 0.999f));
+
+        builder.addData("assets/" + identifier.getNamespace() + "/items/" + identifier.getPath() + ".json", new ItemAsset(
+                new ConditionItemModel(new CustomModelDataFlagProperty(0),
+                        new CompositeItemModel(List.of(
+                                new BasicItemModel(identifier.withSuffix("_body").withPrefix("item/")),
+                                headModel.build()
+                        )),
+                        new BasicItemModel(identifier.withSuffix("_body_empty").withPrefix("item/"))
+                ), new ItemAsset.Properties(false, false)
+        ));
+    }
+
     @Override
     public Component getName(ItemStack self) {
         if (self.has(FactoryDataComponents.DRILL_HEAD) && (self.get(FactoryDataComponents.DRILL_HEAD).get(FactoryDataComponents.MATERIAL_NAME) != null)) {
@@ -54,6 +87,18 @@ public class DrillItem extends Item implements PolymerItem {
         }
 
         return super.getName(self);
+    }
+
+    @Override
+    public void inventoryTick(ItemStack itemStack, ServerLevel level, Entity owner, @Nullable EquipmentSlot slot) {
+        super.inventoryTick(itemStack, level, owner, slot);
+        /*if (slot == null || slot.getType() != EquipmentSlot.Type.HAND || !(owner instanceof LivingEntity livingEntity)) {
+            return;
+        }
+
+        var itemArm = slot != EquipmentSlot.MAINHAND ? livingEntity.getMainArm().getOpposite() : livingEntity.getMainArm();
+        var pos = owner.calculateViewVector(0.0F, livingEntity.yBodyRot + (float) (itemArm == HumanoidArm.RIGHT ? 40 : -40)).scale(0.6F).add(livingEntity.position()).add(0, livingEntity.getBbHeight() / 2, 0);
+        level.sendParticles(ParticleTypes.SMOKE, pos.x, pos.y, pos.z, 0 , 0, 0, 0, 0);*/
     }
 
     @Override
@@ -107,7 +152,8 @@ public class DrillItem extends Item implements PolymerItem {
         }
 
         var head = self.get(FactoryDataComponents.DRILL_HEAD).create();
-        head.hurtAndBreak(amount, level, player, _ -> {});
+        head.hurtAndBreak(amount, level, player, _ -> {
+        });
         if (head.isEmpty()) {
             self.remove(FactoryDataComponents.DRILL_HEAD);
             self.remove(DataComponents.TOOL);
@@ -134,37 +180,5 @@ public class DrillItem extends Item implements PolymerItem {
     @Override
     public Item getPolymerItem(ItemStack itemStack, PacketContext packetContext) {
         return Items.TRIAL_KEY;
-    }
-
-    private static void setupModel(ResourcePackBuilder builder, Identifier identifier) {
-        // Todo: replace this with something dynamic
-        var head = List.of(
-                FactoryItems.COPPER_DRILL_HEAD.builtInRegistryHolder().key().identifier(),
-                FactoryItems.IRON_DRILL_HEAD.builtInRegistryHolder().key().identifier(),
-                FactoryItems.GOLDEN_DRILL_HEAD.builtInRegistryHolder().key().identifier(),
-                FactoryItems.DIAMOND_DRILL_HEAD.builtInRegistryHolder().key().identifier(),
-                FactoryItems.NETHERITE_DRILL_HEAD.builtInRegistryHolder().key().identifier()
-        );
-
-        var headModel = SelectItemModel.builder(new CustomModelDataStringProperty(0));
-        for (var type : head) {
-            var modelId = type.withPrefix("item/").withSuffix("_held");
-            headModel.withCase(type.toString(), new BasicItemModel(modelId));
-
-            builder.addData("assets/" + modelId.getNamespace() + "/models/" + modelId.getPath() + ".json",
-                    new ModelAsset(id("item/handheld_drill"), Map.of("layer0", new ModelAsset.TextureValue(type.withPrefix("item/"), false))));
-        }
-        headModel.fallback(new BasicItemModel(id("item/fallback_drill_head_held")));
-        headModel.transformation(new Matrix4f().translate(-2 / 16f, 2 / 16f, 0).scale(1, 1, 0.999f));
-
-        builder.addData("assets/" + identifier.getNamespace() + "/items/" + identifier.getPath() + ".json", new ItemAsset(
-                new ConditionItemModel(new CustomModelDataFlagProperty(0),
-                        new CompositeItemModel(List.of(
-                                new BasicItemModel(identifier.withSuffix("_body").withPrefix("item/")),
-                                headModel.build()
-                        )),
-                        new BasicItemModel(identifier.withSuffix("_body_empty").withPrefix("item/"))
-                ), new ItemAsset.Properties(false, false)
-        ));
     }
 }
