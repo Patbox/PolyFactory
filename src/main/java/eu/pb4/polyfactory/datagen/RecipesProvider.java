@@ -1559,7 +1559,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 );
             }
 
-            private void spoutMolds(TagKey<Item> tag, SpoutMolds mold) {
+            private void spoutMolds(TagKey<Item> tag, SpoutMolds<Item> mold) {
                 SimpleCookingRecipeBuilder.generic(Ingredient.of(mold.clay()), RecipeCategory.TOOLS, CookingBookCategory.MISC, mold.hardened(),
                         0, 40, SmeltingRecipe::new)
                         .unlockedBy("steel_ingot", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CLAY))
@@ -1579,7 +1579,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .save(CraftingWithLeftoverRecipe.asExporter(output, tag(ConventionalItemTags.INGOTS)));
             }
 
-            private void spoutMolds(Item tag, SpoutMolds mold) {
+            private void spoutMolds(Item tag, SpoutMolds<Item> mold) {
                 SimpleCookingRecipeBuilder.generic(Ingredient.of(mold.clay()), RecipeCategory.TOOLS, CookingBookCategory.MISC, mold.hardened(),
                                 0, 40, SmeltingRecipe::new)
                         .unlockedBy("steel_ingot", InventoryChangeTrigger.TriggerInstance.hasItems(Items.CLAY))

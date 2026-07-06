@@ -108,8 +108,10 @@ public class ItemTagsProvider extends FabricTagsProvider.ItemTagsProvider {
         this.tag(FactoryItemTags.PIPES)
                 .add(FactoryItemIds.PIPE);
 
-        for (var mold : FactoryItems.MOLDS) {
-            mold.createTag(this);
+        for (var self : FactoryItemIds.MOLDS) {
+            this.tag(self.tag()).add(self.hardened()).add(self.mold());
+            this.tag(FactoryItemTags.MOLDS).addOptionalTag(self.tag());
+            this.tag(FactoryItemTags.SHAPEABLE_CLAY_MOLDS).add(self.clay());
         }
 
         this.tag(FactoryItemTags.SPOUT_ITEM_HORIZONTAL).addOptionalTag(FactoryItemTags.MOLDS);

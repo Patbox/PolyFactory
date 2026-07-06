@@ -6,11 +6,10 @@ import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.references.BlockItemIds;
 import net.minecraft.tags.BlockItemTags;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.level.block.Blocks;
+
 import java.util.concurrent.CompletableFuture;
 
 class BlockTagsProvider extends FabricTagsProvider.BlockTagsProvider {
@@ -177,7 +176,7 @@ class BlockTagsProvider extends FabricTagsProvider.BlockTagsProvider {
                 .add(FactoryBlockIds.HAND_CRANK)
                 .add(FactoryBlockIds.GEARBOX)
                 .add(FactoryBlockIds.CHAIN_DRIVE)
-                .add(FactoryBlockIds.CONTAINER)
+                .add(FactoryBlockIds.WOODEN_CONTAINER)
                 .add(FactoryBlockIds.FUNNEL)
                 .add(FactoryBlockIds.WORKBENCH)
                 .add(FactoryBlockIds.BLUEPRINT_WORKBENCH)
