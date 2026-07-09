@@ -132,9 +132,15 @@ public class FactoryItemIds {
 
     public static final ResourceKey<Item> CRISPY_HONEY = of("crispy_honey");
     public static final ResourceKey<Item> HONEYED_APPLE = of("honeyed_apple");
+
     public static final ResourceKey<Item> CRUSHED_RAW_IRON = of("crushed_raw_iron");
     public static final ResourceKey<Item> CRUSHED_RAW_COPPER = of("crushed_raw_copper");
     public static final ResourceKey<Item> CRUSHED_RAW_GOLD = of("crushed_raw_gold");
+
+    public static final ResourceKey<Item> RAW_IRON_NUGGET = of("raw_iron_nugget");
+    public static final ResourceKey<Item> RAW_COPPER_NUGGET = of("raw_copper_nugget");
+    public static final ResourceKey<Item> RAW_GOLD_NUGGET = of("raw_gold_nugget");
+
     public static final ResourceKey<Item> SPRAY_CAN = of("spray_can");
 
     public static final ResourceKey<Item> DRILL = of("drill");
@@ -168,9 +174,10 @@ public class FactoryItemIds {
     public static final SpoutMolds<ResourceKey<Item>> THROWABLE_BOTTLE_MOLD = SpoutMolds.createIds("throwable_bottle");
     public static final SpoutMolds<ResourceKey<Item>> BRITTLE_BOTTLE_MOLD = SpoutMolds.createIds("brittle_bottle");
     public static final SpoutMolds<ResourceKey<Item>> CHAIN_MOLD = SpoutMolds.createIds("chain");
+    public static final SpoutMolds<ResourceKey<Item>> DRILL_HEAD_MOLD = SpoutMolds.createIds("drill_head");
 
     public static final List<SpoutMolds<ResourceKey<Item>>> MOLDS = List.of(
-        INGOT_MOLD, NUGGET_MOLD, PIPE_MOLD, BOTTLE_MOLD, THROWABLE_BOTTLE_MOLD, BRITTLE_BOTTLE_MOLD, CHAIN_MOLD
+        INGOT_MOLD, NUGGET_MOLD, PIPE_MOLD, BOTTLE_MOLD, THROWABLE_BOTTLE_MOLD, BRITTLE_BOTTLE_MOLD, CHAIN_MOLD, DRILL_HEAD_MOLD
     );
 
 

@@ -929,85 +929,88 @@ class RecipesProvider extends FabricRecipeProvider {
                 );
 
                 of(output,
-                        SimpleGrindingRecipe.of("coal_dust", Ingredient.of(Items.COAL), 1, 5, 8, FactoryItems.COAL_DUST),
-                        SimpleGrindingRecipe.of("coal_dust_charcoal", Ingredient.of(Items.CHARCOAL), 1.5, 5, 14, OutputStack.of(FactoryItems.COAL_DUST, 0.8f)),
-                        SimpleGrindingRecipe.of("netherrack_dust", Ingredient.of(Items.NETHERRACK), 2, 8, 15,
+                        SimpleGrindingRecipe.of("coal_dust", Ingredient.of(Items.COAL), 0.5f, 5, 12, FactoryItems.COAL_DUST),
+                        SimpleGrindingRecipe.of("coal_dust_charcoal", Ingredient.of(Items.CHARCOAL), 0.75, 5, 23, OutputStack.of(FactoryItems.COAL_DUST, 0.8f)),
+                        SimpleGrindingRecipe.of("netherrack_dust", Ingredient.of(Items.NETHERRACK), 1, 6, 25,
                                 OutputStack.of(FactoryItems.NETHERRACK_DUST, 1, 2), OutputStack.of(FactoryItems.NETHERRACK_DUST, 0.25f, 5)),
-                        SimpleGrindingRecipe.of("ender_dust", Ingredient.of(Items.ENDER_PEARL), 6, 20, 25,
+                        SimpleGrindingRecipe.of("ender_dust", Ingredient.of(Items.ENDER_PEARL), 4, 16, 30,
                                 OutputStack.of(FactoryItems.ENDER_DUST, 1, 2), OutputStack.of(FactoryItems.ENDER_DUST, 0.20f, 2)),
-                        SimpleGrindingRecipe.of("planks_saw_dust", tag(ItemTags.PLANKS), 1, 5, 6,
+                        SimpleGrindingRecipe.of("planks_saw_dust", tag(ItemTags.PLANKS), 0.75, 5, 8,
                                 OutputStack.of(FactoryItems.SAW_DUST, 0.6f, 3), OutputStack.of(Items.STICK, 0.4f, 3)),
-                        SimpleGrindingRecipe.of("stripped_logs_saw_dust", "logs_saw_dust", tag(ConventionalItemTags.STRIPPED_LOGS), 1, 5, 6,
+                        SimpleGrindingRecipe.of("stripped_logs_saw_dust", "logs_saw_dust", tag(ConventionalItemTags.STRIPPED_LOGS), 0.75, 5, 8,
                                 OutputStack.of(FactoryItems.SAW_DUST, 0.8f, 6), OutputStack.of(Items.STICK, 0.4f, 8)),
-                        SimpleGrindingRecipe.of("stripped_wood_saw_dust", "logs_saw_dust", tag(ConventionalItemTags.STRIPPED_WOODS), 1, 5, 6,
+                        SimpleGrindingRecipe.of("stripped_wood_saw_dust", "logs_saw_dust", tag(ConventionalItemTags.STRIPPED_WOODS), 0.75, 5, 8,
                                 OutputStack.of(FactoryItems.SAW_DUST, 0.8f, 6), OutputStack.of(Items.STICK, 0.4f, 8)),
                         StrippingGrindingRecipe.of("wood_stripping", tag(ItemTags.LOGS), 0.5, 4, 10,
                                 OutputStack.of(FactoryItems.SAW_DUST, 0.3f, 2)),
-                        SimpleGrindingRecipe.of("stone_to_cobblestone", Ingredient.of(Items.STONE), 2, 5, 12, Items.COBBLESTONE),
-                        SimpleGrindingRecipe.of("cobblestone_to_gravel", Ingredient.of(Items.COBBLESTONE), 4, 6, 12, Items.GRAVEL),
-                        SimpleGrindingRecipe.of("diorite_to_gravel", Ingredient.of(Items.DIORITE), 4, 6, 15, OutputStack.of(Items.GRAVEL), OutputStack.of(Items.QUARTZ, 0.05f, 1)),
-                        SimpleGrindingRecipe.of("andesite_to_gravel", Ingredient.of(Items.ANDESITE), 4, 6, 15, OutputStack.of(Items.GRAVEL), OutputStack.of(Items.QUARTZ, 0.05f, 1)),
-                        SimpleGrindingRecipe.of("granite_to_gravel", Ingredient.of(Items.GRANITE), 4, 6, 15, OutputStack.of(Items.GRAVEL), OutputStack.of(Items.QUARTZ, 0.1f, 1)),
-                        SimpleGrindingRecipe.of("gravel_to_sand", Ingredient.of(Items.GRAVEL), 4, 3, 15, Items.SAND),
+                        SimpleGrindingRecipe.of("stone_to_cobblestone", Ingredient.of(Items.STONE), 1, 5, 19, Items.COBBLESTONE),
+                        SimpleGrindingRecipe.of("cobblestone_to_gravel", Ingredient.of(Items.COBBLESTONE), 2, 6, 18, Items.GRAVEL),
+                        SimpleGrindingRecipe.of("diorite_to_gravel", Ingredient.of(Items.DIORITE), 2, 6, 24, OutputStack.of(Items.GRAVEL), OutputStack.of(Items.QUARTZ, 0.05f, 1)),
+                        SimpleGrindingRecipe.of("andesite_to_gravel", Ingredient.of(Items.ANDESITE), 2, 6, 24, OutputStack.of(Items.GRAVEL), OutputStack.of(Items.QUARTZ, 0.05f, 1)),
+                        SimpleGrindingRecipe.of("granite_to_gravel", Ingredient.of(Items.GRANITE), 2, 6, 24, OutputStack.of(Items.GRAVEL), OutputStack.of(Items.QUARTZ, 0.1f, 1)),
+                        SimpleGrindingRecipe.of("tuff_to_gravel", Ingredient.of(Items.TUFF), 2, 6, 24, OutputStack.of(Items.GRAVEL), OutputStack.of(FactoryItems.RAW_IRON_NUGGET, 0.33f, 1)),
 
-                        SimpleGrindingRecipe.of("iron_ingot_to_nuggets", Ingredient.of(Items.IRON_INGOT), 2, 5, 10, new ItemStackTemplate(Items.IRON_NUGGET, 9)),
-                        SimpleGrindingRecipe.of("gold_ingot_to_nuggets", Ingredient.of(Items.GOLD_INGOT), 1.8, 5, 10, new ItemStackTemplate(Items.GOLD_NUGGET, 9)),
-                        SimpleGrindingRecipe.of("nether_wart", Ingredient.of(Items.NETHER_WART_BLOCK), 1.8, 5, 10,
+
+                        SimpleGrindingRecipe.of("gravel_to_sand", Ingredient.of(Items.GRAVEL), 2, 3, 27, Items.SAND),
+
+                        SimpleGrindingRecipe.of("iron_ingot_to_nuggets", Ingredient.of(Items.IRON_INGOT), 1, 5, 15, new ItemStackTemplate(Items.IRON_NUGGET, 9)),
+                        SimpleGrindingRecipe.of("gold_ingot_to_nuggets", Ingredient.of(Items.GOLD_INGOT), 0.9, 5, 15, new ItemStackTemplate(Items.GOLD_NUGGET, 9)),
+                        SimpleGrindingRecipe.of("nether_wart", Ingredient.of(Items.NETHER_WART_BLOCK), 0.9, 5, 15,
                                 OutputStack.of(Items.NETHER_WART), OutputStack.of(Items.NETHER_WART, 0.4f, 5)
                         ),
 
-                        SimpleGrindingRecipe.of("iron_ore_to_raw", tag(ItemTags.IRON_ORES), 6, 12, 38,
+                        SimpleGrindingRecipe.of("iron_ore_to_raw", tag(ItemTags.IRON_ORES), 5, 10, 42,
                                 OutputStack.of(Items.RAW_IRON, 1f, 1), OutputStack.of(Items.RAW_IRON, 0.6f, 5)
                         ),
-                        SimpleGrindingRecipe.of("gold_ore_to_raw", tag(ItemTags.GOLD_ORES), 6, 12, 38,
+                        SimpleGrindingRecipe.of("gold_ore_to_raw", tag(ItemTags.GOLD_ORES), 5, 10, 42,
                                 OutputStack.of(Items.RAW_GOLD, 1f, 1), OutputStack.of(Items.RAW_GOLD, 0.6f, 5)
                         ),
-                        SimpleGrindingRecipe.of("copper_ore_to_raw", tag(ItemTags.COPPER_ORES), 6, 12, 38,
+                        SimpleGrindingRecipe.of("copper_ore_to_raw", tag(ItemTags.COPPER_ORES), 5, 10, 42,
                                 OutputStack.of(Items.RAW_COPPER, 1f, 2), OutputStack.of(Items.RAW_COPPER, 0.6f, 20)
                         ),
-                        SimpleGrindingRecipe.of("bone_to_bone_meal", Ingredient.of(Items.BONE), 1, 5, 10, OutputStack.of(Items.BONE_MEAL, 1, 3), OutputStack.of(Items.BONE_MEAL, 0.5f, 2)),
-                        SimpleGrindingRecipe.of("blaze_rod_to_powder", Ingredient.of(Items.BLAZE_ROD), 2, 5, 10, OutputStack.of(Items.BLAZE_POWDER, 1, 2), OutputStack.of(Items.BLAZE_POWDER, 0.5f, 2)),
-                        SimpleGrindingRecipe.of("breeze_rod_to_charge", Ingredient.of(Items.BREEZE_ROD), 2, 5, 10, OutputStack.of(Items.WIND_CHARGE, 1, 4), OutputStack.of(Items.WIND_CHARGE, 0.5f, 2)),
-                        SimpleGrindingRecipe.of("glowstone_to_powder", Ingredient.of(Items.GLOWSTONE), 1, 5, 10, new ItemStackTemplate(Items.GLOWSTONE_DUST, 4)),
-                        SimpleGrindingRecipe.of("sugar", Ingredient.of(Items.SUGAR_CANE), 1, 5, OutputStack.of(Items.SUGAR, 1f, 1), OutputStack.of(Items.SUGAR, 0.4f, 1)),
+                        SimpleGrindingRecipe.of("bone_to_bone_meal", Ingredient.of(Items.BONE), 0.5, 5, 15, OutputStack.of(Items.BONE_MEAL, 1, 3), OutputStack.of(Items.BONE_MEAL, 0.5f, 2)),
+                        SimpleGrindingRecipe.of("blaze_rod_to_powder", Ingredient.of(Items.BLAZE_ROD), 1, 5, 15, OutputStack.of(Items.BLAZE_POWDER, 1, 2), OutputStack.of(Items.BLAZE_POWDER, 0.5f, 2)),
+                        SimpleGrindingRecipe.of("breeze_rod_to_charge", Ingredient.of(Items.BREEZE_ROD), 1, 5, 15, OutputStack.of(Items.WIND_CHARGE, 1, 4), OutputStack.of(Items.WIND_CHARGE, 0.5f, 2)),
+                        SimpleGrindingRecipe.of("glowstone_to_powder", Ingredient.of(Items.GLOWSTONE), 0.5, 5, 15, new ItemStackTemplate(Items.GLOWSTONE_DUST, 4)),
+                        SimpleGrindingRecipe.of("sugar", Ingredient.of(Items.SUGAR_CANE), 0.5, 10, OutputStack.of(Items.SUGAR, 1f, 1), OutputStack.of(Items.SUGAR, 0.4f, 1)),
 
                         // Crushed raw metals
 
-                        SimpleGrindingRecipe.of("crushed_raw_iron", Ingredient.of(Items.RAW_IRON), 8, 12, 38,
+                        SimpleGrindingRecipe.of("crushed_raw_iron", Ingredient.of(Items.RAW_IRON), 6.5, 10, 42,
                                 OutputStack.of(FactoryItems.CRUSHED_RAW_IRON, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_IRON, 0.4f, 1)
                         ),
-                        SimpleGrindingRecipe.of("crushed_raw_gold", Ingredient.of(Items.RAW_GOLD), 6, 12, 38,
+                        SimpleGrindingRecipe.of("crushed_raw_gold", Ingredient.of(Items.RAW_GOLD), 5, 10, 42,
                                 OutputStack.of(FactoryItems.CRUSHED_RAW_GOLD, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_GOLD, 0.4f, 1)
                         ),
-                        SimpleGrindingRecipe.of("crushed_raw_copper", Ingredient.of(Items.RAW_COPPER), 6, 12, 38,
+                        SimpleGrindingRecipe.of("crushed_raw_copper", Ingredient.of(Items.RAW_COPPER), 5, 10, 42,
                                 OutputStack.of(FactoryItems.CRUSHED_RAW_COPPER, 1f, 1), OutputStack.of(FactoryItems.CRUSHED_RAW_COPPER, 0.4f, 1)
                         ),
 
                         // Flower to Dye
-                        SimpleGrindingRecipe.of("dandelion_to_dye", "dye", Ingredient.of(Items.DANDELION), 1, 6, new ItemStackTemplate(Items.DYE.yellow(), 3)),
-                        SimpleGrindingRecipe.of("torch_flower_to_dye", "dye", Ingredient.of(Items.TORCHFLOWER), 1, 6, new ItemStackTemplate(Items.DYE.orange(), 3)),
-                        SimpleGrindingRecipe.of("orchid_to_dye", "dye", Ingredient.of(Items.BLUE_ORCHID), 1, 6, new ItemStackTemplate(Items.DYE.lightBlue(), 3)),
-                        SimpleGrindingRecipe.of("allium_to_dye", "dye", Ingredient.of(Items.ALLIUM), 1, 6, new ItemStackTemplate(Items.DYE.magenta(), 3)),
-                        SimpleGrindingRecipe.of("azure_bluet_to_dye", "dye", Ingredient.of(Items.AZURE_BLUET), 1, 6, new ItemStackTemplate(Items.DYE.lightGray(), 3)),
-                        SimpleGrindingRecipe.of("daisy_to_dye", "dye", Ingredient.of(Items.OXEYE_DAISY), 1, 6, new ItemStackTemplate(Items.DYE.lightGray(), 3)),
-                        SimpleGrindingRecipe.of("red_tulip_to_dye", "dye", Ingredient.of(Items.RED_TULIP), 1, 6, new ItemStackTemplate(Items.DYE.red(), 3)),
-                        SimpleGrindingRecipe.of("orange_tulip_to_dye", "dye", Ingredient.of(Items.ORANGE_TULIP), 1, 6, new ItemStackTemplate(Items.DYE.orange(), 3)),
-                        SimpleGrindingRecipe.of("white_tulip_to_dye", "dye", Ingredient.of(Items.WHITE_TULIP), 1, 6, new ItemStackTemplate(Items.DYE.lightGray(), 3)),
-                        SimpleGrindingRecipe.of("pink_tulip_to_dye", "dye", Ingredient.of(Items.PINK_TULIP), 1, 6, new ItemStackTemplate(Items.DYE.pink(), 3)),
-                        SimpleGrindingRecipe.of("cornflower_to_dye", "dye", Ingredient.of(Items.CORNFLOWER), 1, 6, new ItemStackTemplate(Items.DYE.blue(), 3)),
-                        SimpleGrindingRecipe.of("lily_to_dye", "dye", Ingredient.of(Items.LILY_OF_THE_VALLEY), 1, 6, new ItemStackTemplate(Items.DYE.white(), 3)),
-                        SimpleGrindingRecipe.of("wither_rose_to_dye", "dye", Ingredient.of(Items.WITHER_ROSE), 1, 6, new ItemStackTemplate(Items.DYE.black(), 3)),
-                        SimpleGrindingRecipe.of("sunflower_to_dye", "dye", Ingredient.of(Items.SUNFLOWER), 1, 6, new ItemStackTemplate(Items.DYE.yellow(), 6)),
-                        SimpleGrindingRecipe.of("lilac_to_dye", "dye", Ingredient.of(Items.LILAC), 1, 6, new ItemStackTemplate(Items.DYE.magenta(), 6)),
-                        SimpleGrindingRecipe.of("peony_to_dye", "dye", Ingredient.of(Items.PEONY), 1, 6, new ItemStackTemplate(Items.DYE.pink(), 6)),
-                        SimpleGrindingRecipe.of("rose_to_dye", "dye", Ingredient.of(Items.ROSE_BUSH), 1, 6, new ItemStackTemplate(Items.DYE.red(), 6)),
-                        SimpleGrindingRecipe.of("pitcher_to_dye", "dye", Ingredient.of(Items.PITCHER_PLANT), 1, 6, new ItemStackTemplate(Items.DYE.cyan(), 6)),
-                        SimpleGrindingRecipe.of("cactus_to_dye", "dye", Ingredient.of(Items.CACTUS), 1, 6, new ItemStackTemplate(Items.DYE.green(), 3)),
-                        SimpleGrindingRecipe.of("closed_eyeblossom_to_dye", "dye", Ingredient.of(Items.CLOSED_EYEBLOSSOM), 1, 6, new ItemStackTemplate(Items.DYE.gray(), 3)),
-                        SimpleGrindingRecipe.of("open_eyeblossom_to_dye", "dye", Ingredient.of(Items.OPEN_EYEBLOSSOM), 1, 6, new ItemStackTemplate(Items.DYE.orange(), 3)),
-                        SimpleGrindingRecipe.of("cactus_flower_to_dye", "dye", Ingredient.of(Items.CACTUS_FLOWER), 1, 6, new ItemStackTemplate(Items.DYE.pink(), 3)),
-                        SimpleGrindingRecipe.of("wildflowers_to_dye", "dye", Ingredient.of(Items.WILDFLOWERS), 1, 6, new ItemStackTemplate(Items.DYE.yellow(), 3)),
-                        SimpleGrindingRecipe.of("leaf_litter_to_dye", "dye", Ingredient.of(Items.LEAF_LITTER), 1, 6, OutputStack.of(Items.DYE.brown(), 0.3f))
+                        SimpleGrindingRecipe.of("dandelion_to_dye", "dye", Ingredient.of(Items.DANDELION), 0.5, 12, new ItemStackTemplate(Items.DYE.yellow(), 3)),
+                        SimpleGrindingRecipe.of("torch_flower_to_dye", "dye", Ingredient.of(Items.TORCHFLOWER), 0.5, 12, new ItemStackTemplate(Items.DYE.orange(), 3)),
+                        SimpleGrindingRecipe.of("orchid_to_dye", "dye", Ingredient.of(Items.BLUE_ORCHID), 0.5, 12, new ItemStackTemplate(Items.DYE.lightBlue(), 3)),
+                        SimpleGrindingRecipe.of("allium_to_dye", "dye", Ingredient.of(Items.ALLIUM), 0.5, 12, new ItemStackTemplate(Items.DYE.magenta(), 3)),
+                        SimpleGrindingRecipe.of("azure_bluet_to_dye", "dye", Ingredient.of(Items.AZURE_BLUET), 0.5, 12, new ItemStackTemplate(Items.DYE.lightGray(), 3)),
+                        SimpleGrindingRecipe.of("daisy_to_dye", "dye", Ingredient.of(Items.OXEYE_DAISY), 0.5, 12, new ItemStackTemplate(Items.DYE.lightGray(), 3)),
+                        SimpleGrindingRecipe.of("red_tulip_to_dye", "dye", Ingredient.of(Items.RED_TULIP), 0.5, 12, new ItemStackTemplate(Items.DYE.red(), 3)),
+                        SimpleGrindingRecipe.of("orange_tulip_to_dye", "dye", Ingredient.of(Items.ORANGE_TULIP), 0.5, 12, new ItemStackTemplate(Items.DYE.orange(), 3)),
+                        SimpleGrindingRecipe.of("white_tulip_to_dye", "dye", Ingredient.of(Items.WHITE_TULIP), 0.5, 12, new ItemStackTemplate(Items.DYE.lightGray(), 3)),
+                        SimpleGrindingRecipe.of("pink_tulip_to_dye", "dye", Ingredient.of(Items.PINK_TULIP), 0.5, 12, new ItemStackTemplate(Items.DYE.pink(), 3)),
+                        SimpleGrindingRecipe.of("cornflower_to_dye", "dye", Ingredient.of(Items.CORNFLOWER), 0.5, 12, new ItemStackTemplate(Items.DYE.blue(), 3)),
+                        SimpleGrindingRecipe.of("lily_to_dye", "dye", Ingredient.of(Items.LILY_OF_THE_VALLEY), 0.5, 12, new ItemStackTemplate(Items.DYE.white(), 3)),
+                        SimpleGrindingRecipe.of("wither_rose_to_dye", "dye", Ingredient.of(Items.WITHER_ROSE), 0.5, 12, new ItemStackTemplate(Items.DYE.black(), 3)),
+                        SimpleGrindingRecipe.of("sunflower_to_dye", "dye", Ingredient.of(Items.SUNFLOWER), 0.5, 12, new ItemStackTemplate(Items.DYE.yellow(), 6)),
+                        SimpleGrindingRecipe.of("lilac_to_dye", "dye", Ingredient.of(Items.LILAC), 0.5, 12, new ItemStackTemplate(Items.DYE.magenta(), 6)),
+                        SimpleGrindingRecipe.of("peony_to_dye", "dye", Ingredient.of(Items.PEONY), 0.5, 12, new ItemStackTemplate(Items.DYE.pink(), 6)),
+                        SimpleGrindingRecipe.of("rose_to_dye", "dye", Ingredient.of(Items.ROSE_BUSH), 0.5, 12, new ItemStackTemplate(Items.DYE.red(), 6)),
+                        SimpleGrindingRecipe.of("pitcher_to_dye", "dye", Ingredient.of(Items.PITCHER_PLANT), 0.5, 12, new ItemStackTemplate(Items.DYE.cyan(), 6)),
+                        SimpleGrindingRecipe.of("cactus_to_dye", "dye", Ingredient.of(Items.CACTUS), 0.5, 12, new ItemStackTemplate(Items.DYE.green(), 3)),
+                        SimpleGrindingRecipe.of("closed_eyeblossom_to_dye", "dye", Ingredient.of(Items.CLOSED_EYEBLOSSOM), 0.5, 12, new ItemStackTemplate(Items.DYE.gray(), 3)),
+                        SimpleGrindingRecipe.of("open_eyeblossom_to_dye", "dye", Ingredient.of(Items.OPEN_EYEBLOSSOM), 0.5, 12, new ItemStackTemplate(Items.DYE.orange(), 3)),
+                        SimpleGrindingRecipe.of("cactus_flower_to_dye", "dye", Ingredient.of(Items.CACTUS_FLOWER), 0.5, 12, new ItemStackTemplate(Items.DYE.pink(), 3)),
+                        SimpleGrindingRecipe.of("wildflowers_to_dye", "dye", Ingredient.of(Items.WILDFLOWERS), 0.5, 12, new ItemStackTemplate(Items.DYE.yellow(), 3)),
+                        SimpleGrindingRecipe.of("leaf_litter_to_dye", "dye", Ingredient.of(Items.LEAF_LITTER), 0.5, 12, OutputStack.of(Items.DYE.brown(), 0.3f))
                 );
 
                 oreSmelting(List.of(FactoryItems.CRUSHED_RAW_IRON), RecipeCategory.MISC, CookingBookCategory.MISC, Items.IRON_INGOT, 0.5F, 180, "iron_ingot");
@@ -1017,7 +1020,17 @@ class RecipesProvider extends FabricRecipeProvider {
                 oreBlasting(List.of(FactoryItems.CRUSHED_RAW_COPPER), RecipeCategory.MISC, CookingBookCategory.MISC, Items.COPPER_INGOT, 0.5F, 100, "copper_ingot");
                 oreBlasting(List.of(FactoryItems.CRUSHED_RAW_GOLD), RecipeCategory.MISC, CookingBookCategory.MISC, Items.GOLD_INGOT, 0.7F, 100, "gold_ingot");
 
-                nineBlockStorageRecipesWithCustomPacking(RecipeCategory.MISC, Items.COPPER_NUGGET, RecipeCategory.MISC, Items.COPPER_INGOT, "copper_ingot_from_nugget", null);
+                oreSmelting(List.of(FactoryItems.RAW_IRON_NUGGET), RecipeCategory.MISC, CookingBookCategory.MISC, Items.IRON_NUGGET, 0.5F / 9, 180 / 8, "iron_ingot");
+                oreSmelting(List.of(FactoryItems.RAW_COPPER_NUGGET), RecipeCategory.MISC, CookingBookCategory.MISC, Items.COPPER_NUGGET, 0.5F / 9, 180 / 8, "copper_ingot");
+                oreSmelting(List.of(FactoryItems.RAW_GOLD_NUGGET), RecipeCategory.MISC, CookingBookCategory.MISC, Items.GOLD_NUGGET, 0.7F / 9, 180 / 8, "gold_ingot");
+                oreBlasting(List.of(FactoryItems.RAW_IRON_NUGGET), RecipeCategory.MISC, CookingBookCategory.MISC, Items.IRON_NUGGET, 0.5F / 9, 100 / 8, "iron_ingot");
+                oreBlasting(List.of(FactoryItems.RAW_COPPER_NUGGET), RecipeCategory.MISC, CookingBookCategory.MISC, Items.COPPER_NUGGET, 0.5F / 9, 100 / 8, "copper_ingot");
+                oreBlasting(List.of(FactoryItems.RAW_GOLD_NUGGET), RecipeCategory.MISC, CookingBookCategory.MISC, Items.GOLD_NUGGET, 0.7F / 9, 100 / 8, "gold_ingot");
+
+                nineBlockStorageRecipesWithCustomPacking(RecipeCategory.MISC, FactoryItems.RAW_COPPER_NUGGET, RecipeCategory.MISC, FactoryItems.CRUSHED_RAW_COPPER, "crushed_copper_from_nugget", null);
+                nineBlockStorageRecipesWithCustomPacking(RecipeCategory.MISC, FactoryItems.RAW_IRON_NUGGET, RecipeCategory.MISC, FactoryItems.CRUSHED_RAW_IRON, "crushed_iron_from_nugget", null);
+                nineBlockStorageRecipesWithCustomPacking(RecipeCategory.MISC, FactoryItems.RAW_GOLD_NUGGET, RecipeCategory.MISC, FactoryItems.CRUSHED_RAW_GOLD, "crushed_gold_from_nugget", null);
+
                 nineBlockStorageRecipesWithCustomPacking(RecipeCategory.MISC, FactoryItems.STEEL_NUGGET, RecipeCategory.MISC, FactoryItems.STEEL_INGOT, "steel_ingot_from_nugget", null);
 
                 for (var entry : HoneycombItem.WAXABLES.get().entrySet()) {
@@ -1468,7 +1481,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 ), null);
 
                 smelteryOreSet(FactoryFluids.IRON, FactoryFluidConstants.IRON_INGOT_MELTING, ItemTags.IRON_ORES, Items.RAW_IRON, Items.RAW_IRON_BLOCK,
-                        FactoryItems.CRUSHED_RAW_IRON, Items.IRON_INGOT, Items.IRON_NUGGET, Items.IRON_BLOCK, null);
+                        FactoryItems.CRUSHED_RAW_IRON, Items.IRON_INGOT, Items.IRON_NUGGET, FactoryItems.RAW_IRON_NUGGET, Items.IRON_BLOCK, null);
                 of(output,
                         SimpleSmelteryRecipe.of("minecraft_iron", Items.ANVIL, FactoryFluids.IRON.of(FluidConstants.INGOT * (9 * 3 + 4) * 3 / 4),FactoryFluidConstants.IRON_INGOT_MELTING * (9 * 3 + 4) * 3 / 4),
                         SimpleSmelteryRecipe.of("minecraft_iron", Items.CHIPPED_ANVIL, FactoryFluids.IRON.of(FluidConstants.INGOT * (9 * 3 + 4) * 2 / 4),FactoryFluidConstants.IRON_INGOT_MELTING * (9 * 3 + 4) * 3 / 4),
@@ -1484,9 +1497,9 @@ class RecipesProvider extends FabricRecipeProvider {
                 );
 
                 smelteryOreSet(FactoryFluids.GOLD, FactoryFluidConstants.GOLD_INGOT_MELTING, ItemTags.GOLD_ORES, Items.RAW_GOLD, Items.RAW_GOLD_BLOCK,
-                        FactoryItems.CRUSHED_RAW_GOLD, Items.GOLD_INGOT, Items.GOLD_NUGGET, Items.GOLD_BLOCK, null);
+                        FactoryItems.CRUSHED_RAW_GOLD, Items.GOLD_INGOT, Items.GOLD_NUGGET, FactoryItems.RAW_GOLD_NUGGET, Items.GOLD_BLOCK, null);
                 smelteryOreSet(FactoryFluids.COPPER, FactoryFluidConstants.COPPER_INGOT_MELTING, ItemTags.COPPER_ORES, Items.RAW_COPPER, Items.RAW_COPPER_BLOCK,
-                        FactoryItems.CRUSHED_RAW_COPPER, Items.COPPER_INGOT, Items.COPPER_NUGGET, Items.COPPER_BLOCK.weathering().unaffected(), FactoryItems.COPPER_PLATE);
+                        FactoryItems.CRUSHED_RAW_COPPER, Items.COPPER_INGOT, Items.COPPER_NUGGET, FactoryItems.RAW_COPPER_NUGGET, Items.COPPER_BLOCK.weathering().unaffected(), FactoryItems.COPPER_PLATE);
 
 
                 of(output,
@@ -1497,7 +1510,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 moldRecipes(FactoryItems.PIPE_MOLD, FactoryFluids.COPPER.of(FluidConstants.INGOT * 2), FactoryItems.PIPE);
 
                 smelteryOreSet(FactoryFluids.STEEL, FactoryFluidConstants.STEEL_INGOT_MELTING, null, FactoryItems.STEEL_ALLOY_MIXTURE, null,
-                        null, FactoryItems.STEEL_INGOT, FactoryItems.STEEL_NUGGET, FactoryItems.STEEL_BLOCK, FactoryItems.STEEL_PLATE);
+                        null, FactoryItems.STEEL_INGOT, FactoryItems.STEEL_NUGGET, null, FactoryItems.STEEL_BLOCK, FactoryItems.STEEL_PLATE);
 
                 // Smeltery Steel recycling
                 of(output,
@@ -1511,11 +1524,12 @@ class RecipesProvider extends FabricRecipeProvider {
                 this.spoutMolds(ConventionalItemTags.NUGGETS, FactoryItems.NUGGET_MOLD);
                 this.spoutMolds(FactoryItemTags.PIPES, FactoryItems.PIPE_MOLD);
 
-
                 this.spoutMolds(FactoryItemTags.MOLD_SHAPE_BOTTLE, FactoryItems.BOTTLE_MOLD);
                 this.spoutMolds(FactoryItemTags.MOLD_SHAPE_THROWABLE_BOTTLE, FactoryItems.THROWABLE_BOTTLE_MOLD);
                 this.spoutMolds(FactoryItemTags.MOLD_SHAPE_BRITTLE_BOTTLE, FactoryItems.BRITTLE_BOTTLE_MOLD);
                 this.spoutMolds(ConventionalItemTags.CHAINS, FactoryItems.CHAIN_MOLD);
+
+                this.spoutMolds(FactoryItemTags.MOLD_SHAPE_DRILL_HEAD, FactoryItems.DRILL_HEAD_MOLD);
 
                 moldRecipes(FactoryItems.BOTTLE_MOLD, FactoryFluids.GLASS.of(FluidConstants.BLOCK / 2), Items.GLASS_BOTTLE);
                 moldRecipes(FactoryItems.THROWABLE_BOTTLE_MOLD, FactoryFluids.GLASS.of(FluidConstants.BLOCK / 2), FactoryItems.THROWABLE_GLASS_BOTTLE);
@@ -1535,6 +1549,20 @@ class RecipesProvider extends FabricRecipeProvider {
                                 SimpleCauldronCastingRecipe.toItem(FactoryFluids.GLASS.of(FluidConstants.BLOCK), Items.GLASS, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value(), 60))
                 );
 
+                moldRecipes(FactoryItems.DRILL_HEAD_MOLD, FactoryFluids.COPPER.ofIngots(5), FactoryItems.COPPER_DRILL_HEAD);
+                moldRecipes(FactoryItems.DRILL_HEAD_MOLD, FactoryFluids.GOLD.ofIngots(5), FactoryItems.GOLDEN_DRILL_HEAD);
+                moldRecipes(FactoryItems.DRILL_HEAD_MOLD, FactoryFluids.IRON.ofIngots(5), FactoryItems.IRON_DRILL_HEAD);
+
+                this.shaped(RecipeCategory.TOOLS, FactoryItems.DIAMOND_DRILL_HEAD)
+                        .pattern("## ")
+                        .pattern("#h#")
+                        .pattern(" # ")
+                        .define('#', Items.DIAMOND)
+                        .define('h', FactoryItems.IRON_DRILL_HEAD)
+                        .unlockedBy("has_drill_head", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.IRON_DRILL_HEAD))
+                        .save(output);
+
+                this.netheriteSmithing(FactoryItems.DIAMOND_DRILL_HEAD, RecipeCategory.TOOLS, FactoryItems.NETHERITE_DRILL_HEAD);
             }
 
             private void moldRecipes(SpoutMolds molds, FluidStack<?> fluidStack, Item item) {
@@ -1600,14 +1628,15 @@ class RecipesProvider extends FabricRecipeProvider {
             }
 
 
-            private void smelteryOreSet(FluidType<?> fluidType, int ingotTime, TagKey<Item> oreBlock, Item raw, Item rawBlock, Item crushed, Item ingot, Item nugget, Item block, Item plate) {
+            private void smelteryOreSet(FluidType<?> fluidType, int ingotTime, TagKey<Item> oreBlock, Item raw, Item rawBlock, Item crushed, Item ingot, Item nugget, Item rawNugget, Item block, Item plate) {
                 var group = FactoryRegistries.FLUID_TYPES.getKey(fluidType).toDebugFileName();
                 of(output,
-                        raw != null ? SimpleSmelteryRecipe.of(group, raw, fluidType.of(FluidConstants.INGOT + FluidConstants.NUGGET * 2), ingotTime * 5 / 4) : null,
+                        raw != null ? SimpleSmelteryRecipe.of(group, raw, fluidType.of(FluidConstants.INGOT + FluidConstants.NUGGET * 3), ingotTime * 5 / 4) : null,
                         oreBlock != null ? SimpleSmelteryRecipe.of(group, oreBlock, fluidType.of(FluidConstants.INGOT * 2), ingotTime * 3 / 2) : null,
                         rawBlock != null ? SimpleSmelteryRecipe.of(group, rawBlock, fluidType.of((FluidConstants.INGOT + FluidConstants.NUGGET) * 9), (ingotTime * 3 / 2) * 9) : null,
-                        crushed != null ? SimpleSmelteryRecipe.of(group, crushed, fluidType.of(FluidConstants.INGOT + FluidConstants.NUGGET * 2), (ingotTime * 5 / 4)) : null,
-                        plate != null ? SimpleSmelteryRecipe.of(group, plate, fluidType.of(FluidConstants.INGOT), ingotTime) : null
+                        crushed != null ? SimpleSmelteryRecipe.of(group, crushed, fluidType.of(FluidConstants.INGOT + FluidConstants.NUGGET * 3), (ingotTime * 5 / 4)) : null,
+                        plate != null ? SimpleSmelteryRecipe.of(group, plate, fluidType.of(FluidConstants.INGOT), ingotTime) : null,
+                        rawNugget != null ? SimpleSmelteryRecipe.of(group, rawNugget, fluidType.of((FluidConstants.INGOT + FluidConstants.NUGGET * 3) / 9), ingotTime * 7 / 8 / 9) : null
                 );
 
                 if (ingot != null) {

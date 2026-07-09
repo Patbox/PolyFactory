@@ -5,6 +5,7 @@ import eu.pb4.factorytools.api.item.FactoryBlockItem;
 import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.other.BlockWithTooltip;
+import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.item.configuration.ClipboardItem;
 import eu.pb4.polyfactory.mixin.ToolMaterialAccessor;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -146,7 +147,7 @@ public class FactoryItems {
     public static final Item DATA_COMPARATOR = register(FactoryBlocks.DATA_COMPARATOR);
     public static final Item DATA_EXTRACTOR = register(FactoryBlocks.DATA_EXTRACTOR);
     public static final Item PROGRAMMABLE_DATA_EXTRACTOR = register(FactoryBlocks.PROGRAMMABLE_DATA_EXTRACTOR);
-    public static final Item DATA_MEMORY = register(FactoryItemIds.DATA_MEMORY, (settings) -> new DataMemoryBlockItem(FactoryBlocks.DATA_MEMORY, settings.useBlockDescriptionPrefix()));
+    public static final Item DATA_MEMORY = register(FactoryItemIds.DATA_MEMORY, new Item.Properties().useBlockDescriptionPrefix().component(FactoryDataComponents.STORED_DATA, DataContainer.empty()), (settings) -> new DataMemoryBlockItem(FactoryBlocks.DATA_MEMORY, settings));
     public static final Item NIXIE_TUBE_CONTROLLER = register(FactoryBlocks.NIXIE_TUBE_CONTROLLER);
     public static final Item GAUGE = register(FactoryBlocks.GAUGE);
     public static final Item HOLOGRAM_PROJECTOR = register(FactoryBlocks.HOLOGRAM_PROJECTOR);
@@ -197,6 +198,10 @@ public class FactoryItems {
     public static final Item CRUSHED_RAW_IRON = register(FactoryItemIds.CRUSHED_RAW_IRON);
     public static final Item CRUSHED_RAW_COPPER = register(FactoryItemIds.CRUSHED_RAW_COPPER);
     public static final Item CRUSHED_RAW_GOLD = register(FactoryItemIds.CRUSHED_RAW_GOLD);
+    public static final Item RAW_IRON_NUGGET = register(FactoryItemIds.RAW_IRON_NUGGET);
+    public static final Item RAW_COPPER_NUGGET = register(FactoryItemIds.RAW_COPPER_NUGGET);
+    public static final Item RAW_GOLD_NUGGET = register(FactoryItemIds.RAW_GOLD_NUGGET);
+
     public static final Item SPRAY_CAN = register(FactoryItemIds.SPRAY_CAN, settings -> new DyeSprayItem(settings.stacksTo(1)));
 
     public static final Item DRILL = register(FactoryItemIds.DRILL, new Item.Properties().stacksTo(1), DrillItem::new);
@@ -232,9 +237,11 @@ public class FactoryItems {
     public static final SpoutMolds<Item> THROWABLE_BOTTLE_MOLD = SpoutMolds.registerItems(FactoryItemIds.THROWABLE_BOTTLE_MOLD);
     public static final SpoutMolds<Item> BRITTLE_BOTTLE_MOLD = SpoutMolds.registerItems(FactoryItemIds.BRITTLE_BOTTLE_MOLD);
     public static final SpoutMolds<Item> CHAIN_MOLD = SpoutMolds.registerItems(FactoryItemIds.CHAIN_MOLD);
+    public static final SpoutMolds<Item> DRILL_HEAD_MOLD = SpoutMolds.registerItems(FactoryItemIds.DRILL_HEAD_MOLD);
 
-
-    public static final List<SpoutMolds<Item>> MOLDS = List.of(INGOT_MOLD, NUGGET_MOLD, PIPE_MOLD, BOTTLE_MOLD, THROWABLE_BOTTLE_MOLD, BRITTLE_BOTTLE_MOLD, CHAIN_MOLD);
+    public static final List<SpoutMolds<Item>> MOLDS = List.of(
+            INGOT_MOLD, NUGGET_MOLD, PIPE_MOLD, BOTTLE_MOLD, THROWABLE_BOTTLE_MOLD, BRITTLE_BOTTLE_MOLD, CHAIN_MOLD, DRILL_HEAD_MOLD
+    );
 
     public static Item.Properties drillHeadProperties(String materialName, ToolMaterial material, float durabilityMultiplier) {
         HolderGetter<Block> registrationLookup = BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK);
@@ -249,7 +256,7 @@ public class FactoryItems {
                 .component(FactoryDataComponents.DRILL_HEAD_TOOL, new Tool(List.of(Tool.Rule.deniesDrops(
                         registrationLookup.getOrThrow(material.incorrectBlocksForDrops())),
                         Tool.Rule.minesAndDrops(registrationLookup.getOrThrow(FactoryBlockTags.MINEABLE_WITH_DRILL),
-                                material.speed() * 1.4f)), 1.1F, 1, true));
+                                material.speed() * 1.5f)), 1.1F, 1, true));
     }
 
     public static void register() {
@@ -392,6 +399,12 @@ public class FactoryItems {
                     entries.accept(CHAIN_LIFT);
                     entries.accept(SPRAY_CAN);
 
+                    entries.accept(COPPER_DRILL_HEAD);
+                    entries.accept(IRON_DRILL_HEAD);
+                    entries.accept(GOLDEN_DRILL_HEAD);
+                    entries.accept(DIAMOND_DRILL_HEAD);
+                    entries.accept(NETHERITE_DRILL_HEAD);
+
                     // Food
                     entries.accept(CRISPY_HONEY);
                     entries.accept(HONEYED_APPLE);
@@ -412,6 +425,9 @@ public class FactoryItems {
                     entries.accept(CRUSHED_RAW_IRON);
                     entries.accept(CRUSHED_RAW_COPPER);
                     entries.accept(CRUSHED_RAW_GOLD);
+                    entries.accept(RAW_IRON_NUGGET);
+                    entries.accept(RAW_COPPER_NUGGET);
+                    entries.accept(RAW_GOLD_NUGGET);
                     entries.accept(STEEL_ALLOY_MIXTURE);
                     entries.accept(STEEL_INGOT);
                     entries.accept(STEEL_NUGGET);
@@ -529,11 +545,6 @@ public class FactoryItems {
                         entries.accept(CLIPBOARD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                         entries.accept(SMELTERY, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                         entries.accept(DRILL, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
-                        entries.accept(COPPER_DRILL_HEAD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
-                        entries.accept(IRON_DRILL_HEAD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
-                        entries.accept(GOLDEN_DRILL_HEAD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
-                        entries.accept(DIAMOND_DRILL_HEAD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
-                        entries.accept(NETHERITE_DRILL_HEAD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                     })).build()
             );
         }

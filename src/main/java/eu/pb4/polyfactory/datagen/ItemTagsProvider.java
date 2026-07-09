@@ -135,6 +135,11 @@ public class ItemTagsProvider extends FabricTagsProvider.ItemTagsProvider {
                 .add(FactoryItemIds.BRITTLE_POTION)
         ;
 
+        this.tag(FactoryItemTags.MOLD_SHAPE_DRILL_HEAD)
+                .addOptionalTag(ItemTags.PICKAXES)
+                .addOptionalTag(FactoryItemTags.DRILL_HEADS)
+        ;
+
         this.tag(FactoryItemTags.GLASS_BOTTLE_MELTABLE)
                 .add(ItemIds.GLASS_BOTTLE)
                 .add(FactoryItemIds.THROWABLE_GLASS_BOTTLE)

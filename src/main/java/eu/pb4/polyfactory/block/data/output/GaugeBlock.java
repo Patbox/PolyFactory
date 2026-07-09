@@ -15,6 +15,7 @@ import eu.pb4.polyfactory.block.data.DataReceiver;
 import eu.pb4.polyfactory.block.data.util.ChanneledDataBlockEntity;
 import eu.pb4.polyfactory.block.data.util.DataCache;
 import eu.pb4.polyfactory.block.data.util.DataNetworkBlock;
+import eu.pb4.polyfactory.block.other.FilledStateProvider;
 import eu.pb4.polyfactory.block.property.ValueModifier;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverDirectionNode;
