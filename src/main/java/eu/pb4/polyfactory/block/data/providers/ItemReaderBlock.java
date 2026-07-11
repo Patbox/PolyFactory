@@ -97,8 +97,8 @@ public class ItemReaderBlock extends OrientableCabledDataProviderBlock {
         private final ItemDisplayElement book;
 
         private Model(BlockState state) {
-            super(state);
             this.book = ItemDisplayElementUtil.createSimple();
+            super(state);
             this.book.setScale(new Vector3f(0.5f));
             this.book.setDisplaySize(1, 1);
             this.book.setTranslation(new Vector3f(0, 0, 0.35f));

@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.block;
 
-import com.google.common.collect.ImmutableSet;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.creative.CreativeContainerBlockEntity;
 import eu.pb4.polyfactory.block.creative.CreativeDrainBlockEntity;
@@ -44,16 +43,13 @@ import eu.pb4.polyfactory.block.mechanical.source.HandCrankBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
 import eu.pb4.polyfactory.block.other.*;
-import eu.pb4.polyfactory.mixin.util.BlockEntityTypeAccessor;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.BlockEntityTypes;
 
 public class FactoryBlockEntities {
     public static final BlockEntityType<ConveyorBlockEntity> CONVEYOR = register("conveyor",
@@ -94,7 +90,7 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<CastingCauldronBlockEntity> CASTING_CAULDRON = register("casting_cauldron",
             FabricBlockEntityTypeBuilder.create(CastingCauldronBlockEntity::new, FactoryBlocks.CASTING_CAULDRON));
     public static final BlockEntityType<ContainerBlockEntity> CONTAINER = register("container",
-             FabricBlockEntityTypeBuilder.create(ContainerBlockEntity::new, FactoryBlocks.CONTAINER));
+             FabricBlockEntityTypeBuilder.create(ContainerBlockEntity::new, FactoryBlocks.WOODEN_CONTAINER));
     public static final BlockEntityType<DeepStorageContainerBlockEntity> DEEP_STORAGE_CONTAINER = register("deep_storage_container",
             FabricBlockEntityTypeBuilder.create(DeepStorageContainerBlockEntity::new, FactoryBlocks.DEEP_STORAGE_CONTAINER));
     public static final BlockEntityType<ItemOutputBufferBlockEntity> ITEM_BUFFER = register("item_buffer",
@@ -163,7 +159,7 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<BlueprintWorkbenchBlockEntity> BLUEPRINT_WORKBENCH = register("blueprint_workbench",  FabricBlockEntityTypeBuilder
             .create(BlueprintWorkbenchBlockEntity::new, FactoryBlocks.BLUEPRINT_WORKBENCH));
     public static final BlockEntityType<ColorableBlockEntity> COLOR_CONTAINER = register("color_container",  FabricBlockEntityTypeBuilder
-            .create(ColorableBlockEntity::new, FactoryBlocks.LAMP, FactoryBlocks.INVERTED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP, FactoryBlocks.FIXTURE_LAMP, FactoryBlocks.INVERTED_FIXTURE_LAMP));
+            .create(ColorableBlockEntity::new, FactoryBlocks.COLORED_LAMP, FactoryBlocks.INVERTED_COLORED_LAMP, FactoryBlocks.CAGED_LAMP, FactoryBlocks.INVERTED_CAGED_LAMP, FactoryBlocks.FIXTURE_LAMP, FactoryBlocks.INVERTED_FIXTURE_LAMP));
 
     public static final BlockEntityType<PipeBlockEntity> PIPE = register("pipe",  FabricBlockEntityTypeBuilder.create(PipeBlockEntity::new, FactoryBlocks.PIPE));
 

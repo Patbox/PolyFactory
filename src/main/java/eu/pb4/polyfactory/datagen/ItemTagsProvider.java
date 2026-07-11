@@ -108,8 +108,10 @@ public class ItemTagsProvider extends FabricTagsProvider.ItemTagsProvider {
         this.tag(FactoryItemTags.PIPES)
                 .add(FactoryItemIds.PIPE);
 
-        for (var mold : FactoryItems.MOLDS) {
-            mold.createTag(this);
+        for (var self : FactoryItemIds.MOLDS) {
+            this.tag(self.tag()).add(self.hardened()).add(self.mold());
+            this.tag(FactoryItemTags.MOLDS).addOptionalTag(self.tag());
+            this.tag(FactoryItemTags.SHAPEABLE_CLAY_MOLDS).add(self.clay());
         }
 
         this.tag(FactoryItemTags.SPOUT_ITEM_HORIZONTAL).addOptionalTag(FactoryItemTags.MOLDS);
@@ -131,6 +133,11 @@ public class ItemTagsProvider extends FabricTagsProvider.ItemTagsProvider {
                 .add(ItemIds.OMINOUS_BOTTLE)
                 .add(FactoryItemIds.BRITTLE_GLASS_BOTTLE)
                 .add(FactoryItemIds.BRITTLE_POTION)
+        ;
+
+        this.tag(FactoryItemTags.MOLD_SHAPE_DRILL_HEAD)
+                .addOptionalTag(ItemTags.PICKAXES)
+                .addOptionalTag(FactoryItemTags.DRILL_HEADS)
         ;
 
         this.tag(FactoryItemTags.GLASS_BOTTLE_MELTABLE)

@@ -245,6 +245,12 @@ public class PolydexCompatImpl {
             if (text != null) {
                 hoverDisplayBuilder.setComponent(FILLED, Component.empty().append(text).withColor(0xd6d6d6));
             }
+        } else if (target.blockState().getBlock() instanceof FilledStateProvider.Remote remote
+                && remote.getFilledStateProvider(target.player().level(), target.pos(), target.blockState(), target.blockEntity()) instanceof FilledStateProvider provider) {
+            var text = provider.getFilledStateText();
+            if (text != null) {
+                hoverDisplayBuilder.setComponent(FILLED, Component.empty().append(text).withColor(0xd6d6d6));
+            }
         }
 
     }

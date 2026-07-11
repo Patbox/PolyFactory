@@ -60,7 +60,7 @@ class LootTables extends FabricBlockLootSubProvider {
         this.dropSelf(FactoryBlocks.GEARBOX);
         this.dropSelf(FactoryBlocks.CLUTCH);
         this.dropSelf(FactoryBlocks.GEARSHIFT);
-        this.dropSelf(FactoryBlocks.CONTAINER);
+        this.dropSelf(FactoryBlocks.WOODEN_CONTAINER);
         this.dropSelf(FactoryBlocks.ITEM_OUTPUT_BUFFER);
         this.dropSelf(FactoryBlocks.TEXT_INPUT);
         this.dropSelf(FactoryBlocks.NIXIE_TUBE);
@@ -131,8 +131,8 @@ class LootTables extends FabricBlockLootSubProvider {
         this.addAxle(FactoryBlocks.AXLE_WITH_GEAR, FactoryItems.STEEL_GEAR);
 
         this.addColored(FactoryBlocks.CABLE);
-        this.addColored(FactoryBlocks.LAMP);
-        this.addColored(FactoryBlocks.INVERTED_LAMP);
+        this.addColored(FactoryBlocks.COLORED_LAMP);
+        this.addColored(FactoryBlocks.INVERTED_COLORED_LAMP);
         this.addColored(FactoryBlocks.CAGED_LAMP);
         this.addColored(FactoryBlocks.INVERTED_CAGED_LAMP);
         this.addColored(FactoryBlocks.FIXTURE_LAMP);

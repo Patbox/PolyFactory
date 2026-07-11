@@ -14,9 +14,8 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static eu.pb4.polyfactory.item.FactoryItems.register;
 
 public class FactoryDebugItems {
     public static final Item DEBUG_PIPE_FLOW = register("debug/pipe_flow", (settings) -> BaseDebugItem.onBlockInteract(settings, "Pipe Flow", 0xff8800, (ctx) -> {
@@ -82,8 +81,13 @@ public class FactoryDebugItems {
         });
     }));
 
-    public static final Item ROTATION_DEBUG = register(FactoryBlocks.ROTATION_DEBUG);
-    public static final Item TPS_PROVIDER = register(FactoryBlocks.TPS_PROVIDER);
+    public static final Item ROTATION_DEBUG = FactoryItems.register(FactoryBlocks.ROTATION_DEBUG);
+    public static final Item TPS_PROVIDER = FactoryItems.register(FactoryBlocks.TPS_PROVIDER);
+
+
+    private static Item register(String path, Function<Item.Properties, Item> function) {
+        return FactoryItems.register(FactoryItemIds.of(path), function);
+    }
 
     public static void addItemGroup(CreativeModeTab.ItemDisplayParameters context, CreativeModeTab.Output entries) {
         entries.accept(DEBUG_PIPE_FLOW, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);

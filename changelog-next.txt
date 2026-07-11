@@ -1,14 +1,11 @@
-- Data Extractor now shows unique icon per type info.
-- Polydex now shows required RPM and stress units for recipes.
-- Gauge and Item Counter should now work with more regular storage blocks.
-- Generic Mixer recipes now support a list of output items with chance and rolls.
-- Brittle Glass Bottle can now be used to pick up water.
-- Brittle Potions can now be used directly in the Brewing Stand.
-- Fixer Mixer recipes not working sometimes when they should (stray small ItemStack blockage).
-- Fixed Deep Storage Container not causing comparator updates for all it's blocks.
-- Fixed polydex links not working in the guide.
-- Fixed fluids in Fluid Tanks causing z-fighting in not too far distances.
-- Fixed Rabbit Stew and Mushroom Stew mixing recipes.
-- Fixed Fans causing player to always be detected as no on ground even if they should be.
-- Fixed Gauge not having breaking particles.
-- Creative flying players are no longer effected by Fans
+- Added Drill Heads:
+  - Made via casting tool metals into a Mold, crafting Diamonds with Iron Drill Head and Netherite smithing.
+  - When put in Mechanical Miners they act as a Pickaxe/Shovel combo.
+  - They are 50% faster than pickaxes for all tiers, x2.2 as durable for metal tiers and x1.2 as durable for Diamond / Netherite tiers.
+- Added Raw Metal Nuggets:
+ - Can be crafted to/from crushed raw ores.
+- Crushed raw metals now give one more nugget worth of molten metals than before (1 ingot + 2 nuggets -> 1 ingot + 3 nuggets).
+- New Recipes:
+  - Grinding Tuff blocks now results in 1 Gravel and 25% chance for 1 Raw Iron Nugget.
+- Made Grinding recipes have higher max speed limit, allowing them to work faster
+- Fixed Item Reader's and Hologram Displays not rendering their inner model parts.

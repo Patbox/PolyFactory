@@ -5,17 +5,15 @@ import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import eu.pb4.mapcanvas.api.font.DefaultFonts;
 import eu.pb4.mapcanvas.api.utils.CanvasUtils;
-import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.block.data.output.GaugeBlock;
-import eu.pb4.polyfactory.entity.ChainLiftEntity;
 import eu.pb4.polyfactory.item.FactoryDebugItems;
+import eu.pb4.polyfactory.item.FactoryItemIds;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.debug.BaseDebugItem;
 import eu.pb4.polyfactory.item.tool.SpoutMolds;
 import eu.pb4.polyfactory.item.util.FluidModelItem;
 import eu.pb4.polyfactory.models.ConveyorModels;
 import eu.pb4.polyfactory.models.FactoryModels;
-import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.ResourceUtils;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
@@ -37,6 +35,7 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Util;
 import net.minecraft.world.item.BlockItem;
@@ -49,13 +48,11 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static eu.pb4.polyfactory.ModInit.id;
@@ -83,7 +80,7 @@ class AssetProvider implements DataProvider {
 
         var moldTexture = new MoldTextures();
 
-        for (var mold : FactoryItems.MOLDS) {
+        for (var mold : FactoryItemIds.MOLDS) {
             createMold(assetWriter, mold, moldTexture);
         }
     }
@@ -109,12 +106,12 @@ class AssetProvider implements DataProvider {
         BufferedImage hardenedBorder = ResourceUtils.getTexture(id("item/mold/template/template_hardened_border"));
     }
 
-    private static void createMold(BiConsumer<String, byte[]> assetWriter, SpoutMolds mold, MoldTextures moldTexture) {
+    private static void createMold(BiConsumer<String, byte[]> assetWriter, SpoutMolds<ResourceKey<Item>> mold, MoldTextures moldTexture) {
         var stencil = ResourceUtils.getTexture(mold.name().withPrefix("item/mold/source/"));
 
 
         {
-            var id = BuiltInRegistries.ITEM.getKey(mold.mold());
+            var id = mold.mold().identifier();
             assetWriter.accept(AssetPaths.itemModel(id),
                     ModelAsset.builder().parent(Identifier.parse("item/generated"))
                             .texture("layer0", id.withPrefix("item/"))
@@ -124,7 +121,7 @@ class AssetProvider implements DataProvider {
         }
 
         {
-            var id = BuiltInRegistries.ITEM.getKey(mold.clay());
+            var id = mold.clay().identifier();
             assetWriter.accept(AssetPaths.itemModel(id),
                     ModelAsset.builder().parent(Identifier.parse("item/generated"))
                             .texture("layer0", id.withPrefix("item/"))
@@ -136,7 +133,7 @@ class AssetProvider implements DataProvider {
 
 
         {
-            var id = BuiltInRegistries.ITEM.getKey(mold.hardened());
+            var id = mold.hardened().identifier();
             assetWriter.accept(AssetPaths.itemModel(id),
                     ModelAsset.builder().parent(Identifier.parse("item/generated"))
                             .texture("layer0", id.withPrefix("item/"))
