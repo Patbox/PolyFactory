@@ -1,7 +1,6 @@
 package eu.pb4.polyfactory.mixin.util;
 
 import eu.pb4.polyfactory.item.FactoryDataComponents;
-import eu.pb4.polyfactory.item.tool.DrillItem;
 import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
@@ -18,9 +17,9 @@ public abstract class GrindstoneMenuMixin {
 
     @Inject(method = "removeNonCursesFrom", at = @At("HEAD"))
     private void stripFromHead(ItemStack item, CallbackInfoReturnable<ItemStack> cir) {
-        var head = item.get(FactoryDataComponents.DRILL_HEAD);
+        var head = item.get(FactoryDataComponents.DRILL_ATTACHMENT);
         if (head != null) {
-            item.set(FactoryDataComponents.DRILL_HEAD, ItemStackTemplate.fromNonEmptyStack(this.removeNonCursesFrom(head.create())));
+            item.set(FactoryDataComponents.DRILL_ATTACHMENT, ItemStackTemplate.fromNonEmptyStack(this.removeNonCursesFrom(head.create())));
         }
     }
 }

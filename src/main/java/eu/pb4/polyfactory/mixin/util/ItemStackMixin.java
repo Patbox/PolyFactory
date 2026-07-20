@@ -1,9 +1,6 @@
 package eu.pb4.polyfactory.mixin.util;
 
-import eu.pb4.polyfactory.item.tool.DrillItem;
 import eu.pb4.polyfactory.item.util.CustomItemBrokenHandler;
-import net.fabricmc.fabric.api.item.v1.CustomDamageHandler;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;

@@ -171,7 +171,7 @@ public abstract class AbstracterCableBlock extends CableNetworkBlock implements 
             stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), IntList.of(this.color)));
             this.cable.setItem(stack);
 
-            if (this.cable.getHolder() == this && this.color >= 0) {
+            if (this.cable.getHolder() == this) {
                 this.cable.tick();
             }
         }

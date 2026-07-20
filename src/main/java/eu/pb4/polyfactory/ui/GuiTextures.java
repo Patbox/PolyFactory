@@ -69,7 +69,6 @@ public class GuiTextures {
     });
 
     public static final LazyItemStack ITEM_FILTER_BLOCKED = new LazyItemStack(icon16("item_filter_blocked").get()::asStack);
-
     public static final LazyItemStack LEFT_SHIFTED_3_BARS = new LazyItemStack(new GuiElementBuilder(Items.TRIAL_KEY).hideTooltip().model(id("-/sgui/left_shifted_3_bars"))::asStack);
     public static final LazyItemStack DEEP_STORAGE_UNIT_SELECTED = new LazyItemStack(new GuiElementBuilder(Items.TRIAL_KEY).hideTooltip().model(id("-/sgui/deep_storage_unit_selected"))::asStack);
     public static final Progress FLAME = Progress.createVertical("flame", 1, 14, true);
@@ -131,13 +130,12 @@ public class GuiTextures {
     public static void register() {
         PolydexTextures.register();
         Progress.createHorizontal("generic_bar", 1, 15, false, 0);
-        Progress.createHorizontal("generic_bar", 1, 15, false, -18);
-        Progress.createHorizontal("generic_bar", 1, 15, false, -18 * 2);
-        Progress.createHorizontal("generic_bar", 1, 15, false, -18 * 3);
+        Progress.createVertical("generic_bar_side", 2, 12, true);
         icon16Offset("generic_bar_background", 0);
-        icon16Offset("generic_bar_background", -18);
-        icon16Offset("generic_bar_background", -18 * 2);
-        icon16Offset("generic_bar_background", -18 * 3);
+        icon16Offset("generic_bar_side_background", 0);
+
+        icon16("drill_icon_area_2x2x1");
+        icon16("drill_icon_area_3x3x1");
     }
 
     public record Temperature(Progress fire, Progress ice) {

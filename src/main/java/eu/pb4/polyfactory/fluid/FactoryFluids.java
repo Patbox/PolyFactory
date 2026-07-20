@@ -133,6 +133,17 @@ public class FactoryFluids {
                     .shootingBehavior(ShootProjectileEntity.ofEntity(EntityTypes.SNOWBALL, 1, FluidConstants.BLOCK / 4 / 20 / 2,
                             1.7f, 0.5f, 0, 0.1f, BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.SNOWBALL_THROW)))
                     .texture(Identifier.withDefaultNamespace("block/powder_snow")).build());
+
+    public static final FluidType<Unit> PLANT_OIL = register(FactoryFluidIds.PLANT_OIL,
+            FluidType.of().density(80).transparent()
+                    .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.PLANT_OIL_SPLASH, 10,300, FactorySoundEvents.FLUID_SHOOT_PLANT_OIL))
+                    .build());
+
+    public static final FluidType<Unit> BIODIESEL = register(FactoryFluidIds.BIODIESEL,
+            FluidType.of().density(81).transparent()
+                    .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.BIODIESEL_SPLASH, 10,300, FactorySoundEvents.FLUID_SHOOT_BIODIESEL))
+                    .build());
+
     public static void register() {
         FluidBehaviours.addBlockStateConversions(Blocks.WATER.defaultBlockState(), Blocks.AIR.defaultBlockState(), WATER.ofBucket());
         FluidBehaviours.addBlockStateConversions(Blocks.POWDER_SNOW.defaultBlockState(), Blocks.AIR.defaultBlockState(), SNOW.ofBucket());
@@ -179,6 +190,8 @@ public class FactoryFluids {
         FluidBehaviours.addItemToFluidLink(Items.GOLD_INGOT, GOLD.defaultInstance());
         FluidBehaviours.addItemToFluidLink(Items.COPPER_INGOT, COPPER.defaultInstance());
         FluidBehaviours.addItemToFluidLink(FactoryItems.STEEL_INGOT, STEEL.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(FactoryItems.PLANT_OIL_BUCKET, PLANT_OIL.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(FactoryItems.BIODIESEL_BUCKET, BIODIESEL.defaultInstance());
 
         Function<ItemStack, FluidInstance<?>> potionFunction = (stack) -> {
             var x = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);

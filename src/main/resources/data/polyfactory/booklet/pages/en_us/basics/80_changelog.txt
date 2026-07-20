@@ -3,6 +3,36 @@ title=Changelogs
 icon=writable_book
 category=polyfactory:basics
 ### EndSection: PageInfo
+### Header: <yellow><b>0.12.1+26.2
+- Todo! Update once ready.
+
+### Header: <yellow><b>0.12.0+26.2
+- Updated to 26.2
+
+### Header: <yellow><b>0.11.1+26.1.2
+- Data Extractor now shows unique icon per type info.
+- Polydex now shows required RPM and stress units for recipes.
+- Gauge and Item Counter should now work with more regular storage blocks.
+- Generic Mixer recipes now support a list of output items with chance and rolls.
+- Brittle Glass Bottle can now be used to pick up water.
+- Brittle Potions can now be used directly in the Brewing Stand.
+- Fixer Mixer recipes not working sometimes when they should (stray small ItemStack blockage).
+- Fixed Deep Storage Container not causing comparator updates for all it's blocks.
+- Fixed polydex links not working in the guide.
+- Fixed fluids in Fluid Tanks causing z-fighting in not too far distances.
+- Fixed Rabbit Stew and Mushroom Stew mixing recipes.
+- Fixed Fans causing player to always be detected as no on ground even if they should be.
+- Fixed Gauge not having breaking particles.
+- Creative flying players are no longer effected by Fans
+
+### Header: <yellow><b>0.11.0+26.1
+- Updated to 26.1.
+
+### Header: <yellow><b>0.10.4+1.21.11
+- Wind Charges now affect Windmills by giving them temporary speed boost.
+- Moved the guidebook implementation into separate library/mod: https://github.com/Patbox/booklet
+- Fixed Pipe and Cable in walls breaking in case of Polymer-based custom wall blocks.
+
 ### Header: <yellow><b>0.10.3+1.21.11
 - Added the guidebook "Factories and you!":
   - Crafted with a Book and Iron Nugget.

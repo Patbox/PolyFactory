@@ -25,6 +25,8 @@ public class FactoryEntities {
     public static final EntityType<HoneySplashEntity> HONEY_SPLASH = register(FactoryEntityIds.HONEY_SPLASH, createSplash(HoneySplashEntity::new));
 
     public static final EntityType<SlimeSplashEntity> SLIME_SPLASH = register(FactoryEntityIds.SLIME_SPLASH, createSplash(SlimeSplashEntity::new));
+    public static final EntityType<PlantOilSplashEntity> PLANT_OIL_SPLASH = register(FactoryEntityIds.PLANT_OIL_SPLASH, createSplash(PlantOilSplashEntity::new));
+    public static final EntityType<BioDieselSplashEntity> BIODIESEL_SPLASH = register(FactoryEntityIds.BIODIESEL_SPLASH, createSplash(BioDieselSplashEntity::new));
 
     public static final EntityType<ChainLiftEntity> CHAIN_LIFT = register(FactoryEntityIds.CHAIN_LIFT, EntityType.Builder.of(ChainLiftEntity::new, MobCategory.MISC)
             .noLootTable().sized(0.98f, 2.25f).passengerAttachments(0.05F).clientTrackingRange(8));

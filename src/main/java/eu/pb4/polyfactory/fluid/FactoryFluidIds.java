@@ -32,6 +32,11 @@ public class FactoryFluidIds {
 
     public static final ResourceKey<FluidType<?>> SNOW = ofVanilla("snow");
 
+    public static final ResourceKey<FluidType<?>> PLANT_OIL = of("plant_oil");
+
+    public static final ResourceKey<FluidType<?>> BIODIESEL = of("biodiesel");
+
+
     public static ResourceKey<FluidType<?>> of(Identifier identifier) {
         return ResourceKey.create(FactoryRegistries.FLUID_TYPES_KEY, identifier);
     }

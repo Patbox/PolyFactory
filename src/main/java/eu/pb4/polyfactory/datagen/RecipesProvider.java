@@ -378,7 +378,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .save(output);
 
 
-                this.shaped(RecipeCategory.REDSTONE, FactoryItems.PRESSURE_FLUID_GUN, 1)
+                this.shaped(RecipeCategory.TOOLS, FactoryItems.PRESSURE_FLUID_GUN, 1)
                         .pattern("ipn")
                         .pattern("sw ")
                         .define('p', FactoryItems.PIPE)
@@ -387,6 +387,18 @@ class RecipesProvider extends FabricRecipeProvider {
                         .define('s', FactoryItems.STEEL_PLATE)
                         .define('w', FactoryItems.WOODEN_PLATE)
                         .unlockedBy("get_copper", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.PIPE))
+                        .save(output);
+
+                this.shaped(RecipeCategory.TOOLS, FactoryItems.PORTABLE_DRILL, 1)
+                        .pattern("it ")
+                        .pattern("tfc")
+                        .pattern(" cs")
+                        .define('i', FactoryItems.STEEL_INGOT)
+                        .define('s', FactoryItems.STEEL_PLATE)
+                        .define('c', FactoryItems.COPPER_PLATE)
+                        .define('t', FactoryItems.TREATED_DRIED_KELP)
+                        .define('f', Items.FURNACE)
+                        .unlockedBy("get_steel", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
                         .save(output);
 
 
@@ -933,6 +945,10 @@ class RecipesProvider extends FabricRecipeProvider {
                         SimpleGrindingRecipe.of("coal_dust_charcoal", Ingredient.of(Items.CHARCOAL), 0.75, 5, 23, OutputStack.of(FactoryItems.COAL_DUST, 0.8f)),
                         SimpleGrindingRecipe.of("netherrack_dust", Ingredient.of(Items.NETHERRACK), 1, 6, 25,
                                 OutputStack.of(FactoryItems.NETHERRACK_DUST, 1, 2), OutputStack.of(FactoryItems.NETHERRACK_DUST, 0.25f, 5)),
+                        SimpleGrindingRecipe.of("sulfur_dust", Ingredient.of(Items.SULFUR), 1.15, 6, 25,
+                                OutputStack.of(FactoryItems.SULFUR_DUST, 1, 2), OutputStack.of(FactoryItems.SULFUR_DUST, 0.25f, 5)),
+                        SimpleGrindingRecipe.of("sulfur_dust_small", Ingredient.of(Items.SULFUR_SPIKE), 1.15 / 4, 6, 20,
+                                OutputStack.of(FactoryItems.SULFUR_DUST, 1, 1),
                         SimpleGrindingRecipe.of("ender_dust", Ingredient.of(Items.ENDER_PEARL), 4, 16, 30,
                                 OutputStack.of(FactoryItems.ENDER_DUST, 1, 2), OutputStack.of(FactoryItems.ENDER_DUST, 0.20f, 2)),
                         SimpleGrindingRecipe.of("planks_saw_dust", tag(ItemTags.PLANKS), 0.75, 5, 8,
@@ -1080,10 +1096,31 @@ class RecipesProvider extends FabricRecipeProvider {
                                 3, OutputStack.of(Items.BUNDLE)),
                         GenericPressRecipe.of("mace", CountedIngredient.ofItems(1, Items.HEAVY_CORE),
                                 CountedIngredient.ofItems(1, Items.BREEZE_ROD),
-                                6, OutputStack.of(Items.MACE))
-                        /*GenericPressRecipe.of("test_fluid", "", CountedIngredient.ofTag(1, fakeTagList(ItemTags.LEAVES)),
+                                6, OutputStack.of(Items.MACE)),
+
+                        GenericPressRecipe.of("sunflower_to_plant_oil", "plant_oil", CountedIngredient.ofItems(1, Items.SUNFLOWER),
                                 CountedIngredient.EMPTY,
-                                3, List.of(OutputStack.of(Items.STICK)), List.of(FactoryFluids.WATER.of(FluidConstants.NUGGET)))*/
+                                8, List.of(), List.of(FactoryFluids.PLANT_OIL.of(FluidConstants.NUGGET * 60 / 100))),
+
+                        GenericPressRecipe.of("seeds_to_plant_oil", "plant_oil", CountedIngredient.ofItems(1, Items.WHEAT_SEEDS),
+                                CountedIngredient.EMPTY,
+                                6, List.of(), List.of(FactoryFluids.PLANT_OIL.of(FluidConstants.NUGGET))),
+
+                        GenericPressRecipe.of("torchflower_seeds_to_plant_oil", "plant_oil", CountedIngredient.ofItems(1, Items.TORCHFLOWER_SEEDS),
+                                CountedIngredient.EMPTY,
+                                6, List.of(), List.of(FactoryFluids.PLANT_OIL.of(FluidConstants.NUGGET * 5 / 4))),
+
+                        GenericPressRecipe.of("beetroot_seeds_to_plant_oil", "plant_oil", CountedIngredient.ofItems(1, Items.BEETROOT_SEEDS),
+                                CountedIngredient.EMPTY,
+                                6, List.of(), List.of(FactoryFluids.PLANT_OIL.of(FluidConstants.NUGGET * 70 / 100))),
+
+                        GenericPressRecipe.of("pumpkin_seeds_to_plant_oil", "plant_oil", CountedIngredient.ofItems(1, Items.PUMPKIN_SEEDS),
+                                CountedIngredient.EMPTY,
+                                6, List.of(), List.of(FactoryFluids.PLANT_OIL.of(FluidConstants.NUGGET * 60 / 100))),
+
+                        GenericPressRecipe.of("melon_seeds_to_plant_oil", "plant_oil", CountedIngredient.ofItems(1, Items.MELON_SEEDS),
+                                CountedIngredient.EMPTY,
+                                6, List.of(), List.of(FactoryFluids.PLANT_OIL.of(FluidConstants.NUGGET * 50 / 100)))
                 );
 
                 for (var i = 0; i < 5; i++) {
@@ -1324,12 +1361,18 @@ class RecipesProvider extends FabricRecipeProvider {
                         GenericMixingRecipe.ofCounted("dynamite",
                                 List.of(CountedIngredient.ofItems(1, Items.PAPER), CountedIngredient.ofItems(1, FactoryItems.SAW_DUST), CountedIngredient.ofTag(1, itemWrap.getOrThrow(ItemTags.SAND)), CountedIngredient.ofItems(2, Items.GUNPOWDER)),
                                 2, 1, 6f, new ItemStackTemplate(FactoryItems.DYNAMITE, 1)),
-                        GenericMixingRecipe.ofCounted("gunpowder",
-                                List.of(CountedIngredient.ofItems(2, FactoryItems.NETHERRACK_DUST),
+                        GenericMixingRecipe.ofCounted("gunpowder", "gunpowder",
+                                List.of(CountedIngredient.ofItems(5, FactoryItems.NETHERRACK_DUST),
                                         CountedIngredient.ofItems(1, FactoryItems.COAL_DUST),
                                         CountedIngredient.ofItems(1, FactoryItems.SAW_DUST)
-                                ),
-                                2, 1, 15f, 0.3f, new ItemStackTemplate(Items.GUNPOWDER)),
+                                ), List.of(),
+                                3, 1, 20f, 0.3f, new ItemStackTemplate(Items.GUNPOWDER)),
+                        GenericMixingRecipe.ofCounted("gunpowder_sulfuric", "gunpowder",
+                                List.of(CountedIngredient.ofItems(2, FactoryItems.SULFUR_DUST),
+                                        CountedIngredient.ofItems(1, FactoryItems.COAL_DUST),
+                                        CountedIngredient.ofItems(1, FactoryItems.SAW_DUST)
+                                ), List.of(),
+                                1.5, 1, 15f, 0.3f, new ItemStackTemplate(Items.GUNPOWDER)),
                         GenericMixingRecipe.ofCounted("ender_infused_amethyst_shard",
                                 List.of(CountedIngredient.ofItems(2, FactoryItems.ENDER_DUST),
                                         CountedIngredient.ofItems(1, Items.AMETHYST_SHARD)
@@ -1424,6 +1467,8 @@ class RecipesProvider extends FabricRecipeProvider {
                 fluidBase(output, Items.HONEY_BOTTLE, Items.GLASS_BOTTLE, FactoryFluids.HONEY.of(FluidConstants.BLOCK / 4), SoundEvents.BOTTLE_FILL, SoundEvents.BOTTLE_EMPTY);
                 fluidBase(output, FactoryItems.SLIME_BUCKET, Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactorySoundEvents.ITEM_BUCKET_FILL_SLIME, FactorySoundEvents.ITEM_BUCKET_EMPTY_SLIME);
                 fluidBase(output, FactoryItems.EXPERIENCE_BUCKET, Items.BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), SoundEvents.BUCKET_FILL, SoundEvents.BUCKET_EMPTY);
+                fluidBase(output, FactoryItems.PLANT_OIL_BUCKET, Items.BUCKET, FactoryFluids.PLANT_OIL.ofBucket(), SoundEvents.BUCKET_FILL, SoundEvents.BUCKET_EMPTY);
+                fluidBase(output, FactoryItems.BIODIESEL_BUCKET, Items.BUCKET, FactoryFluids.BIODIESEL.ofBucket(), SoundEvents.BUCKET_FILL, SoundEvents.BUCKET_EMPTY);
 
                 fluidBasePotion(output, Items.POTION, Items.GLASS_BOTTLE, FluidConstants.BOTTLE, SoundEvents.BOTTLE_FILL, SoundEvents.BOTTLE_EMPTY);
                 fluidBasePotion(output, Items.SPLASH_POTION, FactoryItems.THROWABLE_GLASS_BOTTLE, FluidConstants.BOTTLE, SoundEvents.BOTTLE_FILL, SoundEvents.BOTTLE_EMPTY);

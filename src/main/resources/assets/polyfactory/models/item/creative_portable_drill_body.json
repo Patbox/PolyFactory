@@ -1,6 +1,6 @@
 {
   "parent": "polyfactory:item/handheld_drill",
   "textures": {
-    "layer0": "polyfactory:item/drill_body"
+    "layer0": "polyfactory:item/creative_portable_drill_body"
   }
 }

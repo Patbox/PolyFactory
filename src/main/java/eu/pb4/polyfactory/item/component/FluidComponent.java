@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;
+import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
@@ -16,6 +17,7 @@ import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
@@ -146,6 +148,15 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
 
     public FluidComponent clear() {
         return new FluidComponent(Object2LongMaps.emptyMap(), List.of(), 0, this.capacity);
+    }
+
+    public boolean contains(TagKey<FluidType<?>> tag) {
+        for (var x : this.fluids) {
+            if (x.is(tag)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public record Result(FluidComponent component, long fluidAmount) {}

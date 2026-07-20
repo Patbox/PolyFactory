@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.fluid;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public interface FluidContainer {
 
     boolean canExtract(FluidInstance<?> type, long amount, boolean exact);
 
+    /// Returns amount extracted
     long extract(FluidInstance<?> type, long amount, boolean exact);
 
     long capacity();
@@ -112,5 +114,4 @@ public interface FluidContainer {
     default int updateId() {
         return System.identityHashCode(this);
     }
-
 }

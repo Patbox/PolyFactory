@@ -8,9 +8,11 @@ import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidInteractionMode;
 import eu.pb4.polyfactory.item.component.FluidComponent;
+import eu.pb4.polyfactory.item.component.MiningMode;
 import eu.pb4.polyfactory.item.configuration.ConfigurationData;
 import eu.pb4.polyfactory.item.tool.ImprovedFilterItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
+import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import eu.pb4.polymer.core.api.other.PolymerComponent;
 import net.fabricmc.fabric.api.item.v1.ItemComponentTooltipProviderRegistry;
 import net.minecraft.core.Registry;
@@ -65,16 +67,22 @@ public class FactoryDataComponents {
     public static final DataComponentType<ConfigurationData> CONFIGURATION_DATA = register("configuration_data", DataComponentType.<ConfigurationData>builder().persistent(ConfigurationData.CODEC).build());
     public static final DataComponentType<List<String>> PUNCH_CARD_DATA = register("punch_card_data", DataComponentType.<List<String>>builder().persistent(Codec.STRING.listOf()).build());
 
-    public static final DataComponentType<Tool> DRILL_HEAD_TOOL = register("drill_head_tool", DataComponentType.<Tool>builder().persistent(Tool.CODEC).build());
-    public static final DataComponentType<ItemAttributeModifiers> DRILL_HEAD_ATTRIBUTE_MODIFIERS = register("drill_head_attribute_modifiers", DataComponentType.<ItemAttributeModifiers>builder().persistent(ItemAttributeModifiers.CODEC).build());
-    public static final DataComponentType<ItemStackTemplate> DRILL_HEAD = register("drill_head", DataComponentType.<ItemStackTemplate>builder().persistent(ItemStackTemplate.CODEC).build());
+    public static final DataComponentType<Tool> DRILL_HEAD_TOOL = register("drill_head/tool", DataComponentType.<Tool>builder().persistent(Tool.CODEC).build());
+    public static final DataComponentType<ItemAttributeModifiers> DRILL_HEAD_ATTRIBUTE_MODIFIERS = register("drill_head/attribute_modifiers", DataComponentType.<ItemAttributeModifiers>builder().persistent(ItemAttributeModifiers.CODEC).build());
+
+    public static final DataComponentType<ItemStackTemplate> DRILL_ATTACHMENT = register("drill_attachment", DataComponentType.<ItemStackTemplate>builder().persistent(ItemStackTemplate.CODEC).build());
+
     public static final DataComponentType<Component> MATERIAL_NAME = register("material_name", DataComponentType.<Component>builder().persistent(ComponentSerialization.CODEC).build());
+    public static final DataComponentType<MiningMode> MINING_MODE = register("mining_mode", DataComponentType.<MiningMode>builder().persistent(MiningMode.CODEC).build());
 
     public static void register() {
         ItemComponentTooltipProviderRegistry.addFirst(FLUID);
         ItemComponentTooltipProviderRegistry.addFirst(STORED_DATA);
         ItemComponentTooltipProviderRegistry.addFirst(CONFIGURATION_DATA);
+        ItemComponentTooltipProviderRegistry.addFirst(MINING_MODE);
         BuiltInRegistries.DATA_COMPONENT_TYPE.addAlias(id("clipboard_data"), id("configuration_data"));
+
+        PolymerBlockUtils.SERVER_SIDE_MINING_CHECK.register((blockState, blockPos, serverPlayer) -> serverPlayer.getMainHandItem().getOrDefault(MINING_MODE, MiningMode.SINGLE) != MiningMode.SINGLE);
     }
 
 

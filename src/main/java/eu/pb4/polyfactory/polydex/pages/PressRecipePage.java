@@ -70,7 +70,7 @@ public class PressRecipePage extends PrioritizedRecipePage<GenericPressRecipe> {
 
     @Override
     public ItemStack entryIcon(@Nullable PolydexEntry entry, ServerPlayer player) {
-        return this.mainOutput.length != 0 ? this.mainOutput[0].toItemStack(player) : ItemStack.EMPTY;
+        return this.output.length != 0 ? this.output[0].toItemStack(player) : ItemStack.EMPTY;
     }
 
     @Override
