@@ -56,6 +56,7 @@ public class FactoryItemIds {
     public static final ResourceKey<Item> SAW_DUST = of("saw_dust");
     public static final ResourceKey<Item> COAL_DUST = of("coal_dust");
     public static final ResourceKey<Item> NETHERRACK_DUST = of("netherrack_dust");
+    public static final ResourceKey<Item> SULFUR_DUST = of("sulfur_dust");
     public static final ResourceKey<Item> ENDER_DUST = of("ender_dust");
     public static final ResourceKey<Item> ENDER_INFUSED_AMETHYST_SHARD = of("ender_infused_amethyst_shard");
     public static final ResourceKey<Item> STEEL_ALLOY_MIXTURE = of("steel_alloy_mixture");
@@ -129,6 +130,8 @@ public class FactoryItemIds {
     public static final ResourceKey<Item> EXPERIENCE_BUCKET = of("experience_bucket");
     public static final ResourceKey<Item> SLIME_BUCKET = of("slime_bucket");
     public static final ResourceKey<Item> HONEY_BUCKET = of("honey_bucket");
+    public static final ResourceKey<Item> PLANT_OIL_BUCKET = of("plant_oil_bucket");
+    public static final ResourceKey<Item> BIODIESEL_BUCKET = of("biodiesel_bucket");
 
     public static final ResourceKey<Item> CRISPY_HONEY = of("crispy_honey");
     public static final ResourceKey<Item> HONEYED_APPLE = of("honeyed_apple");
@@ -143,7 +146,8 @@ public class FactoryItemIds {
 
     public static final ResourceKey<Item> SPRAY_CAN = of("spray_can");
 
-    public static final ResourceKey<Item> DRILL = of("drill");
+    public static final ResourceKey<Item> PORTABLE_DRILL = of("portable_drill");
+    public static final ResourceKey<Item> CREATIVE_PORTABLE_DRILL = of("creative_portable_drill");
 
     public static final ResourceKey<Item> COPPER_DRILL_HEAD = of("copper_drill_head");
     public static final ResourceKey<Item> IRON_DRILL_HEAD = of("iron_drill_head");

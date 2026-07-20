@@ -107,27 +107,27 @@ public class PortableFluidTankBlockItem extends FactoryBlockItem {
     }
 
     @Override
-    public ItemStack getPolymerItemStack(ItemStack itemStack, TooltipFlag tooltipType, PacketContext context, HolderLookup.Provider lookup) {
-        var base = super.getPolymerItemStack(itemStack, tooltipType, context, lookup);
-        if (itemStack.has(FactoryDataComponents.FLUID)) {
-            var fluids = itemStack.get(FactoryDataComponents.FLUID);
+    public void modifyBasePolymerItemStack(ItemStack out, ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
+        super.modifyBasePolymerItemStack(out, stack, context, lookup);
+
+        if (stack.has(FactoryDataComponents.FLUID)) {
+            var fluids = stack.get(FactoryDataComponents.FLUID);
             if (fluids != null && fluids.capacity() != -1) {
-                base.set(DataComponents.MAX_DAMAGE, (int) (fluids.capacity() / 100));
-                base.set(DataComponents.DAMAGE, (int) ((fluids.capacity() - fluids.stored()) / 100));
+                out.set(DataComponents.MAX_DAMAGE, (int) (fluids.capacity()));
+                out.set(DataComponents.DAMAGE, (int) ((fluids.capacity() - fluids.stored())));
             }
 
-            var x = (FluidInstance<Object>) getMainFluid(itemStack);
+            var x = (FluidInstance<Object>) getMainFluid(stack);
             if (x != null && x.type().color().isPresent()) {
-                base.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(),
+                out.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(),
                         List.of(FactoryRegistries.FLUID_TYPES.getKey(x.type()).toString()), IntList.of(x.type().color().get().getColor(x.data()))));
             } else if (x != null) {
-                base.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(),
+                out.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(),
                         List.of(FactoryRegistries.FLUID_TYPES.getKey(x.type()).toString()), IntList.of()));
             } else {
-                base.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(),
+                out.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(),
                         List.of(), IntList.of()));
             }
         }
-        return base;
     }
 }

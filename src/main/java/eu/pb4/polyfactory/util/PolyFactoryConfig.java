@@ -10,6 +10,8 @@ import java.nio.file.Files;
 public class PolyFactoryConfig {
     @SerializedName("use_fast_stete_limited_blocks")
     public boolean useFastFullBlocks = true;
+    @SerializedName("dynamic_brewing_recipes")
+    public boolean dynamicBrewingRecipes = true;
 
     private static PolyFactoryConfig instance = null;
 

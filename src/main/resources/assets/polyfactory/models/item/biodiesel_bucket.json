@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "polyfactory:item/drill_body_empty"
+    "layer0": "polyfactory:item/biodiesel_bucket"
   }
 }

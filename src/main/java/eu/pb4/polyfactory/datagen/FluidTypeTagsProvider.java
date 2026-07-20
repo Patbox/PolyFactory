@@ -30,5 +30,8 @@ class FluidTypeTagsProvider extends FabricTagsProvider<FluidType<?>> {
                 .addOptionalTag(FactoryFluidTags.MOLTEN_METAL)
                 .add(FactoryFluidIds.GLASS)
         ;
+
+        this.tag(FactoryFluidTags.DRILL_FUEL)
+                .add(FactoryFluidIds.BIODIESEL);
     }
 }

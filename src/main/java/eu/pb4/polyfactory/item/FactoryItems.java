@@ -6,7 +6,9 @@ import eu.pb4.polyfactory.block.FactoryBlockTags;
 import eu.pb4.polyfactory.block.mechanical.AxleBlock;
 import eu.pb4.polyfactory.block.other.BlockWithTooltip;
 import eu.pb4.polyfactory.data.DataContainer;
+import eu.pb4.polyfactory.item.component.MiningMode;
 import eu.pb4.polyfactory.item.configuration.ClipboardItem;
+import eu.pb4.polyfactory.item.tool.BaseDrillItem;
 import eu.pb4.polyfactory.mixin.ToolMaterialAccessor;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.core.api.item.PolymerCreativeModeTabUtils;
@@ -107,6 +109,7 @@ public class FactoryItems {
     public static final Item SAW_DUST = register(FactoryItemIds.SAW_DUST);
     public static final Item COAL_DUST = register(FactoryItemIds.COAL_DUST);
     public static final Item NETHERRACK_DUST = register(FactoryItemIds.NETHERRACK_DUST);
+    public static final Item SULFUR_DUST = register(FactoryItemIds.SULFUR_DUST);
     public static final Item ENDER_DUST = register(FactoryItemIds.ENDER_DUST);
     public static final Item ENDER_INFUSED_AMETHYST_SHARD = register(FactoryItemIds.ENDER_INFUSED_AMETHYST_SHARD);
     public static final Item STEEL_ALLOY_MIXTURE = register(FactoryItemIds.STEEL_ALLOY_MIXTURE);
@@ -179,9 +182,10 @@ public class FactoryItems {
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
     public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING, settings -> settings.equippableUnswappable(EquipmentSlot.HEAD));
     public static final Item GOLDEN_TINY_POTATO_SPRING = register(FactoryBlocks.GOLDEN_TINY_POTATO_SPRING, settings -> settings.equippableUnswappable(EquipmentSlot.HEAD));
-    public static final Item EXPERIENCE_BUCKET = register(FactoryItemIds.EXPERIENCE_BUCKET, settings -> new SimplePolymerItem(settings.stacksTo(1).craftRemainder(Items.BUCKET)));
-    public static final Item SLIME_BUCKET = register(FactoryItemIds.SLIME_BUCKET, settings -> new SimplePolymerItem(settings.stacksTo(1).craftRemainder(Items.BUCKET)));
-    public static final Item HONEY_BUCKET = register(FactoryItemIds.HONEY_BUCKET, settings -> new SimplePolymerItem(settings.craftRemainder(Items.BUCKET)
+    public static final Item EXPERIENCE_BUCKET = register(FactoryItemIds.EXPERIENCE_BUCKET, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET));
+
+    public static final Item SLIME_BUCKET = register(FactoryItemIds.SLIME_BUCKET, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET));
+    public static final Item HONEY_BUCKET = register(FactoryItemIds.HONEY_BUCKET, new Item.Properties().craftRemainder(Items.BUCKET)
             .usingConvertsTo(Items.BUCKET)
             .food(new FoodProperties.Builder().nutrition(18).saturationModifier(0.2F).build(),
                     Consumables.defaultDrink().consumeSeconds(8.0F).sound(SoundEvents.HONEY_DRINK)
@@ -189,7 +193,10 @@ public class FactoryItems {
                             .onConsume(new RemoveStatusEffectsConsumeEffect(MobEffects.WITHER))
                             .onConsume(new RemoveStatusEffectsConsumeEffect(MobEffects.HUNGER))
                             .build()
-            ).stacksTo(1)));
+            ).stacksTo(1));
+
+    public static final Item PLANT_OIL_BUCKET = register(FactoryItemIds.PLANT_OIL_BUCKET, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET));
+    public static final Item BIODIESEL_BUCKET = register(FactoryItemIds.BIODIESEL_BUCKET, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET));
 
     public static final Item CRISPY_HONEY = register(FactoryItemIds.CRISPY_HONEY, settings -> new SimplePolymerItem(settings
             .food(new FoodProperties.Builder().nutrition(4).saturationModifier(0.6F).build(), Consumables.defaultFood().consumeSeconds(0.8F).build())));
@@ -203,14 +210,17 @@ public class FactoryItems {
     public static final Item RAW_GOLD_NUGGET = register(FactoryItemIds.RAW_GOLD_NUGGET);
 
     public static final Item SPRAY_CAN = register(FactoryItemIds.SPRAY_CAN, settings -> new DyeSprayItem(settings.stacksTo(1)));
+    public static final PoweredDrillItem PORTABLE_DRILL = register(FactoryItemIds.PORTABLE_DRILL, new Item.Properties().stacksTo(1)
+            .component(FactoryDataComponents.MINING_MODE, MiningMode.SINGLE), PoweredDrillItem::new);
 
-    public static final Item DRILL = register(FactoryItemIds.DRILL, new Item.Properties().stacksTo(1), DrillItem::new);
+    public static final Item CREATIVE_PORTABLE_DRILL = register(FactoryItemIds.CREATIVE_PORTABLE_DRILL, new Item.Properties().stacksTo(1)
+            .component(FactoryDataComponents.MINING_MODE, MiningMode.SINGLE), BaseDrillItem::new);
 
-    public static final Item COPPER_DRILL_HEAD = register(FactoryItemIds.COPPER_DRILL_HEAD, drillHeadProperties("copper", ToolMaterial.COPPER, 2.2f));
-    public static final Item IRON_DRILL_HEAD = register(FactoryItemIds.IRON_DRILL_HEAD, drillHeadProperties("iron", ToolMaterial.IRON, 2.2f));
-    public static final Item GOLDEN_DRILL_HEAD = register(FactoryItemIds.GOLDEN_DRILL_HEAD, drillHeadProperties("gold", ToolMaterial.GOLD, 2.2f));
-    public static final Item DIAMOND_DRILL_HEAD = register(FactoryItemIds.DIAMOND_DRILL_HEAD, drillHeadProperties("diamond", ToolMaterial.DIAMOND, 1.2f));
-    public static final Item NETHERITE_DRILL_HEAD = register(FactoryItemIds.NETHERITE_DRILL_HEAD, drillHeadProperties("netherite", ToolMaterial.NETHERITE, 1.2f));
+    public static final Item COPPER_DRILL_HEAD = register(FactoryItemIds.COPPER_DRILL_HEAD, drillHeadProperties("copper", ToolMaterial.COPPER, 2.5f));
+    public static final Item IRON_DRILL_HEAD = register(FactoryItemIds.IRON_DRILL_HEAD, drillHeadProperties("iron", ToolMaterial.IRON, 2.5f));
+    public static final Item GOLDEN_DRILL_HEAD = register(FactoryItemIds.GOLDEN_DRILL_HEAD, drillHeadProperties("gold", ToolMaterial.GOLD, 2.5f));
+    public static final Item DIAMOND_DRILL_HEAD = register(FactoryItemIds.DIAMOND_DRILL_HEAD, drillHeadProperties("diamond", ToolMaterial.DIAMOND, 2.25f));
+    public static final Item NETHERITE_DRILL_HEAD = register(FactoryItemIds.NETHERITE_DRILL_HEAD, drillHeadProperties("netherite", ToolMaterial.NETHERITE, 2.25f));
 
     public static final Item PIPE = register(FactoryItemIds.PIPE, settings -> new PipeItem(FactoryBlocks.PIPE, settings.useBlockDescriptionPrefix()));
     public static final Item FILTERED_PIPE = register(FactoryBlocks.FILTERED_PIPE);
@@ -399,6 +409,8 @@ public class FactoryItems {
                     entries.accept(CHAIN_LIFT);
                     entries.accept(SPRAY_CAN);
 
+                    entries.accept(PORTABLE_DRILL);
+
                     entries.accept(COPPER_DRILL_HEAD);
                     entries.accept(IRON_DRILL_HEAD);
                     entries.accept(GOLDEN_DRILL_HEAD);
@@ -413,6 +425,9 @@ public class FactoryItems {
                     entries.accept(HONEY_BUCKET);
                     entries.accept(SLIME_BUCKET);
                     entries.accept(EXPERIENCE_BUCKET);
+                    entries.accept(PLANT_OIL_BUCKET);
+                    entries.accept(BIODIESEL_BUCKET);
+
                     entries.accept(THROWABLE_GLASS_BOTTLE);
                     entries.accept(LINGERING_THROWABLE_GLASS_BOTTLE);
                     entries.accept(BRITTLE_GLASS_BOTTLE);
@@ -421,6 +436,7 @@ public class FactoryItems {
                     entries.accept(SAW_DUST);
                     entries.accept(COAL_DUST);
                     entries.accept(NETHERRACK_DUST);
+                    entries.accept(SULFUR_DUST);
                     entries.accept(ENDER_DUST);
                     entries.accept(CRUSHED_RAW_IRON);
                     entries.accept(CRUSHED_RAW_COPPER);
@@ -466,6 +482,8 @@ public class FactoryItems {
                     entries.accept(CREATIVE_MOTOR);
                     entries.accept(CREATIVE_CONTAINER);
                     entries.accept(CREATIVE_DRAIN);
+                    entries.accept(CREATIVE_PORTABLE_DRILL);
+
                 })).build()
         );
 
@@ -544,7 +562,6 @@ public class FactoryItems {
                         entries.accept(ELECTRIC_MOTOR, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                         entries.accept(CLIPBOARD, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                         entries.accept(SMELTERY, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
-                        entries.accept(DRILL, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
                     })).build()
             );
         }
@@ -552,6 +569,8 @@ public class FactoryItems {
         AttackBlockCallback.EVENT.register(WRENCH::handleBlockAttack);
         AttackEntityCallback.EVENT.register(WRENCH::handleEntityAttack);
         UseEntityCallback.EVENT.register(WRENCH::handleEntityUse);
+
+        AttackBlockCallback.EVENT.register(PORTABLE_DRILL::handleBlockAttack);
 
         PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(PortableFluidTankBlockItem::createItemAsset);
     }

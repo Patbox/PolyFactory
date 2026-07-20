@@ -27,7 +27,7 @@ public class SlimeSplashEntity extends SplashEntity<Unit> {
     private static final ParticleOptions PARTICLE = new ItemParticleOption(ParticleTypes.ITEM, Items.SLIME_BLOCK);
 
     public SlimeSplashEntity(EntityType<? extends Projectile> entityType, Level world) {
-        super(entityType, world, FactoryFluids.HONEY);
+        super(entityType, world, FactoryFluids.SLIME);
     }
 
     @Override

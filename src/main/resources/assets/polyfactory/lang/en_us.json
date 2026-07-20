@@ -123,6 +123,7 @@
   "item.polyfactory.large_steel_gear": "Large Steel Gear",
   "item.polyfactory.coal_dust": "Coal Dust",
   "item.polyfactory.saw_dust": "Saw Dust",
+  "item.polyfactory.sulfur_dust": "Sulfur Dust",
   "item.polyfactory.string_mesh": "String Mesh",
   "item.polyfactory.crushed_raw_iron": "Crushed Raw Iron",
   "item.polyfactory.crushed_raw_copper": "Crushed Raw Copper",
@@ -135,6 +136,8 @@
   "item.polyfactory.experience_bucket": "Experience Bucket",
   "item.polyfactory.honey_bucket": "Honey Bucket",
   "item.polyfactory.slime_bucket": "Slime Bucket",
+  "item.polyfactory.biodiesel_bucket": "Biodiesel Bucket",
+  "item.polyfactory.plant_oil_bucket": "Plant Oil Bucket",
   "item.polyfactory.ender_dust": "Ender Dust",
   "item.polyfactory.ender_infused_amethyst_shard": "Ender-infused Amethyst Shard",
   "item.polyfactory.redstone_chip": "Redstone Chip",
@@ -159,8 +162,10 @@
   "item.polyfactory.honeyed_apple": "Honeyed Apple",
   "item.polyfactory.chain_lift": "Chain Lift",
 
-  "item.polyfactory.drill": "Pocket Drill",
-  "item.polyfactory.drill.title": "Pocket Drill (%s)",
+  "item.polyfactory.portable_drill": "Portable Drill",
+  "item.polyfactory.portable_drill.title": "Portable Drill (%s)",
+  "item.polyfactory.creative_portable_drill": "Creative Portable Drill",
+  "item.polyfactory.creative_portable_drill.title": "Creative Portable Drill (%s)",
   "item.polyfactory.copper_drill_head": "Copper Drill Head",
   "item.polyfactory.iron_drill_head": "Iron Drill Head",
   "item.polyfactory.golden_drill_head": "Golden Drill Head",
@@ -419,6 +424,8 @@
   "fluid_type.minecraft.potion": "Potion",
   "fluid_type.minecraft.potion.long": "Long %s",
   "fluid_type.minecraft.potion.strong": "Strong %s",
+  "fluid_type.polyfactory.plant_oil": "Plant Oil",
+  "fluid_type.polyfactory.biodiesel": "Biodiesel",
 
   "material.polyfactory.copper": "Copper",
   "material.polyfactory.iron": "Iron",
@@ -426,12 +433,20 @@
   "material.polyfactory.diamond": "Diamond",
   "material.polyfactory.netherite": "Netherite",
 
+  "tooltip.polyfactory.mining_mode": "Mining Mode: %s",
+  "mining_mode.polyfactory.single": "Single",
+  "mining_mode.polyfactory.area_2x2x1": "Area 2x2",
+  "mining_mode.polyfactory.area_3x3x1": "Area 3x3",
+  "mining_mode.polyfactory.veinminer": "Veinminer",
+
   "entity.polyfactory.dynamite": "Dynamite",
   "entity.polyfactory.chain_lift": "Chain Lift",
   "entity.polyfactory.splash": "Splash of %s",
 
   "effect.polyfactory.sticky.slime": "Sticky (Slime)",
   "effect.polyfactory.sticky.honey": "Sticky (Honey)",
+  "effect.polyfactory.slippery": "Slippery",
+  "effect.polyfactory.flammable": "Flammable",
 
   "death.attack.polyfactory.experience_bolt": "%1$s was shot by %2$s",
   "death.attack.polyfactory.experience_bolt.item": "%1$s was shot by %2$s using %3$s",
@@ -457,6 +472,8 @@
   "subtitles.polyfactory.fluid.shoot.experience": "Experience shoots out",
   "subtitles.polyfactory.fluid.shoot.honey": "Honey shoots out",
   "subtitles.polyfactory.fluid.shoot.slime": "Slime shoots out",
+  "subtitles.polyfactory.fluid.shoot.plant_oil": "Plant Oil shoots out",
+  "subtitles.polyfactory.fluid.shoot.biodiesel": "Biodiesel shoots out",
   "subtitles.polyfactory.item.clipboard.write": "Clipboard rustles",
   "subtitles.polyfactory.item.clipboard.apply": "Clipboard rustles",
   "subtitles.polyfactory.block.spout.metal_cooled": "Metal cools down",
@@ -710,5 +727,6 @@
 
   "text.polyfactory.color_simple": "%s (%s)",
   "color.polyfactory.teal": "Teal",
-  "text.polyfactory.attached": "Attached: %s"
+  "text.polyfactory.attached": "Attached: %s",
+  "text.polyfactory.no_fuel": "No Fuel!"
 }

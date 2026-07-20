@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.datagen;
 
 import com.google.common.hash.HashCode;
+import com.mojang.math.Transformation;
 import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.DrawableCanvas;
 import eu.pb4.mapcanvas.api.font.DefaultFonts;
@@ -14,6 +15,7 @@ import eu.pb4.polyfactory.item.tool.SpoutMolds;
 import eu.pb4.polyfactory.item.util.FluidModelItem;
 import eu.pb4.polyfactory.models.ConveyorModels;
 import eu.pb4.polyfactory.models.FactoryModels;
+import eu.pb4.polyfactory.ui.GuiModels;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.ResourceUtils;
 import eu.pb4.polymer.resourcepack.api.AssetPaths;
@@ -22,9 +24,11 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.model.*;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.CustomModelDataFlagProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.UsingItemProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.numeric.CustomModelDataFloatProperty;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.property.numeric.NumericProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.select.DisplayContextProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.ConstantTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.CustomModelDataTintSource;
+import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.ItemTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.PotionTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.model.ModelAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.model.ModelTransformation;
@@ -42,6 +46,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -51,6 +56,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -275,19 +281,9 @@ class AssetProvider implements DataProvider {
                 var offsets = new int[]{-18 * 3, -18 * 2, -18, 0};
 
                 for (int i = 0; i < 4; i++) {
-                    var builder = RangeDispatchItemModel.builder(new CustomModelDataFloatProperty(i)).scale(15);
-                    builder.fallback(new EmptyItemModel());
-
-                    for (int a = 1; a <= 14; a++) {
-                        builder.entry(a, new BasicItemModel(id("sgui/elements/gen/generic_bar_" + a + "_offset_" + offsets[i]),
-                                List.of(new CustomModelDataTintSource(i, 0xFFFFFF))));
-                    }
-
                     list.add(new ConditionItemModel(new CustomModelDataFlagProperty(i),
-                            i == 3 ? new BasicItemModel(id("sgui/elements/empty")) : new CompositeItemModel(List.of(
-                                    new BasicItemModel(id("sgui/elements/generic_bar_background_offset_" + offsets[i])),
-                                    builder.build())
-                            ),
+                            i == 3 ? new BasicItemModel(id("sgui/elements/empty"))
+                                    : GuiModels.createUpperGenericBar(new Matrix4f().translate(offsets[i] / 16f, 0, 0), new CustomModelDataFloatProperty(i), new CustomModelDataTintSource(i, -1)),
                             new EmptyItemModel()
                     ));
                 }
@@ -295,6 +291,7 @@ class AssetProvider implements DataProvider {
 
             consumer.accept(id("-/sgui/left_shifted_3_bars"), new ItemAsset(new CompositeItemModel(list), new ItemAsset.Properties(false, true)));
         }
+
         var baseDeepStorageUnitId = id("sgui/elements/gen/deep_storage_unit/");
 
         // DEEP_STORAGE_UNIT_SELECTED

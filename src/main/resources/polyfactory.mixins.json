@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "AbstractContainerMenuAccessor",
+    "BlockBehaviourAccessor",
     "EnchantmentHelperAccessor",
     "EntityAccessor",
     "ExperienceOrbAccessor",
@@ -54,6 +55,7 @@
     "recipe.ArmorDyeRecipeMixin",
     "recipe.DyedItemColorMixin",
     "recipe.FireworkStarRecipeMixin",
+    "recipe.RecipeManagerMixin",
     "recipe.ShapedRecipeMixin",
     "util.BlockEntityMixin",
     "util.BlockEntityTypeAccessor",
