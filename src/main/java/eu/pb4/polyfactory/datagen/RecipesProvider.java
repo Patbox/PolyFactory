@@ -948,7 +948,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         SimpleGrindingRecipe.of("sulfur_dust", Ingredient.of(Items.SULFUR), 1.15, 6, 25,
                                 OutputStack.of(FactoryItems.SULFUR_DUST, 1, 2), OutputStack.of(FactoryItems.SULFUR_DUST, 0.25f, 5)),
                         SimpleGrindingRecipe.of("sulfur_dust_small", Ingredient.of(Items.SULFUR_SPIKE), 1.15 / 4, 6, 20,
-                                OutputStack.of(FactoryItems.SULFUR_DUST, 1, 1),
+                                OutputStack.of(FactoryItems.SULFUR_DUST, 1, 1)),
                         SimpleGrindingRecipe.of("ender_dust", Ingredient.of(Items.ENDER_PEARL), 4, 16, 30,
                                 OutputStack.of(FactoryItems.ENDER_DUST, 1, 2), OutputStack.of(FactoryItems.ENDER_DUST, 0.20f, 2)),
                         SimpleGrindingRecipe.of("planks_saw_dust", tag(ItemTags.PLANKS), 0.75, 5, 8,
