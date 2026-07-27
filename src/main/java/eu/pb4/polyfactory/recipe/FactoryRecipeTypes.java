@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.recipe.casting.CastingRecipe;
 import eu.pb4.polyfactory.recipe.casting.CauldronCastingRecipe;
 import eu.pb4.polyfactory.recipe.drain.DrainRecipe;
+import eu.pb4.polyfactory.recipe.fermenting.FermentingRecipe;
 import eu.pb4.polyfactory.recipe.fluid.FluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;
 import eu.pb4.polyfactory.recipe.press.PressRecipe;
@@ -19,6 +20,7 @@ public class FactoryRecipeTypes {
     public static final RecipeType<GrindingRecipe> GRINDING = register("grinding");
     public static final RecipeType<PressRecipe> PRESS = register("press");
     public static final RecipeType<MixingRecipe> MIXER = register("mixer");
+    public static final RecipeType<FermentingRecipe> FERMENTER = register("fermenter");
     public static final RecipeType<DrainRecipe> DRAIN = register("drain");
     public static final RecipeType<SpoutRecipe> SPOUT = register("spout");
     public static final RecipeType<SmelteryRecipe> SMELTERY = register("smeltery");

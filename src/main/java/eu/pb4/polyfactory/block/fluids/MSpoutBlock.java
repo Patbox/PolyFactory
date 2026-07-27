@@ -15,7 +15,9 @@ import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.pipe.PumpNode;
+import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polyfactory.util.movingitem.MovingItemContainerHolder;
+import eu.pb4.polyfactory.util.movingitem.MovingItemProvider;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -46,7 +48,7 @@ import java.util.List;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponent.Pipe, PipeConnectable {
+public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponent.Pipe, PipeConnectable, MovingItemConsumer, MovingItemProvider {
     public MSpoutBlock(Properties settings) {
         super(settings);
     }
@@ -171,8 +173,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
         private final LazyItemStack DEFAULT_MODEL = ItemDisplayElementUtil.getModel(id("block/mechanical_spout"));
         private final LazyItemStack ALT_MODEL = ItemDisplayElementUtil.getModel(id("block/mechanical_spout_alt"));
         private final ItemDisplayElement main;
-        private final ItemDisplayElement gearA;
-        private final ItemDisplayElement gearB;
+        private final ItemDisplayElement gears;
         private final ItemDisplayElement fluid;
         private boolean altModel = false;
         private double progress;
@@ -183,11 +184,9 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             this.main = ItemDisplayElementUtil.createSimple(DEFAULT_MODEL.get());
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
-            this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR.get(), this.getUpdateRate(), 0.3f, 0.5f);
-            this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR.get(), this.getUpdateRate(), 0.3f, 0.5f);
+            this.gears = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR_DOUBLE.get(), this.getUpdateRate(), 0.3f, 0.5f);
             this.fluid = LodItemDisplayElement.createSimple();
-            this.gearA.setViewRange(0.4f);
-            this.gearB.setViewRange(0.4f);
+            this.gears.setViewRange(0.4f);
             this.fluid.setViewRange(0.4f);
             this.fluid.setScale(new Vector3f(12 / 16f));
             this.fluid.setOffset(new Vec3(0, 7.5 / 16f - (2 / 16f / 16f), 0));
@@ -197,8 +196,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             this.updateAnimation(0, (dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
             this.addElement(this.main);
             this.addElement(this.fluid);
-            this.addElement(this.gearA);
-            this.addElement(this.gearB);
+            this.addElement(this.gears);
         }
 
         private void updateStatePos(BlockState state) {
@@ -206,8 +204,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
 
             this.main.setYaw(direction.toYRot());
             this.fluid.setYaw(direction.toYRot());
-            this.gearA.setYaw(direction.toYRot());
-            this.gearB.setYaw(direction.toYRot());
+            this.gears.setYaw(direction.toYRot());
         }
 
         private void updateAnimation(float rotation, boolean negative) {
@@ -215,11 +212,9 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             mat.identity();
             mat.translate(0, 0.5f, 0);
             mat.rotateY(negative ? Mth.HALF_PI : -Mth.HALF_PI);
-            mat.translate(0, 0.5f, 0.40f);
+            mat.translate(0, 0.5f, 0);
             mat.rotateZ(rotation);
-            this.gearA.setTransformation(mat);
-            mat.translate(0, 0, -0.80f);
-            this.gearB.setTransformation(mat);
+            this.gears.setTransformation(mat);
         }
 
         @Override
@@ -230,8 +225,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
             if (b) {
                 this.updateAnimation(RotationUser.getRotation(this.getAttachment().getWorld(), this.blockPos().above()).rotation(),
                         (dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
-                this.gearA.startInterpolationIfDirty();
-                this.gearB.startInterpolationIfDirty();
+                this.gears.startInterpolationIfDirty();
             }
         }
 

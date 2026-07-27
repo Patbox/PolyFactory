@@ -35,10 +35,7 @@ import eu.pb4.polyfactory.block.mechanical.conveyor.SplitterBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.MinerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.PlacerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlockEntity;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.GrinderBlockEntity;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.MCrafterBlockEntity;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.*;
 import eu.pb4.polyfactory.block.mechanical.source.HandCrankBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
@@ -111,6 +108,9 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<MixerBlockEntity> MIXER = register("mixer",
              FabricBlockEntityTypeBuilder.create(MixerBlockEntity::new, FactoryBlocks.MIXER));
+
+    public static final BlockEntityType<FermenterBlockEntity> FERMENTER = register("fermenter",
+            FabricBlockEntityTypeBuilder.create(FermenterBlockEntity::new, FactoryBlocks.FERMENTER));
 
     public static final BlockEntityType<MCrafterBlockEntity> CRAFTER = register("crafter",
              FabricBlockEntityTypeBuilder.create(MCrafterBlockEntity::new, FactoryBlocks.CRAFTER));

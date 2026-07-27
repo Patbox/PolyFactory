@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.block.mechanical.conveyor.SimpleMovingItemContainerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
@@ -67,7 +68,7 @@ import org.joml.Quaternionf;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MDrainBlockEntity extends TallItemMachineBlockEntity implements FluidInputOutput.ContainerBased, OutputContainerOwner {
+public class MDrainBlockEntity extends TallItemMachineBlockEntity implements FluidInputOutput.ContainerBased, OutputContainerOwner, SimpleMovingItemContainerBlockEntity {
 
     public static final int CATALYST_FIRST = 2;
     public static final int OUTPUT_FIRST = 1;
@@ -257,7 +258,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
         this.containers[0].tick();
     }
 
-    protected void updatePosition(int id) {
+    public void updatePosition(int id) {
         var c = containers[id];
 
         if (!c.isContainerEmpty()) {
@@ -343,7 +344,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
 
     @Override
     public void setItem(int slot, ItemStack stack) {
-        super.setItem(slot, stack);
+        SimpleMovingItemContainerBlockEntity.super.setItem(slot, stack);
         if (slot == CATALYST_FIRST) {
             this.model.setCatalyst(stack);
         }

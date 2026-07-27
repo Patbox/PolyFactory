@@ -53,6 +53,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements B
     final NonNullList<FilterData> filter = NonNullList.withSize(TARGET_SLOT_COUNT, FilterData.EMPTY_FALSE);
     final int[] slotTargets = new int[TARGET_SLOT_COUNT];
     private final NonNullList<ItemStack> items = NonNullList.withSize(TARGET_SLOT_COUNT, ItemStack.EMPTY);
+    private int minStackSize = 1;
     private int maxStackSize = 64;
     private final Storage<ItemVariant> storage = new FilteredRedirectedSlottedStorage<>(ItemStorage.SIDED,
             this::getLevel, this::getBlockPos, () -> this.getBlockState().getValue(FunnelBlock.FACING), ItemVariant.blank(), this.slotTargets,
@@ -71,6 +72,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements B
         ContainerHelper.saveAllItems(view, items);
         view.putIntArray("targets", slotTargets.clone());
         view.putInt("max_stack_size", this.maxStackSize);
+        view.putInt("min_stack_size", this.minStackSize);
     }
 
     @Override
@@ -82,6 +84,7 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements B
         var targets = view.getIntArray("targets").orElseGet(() -> new int[this.slotTargets.length]);
         System.arraycopy(targets, 0, this.slotTargets, 0, Math.min(targets.length, this.slotTargets.length));
         this.maxStackSize = view.getIntOr("max_stack_size", 64);
+        this.minStackSize = view.getIntOr("min_stack_size", 1);
         this.updateHologram();
     }
 
@@ -105,8 +108,22 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements B
     }
 
     @Override
+    public int minStackSize() {
+        return this.minStackSize;
+    }
+
+    @Override
     public void setMaxStackSize(int maxStackSize) {
         this.maxStackSize = maxStackSize;
+        this.updateHologram();
+        this.setChanged();
+    }
+
+
+
+    @Override
+    public void setMinStackSize(int minStackSize) {
+        this.minStackSize = minStackSize;
         this.updateHologram();
         this.setChanged();
     }
@@ -119,7 +136,8 @@ public class SlotAwareFunnelBlockEntity extends LockableBlockEntity implements B
 
     private void updateHologram() {
         if (this.model != null) {
-            model.countElement.setText(Component.literal("[x" + this.maxStackSize + "]"));
+            model.minCount.setText(Component.literal("[x" + this.minStackSize + ":"));
+            model.maxCount.setText(Component.literal(":x" + this.maxStackSize + "]"));
             model.tick();
         }
     }

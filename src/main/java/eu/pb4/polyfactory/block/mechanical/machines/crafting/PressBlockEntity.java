@@ -5,6 +5,7 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.fluids.DrainBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.block.mechanical.conveyor.SimpleMovingItemContainerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.block.other.ItemOutputBufferBlock;
 import eu.pb4.polyfactory.block.other.OutputContainerOwner;
@@ -45,7 +46,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PressBlockEntity extends TallItemMachineBlockEntity implements OutputContainerOwner {
+public class PressBlockEntity extends TallItemMachineBlockEntity implements OutputContainerOwner, SimpleMovingItemContainerBlockEntity {
     public static final int INPUT_SLOT = 0;
     public static final int INPUT_2_SLOT = 1;
     public static final int OUTPUT_SLOT = 2;
@@ -316,7 +317,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity implements Outp
 
     @Override
     public void setItem(int slot, ItemStack stack) {
-        super.setItem(slot, stack);
+        SimpleMovingItemContainerBlockEntity.super.setItem(slot, stack);
         if (slot == INPUT_2_SLOT && this.model != null) {
             this.model.setItem(stack.copyWithCount(1));
         }
@@ -376,7 +377,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity implements Outp
         new Gui(player);
     }
 
-    protected void updatePosition(int id) {
+    public void updatePosition(int id) {
         var c = containers[id];
 
         if (!c.isContainerEmpty()) {

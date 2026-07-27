@@ -45,7 +45,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public abstract class TallItemMachineBlock extends RotationalNetworkBlock implements FactoryBlock, EntityBlock, WorldlyContainerHolder, RotationUser, MovingItemConsumer, MovingItemProvider {
+public abstract class TallItemMachineBlock extends RotationalNetworkBlock implements FactoryBlock, EntityBlock, WorldlyContainerHolder, RotationUser {
     public static final Property<Part> PART = EnumProperty.create("part", Part.class);
     public static final BooleanProperty HAS_CONVEYOR = BooleanProperty.create("has_conveyor");
     public static final Property<Direction> INPUT_FACING = EnumProperty.create("input_facing", Direction.class, x -> x.getAxis() != Direction.Axis.Y);

@@ -29,6 +29,7 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
     private ItemStack filterStack = ItemStack.EMPTY;
     private FilterData filter = FilterData.of(ItemStack.EMPTY, true);
 
+    private int minStackSize = 1;
     private int maxStackSize = 64;
 
     private final Storage<ItemVariant> storage = new FilteredRedirectedStorage<>(ItemStorage.SIDED,
@@ -45,6 +46,7 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
             view.store("FilterStack", ItemStack.OPTIONAL_CODEC, this.filterStack);
         }
         view.putInt("max_stack_size", this.maxStackSize);
+        view.putInt("min_stack_size", this.minStackSize);
 
     }
 
@@ -61,6 +63,18 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
     }
 
     @Override
+    public int minStackSize() {
+        return minStackSize;
+    }
+
+    @Override
+    public void setMinStackSize(int minStackSize) {
+        this.minStackSize = minStackSize;
+        this.updateHologram();
+        this.setChanged();
+    }
+
+    @Override
     public void setLevel(Level world) {
         super.setLevel(world);
     }
@@ -69,7 +83,8 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
     private void updateHologram() {
         if (this.model != null) {
             model.filterElement.setFilter(this.filter);
-            model.countElement.setText(Component.literal("[x" + this.maxStackSize + "]"));
+            model.minCount.setText(Component.literal("[x" + this.minStackSize + ":"));
+            model.maxCount.setText(Component.literal(":x" + this.maxStackSize + "]"));
             model.updateFacing(this.getBlockState());
             model.tick();
         }
@@ -80,6 +95,7 @@ public class FunnelBlockEntity extends LockableBlockEntity implements BlockEntit
         this.filterStack = view.read("FilterStack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
         this.filter = FilterData.of(this.filterStack, true);
         this.maxStackSize = view.getIntOr("max_stack_size", 64);
+        this.minStackSize = view.getIntOr("min_stack_size", 1);
         this.updateHologram();
     }
 

@@ -1,38 +1,39 @@
 package eu.pb4.polyfactory.item;
 
 import com.mojang.datafixers.util.Pair;
-import eu.pb4.factorytools.api.item.FactoryBlockItem;
-import eu.pb4.polyfactory.block.FactoryBlockTags;
-import eu.pb4.polyfactory.block.mechanical.AxleBlock;
-import eu.pb4.polyfactory.block.other.BlockWithTooltip;
-import eu.pb4.polyfactory.data.DataContainer;
-import eu.pb4.polyfactory.item.component.MiningMode;
-import eu.pb4.polyfactory.item.configuration.ClipboardItem;
-import eu.pb4.polyfactory.item.tool.BaseDrillItem;
-import eu.pb4.polyfactory.mixin.ToolMaterialAccessor;
-import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polymer.core.api.item.PolymerCreativeModeTabUtils;
-import eu.pb4.polymer.core.api.item.SimplePolymerItem;
-import eu.pb4.factorytools.api.item.MultiBlockItem;
 import eu.pb4.factorytools.api.block.MultiBlock;
-import eu.pb4.polyfactory.other.FactoryRegistries;
+import eu.pb4.factorytools.api.item.FactoryBlockItem;
+import eu.pb4.factorytools.api.item.MultiBlockItem;
+import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.block.FactoryBlockTags;
+import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.AbstractCableBlock;
 import eu.pb4.polyfactory.block.fluids.PortableFluidTankBlock;
 import eu.pb4.polyfactory.block.fluids.PortableFluidTankBlockEntity;
+import eu.pb4.polyfactory.block.mechanical.AxleBlock;
+import eu.pb4.polyfactory.block.other.BlockWithTooltip;
+import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.item.block.*;
 import eu.pb4.polyfactory.item.component.FluidComponent;
-import eu.pb4.polyfactory.item.tool.*;
-import eu.pb4.polyfactory.item.util.*;
-import eu.pb4.polyfactory.util.DyeColorExtra;
-import eu.pb4.polymer.core.api.block.PolymerBlock;
-import eu.pb4.polyfactory.ModInit;
-import eu.pb4.polyfactory.block.FactoryBlocks;
+import eu.pb4.polyfactory.item.component.MiningMode;
+import eu.pb4.polyfactory.item.configuration.ClipboardItem;
 import eu.pb4.polyfactory.item.configuration.WrenchItem;
+import eu.pb4.polyfactory.item.tool.*;
+import eu.pb4.polyfactory.item.util.ColoredItem;
+import eu.pb4.polyfactory.item.util.FluidModelItem;
+import eu.pb4.polyfactory.mixin.ToolMaterialAccessor;
+import eu.pb4.polyfactory.other.FactoryRegistries;
+import eu.pb4.polyfactory.util.DyeColorExtra;
+import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polymer.core.api.block.PolymerBlock;
+import eu.pb4.polymer.core.api.item.PolymerCreativeModeTabUtils;
+import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.fabricmc.fabric.api.registry.CompostableRegistry;
 import net.fabricmc.fabric.api.registry.FabricPotionBrewingBuilder;
 import net.fabricmc.fabric.api.registry.FuelValueEvents;
 import net.minecraft.core.HolderGetter;
@@ -44,7 +45,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.*;
+import net.minecraft.util.Unit;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -54,11 +55,15 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.item.component.*;
+import net.minecraft.world.item.component.Consumables;
+import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.item.component.Tool;
+import net.minecraft.world.item.component.Weapon;
 import net.minecraft.world.item.consume_effects.RemoveStatusEffectsConsumeEffect;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.block.Block;
+
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -90,6 +95,7 @@ public class FactoryItems {
     public static final Item PRESS = register(FactoryBlocks.PRESS);
     public static final Item CRAFTER = register(FactoryBlocks.CRAFTER);
     public static final Item MIXER = register(FactoryBlocks.MIXER);
+    public static final Item FERMENTER = register(FactoryBlocks.FERMENTER);
     public static final Item MINER = register(FactoryBlocks.MINER);
     public static final Item PLACER = register(FactoryBlocks.PLACER);
     public static final Item PLANTER = register(FactoryBlocks.PLANTER);
@@ -99,8 +105,8 @@ public class FactoryItems {
     public static final Item GEARBOX = register(FactoryBlocks.GEARBOX);
     public static final Item CLUTCH = register(FactoryBlocks.CLUTCH);
     public static final Item GEARSHIFT = register(FactoryBlocks.GEARSHIFT);
-    public static final Item CONTAINER = register( FactoryBlocks.WOODEN_CONTAINER);
-    public static final Item DEEP_STORAGE_CONTAINER = register( FactoryBlocks.DEEP_STORAGE_CONTAINER);
+    public static final Item CONTAINER = register(FactoryBlocks.WOODEN_CONTAINER);
+    public static final Item DEEP_STORAGE_CONTAINER = register(FactoryBlocks.DEEP_STORAGE_CONTAINER);
     public static final Item ITEM_OUTPUT_BUFFER = register(FactoryBlocks.ITEM_OUTPUT_BUFFER);
     public static final Item NIXIE_TUBE = register(FactoryBlocks.NIXIE_TUBE);
     public static final WindmillSailItem WINDMILL_SAIL = register(FactoryItemIds.WINDMILL_SAIL, WindmillSailItem::new);
@@ -196,7 +202,10 @@ public class FactoryItems {
             ).stacksTo(1));
 
     public static final Item PLANT_OIL_BUCKET = register(FactoryItemIds.PLANT_OIL_BUCKET, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET));
+    public static final Item ETHANOL_BUCKET = register(FactoryItemIds.ETHANOL_BUCKET, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET));
     public static final Item BIODIESEL_BUCKET = register(FactoryItemIds.BIODIESEL_BUCKET, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET));
+
+    public static final Item BIOMASS = register(FactoryItemIds.BIOMASS);
 
     public static final Item CRISPY_HONEY = register(FactoryItemIds.CRISPY_HONEY, settings -> new SimplePolymerItem(settings
             .food(new FoodProperties.Builder().nutrition(4).saturationModifier(0.6F).build(), Consumables.defaultFood().consumeSeconds(0.8F).build())));
@@ -264,7 +273,7 @@ public class FactoryItems {
                                 AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND))
                 .component(DataComponents.WEAPON, new Weapon(2, 0))
                 .component(FactoryDataComponents.DRILL_HEAD_TOOL, new Tool(List.of(Tool.Rule.deniesDrops(
-                        registrationLookup.getOrThrow(material.incorrectBlocksForDrops())),
+                                registrationLookup.getOrThrow(material.incorrectBlocksForDrops())),
                         Tool.Rule.minesAndDrops(registrationLookup.getOrThrow(FactoryBlockTags.MINEABLE_WITH_DRILL),
                                 material.speed() * 1.5f)), 1.1F, 1, true));
     }
@@ -274,7 +283,10 @@ public class FactoryItems {
             builder.add(SAW_DUST, (int) (context.baseSmeltTime() * 0.3));
             builder.add(WOODEN_PLATE, (int) (context.baseSmeltTime() * 0.6));
             builder.add(COAL_DUST, (int) (context.baseSmeltTime() * 0.8));
+            builder.add(BIOMASS, context.baseSmeltTime());
         }));
+
+        CompostableRegistry.INSTANCE.add(BIOMASS, 0.75f);
 
         FabricPotionBrewingBuilder.BUILD.register(builder -> {
             builder.addContainer(BRITTLE_POTION);
@@ -332,6 +344,7 @@ public class FactoryItems {
                     entries.accept(GRINDER);
                     entries.accept(PRESS);
                     entries.accept(MIXER);
+                    entries.accept(FERMENTER);
                     entries.accept(CRAFTER);
                     entries.accept(MINER);
                     entries.accept(PLACER);
@@ -426,7 +439,10 @@ public class FactoryItems {
                     entries.accept(SLIME_BUCKET);
                     entries.accept(EXPERIENCE_BUCKET);
                     entries.accept(PLANT_OIL_BUCKET);
+                    entries.accept(ETHANOL_BUCKET);
                     entries.accept(BIODIESEL_BUCKET);
+
+                    entries.accept(BIOMASS);
 
                     entries.accept(THROWABLE_GLASS_BOTTLE);
                     entries.accept(LINGERING_THROWABLE_GLASS_BOTTLE);
@@ -616,8 +632,10 @@ public class FactoryItems {
     }
 
     public static <E extends Block & PolymerBlock> FactoryBlockItem register(E block) {
-        return register(block, (s) -> {});
+        return register(block, (s) -> {
+        });
     }
+
     public static <E extends Block & PolymerBlock> FactoryBlockItem register(E block, Consumer<Item.Properties> settingsConsumer) {
         var id = BuiltInRegistries.BLOCK.getKey(block);
         FactoryBlockItem item;

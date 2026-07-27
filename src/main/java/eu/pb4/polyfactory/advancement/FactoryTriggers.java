@@ -50,4 +50,6 @@ public interface FactoryTriggers {
     Identifier DEEP_STORAGE_CONTAINER = id("deep_storage_container");
     Identifier ITEM_OUTPUT_BUFFER = id("item_output_buffer");
     Identifier GUIDEBOOK = id("guidebook");
+    Identifier FERMENTER_FERMENTS = id("fermenter_ferments");
+
 }

@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
+import net.minecraft.world.RandomizableContainer;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -63,7 +64,11 @@ public abstract class LevelMixin implements LevelAccessor {
 
         var be = world.getBlockEntity(pos);
 
-        if (be instanceof FilledStateProvider provider) {
+
+
+        if (be instanceof RandomizableContainer randomizableContainer && randomizableContainer.getLootTable() != null) {
+            max = (long) randomizableContainer.getMaxStackSize() * randomizableContainer.getContainerSize();
+        } else if (be instanceof FilledStateProvider provider) {
             count = provider.getFilledAmount();
             max = provider.getFillCapacity();
         } else if (be instanceof Container container) {

@@ -6,6 +6,7 @@ import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.block.mechanical.conveyor.SimpleMovingItemContainerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
@@ -60,7 +61,7 @@ import org.joml.Quaternionf;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MSpoutBlockEntity extends TallItemMachineBlockEntity implements OutputContainerOwner {
+public class MSpoutBlockEntity extends TallItemMachineBlockEntity implements OutputContainerOwner, SimpleMovingItemContainerBlockEntity {
 
     public static final int OUTPUT_FIRST = 1;
     public static final int INPUT_FIRST = 0;
@@ -277,7 +278,7 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity implements Out
         return this.getBlockState().getValue(MSpoutBlock.INPUT_FACING).getOpposite() == dir;
     }
 
-    protected void updatePosition(int id) {
+    public void updatePosition(int id) {
         var c = containers[id];
 
         if (!c.isContainerEmpty()) {

@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.recipe.casting.SimpleCauldronCastingRecipe;
 import eu.pb4.polyfactory.recipe.drain.PotionAddDrainRecipe;
 import eu.pb4.polyfactory.recipe.drain.PotionRemoveDrainRecipe;
 import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
+import eu.pb4.polyfactory.recipe.fermenting.SimpleFermentingRecipe;
 import eu.pb4.polyfactory.recipe.fluid.RemovingFluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.fluid.SimpleFluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.grinding.SimpleGrindingRecipe;
@@ -32,6 +33,7 @@ public class FactoryRecipeSerializers {
     public static final RecipeSerializer<ColoringMixingRecipe> MIXING_COLORING = register("mixing/coloring", ColoringMixingRecipe.CODEC);
 
     public static final RecipeSerializer<GenericMixingRecipe> MIXING_GENERIC = register("mixing/generic", GenericMixingRecipe.CODEC);
+    public static final RecipeSerializer<RatedFluidMixingMixingRecipe> MIXING_RATED_FLUID = register("mixing/rated_fluid", RatedFluidMixingMixingRecipe.CODEC);
     public static final RecipeSerializer<TransformMixingRecipe> MIXING_TRANSFORM = register("mixing/transform", TransformMixingRecipe.CODEC);
     public static final RecipeSerializer<FireworkStarMixingRecipe> MIXING_FIREWORK = register("mixing/firework", FireworkStarMixingRecipe.CODEC);
     public static final RecipeSerializer<ArtificialDyeMixingRecipe> MIXING_ARTIFICIAL_DYE = register("mixing/artificial_dye", ArtificialDyeMixingRecipe.CODEC);
@@ -43,6 +45,8 @@ public class FactoryRecipeSerializers {
             CraftingWithLeftoverRecipe.createCodec(ShapedRecipe.SERIALIZER.codec(), () -> FactoryRecipeSerializers.CRAFTING_SHAPED_LEFTOVER));
     public static final RecipeSerializer<CraftingWithLeftoverRecipe<ShapelessRecipe>> CRAFTING_SHAPELESS_LEFTOVER = register("crafting/shapeless_leftover",
             CraftingWithLeftoverRecipe.createCodec(ShapelessRecipe.SERIALIZER.codec(), () -> FactoryRecipeSerializers.CRAFTING_SHAPELESS_LEFTOVER));
+
+    public static final RecipeSerializer<SimpleFermentingRecipe> FERMENTING_SIMPLE = register("fermenting/simple", SimpleFermentingRecipe.CODEC);
 
     public static final RecipeSerializer<FillSprayCanCraftingRecipe> CRAFTING_FILL_SPRAY_CAN = register("crafting/fill_spray_can",
             CraftingBookCategory.CODEC.xmap(FillSprayCanCraftingRecipe::new, FillSprayCanCraftingRecipe::category).fieldOf("category"));

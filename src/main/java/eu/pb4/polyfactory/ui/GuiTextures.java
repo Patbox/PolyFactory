@@ -24,6 +24,7 @@ public class GuiTextures {
     public static final Function<Component, Component> GRINDER = background("grinder");
     public static final Function<Component, Component> PRESS = background("press");
     public static final Function<Component, Component> MIXER = background("mixer");
+    public static final Function<Component, Component> FERMENTER = background("fermenter");
     public static final Function<Component, Component> MECHANICAL_DRAIN = background("mechanical_drain");
     public static final Function<Component, Component> MECHANICAL_SPOUT = background("mechanical_spout");
     public static final Function<Component, Component> MECHANICAL_SPOUT_NO_CONN = background("mechanical_spout_noconn");
@@ -94,6 +95,8 @@ public class GuiTextures {
     public static final char POLYDEX_OFFSET_N = space(-168);
     public static final char MIXER_FLUID_OFFSET = space(28 - 8);
     public static final char MIXER_FLUID_OFFSET_N = space(-28 + 8);
+    public static final char FERMENTER_FLUID_OFFSET = space(28 - 8 + 18 * 6);
+    public static final char FERMENTER_FLUID_OFFSET_N = space(-28 + 8 - 18 * 6);
     public static final char MECHANICAL_DRAIN_FLUID_OFFSET = space(118 - 8);
     public static final char MECHANICAL_DRAIN_FLUID_OFFSET_N = space(-118 + 8);
     public static final char MECHANICAL_SPOUT_FLUID_OFFSET = space(46 - 8);
@@ -167,7 +170,7 @@ public class GuiTextures {
 
         public ItemStack getNamed(float progress, Component text) {
             var base = withTooltip[Math.min((int) (progress * withTooltip.length), withTooltip.length - 1)].asStack();
-            base.set(DataComponents.ITEM_NAME, text);
+            base.set(DataComponents.CUSTOM_NAME, text);
             return base;
         }
 

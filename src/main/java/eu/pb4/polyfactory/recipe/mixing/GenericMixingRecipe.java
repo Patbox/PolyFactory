@@ -46,6 +46,12 @@ public record GenericMixingRecipe(String group, List<CountedIngredient> input,
             ).apply(x, GenericMixingRecipe::new)
     );
 
+    public static RecipeHolder<GenericMixingRecipe> ofFluids(String string, String group, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, double minTemperature, double maxTemperature, List<FluidStack<?>> fluidOutput) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, List.of(),
+                Optional.ofNullable(fluidInput),
+                List.of(), fluidOutput, mixingTime, minimumSpeed, optimalSpeed, (float) minTemperature, (float) maxTemperature));
+    }
+
     public static RecipeHolder<GenericMixingRecipe> ofCounted(String string, String group, List<CountedIngredient> ingredient, List<FluidInputStack> fluidInput, double mixingTime, double minimumSpeed, double optimalSpeed, float minTemperature, List<ItemStackTemplate> output, List<FluidStack<?>> fluidOutput) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("mixing/" + string), new GenericMixingRecipe(group, ingredient,
                 Optional.ofNullable(fluidInput),

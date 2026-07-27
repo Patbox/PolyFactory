@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.block.mechanical.machines;
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.polyfactory.block.other.MachineInfoProvider;
+import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
 import eu.pb4.polyfactory.util.movingitem.SimpleMovingItemContainerProvider;
 import eu.pb4.polyfactory.util.movingitem.MovingItem;
 import net.minecraft.core.BlockPos;
@@ -17,45 +18,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class TallItemMachineBlockEntity extends LockableBlockEntity implements MachineInfoProvider, SimpleMovingItemContainerProvider, WorldlyContainer {
+public abstract class TallItemMachineBlockEntity extends LockableBlockEntity implements MachineInfoProvider {
     protected Component state;
     public TallItemMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
 
-    @Nullable
-    public abstract BlockModel getModel();
-
     public abstract double getStress();
-
-    protected abstract void updatePosition(int id);
-
-    protected void addMoving(int i, MovingItem x, boolean newlyAdded) {
-        var model = this.getModel();
-        if (model != null) {
-            if (newlyAdded) {
-                updatePosition(i);
-                model.addElement(x);
-            } else {
-                model.addElementWithoutUpdates(x);
-                updatePosition(i);
-            }
-        }
-        this.setChanged();
-    }
-
-    protected void removeMoving(MovingItem movingItem, boolean fullRemove) {
-        var model = this.getModel();
-
-        if (model != null) {
-            if (fullRemove) {
-                model.removeElement(movingItem);
-            } else {
-                model.removeElementWithoutUpdates(movingItem);
-            }
-        }
-        this.setChanged();
-    }
 
     @Override
     public @Nullable Component getCurrentState() {

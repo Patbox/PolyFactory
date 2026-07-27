@@ -10,6 +10,7 @@ public class PolydexTextures {
     public static final Component PRESS;
     public static final Component PRESS_FLUID;
     public static final Component MIXER;
+    public static final Component FERMENTER;
     public static final Component DRAIN;
     public static final Component SPOUT;
     public static final Component SMELTERY;
@@ -30,5 +31,6 @@ public class PolydexTextures {
         DRAIN = t2.getFirst();
         SPOUT = t2.getSecond();
         PRESS_FLUID = t3.getFirst();
+        FERMENTER = t3.getSecond();
     }
 }

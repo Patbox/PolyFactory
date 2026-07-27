@@ -83,7 +83,7 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
 
         var stackToMove = stack.get();
         var copied = false;
-        if (be.maxStackSize() < stackToMove.getCount()) {
+        if (be.matchesStackSize(stackToMove.getCount())) {
             stackToMove = stackToMove.split(be.maxStackSize());
             copied = true;
         }
@@ -135,7 +135,7 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
 
                 var stack = inv.getItem(i);
                 for (var dir : Direction.values()) {
-                    if (!stack.isEmpty() && be.filter.get(a).test(stack) && (sided == null || sided.canTakeItemThroughFace(i, stack, dir))) {
+                    if (!stack.isEmpty() && stack.getCount() >= be.minStackSize() && be.filter.get(a).test(stack) && (sided == null || sided.canTakeItemThroughFace(i, stack, dir))) {
                         inv.setChanged();
                         if (conveyor.pushNew(stack.split(Math.min(be.maxStackSize(), stack.getCount())))) {
                             if (stack.isEmpty()) {
@@ -163,7 +163,7 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
                     try (var t = Transaction.openOuter()) {
                         var resource = view.getResource();
                         var val = view.extract(view.getResource(), Math.min(conveyor.getMaxStackCount(resource.toStack()), be.maxStackSize()), t);
-                        if (val != 0) {
+                        if (val != 0 && val >= be.minStackSize()) {
                             t.commit();
 
                             if (conveyor.pushNew(resource.toStack((int) val))) {

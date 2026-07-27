@@ -11,16 +11,32 @@
     - Area 3x3 - Mines 3x3x1 area based on where player breaks a block. Required 5x more fuel than single mode for a single use.
   - Has lower mining range than a regular tool.
   - Needs to be fueled with Biodiesel to work (You need a Portable Fluid Tank of Biodiesel in your inventory).
+- Added Fermenter:
+  - A new machine blocks, used to ferment items into liquids and other items.
+  - Can be powered with rotation to speed up fermentation process, but it also works when not powered at all.
+  - Crafted with Steel Machine Gearbox, Barrel and 3 Smooth Stone Slabs.
+  - Currently used for production of Ethanol and Biomass.
 - Added Plant Oil fluid:
   - Crafted by using a press on any vanilla seeds or sunflowers.
-  - Usage tbd, aside of ingredient of Biodiesel.
+  - Primarily a recipe ingredient.
+  - Can be used with Nozzle / Pressure Fluid Gun, causing entities to get the Slippery effect:
+    - It lowers entity's friction and slows it down a little.
+- Added Ethanol fluid:
+  - Crafted by fermenting Sugar Cane, Potatoes, Berries and Beetroot.
+  - Used for Crafting of Biodiesel.
 - Added Biodiesel fluid:
-  - Recipe TBD, involves mixing with plant oil
-  - Used to power Pocket Drill.
+  - Crafted via mixing of 10x of Plant Oil with 10x Ethanol for 18x of Biodiesel.
+  - Used to power Portable Drill.
+  - Can be used with Nozzle / Pressure Fluid Gun, causing entities to get the Flammable effect:
+    - It makes entities stay on fire for a longer time.
 - Added Raw Metal Nuggets:
  - Can be crafted to/from crushed raw ores.
 - Added Sulfur Dust:
   - Crafting ingredient, received from grinding Sulfur.
+- Added Biomass:
+  - Leftover product from Fermentation process.
+  - Can be used as Furnace fuel.
+  - Also compostable.
 - New Recipes and changed recipes:
   - Grinding Tuff blocks now results in 1 Gravel and 25% chance for 1 Raw Iron Nugget.
   - Grinding Sulfur block gives you 2 + 5x 25% chance Sulfur Dust
@@ -29,5 +45,8 @@
   - Changed old Gunpowder recipe to require 5 Netherite Dusts rather than 2.
   - Crushed raw metals now give one more nugget worth of molten metals than before (1 ingot + 2 nuggets -> 1 ingot + 3 nuggets).
 - Made Grinding recipes have higher max speed limit, allowing them to work faster
+- Funnels can now require a minimal stack size that can go in/out.
+- Polydex Mixer recipes will now visually scale fluid contents if they are too small.
 - Fixed Item Reader's and Hologram Displays not rendering their inner model parts.
 - Fixed Cable not being updated visually correctly.
+- Fixed Loot Tables being resolved too early in loot chests.

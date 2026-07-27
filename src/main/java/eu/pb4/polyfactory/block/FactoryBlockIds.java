@@ -26,6 +26,7 @@ public class FactoryBlockIds {
     public static final ResourceKey<Block> GRINDER = of("grinder");
     public static final ResourceKey<Block> PRESS = of("press");
     public static final ResourceKey<Block> MIXER = of("mixer");
+    public static final ResourceKey<Block> FERMENTER = of("fermenter");
     public static final ResourceKey<Block> CRAFTER = of("crafter");
     public static final ResourceKey<Block> MINER = of("miner");
     public static final ResourceKey<Block> PLACER = of("placer");

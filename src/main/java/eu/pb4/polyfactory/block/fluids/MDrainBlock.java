@@ -11,7 +11,9 @@ import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.models.fluid.TopFluidViewModel;
+import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polyfactory.util.movingitem.MovingItemContainerHolder;
+import eu.pb4.polyfactory.util.movingitem.MovingItemProvider;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -35,7 +37,7 @@ import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable {
+public class MDrainBlock extends TallItemMachineBlock implements PipeConnectable, MovingItemConsumer, MovingItemProvider {
     public MDrainBlock(Properties settings) {
         super(settings);
     }

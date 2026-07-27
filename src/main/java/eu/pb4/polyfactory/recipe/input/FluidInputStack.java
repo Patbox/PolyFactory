@@ -37,4 +37,8 @@ public record FluidInputStack(FluidInstance<?> instance, long required, long use
     public FluidStack<?> toRequired() {
         return instance.stackOf(required);
     }
+
+    public FluidInputStack scale(int mult) {
+        return new FluidInputStack(instance, required * mult, used * mult);
+    }
 }

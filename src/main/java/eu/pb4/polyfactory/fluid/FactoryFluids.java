@@ -139,8 +139,12 @@ public class FactoryFluids {
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.PLANT_OIL_SPLASH, 10,300, FactorySoundEvents.FLUID_SHOOT_PLANT_OIL))
                     .build());
 
+    public static final FluidType<Unit> ETHANOL = register(FactoryFluidIds.ETHANOL,
+            FluidType.of().density(95).transparent()
+                    .build());
+
     public static final FluidType<Unit> BIODIESEL = register(FactoryFluidIds.BIODIESEL,
-            FluidType.of().density(81).transparent()
+            FluidType.of().density(90).transparent()
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.BIODIESEL_SPLASH, 10,300, FactorySoundEvents.FLUID_SHOOT_BIODIESEL))
                     .build());
 
@@ -191,6 +195,7 @@ public class FactoryFluids {
         FluidBehaviours.addItemToFluidLink(Items.COPPER_INGOT, COPPER.defaultInstance());
         FluidBehaviours.addItemToFluidLink(FactoryItems.STEEL_INGOT, STEEL.defaultInstance());
         FluidBehaviours.addItemToFluidLink(FactoryItems.PLANT_OIL_BUCKET, PLANT_OIL.defaultInstance());
+        FluidBehaviours.addItemToFluidLink(FactoryItems.ETHANOL_BUCKET, ETHANOL.defaultInstance());
         FluidBehaviours.addItemToFluidLink(FactoryItems.BIODIESEL_BUCKET, BIODIESEL.defaultInstance());
 
         Function<ItemStack, FluidInstance<?>> potionFunction = (stack) -> {

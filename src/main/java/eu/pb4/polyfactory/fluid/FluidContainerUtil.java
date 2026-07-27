@@ -95,15 +95,18 @@ public interface FluidContainerUtil {
     }
 
     static ItemStack interactWith(FluidContainer container, ServerPlayer player, ItemStack stack) {
+        return interactWith(container, player, stack, true, true);
+    }
+    static ItemStack interactWith(FluidContainer container, ServerPlayer player, ItemStack stack, boolean canInsert, boolean canExtract) {
         if (stack.getItem() instanceof UniversalFluidContainerItem item) {
             var mode = stack.getOrDefault(FactoryDataComponents.FLUID_INTERACTION_MODE, FluidInteractionMode.EXTRACT);
             var fluids = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
             var topFluid = container.topFluid();
-            if (mode == FluidInteractionMode.EXTRACT && topFluid != null) {
+            if (mode == FluidInteractionMode.EXTRACT && topFluid != null && canExtract) {
                 var maxAmount = item.capacity() - fluids.stored();
                 var extract = container.extract(topFluid, maxAmount, false);
                 stack.set(FactoryDataComponents.FLUID, fluids.insert(topFluid, extract, false).component());
-            } else if (mode == FluidInteractionMode.INSERT) {
+            } else if (mode == FluidInteractionMode.INSERT && canInsert) {
                 for (var fluid : fluids.fluids()) {
                     var extract = fluids.get(fluid);
                     var leftover = container.insert(fluid, extract, false);
@@ -123,13 +126,22 @@ public interface FluidContainerUtil {
         if (optional.isEmpty()) {
             return null;
         }
+
         var recipe = optional.get().value();
+
+        var recipeInput = recipe.fluidInput(input);
+        var recipeOutput = recipe.fluidOutput(input);
+
+        if (!recipeInput.isEmpty() && !canExtract || !recipeOutput.isEmpty() && !canInsert) {
+            return null;
+        }
+
         var itemOut = recipe.assemble(input);
-        for (var fluid : recipe.fluidInput(input)) {
+        for (var fluid : recipeInput) {
             container.extract(fluid, false);
         }
         stack.consume(1, player);
-        for (var fluid : recipe.fluidOutput(input)) {
+        for (var fluid : recipeOutput) {
             container.insert(fluid, false);
         }
         FactoryUtil.playSoundToPlayer(player,recipe.soundEvent().value(), SoundSource.BLOCKS, 0.5f, 1f);
@@ -137,15 +149,19 @@ public interface FluidContainerUtil {
     }
 
     static GuiElement guiElement(@Nullable FluidContainer container, boolean interactable) {
+        return guiElement(container, interactable, interactable);
+    }
+
+    static GuiElement guiElement(@Nullable FluidContainer container, boolean canInsert, boolean canExtract) {
         if (container == null) {
             return SimpleGuiElement.EMPTY;
         }
         return new GuiElement() {
             @Override
             public ClickCallback getGuiCallback() {
-                return interactable ? (index, type, action, gui) -> {
+                return canExtract || canInsert ? (index, type, action, gui) -> {
                     var handler = gui.getPlayer().containerMenu;
-                    var out = interactWith(container, gui.getPlayer(), handler.getCarried());
+                    var out = interactWith(container, gui.getPlayer(), handler.getCarried(), canInsert, canExtract);
                     if (out == null) {
                         return;
                     }

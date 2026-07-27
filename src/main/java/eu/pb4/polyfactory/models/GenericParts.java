@@ -10,6 +10,7 @@ import static eu.pb4.polyfactory.util.FactoryUtil.id;
 public class GenericParts {
     public static final LazyItemStack REGULAR_GEAR = create(id("block/gear"));
     public static final LazyItemStack SMALL_GEAR = create(id("block/decorative_small_gear"));
+    public static final LazyItemStack SMALL_GEAR_DOUBLE = create(id("block/decorative_small_gear_double"));
     public static final LazyItemStack FILTER_MESH = create(id("block/filter_mesh"));
 
     private static LazyItemStack create(Identifier id) {

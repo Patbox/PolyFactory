@@ -13,6 +13,7 @@ import eu.pb4.polyfactory.ui.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -31,6 +32,7 @@ public abstract class MixerRecipePage<T extends MixingRecipe> extends Prioritize
     private final List<PolydexIngredient<?>> ingredients;
     private final PolydexStack<?>[] outputFluids;
     private final List<PolydexIngredient<?>> ingredientsVisual;
+    private final float fluidVisualMult;
 
     @Override
     public @Nullable Component texture(ServerPlayer player) {
@@ -39,13 +41,13 @@ public abstract class MixerRecipePage<T extends MixingRecipe> extends Prioritize
                 .append(Component.literal("" + GuiTextures.POLYDEX_OFFSET_N + GuiTextures.MIXER_POLYDEX_FLUID_OFFSET_1).setStyle(UiResourceCreator.STYLE))
                 .append(FluidTextures.MIXER_POLYDEX.render((a) -> {
                     for (var x : getFluidInput()) {
-                        a.accept(x.instance(), (float) (x.required() / (double) MixerBlockEntity.FLUID_CAPACITY));
+                        a.accept(x.instance(), (float) (x.required() / (double) MixerBlockEntity.FLUID_CAPACITY) * this.fluidVisualMult);
                     }
                 }))
                 .append(Component.literal("" + GuiTextures.MIXER_POLYDEX_FLUID_OFFSET_2).setStyle(UiResourceCreator.STYLE))
                 .append(FluidTextures.MIXER_POLYDEX.render((a) -> {
                     for (var x : getFluidOutput()) {
-                        a.accept(x.instance(), (float) (x.amount() / (double) MixerBlockEntity.FLUID_CAPACITY));
+                        a.accept(x.instance(), (float) (x.amount() / (double) MixerBlockEntity.FLUID_CAPACITY) * this.fluidVisualMult);
                     }
                 }))
                 .append(Component.literal("" + GuiTextures.MIXER_POLYDEX_FLUID_OFFSET_N + GuiTextures.POLYDEX_OFFSET).setStyle(UiResourceCreator.STYLE));
@@ -78,6 +80,25 @@ public abstract class MixerRecipePage<T extends MixingRecipe> extends Prioritize
         this.ingredients = PolydexCompatImpl.createIngredients(getItemInput(), getFluidInput());
         this.ingredientsVisual = PolydexCompatImpl.createIngredients(getItemInput());
         this.outputFluids = PolydexCompatImpl.createFluids(getFluidOutput()).toArray(new PolydexStack[0]);
+
+        var fluidsTotalA = 0;
+        var fluidsTotalB = 0;
+
+        for (var fluid : getFluidInput()) {
+            fluidsTotalB += (int) fluid.required();
+        }
+
+        for (var fluid : getFluidOutput()) {
+            fluidsTotalA += (int) fluid.amount();
+        }
+
+        var fluidsTotal = Math.max(fluidsTotalA, fluidsTotalB);
+
+        if (fluidsTotal < FluidConstants.BLOCK / 2) {
+            this.fluidVisualMult = (float) (FluidConstants.BLOCK / 2) / fluidsTotal;
+        } else {
+            this.fluidVisualMult = 1;
+        }
     }
 
     @Override

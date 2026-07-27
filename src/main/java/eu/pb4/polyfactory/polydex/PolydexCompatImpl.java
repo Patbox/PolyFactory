@@ -28,11 +28,13 @@ import eu.pb4.polyfactory.recipe.ShapelessNbtCopyRecipe;
 import eu.pb4.polyfactory.recipe.casting.SimpleCastingRecipe;
 import eu.pb4.polyfactory.recipe.casting.SimpleCauldronCastingRecipe;
 import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
+import eu.pb4.polyfactory.recipe.fermenting.SimpleFermentingRecipe;
 import eu.pb4.polyfactory.recipe.grinding.SimpleGrindingRecipe;
 import eu.pb4.polyfactory.recipe.grinding.StrippingGrindingRecipe;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.BrewingMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
+import eu.pb4.polyfactory.recipe.mixing.RatedFluidMixingMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.TransformMixingRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
 import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
@@ -84,6 +86,7 @@ public class PolydexCompatImpl {
     public static void register() {
         PolydexPage.registerRecipeViewer(GenericPressRecipe.class, PressRecipePage::new);
         PolydexPage.registerRecipeViewer(GenericMixingRecipe.class, GenericMixerRecipePage::new);
+        PolydexPage.registerRecipeViewer(RatedFluidMixingMixingRecipe.class, RatedFluidMixerRecipePage::new);
         PolydexPage.registerRecipeViewer(TransformMixingRecipe.class, TransformMixerRecipePage::new);
         PolydexPage.registerRecipeViewer(BrewingMixingRecipe.class, BrewingMixerRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleGrindingRecipe.class, SimpleGrindingRecipePage::new);
@@ -96,6 +99,7 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(SimpleCauldronCastingRecipe.class, SimpleCauldronCastingRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleDrainRecipe.class, SimpleDrainRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleSmelteryRecipe.class, SimpleSmelteryRecipePage::new);
+        PolydexPage.registerRecipeViewer(SimpleFermentingRecipe.class, SimpleFermentingRecipePage::new);
         //noinspection RedundantCast
         PolydexPage.registerRecipeViewer((Class<? extends Recipe<?>>) (Object) CraftingWithLeftoverRecipe.class,
                 x -> PolydexImpl.RECIPE_VIEWS.get(((CraftingWithLeftoverRecipe) x.value()).backingRecipe().getClass()).apply(new RecipeHolder<Recipe<?>>(

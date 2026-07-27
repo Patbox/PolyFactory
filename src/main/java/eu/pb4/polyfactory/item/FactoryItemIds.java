@@ -37,6 +37,7 @@ public class FactoryItemIds {
     public static final ResourceKey<Item> PRESS = of(FactoryBlockIds.PRESS);
     public static final ResourceKey<Item> CRAFTER = of(FactoryBlockIds.CRAFTER);
     public static final ResourceKey<Item> MIXER = of(FactoryBlockIds.MIXER);
+    public static final ResourceKey<Item> FERMENTER = of(FactoryBlockIds.FERMENTER);
     public static final ResourceKey<Item> MINER = of(FactoryBlockIds.MINER);
     public static final ResourceKey<Item> PLACER = of(FactoryBlockIds.PLACER);
     public static final ResourceKey<Item> PLANTER = of(FactoryBlockIds.PLANTER);
@@ -131,7 +132,10 @@ public class FactoryItemIds {
     public static final ResourceKey<Item> SLIME_BUCKET = of("slime_bucket");
     public static final ResourceKey<Item> HONEY_BUCKET = of("honey_bucket");
     public static final ResourceKey<Item> PLANT_OIL_BUCKET = of("plant_oil_bucket");
+    public static final ResourceKey<Item> ETHANOL_BUCKET = of("ethanol_bucket");
     public static final ResourceKey<Item> BIODIESEL_BUCKET = of("biodiesel_bucket");
+
+    public static final ResourceKey<Item> BIOMASS = of("biomass");
 
     public static final ResourceKey<Item> CRISPY_HONEY = of("crispy_honey");
     public static final ResourceKey<Item> HONEYED_APPLE = of("honeyed_apple");

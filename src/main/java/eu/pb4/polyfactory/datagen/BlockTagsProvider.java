@@ -48,6 +48,7 @@ class BlockTagsProvider extends FabricTagsProvider.BlockTagsProvider {
                 .add(FactoryBlockIds.MECHANICAL_SPOUT)
                 .add(FactoryBlockIds.MECHANICAL_DRAIN)
                 .add(FactoryBlockIds.GRINDER)
+                .add(FactoryBlockIds.FERMENTER)
                 .add(BlockItemIds.HOPPER.block())
                 .add(BlockItemIds.COMPOSTER.block())
         ;
@@ -87,6 +88,7 @@ class BlockTagsProvider extends FabricTagsProvider.BlockTagsProvider {
                         FactoryBlockIds.MINER,
                         FactoryBlockIds.SPLITTER)
                 .add(FactoryBlockIds.MIXER)
+                .add(FactoryBlockIds.FERMENTER)
                 .add(FactoryBlockIds.EJECTOR)
                 .add(FactoryBlockIds.STEEL_BLOCK)
                 .add(FactoryBlockIds.PLANTER)

@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.fluids.FluidInputOutput;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
+import eu.pb4.polyfactory.block.mechanical.conveyor.SimpleMovingItemContainerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.block.other.ItemOutputBufferBlock;
 import eu.pb4.polyfactory.block.other.OutputContainerOwner;
@@ -66,7 +67,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
-public class MixerBlockEntity extends TallItemMachineBlockEntity implements FluidInputOutput.ContainerBased, OutputContainerOwner {
+public class MixerBlockEntity extends TallItemMachineBlockEntity implements FluidInputOutput.ContainerBased, OutputContainerOwner, SimpleMovingItemContainerBlockEntity {
 
     public static final int OUTPUT_FIRST = 6;
     public static final int INPUT_FIRST = 0;
@@ -91,7 +92,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         super(FactoryBlockEntities.MIXER, pos, state);
     }
 
-    protected void updatePosition(int id) {
+    public void updatePosition(int id) {
         var c = containers[id];
 
         if (!c.isContainerEmpty()) {
@@ -503,10 +504,14 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
         }
 
         private float progress() {
-            return MixerBlockEntity.this.currentRecipe != null
-                    ? (float) Mth.clamp(MixerBlockEntity.this.process / MixerBlockEntity.this.currentRecipe.value().time(
-                    new MixingInput(stacks, FluidContainerInput.of(fluidContainer), level)), 0, 1)
-                    : 0;
+            if (MixerBlockEntity.this.currentRecipe == null) {
+                return 0;
+            }
+
+            var time = MixerBlockEntity.this.currentRecipe.value().time(
+                    new MixingInput(stacks, FluidContainerInput.of(fluidContainer), level));
+
+            return time < MixerBlockEntity.this.speedScale ? 1 : (float) Mth.clamp(MixerBlockEntity.this.process / time, 0, 1);
         }
 
         @Override

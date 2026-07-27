@@ -22,6 +22,7 @@ import eu.pb4.polyfactory.recipe.casting.SimpleCastingRecipe;
 import eu.pb4.polyfactory.recipe.casting.SimpleCauldronCastingRecipe;
 import eu.pb4.polyfactory.recipe.drain.PotionAddDrainRecipe;
 import eu.pb4.polyfactory.recipe.drain.PotionRemoveDrainRecipe;
+import eu.pb4.polyfactory.recipe.fermenting.SimpleFermentingRecipe;
 import eu.pb4.polyfactory.recipe.fluid.RemovingFluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.fluid.SimpleFluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.grinding.SimpleGrindingRecipe;
@@ -145,6 +146,16 @@ class RecipesProvider extends FabricRecipeProvider {
                         .pattern("c")
                         .define('i', Items.IRON_SHOVEL)
                         .define('c', Items.CAULDRON)
+                        .define('g', FactoryItems.STEEL_MACHINE_GEARBOX)
+                        .unlockedBy("get_steel", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
+                        .save(output);
+
+                this.shaped(RecipeCategory.REDSTONE, FactoryItems.FERMENTER, 1)
+                        .pattern(" g ")
+                        .pattern("sbs")
+                        .pattern(" s ")
+                        .define('s', Items.SMOOTH_STONE_SLAB)
+                        .define('b', Items.BARREL)
                         .define('g', FactoryItems.STEEL_MACHINE_GEARBOX)
                         .unlockedBy("get_steel", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
                         .save(output);
@@ -1397,7 +1408,13 @@ class RecipesProvider extends FabricRecipeProvider {
                         GenericMixingRecipe.ofCounted("snow_fluid", "",
                                 List.of(),
                                 List.of(FluidInputStack.from(FactoryFluids.WATER.of(800))),
-                                1, 1, 3f, Float.NEGATIVE_INFINITY, -0.05f, List.of(), List.of(FactoryFluids.SNOW.of(1000)))
+                                1, 1, 3f, Float.NEGATIVE_INFINITY, -0.05f, List.of(), List.of(FactoryFluids.SNOW.of(1000))),
+
+
+                        RatedFluidMixingMixingRecipe.of("biodiesel", "",
+                                List.of(FluidInputStack.from(FactoryFluids.PLANT_OIL.of(10)), FluidInputStack.from(FactoryFluids.ETHANOL.of(10))),
+                                1d, 2f,  15f,-0.1f, 0.3,
+                                400, List.of(FactoryFluids.BIODIESEL.of(18)))
                 );
 
                 for (var recipe : ((PotionBrewingAccessor) PotionBrewing.bootstrap(FeatureFlagSet.of(FeatureFlags.VANILLA))).getPotionMixes()) {
@@ -1419,6 +1436,16 @@ class RecipesProvider extends FabricRecipeProvider {
                                     20, 15, 30, 0.7f, 2f), null
                     );
                 }
+
+                of(output,
+                        SimpleFermentingRecipe.of("sugar_cane", "", Ingredient.of(Items.SUGAR_CANE), OutputStack.of(FactoryItems.BIOMASS, 0.3f), FactoryFluids.ETHANOL.ofNuggets(3), 120),
+                        SimpleFermentingRecipe.of("potato", "", Ingredient.of(Items.POTATO), OutputStack.of(FactoryItems.BIOMASS, 0.45f), FactoryFluids.ETHANOL.ofNuggets(6), 110),
+                        SimpleFermentingRecipe.of("poisonous_potato", "", Ingredient.of(Items.POISONOUS_POTATO), OutputStack.of(FactoryItems.BIOMASS, 0.35f), FactoryFluids.ETHANOL.ofNuggets(10), 80),
+                        SimpleFermentingRecipe.of("sweet_berries", "", Ingredient.of(Items.SWEET_BERRIES), OutputStack.of(FactoryItems.BIOMASS, 0.2f), FactoryFluids.ETHANOL.ofNuggets(3), 120),
+                        SimpleFermentingRecipe.of("glow_berries", "", Ingredient.of(Items.GLOW_BERRIES), OutputStack.of(FactoryItems.BIOMASS, 0.2f), FactoryFluids.ETHANOL.ofNuggets(5), 150),
+                        SimpleFermentingRecipe.of("apple", "", Ingredient.of(Items.APPLE), OutputStack.of(FactoryItems.BIOMASS, 0.1f), FactoryFluids.ETHANOL.ofNuggets(1), 110),
+                        SimpleFermentingRecipe.of("beetroot", "", Ingredient.of(Items.BEETROOT), OutputStack.of(FactoryItems.BIOMASS, 0.25f), FactoryFluids.ETHANOL.ofNuggets(5), 110)
+                );
 
                 this.shaped(RecipeCategory.REDSTONE, FactoryItems.STEEL_GEAR, 3)
                         .unlockedBy("steel_ingot", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
@@ -1468,6 +1495,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 fluidBase(output, FactoryItems.SLIME_BUCKET, Items.BUCKET, FactoryFluids.SLIME.ofBucket(), FactorySoundEvents.ITEM_BUCKET_FILL_SLIME, FactorySoundEvents.ITEM_BUCKET_EMPTY_SLIME);
                 fluidBase(output, FactoryItems.EXPERIENCE_BUCKET, Items.BUCKET, FactoryFluids.EXPERIENCE.ofBucket(), SoundEvents.BUCKET_FILL, SoundEvents.BUCKET_EMPTY);
                 fluidBase(output, FactoryItems.PLANT_OIL_BUCKET, Items.BUCKET, FactoryFluids.PLANT_OIL.ofBucket(), SoundEvents.BUCKET_FILL, SoundEvents.BUCKET_EMPTY);
+                fluidBase(output, FactoryItems.ETHANOL_BUCKET, Items.BUCKET, FactoryFluids.ETHANOL.ofBucket(), SoundEvents.BUCKET_FILL, SoundEvents.BUCKET_EMPTY);
                 fluidBase(output, FactoryItems.BIODIESEL_BUCKET, Items.BUCKET, FactoryFluids.BIODIESEL.ofBucket(), SoundEvents.BUCKET_FILL, SoundEvents.BUCKET_EMPTY);
 
                 fluidBasePotion(output, Items.POTION, Items.GLASS_BOTTLE, FluidConstants.BOTTLE, SoundEvents.BOTTLE_FILL, SoundEvents.BOTTLE_EMPTY);

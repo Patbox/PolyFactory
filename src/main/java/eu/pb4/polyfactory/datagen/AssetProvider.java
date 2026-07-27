@@ -328,6 +328,11 @@ class AssetProvider implements DataProvider {
             consumer.accept(id("-/sgui/deep_storage_unit_selected"),
                     new ItemAsset(new CompositeItemModel(listSelected), new ItemAsset.Properties(false, true)));
         }
+
+        consumer.accept(id("-/block/decorative_small_gear_double"), new ItemAsset(new CompositeItemModel(List.of(
+                new BasicItemModel(id("block/decorative_small_gear"), Optional.of(new Transformation(new Matrix4f().translation(0, 0, 0.4f))), List.of()),
+                new BasicItemModel(id("block/decorative_small_gear"), Optional.of(new Transformation(new Matrix4f().translation(0, 0, -0.4f))), List.of())
+        ))));
     }
 
     private static void createNumberButtons(BiConsumer<String,byte[]> assetWriter) {

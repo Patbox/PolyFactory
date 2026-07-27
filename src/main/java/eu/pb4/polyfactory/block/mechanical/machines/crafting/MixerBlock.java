@@ -14,7 +14,9 @@ import eu.pb4.polyfactory.models.GenericParts;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.models.fluid.TopFluidViewModel;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polyfactory.util.movingitem.MovingItemConsumer;
 import eu.pb4.polyfactory.util.movingitem.MovingItemContainerHolder;
+import eu.pb4.polyfactory.util.movingitem.MovingItemProvider;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
@@ -36,7 +38,7 @@ import org.joml.Matrix4fStack;
 import org.joml.Vector3f;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
-public class MixerBlock extends TallItemMachineBlock implements PipeConnectable {
+public class MixerBlock extends TallItemMachineBlock implements PipeConnectable, MovingItemConsumer, MovingItemProvider {
     public MixerBlock(Properties settings) {
         super(settings);
     }
@@ -118,8 +120,7 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
         private final ItemDisplayElement whisk;
         private final ItemDisplayElement main;
         private final TopFluidViewModel fluid;
-        private final ItemDisplayElement gearA;
-        private final ItemDisplayElement gearB;
+        private final ItemDisplayElement gears;
         private float rotation;
         private boolean active;
 
@@ -129,20 +130,17 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
             this.main.setScale(new Vector3f(2));
             this.main.setTranslation(new Vector3f(0, 0.5f, 0));
             this.whisk = LodItemDisplayElement.createSimple(MODEL_PISTON.get(), 2, 0.4f, 0.8f);
-            this.gearA = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR.get(), this.getUpdateRate(), 0.3f, 0.5f);
-            this.gearB = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR.get(), this.getUpdateRate(), 0.3f, 0.5f);
+            this.gears = LodItemDisplayElement.createSimple(GenericParts.SMALL_GEAR_DOUBLE.get(), this.getUpdateRate(), 0.3f, 0.5f);
 
             this.whisk.setViewRange(0.4f);
-            this.gearA.setViewRange(0.4f);
-            this.gearB.setViewRange(0.4f);
+            this.gears.setViewRange(0.4f);
 
             this.updateStatePos(state);
             var dir = state.getValue(INPUT_FACING);
             this.updateAnimation(true,  true, 0, (dir.getAxisDirection() == Direction.AxisDirection.NEGATIVE) == (dir.getAxis() == Direction.Axis.X));
             this.addElement(this.whisk);
             this.addElement(this.main);
-            this.addElement(this.gearA);
-            this.addElement(this.gearB);
+            this.addElement(this.gears);
         }
 
         private void updateStatePos(BlockState state) {
@@ -150,8 +148,7 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
 
             this.main.setYaw(direction.toYRot());
             this.whisk.setYaw(direction.toYRot());
-            this.gearA.setYaw(direction.toYRot());
-            this.gearB.setYaw(direction.toYRot());
+            this.gears.setYaw(direction.toYRot());
         }
 
         private void updateAnimation(boolean b, boolean c, float rotation, boolean negative) {
@@ -160,11 +157,9 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
             if (b) {
                 mat.pushMatrix();
                 mat.rotateY(negative ? Mth.HALF_PI : -Mth.HALF_PI);
-                mat.translate(0, 0.5f, 0.40f);
+                mat.translate(0, 0.5f, 0);
                 mat.rotateZ(rotation);
-                this.gearA.setTransformation(mat);
-                mat.translate(0, 0, -0.80f);
-                this.gearB.setTransformation(mat);
+                this.gears.setTransformation(mat);
                 mat.popMatrix();
             }
 
@@ -196,8 +191,7 @@ public class MixerBlock extends TallItemMachineBlock implements PipeConnectable 
             this.whisk.startInterpolationIfDirty();
 
 
-            this.gearA.startInterpolationIfDirty();
-            this.gearB.startInterpolationIfDirty();
+            this.gears.startInterpolationIfDirty();
         }
 
         public void setFluid(@Nullable FluidInstance<?> type, float position) {

@@ -75,6 +75,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
             ConveyorLikeDirectional.TransferMode.FROM_CONVEYOR, ConveyorLikeDirectional.TransferMode.TO_CONVEYOR);
     private static final BlockConfig<?> MODE_ACTION = BlockConfig.of("mode", MODE, (t, world, pos, side, state) -> Component.translatable("item.polyfactory.wrench.action.mode.transfer_mode." + t.getSerializedName()));
     private static final BlockConfig<?> MAX_STACK_SIZE_ACTION = BlockConfig.ofBlockEntityInt("max_stack_size", CommonBlockEntity.class, 1, 64, 0, CommonBlockEntity::maxStackSize, CommonBlockEntity::setMaxStackSize);
+    private static final BlockConfig<?> MIN_STACK_SIZE_ACTION = BlockConfig.ofBlockEntityInt("min_stack_size", CommonBlockEntity.class, 1, 64, 0, CommonBlockEntity::minStackSize, CommonBlockEntity::setMinStackSize);
 
     public FunnelBlock(Properties settings) {
         super(settings);
@@ -115,7 +116,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         var stack = conveyor.getContainer();
         var stackToMove = stack.get();
         var copied = false;
-        if (funnelBlockEntity.maxStackSize() < stackToMove.getCount()) {
+        if (funnelBlockEntity.matchesStackSize(stackToMove.getCount())) {
             stackToMove = stackToMove.split(funnelBlockEntity.maxStackSize());
             copied = true;
         }
@@ -160,7 +161,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         if (inv != null) {
             for (var i = 0; i < inv.getContainerSize(); i++) {
                 var stack = inv.getItem(i);
-                if (!stack.isEmpty() && be.matches(stack) && (sided == null || sided.canTakeItemThroughFace(i, stack, selfFacing.getOpposite()))) {
+                if (!stack.isEmpty() && stack.getCount() >= be.minStackSize() && be.matches(stack) && (sided == null || sided.canTakeItemThroughFace(i, stack, selfFacing.getOpposite()))) {
                     inv.setChanged();
                     if (conveyor.pushNew(stack.split(Math.min(be.maxStackSize(), stack.getCount())))) {
                         if (stack.isEmpty()) {
@@ -183,7 +184,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
                     try (var t = Transaction.openOuter()) {
                         var resource = view.getResource();
                         var val = view.extract(view.getResource(), Math.min(conveyor.getMaxStackCount(resource.toStack()), be.maxStackSize()), t);
-                        if (val != 0) {
+                        if (val != 0 && val >= be.minStackSize()) {
                             t.commit();
 
                             if (conveyor.pushNew(resource.toStack((int) val))) {
@@ -316,13 +317,19 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
 
     @Override
     public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(BlockConfig.FACING, MODE_ACTION, MAX_STACK_SIZE_ACTION);
+        return List.of(BlockConfig.FACING, MODE_ACTION, MIN_STACK_SIZE_ACTION, MAX_STACK_SIZE_ACTION);
     }
 
     public interface CommonBlockEntity {
         int maxStackSize();
+        int minStackSize();
 
         void setMaxStackSize(int maxStackSize);
+        void setMinStackSize(int minStackSize);
+
+        default boolean matchesStackSize(int count) {
+            return count <= this.maxStackSize() && count >= this.minStackSize();
+        }
     }
 
     public static class Model extends BlockModel implements WrenchHandler.ExtraModelCallbacks {
@@ -331,7 +338,8 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
         final FilterIcon filterElement = new FilterIcon(this);
         private final ItemDisplayElement mainElement;
         private final float offset;
-        public TextDisplayElement countElement;
+        public TextDisplayElement maxCount;
+        public TextDisplayElement minCount;
 
         protected Model(BlockState state, BlockPos pos) {
             this.mainElement = new LodItemDisplayElement();
@@ -339,19 +347,27 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
             this.mainElement.setItemDisplayContext(ItemDisplayContext.FIXED);
             this.mainElement.setInvisible(true);
             this.mainElement.setViewRange(0.8f);
-            this.countElement = new TextDisplayElement();
-            this.countElement.setShadow(true);
-            this.countElement.setBackground(0);
-            this.countElement.setViewRange(0);
+
+            this.maxCount = new TextDisplayElement();
+            this.maxCount.setShadow(true);
+            this.maxCount.setBackground(0);
+            this.maxCount.setViewRange(0);
+
+            this.minCount = new TextDisplayElement();
+            this.minCount.setShadow(true);
+            this.minCount.setBackground(0);
+            this.minCount.setViewRange(0);
+
             this.offset = pos.distManhattan(BlockPos.ZERO) % 2 == 0 ? 0.002f : 0;
             this.updateFacing(state);
             this.addElement(this.mainElement);
-            this.addElement(this.countElement);
+            this.addElement(this.maxCount);
+            this.addElement(this.minCount);
         }
 
         public void updateFacing(BlockState facing) {
             var rot = facing.getValue(FACING).getRotation().mul(Direction.NORTH.getRotation());
-            var mat = mat();
+            var mat = matStack();
             mat.rotate(rot);
             mat.translate(0, this.offset / 2, this.offset);
             mat.scale(2.01f);
@@ -369,19 +385,27 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
                 mat.translate(0, 8.5f / 16f, 3 / 16f - 0.005f);
             }
             mat.scale(0.3f, 0.3f, 0.005f);
-            var items = this.filterElement.getCount();
-            var offset = items == 0 ? 0 : (items / 2f + 0.5f) * (items > 3 ? 3f / items : 1) + 0.25f;
 
+            var items = this.filterElement.getCount();
+            var offset = items == 0 ? 0.5f : (items / 2f + 0.5f) * (items > 3 ? 3f / items : 1) + 0.25f;
+
+            mat.pushMatrix();
             mat.translate(-offset, -3f / 16f, 0);
             mat.rotateY(Mth.PI);
             mat.scale(1.5f);
-            this.countElement.setTransformation(mat);
-            mat.scale(1 / 1.5f);
+            this.maxCount.setTransformation(mat);
+            mat.popMatrix();
 
+            mat.pushMatrix();
+            mat.translate(offset, -3f / 16f, 0);
             mat.rotateY(Mth.PI);
-            mat.translate(offset, 3f / 16f, 0);
+            mat.scale(1.5f);
+            this.minCount.setTransformation(mat);
+            mat.popMatrix();
+
 
             this.filterElement.setTransformation(mat);
+
             this.tick();
         }
 
@@ -398,14 +422,20 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
 
         @Override
         public void startTargetting(ServerPlayer player) {
-            player.connection.send(new ClientboundSetEntityDataPacket(this.countElement.getEntityId(), List.of(
+            player.connection.send(new ClientboundSetEntityDataPacket(this.maxCount.getEntityId(), List.of(
+                    SynchedEntityData.DataValue.create(DisplayEntityData.VIEW_RANGE, 1f)
+            )));
+            player.connection.send(new ClientboundSetEntityDataPacket(this.minCount.getEntityId(), List.of(
                     SynchedEntityData.DataValue.create(DisplayEntityData.VIEW_RANGE, 1f)
             )));
         }
 
         @Override
         public void stopTargetting(ServerPlayer player) {
-            player.connection.send(new ClientboundSetEntityDataPacket(this.countElement.getEntityId(), List.of(
+            player.connection.send(new ClientboundSetEntityDataPacket(this.maxCount.getEntityId(), List.of(
+                    SynchedEntityData.DataValue.create(DisplayEntityData.VIEW_RANGE, 0f)
+            )));
+            player.connection.send(new ClientboundSetEntityDataPacket(this.minCount.getEntityId(), List.of(
                     SynchedEntityData.DataValue.create(DisplayEntityData.VIEW_RANGE, 0f)
             )));
         }

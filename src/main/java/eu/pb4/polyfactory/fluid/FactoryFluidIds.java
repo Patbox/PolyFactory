@@ -34,6 +34,8 @@ public class FactoryFluidIds {
 
     public static final ResourceKey<FluidType<?>> PLANT_OIL = of("plant_oil");
 
+    public static final ResourceKey<FluidType<?>> ETHANOL = of("ethanol");
+
     public static final ResourceKey<FluidType<?>> BIODIESEL = of("biodiesel");
 
 
