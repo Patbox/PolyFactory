@@ -50,4 +50,10 @@ public interface FermentingRecipe extends Recipe<SingleItemWithTemperature> {
     }
 
     List<ItemStack> assembleStacks(SingleItemWithTemperature input, RandomSource randomSource, boolean applyChance);
+
+    default ItemStack getRemainingItem(SingleItemWithTemperature input, RandomSource random) {
+        var remainer = input.stack().getCraftingRemainder();
+
+        return remainer != null ? remainer.create() : ItemStack.EMPTY;
+    }
 }

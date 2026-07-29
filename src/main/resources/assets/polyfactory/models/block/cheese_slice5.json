@@ -1,0 +1,22 @@
+{
+    "textures": {
+        "particle": "polyfactory:block/cheese_top",
+        "bottom": "polyfactory:block/cheese_top",
+        "top": "polyfactory:block/cheese_top",
+        "side": "polyfactory:block/cheese_side",
+        "inside": "polyfactory:block/cheese_side"
+    },
+    "elements": [
+        {   "from": [ 11, 0, 1 ],
+            "to": [ 15, 8, 15 ],
+            "faces": {
+                "down":  { "texture": "#bottom", "cullface": "down" },
+                "up":    { "texture": "#top" },
+                "north": { "texture": "#side" },
+                "south": { "texture": "#side" },
+                "west":  { "texture": "#inside" },
+                "east":  { "texture": "#side" }
+            }
+        }
+    ]
+}

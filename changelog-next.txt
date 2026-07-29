@@ -1,10 +1,11 @@
 - Added Drill Heads:
-  - Made via casting tool metals into a Mold, crafting Diamonds with Iron Drill Head and Netherite smithing.
   - When put in a Mechanical Miners or a Portable Drill, acting as a Pickaxe/Shovel combo.
+  - Made via casting tool metals into a Mold, crafting Diamonds with Iron Drill Head and Netherite smithing.
   - They are 50% faster than pickaxes for all tiers, x2.5 as durable for metal tiers and x2.25 as durable for Diamond / Netherite tiers.
 - Added Portable Drill:
+  - A new mining tool powered by Biodiesel!
   - Crafted with 1 Steel Ingot, 1 Steel Plate, 2 Copper Plates, 2 Treated Kelp and 1 Furnace (todo: replace that?)
-  - Can't be used to mine by itself, as you need to put a Drill Head on it and fuel.
+  - Can't be used to mine by itself, as you need to put a Drill Head on it and have fuel in inventory.
   - Has 3 Mining Modes:
     - Single - Mines a single block.
     - Area 2x2 - Mines 2x2x1 area based on where player breaks a block. Required 3x more fuel than single mode for single use.
@@ -16,6 +17,10 @@
   - Can be powered with rotation to speed up fermentation process, but it also works when not powered at all.
   - Crafted with Steel Machine Gearbox, Barrel and 3 Smooth Stone Slabs.
   - Currently used for production of Ethanol and Biomass.
+- Added Multimeter:
+  - A new item allowing you to read easily the state of blocks/machines.
+  - Crafted with 2 Steel Plates, Redstone Chip and 2 Cables.
+  - Currently can read values such as: Redstone power, Rotation (speed and stress), Data Receiver/Provider count, Pipe Flow, Machine State and Filled Amount.
 - Added Plant Oil fluid:
   - Crafted by using a press on any vanilla seeds or sunflowers.
   - Primarily a recipe ingredient.
@@ -29,6 +34,10 @@
   - Used to power Portable Drill.
   - Can be used with Nozzle / Pressure Fluid Gun, causing entities to get the Flammable effect:
     - It makes entities stay on fire for a longer time.
+- Added Cheese:
+  - A food block that you can place (like Cake).
+  - Restores you 2 points (1 shank) of hunger and gives you 0.5 saturation.
+  - Crafted via fermentation of Bucket of Milk.
 - Added Raw Metal Nuggets:
  - Can be crafted to/from crushed raw ores.
 - Added Sulfur Dust:
@@ -50,3 +59,4 @@
 - Fixed Item Reader's and Hologram Displays not rendering their inner model parts.
 - Fixed Cable not being updated visually correctly.
 - Fixed Loot Tables being resolved too early in loot chests.
+- Fixed Mechanical Miners not updating their state when attacking entities.

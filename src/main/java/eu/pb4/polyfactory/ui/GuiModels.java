@@ -33,6 +33,21 @@ public class GuiModels {
         );
     }
 
+    public static ItemModel createBottomGenericBar(Matrix4f transform, NumericProperty progress, ItemTintSource tintSource) {
+        var builder = RangeDispatchItemModel.builder(progress).scale(14);
+        builder.fallback(new EmptyItemModel());
+
+        for (int a = 2; a <= 14; a++) {
+            builder.entry(a - 1, new BasicItemModel(id("sgui/elements/gen/generic_bar_bottom_" + a),
+                    List.of(tintSource)));
+        }
+
+        return new CompositeItemModel(List.of(
+                new BasicItemModel(id("sgui/elements/generic_bar_bottom_background")),
+                builder.build()), Optional.of(new Transformation(transform))
+        );
+    }
+
     public static ItemModel createSideGenericBar(Matrix4f transform, NumericProperty progress, ItemTintSource tintSource) {
         var builder = RangeDispatchItemModel.builder(progress).scale(11);
         builder.fallback(new EmptyItemModel());

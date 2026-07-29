@@ -75,6 +75,7 @@ public class FactoryItems {
     public static final Item FLUID_MODEL = register(FactoryItemIds.FLUID_MODEL, FluidModelItem::new);
     // Actual items
     public static final WrenchItem WRENCH = register(FactoryItemIds.WRENCH, settings -> new WrenchItem(settings.stacksTo(1)));
+    public static final Item MULTIMETER = register(FactoryItemIds.MULTIMETER, new Item.Properties().stacksTo(1));
     public static final FactoryGuideBookItem GUIDE_BOOK = register(FactoryItemIds.GUIDE_BOOK, settings -> new FactoryGuideBookItem(settings.stacksTo(1)));
     public static final Item CLIPBOARD = register(FactoryItemIds.CLIPBOARD, settings -> new ClipboardItem(settings.stacksTo(1)));
     public static final Item CONVEYOR = register(FactoryBlocks.CONVEYOR);
@@ -211,6 +212,9 @@ public class FactoryItems {
             .food(new FoodProperties.Builder().nutrition(4).saturationModifier(0.6F).build(), Consumables.defaultFood().consumeSeconds(0.8F).build())));
     public static final Item HONEYED_APPLE = register(FactoryItemIds.HONEYED_APPLE, settings -> new SimplePolymerItem(settings
             .food(new FoodProperties.Builder().nutrition(7).saturationModifier(1.5f).build())));
+
+    public static final Item CHEESE = register(FactoryBlocks.CHEESE);
+
     public static final Item CRUSHED_RAW_IRON = register(FactoryItemIds.CRUSHED_RAW_IRON);
     public static final Item CRUSHED_RAW_COPPER = register(FactoryItemIds.CRUSHED_RAW_COPPER);
     public static final Item CRUSHED_RAW_GOLD = register(FactoryItemIds.CRUSHED_RAW_GOLD);
@@ -219,11 +223,9 @@ public class FactoryItems {
     public static final Item RAW_GOLD_NUGGET = register(FactoryItemIds.RAW_GOLD_NUGGET);
 
     public static final Item SPRAY_CAN = register(FactoryItemIds.SPRAY_CAN, settings -> new DyeSprayItem(settings.stacksTo(1)));
-    public static final PoweredDrillItem PORTABLE_DRILL = register(FactoryItemIds.PORTABLE_DRILL, new Item.Properties().stacksTo(1)
-            .component(FactoryDataComponents.MINING_MODE, MiningMode.SINGLE), PoweredDrillItem::new);
+    public static final PoweredDrillItem PORTABLE_DRILL = register(FactoryItemIds.PORTABLE_DRILL, new Item.Properties().stacksTo(1), PoweredDrillItem::new);
 
-    public static final Item CREATIVE_PORTABLE_DRILL = register(FactoryItemIds.CREATIVE_PORTABLE_DRILL, new Item.Properties().stacksTo(1)
-            .component(FactoryDataComponents.MINING_MODE, MiningMode.SINGLE), BaseDrillItem::new);
+    public static final Item CREATIVE_PORTABLE_DRILL = register(FactoryItemIds.CREATIVE_PORTABLE_DRILL, new Item.Properties().stacksTo(1), BaseDrillItem::new);
 
     public static final Item COPPER_DRILL_HEAD = register(FactoryItemIds.COPPER_DRILL_HEAD, drillHeadProperties("copper", ToolMaterial.COPPER, 2.5f));
     public static final Item IRON_DRILL_HEAD = register(FactoryItemIds.IRON_DRILL_HEAD, drillHeadProperties("iron", ToolMaterial.IRON, 2.5f));
@@ -275,7 +277,9 @@ public class FactoryItems {
                 .component(FactoryDataComponents.DRILL_HEAD_TOOL, new Tool(List.of(Tool.Rule.deniesDrops(
                                 registrationLookup.getOrThrow(material.incorrectBlocksForDrops())),
                         Tool.Rule.minesAndDrops(registrationLookup.getOrThrow(FactoryBlockTags.MINEABLE_WITH_DRILL),
-                                material.speed() * 1.5f)), 1.1F, 1, true));
+                                material.speed() * 1.5f)), 1.1F, 1, true))
+                .component(FactoryDataComponents.MINING_MODES, List.of(MiningMode.SINGLE, MiningMode.AREA_2X2X1, MiningMode.AREA_3X3X1))
+                ;
     }
 
     public static void register() {
@@ -283,7 +287,7 @@ public class FactoryItems {
             builder.add(SAW_DUST, (int) (context.baseSmeltTime() * 0.3));
             builder.add(WOODEN_PLATE, (int) (context.baseSmeltTime() * 0.6));
             builder.add(COAL_DUST, (int) (context.baseSmeltTime() * 0.8));
-            builder.add(BIOMASS, context.baseSmeltTime());
+            builder.add(BIOMASS, (int) (context.baseSmeltTime() * 0.6));
         }));
 
         CompostableRegistry.INSTANCE.add(BIOMASS, 0.75f);
@@ -418,6 +422,7 @@ public class FactoryItems {
                     // Tools
                     entries.accept(DYNAMITE);
                     entries.accept(STICKY_DYNAMITE);
+                    entries.accept(MULTIMETER);
                     entries.accept(PRESSURE_FLUID_GUN);
                     entries.accept(CHAIN_LIFT);
                     entries.accept(SPRAY_CAN);
@@ -433,6 +438,7 @@ public class FactoryItems {
                     // Food
                     entries.accept(CRISPY_HONEY);
                     entries.accept(HONEYED_APPLE);
+                    entries.accept(CHEESE);
 
                     // Other Items
                     entries.accept(HONEY_BUCKET);

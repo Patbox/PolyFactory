@@ -12,7 +12,7 @@ import java.util.List;
 public class PotatoWisdom {
     public static final List<String> RANDOM = new ArrayList<>();
     public static String get(RandomSource random) {
-        if (random.nextFloat() > 0.8 && Calendar.getInstance().get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY) {
+        if (random.nextFloat() > 0.9 && Calendar.getInstance().get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY) {
             return "It Is Wednesday My Dudes";
         }
 

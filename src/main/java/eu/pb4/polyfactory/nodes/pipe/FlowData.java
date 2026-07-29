@@ -55,7 +55,6 @@ public class FlowData implements GraphEntity<FlowData> {
     private boolean isInvalid = true;
 
 
-
     public FlowData() {
     }
 

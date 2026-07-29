@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block.data;
 
+import com.kneelawk.graphlib.api.graph.NodeHolder;
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.util.LazyItemStack;
@@ -17,17 +18,20 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
@@ -41,7 +45,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
-public abstract class InputTransformerBlock extends DataNetworkBlock implements EntityBlock, FactoryBlock, CableConnectable, DataProvider, DataReceiver, ConfigurableBlock {
+public abstract class InputTransformerBlock extends DataNetworkBlock implements EntityBlock, FactoryBlock, CableConnectable, DataProvider, DataReceiver, ConfigurableBlock, DataUser {
     public static final EnumProperty<Direction> FACING_INPUT = EnumProperty.create("facing_input", Direction.class);
     public static final EnumProperty<Direction> FACING_OUTPUT = EnumProperty.create("facing_output", Direction.class);
 
@@ -128,11 +132,18 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
     public int sendData(LevelAccessor world, Direction direction, BlockPos selfPos, DataContainer data, int dataId) {
         if (data != null && world instanceof ServerLevel serverWorld && world.getBlockEntity(selfPos) instanceof InputTransformerBlockEntity be) {
             be.setLastOutput(data);
-            return Data.getLogic(serverWorld, selfPos,
-                    x -> x.getNode() instanceof ChannelProviderDirectionNode p && p.channel() == be.outputChannel() && p.direction() == direction)
+            return Data.getLogic(serverWorld, selfPos, getOutputPredicate(be.outputChannel(), direction))
                     .pushDataUpdate(selfPos, be.outputChannel(), data, direction, dataId);
         }
         return 0;
+    }
+
+    private static Predicate<NodeHolder<BlockNode>> getOutputPredicate(int channel, Direction direction) {
+        return x -> x.getNode() instanceof ChannelProviderDirectionNode p && p.channel() == channel && p.direction() == direction;
+    }
+
+    private static Predicate<NodeHolder<BlockNode>> getInputPredicate(int channel, Direction direction) {
+        return x -> x.getNode() instanceof ChannelReceiverDirectionNode p && p.channel() == channel && p.direction() == direction;
     }
 
     @Override
@@ -144,6 +155,39 @@ public abstract class InputTransformerBlock extends DataNetworkBlock implements 
             );
         }
         return List.of();
+    }
+
+    @Override
+    public @Nullable Component getDataNetworkName(ServerLevel level, BlockPos blockPos, Vec3 location, BlockState blockState, BlockEntity entity) {
+        return switch (getTargetNetwork(blockPos, location, blockState)) {
+            default -> null;
+            case 1 -> DataUser.NETWORK_NAME_INPUT;
+            case 2 -> DataUser.NETWORK_NAME_OUTPUT;
+        };
+    }
+
+    @Override
+    public Predicate<NodeHolder<BlockNode>> getDataReadingNodePredicate(ServerLevel level, BlockPos blockPos, Vec3 location, BlockState blockState, BlockEntity entity) {
+        if (entity instanceof InputTransformerBlockEntity be) {
+            return switch (getTargetNetwork(blockPos, location, blockState)) {
+                default -> _ -> true;
+                case 1 -> getInputPredicate(be.inputChannel(), blockState.getValue(FACING_INPUT));
+                case 2 -> getOutputPredicate(be.outputChannel(), blockState.getValue(FACING_OUTPUT));
+            };
+        }
+
+        return _ -> true;
+    }
+
+    private static int getTargetNetwork(BlockPos pos, Vec3 location, BlockState state) {
+        var input = state.getValue(FACING_INPUT);
+        var output = state.getValue(FACING_OUTPUT);
+
+        if (input == output) {
+            return 0;
+        }
+
+        return Vec3.atCenterOf(pos).relative(input, 0.5).distanceToSqr(location) < Vec3.atCenterOf(pos).relative(output, 0.5).distanceToSqr(location) ? 1 : 2;
     }
 
     @Override

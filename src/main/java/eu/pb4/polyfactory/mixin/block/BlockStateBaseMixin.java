@@ -55,7 +55,7 @@ public abstract class BlockStateBaseMixin implements TypedInstance<Block> {
     @Inject(method = "getDestroyProgress", at = @At("HEAD"), cancellable = true)
     private void replaceDestroyProgress(Player player, BlockGetter level, BlockPos pos, CallbackInfoReturnable<Float> cir) {
         var tool = player.getMainHandItem();
-        if (!tool.has(FactoryDataComponents.MINING_MODE)) {
+        if (!tool.has(FactoryDataComponents.SELECTED_MINING_MODE)) {
             return;
         }
 
@@ -68,7 +68,7 @@ public abstract class BlockStateBaseMixin implements TypedInstance<Block> {
 
         var time = 0d;
 
-        for (var p : tool.getOrDefault(FactoryDataComponents.MINING_MODE, MiningMode.SINGLE).positions(player, level, pos, this.asState(), direction)) {
+        for (var p : tool.getOrDefault(FactoryDataComponents.SELECTED_MINING_MODE, MiningMode.SINGLE).positions(player, level, pos, this.asState(), direction)) {
             var s = level.getBlockState(p);
             if (MiningMode.skipMiningFor(player, level, pos, s)) continue;
             var progress = ((BlockBehaviourAccessor) s.getBlock()).callGetDestroyProgress(s, player, level, p);

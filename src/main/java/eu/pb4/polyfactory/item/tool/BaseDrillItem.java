@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.item.tool;
 
 import eu.pb4.polyfactory.item.FactoryDataComponents;
-import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.item.FactoryItemIds;
 import eu.pb4.polyfactory.item.component.MiningMode;
 import eu.pb4.polyfactory.item.util.CustomItemBrokenHandler;
 import eu.pb4.polyfactory.ui.GuiModels;
@@ -26,6 +26,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Util;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -43,15 +44,21 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static eu.pb4.polyfactory.ModInit.id;
 
 public class BaseDrillItem extends Item implements PolymerItem, CustomItemBrokenHandler {
+    public static final List<Identifier> HEAD_ATTACHMENT_IDS = new ArrayList<>(List.of(
+            FactoryItemIds.COPPER_DRILL_HEAD.identifier(),
+            FactoryItemIds.IRON_DRILL_HEAD.identifier(),
+            FactoryItemIds.GOLDEN_DRILL_HEAD.identifier(),
+            FactoryItemIds.DIAMOND_DRILL_HEAD.identifier(),
+            FactoryItemIds.NETHERITE_DRILL_HEAD.identifier()
+    ));
+
     public BaseDrillItem(Properties properties) {
         super(properties);
         var model = properties.effectiveModel();
@@ -91,14 +98,18 @@ public class BaseDrillItem extends Item implements PolymerItem, CustomItemBroken
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         var stack = player.getMainHandItem();
 
-        var values = MiningMode.values();
-        var mode = stack.getOrDefault(FactoryDataComponents.MINING_MODE, MiningMode.SINGLE);
+        var modes = stack.get(FactoryDataComponents.MINING_MODES);
+        if (modes == null) {
+            return InteractionResult.PASS;
+        }
 
-        stack.set(FactoryDataComponents.MINING_MODE, values[(values.length + mode.ordinal() + (player.isSecondaryUseActive() ? -1 : 1)) % values.length]);
+        var mode = stack.getOrDefault(FactoryDataComponents.SELECTED_MINING_MODE, MiningMode.SINGLE);
+
+        stack.set(FactoryDataComponents.SELECTED_MINING_MODE, player.isSecondaryUseActive() ? Util.findPreviousInIterable(modes, mode) : Util.findNextInIterable(modes, mode));
 
         FactoryUtil.playSoundToPlayer(player, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.PLAYERS, 0.5f, 1.2f);
 
-        player.sendOverlayMessage(Component.empty().append(player.getMainHandItem().getOrDefault(FactoryDataComponents.MINING_MODE, MiningMode.SINGLE).tooltip()));
+        player.sendOverlayMessage(Component.empty().append(player.getMainHandItem().getOrDefault(FactoryDataComponents.SELECTED_MINING_MODE, MiningMode.SINGLE).tooltip()));
 
         return InteractionResult.SUCCESS_SERVER;
     }
@@ -169,12 +180,12 @@ public class BaseDrillItem extends Item implements PolymerItem, CustomItemBroken
         PolymerItem.super.modifyBasePolymerItemStack(out, stack, context, lookup);
         var head = stack.get(FactoryDataComponents.DRILL_ATTACHMENT);
         String id = "";
-        String mode = stack.getOrDefault(FactoryDataComponents.MINING_MODE, MiningMode.SINGLE).getSerializedName();
+        String mode = stack.getOrDefault(FactoryDataComponents.SELECTED_MINING_MODE, MiningMode.SINGLE).getSerializedName();
         if (head != null) {
             id = "" + head.components().get(head.item().components(), DataComponents.ITEM_MODEL);
         }
 
-        if (stack.getOrDefault(FactoryDataComponents.MINING_MODE, MiningMode.SINGLE) != MiningMode.SINGLE) {
+        if (stack.getOrDefault(FactoryDataComponents.SELECTED_MINING_MODE, MiningMode.SINGLE) != MiningMode.SINGLE) {
             out.set(DataComponents.TOOL, new Tool(List.of(), 0, 1, true));
         }
 
@@ -195,12 +206,17 @@ public class BaseDrillItem extends Item implements PolymerItem, CustomItemBroken
         var out = takeItemFrom(drill);
 
         drill.set(FactoryDataComponents.DRILL_ATTACHMENT, ItemStackTemplate.fromNonEmptyStack(head));
+        drill.set(FactoryDataComponents.MINING_MODES, head.get(FactoryDataComponents.MINING_MODES));
+        var modes = head.get(FactoryDataComponents.MINING_MODES);
+
+        drill.set(FactoryDataComponents.SELECTED_MINING_MODE, modes != null && !modes.isEmpty() ? modes.getFirst() : null);
         drill.set(DataComponents.TOOL, head.get(FactoryDataComponents.DRILL_HEAD_TOOL));
         drill.set(DataComponents.ATTRIBUTE_MODIFIERS, head.get(FactoryDataComponents.DRILL_HEAD_ATTRIBUTE_MODIFIERS));
         drill.set(DataComponents.ENCHANTMENTS, head.get(DataComponents.ENCHANTMENTS));
         drill.set(DataComponents.MAX_DAMAGE, head.get(DataComponents.MAX_DAMAGE));
         drill.set(DataComponents.DAMAGE, head.get(DataComponents.DAMAGE));
         drill.set(DataComponents.UNBREAKABLE, head.get(DataComponents.UNBREAKABLE));
+        drill.set(DataComponents.WEAPON, head.get(DataComponents.WEAPON));
 
         return out;
     }
@@ -214,29 +230,23 @@ public class BaseDrillItem extends Item implements PolymerItem, CustomItemBroken
             head.set(DataComponents.DAMAGE, drill.get(DataComponents.DAMAGE));
 
             drill.remove(FactoryDataComponents.DRILL_ATTACHMENT);
+            drill.remove(FactoryDataComponents.MINING_MODES);
+            drill.remove(FactoryDataComponents.SELECTED_MINING_MODE);
             drill.remove(DataComponents.TOOL);
             drill.remove(DataComponents.ATTRIBUTE_MODIFIERS);
             drill.remove(DataComponents.ENCHANTMENTS);
             drill.remove(DataComponents.MAX_DAMAGE);
             drill.remove(DataComponents.DAMAGE);
             drill.remove(DataComponents.UNBREAKABLE);
+            drill.remove(DataComponents.WEAPON);
 
             return head;
         }
     }
 
     private static void setupModel(ResourcePackBuilder builder, Identifier identifier) {
-        // Todo: replace this with something dynamic
-        var head = List.of(
-                FactoryItems.COPPER_DRILL_HEAD.builtInRegistryHolder().key().identifier(),
-                FactoryItems.IRON_DRILL_HEAD.builtInRegistryHolder().key().identifier(),
-                FactoryItems.GOLDEN_DRILL_HEAD.builtInRegistryHolder().key().identifier(),
-                FactoryItems.DIAMOND_DRILL_HEAD.builtInRegistryHolder().key().identifier(),
-                FactoryItems.NETHERITE_DRILL_HEAD.builtInRegistryHolder().key().identifier()
-        );
-
         var headModel = SelectItemModel.builder(new CustomModelDataStringProperty(0));
-        for (var type : head) {
+        for (var type : HEAD_ATTACHMENT_IDS) {
             var modelId = type.withPrefix("item/").withSuffix("_held");
             headModel.withCase(type.toString(), new BasicItemModel(modelId));
 

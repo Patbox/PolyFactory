@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.block;
 
+import eu.pb4.polyfactory.compat.OtherBlockIds;
 import eu.pb4.polyfactory.other.FactoryBiomeTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -12,6 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public final class BlockHeat {
     public static final float LAVA = 0.85f;
+    public static final float LAVA_CAULDRON = 0.80f;
     public static final float CAMPFIRE = 0.45f;
     public static final float MAGMA = 0.45f;
     public static final float FIRE = 0.45f;
@@ -20,6 +22,7 @@ public final class BlockHeat {
     public static final float NEUTRAL = 0f;
     public static final float SNOW = -0.08f;
     public static final float ICE = -0.1f;
+    public static final float VOID = -0.8f;
     public static final float BIOME_REALLY_HOT = 0.15f;
     public static final float BIOME_HOT = 0.08f;
     public static final float BIOME_REALLY_COLD = -0.15f;
@@ -55,12 +58,16 @@ public final class BlockHeat {
             return FIRE;
         } else if (state.is(Blocks.LAVA)) {
             return LAVA;
-        } else if (state.is(Blocks.TORCH)) {
+        } else if (state.is(Blocks.LAVA_CAULDRON)) {
+            return LAVA_CAULDRON;
+        } else if (state.is(Blocks.TORCH) || state.is(Blocks.SOUL_TORCH) || state.is(Blocks.COPPER_TORCH)) {
             return TORCH;                           
         } else if (state.is(BlockTags.SNOW)) {
             return SNOW;
         } else if (state.is(BlockTags.ICE)) {
             return ICE;
+        } else if (state.is(OtherBlockIds.VOID_LACHRYMA)) {
+            return VOID;
         } else {
             return NEUTRAL;
         }

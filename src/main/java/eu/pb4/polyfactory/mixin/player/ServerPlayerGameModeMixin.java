@@ -65,11 +65,11 @@ public class ServerPlayerGameModeMixin implements ServerPlayerGameModeExt {
     @WrapOperation(method = "handleBlockBreakAction", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;isUnderSpawnProtection(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;)Z"))
     private boolean handleMultiDestroySpawnProtection(MinecraftServer instance, ServerLevel level, BlockPos pos, Player player, Operation<Boolean> original) {
         var tool = player.getMainHandItem();
-        if (!tool.has(FactoryDataComponents.MINING_MODE)) {
+        if (!tool.has(FactoryDataComponents.SELECTED_MINING_MODE)) {
             return original.call(instance, level, pos, player);
         }
 
-        for (var p : tool.getOrDefault(FactoryDataComponents.MINING_MODE, MiningMode.SINGLE).positions(player, this.level, pos, level.getBlockState(pos), this.miningDirection)) {
+        for (var p : tool.getOrDefault(FactoryDataComponents.SELECTED_MINING_MODE, MiningMode.SINGLE).positions(player, this.level, pos, level.getBlockState(pos), this.miningDirection)) {
             if (MiningMode.skipMiningFor(player, level, pos, level.getBlockState(p))) continue;
             if (original.call(instance, level, p, player)) {
                 return true;
@@ -81,11 +81,11 @@ public class ServerPlayerGameModeMixin implements ServerPlayerGameModeExt {
     @WrapOperation(method = "handleBlockBreakAction", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;mayInteract(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/BlockPos;)Z"))
     private boolean handleMultiDestroyMayInteract(ServerLevel instance, Entity entity, BlockPos pos, Operation<Boolean> original) {
         var tool = player.getMainHandItem();
-        if (!tool.has(FactoryDataComponents.MINING_MODE)) {
+        if (!tool.has(FactoryDataComponents.SELECTED_MINING_MODE)) {
             return original.call(instance, entity, pos);
         }
 
-        for (var p : tool.getOrDefault(FactoryDataComponents.MINING_MODE, MiningMode.SINGLE).positions(player, this.level, pos, level.getBlockState(pos), this.miningDirection)) {
+        for (var p : tool.getOrDefault(FactoryDataComponents.SELECTED_MINING_MODE, MiningMode.SINGLE).positions(player, this.level, pos, level.getBlockState(pos), this.miningDirection)) {
             if (MiningMode.skipMiningFor(player, level, pos, level.getBlockState(p))) continue;
             if (!original.call(instance, entity, p)) {
                 return false;
@@ -99,11 +99,11 @@ public class ServerPlayerGameModeMixin implements ServerPlayerGameModeExt {
         this.currentlyDestroyed = pos;
         try {
             var tool = player.getMainHandItem();
-            if (!tool.has(FactoryDataComponents.MINING_MODE)) {
+            if (!tool.has(FactoryDataComponents.SELECTED_MINING_MODE)) {
                 return original.call(instance, pos);
             }
 
-            for (var p : tool.getOrDefault(FactoryDataComponents.MINING_MODE, MiningMode.SINGLE).positions(player, this.level, pos, level.getBlockState(pos), this.miningDirection)) {
+            for (var p : tool.getOrDefault(FactoryDataComponents.SELECTED_MINING_MODE, MiningMode.SINGLE).positions(player, this.level, pos, level.getBlockState(pos), this.miningDirection)) {
                 var head = tool.get(FactoryDataComponents.DRILL_ATTACHMENT);
                 if (MiningMode.skipMiningFor(player, level, pos, level.getBlockState(p))) continue;
                 original.call(instance, p);

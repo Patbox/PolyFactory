@@ -1,0 +1,22 @@
+### Section: PageInfo
+title=<item 'polyfactory:multimeter'>
+icon=polyfactory:multimeter
+category=polyfactory:basics
+order=20
+### EndSection: PageInfo
+<yellow><item 'polyfactory:multimeter'></> is a tool that allows you to easily read state of the machines and blocks.
+<nl2>
+While you hold it, by looking at a compatible block or entity, the sidebar will appear showing all available properties.
+Currently, it supports:
+- Redstone Power level,
+- Rotation Speed, Stress Capacity and Active Stress,
+- Data Network name (if block is connected to multiple networks at the same time),
+- Data Provider and Data Receiver count for each channel,
+- Pipe Fluid Flow strength for each direction,
+- Current Machine State (also shown in Polydex Hover),
+- Filled State for supported blocks (also shown in Polydex Hover),
+- ...? ;-)
+
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:multimeter'>View the <item 'polyfactory:multimeter'> recipe</>

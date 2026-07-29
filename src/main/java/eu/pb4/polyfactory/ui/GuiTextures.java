@@ -133,9 +133,11 @@ public class GuiTextures {
     public static void register() {
         PolydexTextures.register();
         Progress.createHorizontal("generic_bar", 1, 15, false, 0);
+        Progress.createHorizontal("generic_bar_bottom", 2, 15, false, 0);
         Progress.createVertical("generic_bar_side", 2, 12, true);
         icon16Offset("generic_bar_background", 0);
         icon16Offset("generic_bar_side_background", 0);
+        icon16Offset("generic_bar_bottom_background", 0);
 
         icon16("drill_icon_area_2x2x1");
         icon16("drill_icon_area_3x3x1");

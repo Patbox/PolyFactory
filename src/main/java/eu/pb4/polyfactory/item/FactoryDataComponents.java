@@ -73,16 +73,17 @@ public class FactoryDataComponents {
     public static final DataComponentType<ItemStackTemplate> DRILL_ATTACHMENT = register("drill_attachment", DataComponentType.<ItemStackTemplate>builder().persistent(ItemStackTemplate.CODEC).build());
 
     public static final DataComponentType<Component> MATERIAL_NAME = register("material_name", DataComponentType.<Component>builder().persistent(ComponentSerialization.CODEC).build());
-    public static final DataComponentType<MiningMode> MINING_MODE = register("mining_mode", DataComponentType.<MiningMode>builder().persistent(MiningMode.CODEC).build());
+    public static final DataComponentType<MiningMode> SELECTED_MINING_MODE = register("selected_mining_mode", DataComponentType.<MiningMode>builder().persistent(MiningMode.CODEC).build());
+    public static final DataComponentType<List<MiningMode>> MINING_MODES = register("mining_modes", DataComponentType.<List<MiningMode>>builder().persistent(MiningMode.CODEC.listOf()).build());
 
     public static void register() {
         ItemComponentTooltipProviderRegistry.addFirst(FLUID);
         ItemComponentTooltipProviderRegistry.addFirst(STORED_DATA);
         ItemComponentTooltipProviderRegistry.addFirst(CONFIGURATION_DATA);
-        ItemComponentTooltipProviderRegistry.addFirst(MINING_MODE);
+        ItemComponentTooltipProviderRegistry.addFirst(SELECTED_MINING_MODE);
         BuiltInRegistries.DATA_COMPONENT_TYPE.addAlias(id("clipboard_data"), id("configuration_data"));
 
-        PolymerBlockUtils.SERVER_SIDE_MINING_CHECK.register((blockState, blockPos, serverPlayer) -> serverPlayer.getMainHandItem().getOrDefault(MINING_MODE, MiningMode.SINGLE) != MiningMode.SINGLE);
+        PolymerBlockUtils.SERVER_SIDE_MINING_CHECK.register((blockState, blockPos, serverPlayer) -> serverPlayer.getMainHandItem().getOrDefault(SELECTED_MINING_MODE, MiningMode.SINGLE) != MiningMode.SINGLE);
     }
 
 

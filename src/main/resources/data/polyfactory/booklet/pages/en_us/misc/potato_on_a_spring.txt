@@ -1,0 +1,17 @@
+### Section: PageInfo
+title=<item 'polyfactory:tiny_potato_spring'>
+icon=polyfactory:tiny_potato_spring
+category=polyfactory:misc
+order=9999
+### EndSection: PageInfo
+<yellow><item 'polyfactory:tiny_potato_spring'></> is a *decorative* block acting as a bobble head of out beloved Tiny Potato,
+the adopted mascot of <u><blue><url 'https://fabricmc.net/'>The Fabric Project</*>.
+It originates from the <u><blue><url 'https://botaniamod.net/'>Botania Mod</*>.
+<nl>
+There also exist a Golden variant of this block, which only differs visually.
+<nl2>
+<gray><i>It might or might not hold some secrets...</*>
+
+### Align: Center
+<u><blue><polydex 'polyfactory:tiny_potato_spring'>View the <item 'polyfactory:tiny_potato_spring'> recipe</><nl>
+<u><blue><polydex 'polyfactory:golden_tiny_potato_spring'>View the <item 'polyfactory:golden_tiny_potato_spring'> recipe</><nl>

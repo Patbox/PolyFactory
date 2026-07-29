@@ -141,6 +141,9 @@ public class FactoryBlocks {
     public static final PolymerButtonBlock STEEL_BUTTON = register(FactoryBlockIds.STEEL_BUTTON, BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_BUTTON), settings -> new PolymerButtonBlock("steel", BlockSetType.IRON, 5, settings.noOcclusion()));
     public static final TinyPotatoSpringBlock TINY_POTATO_SPRING = register(FactoryBlockIds.TINY_POTATO_SPRING, settings -> new TinyPotatoSpringBlock(settings.strength(1).noOcclusion()));
     public static final TinyPotatoSpringBlock GOLDEN_TINY_POTATO_SPRING = register(FactoryBlockIds.GOLDEN_TINY_POTATO_SPRING, settings -> new TinyPotatoSpringBlock(settings.strength(2).noOcclusion()));
+
+    public static final CheeseBlock CHEESE = register(FactoryBlockIds.CHEESE, BlockBehaviour.Properties.ofFullCopy(Blocks.CAKE), CheeseBlock::new);
+
     public static final RotationalDebugBlock ROTATION_DEBUG = register(FactoryBlockIds.ROTATION_DEBUG, settings -> new RotationalDebugBlock(settings.noOcclusion().strength(-1, -1)));
     public static final PipeBlock PIPE = register(FactoryBlockIds.PIPE, BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK.weathering().unaffected()), settings -> new PipeBlock(settings.noOcclusion()));
     public static final FilteredPipeBlock FILTERED_PIPE = register(FactoryBlockIds.FILTERED_PIPE, BlockBehaviour.Properties.ofFullCopy(PIPE), settings -> new FilteredPipeBlock(settings.noOcclusion()));

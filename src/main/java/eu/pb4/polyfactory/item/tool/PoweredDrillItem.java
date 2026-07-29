@@ -6,13 +6,11 @@ import eu.pb4.polyfactory.fluid.FluidContainerFromComponent;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.item.component.MiningMode;
-import eu.pb4.polyfactory.item.configuration.WrenchHandler;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -35,7 +33,7 @@ public class PoweredDrillItem extends BaseDrillItem {
     }
 
     private static long getUsedFuel(ItemStack stack) {
-        return BASE_USED_FUEL * switch (stack.getOrDefault(FactoryDataComponents.MINING_MODE, MiningMode.SINGLE)) {
+        return BASE_USED_FUEL * switch (stack.getOrDefault(FactoryDataComponents.SELECTED_MINING_MODE, MiningMode.SINGLE)) {
             case SINGLE -> 1;
             case AREA_2X2X1 -> 3;
             case AREA_3X3X1 -> 5;

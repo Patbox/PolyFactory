@@ -1,0 +1,34 @@
+### Section: PageInfo
+title=<item 'polyfactory:pipe'>
+icon=polyfactory:pipe
+category=polyfactory:fluids
+order=10
+### EndSection: PageInfo
+<yellow><item 'polyfactory:pipe'></> is a block that allows you to transport fluids around, both for storage,
+placement / draining and crafting purposes.
+<nl>
+Regular <item 'polyfactory:pipe'> can connect directionally with other pipes, allowing it to split and join fluid flow.
+They also will try to connect to any other fluid input/output or pipe, through that functionality can be disabled per
+block with a <u><blue><pagelink '/basics/wrench'><item 'polyfactory:wrench'></*>.
+<nl>
+You can put <item 'polyfactory:pipe'> into a wall block, allowing you to compose it in better.
+<nl>
+Pipes by default do not move fluids, as you need to power them with a <u><blue><pagelink './mechanical_pump'><item 'polyfactory:pump'></*>.
+<nl2>
+<yellow><item 'polyfactory:redstone_valve_pipe'></> is a pipe variant, which can be used to connect / disconnect pipe
+network automatically by applying redstone power to it.
+This pipe also can only connect in axis it is facing.
+<nl2>
+<yellow><item 'polyfactory:filtered_pipe'></> is a pipe variant, allows you to filter out fluids passing through it, handling
+it both as whitelist or a blacklist depending on the need. To set the filter you need to use item associated with certain
+fluid on it, for example Bucket of Water to set it to filtering water or Iron Ingot to filter out Molten Iron.
+If not configured, the filter will automatically set itself to first fluid it gets in contact with.
+<nl>
+This pipe also can only connect in axis it is facing.
+
+### Image: polyfactory:fluids/pipe_example Example system using pipes.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:pipe'>View the <item 'polyfactory:pipe'> recipe</><nl>
+<u><blue><polydex 'polyfactory:redstone_valve_pipe'>View the <item 'polyfactory:redstone_valve_pipe'> recipe</><nl>
+<u><blue><polydex 'polyfactory:filtered_pipe'>View the <item 'polyfactory:filtered_pipe'> recipe</><nl>

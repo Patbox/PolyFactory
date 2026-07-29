@@ -10,7 +10,9 @@ import eu.pb4.polyfactory.recipe.input.SingleItemWithTemperature;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -33,6 +35,11 @@ public record SimpleFermentingRecipe(String group, Ingredient input,
                     Codec.FLOAT.optionalFieldOf("max_temperature", Float.POSITIVE_INFINITY).forGetter(SimpleFermentingRecipe::maxTemperature)
             ).apply(x, SimpleFermentingRecipe::new)
     );
+
+    public static RecipeHolder<SimpleFermentingRecipe> of(String id, String group, Ingredient input, Item result, double time) {
+        return new RecipeHolder<>(FactoryUtil.recipeKey("fermenting/" + id), new SimpleFermentingRecipe(group, input, List.of(OutputStack.of(result)),
+                List.of(), time, 0, 1));
+    }
 
     public static RecipeHolder<SimpleFermentingRecipe> of(String id, String group, Ingredient input, OutputStack outputItem, FluidStack<?> outputFluid, double time) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("fermenting/" + id), new SimpleFermentingRecipe(group, input, List.of(outputItem),

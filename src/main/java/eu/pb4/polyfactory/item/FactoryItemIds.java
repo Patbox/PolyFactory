@@ -17,6 +17,7 @@ public class FactoryItemIds {
     public static final ResourceKey<Item> FLUID_MODEL = of("fluid_model");
     // Actual items
     public static final ResourceKey<Item> WRENCH = of("wrench");
+    public static final ResourceKey<Item> MULTIMETER = of("multimeter");
     public static final ResourceKey<Item> GUIDE_BOOK = of("guidebook");
     public static final ResourceKey<Item> CLIPBOARD = of("clipboard");
     public static final ResourceKey<Item> CONVEYOR = of(FactoryBlockIds.CONVEYOR);
@@ -139,6 +140,7 @@ public class FactoryItemIds {
 
     public static final ResourceKey<Item> CRISPY_HONEY = of("crispy_honey");
     public static final ResourceKey<Item> HONEYED_APPLE = of("honeyed_apple");
+    public static final ResourceKey<Item> CHEESE = of("cheese");
 
     public static final ResourceKey<Item> CRUSHED_RAW_IRON = of("crushed_raw_iron");
     public static final ResourceKey<Item> CRUSHED_RAW_COPPER = of("crushed_raw_copper");

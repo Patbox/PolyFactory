@@ -177,6 +177,11 @@ public abstract class TallItemMachineBlock extends RotationalNetworkBlock implem
         }
     }
 
+    @Override
+    public BlockPos offsetRotationReadingPosition(BlockPos pos, BlockState state) {
+        return state.getValue(PART) == Part.MAIN ? pos.above() : pos;
+    }
+
     public enum Part implements StringRepresentable {
         MAIN,
         TOP;

@@ -240,7 +240,7 @@ class AssetProvider implements DataProvider {
 
         for (var item : List.of(FactoryItems.TINY_POTATO_SPRING, FactoryItems.GOLDEN_TINY_POTATO_SPRING, FactoryItems.PIPE, FactoryItems.MECHANICAL_DRAIN, FactoryItems.PORTABLE_FLUID_TANK,
                 FactoryItems.LARGE_STEEL_GEAR,
-                FactoryItems.PUMP, FactoryItems.STEEL_BUTTON, FactoryDebugItems.ROTATION_DEBUG)) {
+                FactoryItems.PUMP, FactoryItems.STEEL_BUTTON, FactoryDebugItems.ROTATION_DEBUG, FactoryItems.CHEESE)) {
             fromItem.accept(item, id -> new ItemAsset(new BasicItemModel(id.withPrefix("item/")), ItemAsset.Properties.DEFAULT));
         }
 

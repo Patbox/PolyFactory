@@ -14,6 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
 public interface NetworkComponent {
     interface Rotational extends NetworkComponent {
@@ -46,6 +47,14 @@ public interface NetworkComponent {
                 return o.get().getGraph().getGraphEntity(FlowData.TYPE);
             }
             return FlowData.EMPTY;
+        }
+
+        static FlowData getLogicNullable(ServerLevel world, BlockPos pos) {
+            var o = FactoryNodes.PIPE.getGraphWorld(world).getNodesAt(pos).findFirst();
+            if (o.isPresent()) {
+                return o.get().getGraph().getGraphEntity(FlowData.TYPE);
+            }
+            return null;
         }
 
         static void forEachLogic(ServerLevel world, BlockPos pos, Consumer<FlowData> consumer) {
@@ -83,6 +92,17 @@ public interface NetworkComponent {
             return DataStorage.EMPTY;
         }
 
+        @Nullable
+        static DataStorage getLogicNullable(ServerLevel world, BlockPos pos) {
+            {
+                var o = FactoryNodes.DATA.getGraphWorld(world).getNodesAt(pos).findFirst();
+                if (o.isPresent()) {
+                    return o.get().getGraph().getGraphEntity(DataStorage.TYPE);
+                }
+            }
+            return null;
+        }
+
         static DataStorage getLogic(ServerLevel world, BlockPos pos, Predicate<NodeHolder<BlockNode>> predicate) {
             {
                 var o = FactoryNodes.DATA.getGraphWorld(world).getNodesAt(pos).filter(predicate).findFirst();
@@ -91,6 +111,17 @@ public interface NetworkComponent {
                 }
             }
             return DataStorage.EMPTY;
+        }
+
+        @Nullable
+        static DataStorage getLogicNullable(ServerLevel world, BlockPos pos, Predicate<NodeHolder<BlockNode>> predicate) {
+            {
+                var o = FactoryNodes.DATA.getGraphWorld(world).getNodesAt(pos).filter(predicate).findFirst();
+                if (o.isPresent()) {
+                    return o.get().getGraph().getGraphEntity(DataStorage.TYPE);
+                }
+            }
+            return null;
         }
     }
 

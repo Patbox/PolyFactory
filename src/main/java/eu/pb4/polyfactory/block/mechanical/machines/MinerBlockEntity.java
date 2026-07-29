@@ -283,6 +283,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
             player.attack(entities.getFirst());
             self.syncActiveToolData();
             self.lastAttackedTicks = 0;
+            self.setChanged();
             return;
         }
 

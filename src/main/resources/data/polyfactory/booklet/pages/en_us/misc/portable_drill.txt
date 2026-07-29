@@ -1,0 +1,22 @@
+### Section: PageInfo
+title=<item 'polyfactory:portable_drill'>
+icon=polyfactory:portable_drill[polyfactory:drill_attachment='polyfactory:diamond_drill_head']
+category=polyfactory:misc
+order=21
+### EndSection: PageInfo
+<yellow><item 'polyfactory:portable_drill'></> is an item which can be used to mine blocks when combined
+with <u><blue><pagelink './drill_head'>a Drill Head</*>, taking its properties.
+It can't break blocks at all without a Drill Head or without a <pageref '/fluids/portable_fluid_tank'> filled with Biodiesel.
+<nl2>
+By right-clicking you can change it's mining mode, with them being:
+- Single - Mines a single block.
+- Area 2x2 - Mines 2x2x1 area based on where player breaks a block. Requires 3x more fuel than single mode for single use.
+- Area 3x3 - Mines 3x3x1 area based on where player breaks a block. Requires 5x more fuel than single mode for a single use.
+<nl2>
+It also has lower mining range than regular tools such as pickaxe or shovel.
+
+
+### Align: Center
+<u><blue><polydex 'polyfactory:portable_drill'>View the <item 'polyfactory:portable_drill'> recipe</><nl>
+<u><blue><polydex 'polyfactory:biodiesel'>View the <lang 'fluid_type.polyfactory.biodiesel'> recipe</><nl>
+<u><blue><polydex '#polyfactory:drill_heads' search>View the Drill Head recipes</><nl>

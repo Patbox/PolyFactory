@@ -188,6 +188,11 @@ public class SteamEngineBlock extends MultiBlock implements FactoryBlock, Entity
     }
 
     @Override
+    public BlockPos offsetRotationReadingPosition(BlockPos pos, BlockState state) {
+        return pos.above(2 - state.getValue(this.partY));
+    }
+
+    @Override
     public boolean tickElementHolder(ServerLevel world, BlockPos pos, BlockState initialBlockState) {
         return true;
     }

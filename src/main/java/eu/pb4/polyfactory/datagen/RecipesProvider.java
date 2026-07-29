@@ -8,7 +8,6 @@ import eu.pb4.polyfactory.fluid.FactoryFluidConstants;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.fluid.FluidType;
-import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.SpoutMolds;
@@ -914,6 +913,16 @@ class RecipesProvider extends FabricRecipeProvider {
                         .unlockedBy("get_item", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
                         .save(output);
 
+                this.shaped(RecipeCategory.REDSTONE, FactoryItems.MULTIMETER)
+                        .pattern(" c ")
+                        .pattern("src")
+                        .pattern(" s ")
+                        .define('s', FactoryItems.STEEL_PLATE)
+                        .define('r', FactoryItems.REDSTONE_CHIP)
+                        .define('c', FactoryItems.CABLE)
+                        .unlockedBy("get_item", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
+                        .save(output);
+
                 this.shapeless(RecipeCategory.MISC, FactoryItems.GUIDE_BOOK)
                         .requires(Items.IRON_NUGGET)
                         .requires(Items.BOOK)
@@ -1438,13 +1447,15 @@ class RecipesProvider extends FabricRecipeProvider {
                 }
 
                 of(output,
-                        SimpleFermentingRecipe.of("sugar_cane", "", Ingredient.of(Items.SUGAR_CANE), OutputStack.of(FactoryItems.BIOMASS, 0.3f), FactoryFluids.ETHANOL.ofNuggets(3), 120),
-                        SimpleFermentingRecipe.of("potato", "", Ingredient.of(Items.POTATO), OutputStack.of(FactoryItems.BIOMASS, 0.45f), FactoryFluids.ETHANOL.ofNuggets(6), 110),
-                        SimpleFermentingRecipe.of("poisonous_potato", "", Ingredient.of(Items.POISONOUS_POTATO), OutputStack.of(FactoryItems.BIOMASS, 0.35f), FactoryFluids.ETHANOL.ofNuggets(10), 80),
+                        SimpleFermentingRecipe.of("sugar_cane", "", Ingredient.of(Items.SUGAR_CANE), OutputStack.of(FactoryItems.BIOMASS, 0.3f), FactoryFluids.ETHANOL.ofNuggets(3), 140),
+                        SimpleFermentingRecipe.of("potato", "", Ingredient.of(Items.POTATO), OutputStack.of(FactoryItems.BIOMASS, 0.45f), FactoryFluids.ETHANOL.ofNuggets(6), 130),
+                        SimpleFermentingRecipe.of("poisonous_potato", "", Ingredient.of(Items.POISONOUS_POTATO), OutputStack.of(FactoryItems.BIOMASS, 0.35f), FactoryFluids.ETHANOL.ofNuggets(10), 90),
                         SimpleFermentingRecipe.of("sweet_berries", "", Ingredient.of(Items.SWEET_BERRIES), OutputStack.of(FactoryItems.BIOMASS, 0.2f), FactoryFluids.ETHANOL.ofNuggets(3), 120),
-                        SimpleFermentingRecipe.of("glow_berries", "", Ingredient.of(Items.GLOW_BERRIES), OutputStack.of(FactoryItems.BIOMASS, 0.2f), FactoryFluids.ETHANOL.ofNuggets(5), 150),
-                        SimpleFermentingRecipe.of("apple", "", Ingredient.of(Items.APPLE), OutputStack.of(FactoryItems.BIOMASS, 0.1f), FactoryFluids.ETHANOL.ofNuggets(1), 110),
-                        SimpleFermentingRecipe.of("beetroot", "", Ingredient.of(Items.BEETROOT), OutputStack.of(FactoryItems.BIOMASS, 0.25f), FactoryFluids.ETHANOL.ofNuggets(5), 110)
+                        SimpleFermentingRecipe.of("glow_berries", "", Ingredient.of(Items.GLOW_BERRIES), OutputStack.of(FactoryItems.BIOMASS, 0.2f), FactoryFluids.ETHANOL.ofNuggets(5), 160),
+                        SimpleFermentingRecipe.of("apple", "", Ingredient.of(Items.APPLE), OutputStack.of(FactoryItems.BIOMASS, 0.1f), FactoryFluids.ETHANOL.ofNuggets(1), 130),
+                        SimpleFermentingRecipe.of("beetroot", "", Ingredient.of(Items.BEETROOT), OutputStack.of(FactoryItems.BIOMASS, 0.25f), FactoryFluids.ETHANOL.ofNuggets(5), 110),
+
+                        SimpleFermentingRecipe.of("cheese", "", Ingredient.of(Items.MILK_BUCKET), FactoryItems.CHEESE, 250)
                 );
 
                 this.shaped(RecipeCategory.REDSTONE, FactoryItems.STEEL_GEAR, 3)

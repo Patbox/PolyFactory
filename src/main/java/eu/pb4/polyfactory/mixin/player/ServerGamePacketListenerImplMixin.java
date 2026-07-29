@@ -3,6 +3,7 @@ package eu.pb4.polyfactory.mixin.player;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import eu.pb4.polyfactory.block.collection.BlockCollection;
+import eu.pb4.polyfactory.item.util.MultimeterHandler;
 import eu.pb4.polyfactory.item.util.SwitchActionItem;
 import eu.pb4.polyfactory.item.configuration.WrenchHandler;
 import eu.pb4.polyfactory.util.ServerPlayNetExt;
@@ -29,10 +30,13 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerPlayNet
     @Shadow public ServerPlayer player;
     @Unique
     private final WrenchHandler wrenchHandler = new WrenchHandler((ServerGamePacketListenerImpl) (Object) this);
+    @Unique
+    private final MultimeterHandler multimeterHandler = new MultimeterHandler((ServerGamePacketListenerImpl) (Object) this);
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo ci) {
         this.wrenchHandler.tickDisplay(this.getPlayer());
+        this.multimeterHandler.tickDisplay(this.getPlayer());
     }
 
     @Inject(method = "handlePlayerAction", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/game/ServerboundPlayerActionPacket;getAction()Lnet/minecraft/network/protocol/game/ServerboundPlayerActionPacket$Action;"), cancellable = true)
@@ -74,4 +78,8 @@ public abstract class ServerGamePacketListenerImplMixin implements ServerPlayNet
         return this.wrenchHandler;
     }
 
+    @Override
+    public MultimeterHandler polyFactory$getMultimeterHandler() {
+        return this.multimeterHandler;
+    }
 }

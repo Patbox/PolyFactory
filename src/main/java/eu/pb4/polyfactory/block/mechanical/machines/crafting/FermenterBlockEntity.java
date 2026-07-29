@@ -229,6 +229,8 @@ public class FermenterBlockEntity extends TallItemMachineBlockEntity implements 
                 continue;
             }
 
+            var preventFinish = false;
+
             var result = self.recipes[i].value().fluidOutput(input);
             var stored = self.fluidContainer.stored();
 
@@ -236,27 +238,57 @@ public class FermenterBlockEntity extends TallItemMachineBlockEntity implements 
                 stored += x.amount();
             }
 
-            if (stored <= self.fluidContainer.capacity()) {
-                stuck = true;
+            if (stored > self.fluidContainer.capacity()) {
+                preventFinish = true;
+            }
+
+            var output = self.getOutputContainer();
+            // Check space
+            if (!stuck) {
+                var inv = new SimpleContainer(output.getContainerSize());
+                for (int a = 0; a < output.getContainerSize(); a++) {
+                    inv.setItem(a, output.getItem(i).copy());
+                }
+
+                for (var item : self.recipes[i].value().assembleStacks(input, level.getRandom(), false)) {
+                    FactoryUtil.tryInsertingRegular(inv, item);
+
+                    if (!item.isEmpty()) {
+                        preventFinish = true;
+                        break;
+                    }
+                }
+                var leftover = self.recipes[i].value().getRemainingItem(input, level.getRandom());
+                FactoryUtil.tryInsertingRegular(inv, leftover);
+
+                if (!leftover.isEmpty()) {
+                    preventFinish = true;
+                }
             }
 
             if (self.progress[i] < self.recipes[i].value().time(input)) {
                 self.progress[i] += speed;
                 dirty = true;
                 continue;
-            } else if (stored > self.fluidContainer.capacity()) {
+            } else if (preventFinish) {
+                stuck = true;
                 continue;
             }
 
             dirty = true;
-            stack.shrink(1);
             self.progress[i] = 0;
 
             for (var x : result) {
                 self.fluidContainer.insert(x, false);
             }
 
-            self.recipes[i].value().assembleStacks(input, level.getRandom(), true).forEach(self::addToOutputOrDrop);
+            for (var out : self.recipes[i].value().assembleStacks(input, level.getRandom(), true)) {
+                FactoryUtil.tryInsertingRegular(output, out.copy());
+            }
+
+            FactoryUtil.tryInsertingRegular(output, self.recipes[i].value().getRemainingItem(input, level.getRandom()));
+
+            stack.shrink(1);
 
             if (FactoryUtil.getClosestPlayer(level, pos, 32) instanceof ServerPlayer player) {
                 TriggerCriterion.trigger(player, FactoryTriggers.FERMENTER_FERMENTS);
@@ -314,7 +346,11 @@ public class FermenterBlockEntity extends TallItemMachineBlockEntity implements 
     }
 
     private void addToOutputOrDrop(ItemStack stack) {
-        FactoryUtil.insertBetween(this, OUTPUT_FIRST, this.getContainerSize(), stack);
+        if (stack.isEmpty()) {
+            return;
+        }
+
+        FactoryUtil.tryInsertingRegular(this.getOutputContainer(), stack);
         if (!stack.isEmpty()) {
             assert this.level != null;
             Containers.dropItemStack(this.level, this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 0.5, this.worldPosition.getZ() + 0.5, stack);
@@ -363,7 +399,7 @@ public class FermenterBlockEntity extends TallItemMachineBlockEntity implements 
 
     @Override
     public Component getFilledStateText() {
-        return this.state;
+        return null;
     }
 
     @Override
@@ -408,10 +444,12 @@ public class FermenterBlockEntity extends TallItemMachineBlockEntity implements 
 
             this.setSlot(2 * 9 + 2, GuiTextures.TEMPERATURE.getNamed(Mth.clamp(FermenterBlockEntity.this.temperature, -1, 1), CURRENT_HEAT));
 
-            this.setSlot(5 + 9 + 9, GuiElementBuilder.from(GuiTextures.EMPTY.asStack()).setName(CURRENT_HEAT));
-            this.setSlot(6, new FurnaceResultSlot(player, FermenterBlockEntity.this, 6, 3, 0));
-            this.setSlot(6 + 9, new FurnaceResultSlot(player, FermenterBlockEntity.this, 7, 3, 0));
-            this.setSlot(6 + 18, new FurnaceResultSlot(player, FermenterBlockEntity.this, 8, 3, 0));
+            this.setSlot(5, new FurnaceResultSlot(player, FermenterBlockEntity.this, 6, 3, 0));
+            this.setSlot(6, new FurnaceResultSlot(player, FermenterBlockEntity.this, 7, 3, 0));
+            this.setSlot(5 + 9, new FurnaceResultSlot(player, FermenterBlockEntity.this, 8, 3, 0));
+            this.setSlot(6 + 9, new FurnaceResultSlot(player, FermenterBlockEntity.this, 9, 3, 0));
+            this.setSlot(5 + 18, new FurnaceResultSlot(player, FermenterBlockEntity.this, 10, 3, 0));
+            this.setSlot(6 + 18, new FurnaceResultSlot(player, FermenterBlockEntity.this, 11, 3, 0));
             this.open();
         }
 

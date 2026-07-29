@@ -4,6 +4,8 @@ import com.kneelawk.graphlib.api.graph.NodeHolder;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
@@ -42,6 +44,14 @@ public interface RotationUser extends NetworkComponent.Rotational {
     }
 
     void updateRotationalData(RotationData.State modifier, BlockState state, ServerLevel world, BlockPos pos);
+
+    default BlockPos offsetRotationReadingPosition(BlockPos pos, BlockState state) {
+        return pos;
+    }
+
+    default Predicate<NodeHolder<?>> getRotationReadingNodePredicate(ServerLevel level, BlockPos blockPos, Vec3 location, BlockState blockState, BlockEntity entity) {
+        return _ -> true;
+    }
 
     static RotationData getRotation(Level world, BlockPos pos) {
         var x = getNullableRotation(world, pos);
