@@ -70,6 +70,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import static eu.pb4.polyfactory.util.FactoryUtil.fakeTagList;
 import static eu.pb4.polyfactory.util.FactoryUtil.recipeKey;
 
 class RecipesProvider extends FabricRecipeProvider {
@@ -218,6 +219,18 @@ class RecipesProvider extends FabricRecipeProvider {
                         .pattern("aaa")
                         .define('b', Items.BLAST_FURNACE)
                         .define('w', FactoryItems.STEEL_PLATE).define('a', Items.DEEPSLATE_BRICKS)
+                        .unlockedBy("get_steel", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
+                        .save(output);
+
+                this.shaped(RecipeCategory.REDSTONE, FactoryItems.DIESEL_ENGINE, 1)
+                        .pattern("wpw")
+                        .pattern("abc")
+                        .pattern("wpw")
+                        .define('p', Items.PISTON)
+                        .define('b', Items.BLAST_FURNACE)
+                        .define('w', FactoryItems.STEEL_PLATE)
+                        .define('a', FactoryItems.AXLE)
+                        .define('c', FactoryItems.PIPE)
                         .unlockedBy("get_steel", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
                         .save(output);
 
@@ -407,7 +420,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .define('s', FactoryItems.STEEL_PLATE)
                         .define('c', FactoryItems.COPPER_PLATE)
                         .define('t', FactoryItems.TREATED_DRIED_KELP)
-                        .define('f', Items.FURNACE)
+                        .define('f', FactoryItems.DIESEL_ENGINE)
                         .unlockedBy("get_steel", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
                         .save(output);
 
@@ -1277,12 +1290,12 @@ class RecipesProvider extends FabricRecipeProvider {
                         of(output, GenericMixingRecipe.ofCounted(nameSolid + "_direct", "concrete_direct",
                                 List.of(CountedIngredient.ofTag(4, itemWrap.getOrThrow(ItemTags.SMELTS_TO_GLASS)),
                                         CountedIngredient.ofItems(4, Items.GRAVEL),
-                                        CountedIngredient.ofItems(0, Items.WATER_BUCKET),
+                                        CountedIngredient.ofTag(0, fakeTagList(ConventionalItemTags.WATER_BUCKETS)),
                                         CountedIngredient.ofItems(1, dye)),
                                 5, 1, 15, new ItemStackTemplate(solid, 8)));
 
                         of(output, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder", "concrete_water",
-                                List.of(CountedIngredient.ofItems(1, powder), CountedIngredient.ofItems(0, Items.WATER_BUCKET)),
+                                List.of(CountedIngredient.ofItems(1, powder), CountedIngredient.ofTag(0, fakeTagList(ConventionalItemTags.WATER_BUCKETS))),
                                 1, 1, 4, new ItemStackTemplate(solid, 1)));
 
 
@@ -1335,10 +1348,14 @@ class RecipesProvider extends FabricRecipeProvider {
                                 List.of(Ingredient.of(Items.DIRT), Ingredient.of(Items.GRAVEL)), 2, 4, 10, new ItemStackTemplate(Items.COARSE_DIRT, 2)),
                         GenericMixingRecipe.of("packed_mud",
                                 List.of(Ingredient.of(Items.WHEAT), Ingredient.of(Items.MUD)), 2, 4, 10, new ItemStackTemplate(Items.PACKED_MUD)),
-                        GenericMixingRecipe.ofCounted("cake",
+                        GenericMixingRecipe.ofCounted("cake", "cake",
                                 List.of(CountedIngredient.ofItems(2, Items.WHEAT), CountedIngredient.ofItems(2, Items.SUGAR),
                                         CountedIngredient.ofItems(1, Items.EGG),
                                         CountedIngredient.ofItemsRemainder(2, Items.MILK_BUCKET, Items.BUCKET)),
+                                3, 4, 10, new ItemStackTemplate(Items.CAKE)),
+                        GenericMixingRecipe.ofCounted("cake_fluid", "cake",
+                                List.of(CountedIngredient.ofItems(2, Items.WHEAT), CountedIngredient.ofItems(2, Items.SUGAR),
+                                        CountedIngredient.ofItems(1, Items.EGG)), List.of(FluidInputStack.from(FactoryFluids.MILK.of((long) (FluidConstants.BUCKET * 1.8f)))),
                                 3, 4, 10, new ItemStackTemplate(Items.CAKE)),
                         GenericMixingRecipe.ofCounted("pumpkin_pie",
                                 List.of(CountedIngredient.ofItems(1, Items.PUMPKIN), CountedIngredient.ofItems(1, Items.SUGAR),

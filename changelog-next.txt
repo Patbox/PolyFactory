@@ -4,7 +4,7 @@
   - They are 50% faster than pickaxes for all tiers, x2.5 as durable for metal tiers and x2.25 as durable for Diamond / Netherite tiers.
 - Added Portable Drill:
   - A new mining tool powered by Biodiesel!
-  - Crafted with 1 Steel Ingot, 1 Steel Plate, 2 Copper Plates, 2 Treated Kelp and 1 Furnace (todo: replace that?)
+  - Crafted with 1 Steel Ingot, 1 Steel Plate, 2 Copper Plates, 2 Treated Kelp and 1 Diesel Engine
   - Can't be used to mine by itself, as you need to put a Drill Head on it and have fuel in inventory.
   - Has 3 Mining Modes:
     - Single - Mines a single block.
@@ -12,6 +12,14 @@
     - Area 3x3 - Mines 3x3x1 area based on where player breaks a block. Required 5x more fuel than single mode for a single use.
   - Has lower mining range than a regular tool.
   - Needs to be fueled with Biodiesel to work (You need a Portable Fluid Tank of Biodiesel in your inventory).
+- Added Diesel Engine:
+  - New rotational energy source, fueled by Biodiesel!
+  - Crafted with 2 Pistons, 4 Steel Plates, Axle, Copper Pipe and Blast Furnace.
+  - Can be configured to only work when powered (or not) by redstone (by default always active).
+  - It's speed can be changed between 5 levels (from 1 to 5 inclusive), increasing speed by 33.3 RPM for each level.
+  - The current gear/speed level also controls how much fuel it burns.
+  - On gear 3, it's comparable with Steam Engine.
+  - It can hold 1.2 buckets of fuel on its own, but also acts as weak pump allowing easily fuel it from other sources.
 - Added Fermenter:
   - A new machine blocks, used to ferment items into liquids and other items.
   - Can be powered with rotation to speed up fermentation process, but it also works when not powered at all.
@@ -55,9 +63,11 @@
   - Added new mixin Gunpowder recipe using 2 Sulfur Dust, 1 Coal Dust and 1 Saw Dust.
   - Changed old Gunpowder recipe to require 5 Netherite Dusts rather than 2.
   - Crushed raw metals now give one more nugget worth of molten metals than before (1 ingot + 2 nuggets -> 1 ingot + 3 nuggets).
+  - Mixer cake recipe can now use Milk fluid rather than only Milk Buckets.
 - Made Grinding recipes have higher max speed limit, allowing them to work faster
 - Funnels can now require a minimal stack size that can go in/out.
 - Polydex Mixer recipes will now visually scale fluid contents if they are too small.
+- Tweaked some item models to match block / in-world look more closely.
 - Potatoes gained new wisdom.
 - Fixed Item Reader's and Hologram Displays not rendering their inner model parts.
 - Fixed Cable not being updated visually correctly.

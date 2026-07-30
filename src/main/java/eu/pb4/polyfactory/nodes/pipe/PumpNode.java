@@ -10,7 +10,6 @@ import com.kneelawk.graphlib.api.util.HalfLink;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.ModInit;
-import eu.pb4.polyfactory.nodes.AxisNode;
 import eu.pb4.polyfactory.nodes.DirectionNode;
 import eu.pb4.polyfactory.nodes.FactoryNodes;
 import eu.pb4.polyfactory.nodes.generic.FunctionalNode;
@@ -22,7 +21,7 @@ import net.minecraft.core.Direction;
 
 public record PumpNode(Direction flowDirection, boolean isPulling, Direction direction, int range) implements FunctionalNode, DirectionNode {
     public static final int DEFAULT_RANGE = 32;
-    public static final int SPOUT_RANGE = 8;
+    public static final int WEAK_RANGE = 8;
 
     public static final Codec<PumpNode> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Direction.CODEC.fieldOf("direction").forGetter(PumpNode::flowDirection),

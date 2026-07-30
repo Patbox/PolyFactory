@@ -58,7 +58,7 @@ public class PoweredDrillItem extends BaseDrillItem {
         var required = getUsedFuel(itemStack);
         for (var container : findFluidContainer(user)) {
             for (var fluid : container.fluids()) {
-                if (fluid.is(FactoryFluidTags.DRILL_FUEL)) {
+                if (fluid.is(FactoryFluidTags.DIESEL_ENGINE_FUEL)) {
                     required -= container.get(fluid);
 
                     if (required <= 0) {
@@ -75,7 +75,7 @@ public class PoweredDrillItem extends BaseDrillItem {
         long total = 0;
         for (var container : findFluidContainer(user)) {
             for (var fluid : container.fluids()) {
-                if (fluid.is(FactoryFluidTags.DRILL_FUEL)) {
+                if (fluid.is(FactoryFluidTags.DIESEL_ENGINE_FUEL)) {
                     total += container.get(fluid);
                 }
             }
@@ -89,7 +89,7 @@ public class PoweredDrillItem extends BaseDrillItem {
 
         for (var container : findFluidContainer(user)) {
             for (var fluid : container.fluids()) {
-                if (fluid.is(FactoryFluidTags.DRILL_FUEL)) {
+                if (fluid.is(FactoryFluidTags.DIESEL_ENGINE_FUEL)) {
                     required -= container.extract(fluid, required, false);
 
                     if (required <= 0) {
@@ -105,7 +105,7 @@ public class PoweredDrillItem extends BaseDrillItem {
         for (var eq : EquipmentSlot.values()) {
             var stack = user.getItemBySlot(eq);
             var fluid = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
-            if (!fluid.isEmpty() && fluid.contains(FactoryFluidTags.DRILL_FUEL)) {
+            if (!fluid.isEmpty() && fluid.contains(FactoryFluidTags.DIESEL_ENGINE_FUEL)) {
                 stacks.add(FluidContainerFromComponent.of(SlotAccess.forEquipmentSlot(user, eq)));
             }
         }
@@ -113,7 +113,7 @@ public class PoweredDrillItem extends BaseDrillItem {
         if (user instanceof Player player) {
             for (int i = 0; i < player.getInventory().getNonEquipmentItems().size(); i++) {
                 var fluid = player.getInventory().getItem(i).getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
-                if (!fluid.isEmpty() && fluid.contains(FactoryFluidTags.DRILL_FUEL)) {
+                if (!fluid.isEmpty() && fluid.contains(FactoryFluidTags.DIESEL_ENGINE_FUEL)) {
                     stacks.add(FluidContainerFromComponent.of(player.getInventory().getSlot(i)));
                 }
             }

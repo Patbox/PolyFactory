@@ -4,8 +4,6 @@ import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
-import eu.pb4.sgui.api.elements.GuiElementBuilderCreator;
-import eu.pb4.sgui.api.elements.ItemStackBuilder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
@@ -29,6 +27,7 @@ public class GuiTextures {
     public static final Function<Component, Component> MECHANICAL_SPOUT = background("mechanical_spout");
     public static final Function<Component, Component> MECHANICAL_SPOUT_NO_CONN = background("mechanical_spout_noconn");
     public static final Function<Component, Component> STEAM_ENGINE = background("steam_engine");
+    public static final Function<Component, Component> DIESEL_ENGINE = background("diesel_engine");
     public static final Function<Component, Component> SMELTERY = background("smeltery");
     public static final Function<Component, Component> PRIMITIVE_SMELTERY = background("primitive_smeltery");
     public static final Function<Component, Component> CENTER_SLOT_GENERIC = background("center_slot");
@@ -52,6 +51,9 @@ public class GuiTextures {
     public static final Supplier<GuiElementBuilder> BUTTON_ACTIVE_ALWAYS = icon32("button/active/always");
     public static final Supplier<GuiElementBuilder> BUTTON_ACTIVE_POWERED = icon32("button/active/powered");
     public static final Supplier<GuiElementBuilder> BUTTON_ACTIVE_NOT_POWERED = icon32("button/active/not_powered");
+
+    @SuppressWarnings("unchecked")
+    public static final Supplier<GuiElementBuilder>[] BUTTON_SPEED_GEAR = IntStream.rangeClosed(0, 5).mapToObj(i -> icon32("button/speed_gear/" + i)).toArray(Supplier[]::new);
 
     public static final Supplier<GuiElementBuilder> BUTTON_CLOSE = icon32("button/close");
     public static final Supplier<GuiElementBuilder> BUTTON_DONE = icon32("button/done");
@@ -79,6 +81,7 @@ public class GuiTextures {
     public static final Progress PROGRESS_VERTICAL = Progress.createVertical("progress_vertical", 0, 15, false);
     public static final Progress PROGRESS_HORIZONTAL = Progress.createHorizontal("progress_horizontal", 0, 15, false);
     public static final Progress PROGRESS_HORIZONTAL_OFFSET_RIGHT = Progress.createHorizontal32Right("progress_horizontal_offset_right", 6, 26, false);
+    public static final Progress DIESEL_ENGINE_POWER = Progress.createVertical48H("diesel_engine_power", 1, 46, true);
 
     public static final Temperature TEMPERATURE = new Temperature(FLAME, ICE);
     public static final Temperature TEMPERATURE_OFFSET_RIGHT = new Temperature(FLAME_OFFSET_RIGHT, ICE_OFFSET_RIGHT);
@@ -228,6 +231,13 @@ public class GuiTextures {
         public static Progress createVertical32Right(String path, int start, int stop, boolean reverse) {
             var size = stop - start;
             var function = verticalProgress32Right(path, start, stop, reverse);
+
+            return create(size, function);
+        }
+
+        public static Progress createVertical48H(String path, int start, int stop, boolean reverse) {
+            var size = stop - start;
+            var function = verticalProgress48H(path, start, stop, reverse);
 
             return create(size, function);
         }

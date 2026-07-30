@@ -3,8 +3,6 @@ package eu.pb4.polyfactory.ui;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
-import eu.pb4.factorytools.api.util.LazyItemStack;
-import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.mapcanvas.api.core.CanvasColor;
 import eu.pb4.mapcanvas.api.core.CanvasImage;
 import eu.pb4.mapcanvas.api.font.DefaultFonts;
@@ -27,7 +25,6 @@ import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.DyedItemColor;
@@ -49,6 +46,7 @@ public class UiResourceCreator {
     public static final String BASE_MODEL = "minecraft:item/generated";
     public static final String X32_MODEL = "polyfactory:sgui/button_32";
     public static final String X32_RIGHT_MODEL = "polyfactory:sgui/button_32_right";
+    public static final String X48H_MODEL = "polyfactory:sgui/button_48h";
 
     public static final Style STYLE = Style.EMPTY.withColor(0xFFFFFF).withFont(new FontDescription.Resource(id("gui")));
     private static final String ITEM_TEMPLATE = """
@@ -131,6 +129,10 @@ public class UiResourceCreator {
 
     public static IntFunction<GuiElementBuilder> horizontalProgress32Right(String path, int start, int stop, boolean reverse) {
         return genericProgress(path, start, stop, reverse, X32_RIGHT_MODEL, HORIZONTAL_PROGRESS, 0);
+    }
+
+    public static IntFunction<GuiElementBuilder> verticalProgress48H(String path, int start, int stop, boolean reverse) {
+        return genericProgress(path, start, stop, reverse, X48H_MODEL, VERTICAL_PROGRESS, 0);
     }
 
     public static IntFunction<GuiElementBuilder> verticalProgress32(String path, int start, int stop, boolean reverse) {

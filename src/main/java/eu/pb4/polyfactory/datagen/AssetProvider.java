@@ -38,6 +38,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -88,11 +89,11 @@ class AssetProvider implements DataProvider {
         }
     }
 
-    private static void createGaugeStyles(BiConsumer<String,byte[]> assetWriter) {
+    private static void createGaugeStyles(BiConsumer<String, byte[]> assetWriter) {
         for (var style : GaugeBlock.Style.values()) {
             if (style == GaugeBlock.Style.DEFAULT) continue;
 
-            assetWriter.accept("assets/polyfactory/models/block/gauge_" + style.getSerializedName() +".json", ModelAsset.builder()
+            assetWriter.accept("assets/polyfactory/models/block/gauge_" + style.getSerializedName() + ".json", ModelAsset.builder()
                     .parent(id("block/gauge"))
                     .texture("front_inner", id("block/gauge/front_inner_" + style.getSerializedName()))
                     .build().toBytes()
@@ -146,7 +147,7 @@ class AssetProvider implements DataProvider {
         }
     }
 
-    private static void createStencilTexture(Identifier identifier, BufferedImage base, BufferedImage border, BufferedImage stencil, BiConsumer<String,byte[]> assetWriter) {
+    private static void createStencilTexture(Identifier identifier, BufferedImage base, BufferedImage border, BufferedImage stencil, BiConsumer<String, byte[]> assetWriter) {
         if (base.getWidth() != border.getWidth() || border.getWidth() != stencil.getWidth() || base.getHeight() != border.getHeight() || border.getHeight() != stencil.getHeight()) {
             throw new IllegalArgumentException("Mismatched image width and height for stencil texture " + identifier);
         }
@@ -241,6 +242,32 @@ class AssetProvider implements DataProvider {
             fromItem.accept(item, id -> new ItemAsset(new BasicItemModel(id.withPrefix("item/")), ItemAsset.Properties.DEFAULT));
         }
 
+        var axleModel = id("block/axle_no_custom");
+        var shortAxleModel = id("block/axle_short");
+
+        var rotationAlongsideX = Optional.of(new Transformation(new Matrix4f().translate(0.5f, 0.5f, 0.5f).rotateX(Mth.HALF_PI).translate(-0.5f, -0.5f, -0.5f)));
+        var rotationAlongsideZ = Optional.of(new Transformation(new Matrix4f().translate(0.5f, 0.5f, 0.5f).rotateZ(Mth.HALF_PI).translate(-0.5f, -0.5f, -0.5f)));
+        for (var item : List.of(FactoryItems.CLUTCH, FactoryItems.GEARSHIFT, FactoryItems.STRESSOMETER, FactoryItems.TACHOMETER)) {
+            fromItem.accept(item, id -> new ItemAsset(new CompositeItemModel(List.of(
+                    new BasicItemModel(id.withPrefix("block/")),
+                    new BasicItemModel(axleModel, rotationAlongsideX, List.of())
+            )), ItemAsset.Properties.DEFAULT));
+        }
+
+        for (var item : List.of(FactoryItems.DIESEL_ENGINE)) {
+            fromItem.accept(item, id -> new ItemAsset(new CompositeItemModel(List.of(
+                    new BasicItemModel(id.withPrefix("block/")),
+                    new BasicItemModel(shortAxleModel, rotationAlongsideX, List.of())
+            )), ItemAsset.Properties.DEFAULT));
+        }
+
+        fromItem.accept(FactoryItems.GEARBOX, id -> new ItemAsset(new CompositeItemModel(List.of(
+                new BasicItemModel(id.withPrefix("block/")),
+                new BasicItemModel(axleModel, rotationAlongsideX, List.of()),
+                new BasicItemModel(axleModel, rotationAlongsideZ, List.of()),
+                new BasicItemModel(axleModel, Optional.empty(), List.of())
+        )), ItemAsset.Properties.DEFAULT));
+
         fromItem.accept(FactoryItems.STEEL_GEAR, id -> new ItemAsset(SelectItemModel.builder(new DisplayContextProperty())
                 .withCase(List.of(
                         ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
@@ -332,7 +359,7 @@ class AssetProvider implements DataProvider {
         ))));
     }
 
-    private static void createNumberButtons(BiConsumer<String,byte[]> assetWriter) {
+    private static void createNumberButtons(BiConsumer<String, byte[]> assetWriter) {
         var empty = ResourceUtils.getTexture(id("sgui/elements/numbered_buttons/empty"));
         for (int i = 0; i < 100; i++) {
             var out = new BufferedImage(empty.getWidth(), empty.getHeight(), empty.getType());
@@ -391,7 +418,7 @@ class AssetProvider implements DataProvider {
 
             }
 
-            assetWriter.accept("assets/polyfactory/textures/sgui/elements/numbered_buttons/num_"  + i + ".png", buf.toByteArray());
+            assetWriter.accept("assets/polyfactory/textures/sgui/elements/numbered_buttons/num_" + i + ".png", buf.toByteArray());
         }
     }
 

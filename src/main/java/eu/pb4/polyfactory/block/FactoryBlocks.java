@@ -25,6 +25,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.MinerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.PlacerBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.*;
+import eu.pb4.polyfactory.block.mechanical.source.DieselEngineBlock;
 import eu.pb4.polyfactory.block.mechanical.source.HandCrankBlock;
 import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlock;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlock;
@@ -65,9 +66,11 @@ public class FactoryBlocks {
             .requiresCorrectToolForDrops().strength(3.3F).noOcclusion().sound(SoundType.IRON)));
     public static final FanBlock FAN = register(FactoryBlockIds.FAN, settings -> new FanBlock(settings.noOcclusion().destroyTime(3).sound(SoundType.IRON).requiresCorrectToolForDrops()));
     public static final EjectorBlock EJECTOR = register(FactoryBlockIds.EJECTOR, BlockBehaviour.Properties.ofFullCopy(FAN), EjectorBlock::new);
-    public static final SelectivePassthroughBlock METAL_GRID = register(FactoryBlockIds.METAL_GRID, BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK), settings -> new SelectivePassthroughBlock(settings.strength(4.0F, 3.0F).noOcclusion()));
+    public static final SelectivePassthroughBlock METAL_GRID = register(FactoryBlockIds.METAL_GRID, BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(4.0F, 3.0F).noOcclusion(), SelectivePassthroughBlock::new);
     public static final HandCrankBlock HAND_CRANK = register(FactoryBlockIds.HAND_CRANK, settings -> new HandCrankBlock(settings.destroyTime(1).noOcclusion()));
-    public static final SteamEngineBlock STEAM_ENGINE = register(FactoryBlockIds.STEAM_ENGINE, BlockBehaviour.Properties.ofFullCopy(SPLITTER), settings -> new SteamEngineBlock(settings.strength(4F).noOcclusion()));
+    public static final SteamEngineBlock STEAM_ENGINE = register(FactoryBlockIds.STEAM_ENGINE, BlockBehaviour.Properties.ofFullCopy(SPLITTER).strength(4F).noOcclusion(), SteamEngineBlock::new);
+    public static final DieselEngineBlock DIESEL_ENGINE = register(FactoryBlockIds.DIESEL_ENGINE, BlockBehaviour.Properties.ofFullCopy(SPLITTER).strength(3F).noOcclusion(), DieselEngineBlock::new);
+
     public static final GrinderBlock GRINDER = register(FactoryBlockIds.GRINDER, BlockBehaviour.Properties.ofFullCopy(SPLITTER).sound(SoundType.WOOD), GrinderBlock::new);
     public static final PressBlock PRESS = register(FactoryBlockIds.PRESS, BlockBehaviour.Properties.ofFullCopy(SPLITTER), PressBlock::new);
     public static final MixerBlock MIXER = register(FactoryBlockIds.MIXER, BlockBehaviour.Properties.ofFullCopy(SPLITTER), MixerBlock::new);

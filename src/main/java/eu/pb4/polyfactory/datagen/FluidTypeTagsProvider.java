@@ -31,7 +31,7 @@ class FluidTypeTagsProvider extends FabricTagsProvider<FluidType<?>> {
                 .add(FactoryFluidIds.GLASS)
         ;
 
-        this.tag(FactoryFluidTags.DRILL_FUEL)
+        this.tag(FactoryFluidTags.DIESEL_ENGINE_FUEL)
                 .add(FactoryFluidIds.BIODIESEL);
     }
 }

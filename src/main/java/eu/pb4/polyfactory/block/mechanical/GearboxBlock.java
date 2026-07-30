@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.AllSideNode;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
@@ -31,9 +32,12 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
 public class GearboxBlock extends RotationalNetworkBlock implements FactoryBlock, BarrierBasedWaterloggable {
+    private final Identifier model;
+
     public GearboxBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false));
+        this.model = settings.blockIdOrThrow().identifier().withPrefix("block/");
     }
 
     @Override
@@ -90,7 +94,7 @@ public class GearboxBlock extends RotationalNetworkBlock implements FactoryBlock
         private final ItemDisplayElement zAxle;
 
         private Model() {
-            this.mainElement = ItemDisplayElementUtil.createSimple(FactoryItems.GEARBOX);
+            this.mainElement = ItemDisplayElementUtil.createSimple(model);
             this.mainElement.setScale(new Vector3f(2));
             this.addElement(this.mainElement);
 

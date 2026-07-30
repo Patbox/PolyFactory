@@ -29,6 +29,8 @@ public class FactoryItemIds {
     public static final ResourceKey<Item> EJECTOR = of(FactoryBlockIds.EJECTOR);
     public static final ResourceKey<Item> HAND_CRANK = of(FactoryBlockIds.HAND_CRANK);
     public static final ResourceKey<Item> STEAM_ENGINE = of(FactoryBlockIds.STEAM_ENGINE);
+    public static final ResourceKey<Item> DIESEL_ENGINE = of(FactoryBlockIds.DIESEL_ENGINE);
+
     public static final ResourceKey<Item> SMELTERY_CORE = of(FactoryBlockIds.SMELTERY_CORE);
     public static final ResourceKey<Item> SMELTERY = of(FactoryBlockIds.SMELTERY);
     public static final ResourceKey<Item> PRIMITIVE_SMELTERY = of(FactoryBlockIds.PRIMITIVE_SMELTERY);
@@ -140,7 +142,7 @@ public class FactoryItemIds {
 
     public static final ResourceKey<Item> CRISPY_HONEY = of("crispy_honey");
     public static final ResourceKey<Item> HONEYED_APPLE = of("honeyed_apple");
-    public static final ResourceKey<Item> CHEESE_WHEEL = of("cheese_wheel");
+    public static final ResourceKey<Item> CHEESE_WHEEL = of(FactoryBlockIds.CHEESE_WHEEL);
     public static final ResourceKey<Item> CHEESE_WEDGE = of("cheese_wedge");
 
     public static final ResourceKey<Item> CRUSHED_RAW_IRON = of("crushed_raw_iron");

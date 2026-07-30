@@ -5,6 +5,7 @@ import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -15,6 +16,7 @@ import eu.pb4.sgui.api.gui.SlotBasedGui;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Util;
 import net.minecraft.world.item.ItemStack;
 
 public class GuiUtils {
@@ -25,7 +27,7 @@ public class GuiUtils {
     }
 
 
-    public static  <T extends Enum<T>> GuiElement createIteratingButton(Supplier<T> supplier, Consumer<T> consumer, T[] values, Function<T, GuiElementBuilder> builderFunction) {
+    public static  <T> GuiElement createIteratingButton(Supplier<T> supplier, Consumer<T> consumer, T[] values, Function<T, GuiElementBuilder> builderFunction) {
         return new GuiElement() {
             @Override
             public ItemStack getItemStack() {
@@ -37,7 +39,9 @@ public class GuiUtils {
                 return (i, clickType, slotActionType, slotGuiInterface) -> {
                     if (clickType.isLeft) {
                         GuiUtils.playClickSound(slotGuiInterface.getPlayer());
-                        consumer.accept(values[(values.length + supplier.get().ordinal() + (clickType.shift ? -1 : 1)) % values.length]);
+                        consumer.accept(clickType.shift
+                                ? Util.findPreviousInIterable(List.of(values), supplier.get())
+                                : Util.findNextInIterable(List.of(values), supplier.get()) );
                     }
                 };
             }

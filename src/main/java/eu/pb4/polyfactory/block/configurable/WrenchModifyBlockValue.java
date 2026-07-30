@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
 
 public interface WrenchModifyBlockValue<T> {
@@ -24,6 +25,19 @@ public interface WrenchModifyBlockValue<T> {
 
     static <T> WrenchModifyBlockValue<T> simple(BiFunction<T, Boolean, T> transformer) {
         return (value, next, player, world, pos, side, state) -> transformer.apply(value, next);
+    }
+
+    static <T> WrenchModifyBlockValue<T> simple(List<T> values) {
+        return (value, next, player, world, pos, side, state) -> next ? Util.findNextInIterable(values, value) : Util.findPreviousInIterable(values, value);
+    }
+
+    static <T> WrenchModifyBlockValue<T> simple(T... values) {
+        return simple(List.of(values));
+    }
+
+    @SafeVarargs
+    static <T extends Enum<T>> WrenchModifyBlockValue<T> enums(T... values) {
+        return (value, next, player, world, pos, side, state) -> FactoryUtil.nextEnum(value, values, next);
     }
 
     static WrenchModifyBlockValue<Direction> ofDirection(EnumProperty<Direction> property) {

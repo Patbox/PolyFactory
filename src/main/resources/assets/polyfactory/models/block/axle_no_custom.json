@@ -1,26 +1,5 @@
 {
-	"format_version": "1.21.6",
-	"credit": "Made with Blockbench",
-	"parent": "minecraft:block/block",
-	"ambientocclusion": false,
-	"textures": {
-		"0": "polyfactory:block/axle",
-		"particle": "polyfactory:block/axle"
-	},
-	"elements": [
-		{
-			"from": [5, 0, 5],
-			"to": [11, 13, 11],
-			"faces": {
-				"north": {"uv": [0, 0, 6, 13], "texture": "#0"},
-				"east": {"uv": [0, 0, 6, 13], "texture": "#0"},
-				"south": {"uv": [0, 0, 6, 13], "texture": "#0"},
-				"west": {"uv": [0, 0, 6, 13], "texture": "#0"},
-				"up": {"uv": [6, 0, 12, 6], "texture": "#0"},
-				"down": {"uv": [6, 0, 12, 6], "texture": "#0"}
-			}
-		}
-	],
+	"parent": "polyfactory:block/axle",
 	"display": {
 		"thirdperson_righthand": {
 			"rotation": [75, 45, 0],

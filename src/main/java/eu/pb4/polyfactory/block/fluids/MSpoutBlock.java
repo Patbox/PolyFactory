@@ -150,7 +150,7 @@ public class MSpoutBlock extends TallItemMachineBlock implements NetworkComponen
 
     @Override
     public Collection<BlockNode> createPipeNodes(BlockState state, ServerLevel world, BlockPos pos) {
-        return state.getValue(PART) == Part.TOP ? List.of(new PumpNode(Direction.DOWN, true, PumpNode.SPOUT_RANGE)) : List.of();
+        return state.getValue(PART) == Part.TOP ? List.of(new PumpNode(Direction.DOWN, true, PumpNode.WEAK_RANGE)) : List.of();
     }
 
     @Override

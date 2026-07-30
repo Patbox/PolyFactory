@@ -53,6 +53,7 @@ class LootTables extends FabricBlockLootSubProvider {
         this.dropSelf(FactoryBlocks.CONVEYOR);
         this.dropSelf(FactoryBlocks.STICKY_CONVEYOR);
         this.dropSelf(FactoryBlocks.ELECTRIC_MOTOR);
+        this.dropSelf(FactoryBlocks.DIESEL_ENGINE);
         this.dropSelf(FactoryBlocks.FUNNEL);
         this.dropSelf(FactoryBlocks.STEEL_BLOCK);
         this.dropSelf(FactoryBlocks.SLOT_AWARE_FUNNEL);

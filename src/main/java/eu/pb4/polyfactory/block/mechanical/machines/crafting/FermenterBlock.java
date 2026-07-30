@@ -52,16 +52,15 @@ public class FermenterBlock extends TallItemMachineBlock implements PipeConnecta
         var be = (FermenterBlockEntity) self.getBlockEntity();
 
         var stack = conveyor.getContainer().get();
+        var initialCount = stack.getCount();
 
-        if (FactoryUtil.insertBetween(be, 0, FermenterBlockEntity.OUTPUT_FIRST, stack) == -1) {
-            return false;
-        }
+        be.insertStack(stack, pushDirection);
 
         if (stack.isEmpty()) {
             conveyor.clearContainer();
         }
 
-        return true;
+        return stack.getCount() != initialCount;
     }
 
     @Override

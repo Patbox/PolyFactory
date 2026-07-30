@@ -36,6 +36,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.MinerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.PlacerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.PlanterBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.*;
+import eu.pb4.polyfactory.block.mechanical.source.DieselEngineBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.source.HandCrankBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.source.SteamEngineBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.source.WindmillBlockEntity;
@@ -75,6 +76,9 @@ public class FactoryBlockEntities {
 
     public static final BlockEntityType<SteamEngineBlockEntity> STEAM_ENGINE = register("steam_engine",
              FabricBlockEntityTypeBuilder.create(SteamEngineBlockEntity::new, FactoryBlocks.STEAM_ENGINE));
+
+    public static final BlockEntityType<DieselEngineBlockEntity> DIESEL_ENGINE = register("diesel_engine",
+            FabricBlockEntityTypeBuilder.create(DieselEngineBlockEntity::new, FactoryBlocks.DIESEL_ENGINE));
 
     public static final BlockEntityType<IndustrialSmelteryBlockEntity> SMELTERY = register("smeltery",
             FabricBlockEntityTypeBuilder.create(IndustrialSmelteryBlockEntity::new, FactoryBlocks.SMELTERY));

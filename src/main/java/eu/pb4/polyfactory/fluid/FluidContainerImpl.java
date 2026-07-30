@@ -45,7 +45,7 @@ public class FluidContainerImpl implements FluidContainer {
         return new FluidContainerImpl(maxStorage, markDirty, (self, type) -> filter.test(type));
     }
 
-    public static FluidContainer onlyInTag(long maxStorage, TagKey<FluidType<?>> tag, Runnable markDirty) {
+    public static FluidContainerImpl onlyInTag(long maxStorage, TagKey<FluidType<?>> tag, Runnable markDirty) {
         return new FluidContainerImpl(maxStorage, markDirty, (self, type) -> type.is(tag));
     }
 

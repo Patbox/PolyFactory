@@ -20,6 +20,7 @@ public record FluidTextures(Map<FluidType<?>, char[]> textures, FluidUiPositionC
     public static final FluidTextures PRESS_POLYDEX = FluidTextures.of("press_polydex", 10, 16,18 + 53);
     public static final FluidTextures SMELTERY = FluidTextures.of("smeltery", 48, 80, 21);
     public static final FluidTextures PRIMITIVE_SMELTERY = FluidTextures.of("primitive_smeltery", 48, 44, 21);
+    public static final FluidTextures DIESEL_ENGINE = FluidTextures.of("diesel_engine", 48 - 18, 44, 21);
 
 
     public Component render(Consumer<BiConsumer<FluidInstance<?>, Float>> provider) {

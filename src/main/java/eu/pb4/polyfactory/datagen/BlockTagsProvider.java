@@ -124,6 +124,7 @@ class BlockTagsProvider extends FabricTagsProvider.BlockTagsProvider {
                 .add(FactoryBlockIds.GAUGE)
                 .add(FactoryBlockIds.ELECTRIC_MOTOR)
                 .add(FactoryBlockIds.ELECTRIC_GENERATOR)
+                .add(FactoryBlockIds.DIESEL_ENGINE)
                 .add(FactoryBlockIds.DATA_MEMORY)
                 .add(FactoryBlockIds.TACHOMETER)
                 .add(FactoryBlockIds.STRESSOMETER)
@@ -167,6 +168,8 @@ class BlockTagsProvider extends FabricTagsProvider.BlockTagsProvider {
                 .add(FactoryBlockIds.WIRELESS_REDSTONE_RECEIVER)
                 .add(FactoryBlockIds.CAGED_LAMP)
                 .add(FactoryBlockIds.INVERTED_CAGED_LAMP)
+                .add(FactoryBlockIds.DIESEL_ENGINE)
+                .add(FactoryBlockIds.CHEESE_WHEEL)
 
         ;
 

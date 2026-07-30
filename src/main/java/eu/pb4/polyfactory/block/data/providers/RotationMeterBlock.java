@@ -27,6 +27,7 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
@@ -54,8 +55,11 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock implements FactoryBlock, CableConnectable, DataProvider,
         NetworkComponent.Data, NetworkComponent.Rotational, EntityBlock {
+    private final Identifier model;
+
     public RotationMeterBlock(Properties settings) {
         super(settings);
+        this.model = settings.blockIdOrThrow().identifier().withPrefix("block/");
     }
 
     @Override
@@ -213,13 +217,13 @@ public abstract class RotationMeterBlock extends AxisAndFacingNetworkBlock imple
         }
     }
 
-    public static final class Model extends RotationAwareModel {
+    public final class Model extends RotationAwareModel {
         private final ItemDisplayElement axle;
         private final ItemDisplayElement base;
 
         public Model(BlockState state) {
             this.axle = LodItemDisplayElement.createSimple(AxleBlock.Model.ITEM_MODEL, this.getUpdateRate(), 0.3f, 0.6f);
-            this.base = ItemDisplayElementUtil.createSimple(state.getBlock().asItem());
+            this.base = ItemDisplayElementUtil.createSimple(model);
             this.base.setScale(new Vector3f(2));
 
             updateStatePos(state);

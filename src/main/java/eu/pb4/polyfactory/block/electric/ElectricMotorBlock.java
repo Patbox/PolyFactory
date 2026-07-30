@@ -115,7 +115,7 @@ public class ElectricMotorBlock extends NetworkBlock implements FactoryBlock, En
 
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
-        //if (!player.isSneaking() && hand == Hand.MAIN_HAND && hit.getSide() != state.get(FACING) && player.isCreative() && world.getBlockEntity(pos) instanceof ElectricMotorBlockEntity be && player instanceof ServerPlayerEntity serverPlayer) {
+        //if (!player.isSneaking() && hand == Hand.MAIN_HAND && hit.getSide() != state.get(FACING) && player.isCreative() && world.getBlockEntity(pos) instanceof DieselEngineBlockEntity be && player instanceof ServerPlayerEntity serverPlayer) {
         //    be.openGui(serverPlayer);
         //    return ActionResult.SUCCESS;
         //}
