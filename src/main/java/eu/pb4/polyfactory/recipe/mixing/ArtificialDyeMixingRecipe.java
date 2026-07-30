@@ -133,15 +133,24 @@ public record ArtificialDyeMixingRecipe(double time,
             }
         }
 
-
+        // guard divide by zero for colorCount
+        if (colorCount == 0) {
+          // return something instead of crashing the server
+          return ArtificialDyeItem.of(0x000000);
+        }
         int r = rgb[0] / colorCount;
         int g = rgb[1] / colorCount;
         int b = rgb[2] / colorCount;
         float scale = (float) maxColor / (float) colorCount;
         float maxValue = (float) Math.max(rgbDye[0] / colorCount, Math.max(rgbDye[1] / colorCount, rgbDye[2] / colorCount));
+        // guard divide by zero for maxValue
+        if (maxValue <= 0f) {
+          maxValue = 1f;
+        }
         r = (int) ((float) r * scale / maxValue);
         g = (int) ((float) g * scale / maxValue);
         b = (int) ((float) b * scale / maxValue);
+
 
         int color = Math.min(r, 0xFF);
         color = (color << 8) + Math.min(g, 0xFF);
