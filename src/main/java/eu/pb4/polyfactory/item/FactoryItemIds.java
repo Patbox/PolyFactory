@@ -140,7 +140,8 @@ public class FactoryItemIds {
 
     public static final ResourceKey<Item> CRISPY_HONEY = of("crispy_honey");
     public static final ResourceKey<Item> HONEYED_APPLE = of("honeyed_apple");
-    public static final ResourceKey<Item> CHEESE = of("cheese");
+    public static final ResourceKey<Item> CHEESE_WHEEL = of("cheese_wheel");
+    public static final ResourceKey<Item> CHEESE_WEDGE = of("cheese_wedge");
 
     public static final ResourceKey<Item> CRUSHED_RAW_IRON = of("crushed_raw_iron");
     public static final ResourceKey<Item> CRUSHED_RAW_COPPER = of("crushed_raw_copper");

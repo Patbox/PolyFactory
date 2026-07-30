@@ -82,8 +82,12 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
         }
 
         var stackToMove = stack.get();
+        if (stackToMove.getCount() < be.minStackSize()) {
+            return false;
+        }
+
         var copied = false;
-        if (be.matchesStackSize(stackToMove.getCount())) {
+        if (stackToMove.getCount() > be.maxStackSize()) {
             stackToMove = stackToMove.split(be.maxStackSize());
             copied = true;
         }
@@ -137,12 +141,15 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
                 for (var dir : Direction.values()) {
                     if (!stack.isEmpty() && stack.getCount() >= be.minStackSize() && be.filter.get(a).test(stack) && (sided == null || sided.canTakeItemThroughFace(i, stack, dir))) {
                         inv.setChanged();
-                        if (conveyor.pushNew(stack.split(Math.min(be.maxStackSize(), stack.getCount())))) {
+                        var split = stack.split(getStackSizeToPush(conveyor, be, stack, stack.getCount()));
+                        if (conveyor.pushNew(split)) {
                             if (stack.isEmpty()) {
                                 inv.setItem(i, ItemStack.EMPTY);
                             }
                             conveyor.setMovementPosition(pushDirection.getOpposite() == selfFacing ? 0.15 : 0.5);
                             return;
+                        } else {
+                            stack.grow(split.getCount());
                         }
                     }
                 }
@@ -162,7 +169,7 @@ public class SlotAwareFunnelBlock extends FunnelBlock {
                     }
                     try (var t = Transaction.openOuter()) {
                         var resource = view.getResource();
-                        var val = view.extract(view.getResource(), Math.min(conveyor.getMaxStackCount(resource.toStack()), be.maxStackSize()), t);
+                        var val = view.extract(view.getResource(), getStackSizeToPush(conveyor, be, view.getResource().toStack(), view.getAmount()), t);
                         if (val != 0 && val >= be.minStackSize()) {
                             t.commit();
 

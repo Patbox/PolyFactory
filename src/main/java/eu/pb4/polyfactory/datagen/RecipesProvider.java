@@ -1455,8 +1455,13 @@ class RecipesProvider extends FabricRecipeProvider {
                         SimpleFermentingRecipe.of("apple", "", Ingredient.of(Items.APPLE), OutputStack.of(FactoryItems.BIOMASS, 0.1f), FactoryFluids.ETHANOL.ofNuggets(1), 130),
                         SimpleFermentingRecipe.of("beetroot", "", Ingredient.of(Items.BEETROOT), OutputStack.of(FactoryItems.BIOMASS, 0.25f), FactoryFluids.ETHANOL.ofNuggets(5), 110),
 
-                        SimpleFermentingRecipe.of("cheese", "", Ingredient.of(Items.MILK_BUCKET), FactoryItems.CHEESE, 250)
+                        SimpleFermentingRecipe.of("cheese", "", Ingredient.of(Items.MILK_BUCKET), FactoryItems.CHEESE_WHEEL, 250)
                 );
+
+                this.shapeless(RecipeCategory.FOOD, FactoryItems.CHEESE_WEDGE, 7)
+                        .unlockedBy("cheese", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.CHEESE_WHEEL))
+                        .requires(FactoryItems.CHEESE_WHEEL)
+                        .save(output, "cheese_wheel_to_wedge");
 
                 this.shaped(RecipeCategory.REDSTONE, FactoryItems.STEEL_GEAR, 3)
                         .unlockedBy("steel_ingot", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))

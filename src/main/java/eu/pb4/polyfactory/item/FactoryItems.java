@@ -65,7 +65,6 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.block.Block;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static eu.pb4.polyfactory.ModInit.id;
@@ -187,8 +186,8 @@ public class FactoryItems {
     public static final Item DYNAMITE = register(FactoryItemIds.DYNAMITE, settings -> new DynamiteItem(settings.stacksTo(16)));
     public static final Item STICKY_DYNAMITE = register(FactoryItemIds.STICKY_DYNAMITE, settings -> new DynamiteItem(settings.stacksTo(16)));
     public static final Item INVERTED_REDSTONE_LAMP = register(FactoryBlocks.INVERTED_REDSTONE_LAMP);
-    public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING, settings -> settings.equippableUnswappable(EquipmentSlot.HEAD));
-    public static final Item GOLDEN_TINY_POTATO_SPRING = register(FactoryBlocks.GOLDEN_TINY_POTATO_SPRING, settings -> settings.equippableUnswappable(EquipmentSlot.HEAD));
+    public static final Item TINY_POTATO_SPRING = register(FactoryBlocks.TINY_POTATO_SPRING, new Item.Properties().equippableUnswappable(EquipmentSlot.HEAD));
+    public static final Item GOLDEN_TINY_POTATO_SPRING = register(FactoryBlocks.GOLDEN_TINY_POTATO_SPRING, new Item.Properties().equippableUnswappable(EquipmentSlot.HEAD));
     public static final Item EXPERIENCE_BUCKET = register(FactoryItemIds.EXPERIENCE_BUCKET, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET));
 
     public static final Item SLIME_BUCKET = register(FactoryItemIds.SLIME_BUCKET, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET));
@@ -213,7 +212,8 @@ public class FactoryItems {
     public static final Item HONEYED_APPLE = register(FactoryItemIds.HONEYED_APPLE, settings -> new SimplePolymerItem(settings
             .food(new FoodProperties.Builder().nutrition(7).saturationModifier(1.5f).build())));
 
-    public static final Item CHEESE = register(FactoryBlocks.CHEESE);
+    public static final Item CHEESE_WHEEL = register(FactoryBlocks.CHEESE_WHEEL, new Item.Properties().stacksTo(8));
+    public static final Item CHEESE_WEDGE = register(FactoryItemIds.CHEESE_WEDGE, new Item.Properties().food(new FoodProperties.Builder().nutrition(2).saturationModifier(0.5f).build(), Consumables.defaultFood().consumeSeconds(1f).build()));
 
     public static final Item CRUSHED_RAW_IRON = register(FactoryItemIds.CRUSHED_RAW_IRON);
     public static final Item CRUSHED_RAW_COPPER = register(FactoryItemIds.CRUSHED_RAW_COPPER);
@@ -244,7 +244,7 @@ public class FactoryItems {
     public static final Item CREATIVE_DRAIN = register(FactoryBlocks.CREATIVE_DRAIN);
     public static final Item FLUID_TANK = register(FactoryBlocks.FLUID_TANK);
     public static final Item PORTABLE_FLUID_TANK = register(FactoryBlocks.PORTABLE_FLUID_TANK,
-            (s) -> s.stacksTo(1).component(FactoryDataComponents.FLUID, FluidComponent.empty(PortableFluidTankBlockEntity.CAPACITY)));
+            new Item.Properties().stacksTo(1).component(FactoryDataComponents.FLUID, FluidComponent.empty(PortableFluidTankBlockEntity.CAPACITY)));
 
     public static final PressureFluidGun PRESSURE_FLUID_GUN = register(FactoryItemIds.PRESSURE_FLUID_GUN, settings -> new PressureFluidGun(
             settings.stacksTo(1).enchantable(5).repairable(COPPER_PLATE).durability(800)));
@@ -438,7 +438,8 @@ public class FactoryItems {
                     // Food
                     entries.accept(CRISPY_HONEY);
                     entries.accept(HONEYED_APPLE);
-                    entries.accept(CHEESE);
+                    entries.accept(CHEESE_WHEEL);
+                    entries.accept(CHEESE_WEDGE);
 
                     // Other Items
                     entries.accept(HONEY_BUCKET);
@@ -638,15 +639,13 @@ public class FactoryItems {
     }
 
     public static <E extends Block & PolymerBlock> FactoryBlockItem register(E block) {
-        return register(block, (s) -> {
-        });
+        return register(block, new Item.Properties());
     }
 
-    public static <E extends Block & PolymerBlock> FactoryBlockItem register(E block, Consumer<Item.Properties> settingsConsumer) {
+    public static <E extends Block & PolymerBlock> FactoryBlockItem register(E block, Item.Properties settings) {
         var id = BuiltInRegistries.BLOCK.getKey(block);
         FactoryBlockItem item;
-        var settings = new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)).useBlockDescriptionPrefix();
-        settingsConsumer.accept(settings);
+        settings.setId(ResourceKey.create(Registries.ITEM, id)).useBlockDescriptionPrefix();
 
         if (block instanceof MultiBlock multiBlock) {
             item = new MultiBlockItem(multiBlock, settings);

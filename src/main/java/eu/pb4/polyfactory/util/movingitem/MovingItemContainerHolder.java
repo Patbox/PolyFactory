@@ -40,8 +40,7 @@ public interface MovingItemContainerHolder {
         }
 
         var i = Math.min(stack.getCount(), getMaxStackCount(stack));
-        var moving = new MovingItem(stack.copyWithCount(i));
-        stack.shrink(i);
+        var moving = new MovingItem(stack.split(i));
 
         setContainer(moving);
         return true;

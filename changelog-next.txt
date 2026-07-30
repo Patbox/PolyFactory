@@ -34,10 +34,12 @@
   - Used to power Portable Drill.
   - Can be used with Nozzle / Pressure Fluid Gun, causing entities to get the Flammable effect:
     - It makes entities stay on fire for a longer time.
-- Added Cheese:
-  - A food block that you can place (like Cake).
+- Added Cheese Wheel and Cheese Wedge:
+  - Cheese Wheel is food block that you can place (like Cake).
   - Restores you 2 points (1 shank) of hunger and gives you 0.5 saturation.
   - Crafted via fermentation of Bucket of Milk.
+  - Cheese Wedge is a consumable item, that is equal to a single bite of Cheese Wheel.
+  - You get it from breaking Cheese Wheel block (you get leftover bite count of them) or by crafting it directly from Cheese Wheel.
 - Added Raw Metal Nuggets:
  - Can be crafted to/from crushed raw ores.
 - Added Sulfur Dust:
@@ -56,7 +58,9 @@
 - Made Grinding recipes have higher max speed limit, allowing them to work faster
 - Funnels can now require a minimal stack size that can go in/out.
 - Polydex Mixer recipes will now visually scale fluid contents if they are too small.
+- Potatoes gained new wisdom.
 - Fixed Item Reader's and Hologram Displays not rendering their inner model parts.
 - Fixed Cable not being updated visually correctly.
 - Fixed Loot Tables being resolved too early in loot chests.
 - Fixed Mechanical Miners not updating their state when attacking entities.
+- (Hopefully) Fixed Funnel item loss.

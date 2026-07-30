@@ -1,11 +1,13 @@
 package eu.pb4.polyfactory.datagen;
 
+import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.data.util.DirectionalCabledDataBlock;
 import eu.pb4.polyfactory.block.fluids.transport.PipeInWallBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlock;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlock;
+import eu.pb4.polyfactory.block.other.CheeseBlock;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.loottable.CopyCachedDataLootFunction;
 import eu.pb4.polyfactory.loottable.CopyColorLootFunction;
@@ -144,6 +146,21 @@ class LootTables extends FabricBlockLootSubProvider {
         this.createMultiPropConditionTable(FactoryBlocks.DEEP_STORAGE_CONTAINER,
                 (block2, pred) -> pred.hasProperty(block2.partX, 0).hasProperty(block2.partY, 0).hasProperty(block2.partZ, 0));
 
+
+        {
+            var table = LootTable.lootTable();
+            for (int i = 0; i <= 6; i++) {
+                table.withPool(LootPool.lootPool()
+                        .when(ExplosionCondition.survivesExplosion())
+                        .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(FactoryBlocks.CHEESE_WHEEL)
+                                .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(CheeseBlock.BITES, i)))
+                        .setRolls(ConstantValue.exactly(7 - i))
+                        .add(LootItem.lootTableItem(FactoryItems.CHEESE_WEDGE))
+                );
+            }
+
+            this.add(FactoryBlocks.CHEESE_WHEEL,  table);
+        }
     }
 
     private void addTallMachineDrop(TallItemMachineBlock block) {

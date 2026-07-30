@@ -93,7 +93,7 @@ public class FactoryBlockIds {
     public static final ResourceKey<Block> TINY_POTATO_SPRING = of("tiny_potato_spring");
     public static final ResourceKey<Block> GOLDEN_TINY_POTATO_SPRING = of("golden_tiny_potato_spring");
 
-    public static final ResourceKey<Block> CHEESE = of("cheese");
+    public static final ResourceKey<Block> CHEESE_WHEEL = of("cheese_wheel");
 
     public static final ResourceKey<Block> ROTATION_DEBUG = of("rot_debug");
     public static final ResourceKey<Block> PIPE = of("pipe");

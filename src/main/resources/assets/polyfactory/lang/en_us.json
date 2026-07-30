@@ -163,7 +163,8 @@
   "item.polyfactory.brittle_potion": "Brittle %s",
   "item.polyfactory.crispy_honey": "Crispy Honey",
   "item.polyfactory.honeyed_apple": "Honeyed Apple",
-  "block.polyfactory.cheese": "Cheese",
+  "block.polyfactory.cheese_wheel": "Cheese Wheel",
+  "item.polyfactory.cheese_wedge": "Cheese Wedge",
   "item.polyfactory.chain_lift": "Chain Lift",
 
   "item.polyfactory.portable_drill": "Portable Drill",

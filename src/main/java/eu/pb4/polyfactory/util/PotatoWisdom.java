@@ -10,29 +10,34 @@ import java.util.Calendar;
 import java.util.List;
 
 public class PotatoWisdom {
-    public static final List<String> RANDOM = new ArrayList<>();
+    public static final List<String> SPLASH = new ArrayList<>();
+    public static final List<String> POLYFACTORY = new ArrayList<>();
     public static String get(RandomSource random) {
         if (random.nextFloat() > 0.9 && Calendar.getInstance().get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY) {
             return "It Is Wednesday My Dudes";
         }
 
-        if (RANDOM.isEmpty()) {
-            return "missingno";
+        if (!SPLASH.isEmpty() && random.nextBoolean()) {
+            return SPLASH.get(random.nextInt(SPLASH.size()));
         }
 
-        return RANDOM.get(random.nextInt(RANDOM.size()));
+        if (!POLYFACTORY.isEmpty()) {
+            return POLYFACTORY.get(random.nextInt(POLYFACTORY.size()));
+        }
+
+        return "No thoughts, head empty... (Wisdom not loaded!)";
     }
 
     public static void load() {
         try {
             var file = FabricLoader.getInstance().getModContainer(ModInit.ID).get().findPath("potato.txt");
             if (file.isPresent()) {
-                RANDOM.addAll(Files.readAllLines(file.get()));
+                POLYFACTORY.addAll(Files.readAllLines(file.get()));
             }
 
             var splashPath = PolymerCommonUtils.getClientJarRoot().resolve("assets/minecraft/texts/splashes.txt");
             if (Files.exists(splashPath)) {
-                RANDOM.addAll(Files.readAllLines(splashPath));
+                SPLASH.addAll(Files.readAllLines(splashPath));
             }
         } catch (Throwable e) {
             e.printStackTrace();

@@ -24,16 +24,13 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.model.*;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.CustomModelDataFlagProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.UsingItemProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.numeric.CustomModelDataFloatProperty;
-import eu.pb4.polymer.resourcepack.extras.api.format.item.property.numeric.NumericProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.select.DisplayContextProperty;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.ConstantTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.CustomModelDataTintSource;
-import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.ItemTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.PotionTintSource;
 import eu.pb4.polymer.resourcepack.extras.api.format.model.ModelAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.model.ModelTransformation;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
@@ -240,7 +237,7 @@ class AssetProvider implements DataProvider {
 
         for (var item : List.of(FactoryItems.TINY_POTATO_SPRING, FactoryItems.GOLDEN_TINY_POTATO_SPRING, FactoryItems.PIPE, FactoryItems.MECHANICAL_DRAIN, FactoryItems.PORTABLE_FLUID_TANK,
                 FactoryItems.LARGE_STEEL_GEAR,
-                FactoryItems.PUMP, FactoryItems.STEEL_BUTTON, FactoryDebugItems.ROTATION_DEBUG, FactoryItems.CHEESE)) {
+                FactoryItems.PUMP, FactoryItems.STEEL_BUTTON, FactoryDebugItems.ROTATION_DEBUG, FactoryItems.CHEESE_WHEEL)) {
             fromItem.accept(item, id -> new ItemAsset(new BasicItemModel(id.withPrefix("item/")), ItemAsset.Properties.DEFAULT));
         }
 
