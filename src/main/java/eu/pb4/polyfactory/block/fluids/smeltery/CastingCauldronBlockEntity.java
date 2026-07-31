@@ -145,7 +145,7 @@ public class CastingCauldronBlockEntity extends LockableBlockEntity implements S
     }
 
     private FluidContainerInput asInput() {
-        return this.provider.getFluidContainerInput();
+        return FluidContainerInput.of(this.provider.asHandler());
     }
 
     @Override

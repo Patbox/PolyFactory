@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.ui;
+package eu.pb4.polyfactory.ui.fluid;
 
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidType;

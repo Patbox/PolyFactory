@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.casting.CastingRecipe;
+import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polyfactory.recipe.input.SingleItemWithFluid;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.inventory.MinimalSidedContainer;
@@ -190,7 +191,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
     }
 
     private SingleItemWithFluid asInput() {
-        return new SingleItemWithFluid(this.getItem(INPUT_FIRST).copy(), this.provider.getFluidContainerInput(), (ServerLevel) level);
+        return new SingleItemWithFluid(this.getItem(INPUT_FIRST).copy(), FluidContainerInput.of(this.provider.asHandler()), (ServerLevel) level);
     }
 
     @Override
@@ -266,7 +267,7 @@ public class CastingTableBlockEntity extends LockableBlockEntity implements Mini
 
     public InteractionResult activate(FaucetBlock.FaucedProvider provider, float rate) {
         if (this.isInputEmpty() && !this.isOutputEmpty()) {
-            var input = new SingleItemWithFluid(this.getItem(1), provider.getFluidContainerInput(), (ServerLevel) this.level);
+            var input = new SingleItemWithFluid(this.getItem(1), FluidContainerInput.of(provider.asHandler()), (ServerLevel) this.level);
 
             if ((this.currentRecipe != null && this.currentRecipe.value().matches(input, input.world()))
                     || (this.currentRecipe = ((ServerLevel) level).recipeAccess().getRecipeFor(FactoryRecipeTypes.CASTING, input, level).orElse(null)) != null) {

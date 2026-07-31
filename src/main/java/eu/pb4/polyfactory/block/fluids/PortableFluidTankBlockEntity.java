@@ -107,7 +107,7 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
         }
 
         if (self.faucedProvider != FaucetBlock.FaucedProvider.EMPTY &&
-                (!self.faucedProvider.isValid() && self.faucedActivate || self.container.isFull() || self.faucedProvider.getFluidContainerInput().get(self.faucedFluid) == 0)) {
+                (!self.faucedProvider.isValid() && self.faucedActivate || self.container.isFull() || self.faucedProvider.asHandler().get(self.faucedFluid) == 0)) {
             self.faucedProvider.setActiveFluid(null);
             self.faucedProvider = FaucetBlock.FaucedProvider.EMPTY;
             self.faucedActivate = false;
@@ -119,7 +119,7 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
                     Math.min(
                             Math.min((long) (self.faucedRate * 0.05 * maxFlow * self.faucedFluid.getFlowSpeedMultiplier(serverWorld)), maxFlow),
                             self.container.empty()),
-                    self.faucedProvider.getFluidContainerInput().get(self.faucedFluid));
+                    self.faucedProvider.asHandler().get(self.faucedFluid));
             self.faucedProvider.setActiveFluid(self.faucedFluid);
             self.faucedProvider.extract(self.faucedFluid, amount);
             self.container.insert(self.faucedFluid, amount, false);
@@ -151,7 +151,7 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
     }
 
     public InteractionResult activate(FaucetBlock.FaucedProvider provider, float rate) {
-        if (!provider.isValid() || this.container.isFull() || provider.getFluidContainerInput().isEmpty()) {
+        if (!provider.isValid() || this.container.isFull() || provider.asHandler().isEmpty()) {
             return InteractionResult.FAIL;
         }
         if (this.faucedActivate && provider == this.faucedProvider) {
@@ -164,10 +164,10 @@ public class PortableFluidTankBlockEntity extends BlockEntity implements FluidIn
         this.faucedProvider = provider;
         this.faucedActivate = true;
         this.faucedRate = rate;
-        this.faucedFluid = provider.getFluidContainerInput().fluids().getFirst();
+        this.faucedFluid = provider.asHandler().fluids().getFirst();
 
         for (var fluid : this.container.fluids()) {
-            if (provider.getFluidContainerInput().get(fluid) > 0) {
+            if (provider.asHandler().get(fluid) > 0) {
                 this.faucedFluid = fluid;
                 break;
             }

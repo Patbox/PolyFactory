@@ -2,11 +2,11 @@ package eu.pb4.polyfactory.item.component;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import eu.pb4.polyfactory.fluid.FluidContainer;
-import eu.pb4.polyfactory.fluid.FluidInstance;
-import eu.pb4.polyfactory.fluid.FluidStack;
-import eu.pb4.polyfactory.fluid.FluidType;
+import eu.pb4.polyfactory.fluid.*;
+import eu.pb4.polyfactory.ui.GuiTextures;
+import eu.pb4.polyfactory.ui.fluid.HorizontalFluidTextures;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import eu.pb4.polymer.common.api.PolymerCommonUtils;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
@@ -17,12 +17,15 @@ import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
+import org.jetbrains.annotations.Nullable;
 
-public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidInstance<?>> fluids, long stored, long capacity) implements TooltipProvider {
+public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidInstance<?>> fluids,
+                             long stored, long capacity) implements TooltipProvider, FluidHolder {
     public static final FluidComponent DEFAULT = new FluidComponent(Object2LongMaps.emptyMap(), List.of(), 0, -1);
     public static final Codec<FluidComponent> SIMPLE_CODEC = FluidStack.CODEC.listOf().xmap(FluidComponent::fromStacks, FluidComponent::toStacks);
     public static final Codec<FluidComponent> CODEC =  Codec.withAlternative(RecordCodecBuilder.create(instance -> instance.group(
@@ -48,7 +51,7 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
     }
 
     public static FluidComponent copyFrom(FluidContainer container) {
-        return new FluidComponent(new Object2LongOpenHashMap<>(container.asMap()), new ArrayList<>(container.fluids()), container.stored(), container.capacity());
+        return container.asFluidComponent();
     }
 
     public static FluidComponent empty(long capacity) {
@@ -71,7 +74,11 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
                 list.add(fluid.stackOf(leftover));
             }
         }
-        return FluidComponent.fromStacks(list, this.capacity);
+        return this.isInfinite() ? this : FluidComponent.fromStacks(list, this.capacity);
+    }
+
+    public boolean isInfinite() {
+        return this.capacity == Long.MAX_VALUE;
     }
 
     public Result insert(FluidInstance<?> fluid, long amount, boolean strict) {
@@ -87,7 +94,7 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
             return new Result(this, amount);
         }
 
-        return new Result(with(fluid, this.get(fluid) + maxAmount), amount - maxAmount);
+        return new Result(this.isInfinite() ? this : with(fluid, this.get(fluid) + maxAmount), amount - maxAmount);
     }
 
     public Result extract(FluidInstance<?> fluid, long amount, boolean strict) {
@@ -99,7 +106,7 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
         if (maxAmount == 0) {
             return new Result(this, 0);
         }
-        return new Result(with(fluid, this.get(fluid) - maxAmount), maxAmount);
+        return new Result(this.isInfinite() ? this : with(fluid, this.get(fluid) - maxAmount), maxAmount);
     }
 
     public long get(FluidInstance<?> fluid) {
@@ -131,18 +138,21 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
         map.forEach(container::set);
     }
 
-    public boolean isEmpty() {
-        return this.stored == 0;
-    }
-
     @Override
     public void addToTooltip(Item.TooltipContext context, Consumer<Component> tooltip, TooltipFlag type, DataComponentGetter components) {
-        for (var fluid : fluids) {
+        for (var fluid : fluids.reversed()) {
             tooltip.accept(Component.literal(" ").append(fluid.toLabeledAmount(this.map.getOrDefault(fluid, 0))).withStyle(ChatFormatting.GRAY));
         }
 
         if (this.capacity != -1) {
             tooltip.accept(Component.translatable("text.polyfactory.x_out_of_y", FactoryUtil.fluidTextGeneric(this.stored), FactoryUtil.fluidTextGeneric(this.capacity)).withStyle(ChatFormatting.YELLOW));
+        }
+
+        if (PolymerCommonUtils.isServerNetworkingThread()) {
+            tooltip.accept(Component.literal(" ").append(HorizontalFluidTextures.TOOLTIP.render(this::provideRender))
+                    .append(GuiTextures.negativeSpace(1))
+                    .append(GuiTextures.FLUID_TOOLTIP_BACKGROUND).setStyle(Style.EMPTY.withShadowColor(0)));
+            tooltip.accept(Component.empty());
         }
     }
 
@@ -157,6 +167,26 @@ public record FluidComponent(Object2LongMap<FluidInstance<?>> map, List<FluidIns
             }
         }
         return false;
+    }
+
+    public FluidComponent withCapacity(long capacity) {
+        return new FluidComponent(this.map, this.fluids, this.stored, capacity);
+    }
+
+    public FluidComponent rotateFluids(boolean previous) {
+        if (this.fluids.size() <= 1) {
+            return this;
+        }
+
+        var list = new ArrayList<>(this.fluids);
+
+        if (previous) {
+            list.addFirst(list.removeLast());
+        } else {
+            list.add(list.removeFirst());
+        }
+
+        return new FluidComponent(this.map, list, this.stored, this.capacity);
     }
 
     public record Result(FluidComponent component, long fluidAmount) {}

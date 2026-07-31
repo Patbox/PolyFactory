@@ -1,5 +1,6 @@
 package eu.pb4.polyfactory.fluid;
 
+import eu.pb4.polyfactory.item.component.FluidComponent;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.Nullable;
@@ -7,111 +8,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public interface FluidContainer {
-    long get(FluidInstance<?> type);
+public interface FluidContainer extends FluidHolder, FluidExchangeHandler {
+    FluidContainer EMPTY = new FluidContainerImpl(0, () -> {}, (_, _) -> false);
 
     long set(FluidInstance<?> type, long amount);
 
-    default boolean doesNotContain(FluidInstance<?> type) {
-        return !contains(type);
-    }
-
-    default boolean contains(FluidInstance<?> type) {
-        return this.get(type) > 0;
-    }
-
-    boolean canInsert(FluidInstance<?> type, long amount, boolean exact);
-
-    long insert(FluidInstance<?> type, long amount, boolean exact);
-
-    boolean canExtract(FluidInstance<?> type, long amount, boolean exact);
-
-    /// Returns amount extracted
-    long extract(FluidInstance<?> type, long amount, boolean exact);
-
-    long capacity();
-
-    long stored();
-
-    Object2LongMap<FluidInstance<?>> asMap();
-
-    List<FluidInstance<?>> fluids();
-
     void clear();
-
-    @Nullable
-    default FluidInstance<?> topFluid() {
-        var fluids = fluids();
-        return fluids.isEmpty() ? null : fluids.getLast();
-    }
-
-    @Nullable
-    default FluidInstance<?> bottomFluid() {
-        var fluids = fluids();
-        return fluids.isEmpty() ? null : fluids.getFirst();
-    }
-
-    default void provideRender(BiConsumer<FluidInstance<?>, Float> consumer) {
-        forEach((a, b) -> consumer.accept(a, (float) (((double) b) / this.capacity())));
-    }
-
-    default void forEach(BiConsumer<FluidInstance<?>, Long> consumer) {
-        for (var f : this.fluids()) {
-            consumer.accept(f, this.get(f));
-        }
-    }
-
-    default void forEachReversed(BiConsumer<FluidInstance<?>, Long> consumer) {
-        for (var f : this.fluids().reversed()) {
-            consumer.accept(f, this.get(f));
-        }
-    }
-
-    default boolean isEmpty() {
-        return this.stored() == 0;
-    }
-
-    default boolean canInsert(FluidStack<?> stack, boolean strict) {
-        return canInsert(stack.instance(), stack.amount(), strict);
-    }
-
-    default boolean canExtract(FluidStack<?> stack, boolean strict) {
-        return canExtract(stack.instance(), stack.amount(), strict);
-    }
-
-    default void insertExact(FluidInstance<?> instance, long amount) {
-        insert(instance, amount, true);
-    }
-
-    default long insert(FluidStack<?> stack, boolean strict) {
-        return insert(stack.instance(), stack.amount(), strict);
-    }
-
-    default long extract(FluidStack<?> stack, boolean strict) {
-        return extract(stack.instance(), stack.amount(), strict);
-    }
-
-    default float getFilledPercentage() {
-        return (float) (((double) this.stored()) / this.capacity());
-    }
-
-    default boolean isNotEmpty() {
-        return !this.isEmpty();
-    }
-
-    default boolean isFull() {
-        return this.stored() >= this.capacity();
-    }
-
-    default boolean isNotFull() {
-        return !isFull();
-    }
-
-    default long empty() {
-        return Math.max(this.capacity() - this.stored(), 0);
-    }
 
     default int updateId() {
         return System.identityHashCode(this);
     }
+
+    FluidComponent asFluidComponent();
 }

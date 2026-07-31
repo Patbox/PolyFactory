@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.fluid.FactoryFluidTags;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerFromComponent;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
+import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.item.component.MiningMode;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
@@ -104,17 +105,22 @@ public class PoweredDrillItem extends BaseDrillItem {
         var stacks = new ArrayList<FluidContainer>();
         for (var eq : EquipmentSlot.values()) {
             var stack = user.getItemBySlot(eq);
-            var fluid = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
-            if (!fluid.isEmpty() && fluid.contains(FactoryFluidTags.DIESEL_ENGINE_FUEL)) {
-                stacks.add(FluidContainerFromComponent.of(SlotAccess.forEquipmentSlot(user, eq)));
+            if (stack.is(FactoryItemTags.INVENTORY_FLUID_SOURCES)) {
+                var fluid = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
+                if (!fluid.isEmpty() && fluid.contains(FactoryFluidTags.DIESEL_ENGINE_FUEL)) {
+                    stacks.add(FluidContainerFromComponent.of(SlotAccess.forEquipmentSlot(user, eq)));
+                }
             }
         }
 
         if (user instanceof Player player) {
             for (int i = 0; i < player.getInventory().getNonEquipmentItems().size(); i++) {
-                var fluid = player.getInventory().getItem(i).getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
-                if (!fluid.isEmpty() && fluid.contains(FactoryFluidTags.DIESEL_ENGINE_FUEL)) {
-                    stacks.add(FluidContainerFromComponent.of(player.getInventory().getSlot(i)));
+                var stack = player.getInventory().getItem(i);
+                if (stack.is(FactoryItemTags.INVENTORY_FLUID_SOURCES)) {
+                    var fluid = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
+                    if (!fluid.isEmpty() && fluid.contains(FactoryFluidTags.DIESEL_ENGINE_FUEL)) {
+                        stacks.add(FluidContainerFromComponent.of(player.getInventory().getSlot(i)));
+                    }
                 }
             }
         }

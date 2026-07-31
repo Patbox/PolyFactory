@@ -3,7 +3,6 @@ package eu.pb4.polyfactory.datagen;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.item.FactoryItemIds;
 import eu.pb4.polyfactory.item.FactoryItemTags;
-import eu.pb4.polyfactory.item.FactoryItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
@@ -14,7 +13,6 @@ import net.minecraft.references.ItemIds;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
@@ -100,6 +98,21 @@ public class ItemTagsProvider extends FabricTagsProvider.ItemTagsProvider {
                 .add(ItemIds.END_CRYSTAL, ItemIds.ENDER_EYE, ItemIds.EXPERIENCE_BOTTLE, ItemIds.GLASS_BOTTLE, ItemIds.POTION, ItemIds.WHEAT)
         ;
 
+        this.tag(FactoryItemTags.INVENTORY_FLUID_SOURCES)
+                .add(FactoryItemIds.CANISTER)
+                //.add(FactoryItemIds.CREATIVE_CANISTER)
+                .add(FactoryItemIds.PORTABLE_FLUID_TANK)
+        ;
+
+        this.tag(FactoryItemTags.DYNAMIC_FLUID_INTERACTION)
+                .add(FactoryItemIds.CANISTER)
+                //.add(FactoryItemIds.CREATIVE_CANISTER)
+        ;
+
+        this.tag(FactoryItemTags.FLUID_CONTAINER_INTERACTABLE_ON_ATTACK)
+                .add(FactoryItemIds.CANISTER)
+        ;
+
         this.tag(FactoryItemTags.XP_CONVERSION_CATALYST)
                 .add(ItemIds.ECHO_SHARD);
         this.tag(FactoryItemTags.DRAIN_CATALYST)
@@ -146,6 +159,16 @@ public class ItemTagsProvider extends FabricTagsProvider.ItemTagsProvider {
                 .add(FactoryItemIds.BRITTLE_GLASS_BOTTLE)
                 .add(FactoryItemIds.LINGERING_THROWABLE_GLASS_BOTTLE)
         ;
+
+        this.tag(FactoryItemTags.CREATIVE_ITEMS)
+                //.add(FactoryItemIds.CREATIVE_CANISTER)
+                .add(FactoryItemIds.CREATIVE_PORTABLE_DRILL)
+                .add(FactoryItemIds.CREATIVE_CONTAINER)
+                .add(FactoryItemIds.CREATIVE_DRAIN)
+                .add(FactoryItemIds.CREATIVE_MOTOR);
+
+        this.tag(ConventionalItemTags.HIDDEN_FROM_RECIPE_VIEWERS)
+                .addOptionalTag(FactoryItemTags.CREATIVE_ITEMS);
     }
 
 

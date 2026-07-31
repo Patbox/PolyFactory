@@ -14,11 +14,11 @@ import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
-import eu.pb4.polyfactory.ui.FluidTextures;
+import eu.pb4.polyfactory.ui.fluid.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
+import eu.pb4.polyfactory.ui.fluid.HorizontalFluidTextures;
 import eu.pb4.polyfactory.util.*;
-import eu.pb4.polyfactory.util.language.VanillaLanguageDownloader;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
@@ -29,20 +29,11 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.tint.DyeTintSource;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
-import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeGenerationSettings;
-import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import net.minecraft.world.level.biome.MobSpawnSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import java.util.List;
 
@@ -107,6 +98,7 @@ public class ModInit implements ModInitializer {
 		PolymerResourcePackUtils.markAsRequired();
 
 		FluidTextures.setup();
+		HorizontalFluidTextures.setup();
 
 		ServerPlayConnectionEvents.JOIN.register(FactorySecrets::onJoin);
 

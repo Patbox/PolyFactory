@@ -80,7 +80,7 @@ public class MultimeterHandler {
 
 
                     if (rot != null) {
-                        addLine(b, "rotation_speed", (int) (rot.speed() / 360 * 60 * 20));
+                        addLine(b, "rotation_speed", (int) (rot.speedRPM()));
                         addLine(b, "rotation_stress", rot.isOverstressed() ? TextColor.RED : TextColor.YELLOW, (int) Math.round(rot.directStressUsage()), (int) Math.round(rot.directStressCapacity()));
                     }
 

@@ -40,6 +40,7 @@ public class GuiTextures {
     public static final Function<Component, Component> TEXT_INPUT = backgroundAnvil("text_input");
     public static final Function<Component, Component> DATA_EXTRACTOR = backgroundAnvil("data_extractor");
     public static final Supplier<GuiElementBuilder> EMPTY_BUILDER = icon16("empty");
+    public static final Supplier<GuiElementBuilder> EMPTY_BUNDLE_BUILDER = icon16("empty", Items.BUNDLE);
     public static final GuiElementBuilder EMPTY = EMPTY_BUILDER.get().hideTooltip();
     public static final Supplier<GuiElementBuilder> POLYDEX_BUTTON = icon32("polydex");
     public static final Supplier<GuiElementBuilder> PLUS_BUTTON = icon32("button/plus");
@@ -81,12 +82,15 @@ public class GuiTextures {
     public static final Progress PROGRESS_VERTICAL = Progress.createVertical("progress_vertical", 0, 15, false);
     public static final Progress PROGRESS_HORIZONTAL = Progress.createHorizontal("progress_horizontal", 0, 15, false);
     public static final Progress PROGRESS_HORIZONTAL_OFFSET_RIGHT = Progress.createHorizontal32Right("progress_horizontal_offset_right", 6, 26, false);
-    public static final Progress DIESEL_ENGINE_POWER = Progress.createVertical48H("diesel_engine_power", 1, 46, true);
+    public static final Progress DIESEL_ENGINE_POWER = Progress.createVertical48V("diesel_engine_power", 1, 46, true);
 
     public static final Temperature TEMPERATURE = new Temperature(FLAME, ICE);
     public static final Temperature TEMPERATURE_OFFSET_RIGHT = new Temperature(FLAME_OFFSET_RIGHT, ICE_OFFSET_RIGHT);
     public static final IntFunction<GuiElementBuilder>[] NUMBERS_FLAT_24 = createNumbers(8 * 3, false, 0);
     public static final IntFunction<GuiElementBuilder>[] NUMBERS_SHADOW_8 = createNumbers(8, true, 0);
+
+    public static final Component FLUID_TOOLTIP_BACKGROUND = fontComponent(id("sgui/fluid_tooltip_background"), 13 - 11 + 1, 18);
+
     public static final char SPACE_1 = space(1);
     public static final char SPACE_5 = space(5);
     public static final char SPACE_10 = space(10);
@@ -118,6 +122,8 @@ public class GuiTextures {
     public static final char PRESS_POLYDEX_FLUID_OFFSET = space(107 - 8);
     public static final char PRESS_POLYDEX_FLUID_OFFSET_N = space(-107 + 8);
     public static final char NEGATIVE_SPACE_1 = space(-1);
+    public static final char NEGATIVE_SPACE_2 = space(-2);
+    public static final char NEGATIVE_SPACE_5 = space(-5);
     public static final char NEGATIVE_SPACE_5000 = space(-5000);
     public static final char NEGATIVE_SPACE_2500 = space(-2500);
     public static final char NEGATIVE_SPACE_1024 = space(-1024);
@@ -144,6 +150,37 @@ public class GuiTextures {
 
         icon16("drill_icon_area_2x2x1");
         icon16("drill_icon_area_3x3x1");
+    }
+
+    public static Component negativeSpace(Integer value) {
+        var string = new StringBuilder();
+
+        while (value > 0) {
+            if (value >= 100) {
+                string.append(NEGATIVE_SPACE_100);
+                value -= 100;
+            } else if (value >= 50) {
+                string.append(NEGATIVE_SPACE_50);
+                value -= 50;
+            } else if (value >= 20) {
+                string.append(NEGATIVE_SPACE_20);
+                value -= 20;
+            } else if (value >= 10) {
+                string.append(NEGATIVE_SPACE_10);
+                value -= 10;
+            } else if (value >= 5) {
+                string.append(NEGATIVE_SPACE_5);
+                value -= 5;
+            } else if (value >= 2) {
+                string.append(NEGATIVE_SPACE_2);
+                value -= 2;
+            } else {
+                string.append(NEGATIVE_SPACE_1);
+                value -= 1;
+            }
+        }
+
+        return Component.literal(string.toString()).setStyle(STYLE);
     }
 
     public record Temperature(Progress fire, Progress ice) {
@@ -235,9 +272,9 @@ public class GuiTextures {
             return create(size, function);
         }
 
-        public static Progress createVertical48H(String path, int start, int stop, boolean reverse) {
+        public static Progress createVertical48V(String path, int start, int stop, boolean reverse) {
             var size = stop - start;
-            var function = verticalProgress48H(path, start, stop, reverse);
+            var function = verticalProgress48V(path, start, stop, reverse);
 
             return create(size, function);
         }

@@ -22,6 +22,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -117,11 +118,16 @@ public class BaseDrillItem extends Item implements PolymerItem, CustomItemBroken
     @Override
     public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
-        if (display.shows(FactoryDataComponents.DRILL_ATTACHMENT) && itemStack.has(FactoryDataComponents.DRILL_ATTACHMENT)) {
-            var head = Objects.requireNonNull(itemStack.get(FactoryDataComponents.DRILL_ATTACHMENT));
-            builder.accept(Component.translatable("text.polyfactory.attached", head.getOrDefault(DataComponents.CUSTOM_NAME, head.getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY)))
-                    .withStyle(ChatFormatting.GRAY)
-            );
+        if (display.shows(FactoryDataComponents.DRILL_ATTACHMENT)) {
+            if (itemStack.has(FactoryDataComponents.DRILL_ATTACHMENT)) {
+                var head = Objects.requireNonNull(itemStack.get(FactoryDataComponents.DRILL_ATTACHMENT));
+                builder.accept(Component.translatable("text.polyfactory.attached", head.getOrDefault(DataComponents.CUSTOM_NAME, head.getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY)))
+                        .withStyle(ChatFormatting.GRAY)
+                );
+            } else {
+                builder.accept(Component.translatable("item.polyfactory.portable_drill.tooltip.1").withColor(TextColor.GRAY));
+                builder.accept(Component.translatable("item.polyfactory.portable_drill.tooltip.2").withColor(TextColor.GRAY));
+            }
         }
     }
 

@@ -12,6 +12,10 @@ Fluids can be transported with blocks such as <item 'polyfactory:pipe'>, which n
 Pipes and pumps can pull fluids from fluid storage blocks or from in-world blocks such as Water/Lava sources, Honey/Slime
 blocks, Beehives and so on. Custom PolyFactory fluids might require specific recipes and smeltery to use it.
 <nl2>
+If you want to input (or take) fluids into / out of some "open" blocks (think <pageref '/crafting/mechanical_mixer'>, Fluid Drain and so on), you can interact with them
+using buckets, bottles and other compatible items. This interaction can happen both in world and in the block's container interface, by targeting the visual fluid visualizer,
+while holding the item in the cursor. Do note not all blocks allow the same insertion / extraction behavior.
+<nl2>
 <yellow>Smelting</> is a process of melting metallic items with a Smeltery. PolyFactory adds 2 types of Smelteries:
 - <item 'polyfactory:primitive_smeltery'> - Early-game primitive and slower smeltery.
 - <item 'polyfactory:smeltery'> - Mid-game larger smeltery. It's faster and can smelt 9 items at the same time.

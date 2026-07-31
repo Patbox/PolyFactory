@@ -15,6 +15,7 @@ import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
+import eu.pb4.polyfactory.fluid.FluidInteractionMode;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -65,7 +66,7 @@ public class DieselEngineBlock extends NetworkBlock implements FactoryBlock, Ent
             BlockValueFormatter.text(RedstoneActivationType::asName), DieselEngineBlockEntity::getRedstoneActivationType,
             DieselEngineBlockEntity::setRedstoneActivationType, WrenchModifyBlockValue.enums(RedstoneActivationType.values()));
 
-    private static final BlockConfig<?> SPEED_GEAR_CONFIG = BlockConfig.ofBlockEntity("speed_gear", Codec.INT, DieselEngineBlockEntity.class,
+    private static final BlockConfig<?> ENGINE_GEAR_CONFIG = BlockConfig.ofBlockEntity("engine_gear", Codec.INT, DieselEngineBlockEntity.class,
             BlockValueFormatter.str(String::valueOf), DieselEngineBlockEntity::getGear,
             DieselEngineBlockEntity::setGear, WrenchModifyBlockValue.simple(IntStream.rangeClosed(1, 5).boxed().toList()));
 
@@ -97,7 +98,7 @@ public class DieselEngineBlock extends NetworkBlock implements FactoryBlock, Ent
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        return this.defaultBlockState().setValue(FACING, ctx.getPlayer() != null && ctx.getPlayer().isShiftKeyDown() ? ctx.getClickedFace() : ctx.getClickedFace().getOpposite());
+        return this.defaultBlockState().setValue(FACING, ctx.getPlayer() != null && ctx.getPlayer().isShiftKeyDown() ? ctx.getClickedFace().getOpposite() : ctx.getNearestLookingDirection());
     }
 
     @Override
@@ -105,7 +106,7 @@ public class DieselEngineBlock extends NetworkBlock implements FactoryBlock, Ent
         if (!oldState.is(state.getBlock())) {
             this.updatePowered(world, pos, state);
         }
-        super.onPlace(state,world,pos, oldState, notify);
+        super.onPlace(state, world, pos, oldState, notify);
     }
 
     @Override
@@ -167,28 +168,13 @@ public class DieselEngineBlock extends NetworkBlock implements FactoryBlock, Ent
         if (!(level.getBlockEntity(pos) instanceof DieselEngineBlockEntity be) || hit.getDirection() != state.getValue(FACING).getOpposite() || stack.isEmpty()) {
             return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
-        var copy = stack.copy();
-        var x = FluidContainerUtil.interactWith(be.getMainFluidContainer(), (ServerPlayer) player, player.getMainHandItem());
+
+        var x = FluidContainerUtil.interactWithInWorld(be.getMainFluidContainer(), (ServerPlayer) player, stack, hand, FluidInteractionMode.ANY);
         if (x == null) {
             return super.useItemOn(stack, state, level, pos, player, hand, hit);
         }
-        if (stack.isEmpty() && ItemStack.matches(stack, copy)) {
-            return InteractionResult.FAIL;
-        }
 
-        if (stack.isEmpty()) {
-            player.setItemInHand(InteractionHand.MAIN_HAND, x);
-        } else if (!x.isEmpty()) {
-            if (player.isCreative()) {
-                if (!player.getInventory().contains(x)) {
-                    player.getInventory().add(x);
-                }
-            } else {
-                player.getInventory().placeItemBackInInventory(x);
-            }
-        }
-
-        return InteractionResult.SUCCESS_SERVER;
+        return x;
     }
 
     @Override
@@ -208,7 +194,7 @@ public class DieselEngineBlock extends NetworkBlock implements FactoryBlock, Ent
 
     @Override
     public List<BlockConfig<?>> getBlockConfiguration(ServerPlayer player, BlockPos blockPos, Direction side, BlockState state) {
-        return List.of(BlockConfig.FACING, REDSTONE_ACTIVATION_CONFIG, SPEED_GEAR_CONFIG);
+        return List.of(BlockConfig.FACING, REDSTONE_ACTIVATION_CONFIG, ENGINE_GEAR_CONFIG);
     }
 
     @Override

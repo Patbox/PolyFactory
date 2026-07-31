@@ -118,6 +118,7 @@ public class PolydexCompatImpl {
         PolydexEntry.registerEntryCreator(FactoryItems.INVERTED_CAGED_LAMP, PolydexCompatImpl::seperateColoredItems);
         PolydexEntry.registerEntryCreator(FactoryItems.BRITTLE_POTION, PolydexImpl::seperateCustomPotion);
         PolydexEntry.registerEntryCreator(FactoryItems.PORTABLE_FLUID_TANK, PolydexCompatImpl::seperateFluidItems);
+        PolydexEntry.registerEntryCreator(FactoryItems.CANISTER, PolydexCompatImpl::seperateFluidItems);
         HoverDisplayBuilder.register(PolydexCompatImpl::stateAccurateNames);
     }
 

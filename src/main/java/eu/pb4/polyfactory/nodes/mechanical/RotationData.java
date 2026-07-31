@@ -18,6 +18,7 @@ import eu.pb4.polyfactory.nodes.mechanical_connectors.GearNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.LargeGearNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.SelfGearNode;
 import eu.pb4.polyfactory.nodes.mechanical_connectors.SmallGearNode;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import it.unimi.dsi.fastutil.longs.Long2BooleanOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2FloatOpenHashMap;
@@ -415,6 +416,10 @@ public class RotationData implements GraphEntity<RotationData> {
 
     public float speedRadians() {
         return (float) (this.speed * (this.negative ? -1 : 1) * Mth.DEG_TO_RAD);
+    }
+
+    public double speedRPM() {
+        return FactoryUtil.degreesPerTickToRPM(this.speed);
     }
 
     public static class State {

@@ -164,6 +164,10 @@ public class FactoryUtil {
     }
 
     public static MutableComponent fluidTextGeneric(long amount) {
+        if (amount == Long.MAX_VALUE) {
+            return Component.literal("∞");
+        }
+
         if (amount >= FluidConstants.BLOCK) {
             long buckets = amount / (FluidConstants.BLOCK / 1000);
             return Component.literal((buckets / 1000) + "." + (buckets / 10 % 100) + "B");
@@ -737,6 +741,14 @@ public class FactoryUtil {
         var list = new ArrayList<T>();
         iterable.forEach(list::add);
         return list;
+    }
+
+    public static double degreesPerTickToRPM(double speed) {
+        return speed / 360 * 60 * 20;
+    }
+
+    public static double rpmToDegreesPerTick(double speed) {
+        return speed * 360 / 60 / 20;
     }
 
 

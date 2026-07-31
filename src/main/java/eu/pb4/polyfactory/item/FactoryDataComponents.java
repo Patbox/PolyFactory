@@ -6,7 +6,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polyfactory.ModInit;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.fluid.FluidInstance;
-import eu.pb4.polyfactory.fluid.FluidInteractionMode;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.item.component.MiningMode;
 import eu.pb4.polyfactory.item.configuration.ConfigurationData;
@@ -55,7 +54,6 @@ public class FactoryDataComponents {
 
     public static final DataComponentType<Integer> CHANNEL = register("channel", DataComponentType.<Integer>builder().persistent(Codec.INT).build());
     public static final DataComponentType<FluidComponent> FLUID = register("fluid", DataComponentType.<FluidComponent>builder().persistent(FluidComponent.CODEC).build());
-    public static final DataComponentType<FluidInteractionMode> FLUID_INTERACTION_MODE = register("fluid_interaction_mode", DataComponentType.<FluidInteractionMode>builder().persistent(FluidInteractionMode.CODEC).build());
     public static final DataComponentType<FluidInstance<?>> CURRENT_FLUID = register("current_fluid", DataComponentType.<FluidInstance<?>>builder().persistent(FluidInstance.CODEC).build());
 
     public static final DataComponentType<ImprovedFilterItem.Match> ITEM_FILTER_MATCH = register("item_filter/match", DataComponentType.<ImprovedFilterItem.Match>builder()

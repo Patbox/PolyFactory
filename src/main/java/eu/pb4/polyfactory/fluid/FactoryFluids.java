@@ -48,6 +48,7 @@ public class FactoryFluids {
             FluidType.of().density(1000).fluid(Fluids.LAVA).brightness(15).heat(BlockHeat.LAVA)
                     .flowSpeedMultiplier(((world, data) -> world != null && world.environmentAttributes().getDimensionValue(EnvironmentAttributes.FAST_LAVA) ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
+                    .soundEvents(SoundEvents.BUCKET_EMPTY_LAVA, SoundEvents.BUCKET_FILL_LAVA)
                     .maxFlow(((world, data) -> world != null && world.environmentAttributes().getDimensionValue(EnvironmentAttributes.FAST_LAVA) ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     public static final FluidType<Unit> MILK = register(FactoryFluidIds.MILK,
@@ -60,6 +61,7 @@ public class FactoryFluids {
                     .solidTexture(id("block/fluid/glass_solid"))
                     .flowSpeedMultiplier(1)
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
+                    .soundEvents(SoundEvents.BUCKET_EMPTY_LAVA, SoundEvents.BUCKET_FILL_LAVA)
                     .maxFlow((world, data) -> FluidConstants.BOTTLE * 2 / 3).build());
 
     public static final FluidType<Unit> IRON = register(FactoryFluidIds.IRON,
@@ -67,6 +69,7 @@ public class FactoryFluids {
                     .solidTexture(id("block/fluid/iron_solid"))
                     .flowSpeedMultiplier(((world, data) -> world != null && world.environmentAttributes().getDimensionValue(EnvironmentAttributes.FAST_LAVA) ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
+                    .soundEvents(SoundEvents.BUCKET_EMPTY_LAVA, SoundEvents.BUCKET_FILL_LAVA)
                     .maxFlow(((world, data) -> world != null && world.environmentAttributes().getDimensionValue(EnvironmentAttributes.FAST_LAVA) ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
 
     public static final FluidType<Unit> STEEL = register(FactoryFluidIds.STEEL,
@@ -74,6 +77,7 @@ public class FactoryFluids {
                     .solidTexture(id("block/fluid/steel_solid"))
                     .flowSpeedMultiplier(((world, data) -> world != null && world.environmentAttributes().getDimensionValue(EnvironmentAttributes.FAST_LAVA) ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
+                    .soundEvents(SoundEvents.BUCKET_EMPTY_LAVA, SoundEvents.BUCKET_FILL_LAVA)
                     .maxFlow(((world, data) -> world != null && world.environmentAttributes().getDimensionValue(EnvironmentAttributes.FAST_LAVA) ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
 
 
@@ -82,6 +86,7 @@ public class FactoryFluids {
                     .solidTexture(id("block/fluid/gold_solid"))
                     .flowSpeedMultiplier(((world, data) -> world != null && world.environmentAttributes().getDimensionValue(EnvironmentAttributes.FAST_LAVA) ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
+                    .soundEvents(SoundEvents.BUCKET_EMPTY_LAVA, SoundEvents.BUCKET_FILL_LAVA)
                     .maxFlow(((world, data) -> world != null && world.environmentAttributes().getDimensionValue(EnvironmentAttributes.FAST_LAVA) ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
 
     public static final FluidType<Unit> COPPER = register(FactoryFluidIds.COPPER,
@@ -89,9 +94,11 @@ public class FactoryFluids {
                     .solidTexture(id("block/fluid/copper_solid"))
                     .flowSpeedMultiplier(((world, data) -> world != null && world.environmentAttributes().getDimensionValue(EnvironmentAttributes.FAST_LAVA) ? 1 : 0.5))
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.LAVA_SPLASH, 10,400, FactorySoundEvents.FLUID_SHOOT_LAVA))
+                    .soundEvents(SoundEvents.BUCKET_EMPTY_LAVA, SoundEvents.BUCKET_FILL_LAVA)
                     .maxFlow(((world, data) -> world != null && world.environmentAttributes().getDimensionValue(EnvironmentAttributes.FAST_LAVA) ? FluidConstants.BOTTLE : FluidConstants.BOTTLE * 2 / 3)).build());
     public static final FluidType<Unit> EXPERIENCE = register(FactoryFluidIds.EXPERIENCE,
             FluidType.of().density(50).flowSpeedMultiplier(1.3).maxFlow(FluidConstants.BOTTLE * 2).brightness(14).heat(BlockHeat.EXPERIENCE)
+                    .soundEvents(SoundEvents.BUCKET_EMPTY_LAVA, SoundEvents.BUCKET_FILL_LAVA)
                     .shootingBehavior(new ShootProjectileEntity<>((world, fluid, amount) -> {
                         var xp = FactoryEntities.EXPERIENCE_SPLASH.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
                         assert xp != null;
@@ -121,17 +128,21 @@ public class FactoryFluids {
     public static final FluidType<Unit> HONEY = register(FactoryFluidIds.HONEY,
             FluidType.of().density(500).transparent().flowSpeedMultiplier(0.6).maxFlow(FluidConstants.BOTTLE * 2 / 3).transparent()
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.HONEY_SPLASH, 3, FluidConstants.BOTTLE / 80, FactorySoundEvents.FLUID_SHOOT_HONEY))
+                    .soundEvents(SoundEvents.HONEY_BLOCK_PLACE, SoundEvents.HONEY_BLOCK_BREAK)
+
                     .build());
 
     public static final FluidType<Unit> SLIME = register(FactoryFluidIds.SLIME,
             FluidType.of().density(600).transparent().flowSpeedMultiplier(0.6).maxFlow(FluidConstants.BOTTLE * 2 / 3).transparent()
                     .shootingBehavior(ShootProjectileEntity.ofSplash(FactoryEntities.SLIME_SPLASH, 3, FluidConstants.BOTTLE / 80, FactorySoundEvents.FLUID_SHOOT_SLIME))
+                    .soundEvents(SoundEvents.SLIME_BLOCK_PLACE, SoundEvents.SLIME_BLOCK_BREAK)
                     .build());
 
     public static final FluidType<Unit> SNOW = register(FactoryFluidIds.SNOW,
             FluidType.of().density(90).flowSpeedMultiplier(0.98).maxFlow(FluidConstants.BOTTLE * 4 / 5).heat(BlockHeat.SNOW)
                     .shootingBehavior(ShootProjectileEntity.ofEntity(EntityTypes.SNOWBALL, 1, FluidConstants.BLOCK / 4 / 20 / 2,
                             1.7f, 0.5f, 0, 0.1f, BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.SNOWBALL_THROW)))
+                    .soundEvents(SoundEvents.BUCKET_EMPTY_POWDER_SNOW, SoundEvents.BUCKET_FILL_POWDER_SNOW)
                     .texture(Identifier.withDefaultNamespace("block/powder_snow")).build());
 
     public static final FluidType<Unit> PLANT_OIL = register(FactoryFluidIds.PLANT_OIL,

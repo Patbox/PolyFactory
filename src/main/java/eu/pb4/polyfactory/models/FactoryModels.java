@@ -36,6 +36,9 @@ public interface FactoryModels {
             arr[i] = new FluidModel(id("block/fluid/portable_fluid_tank/h" + (i + 1)));
         }
     });
+
+    FluidModel CANISTER_ITEM = new FluidModel(id("block/fluid/canister_model"));
+
     DirectionConnectingModel COLORED_CABLE = new DirectionConnectingModel(id("block/cable_colored"), true);
     DirectionConnectingModel COLORED_WALL_CABLE = new DirectionConnectingModel(id("block/cable_colored_wall"), true);
     DirectionConnectingModel PIPE = new DirectionConnectingModel(id("block/pipe"), false);

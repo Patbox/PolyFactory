@@ -36,6 +36,7 @@ import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.registry.CompostableRegistry;
 import net.fabricmc.fabric.api.registry.FabricPotionBrewingBuilder;
 import net.fabricmc.fabric.api.registry.FuelValueEvents;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
@@ -251,6 +252,9 @@ public class FactoryItems {
     public static final PressureFluidGun PRESSURE_FLUID_GUN = register(FactoryItemIds.PRESSURE_FLUID_GUN, settings -> new PressureFluidGun(
             settings.stacksTo(1).enchantable(5).repairable(COPPER_PLATE).durability(800)));
 
+    public static final Item CANISTER = register(FactoryItemIds.CANISTER, new Item.Properties().component(FactoryDataComponents.FLUID, FluidComponent.DEFAULT.withCapacity(FluidConstants.BUCKET * 2)).stacksTo(1), CanisterItem::new);
+    //public static final Item CREATIVE_CANISTER = register(FactoryItemIds.CREATIVE_CANISTER, new Item.Properties().component(FactoryDataComponents.FLUID, FluidComponent.DEFAULT.withCapacity(Long.MAX_VALUE)).stacksTo(1), CanisterItem::new);
+
     public static final Item ITEM_PACKER = register(FactoryBlocks.ITEM_PACKER);
 
     public static final SpoutMolds<Item> INGOT_MOLD = SpoutMolds.registerItems(FactoryItemIds.INGOT_MOLD);
@@ -427,6 +431,7 @@ public class FactoryItems {
                     entries.accept(STICKY_DYNAMITE);
                     entries.accept(MULTIMETER);
                     entries.accept(PRESSURE_FLUID_GUN);
+                    entries.accept(CANISTER);
                     entries.accept(CHAIN_LIFT);
                     entries.accept(SPRAY_CAN);
 
@@ -508,6 +513,7 @@ public class FactoryItems {
                     entries.accept(CREATIVE_MOTOR);
                     entries.accept(CREATIVE_CONTAINER);
                     entries.accept(CREATIVE_DRAIN);
+                    //entries.accept(CREATIVE_CANISTER);
                     entries.accept(CREATIVE_PORTABLE_DRILL);
 
                 })).build()
@@ -547,19 +553,21 @@ public class FactoryItems {
                         entries.accept(ColoredItem.stack(INVERTED_FIXTURE_LAMP, 1, DyeColorExtra.getColor(dye)));
                     }
 
-                    for (var fluid : FactoryRegistries.FLUID_TYPES) {
-                        if (fluid.defaultData() == Unit.INSTANCE) {
-                            var stack = PORTABLE_FLUID_TANK.getDefaultInstance();
-                            stack.update(FactoryDataComponents.FLUID, FluidComponent.DEFAULT, x -> x.with(fluid.defaultInstance(), x.capacity()));
-                            entries.accept(stack);
+                    for (var container : List.of(PORTABLE_FLUID_TANK, CANISTER)) {
+                        for (var fluid : FactoryRegistries.FLUID_TYPES) {
+                            if (fluid.defaultData() == Unit.INSTANCE) {
+                                var stack = container.getDefaultInstance();
+                                stack.update(FactoryDataComponents.FLUID, FluidComponent.DEFAULT, x -> x.with(fluid.defaultInstance(), x.capacity()));
+                                entries.accept(stack);
+                            }
                         }
-                    }
 
-                    for (var potion : BuiltInRegistries.POTION.asHolderIdMap()) {
-                        if (potion != Potions.WATER) {
-                            var stack = PORTABLE_FLUID_TANK.getDefaultInstance();
-                            stack.update(FactoryDataComponents.FLUID, FluidComponent.DEFAULT, x -> x.with(FactoryFluids.getPotion(potion), x.capacity()));
-                            entries.accept(stack);
+                        for (var potion : BuiltInRegistries.POTION.asHolderIdMap()) {
+                            if (potion != Potions.WATER) {
+                                var stack = container.getDefaultInstance();
+                                stack.update(FactoryDataComponents.FLUID, FluidComponent.DEFAULT, x -> x.with(FactoryFluids.getPotion(potion), x.capacity()));
+                                entries.accept(stack);
+                            }
                         }
                     }
 
@@ -575,6 +583,23 @@ public class FactoryItems {
                         entries.accept(x);
                     }
 
+                    /*for (var container : List.of(CREATIVE_CANISTER)) {
+                        for (var fluid : FactoryRegistries.FLUID_TYPES) {
+                            if (fluid.defaultData() == Unit.INSTANCE) {
+                                var stack = container.getDefaultInstance();
+                                stack.update(FactoryDataComponents.FLUID, FluidComponent.DEFAULT, x -> x.with(fluid.defaultInstance(), x.capacity()));
+                                entries.accept(stack);
+                            }
+                        }
+
+                        for (var potion : BuiltInRegistries.POTION.asHolderIdMap()) {
+                            if (potion != Potions.WATER) {
+                                var stack = container.getDefaultInstance();
+                                stack.update(FactoryDataComponents.FLUID, FluidComponent.DEFAULT, x -> x.with(FactoryFluids.getPotion(potion), x.capacity()));
+                                entries.accept(stack);
+                            }
+                        }
+                    }*/
                 })).build()
         );
 

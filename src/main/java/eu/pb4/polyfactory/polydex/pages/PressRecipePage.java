@@ -1,15 +1,13 @@
 package eu.pb4.polyfactory.polydex.pages;
 
-import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polydex.api.v1.recipe.*;
 import eu.pb4.polyfactory.block.fluids.DrainBlockEntity;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlockEntity;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
-import eu.pb4.polyfactory.ui.FluidTextures;
+import eu.pb4.polyfactory.ui.fluid.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;

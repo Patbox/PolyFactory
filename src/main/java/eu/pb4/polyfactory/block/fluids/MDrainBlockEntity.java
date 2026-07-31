@@ -12,10 +12,7 @@ import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.PressBlock;
 import eu.pb4.polyfactory.block.other.ItemOutputBufferBlock;
 import eu.pb4.polyfactory.block.other.OutputContainerOwner;
-import eu.pb4.polyfactory.fluid.FluidContainer;
-import eu.pb4.polyfactory.fluid.FluidContainerImpl;
-import eu.pb4.polyfactory.fluid.FluidContainerUtil;
-import eu.pb4.polyfactory.fluid.FluidType;
+import eu.pb4.polyfactory.fluid.*;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.component.FluidComponent;
@@ -23,7 +20,7 @@ import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.drain.DrainRecipe;
 import eu.pb4.polyfactory.recipe.input.DrainInput;
-import eu.pb4.polyfactory.ui.FluidTextures;
+import eu.pb4.polyfactory.ui.fluid.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.TagLimitedSlot;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
@@ -32,7 +29,6 @@ import eu.pb4.polyfactory.util.inventory.SubContainer;
 import eu.pb4.polyfactory.util.movingitem.SimpleMovingItemContainer;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -351,48 +347,49 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
     }
 
     @Override
-    public InteractionResult onUse(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
-        var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+    public InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if ((stack.isEmpty() || (ItemStack.isSameItemSameComponents(stack, this.catalyst()) && stack.getCount() < stack.getMaxStackSize()))
-                && hit.getDirection() == Direction.UP && !this.catalyst().isEmpty()) {
+                && hitResult.getDirection() == Direction.UP && !this.catalyst().isEmpty()) {
             if (stack.isEmpty()) {
-                player.setItemInHand(InteractionHand.MAIN_HAND, this.catalyst());
+                player.setItemInHand(hand, this.catalyst());
             } else {
                 stack.grow(1);
             }
             this.setCatalyst(ItemStack.EMPTY);
             return InteractionResult.SUCCESS_SERVER;
-        } else if (stack.is(FactoryItemTags.DRAIN_CATALYST) && hit.getDirection() == Direction.UP && this.catalyst().isEmpty()) {
+        } else if (stack.is(FactoryItemTags.DRAIN_CATALYST) && hitResult.getDirection() == Direction.UP && this.catalyst().isEmpty()) {
             this.setCatalyst(stack.copyWithCount(1));
             stack.consume(1, player);
             return InteractionResult.SUCCESS_SERVER;
         }
 
-        if (world instanceof ServerLevel serverWorld) {
-            var container = this.getFluidContainer();
-            var copy = stack.copy();
-            var input = DrainInput.of(copy, this.catalyst(), container, !(player instanceof FakePlayer));
-            var optional = serverWorld.recipeAccess().getRecipeFor(FactoryRecipeTypes.DRAIN, input, world);
-            if (optional.isEmpty()) {
-                return super.onUse(state, world, pos, player, hit);
-            }
+        var res = FluidContainerUtil.interactWithInWorld(this.getFluidContainer(), player, stack, hand, FluidInteractionMode.ANY, FluidInteractionMode.INSERT, recipe -> {
             if (player instanceof ServerPlayer serverPlayer) {
-                CriteriaTriggers.RECIPE_CRAFTED.trigger(serverPlayer, optional.get().id(), List.of(stack.copy(), this.catalyst()));
+                if (recipe.isPresent()) {
+                    CriteriaTriggers.RECIPE_CRAFTED.trigger(serverPlayer, recipe.get().id(), List.of(stack.copy(), this.catalyst()));
+                }
                 TriggerCriterion.trigger(serverPlayer, FactoryTriggers.DRAIN_USE);
             }
+        });
 
-            var recipe = optional.get().value();
-            var itemOut = recipe.assemble(input);
-            for (var fluid : recipe.fluidInput(input)) {
-                container.extract(fluid, false);
-            }
-            player.setItemInHand(InteractionHand.MAIN_HAND, FactoryUtil.exchangeStack(stack, recipe.decreasedInputItemAmount(input), player, itemOut));
-            for (var fluid : recipe.fluidOutput(input)) {
-                container.insert(fluid, false);
-            }
-            world.playSound(null, pos, recipe.soundEvent().value(), SoundSource.BLOCKS);
+        if (res == null) {
+            return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         }
-        return InteractionResult.SUCCESS_SERVER;
+
+        return res;
+    }
+
+    @Override
+    public InteractionResult onPlayerAttack(BlockState state, Level world, BlockPos pos, Player player) {
+        var itemStack = player.getMainHandItem();
+        if (itemStack.is(FactoryItemTags.FLUID_CONTAINER_INTERACTABLE_ON_ATTACK)) {
+            var x = FluidContainerUtil.interactWithInWorld(this.fluidContainer, player, itemStack, InteractionHand.MAIN_HAND, FluidInteractionMode.ANY, FluidInteractionMode.EXTRACT);
+            if (x != null) {
+                return x;
+            }
+        }
+
+        return super.onPlayerAttack(state, world, pos, player);
     }
 
     private void addToOutputOrDrop(ItemStack stack) {

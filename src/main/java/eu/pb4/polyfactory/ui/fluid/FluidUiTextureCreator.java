@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory.ui;
+package eu.pb4.polyfactory.ui.fluid;
 
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.polyfactory.other.FactoryRegistries;
@@ -28,6 +28,7 @@ public class FluidUiTextureCreator {
     public void registerTextures(Identifier id, FluidType<?> object) {
         this.textures.add(Pair.of(id, object.texture()));
     }
+
     public void setup() {
         for (var fluid : FactoryRegistries.FLUID_TYPES.keySet()) {
             this.registerTextures(fluid, Objects.requireNonNull(FactoryRegistries.FLUID_TYPES.getValue(fluid)));

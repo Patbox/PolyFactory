@@ -178,6 +178,9 @@ public class FactoryItemIds {
 
     public static final ResourceKey<Item> PRESSURE_FLUID_GUN = of("pressure_fluid_gun");
 
+    public static final ResourceKey<Item> CANISTER = of("canister");
+    //public static final ResourceKey<Item> CREATIVE_CANISTER = of("creative_canister");
+
     public static final ResourceKey<Item> ITEM_PACKER = of(FactoryBlockIds.ITEM_PACKER);
 
     public static final SpoutMolds<ResourceKey<Item>> INGOT_MOLD = SpoutMolds.createIds("ingot");

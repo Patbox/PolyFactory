@@ -14,7 +14,7 @@ import eu.pb4.polyfactory.fluid.FluidContainerUtil;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.smeltery.SmelteryRecipe;
-import eu.pb4.polyfactory.ui.FluidTextures;
+import eu.pb4.polyfactory.ui.fluid.FluidTextures;
 import eu.pb4.polyfactory.ui.FuelSlot;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;

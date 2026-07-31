@@ -10,17 +10,15 @@ import eu.pb4.polyfactory.block.mechanical.RotationUser;
 import eu.pb4.polyfactory.block.mechanical.machines.TallItemMachineBlockEntity;
 import eu.pb4.polyfactory.block.other.ItemOutputBufferBlock;
 import eu.pb4.polyfactory.block.other.OutputContainerOwner;
-import eu.pb4.polyfactory.fluid.FluidContainer;
-import eu.pb4.polyfactory.fluid.FluidContainerImpl;
-import eu.pb4.polyfactory.fluid.FluidContainerUtil;
-import eu.pb4.polyfactory.fluid.FluidType;
+import eu.pb4.polyfactory.fluid.*;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
+import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.fermenting.FermentingRecipe;
 import eu.pb4.polyfactory.recipe.input.SingleItemWithTemperature;
-import eu.pb4.polyfactory.ui.FluidTextures;
+import eu.pb4.polyfactory.ui.fluid.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -319,30 +317,26 @@ public class FermenterBlockEntity extends TallItemMachineBlockEntity implements 
     }
 
     @Override
-    public InteractionResult onUse(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
-        var stack = player.getMainHandItem();
-        var copy = stack.copy();
-        var x = FluidContainerUtil.interactWith(this.fluidContainer, (ServerPlayer) player, player.getMainHandItem(), false, true);
+    public InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        var x = FluidContainerUtil.interactWithInWorld(this.fluidContainer, player, itemStack, hand, FluidInteractionMode.EXTRACT);
         if (x == null) {
-            return super.onUse(state, world, pos, player, hit);
-        }
-        if (stack.isEmpty() && ItemStack.matches(stack, copy)) {
-            return InteractionResult.FAIL;
+            return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
         }
 
-        if (stack.isEmpty()) {
-            player.setItemInHand(InteractionHand.MAIN_HAND, x);
-        } else if (!x.isEmpty()) {
-            if (player.isCreative()) {
-                if (!player.getInventory().contains(x)) {
-                    player.getInventory().add(x);
-                }
-            } else {
-                player.getInventory().placeItemBackInInventory(x);
+        return x;
+    }
+
+    @Override
+    public InteractionResult onPlayerAttack(BlockState state, Level world, BlockPos pos, Player player) {
+        var itemStack = player.getMainHandItem();
+        if (itemStack.is(FactoryItemTags.FLUID_CONTAINER_INTERACTABLE_ON_ATTACK)) {
+            var x = FluidContainerUtil.interactWithInWorld(this.fluidContainer, player, itemStack, InteractionHand.MAIN_HAND, FluidInteractionMode.EXTRACT);
+            if (x != null) {
+                return x;
             }
         }
 
-        return InteractionResult.SUCCESS_SERVER;
+        return super.onPlayerAttack(state, world, pos, player);
     }
 
     private void addToOutputOrDrop(ItemStack stack) {

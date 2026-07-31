@@ -17,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Brightness;
 import net.minecraft.util.Unit;
@@ -167,5 +168,13 @@ public record FluidInstance<T>(Holder<FluidType<T>> holder, T data) implements T
     @Override
     public Holder<FluidType<?>> typeHolder() {
         return (Holder<FluidType<?>>) (Object) this.holder;
+    }
+
+    public SoundEvent insertSoundEvent() {
+        return this.type().insertSoundEvent();
+    }
+
+    public SoundEvent extractSoundEvent() {
+        return this.type().extractSoundEvent();
     }
 }

@@ -1,22 +1,18 @@
 package eu.pb4.polyfactory.polydex.pages;
 
-import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.polydex.api.v1.recipe.PageBuilder;
 import eu.pb4.polydex.api.v1.recipe.PolydexEntry;
 import eu.pb4.polydex.api.v1.recipe.PolydexIngredient;
 import eu.pb4.polydex.api.v1.recipe.PolydexStack;
-import eu.pb4.polyfactory.block.mechanical.machines.crafting.FermenterBlockEntity;
 import eu.pb4.polyfactory.block.mechanical.machines.crafting.MixerBlockEntity;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.polyfactory.recipe.fermenting.FermentingRecipe;
-import eu.pb4.polyfactory.recipe.input.FluidInputStack;
-import eu.pb4.polyfactory.ui.FluidTextures;
+import eu.pb4.polyfactory.ui.fluid.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
-import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;

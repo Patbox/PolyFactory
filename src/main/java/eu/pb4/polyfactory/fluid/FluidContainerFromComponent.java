@@ -11,7 +11,7 @@ public interface FluidContainerFromComponent extends FluidContainer {
     static FluidContainerFromComponent of(ItemStack stack) {
         return new FluidContainerFromComponent() {
             @Override
-            public FluidComponent component() {
+            public FluidComponent asFluidComponent() {
                 return stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
             }
 
@@ -25,7 +25,7 @@ public interface FluidContainerFromComponent extends FluidContainer {
     static FluidContainerFromComponent of(SlotAccess stack) {
         return new FluidContainerFromComponent() {
             @Override
-            public FluidComponent component() {
+            public FluidComponent asFluidComponent() {
                 return stack.get().getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
             }
 
@@ -39,7 +39,7 @@ public interface FluidContainerFromComponent extends FluidContainer {
     static FluidContainerFromComponent ofCopying(SlotAccess stack) {
         return new FluidContainerFromComponent() {
             @Override
-            public FluidComponent component() {
+            public FluidComponent asFluidComponent() {
                 return stack.get().getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
             }
 
@@ -54,12 +54,16 @@ public interface FluidContainerFromComponent extends FluidContainer {
 
     @Override
     default long get(FluidInstance<?> type) {
-        return component().get(type);
+        return asFluidComponent().get(type);
     }
 
     @Override
     default long set(FluidInstance<?> type, long amount) {
-        var comp = component();
+        var comp = asFluidComponent();
+        if (comp.isInfinite()) {
+            return 0;
+        }
+
         var current = comp.get(type);
         setComponent(comp.with(type, amount));
         return current;
@@ -67,54 +71,66 @@ public interface FluidContainerFromComponent extends FluidContainer {
 
     @Override
     default boolean canInsert(FluidInstance<?> type, long amount, boolean exact) {
-        var comp = component();
+        var comp = asFluidComponent();
+        if (comp.isInfinite()) {
+            return true;
+        }
+
         return exact ? comp.stored() + amount <= comp.capacity() : comp.stored() != comp.capacity();
     }
 
     @Override
     default long insert(FluidInstance<?> type, long amount, boolean exact) {
-        var res = component().insert(type, amount, exact);
+        var comp = asFluidComponent();
+        if (comp.isInfinite()) {
+            return amount;
+        }
+        var res = asFluidComponent().insert(type, amount, exact);
         setComponent(res.component());
         return res.fluidAmount();
     }
 
     @Override
     default boolean canExtract(FluidInstance<?> type, long amount, boolean exact) {
-        var comp = component();
+        var comp = asFluidComponent();
+        if (comp.isInfinite()) {
+            return true;
+        }
         return exact ? comp.get(type) >= amount : comp.get(type) > 0;
     }
 
     @Override
     default long extract(FluidInstance<?> type, long amount, boolean exact) {
-        var res = component().extract(type, amount, exact);
+        var comp = asFluidComponent();
+        if (comp.isInfinite()) {
+            return amount;
+        }
+
+        var res = comp.extract(type, amount, exact);
         setComponent(res.component());
-        return res.fluidAmount();    }
+        return res.fluidAmount();
+    }
 
     @Override
     default long capacity() {
-        return component().capacity();
+        return asFluidComponent().capacity();
     }
 
     @Override
     default long stored() {
-        return component().stored();
-    }
-
-    @Override
-    default Object2LongMap<FluidInstance<?>> asMap() {
-        return component().map();
+        return asFluidComponent().stored();
     }
 
     @Override
     default List<FluidInstance<?>> fluids() {
-        return component().fluids();
+        return asFluidComponent().fluids();
     }
 
     @Override
     default void clear() {
-        setComponent(component().clear());
+        setComponent(asFluidComponent().clear());
     }
 
-    FluidComponent component();
+    FluidComponent asFluidComponent();
     void setComponent(FluidComponent component);
 }

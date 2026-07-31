@@ -33,6 +33,7 @@ public interface FactorySoundEvents {
     SoundEvent ITEM_CLIPBOARD_WRITE = of("item.clipboard.write");
     SoundEvent ITEM_CLIPBOARD_APPLY = of("item.clipboard.apply");
     Holder<SoundEvent> BLOCK_SPOUT_METAL_COOLED = ofEntry("block.spout.metal_cooled");
+    SoundEvent ITEM_CANISTER_SHAKE_UP = of("item.canister.shake_up");
 
     static SoundEvent of(String path) {
         var obj = SoundEvent.createVariableRangeEvent(id(path));

@@ -46,7 +46,7 @@ public class UiResourceCreator {
     public static final String BASE_MODEL = "minecraft:item/generated";
     public static final String X32_MODEL = "polyfactory:sgui/button_32";
     public static final String X32_RIGHT_MODEL = "polyfactory:sgui/button_32_right";
-    public static final String X48H_MODEL = "polyfactory:sgui/button_48h";
+    public static final String X48V_MODEL = "polyfactory:sgui/button_48v";
 
     public static final Style STYLE = Style.EMPTY.withColor(0xFFFFFF).withFont(new FontDescription.Resource(id("gui")));
     private static final String ITEM_TEMPLATE = """
@@ -93,6 +93,11 @@ public class UiResourceCreator {
         return () -> new GuiElementBuilder(model).setName(Component.empty()).hideDefaultTooltip();
     }
 
+    public static Supplier<GuiElementBuilder> icon16(String path, Item item) {
+        var model = genericIconRaw(item, path, BASE_MODEL, 0);
+        return () -> new GuiElementBuilder(model).setName(Component.empty()).hideDefaultTooltip();
+    }
+
     public static Supplier<GuiElementBuilder> icon16Offset(String path, int offset) {
         var model = genericIconRaw(Items.ALLIUM, path, BASE_MODEL, offset);
         return () -> new GuiElementBuilder(model).setName(Component.empty()).hideDefaultTooltip();
@@ -131,8 +136,8 @@ public class UiResourceCreator {
         return genericProgress(path, start, stop, reverse, X32_RIGHT_MODEL, HORIZONTAL_PROGRESS, 0);
     }
 
-    public static IntFunction<GuiElementBuilder> verticalProgress48H(String path, int start, int stop, boolean reverse) {
-        return genericProgress(path, start, stop, reverse, X48H_MODEL, VERTICAL_PROGRESS, 0);
+    public static IntFunction<GuiElementBuilder> verticalProgress48V(String path, int start, int stop, boolean reverse) {
+        return genericProgress(path, start, stop, reverse, X48V_MODEL, VERTICAL_PROGRESS, 0);
     }
 
     public static IntFunction<GuiElementBuilder> verticalProgress32(String path, int start, int stop, boolean reverse) {
@@ -179,7 +184,7 @@ public class UiResourceCreator {
         var texturePath = elementPath(path);
         var modelPath = elementPath(path + extra);
         SIMPLE_MODEL.add(new SimpleModel(texturePath, modelPath, base, offset));
-        return new ItemStackTemplate(Items.TRIAL_KEY, DataComponentPatch.builder()
+        return new ItemStackTemplate(item, DataComponentPatch.builder()
                 .set(DataComponents.ITEM_MODEL, ResourcePackExtras.bridgeModel(texturePath))
                 .build());
     }
@@ -210,6 +215,10 @@ public class UiResourceCreator {
 
         FONT_TEXTURES.add(texture);
         return new TextBuilders(Component.literal(builder.toString()).setStyle(STYLE));
+    }
+
+    public static Component fontComponent(Identifier path, int ascent, int height) {
+        return Component.literal(Character.toString(font(path, ascent, height))).setStyle(STYLE);
     }
 
     public static char font(Identifier path, int ascent, int height) {

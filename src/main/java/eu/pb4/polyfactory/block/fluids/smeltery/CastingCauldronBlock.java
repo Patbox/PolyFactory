@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
+import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polymer.core.api.block.PolymerBlock;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -80,7 +81,7 @@ public class CastingCauldronBlock extends Block implements PolymerBlock, BlockWi
     }
 
     public InteractionResult tryCauldronCasting(ServerLevel world, BlockPos pos, FaucetBlock.FaucedProvider provider, float rate) {
-        var recipe = world.recipeAccess().getRecipeFor(FactoryRecipeTypes.CASTING_CAULDRON, provider.getFluidContainerInput(), world);
+        var recipe = world.recipeAccess().getRecipeFor(FactoryRecipeTypes.CASTING_CAULDRON, FluidContainerInput.of(provider.asHandler()), world);
         if (recipe.isEmpty()) {
             return InteractionResult.FAIL;
         }

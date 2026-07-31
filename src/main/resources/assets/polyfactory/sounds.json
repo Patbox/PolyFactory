@@ -347,5 +347,22 @@
       }
     ],
     "subtitle": "subtitles.polyfactory.block.spout.metal_cooled"
+  },
+  "item.canister.shake_up": {
+    "sounds": [
+      {
+        "name": "item/bucket/emptysulfurcube1",
+        "pitch": 1.2
+      },
+      {
+        "name": "item/bucket/emptysulfurcube2",
+        "pitch": 1.2
+      },
+      {
+        "name": "item/bucket/emptysulfurcube3",
+        "pitch": 1.2
+      }
+    ],
+    "subtitle": "subtitles.item.canister.shake_up"
   }
 }

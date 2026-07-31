@@ -1,7 +1,6 @@
 package eu.pb4.polyfactory.polydex.pages;
 
 import eu.pb4.factorytools.api.recipe.CountedIngredient;
-import eu.pb4.factorytools.api.util.LazyItemStack;
 import eu.pb4.polydex.api.v1.recipe.PageBuilder;
 import eu.pb4.polydex.api.v1.recipe.PolydexEntry;
 import eu.pb4.polydex.api.v1.recipe.PolydexIngredient;
@@ -11,8 +10,7 @@ import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.polydex.PolydexCompatImpl;
 import eu.pb4.polyfactory.polydex.PolydexTextures;
 import eu.pb4.polyfactory.recipe.casting.CastingRecipe;
-import eu.pb4.polyfactory.recipe.spout.SpoutRecipe;
-import eu.pb4.polyfactory.ui.FluidTextures;
+import eu.pb4.polyfactory.ui.fluid.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;

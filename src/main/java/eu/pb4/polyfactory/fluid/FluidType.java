@@ -16,6 +16,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Brightness;
 import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
@@ -39,7 +41,9 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
                            MaxFlowProvider<T> maxFlow,
                            FlowSpeedProvider<T> flowSpeedMultiplier,
                            Optional<Brightness> brightness,
-                           FluidShootingBehavior<T> shootingBehavior
+                           FluidShootingBehavior<T> shootingBehavior,
+                           SoundEvent insertSoundEvent,
+                           SoundEvent extractSoundEvent
 ) {
 
     private static final Map<Fluid, FluidType<?>> FLUID_TO_TYPE = new IdentityHashMap<>();
@@ -190,6 +194,8 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         private MaxFlowProvider<T> maxFlow = (w, x) -> FluidConstants.BOTTLE;
         private FlowSpeedProvider<T> flowSpeedMultiplier = (w, x) -> 1;
         private FluidShootingBehavior<T> shootingBehavior = new NoOpFluidShootingBehavior<>();
+        private SoundEvent insertSoundEvent = SoundEvents.BUCKET_EMPTY;
+        private SoundEvent extractSoundEvent = SoundEvents.BUCKET_FILL;
 
         private Builder(Codec<T> dataCodec, T defaultData) {
             this.dataCodec = dataCodec;
@@ -286,9 +292,16 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
             return this;
         }
 
+        public Builder<T> soundEvents(SoundEvent insert, SoundEvent extract) {
+            this.insertSoundEvent = insert;
+            this.extractSoundEvent = extract;
+            return this;
+        }
+
         public FluidType<T> build() {
             return new FluidType<>(this.density, this.heat, this.dataCodec, this.defaultData, this.fluid, this.texture, this.solidTexture, this.modelRenderType,
-                    this.color, this.name, this.particleGetter, this.maxFlow, this.flowSpeedMultiplier, this.brightness, this.shootingBehavior);
+                    this.color, this.name, this.particleGetter, this.maxFlow, this.flowSpeedMultiplier, this.brightness, this.shootingBehavior,
+                    this.insertSoundEvent, this.extractSoundEvent);
         }
     }
 }

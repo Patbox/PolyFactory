@@ -2,7 +2,6 @@ package eu.pb4.polyfactory.block.mechanical.source;
 
 import eu.pb4.factorytools.api.block.entity.LockableBlockEntity;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
-import eu.pb4.polyfactory.block.fluids.FluidContainerOwner;
 import eu.pb4.polyfactory.block.fluids.FluidInput;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.fluid.FactoryFluidTags;
@@ -11,7 +10,7 @@ import eu.pb4.polyfactory.fluid.FluidContainerImpl;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
 import eu.pb4.polyfactory.fluid.world.FluidWorldPullInteraction;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
-import eu.pb4.polyfactory.ui.FluidTextures;
+import eu.pb4.polyfactory.ui.fluid.FluidTextures;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
@@ -32,9 +31,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.stream.IntStream;
 
 public class DieselEngineBlockEntity extends LockableBlockEntity implements FluidInput.ContainerBased {
@@ -101,7 +100,7 @@ public class DieselEngineBlockEntity extends LockableBlockEntity implements Flui
                 consume -= (int) self.container.extract(fluid, consume, false);
             }
 
-            var strength = Math.max(10 * self.state * self.gear / 60 / 20, 1f / 60 / 20);
+            var strength = Math.max(10 * self.state * self.gear / 60 / 20, 10f / 60 / 20);
             NetworkComponent.Pipe.getLogic(serverLevel, pos).setSourceStrength(pos, strength);
             self.fluidPull.pullFluid(state.getValue(DieselEngineBlock.FACING).getOpposite(), strength);
         }
@@ -155,7 +154,7 @@ public class DieselEngineBlockEntity extends LockableBlockEntity implements Flui
     }
 
     @Override
-    public @Nullable FluidContainer getMainFluidContainer() {
+    public @NotNull FluidContainer getMainFluidContainer() {
         return this.container;
     }
 
@@ -187,7 +186,7 @@ public class DieselEngineBlockEntity extends LockableBlockEntity implements Flui
                     DieselEngineBlockEntity.this::getGear,
                     DieselEngineBlockEntity.this::setGear,
                     IntStream.rangeClosed(1, 5).boxed().toArray(Integer[]::new),
-                    gear -> GuiTextures.BUTTON_SPEED_GEAR[gear].get().setName(Component.translatable("item.polyfactory.wrench.action.speed_gear").append(": " + gear + " / 5"))
+                    gear -> GuiTextures.BUTTON_SPEED_GEAR[gear].get().setName(Component.translatable("item.polyfactory.wrench.action.engine_gear").append(": " + gear + " / 5"))
             ));
 
             this.open();

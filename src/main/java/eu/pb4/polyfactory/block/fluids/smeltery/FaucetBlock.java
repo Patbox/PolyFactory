@@ -7,8 +7,7 @@ import eu.pb4.polyfactory.block.fluids.FluidOutput;
 import eu.pb4.polyfactory.block.fluids.PortableFluidTankBlock;
 import eu.pb4.polyfactory.block.fluids.PortableFluidTankBlockEntity;
 import eu.pb4.polyfactory.block.fluids.transport.PipeConnectable;
-import eu.pb4.polyfactory.fluid.FluidInstance;
-import eu.pb4.polyfactory.fluid.FluidStack;
+import eu.pb4.polyfactory.fluid.*;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
@@ -131,23 +130,12 @@ public class FaucetBlock extends Block implements FactoryBlock, PolymerTexturedB
             return super.useItemOn(stack, state, world, pos, player, hand, hit);
         }
 
-        var copy = stack.copy();
-        var input = new DrainInput(copy, ItemStack.EMPTY, output.getFluidContainerInput(), !(player instanceof FakePlayer));
-        var optional = world.recipeAccess().getRecipeFor(FactoryRecipeTypes.DRAIN, input, player.level());
-        if (optional.isEmpty() || !optional.get().value().fluidOutput(input).isEmpty()) {
+        var result = FluidContainerUtil.interactWithInWorld(output.asHandler(), player, stack, hand, FluidInteractionMode.EXTRACT);
+        if (result == null) {
             return super.useItemOn(stack, state, world, pos, player, hand, hit);
         }
 
-        var recipe = optional.get().value();
-        var itemOut = recipe.assemble(input);
-        for (var fluid : recipe.fluidInput(input)) {
-            output.extract(fluid);
-        }
-        player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, itemOut, false));
-
-        FactoryUtil.playSoundToPlayer(player, recipe.soundEvent().value(), SoundSource.BLOCKS, 0.5f, 1f);
-
-        return InteractionResult.SUCCESS_SERVER;
+        return result;
     }
 
     @Override
@@ -246,13 +234,12 @@ public class FaucetBlock extends Block implements FactoryBlock, PolymerTexturedB
 
     public record SimpleProvider(FaucetBlock.Model model, BlockState selfState, BlockPos faucedPos, ServerLevel world, BooleanSupplier removed, FluidOutput output, Direction direction) implements FaucedProvider {
         @Override
-        public FluidContainerInput getFluidContainerInput() {
-            return output.getFluidContainerInput(direction);
-        }
-
-        @Override
         public boolean isValid() {
             return !removed.getAsBoolean() && world.getBlockState(faucedPos) == selfState;
+        }
+
+        public FluidExchangeHandler asHandler() {
+            return output.getFluidExchangeHandler(direction);
         }
 
         @Override
@@ -274,9 +261,9 @@ public class FaucetBlock extends Block implements FactoryBlock, PolymerTexturedB
         }
 
         @Override
-        public FluidContainerInput getFluidContainerInput() {
+        public FluidExchangeHandler asHandler() {
             var output = getOutput();
-            return output != null ? output.getFluidContainerInput(direction) : FluidContainerInput.EMPTY;
+            return output != null ? output.getFluidExchangeHandler(direction) : FluidContainer.EMPTY;
         }
 
         @Override
@@ -302,8 +289,8 @@ public class FaucetBlock extends Block implements FactoryBlock, PolymerTexturedB
 
     public record ModelOnlyProvider(FaucetBlock.Model model, Direction direction) implements FaucedProvider {
         @Override
-        public FluidContainerInput getFluidContainerInput() {
-            return FluidContainerInput.EMPTY;
+        public FluidExchangeHandler asHandler() {
+            return FluidContainer.EMPTY;
         }
 
         @Override
@@ -326,8 +313,8 @@ public class FaucetBlock extends Block implements FactoryBlock, PolymerTexturedB
     public interface FaucedProvider {
         FaucedProvider EMPTY = new FaucedProvider() {
             @Override
-            public FluidContainerInput getFluidContainerInput() {
-                return FluidContainerInput.EMPTY;
+            public FluidExchangeHandler asHandler() {
+                return FluidContainer.EMPTY;
             }
 
             @Override
@@ -351,13 +338,14 @@ public class FaucetBlock extends Block implements FactoryBlock, PolymerTexturedB
             }
         };
 
-        FluidContainerInput getFluidContainerInput();
+        FluidExchangeHandler asHandler();
 
         boolean isValid();
 
         default void extract(FluidStack<?> fluidStacks) {
             this.extract(fluidStacks.instance(), fluidStacks.amount());
         }
+
         void extract(FluidInstance<?> fluid, long amount);
 
         void setActiveFluid(@Nullable FluidInstance<?> fluid);

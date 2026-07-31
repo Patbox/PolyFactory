@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.block.mechanical.RotationConstants;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.GuiUtils;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -60,11 +61,11 @@ public class CreativeMotorBlockEntity extends LockableBlockEntity {
             this.setTitle(GuiTextures.FILL3.apply(CreativeMotorBlockEntity.this.getName()));
             this.updateNumbers();
             this.setSlot(1, GuiTextures.MINUS_BUTTON.get().hideTooltip().unbreakable().setCallback((clickType) -> {
-                CreativeMotorBlockEntity.this.speed = Math.max(CreativeMotorBlockEntity.this.speed - (clickType.shift ? 10 : 1), -RotationConstants.MAX_SPEED * 50);
+                setRPM(Math.max(getRPM() - (clickType.shift ? 10 : 1), -Math.round(FactoryUtil.degreesPerTickToRPM(RotationConstants.MAX_SPEED * 50))));
                 CreativeMotorBlockEntity.this.setChanged();
             }));
             this.setSlot(7, GuiTextures.PLUS_BUTTON.get().hideTooltip().unbreakable().setCallback((clickType) -> {
-                CreativeMotorBlockEntity.this.speed = Math.min(CreativeMotorBlockEntity.this.speed + (clickType.shift ? 10 : 1), RotationConstants.MAX_SPEED * 50);
+                setRPM(Math.min(getRPM() + (clickType.shift ? 10 : 1), Math.round(FactoryUtil.degreesPerTickToRPM(RotationConstants.MAX_SPEED * 50))));
                 CreativeMotorBlockEntity.this.setChanged();
             }));
 
@@ -89,5 +90,14 @@ public class CreativeMotorBlockEntity extends LockableBlockEntity {
             updateNumbers();
             super.onTick();
         }
+    }
+
+    private double getRPM() {
+        return FactoryUtil.degreesPerTickToRPM(this.speed);
+    }
+
+    private void setRPM(double speed) {
+        this.speed = FactoryUtil.rpmToDegreesPerTick(speed);
+        this.setChanged();
     }
 }

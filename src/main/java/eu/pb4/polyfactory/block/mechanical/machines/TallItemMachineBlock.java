@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block.mechanical.machines;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
+import eu.pb4.factorytools.api.block.AttackableBlock;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
@@ -15,6 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.*;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.WorldlyContainerHolder;
@@ -45,7 +47,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public abstract class TallItemMachineBlock extends RotationalNetworkBlock implements FactoryBlock, EntityBlock, WorldlyContainerHolder, RotationUser {
+public abstract class TallItemMachineBlock extends RotationalNetworkBlock implements FactoryBlock, EntityBlock, WorldlyContainerHolder, RotationUser, AttackableBlock {
     public static final Property<Part> PART = EnumProperty.create("part", Part.class);
     public static final BooleanProperty HAS_CONVEYOR = BooleanProperty.create("has_conveyor");
     public static final Property<Direction> INPUT_FACING = EnumProperty.create("input_facing", Direction.class, x -> x.getAxis() != Direction.Axis.Y);
@@ -112,6 +114,20 @@ public abstract class TallItemMachineBlock extends RotationalNetworkBlock implem
     }
 
     @Override
+    protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (!level.isClientSide() && !player.isShiftKeyDown()) {
+            pos = state.getValue(PART) == Part.MAIN ? pos : pos.below();
+
+            if (level.getBlockEntity(pos) instanceof TallItemMachineBlockEntity be) {
+                return be.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
+            }
+            return InteractionResult.FAIL;
+        }
+
+        return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
+    }
+
+    @Override
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         if (!world.isClientSide() && !player.isShiftKeyDown()) {
             pos = state.getValue(PART) == Part.MAIN ? pos : pos.below();
@@ -123,6 +139,19 @@ public abstract class TallItemMachineBlock extends RotationalNetworkBlock implem
         }
 
         return super.useWithoutItem(state, world, pos, player, hit);
+    }
+
+    @Override
+    public InteractionResult onPlayerAttack(BlockState state, Player player, Level world, BlockPos pos, Direction direction) {
+        if (!world.isClientSide() && !player.isShiftKeyDown()) {
+            pos = state.getValue(PART) == Part.MAIN ? pos : pos.below();
+
+            if (world.getBlockEntity(pos) instanceof TallItemMachineBlockEntity be) {
+                return be.onPlayerAttack(state, world, pos, player);
+            }
+        }
+
+        return InteractionResult.PASS;
     }
 
     @Override

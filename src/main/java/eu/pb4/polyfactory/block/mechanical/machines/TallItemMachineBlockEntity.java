@@ -9,9 +9,11 @@ import eu.pb4.polyfactory.util.movingitem.MovingItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,5 +36,13 @@ public abstract class TallItemMachineBlockEntity extends LockableBlockEntity imp
     public InteractionResult onUse(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         this.openGui((ServerPlayer) player);
         return InteractionResult.SUCCESS_SERVER;
+    }
+
+    public InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
+    }
+
+    public InteractionResult onPlayerAttack(BlockState state, Level world, BlockPos pos, Player player) {
+        return InteractionResult.PASS;
     }
 }

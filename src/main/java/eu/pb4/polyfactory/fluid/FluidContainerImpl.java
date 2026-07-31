@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.fluid;
 
 import com.mojang.serialization.RecordBuilder;
+import eu.pb4.polyfactory.item.component.FluidComponent;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
@@ -86,6 +87,11 @@ public class FluidContainerImpl implements FluidContainer {
     public long insert(FluidInstance<?> type, long amount, boolean exact) {
         if (!canInsert(type, amount, exact) || amount == 0) {
             return amount;
+        }
+
+        // Overflow for creative canisters.
+        if (this.stored + amount < this.stored) {
+            amount = Long.MAX_VALUE - this.stored;
         }
 
         var next = Math.min(this.stored + amount, this.capacity);
@@ -214,8 +220,8 @@ public class FluidContainerImpl implements FluidContainer {
     }
 
     @Override
-    public Object2LongMap<FluidInstance<?>> asMap() {
-        return Object2LongMaps.unmodifiable(this.storedFluids);
+    public FluidComponent asFluidComponent() {
+        return new FluidComponent(new Object2LongOpenHashMap<>(this.storedFluids), List.copyOf(this.fluids), this.stored, this.capacity);
     }
 
     @Override

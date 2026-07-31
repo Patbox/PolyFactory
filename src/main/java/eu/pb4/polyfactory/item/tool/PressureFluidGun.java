@@ -7,6 +7,7 @@ import eu.pb4.polyfactory.fluid.FluidContainerFromComponent;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.shooting.EntityShooterContext;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
+import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.models.FactoryModels;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -138,17 +139,22 @@ public class PressureFluidGun extends Item implements PolymerItem {
         var stacks = new ArrayList<FluidContainer>();
         for (var eq : EquipmentSlot.values()) {
             var stack = user.getItemBySlot(eq);
-            var fluid = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
-            if (!fluid.isEmpty()) {
-                stacks.add(FluidContainerFromComponent.of(SlotAccess.forEquipmentSlot(user, eq)));
+            if (stack.is(FactoryItemTags.INVENTORY_FLUID_SOURCES)) {
+                var fluid = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
+                if (!fluid.isEmpty()) {
+                    stacks.add(FluidContainerFromComponent.of(SlotAccess.forEquipmentSlot(user, eq)));
+                }
             }
         }
 
         if (user instanceof Player player) {
             for (int i = 0; i < player.getInventory().getNonEquipmentItems().size(); i++) {
-                var fluid = player.getInventory().getItem(i).getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
-                if (!fluid.isEmpty()) {
-                    stacks.add(FluidContainerFromComponent.of(player.getInventory().getSlot(i)));
+                var stack = player.getInventory().getItem(i);
+                if (stack.is(FactoryItemTags.INVENTORY_FLUID_SOURCES)) {
+                    var fluid = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
+                    if (!fluid.isEmpty()) {
+                        stacks.add(FluidContainerFromComponent.of(player.getInventory().getSlot(i)));
+                    }
                 }
             }
         }

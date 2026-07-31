@@ -11,7 +11,7 @@ through some of them might react with each other. Portable Fluid Tank can only b
 as indicated by its opening.
 <nl>
 When broken, fluids will be contained within the item. They can then be placed again or used by items such as
-<item 'polyfactory:pressure_fluid_gun'>.
+<item 'polyfactory:pressure_fluid_gun'> or <linkref '/misc/portable_drill'>.
 
 ### Align: Center
 <u><blue><polydex 'polyfactory:portable_fluid_tank'>View the <item 'polyfactory:portable_fluid_tank'> recipe</>

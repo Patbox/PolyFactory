@@ -127,7 +127,7 @@ public class PortableFluidTankBlockItem extends FactoryBlockItem {
             float progress = 0;
             int progressColor = -1;//ARGB.colorFromFloat(1.0F, 0.44F, 0.53F, 1.0F);
 
-            if (fluids != null && fluids.capacity() != -1 && !fluids.isEmpty()) {
+            if (fluids != null && fluids.capacity() != -1 && fluids.capacity() < Integer.MAX_VALUE && !fluids.isEmpty()) {
                 out.set(DataComponents.MAX_DAMAGE, (int) (fluids.capacity()));
                 out.set(DataComponents.DAMAGE, (int) ((fluids.capacity() - fluids.stored())));
                 //progress = (float) fluids.stored() / fluids.capacity();

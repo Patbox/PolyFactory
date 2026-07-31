@@ -29,6 +29,12 @@
   - A new item allowing you to read easily the state of blocks/machines.
   - Crafted with 2 Steel Plates, Redstone Chip and 2 Cables.
   - Currently can read values such as: Redstone power, Rotation (speed and stress), Data Receiver/Provider count, Pipe Flow, Machine State and Filled Amount.
+- Added Canister:
+  - A universal in-inventory Fluid container, ideal for (re)moving fluids and quickly fueling something.
+  - Similarly to buckets and alike, can be used to directly interact with some containers in world or within the block's container ui.
+  - Crafted with 2 Steel Plates and 1 Bucket.
+  - It can store up to 2 buckets/blocks worth of fluid. It also can store different types of fluid at the same time.
+  - Always interacts with the top fluid, be it when extracting or interacting.
 - Added Plant Oil fluid:
   - Crafted by using a press on any vanilla seeds or sunflowers.
   - Primarily a recipe ingredient.
@@ -68,7 +74,10 @@
 - Funnels can now require a minimal stack size that can go in/out.
 - Polydex Mixer recipes will now visually scale fluid contents if they are too small.
 - Tweaked some item models to match block / in-world look more closely.
+- Portable Fluid Containers tooltip now contains visualization of the contents.s
+- Creative Motor now uses Rotations Per Minute rather than Degrees Per Tick to display / change its speed.
 - Potatoes gained new wisdom.
+- Creative items should no longer show up in Polydex (and possibly other recipe viewers).
 - Fixed Item Reader's and Hologram Displays not rendering their inner model parts.
 - Fixed Cable not being updated visually correctly.
 - Fixed Loot Tables being resolved too early in loot chests.

@@ -1,15 +1,14 @@
 package eu.pb4.polyfactory.block.fluids;
 
 import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.factorytools.api.block.AttackableBlock;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.BlockModel;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.fluids.transport.PipeConnectable;
 import eu.pb4.polyfactory.block.other.FilledStateProvider;
-import eu.pb4.polyfactory.fluid.FactoryFluids;
-import eu.pb4.polyfactory.fluid.FluidBehaviours;
-import eu.pb4.polyfactory.fluid.FluidInstance;
+import eu.pb4.polyfactory.fluid.*;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.mixin.ExperienceOrbAccessor;
 import eu.pb4.polyfactory.models.fluid.TopFluidViewModel;
@@ -47,7 +46,7 @@ import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
 import java.util.List;
 
-public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, EntityBlock {
+public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, EntityBlock, AttackableBlock {
     public DrainBlock(Properties settings) {
         super(settings);
     }
@@ -71,49 +70,53 @@ public class DrainBlock extends Block implements FactoryBlock, PipeConnectable, 
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
-        var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
-        if (world instanceof ServerLevel serverWorld && world.getBlockEntity(pos) instanceof DrainBlockEntity be) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (level.getBlockEntity(pos) instanceof DrainBlockEntity be) {
             if ((stack.isEmpty() || (ItemStack.isSameItemSameComponents(stack, be.catalyst()) && stack.getCount() < stack.getMaxStackSize()))
-                    && hit.getDirection() == Direction.UP && !be.catalyst().isEmpty()) {
+                    && hitResult.getDirection() == Direction.UP && !be.catalyst().isEmpty()) {
                 if (stack.isEmpty()) {
-                    player.setItemInHand(InteractionHand.MAIN_HAND, be.catalyst());
+                    player.setItemInHand(hand, be.catalyst());
                 } else {
                     stack.grow(1);
                 }
                 be.setCatalyst(ItemStack.EMPTY);
                 return InteractionResult.SUCCESS_SERVER;
-            } else if (stack.is(FactoryItemTags.DRAIN_CATALYST) && hit.getDirection() == Direction.UP && be.catalyst().isEmpty()) {
+            } else if (stack.is(FactoryItemTags.DRAIN_CATALYST) && hitResult.getDirection() == Direction.UP && be.catalyst().isEmpty()) {
                 be.setCatalyst(stack.copyWithCount(1));
                 stack.consume(1, player);
                 return InteractionResult.SUCCESS_SERVER;
             }
 
-            var container = be.getFluidContainer();
-            var copy = stack.copy();
-            var input = DrainInput.of(copy, be.catalyst(), container, !(player instanceof FakePlayer));
-            var optional = serverWorld.recipeAccess().getRecipeFor(FactoryRecipeTypes.DRAIN, input, world);
-            if (optional.isEmpty()) {
-                return super.useWithoutItem(state, world, pos, player, hit);
+            var res = FluidContainerUtil.interactWithInWorld(be.getFluidContainer(), player, stack, hand, FluidInteractionMode.ANY, FluidInteractionMode.INSERT, recipe -> {
+                if (player instanceof ServerPlayer serverPlayer) {
+                    if (recipe.isPresent()) {
+                        CriteriaTriggers.RECIPE_CRAFTED.trigger(serverPlayer, recipe.get().id(), List.of(stack.copy(), be.catalyst()));
+                    }
+                    TriggerCriterion.trigger(serverPlayer, FactoryTriggers.DRAIN_USE);
+                }
+            });
+
+            if (res == null) {
+                return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
             }
-            var recipe = optional.get().value();
-            if (player instanceof ServerPlayer serverPlayer) {
-                CriteriaTriggers.RECIPE_CRAFTED.trigger(serverPlayer, optional.get().id(), List.of(stack.copy(), be.catalyst()));
-                TriggerCriterion.trigger(serverPlayer, FactoryTriggers.DRAIN_USE);
-            }
-            var itemOut = recipe.assemble(input);
-            for (var fluid : recipe.fluidInput(input)) {
-                container.extract(fluid, false);
-            }
-            player.setItemInHand(InteractionHand.MAIN_HAND, FactoryUtil.exchangeStack(stack, recipe.decreasedInputItemAmount(input), player, itemOut));
-            for (var fluid : recipe.fluidOutput(input)) {
-                container.insert(fluid, false);
-            }
-            world.playSound(null, pos, recipe.soundEvent().value(), SoundSource.BLOCKS);
-            return InteractionResult.SUCCESS_SERVER;
+
+            return res;
         }
 
-        return super.useWithoutItem(state, world, pos, player, hit);
+        return super.useWithoutItem(state, level, pos, player, hitResult);
+    }
+
+    @Override
+    public InteractionResult onPlayerAttack(BlockState state, Player player, Level world, BlockPos pos, Direction direction) {
+        var itemStack = player.getMainHandItem();
+        if (itemStack.is(FactoryItemTags.FLUID_CONTAINER_INTERACTABLE_ON_ATTACK) && world.getBlockEntity(pos) instanceof DrainBlockEntity be) {
+            var x = FluidContainerUtil.interactWithInWorld(be.getFluidContainer(), player, itemStack, InteractionHand.MAIN_HAND, FluidInteractionMode.ANY, FluidInteractionMode.EXTRACT);
+            if (x != null) {
+                return x;
+            }
+        }
+
+        return InteractionResult.PASS;
     }
 
 

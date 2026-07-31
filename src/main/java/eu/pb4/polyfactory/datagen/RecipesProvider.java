@@ -368,6 +368,15 @@ class RecipesProvider extends FabricRecipeProvider {
                         .unlockedBy("get_copper", InventoryChangeTrigger.TriggerInstance.hasItems(Items.COPPER_INGOT))
                         .save(output);
 
+                this.shaped(RecipeCategory.REDSTONE, FactoryItems.CANISTER, 1)
+                        .pattern("p")
+                        .pattern("t")
+                        .pattern("p")
+                        .define('p', FactoryItems.STEEL_PLATE)
+                        .define('t', Items.BUCKET)
+                        .unlockedBy("get_copper", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
+                        .save(output);
+
                 this.shaped(RecipeCategory.REDSTONE, FactoryItems.FLUID_TANK, 1)
                         .pattern("pgp")
                         .pattern("gcg")
