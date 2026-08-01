@@ -1,0 +1,28 @@
+### Section: PageInfo
+title=<item 'polyfactory:speaker'> / <item 'polyfactory:record_player'>
+icon=polyfactory:speaker
+category=polyfactory:cable
+order=80
+### EndSection: PageInfo
+<yellow><item 'polyfactory:speaker'></> is a data receiver block allowing you to play sounds.
+<nl2>
+To play sounds, you need to send a string/text data using one of these formats:
+<nl>
+<gray><red>\<instrument\></> n<yellow>\<note></> <pink><volume></*><nl>
+<gray><red>\<instrument\></> n<yellow>\<note></></*><nl>
+<gray><red>\<instrument\></> <yellow>\<pitch></> <pink><volume></*><nl>
+<gray><red>\<instrument\></> <yellow>\<pitch></></*><nl>
+Where `<instrument>` is the instrument's blockstate / string name (for example `bell`),
+`<note>` is a NoteBlock note (from 0 to 24), `<pitch>` is a raw sound pitch and `<volume>` is sounds volume (from 0 to 1.5).
+Example data would look like this `banjo n12 0.8`.
+<nl2>
+You can also use the <item 'polyfactory:record_player'> described below to play any Music Disc.
+<nl2><nl>
+<yellow><item 'polyfactory:record_player'></> is a data provider block allowing you to play music through the cable
+data network. It doesn't play the sound by its own and depends on connected <item 'polyfactory:speaker'> blocks to work.
+Otherwise, it should act pretty similar to regular Jukebox.
+
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:speaker'>View the <item 'polyfactory:speaker'> recipe</><nl>
+<u><blue><polydex 'polyfactory:record_player'>View the <item 'polyfactory:record_player'> recipe</>

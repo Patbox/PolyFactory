@@ -5,7 +5,92 @@ category=polyfactory:basics
 order=80
 ### EndSection: PageInfo
 ### Header: <yellow><b>0.12.1+26.2
-- Todo! Update once ready.
+- Added Drill Heads:
+  - When put in a Mechanical Miners or a Portable Drill, acting as a Pickaxe/Shovel combo.
+  - Made via casting tool metals into a Mold, crafting Diamonds with Iron Drill Head and Netherite smithing.
+  - They are 50% faster than pickaxes for all tiers, x2.5 as durable for metal tiers and x2.25 as durable for Diamond / Netherite tiers.
+- Added Portable Drill:
+  - A new mining tool powered by Biodiesel!
+  - Crafted with 1 Steel Ingot, 1 Steel Plate, 2 Copper Plates, 2 Treated Kelp and 1 Diesel Engine
+  - Can't be used to mine by itself, as you need to put a Drill Head on it and have fuel in inventory.
+  - Has 3 Mining Modes:
+    - Single - Mines a single block.
+    - Area 2x2 - Mines 2x2x1 area based on where player breaks a block. Required 3x more fuel than single mode for single use.
+    - Area 3x3 - Mines 3x3x1 area based on where player breaks a block. Required 5x more fuel than single mode for a single use.
+  - Has lower mining range than a regular tool.
+  - Needs to be fueled with Biodiesel to work (You need a Portable Fluid Tank of Biodiesel in your inventory).
+- Added Diesel Engine:
+  - New rotational energy source, fueled by Biodiesel!
+  - Crafted with 2 Pistons, 4 Steel Plates, Axle, Copper Pipe and Blast Furnace.
+  - Can be configured to only work when powered (or not) by redstone (by default always active).
+  - It's speed can be changed between 5 levels (from 1 to 5 inclusive), increasing speed by 33.3 RPM for each level.
+  - The current gear/speed level also controls how much fuel it burns.
+  - On gear 3, it's comparable with Steam Engine.
+  - It can hold 1.2 buckets of fuel on its own, but also acts as weak pump allowing easily fuel it from other sources.
+- Added Fermenter:
+  - A new machine blocks, used to ferment items into liquids and other items.
+  - Can be powered with rotation to speed up fermentation process, but it also works when not powered at all.
+  - Crafted with Steel Machine Gearbox, Barrel and 3 Smooth Stone Slabs.
+  - Currently used for production of Ethanol and Biomass.
+- Added Multimeter:
+  - A new item allowing you to read easily the state of blocks/machines.
+  - Crafted with 2 Steel Plates, Redstone Chip and 2 Cables.
+  - Currently can read values such as: Redstone power, Rotation (speed and stress), Data Receiver/Provider count, Pipe Flow, Machine State and Filled Amount.
+- Added Canister:
+  - A universal in-inventory Fluid container, ideal for (re)moving fluids and quickly fueling something.
+  - Similarly to buckets and alike, can be used to directly interact with some containers in world or within the block's container ui.
+  - Crafted with 2 Steel Plates and 1 Bucket.
+  - It can store up to 2 buckets/blocks worth of fluid. It also can store different types of fluid at the same time.
+  - Always interacts with the top fluid, be it when extracting or interacting.
+- Added Plant Oil fluid:
+  - Crafted by using a press on any vanilla seeds or sunflowers.
+  - Primarily a recipe ingredient.
+  - Can be used with Nozzle / Pressure Fluid Gun, causing entities to get the Slippery effect:
+    - It lowers entity's friction and slows it down a little.
+- Added Ethanol fluid:
+  - Crafted by fermenting Sugar Cane, Potatoes, Berries and Beetroot.
+  - Used for Crafting of Biodiesel.
+- Added Biodiesel fluid:
+  - Crafted via mixing of 10x of Plant Oil with 10x Ethanol for 18x of Biodiesel.
+  - Used to power Portable Drill.
+  - Can be used with Nozzle / Pressure Fluid Gun, causing entities to get the Flammable effect:
+    - It makes entities stay on fire for a longer time.
+- Added Cheese Wheel and Cheese Wedge:
+  - Cheese Wheel is food block that you can place (like Cake).
+  - Restores you 2 points (1 shank) of hunger and gives you 0.5 saturation.
+  - Crafted via fermentation of Bucket of Milk.
+  - Cheese Wedge is a consumable item, that is equal to a single bite of Cheese Wheel.
+  - You get it from breaking Cheese Wheel block (you get leftover bite count of them) or by crafting it directly from Cheese Wheel.
+- Added Raw Metal Nuggets:
+ - Can be crafted to/from crushed raw ores.
+- Added Sulfur Dust:
+  - Crafting ingredient, received from grinding Sulfur.
+- Added Biomass:
+  - Leftover product from Fermentation process.
+  - Can be used as Furnace fuel.
+  - Also compostable.
+- New Recipes and changed recipes:
+  - Grinding Tuff blocks now results in 1 Gravel and 25% chance for 1 Raw Iron Nugget.
+  - Grinding Sulfur block gives you 2 + 5x 25% chance Sulfur Dust
+  - Grinding Sulfur Spike gives you 1 Sulfur Dust
+  - Added new mixin Gunpowder recipe using 2 Sulfur Dust, 1 Coal Dust and 1 Saw Dust.
+  - Changed old Gunpowder recipe to require 5 Netherite Dusts rather than 2.
+  - Crushed raw metals now give one more nugget worth of molten metals than before (1 ingot + 2 nuggets -> 1 ingot + 3 nuggets).
+  - Mixer cake recipe can now use Milk fluid rather than only Milk Buckets.
+- Made Grinding recipes have higher max speed limit, allowing them to work faster
+- Funnels can now require a minimal stack size that can go in/out.
+- Polydex Mixer recipes will now visually scale fluid contents if they are too small.
+- Tweaked some item models to match block / in-world look more closely.
+- Portable Fluid Containers tooltip now contains visualization of the contents.
+- Added support for raw notes to the Speaker Note Block sound data input (start with n, for example `bell n5`).
+- Creative Motor now uses Rotations Per Minute rather than Degrees Per Tick to display / change its speed.
+- Potatoes gained new wisdom.
+- Creative items should no longer show up in Polydex (and possibly other recipe viewers).
+- Fixed Item Reader's and Hologram Displays not rendering their inner model parts.
+- Fixed Cable not being updated visually correctly.
+- Fixed Loot Tables being resolved too early in loot chests.
+- Fixed Mechanical Miners not updating their state when attacking entities.
+- (Hopefully) Fixed Funnel item loss.
 
 ### Header: <yellow><b>0.12.0+26.2
 - Updated to 26.2

@@ -1,0 +1,30 @@
+### Section: PageInfo
+title=<item 'polyfactory:data_extractor'>
+icon=polyfactory:data_extractor
+category=polyfactory:cable
+order=40
+### EndSection: PageInfo
+<yellow><item 'polyfactory:data_extractor'></> is a single input to single output data transformer block allowing you
+to extract specific data/fields from complex data types.
+<nl2>
+Each input and output are visually indicated on the block textures, where Input is two inner facing red arrows
+and the Output is two outwards facing green arrows.
+<nl>
+All I/O connections have fully configurable direction and channel, will full support for overlapping them as well as putting them into a feedback loop.
+<nl>
+You can configure them, as well as how this block operates by using the <pageref '/basics/wrench'>.
+<nl2>
+To configure which field to extract, you can just interact with block directly (but <item 'polyfactory:wrench'> also works).
+It will open a text field, allowing you to specify what data do you need. For example format / supported extraction,
+you can see icons below containing the name of data type as well as supported fields by it. Additionally, the first icon shows
+fields that can be extracted from all data types.
+<nl>
+For example extracting `type` from data provided by <item 'polyfactory:item_reader'> will show the id of the item (for example `polyfactory:guidebook`
+for the <item 'polyfactory:guidebook'>).
+<nl>
+Some of the extraction types also support arguments, allowing you to more precisely select what to extract
+(for example `substring:2.7` from `Hello World` will return `llo W`).
+
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:data_extractor'>View the <item 'polyfactory:data_extractor'> recipe</>

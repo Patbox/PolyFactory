@@ -1,0 +1,32 @@
+### Section: PageInfo
+title=<item 'polyfactory:data_comparator'>
+icon=polyfactory:data_comparator
+category=polyfactory:cable
+order=51
+### EndSection: PageInfo
+<yellow><item 'polyfactory:data_comparator'></> is a double input to single output data transformer block allowing you
+to compare the input data between each other.
+<nl2>
+Each input and output are visually indicated on the block textures, where Input A is an inner facing red arrow,
+Input B is an inner facing blue arrow and the output is indicated by two, outwards facing green arrows.
+<nl>
+All I/O connections have fully configurable direction and channel, will full support for overlapping them as well as putting them into a feedback loop.
+Additionally, Input's can be disabled by setting their channel to X, which will make them reuse last valid input for next operation.
+<nl>
+You can configure them, as well as how this block operates by using the <pageref '/basics/wrench'>.
+<nl2>
+This block supports following operations:
+- Equal - Checks if data value is the same (a == b),
+- Not Equal - Checks if data value is different (a != b),
+- Less Than - Checks if A value is less than B value (a < b),
+- Less Or Equal - Checks if A value is less or equal to B value (a <= b),
+- More Than - Checks if A value is mores than B value (a > b),
+- More Or Equal - Checks if A value is more or equal to B value (a >= b).
+<nl2>
+In case of different types, comparison might end up being a bit arbitrary.
+In that case you might want to use the <pageref './data_extractor'> to select which property you actually need.
+Alternatively you can enable strict mode, which will make comparisons always fail if compared data types are different.
+
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:data_comparator'>View the <item 'polyfactory:data_comparator'> recipe</>

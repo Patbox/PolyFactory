@@ -78,7 +78,9 @@ public class SpeakerBlock extends DirectionalCabledDataBlock implements DataRece
                     notFound = false;
                     if (parts.length >= 2) {
                         try {
-                            pitch = Float.parseFloat(parts[1]);
+                            pitch = parts[1].length() > 1 && Character.toLowerCase(parts[1].charAt(0)) == 'n'
+                                    ? NoteBlock.getPitchFromNote(Math.clamp(Integer.parseInt(parts[1].substring(1)), 0, 24))
+                                    : Float.parseFloat(parts[1]);
                         } catch (Throwable ignored) {
                         }
                     }

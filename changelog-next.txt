@@ -74,7 +74,8 @@
 - Funnels can now require a minimal stack size that can go in/out.
 - Polydex Mixer recipes will now visually scale fluid contents if they are too small.
 - Tweaked some item models to match block / in-world look more closely.
-- Portable Fluid Containers tooltip now contains visualization of the contents.s
+- Portable Fluid Containers tooltip now contains visualization of the contents.
+- Added support for raw notes to the Speaker Note Block sound data input (start with n, for example `bell n5`).
 - Creative Motor now uses Rotations Per Minute rather than Degrees Per Tick to display / change its speed.
 - Potatoes gained new wisdom.
 - Creative items should no longer show up in Polydex (and possibly other recipe viewers).

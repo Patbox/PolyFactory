@@ -22,7 +22,6 @@ The same controls also apply in gui interfaces.
 Use ['<key 'key.use'>] while not pointing at interactable block to change the order of fluids<nl>
 Use ['<key 'key.use'>] while pointing at interactable block or fluid UI to pour top-most fluid into the container<nl>
 Use ['<key 'key.attack'>] while pointing at interactable block or fluid UI to fill the Canister with top-most fluid from the container<nl>
-<lang 'item.polyfactory.wrench.tooltip.2' '<key 'key.attack'>'><nl>
 ### Body:
 ### Align: Center
 <u><blue><polydex 'polyfactory:canister'>View the <lang 'item.polyfactory.canister'> recipe</>

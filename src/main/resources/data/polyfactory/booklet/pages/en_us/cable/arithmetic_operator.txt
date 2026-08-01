@@ -1,0 +1,35 @@
+### Section: PageInfo
+title=<item 'polyfactory:arithmetic_operator'>
+icon=polyfactory:arithmetic_operator
+category=polyfactory:cable
+order=50
+### EndSection: PageInfo
+<yellow><item 'polyfactory:arithmetic_operator'></> is a double input to single output data transformer block allowing you
+to apply mathematical and alike operations on incoming data.
+<nl2>
+Each input and output are visually indicated on the block textures, where Input A is an inner facing red arrow,
+Input B is an inner facing blue arrow and the output is indicated by two, outwards facing green arrows.
+<nl>
+All I/O connections have fully configurable direction and channel, will full support for overlapping them as well as putting them into a feedback loop.
+Additionally, Input's can be disabled by setting their channel to X, which will make them reuse last valid input for next operation.
+<nl>
+You can configure them, as well as how this block operates by using the <pageref '/basics/wrench'>.
+<nl2>
+This block supports following operations:
+- Addition - Two values will be added together (a + b),
+- Subtraction - Two values will be subtracted from each other (a - b),
+- Multiplication - Two values will be multiplied together (a * b),
+- Division - Two values will be divided by each together (a / b),
+<nl2>
+Additionally, you can (or need) to configure on which data types this block works. It supports the following modes:
+- Integer - Inputs will be converted to an integer (1, 2, 6, -10, etc.),
+- Decimal - Inputs will be converted to an decimal numbers (1, 2.4, 6.1, -10.004, etc.),
+- Boolean - Inputs will be converted to boolean values (true/false or 1/0),
+- String - Inputs will be converted to text (`Hello world`, `2.8`, etc.)
+<nl>
+In case of complex types, it will try to strip them directly to the barest value, which might not be what you want.
+In that case you might want to use the <pageref './data_extractor'> to select which property you actually need.
+
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:arithmetic_operator'>View the <item 'polyfactory:arithmetic_operator'> recipe</>
