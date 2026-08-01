@@ -66,6 +66,8 @@ public class FactoryRecipeSerializers {
     public static final RecipeSerializer<SimpleFluidInteractionRecipe> FLUID_INTERACTION_SIMPLE = register("fluid_interaction/simple", SimpleFluidInteractionRecipe.CODEC);
     public static final RecipeSerializer<RemovingFluidInteractionRecipe> FLUID_INTERACTION_REMOVING = register("fluid_interaction/removing", RemovingFluidInteractionRecipe.CODEC);
 
+    public static final RecipeSerializer<DrillAttachmentEquipCraftingRecipe> CRAFTING_DRILL_ATTACHMENT_EQUIP = register("crafting/drill_attachment_equip", DrillAttachmentEquipCraftingRecipe.CODEC);
+
     public static void register() {
         BuiltInRegistries.RECIPE_SERIALIZER.addAlias(id("grinding"), id("grinding/simple"));
     }

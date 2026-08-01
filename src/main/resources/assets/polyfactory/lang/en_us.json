@@ -177,7 +177,7 @@
   "item.polyfactory.chain_lift": "Chain Lift",
 
   "item.polyfactory.portable_drill": "Portable Drill",
-  "item.polyfactory.portable_drill.tooltip.1": "Hold Drill Head in a cursor,",
+  "item.polyfactory.portable_drill.tooltip.1": "Hold Drill Head in the cursor slot,",
   "item.polyfactory.portable_drill.tooltip.2": "then right click the Drill with it!",
   "item.polyfactory.portable_drill.title": "Portable Drill (%s)",
   "item.polyfactory.creative_portable_drill": "Creative Portable Drill",
@@ -604,6 +604,9 @@
   "advancements.polyfactory.tachometer.title": "Measured rotation",
   "advancements.polyfactory.tachometer.description": "Place Tachometer or Stressometer to measure rotation!",
 
+  "advancements.polyfactory.multimeter.title": "Universal measurements",
+  "advancements.polyfactory.multimeter.description": "Craft a Multimeter and measure things with it!",
+
   "advancements.polyfactory.chain_drive.title": "Connected with chains",
   "advancements.polyfactory.chain_drive.description": "Connect two Chain Drives with Iron Chains!",
 
@@ -618,6 +621,18 @@
 
   "advancements.polyfactory.item_output_buffer.title": "Buffered outputs",
   "advancements.polyfactory.item_output_buffer.description": "Place the Item Output Buffer in a way that connects with a machine block!",
+
+  "advancements.polyfactory.fermenter.title": "Let the time do it's thing...",
+  "advancements.polyfactory.fermenter.description": "Use Fermenter to ferment something!",
+
+  "advancements.polyfactory.cheese.title": "Bone Cheese with Ease",
+  "advancements.polyfactory.cheese.description": "Eat Cheese, either as a Wedge or from the Wheel!",
+
+  "advancements.polyfactory.biodiesel.title": "The Power of Bio!",
+  "advancements.polyfactory.biodiesel.description": "Obtain BioDiesel and a Diesel Engine!",
+
+  "advancements.polyfactory.portable_drill.title": "Miner's Best Friend!",
+  "advancements.polyfactory.portable_drill.description": "Obtain Portable Drill and use it to mine some blocks",
 
   "advancements.polyfactory.crafter.title": "Automatic Crafting",
   "advancements.polyfactory.crafter.description": "Craft something with Mechanical Crafter",

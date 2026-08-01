@@ -21,11 +21,12 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementType;
-import net.minecraft.advancements.triggers.InventoryChangeTrigger;
+import net.minecraft.advancements.predicates.BlockPredicate;
+import net.minecraft.advancements.predicates.ContextAwarePredicate;
+import net.minecraft.advancements.triggers.*;
 import net.minecraft.advancements.predicates.ItemPredicate;
-import net.minecraft.advancements.triggers.ItemUsedOnLocationTrigger;
 import net.minecraft.advancements.predicates.LocationPredicate;
-import net.minecraft.advancements.triggers.RecipeCraftedTrigger;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
@@ -39,6 +40,7 @@ import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.storage.loot.predicates.AnyOfCondition;
+import net.minecraft.world.level.storage.loot.predicates.LocationCheck;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import java.util.List;
 import java.util.Optional;
@@ -159,6 +161,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
 
     private void taters(HolderLookup.Provider registryLookup, AdvancementHolder root, Consumer<AdvancementHolder> exporter) {
         var itemWrap = registryLookup.lookupOrThrow(Registries.ITEM);
+        var blockWrap = registryLookup.lookupOrThrow(Registries.BLOCK);
 
         var tater16 = Advancement.Builder.advancement()
                 .parent(root)
@@ -208,6 +211,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
 
     private void mainline(HolderLookup.Provider registryLookup, AdvancementHolder root, Consumer<AdvancementHolder> exporter) {
         var itemWrap = registryLookup.lookupOrThrow(Registries.ITEM);
+        var blockWrap = registryLookup.lookupOrThrow(Registries.BLOCK);
 
         // Start
 
@@ -480,6 +484,71 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 .addCriterion("use", TriggerCriterion.of(FactoryTriggers.ITEM_OUTPUT_BUFFER))
                 .save(exporter, "polyfactory:main/base/item_output_buffer");
 
+        var fermenter = Advancement.Builder.advancement()
+                .parent(steel)
+                .display(
+                        FactoryItems.FERMENTER,
+                        Component.translatable("advancements.polyfactory.fermenter.title"),
+                        Component.translatable("advancements.polyfactory.fermenter.description"),
+                        null,
+                        AdvancementType.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .addCriterion("use", TriggerCriterion.of(FactoryTriggers.FERMENTER_FERMENTS))
+                .save(exporter, "polyfactory:main/base/fermenters");
+
+        var cheeseWheel = Advancement.Builder.advancement()
+                .parent(fermenter)
+                .display(
+                        FactoryItems.CHEESE_WEDGE,
+                        Component.translatable("advancements.polyfactory.cheese.title"),
+                        Component.translatable("advancements.polyfactory.cheese.description"),
+                        null,
+                        AdvancementType.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .addCriterion("item", ConsumeItemTrigger.TriggerInstance.usedItem(itemWrap, FactoryItems.CHEESE_WEDGE))
+                .addCriterion("block", CriteriaTriggers.DEFAULT_BLOCK_USE.createCriterion(new DefaultBlockInteractionTrigger.TriggerInstance(Optional.empty(), Optional.of(
+                        ContextAwarePredicate.create(new LocationCheck(Optional.of(LocationPredicate.Builder.location().setBlock(BlockPredicate.Builder.block().of(blockWrap, FactoryBlocks.CHEESE_WHEEL)).build()), BlockPos.ZERO))
+                ))))
+                .requirements(AdvancementRequirements.Strategy.OR)
+                .save(exporter, "polyfactory:main/base/cheese");
+
+        var biodiesel = Advancement.Builder.advancement()
+                .parent(fermenter)
+                .display(
+                        FactoryItems.BIODIESEL_BUCKET,
+                        Component.translatable("advancements.polyfactory.biodiesel.title"),
+                        Component.translatable("advancements.polyfactory.biodiesel.description"),
+                        null,
+                        AdvancementType.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .addCriterion("fuel", RecipeCraftedTrigger.TriggerInstance.craftedItem(recipeKey("mixing/biodiesel")))
+                .addCriterion("engine", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.DIESEL_ENGINE))
+                .save(exporter, "polyfactory:main/base/biodiesel");
+
+        var portableDrill = Advancement.Builder.advancement()
+                .parent(biodiesel)
+                .display(
+                        new ItemStackTemplate(FactoryItems.PORTABLE_DRILL, DataComponentPatch.builder().set(FactoryDataComponents.DRILL_ATTACHMENT, new ItemStackTemplate(FactoryItems.DIAMOND_DRILL_HEAD)).build()),
+                        Component.translatable("advancements.polyfactory.portable_drill.title"),
+                        Component.translatable("advancements.polyfactory.portable_drill.description"),
+                        null,
+                        AdvancementType.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .addCriterion("item", TriggerCriterion.of(FactoryTriggers.PORTABLE_DRILL_MINES))
+                .save(exporter, "polyfactory:main/base/portable_drill");
+
         var gear = Advancement.Builder.advancement()
                 .parent(steel)
                 .display(
@@ -494,25 +563,6 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 )
                 .addCriterion("use", TriggerCriterion.of(FactoryTriggers.CONNECT_DIFFERENT_GEARS))
                 .save(exporter, "polyfactory:main/base/steel_gear");
-
-        var tachometer = Advancement.Builder.advancement()
-                .parent(gear)
-                .display(
-                        FactoryItems.TACHOMETER,
-                        Component.translatable("advancements.polyfactory.tachometer.title"),
-                        Component.translatable("advancements.polyfactory.tachometer.description"),
-                        null,
-                        AdvancementType.TASK,
-                        true,
-                        true,
-                        false
-                )
-                .addCriterion("use", ItemUsedOnLocationTrigger.TriggerInstance.placedBlock(
-                        AnyOfCondition.anyOf(
-                                LootItemBlockStatePropertyCondition.hasBlockStateProperties(FactoryBlocks.TACHOMETER),
-                                LootItemBlockStatePropertyCondition.hasBlockStateProperties(FactoryBlocks.STRESSOMETER)
-                        )))
-                .save(exporter, "polyfactory:main/base/tachometer");
 
         var chainDrive = Advancement.Builder.advancement()
                 .parent(gear)
@@ -547,7 +597,7 @@ class AdvancementsProvider extends FabricAdvancementProvider {
         // Steel -> Press
 
         var sprayCan = Advancement.Builder.advancement()
-                .parent(grinder)
+                .parent(press)
                 .display(
                         new ItemStackTemplate(FactoryItems.SPRAY_CAN, DataComponentPatch.builder()
                                 .set(FactoryDataComponents.COLOR, DyeColorExtra.getColor(DyeColor.BLUE))
@@ -1004,6 +1054,40 @@ class AdvancementsProvider extends FabricAdvancementProvider {
                 )
                 .addCriterion("use", TriggerCriterion.of(FactoryTriggers.CABLE_CONNECT))
                 .save(exporter, "polyfactory:main/base/cable");
+
+        var tachometer = Advancement.Builder.advancement()
+                .parent(cable)
+                .display(
+                        FactoryItems.TACHOMETER,
+                        Component.translatable("advancements.polyfactory.tachometer.title"),
+                        Component.translatable("advancements.polyfactory.tachometer.description"),
+                        null,
+                        AdvancementType.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .addCriterion("use", ItemUsedOnLocationTrigger.TriggerInstance.placedBlock(
+                        AnyOfCondition.anyOf(
+                                LootItemBlockStatePropertyCondition.hasBlockStateProperties(FactoryBlocks.TACHOMETER),
+                                LootItemBlockStatePropertyCondition.hasBlockStateProperties(FactoryBlocks.STRESSOMETER)
+                        )))
+                .save(exporter, "polyfactory:main/base/tachometer");
+
+        var multimeter = Advancement.Builder.advancement()
+                .parent(cable)
+                .display(
+                        FactoryItems.MULTIMETER,
+                        Component.translatable("advancements.polyfactory.multimeter.title"),
+                        Component.translatable("advancements.polyfactory.multimeter.description"),
+                        null,
+                        AdvancementType.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .addCriterion("a", TriggerCriterion.of(FactoryTriggers.MULTIMETER_MEASURE))
+                .save(exporter, "polyfactory:main/base/multimeter");
 
         var recordPlayer = Advancement.Builder.advancement()
                 .parent(cable)

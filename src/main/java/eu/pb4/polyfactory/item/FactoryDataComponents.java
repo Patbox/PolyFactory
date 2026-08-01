@@ -73,6 +73,8 @@ public class FactoryDataComponents {
     public static final DataComponentType<Component> MATERIAL_NAME = register("material_name", DataComponentType.<Component>builder().persistent(ComponentSerialization.CODEC).build());
     public static final DataComponentType<MiningMode> SELECTED_MINING_MODE = register("selected_mining_mode", DataComponentType.<MiningMode>builder().persistent(MiningMode.CODEC).build());
     public static final DataComponentType<List<MiningMode>> MINING_MODES = register("mining_modes", DataComponentType.<List<MiningMode>>builder().persistent(MiningMode.CODEC.listOf()).build());
+    public static final DataComponentType<Long> CANISTER_TRANSFER_AMOUNT = register("canister/transfer_amount", DataComponentType.<Long>builder().persistent(ExtraCodecs.NON_NEGATIVE_LONG).build());
+    public static final DataComponentType<Long> CANISTER_MAX_TRANSFER = register("canister/max_transfer", DataComponentType.<Long>builder().persistent(ExtraCodecs.NON_NEGATIVE_LONG).build());
 
     public static void register() {
         ItemComponentTooltipProviderRegistry.addFirst(FLUID);

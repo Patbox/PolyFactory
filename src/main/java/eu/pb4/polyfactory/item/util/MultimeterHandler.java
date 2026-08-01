@@ -1,7 +1,9 @@
 package eu.pb4.polyfactory.item.util;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.factorytools.api.block.MultiBlock;
 import eu.pb4.polyfactory.ModInit;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.block.data.DataUser;
 import eu.pb4.polyfactory.block.data.providers.TinyPotatoSpringBlock;
 import eu.pb4.polyfactory.block.mechanical.RotationUser;
@@ -151,6 +153,7 @@ public class MultimeterHandler {
             }
 
             if (hasElements[0]) {
+                TriggerCriterion.trigger(player, FactoryTriggers.MULTIMETER_MEASURE);
                 this.sidebar.show();
             } else {
                 this.sidebar.hide();

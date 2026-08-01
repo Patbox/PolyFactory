@@ -8,6 +8,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
@@ -30,7 +31,7 @@ public record CraftingWithLeftoverRecipe<T extends CraftingRecipe>(RecipeSeriali
         return MapCodec.recursive("CraftingWithLeftovers", (c) -> RecordCodecBuilder.mapCodec(instance -> instance.group(
                 MapCodec.unit(serializer).forGetter(CraftingWithLeftoverRecipe::serializer),
                 recipeCodec.forGetter(CraftingWithLeftoverRecipe::backingRecipe),
-                Ingredient.CODEC.listOf().fieldOf("leftovers").forGetter(CraftingWithLeftoverRecipe::leftovers)
+                ExtraCodecs.compactListCodec(Ingredient.CODEC).fieldOf("leftovers").forGetter(CraftingWithLeftoverRecipe::leftovers)
         ).apply(instance, CraftingWithLeftoverRecipe::new)));
     }
     public static CraftingWithLeftoverRecipe<ShapedRecipe> of(ShapedRecipe recipe, Ingredient... leftovers) {

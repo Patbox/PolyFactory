@@ -6,8 +6,14 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
+import eu.pb4.polyfactory.recipe.fluid.effects.FluidInteractionEffect;
 import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -24,17 +30,19 @@ import net.minecraft.world.level.Level;
 public record SimpleFluidInteractionRecipe(List<FluidInputStack> fluidInput, List<FluidStack<?>> fluidOutput,
                                            List<OutputStack> itemOutput, Optional<ParticleOptions> particleEffect,
                                            Optional<Holder<SoundEvent>> soundEvent, float particleChance,
-                                           float minTemperature, float maxTemperature, int maxApplyPerTick) implements FluidInteractionRecipe {
+                                           float minTemperature, float maxTemperature, int maxApplyPerTick,
+                                           List<FluidInteractionEffect> effects) implements FluidInteractionRecipe {
     public static final MapCodec<SimpleFluidInteractionRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            FluidInputStack.CODEC.listOf().fieldOf("fluid_input").forGetter(SimpleFluidInteractionRecipe::fluidInput),
-            FluidStack.CODEC.listOf().fieldOf("fluid_output").forGetter(SimpleFluidInteractionRecipe::fluidOutput),
-            OutputStack.CODEC.listOf().fieldOf("item_output").forGetter(SimpleFluidInteractionRecipe::itemOutput),
+            ExtraCodecs.compactListCodec(FluidInputStack.CODEC).fieldOf("fluid_input").forGetter(SimpleFluidInteractionRecipe::fluidInput),
+            ExtraCodecs.compactListCodec(FluidStack.CODEC).fieldOf("fluid_output").forGetter(SimpleFluidInteractionRecipe::fluidOutput),
+            ExtraCodecs.compactListCodec(OutputStack.CODEC).fieldOf("item_output").forGetter(SimpleFluidInteractionRecipe::itemOutput),
             ParticleTypes.CODEC.optionalFieldOf("particle").forGetter(SimpleFluidInteractionRecipe::particleEffect),
             SoundEvent.CODEC.optionalFieldOf("sound_event").forGetter(SimpleFluidInteractionRecipe::soundEvent),
             Codec.FLOAT.optionalFieldOf("particle_chance", 0f).forGetter(SimpleFluidInteractionRecipe::particleChance),
             Codec.FLOAT.optionalFieldOf("min_temperature", Float.NEGATIVE_INFINITY).forGetter(SimpleFluidInteractionRecipe::minTemperature),
             Codec.FLOAT.optionalFieldOf("max_temperature", Float.POSITIVE_INFINITY).forGetter(SimpleFluidInteractionRecipe::maxTemperature),
-            Codec.INT.optionalFieldOf("max_apply_per_tick", 1).forGetter(SimpleFluidInteractionRecipe::maxApplyPerTick)
+            Codec.INT.optionalFieldOf("max_apply_per_tick", 1).forGetter(SimpleFluidInteractionRecipe::maxApplyPerTick),
+            ExtraCodecs.compactListCodec(FluidInteractionEffect.CODEC).optionalFieldOf("effects", List.of()).forGetter(SimpleFluidInteractionRecipe::effects)
     ).apply(instance, SimpleFluidInteractionRecipe::new));
 
     @Override
@@ -86,6 +94,13 @@ public record SimpleFluidInteractionRecipe(List<FluidInputStack> fluidInput, Lis
     @Override
     public float particleChance(FluidContainerInput input) {
         return this.particleChance;
+    }
+
+    @Override
+    public void applyEffects(ServerLevel serverLevel, FluidContainerInput input, int applied, @Nullable Entity holderEntity, Vec3 position) {
+        for (var effect : this.effects) {
+            effect.apply(serverLevel, input, applied, holderEntity, position);
+        }
     }
 
     @Override

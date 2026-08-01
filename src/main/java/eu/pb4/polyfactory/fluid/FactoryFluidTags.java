@@ -6,6 +6,7 @@ import net.minecraft.tags.TagKey;
 
 public class FactoryFluidTags {
     public static final TagKey<FluidType<?>> MOLTEN_METAL = of("molten_metal");
+    public static final TagKey<FluidType<?>> CAUSES_IGNITION = of("causes_ignition");
     public static final TagKey<FluidType<?>> SMELTERY_ALLOWED_FLUIDS = of("smeltery/allowed_fluids");
     public static final TagKey<FluidType<?>> USE_INGOTS_FOR_AMOUNT = of("use_ingots_for_amount");
     public static final TagKey<FluidType<?>> DIESEL_ENGINE_FUEL = of("diesel_engine_fuel");

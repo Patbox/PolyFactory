@@ -37,8 +37,8 @@ public record RatedFluidMixingMixingRecipe(String group, List<FluidInputStack> f
                                            double optimalSpeed, float minimumTemperature, float maxTemperature) implements MixingRecipe {
     public static final MapCodec<RatedFluidMixingMixingRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     Codec.STRING.optionalFieldOf("group", "").forGetter(RatedFluidMixingMixingRecipe::group),
-                    FluidInputStack.CODEC.listOf().fieldOf("input").forGetter(RatedFluidMixingMixingRecipe::fluidInputs),
-                    FluidStack.CODEC.listOf().fieldOf("output").forGetter(RatedFluidMixingMixingRecipe::fluidOutput),
+                    ExtraCodecs.compactListCodec(FluidInputStack.CODEC).fieldOf("input").forGetter(RatedFluidMixingMixingRecipe::fluidInputs),
+                    ExtraCodecs.compactListCodec(FluidStack.CODEC).fieldOf("output").forGetter(RatedFluidMixingMixingRecipe::fluidOutput),
                     Codec.INT.optionalFieldOf("max_multiplied", 1).forGetter(RatedFluidMixingMixingRecipe::maxMultiplied),
                     Codec.DOUBLE.fieldOf("time").forGetter(RatedFluidMixingMixingRecipe::time),
                     Codec.DOUBLE.optionalFieldOf("minimum_speed", 1d).forGetter(RatedFluidMixingMixingRecipe::minimumSpeed),

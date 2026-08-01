@@ -1,5 +1,7 @@
 package eu.pb4.polyfactory.item.tool;
 
+import eu.pb4.factorytools.api.advancement.TriggerCriterion;
+import eu.pb4.polyfactory.advancement.FactoryTriggers;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItemIds;
 import eu.pb4.polyfactory.item.component.MiningMode;
@@ -154,6 +156,10 @@ public class BaseDrillItem extends Item implements PolymerItem, CustomItemBroken
 
         var takePower = !(owner instanceof ServerPlayer player) || !(((ServerPlayerGameModeExt) player.gameMode).polyfactory$currentlyDestroyed() instanceof BlockPos currentPos) || currentPos.equals(pos);
 
+        if (owner instanceof ServerPlayer player) {
+            TriggerCriterion.trigger(player, FactoryTriggers.PORTABLE_DRILL_MINES);
+        }
+
         if (takePower) {
             this.drainFuel(owner, itemStack);
             return true;
@@ -208,7 +214,7 @@ public class BaseDrillItem extends Item implements PolymerItem, CustomItemBroken
         return Items.TRIAL_KEY;
     }
 
-    private static ItemStack putItemIn(ItemStack drill, ItemStack head) {
+    public static ItemStack putItemIn(ItemStack drill, ItemStack head) {
         var out = takeItemFrom(drill);
 
         drill.set(FactoryDataComponents.DRILL_ATTACHMENT, ItemStackTemplate.fromNonEmptyStack(head));
@@ -227,7 +233,7 @@ public class BaseDrillItem extends Item implements PolymerItem, CustomItemBroken
         return out;
     }
 
-    private static ItemStack takeItemFrom(ItemStack drill) {
+    public static ItemStack takeItemFrom(ItemStack drill) {
         if (!drill.has(FactoryDataComponents.DRILL_ATTACHMENT)) {
             return ItemStack.EMPTY;
         } else {

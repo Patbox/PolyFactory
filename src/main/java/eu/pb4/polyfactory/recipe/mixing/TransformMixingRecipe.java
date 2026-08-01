@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
@@ -35,9 +36,9 @@ public record TransformMixingRecipe(String group, Ingredient base, List<CountedI
                     Codec.STRING.optionalFieldOf("group", "").forGetter(TransformMixingRecipe::group),
                     Ingredient.CODEC.fieldOf("base").forGetter(TransformMixingRecipe::base),
                     CountedIngredient.LIST_CODEC.fieldOf("input").forGetter(TransformMixingRecipe::input),
-                    FluidInputStack.CODEC.listOf().optionalFieldOf("fluid_input").forGetter(TransformMixingRecipe::fluidInputs),
+                    ExtraCodecs.compactListCodec(FluidInputStack.CODEC).optionalFieldOf("fluid_input").forGetter(TransformMixingRecipe::fluidInputs),
                     ItemStackTemplate.CODEC.fieldOf("output").forGetter(TransformMixingRecipe::output),
-                    FluidStack.CODEC.listOf().fieldOf("output_fluid").forGetter(TransformMixingRecipe::fluidOutput),
+                    ExtraCodecs.compactListCodec(FluidStack.CODEC).fieldOf("output_fluid").forGetter(TransformMixingRecipe::fluidOutput),
                     Codec.DOUBLE.fieldOf("time").forGetter(TransformMixingRecipe::time),
                     Codec.DOUBLE.optionalFieldOf("minimum_speed", 1d).forGetter(TransformMixingRecipe::minimumSpeed),
                     Codec.DOUBLE.optionalFieldOf("optimal_speed", 1d).forGetter(TransformMixingRecipe::optimalSpeed),

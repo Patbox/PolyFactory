@@ -13,6 +13,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -26,7 +27,7 @@ public record SimpleSpoutRecipe(CountedIngredient item, List<FluidStack<?>> flui
                                 double time, double coolingTime) implements SpoutRecipe {
     public static final MapCodec<SimpleSpoutRecipe> CODEC = RecordCodecBuilder.mapCodec(x -> x.group(
                     CountedIngredient.CODEC.fieldOf("item").forGetter(SimpleSpoutRecipe::item),
-                    FluidStack.CODEC.listOf().optionalFieldOf("fluid_input", List.of()).forGetter(SimpleSpoutRecipe::fluidInput),
+                    ExtraCodecs.compactListCodec(FluidStack.CODEC).optionalFieldOf("fluid_input", List.of()).forGetter(SimpleSpoutRecipe::fluidInput),
                     ItemStackTemplate.CODEC.fieldOf("result").forGetter(SimpleSpoutRecipe::output),
                     Codec.BOOL.optionalFieldOf("copy_components", false).forGetter(SimpleSpoutRecipe::copyComponents),
                     Codec.INT.optionalFieldOf("item_damage", 0).forGetter(SimpleSpoutRecipe::itemDamage),

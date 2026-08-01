@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.mechanical.source;
 
 import com.kneelawk.graphlib.api.graph.user.BlockNode;
 import com.mojang.serialization.Codec;
+import eu.pb4.factorytools.api.block.AttackableBlock;
 import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.factorytools.api.virtualentity.LodItemDisplayElement;
@@ -16,6 +17,7 @@ import eu.pb4.polyfactory.block.network.NetworkBlock;
 import eu.pb4.polyfactory.block.network.NetworkComponent;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
 import eu.pb4.polyfactory.fluid.FluidInteractionMode;
+import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
 import eu.pb4.polyfactory.nodes.mechanical.RotationData;
@@ -58,7 +60,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class DieselEngineBlock extends NetworkBlock implements FactoryBlock, EntityBlock, PipeConnectable, RotationUser, ConfigurableBlock, NetworkComponent.Rotational, NetworkComponent.Pipe {
+public class DieselEngineBlock extends NetworkBlock implements FactoryBlock, EntityBlock, PipeConnectable, RotationUser, ConfigurableBlock, NetworkComponent.Rotational, NetworkComponent.Pipe, AttackableBlock {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
@@ -169,12 +171,25 @@ public class DieselEngineBlock extends NetworkBlock implements FactoryBlock, Ent
             return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
 
-        var x = FluidContainerUtil.interactWithInWorld(be.getMainFluidContainer(), (ServerPlayer) player, stack, hand, FluidInteractionMode.ANY);
+        var x = FluidContainerUtil.interactWithInWorld(be.getMainFluidContainer(), player, stack, hand, FluidInteractionMode.ANY, FluidInteractionMode.INSERT);
         if (x == null) {
             return super.useItemOn(stack, state, level, pos, player, hand, hit);
         }
 
         return x;
+    }
+
+    @Override
+    public InteractionResult onPlayerAttack(BlockState state, Player player, Level world, BlockPos pos, Direction direction) {
+        var itemStack = player.getMainHandItem();
+        if (itemStack.is(FactoryItemTags.FLUID_CONTAINER_INTERACTABLE_ON_ATTACK) && world.getBlockEntity(pos) instanceof DieselEngineBlockEntity be) {
+            var x = FluidContainerUtil.interactWithInWorld(be.getMainFluidContainer(), player, itemStack, InteractionHand.MAIN_HAND, FluidInteractionMode.ANY, FluidInteractionMode.EXTRACT);
+            if (x != null) {
+                return x;
+            }
+        }
+
+        return InteractionResult.PASS;
     }
 
     @Override

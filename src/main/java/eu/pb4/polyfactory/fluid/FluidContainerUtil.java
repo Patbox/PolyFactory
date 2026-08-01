@@ -72,6 +72,8 @@ public interface FluidContainerUtil {
             var outputItems = recipe.itemOutput(input, world.registryAccess());
 
             var item = new ArrayList<ItemStack>();
+
+            int appliedTimes = 0;
             for (var i = 0; i < recipe.maxApplyPerTick(); i++) {
                 for (var stack : inputFluids) {
                     container.extract(stack.instance(), stack.used(), false);
@@ -91,6 +93,7 @@ public interface FluidContainerUtil {
                     }
                 }
 
+                appliedTimes++;
 
                 if (!recipe.matches(input, world)) {
                     break;
@@ -98,6 +101,10 @@ public interface FluidContainerUtil {
             }
 
             list.add(new Pair<>(entry.id(), item));
+
+            if (appliedTimes > 0) {
+                recipe.applyEffects(world, input, appliedTimes, null, pos);
+            }
         }
 
         if (!list.isEmpty() && FactoryUtil.getClosestPlayer(world, BlockPos.containing(pos), 16) instanceof ServerPlayer serverPlayer) {
@@ -169,6 +176,7 @@ public interface FluidContainerUtil {
 
         if (stack.is(FactoryItemTags.DYNAMIC_FLUID_INTERACTION)) {
             var fluids = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
+            var maxTransfer = stack.getOrDefault(FactoryDataComponents.CANISTER_TRANSFER_AMOUNT, Long.MAX_VALUE);
 
             interaction = interaction.and(preferredInteraction);
 
@@ -182,7 +190,7 @@ public interface FluidContainerUtil {
 
             if (interaction == FluidInteractionMode.INSERT && container.isNotFull() && fluids.isNotEmpty()) {
                 var fluid = Objects.requireNonNull(fluids.topFluid());
-                var extract = fluids.get(fluid);
+                var extract = Math.min(fluids.get(fluid), maxTransfer);
                 var leftover = container.insert(fluid, extract, false);
                 if (leftover != extract) {
                     if (!fluids.isInfinite()) {
@@ -196,7 +204,7 @@ public interface FluidContainerUtil {
             } else if (interaction == FluidInteractionMode.EXTRACT && container.isNotEmpty() && fluids.isNotFull()) {
                 var topFluid = Objects.requireNonNull(container.topFluid());
 
-                var maxAmount = fluids.capacity() - fluids.stored();
+                var maxAmount = Math.min(fluids.capacity() - fluids.stored(), maxTransfer);
                 var extract = container.extract(topFluid, maxAmount, false);
                 if (extract != 0) {
                     if (!fluids.isInfinite()) {

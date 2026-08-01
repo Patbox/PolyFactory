@@ -101,7 +101,7 @@ public class PortableFluidTankBlockItem extends FactoryBlockItem {
     @Override
     public void inventoryTick(ItemStack stack, ServerLevel world, Entity entity, @Nullable EquipmentSlot slot) {
         super.inventoryTick(stack, world, entity, slot);
-        FluidContainerUtil.tick(FluidContainerFromComponent.of(stack), world, entity.position().add(0, entity.getY() / 2, 0), 0,
+        FluidContainerUtil.tick(FluidContainerFromComponent.of(stack), world, entity.position().add(0, entity.getBbHeight() / 2, 0), 0,
                 FactoryUtil.getItemConsumer(entity));
     }
 
@@ -129,7 +129,7 @@ public class PortableFluidTankBlockItem extends FactoryBlockItem {
 
             if (fluids != null && fluids.capacity() != -1 && fluids.capacity() < Integer.MAX_VALUE && !fluids.isEmpty()) {
                 out.set(DataComponents.MAX_DAMAGE, (int) (fluids.capacity()));
-                out.set(DataComponents.DAMAGE, (int) ((fluids.capacity() - fluids.stored())));
+                out.set(DataComponents.DAMAGE, (int) ((fluids.capacity() - fluids.stored() + 1)));
                 //progress = (float) fluids.stored() / fluids.capacity();
             }
 

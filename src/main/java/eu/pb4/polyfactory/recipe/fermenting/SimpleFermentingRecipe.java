@@ -29,7 +29,7 @@ public record SimpleFermentingRecipe(String group, Ingredient input,
                     Codec.STRING.optionalFieldOf("group", "").forGetter(SimpleFermentingRecipe::group),
                     Ingredient.CODEC.fieldOf("input").forGetter(SimpleFermentingRecipe::input),
                     ExtraCodecs.compactListCodec(OutputStack.CODEC).optionalFieldOf("output", List.of()).forGetter(SimpleFermentingRecipe::output),
-                    FluidStack.CODEC.listOf().fieldOf("output_fluid").forGetter(SimpleFermentingRecipe::fluidOutput),
+                    ExtraCodecs.compactListCodec(FluidStack.CODEC).fieldOf("output_fluid").forGetter(SimpleFermentingRecipe::fluidOutput),
                     Codec.DOUBLE.fieldOf("time").forGetter(SimpleFermentingRecipe::time),
                     Codec.FLOAT.optionalFieldOf("minimal_temperature", Float.NEGATIVE_INFINITY).forGetter(SimpleFermentingRecipe::minimumTemperature),
                     Codec.FLOAT.optionalFieldOf("max_temperature", Float.POSITIVE_INFINITY).forGetter(SimpleFermentingRecipe::maxTemperature)

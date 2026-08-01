@@ -252,7 +252,11 @@ public class FactoryItems {
     public static final PressureFluidGun PRESSURE_FLUID_GUN = register(FactoryItemIds.PRESSURE_FLUID_GUN, settings -> new PressureFluidGun(
             settings.stacksTo(1).enchantable(5).repairable(COPPER_PLATE).durability(800)));
 
-    public static final Item CANISTER = register(FactoryItemIds.CANISTER, new Item.Properties().component(FactoryDataComponents.FLUID, FluidComponent.DEFAULT.withCapacity(FluidConstants.BUCKET * 2)).stacksTo(1), CanisterItem::new);
+    public static final Item CANISTER = register(FactoryItemIds.CANISTER, new Item.Properties()
+            .component(FactoryDataComponents.FLUID, FluidComponent.DEFAULT.withCapacity(FluidConstants.BUCKET * 2))
+            .component(FactoryDataComponents.CANISTER_TRANSFER_AMOUNT,FluidConstants.BUCKET * 2)
+            .component(FactoryDataComponents.CANISTER_MAX_TRANSFER,FluidConstants.BUCKET * 2)
+            .stacksTo(1), CanisterItem::new);
     //public static final Item CREATIVE_CANISTER = register(FactoryItemIds.CREATIVE_CANISTER, new Item.Properties().component(FactoryDataComponents.FLUID, FluidComponent.DEFAULT.withCapacity(Long.MAX_VALUE)).stacksTo(1), CanisterItem::new);
 
     public static final Item ITEM_PACKER = register(FactoryBlocks.ITEM_PACKER);
@@ -526,7 +530,7 @@ public class FactoryItems {
 
                     for (var dye : FactoryUtil.COLORS_CREATIVE) {
                         var stack = WINDMILL_SAIL.getDefaultInstance();
-                        stack.set(DataComponents.DYED_COLOR, new DyedItemColor(DyeColorExtra.getColor(dye)));
+                        stack.set(DataComponents.DYED_COLOR, new DyedItemColor(DyeColorExtra.getColor(dye) & 0xFFFFFF));
                         entries.accept(stack);
                     }
 

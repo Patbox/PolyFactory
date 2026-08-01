@@ -88,6 +88,15 @@ public record FluidType<T>(int density, float heat, Codec<T> dataCodec, T defaul
         return new FluidStack<>(defaultInstance(), FluidConstants.BUCKET);
     }
 
+
+    public FluidStack<T> ofMilliBucket(int amount) {
+        return of(FluidConstants.BUCKET / 1000 * amount);
+    }
+
+    public FluidStack<T> ofMilliBucket(int amount, T data) {
+        return of(FluidConstants.BUCKET / 1000 * amount, data);
+    }
+
     public FluidStack<T> of(long amount) {
         return new FluidStack<T>(defaultInstance(), amount);
     }

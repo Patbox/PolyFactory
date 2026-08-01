@@ -12,6 +12,7 @@ import net.minecraft.advancements.predicates.ContextAwarePredicate;
 import net.minecraft.advancements.predicates.ItemPredicate;
 import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 
 public class FluidShootsCriterion extends SimpleCriterionTrigger<FluidShootsCriterion.Condition> {
@@ -45,7 +46,7 @@ public class FluidShootsCriterion extends SimpleCriterionTrigger<FluidShootsCrit
     public record Condition(Optional<ItemPredicate> itemPredicate, List<FluidInstance<?>> fluids) implements SimpleInstance {
         public static final Codec<Condition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 ItemPredicate.CODEC.optionalFieldOf("item").forGetter(Condition::itemPredicate),
-                FluidInstance.CODEC.listOf().fieldOf("fluid").forGetter(Condition::fluids)
+                ExtraCodecs.compactListCodec(FluidInstance.CODEC).fieldOf("fluid").forGetter(Condition::fluids)
         ).apply(instance, Condition::new));
         @Override
         public Optional<ContextAwarePredicate> player() {

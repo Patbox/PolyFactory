@@ -23,6 +23,10 @@ class FluidTypeTagsProvider extends FabricTagsProvider<FluidType<?>> {
                 .add(FactoryFluidIds.STEEL)
         ;
 
+        this.tag(FactoryFluidTags.CAUSES_IGNITION)
+                .add(FactoryFluidIds.LAVA)
+                .addOptionalTag(FactoryFluidTags.MOLTEN_METAL);
+
         this.tag(FactoryFluidTags.USE_INGOTS_FOR_AMOUNT)
                 .addOptionalTag(FactoryFluidTags.MOLTEN_METAL);
 

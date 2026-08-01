@@ -51,5 +51,6 @@ public interface FactoryTriggers {
     Identifier ITEM_OUTPUT_BUFFER = id("item_output_buffer");
     Identifier GUIDEBOOK = id("guidebook");
     Identifier FERMENTER_FERMENTS = id("fermenter_ferments");
-
+    Identifier PORTABLE_DRILL_MINES = id("portable_drill_mines");
+    Identifier MULTIMETER_MEASURE = id("multimeter_measure");
 }

@@ -5,6 +5,10 @@ import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeTypes;
 import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -32,6 +36,10 @@ public interface FluidInteractionRecipe extends Recipe<FluidContainerInput> {
     int maxApplyPerTick();
 
     float particleChance(FluidContainerInput input);
+
+    default void applyEffects(ServerLevel serverLevel, FluidContainerInput input, int applied, @Nullable Entity holderEntity, Vec3 position) {
+
+    }
 
     @Override
     default RecipeType<FluidInteractionRecipe> getType() {

@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.item.tool;
 
 import com.mojang.math.Transformation;
+import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidContainerFromComponent;
 import eu.pb4.polyfactory.fluid.FluidContainerUtil;
 import eu.pb4.polyfactory.fluid.FluidInstance;
@@ -39,6 +40,7 @@ import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -85,7 +87,7 @@ public class CanisterItem extends SimplePolymerItem {
     @Override
     public void inventoryTick(ItemStack stack, ServerLevel world, Entity entity, @Nullable EquipmentSlot slot) {
         super.inventoryTick(stack, world, entity, slot);
-        FluidContainerUtil.tick(FluidContainerFromComponent.of(stack), world, entity.position().add(0, entity.getY() / 2, 0), 0,
+        FluidContainerUtil.tick(FluidContainerFromComponent.of(stack), world, entity.position().add(0, entity.getBbHeight() / 2, 0), 0,
                 FactoryUtil.getItemConsumer(entity));
     }
 
@@ -108,9 +110,9 @@ public class CanisterItem extends SimplePolymerItem {
     public void modifyBasePolymerItemStack(ItemStack out, ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
         var fluids = stack.getOrDefault(FactoryDataComponents.FLUID, FluidComponent.DEFAULT);
 
-        if (fluids.capacity() < Integer.MAX_VALUE) {
+        if (fluids.capacity() < Integer.MAX_VALUE && fluids.isNotEmpty()) {
             out.set(DataComponents.MAX_DAMAGE, (int) fluids.capacity());
-            out.set(DataComponents.DAMAGE, (int) (fluids.capacity() - fluids.stored()));
+            out.set(DataComponents.DAMAGE, (int) (fluids.capacity() - fluids.stored() + 1));
         }
 
         //noinspection unchecked
@@ -166,13 +168,13 @@ public class CanisterItem extends SimplePolymerItem {
                 new CompositeItemModel(List.of(
                         new BasicItemModel(identifier.withPrefix("item/").withSuffix("_inner"), Optional.of(new Transformation(new Matrix4f()
                                 .translate(0.5f, 0.5f, 0.5f)
-                                .scale(1, 1, 0.99f)
+                                .scale(1, 1, 0.1f)
                                 .translate(-0.5f, -0.5f, -0.5f)
                         )), List.of()),
                         new BasicItemModel(identifier.withPrefix("item/").withSuffix("_outer")),
                         fluidModelSwitch.transformation(new Matrix4f()
                                 .translate(0.5f, 0.5f, 0.5f)
-                                .scale(1, 1, 0.995f)
+                                .scale(1, 1, 0.75f)
                                 .translate(-0.5f, -0.5f, -0.5f)
                         ).build()
                 )), ItemAsset.Properties.DEFAULT));

@@ -8,6 +8,7 @@ import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;
 import eu.pb4.polyfactory.recipe.input.FluidContainerInput;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
+import net.minecraft.util.ExtraCodecs;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public record RemovingFluidInteractionRecipe(List<FluidInputStack> fluidInput, O
                                              Optional<Holder<SoundEvent>> soundEvent, float particleChance,
                                              float minTemperature, float maxTemperature) implements FluidInteractionRecipe {
     public static final MapCodec<RemovingFluidInteractionRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            FluidInputStack.CODEC.listOf().fieldOf("fluid_input").forGetter(RemovingFluidInteractionRecipe::fluidInput),
+            ExtraCodecs.compactListCodec(FluidInputStack.CODEC).fieldOf("fluid_input").forGetter(RemovingFluidInteractionRecipe::fluidInput),
             ParticleTypes.CODEC.optionalFieldOf("particle").forGetter(RemovingFluidInteractionRecipe::particleEffect),
             SoundEvent.CODEC.optionalFieldOf("sound_event").forGetter(RemovingFluidInteractionRecipe::soundEvent),
             Codec.FLOAT.optionalFieldOf("particle_chance", 0f).forGetter(RemovingFluidInteractionRecipe::particleChance),

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.TriState;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
@@ -32,7 +33,7 @@ public record GenericPressRecipe(String group, CountedIngredient inputA, Counted
                     CountedIngredient.CODEC.optionalFieldOf("input_b", CountedIngredient.EMPTY).forGetter(GenericPressRecipe::inputB),
                     OutputStack.LIST_CODEC.fieldOf("output").forGetter(GenericPressRecipe::output),
                     Codec.DOUBLE.optionalFieldOf("minimum_speed", 0d).forGetter(GenericPressRecipe::minimumSpeed),
-                    FluidStack.CODEC.listOf().optionalFieldOf("output_fluids", List.of()).forGetter(GenericPressRecipe::outputFluids),
+                    ExtraCodecs.compactListCodec(FluidStack.CODEC).optionalFieldOf("output_fluids", List.of()).forGetter(GenericPressRecipe::outputFluids),
                     TriState.CODEC.optionalFieldOf("require_fluid_output", TriState.DEFAULT).forGetter(GenericPressRecipe::requireFluidOutput)
             ).apply(x, GenericPressRecipe::new)
     );
