@@ -42,7 +42,7 @@ jobs:
           name: Artifacts
           path: build/libs/
       - name: Build and publish with Gradle
-        run: ./gradlew build publish
+        run: ./gradlew runDatagen build publish
         env:
           MODRINTH: ${{ secrets.MODRINTH }}
           CHANGELOG: ${{ github.event.release.body }}
