@@ -2,6 +2,7 @@
 title=Erste Schritte
 icon=player_head
 category=polyfactory:basics
+order=0
 ### EndSection: PageInfo
 
 PolyFactory ist eine serverseitige Tech-Mod, die weitere Möglichkeiten zur Automatisierung und Herstellung von Dingen hinzufügt.

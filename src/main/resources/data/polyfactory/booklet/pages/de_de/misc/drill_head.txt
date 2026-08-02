@@ -1,0 +1,16 @@
+### Section: PageInfo
+title=Bohrköpfe
+icon=polyfactory:iron_drill_head
+category=polyfactory:misc
+order=20
+### EndSection: PageInfo
+Ein <yellow>Bohrkopf</> ist ein Gegenstand zum Abbauen von Blöcken. Allein lässt er sich nicht verwenden, sondern muss in einen
+<pageref '/rotation/mechanical_miner'> oder einen <pageref './portable_drill'> eingesetzt werden.
+<nl2>
+Bohrköpfe ersetzen sowohl Spitzhacke als auch Schaufel und existieren für die (entsprechend kompatiblen) Spitzhacken aus Kupfer und besseren Materialien.
+Sie haben zudem eine höhere Haltbarkeit (2,5-fach bei den Metallstufen, 2,25-fach bei Diamant und Netherit) und bauen 50% schneller ab.
+<nl>
+Bohrköpfe lassen sich verzaubern und nehmen dieselben Verzauberungen an wie eine normale Spitzhacke.
+
+### Align: Center
+<u><blue><polydex '#polyfactory:drill_heads' search>Zeige die Bohrkopf-Rezepte</><nl>

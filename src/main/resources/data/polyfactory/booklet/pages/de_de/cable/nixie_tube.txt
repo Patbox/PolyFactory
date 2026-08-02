@@ -1,0 +1,23 @@
+### Section: PageInfo
+title=<item 'polyfactory:nixie_tube'>
+icon=polyfactory:nixie_tube
+category=polyfactory:cable
+order=20
+### EndSection: PageInfo
+Die <yellow><item 'polyfactory:nixie_tube'></> ist ein Datenempfängerblock, mit dem sich Text in der Welt anzeigen lässt.
+Der Block kann selbst keine Daten empfangen und benötigt dafür die <yellow><item 'polyfactory:nixie_tube_controller'></>.
+<nl2>
+Die Textfarbe der <item 'polyfactory:nixie_tube'> lässt sich ändern, indem du einen Farbstoff oder eine Sprühdose direkt auf dem Block benutzt.
+Außerdem kannst du mit einem umbenannten Namensschild ihren Text setzen, ohne sie mit der Steuerung zu verbinden.
+<nl2>
+Um eine <item 'polyfactory:nixie_tube_controller'> anzuschließen, platzierst du sie so, dass sie sich sichtbar mit den Nixie-Röhren verbindet.
+Danach kannst du entweder Kabel und Datenquellen an die Steuerung anschließen oder sie mit dem <pageref '/basics/wrench'> konfigurieren.
+Zur Auswahl stehen unter anderem Kanal, Ausrichtung, Scrollgeschwindigkeit des Textes (0 deaktiviert sie) und die Scroll-Schleife
+(ob der Text nach dem Durchlauf wieder von vorn beginnen soll). Damit lassen sich interessant aussehende Textanzeigen bauen.
+
+### Image: polyfactory:cable/nixie_tube Beispiel für gefärbte Nixie-Röhren.
+
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:nixie_tube'>Zeige das <item 'polyfactory:nixie_tube'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:nixie_tube_controller'>Zeige das <item 'polyfactory:nixie_tube_controller'>-Rezept</>

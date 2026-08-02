@@ -2,6 +2,7 @@
 title=<item 'polyfactory:casting_table'>
 icon=polyfactory:casting_table
 category=polyfactory:fluids
+order=60
 ### EndSection: PageInfo
 Der <yellow><item 'polyfactory:casting_table'></> ist ein Block, mit dem du Dinge mithilfe von Flüssigkeiten herstellen kannst.
 <nl2>

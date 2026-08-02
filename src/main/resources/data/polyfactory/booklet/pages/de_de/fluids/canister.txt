@@ -1,0 +1,27 @@
+### Section: PageInfo
+title=<lang 'item.polyfactory.canister'>
+icon=polyfactory:canister
+category=polyfactory:fluids
+order=100
+### EndSection: PageInfo
+Der <yellow><lang 'item.polyfactory.canister'></> ist ein Werkzeug, mit dem sich Flüssigkeiten bequem aufnehmen und transportieren lassen.
+<nl2>
+Er kann bis zu 2 Eimer an Flüssigkeit speichern und auch verschiedene Flüssigkeitstypen gleichzeitig enthalten,
+wobei einige miteinander reagieren können.
+<nl2>
+Beim Benutzen an Blöcken, die Flüssigkeitsinteraktion in der Welt erlauben, gießt er seine gesamte Flüssigkeit in den Block.
+<nl>
+Um Flüssigkeit aus ihnen zu entnehmen (sofern sie das zulassen), schlage den Block an, während du den Kanister hältst.
+<nl>
+Die oberste Flüssigkeit wechselst du, indem du den Kanister benutzt, ohne dabei etwas anzuvisieren.
+<nl>
+Dieselbe Steuerung gilt auch in Inventar-Fenstern.
+
+### Header: Steuerung
+### Align: Center
+Benutze ['<key 'key.use'>], ohne einen benutzbaren Block anzuvisieren, um die Reihenfolge der Flüssigkeiten zu ändern<nl>
+Benutze ['<key 'key.use'>], während du einen benutzbaren Block oder eine Flüssigkeitsanzeige anvisierst, um die oberste Flüssigkeit in den Behälter zu gießen<nl>
+Benutze ['<key 'key.attack'>], während du einen benutzbaren Block oder eine Flüssigkeitsanzeige anvisierst, um den Kanister mit der obersten Flüssigkeit des Behälters zu füllen<nl>
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:canister'>Zeige das <lang 'item.polyfactory.canister'>-Rezept</>

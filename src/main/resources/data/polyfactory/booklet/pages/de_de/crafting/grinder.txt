@@ -2,6 +2,7 @@
 title=<item 'polyfactory:grinder'>
 icon=polyfactory:grinder
 category=polyfactory:crafting
+order=10
 ### EndSection: PageInfo
 Das <yellow><item 'polyfactory:grinder'></> ist ein Herstellungs-Maschinenblock, der Rotationsenergie benötigt.
 Es ist eine der ersten Maschinen, die du herstellen kannst (und musst). Es hat einen Eingabe- und 3 Ausgabeslots.

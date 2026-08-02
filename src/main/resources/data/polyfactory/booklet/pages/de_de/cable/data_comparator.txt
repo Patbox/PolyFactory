@@ -1,0 +1,32 @@
+### Section: PageInfo
+title=<item 'polyfactory:data_comparator'>
+icon=polyfactory:data_comparator
+category=polyfactory:cable
+order=51
+### EndSection: PageInfo
+Der <yellow><item 'polyfactory:data_comparator'></> ist ein Datenumwandlungsblock mit zwei Eingängen und einem Ausgang,
+mit dem du die eingehenden Daten miteinander vergleichen kannst.
+<nl2>
+Alle Ein- und Ausgänge sind auf den Blocktexturen sichtbar gekennzeichnet: Eingang A ist ein nach innen zeigender roter Pfeil,
+Eingang B ein nach innen zeigender blauer Pfeil, und der Ausgang wird durch zwei nach außen zeigende grüne Pfeile dargestellt.
+<nl>
+Bei allen Ein-/Ausgängen lassen sich Richtung und Kanal frei einstellen, inklusive voller Unterstützung für Überlappungen und Rückkopplungsschleifen.
+Zusätzlich lassen sich Eingänge deaktivieren, indem du ihren Kanal auf X setzt – dann wird für die nächste Operation der letzte gültige Eingabewert weiterverwendet.
+<nl>
+Das alles sowie die Arbeitsweise des Blocks kannst du mit dem <pageref '/basics/wrench'> einstellen.
+<nl2>
+Dieser Block unterstützt folgende Operationen:
+- Gleich – prüft, ob die Datenwerte identisch sind (a == b),
+- Ungleich – prüft, ob die Datenwerte verschieden sind (a != b),
+- Kleiner als – prüft, ob Wert A kleiner als Wert B ist (a < b),
+- Kleiner oder gleich – prüft, ob Wert A kleiner oder gleich Wert B ist (a <= b),
+- Größer als – prüft, ob Wert A größer als Wert B ist (a > b),
+- Größer oder gleich – prüft, ob Wert A größer oder gleich Wert B ist (a >= b).
+<nl2>
+Bei unterschiedlichen Typen kann der Vergleich etwas willkürlich ausfallen.
+In dem Fall solltest du den <pageref './data_extractor'> verwenden, um gezielt die Eigenschaft auszuwählen, die du wirklich brauchst.
+Alternativ kannst du den strengen Modus aktivieren, wodurch Vergleiche bei unterschiedlichen Datentypen immer fehlschlagen.
+
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:data_comparator'>Zeige das <item 'polyfactory:data_comparator'>-Rezept</>

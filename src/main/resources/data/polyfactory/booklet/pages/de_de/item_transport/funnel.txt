@@ -2,6 +2,7 @@
 title=<item 'polyfactory:funnel'>
 icon=polyfactory:funnel
 category=polyfactory:item_transport
+order=21
 ### EndSection: PageInfo
 Der <yellow><item 'polyfactory:funnel'></> ist ein Block, der Gegenstände zwischen Behältern und dem
 <u><blue><pagelink 'polyfactory:item_transport/conveyor'><item 'polyfactory:conveyor'></*> transportiert.

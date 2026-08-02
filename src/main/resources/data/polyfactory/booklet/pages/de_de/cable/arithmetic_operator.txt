@@ -1,0 +1,35 @@
+### Section: PageInfo
+title=<item 'polyfactory:arithmetic_operator'>
+icon=polyfactory:arithmetic_operator
+category=polyfactory:cable
+order=50
+### EndSection: PageInfo
+Der <yellow><item 'polyfactory:arithmetic_operator'></> ist ein Datenumwandlungsblock mit zwei Eingängen und einem Ausgang,
+mit dem du mathematische und ähnliche Operationen auf eingehende Daten anwenden kannst.
+<nl2>
+Alle Ein- und Ausgänge sind auf den Blocktexturen sichtbar gekennzeichnet: Eingang A ist ein nach innen zeigender roter Pfeil,
+Eingang B ein nach innen zeigender blauer Pfeil, und der Ausgang wird durch zwei nach außen zeigende grüne Pfeile dargestellt.
+<nl>
+Bei allen Ein-/Ausgängen lassen sich Richtung und Kanal frei einstellen, inklusive voller Unterstützung für Überlappungen und Rückkopplungsschleifen.
+Zusätzlich lassen sich Eingänge deaktivieren, indem du ihren Kanal auf X setzt – dann wird für die nächste Operation der letzte gültige Eingabewert weiterverwendet.
+<nl>
+Das alles sowie die Arbeitsweise des Blocks kannst du mit dem <pageref '/basics/wrench'> einstellen.
+<nl2>
+Dieser Block unterstützt folgende Operationen:
+- Addition – beide Werte werden addiert (a + b),
+- Subtraktion – die Werte werden voneinander subtrahiert (a - b),
+- Multiplikation – beide Werte werden multipliziert (a * b),
+- Division – die Werte werden durcheinander dividiert (a / b),
+<nl2>
+Zusätzlich kannst (bzw. musst) du festlegen, mit welchen Datentypen der Block arbeitet. Unterstützt werden folgende Modi:
+- Ganzzahl – Eingaben werden in eine Ganzzahl umgewandelt (1, 2, 6, -10 usw.),
+- Dezimalzahl – Eingaben werden in Dezimalzahlen umgewandelt (1, 2.4, 6.1, -10.004 usw.),
+- Boolean – Eingaben werden in Wahrheitswerte umgewandelt (true/false bzw. 1/0),
+- Text – Eingaben werden in Text umgewandelt (`Hello world`, `2.8` usw.)
+<nl>
+Bei komplexen Typen wird versucht, sie direkt auf den nacktesten Wert zu reduzieren, was nicht immer das gewünschte Ergebnis liefert.
+In dem Fall solltest du den <pageref './data_extractor'> verwenden, um gezielt die Eigenschaft auszuwählen, die du wirklich brauchst.
+
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:arithmetic_operator'>Zeige das <item 'polyfactory:arithmetic_operator'>-Rezept</>

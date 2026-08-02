@@ -1,0 +1,22 @@
+### Section: PageInfo
+title=<item 'polyfactory:portable_drill'>
+icon=polyfactory:portable_drill[polyfactory:drill_attachment='polyfactory:diamond_drill_head']
+category=polyfactory:misc
+order=21
+### EndSection: PageInfo
+Der <yellow><item 'polyfactory:portable_drill'></> ist ein Gegenstand, mit dem sich Blöcke abbauen lassen, sobald du ihn
+mit <u><blue><pagelink './drill_head'>einem Bohrkopf</*> kombinierst – dessen Eigenschaften übernimmt er dann.
+Ohne Bohrkopf oder ohne einen mit Biodiesel gefüllten <pageref '/fluids/portable_fluid_tank'> kann er überhaupt keine Blöcke abbauen.
+<nl2>
+Per Rechtsklick wechselst du seinen Abbaumodus. Zur Auswahl stehen:
+- Einzeln – baut einen einzelnen Block ab.
+- Bereich 2x2 – baut einen 2x2x1 großen Bereich ausgehend von dem Block ab, den der Spieler zerstört. Benötigt pro Einsatz 3-mal so viel Kraftstoff wie der Einzelmodus.
+- Bereich 3x3 – baut einen 3x3x1 großen Bereich ausgehend von dem Block ab, den der Spieler zerstört. Benötigt pro Einsatz 5-mal so viel Kraftstoff wie der Einzelmodus.
+<nl2>
+Außerdem hat er eine geringere Abbaureichweite als normale Werkzeuge wie Spitzhacke oder Schaufel.
+
+
+### Align: Center
+<u><blue><polydex 'polyfactory:portable_drill'>Zeige das <item 'polyfactory:portable_drill'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:biodiesel'>Zeige das <lang 'fluid_type.polyfactory.biodiesel'>-Rezept</><nl>
+<u><blue><polydex '#polyfactory:drill_heads' search>Zeige die Bohrkopf-Rezepte</><nl>

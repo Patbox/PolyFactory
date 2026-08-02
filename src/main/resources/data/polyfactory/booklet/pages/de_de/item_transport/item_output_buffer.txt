@@ -2,6 +2,7 @@
 title=<item 'polyfactory:item_output_buffer'>
 icon=polyfactory:item_output_buffer
 category=polyfactory:item_transport
+order=30
 ### EndSection: PageInfo
 Der <yellow><item 'polyfactory:item_output_buffer'></> ist ein Lagerblock, der als Erweiterung
 der Ausgabeslots angeschlossener Herstellungsmaschinen dient. Er kann bis zu 18 Stapel speichern.

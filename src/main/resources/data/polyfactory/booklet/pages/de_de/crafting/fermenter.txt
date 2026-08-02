@@ -1,0 +1,21 @@
+### Section: PageInfo
+title=<item 'polyfactory:fermenter'>
+icon=polyfactory:fermenter
+category=polyfactory:crafting
+order=90
+### EndSection: PageInfo
+Der <yellow><item 'polyfactory:fermenter'></> ist ein 1x2x1 großer Maschinenblock, mit dem sich bestimmte Gegenstände zu anderen Gegenständen und Flüssigkeiten fermentieren lassen.
+<nl2>
+Dieser Block kann bis zu 6 Gegenstände gleichzeitig verarbeiten und dabei 6 Stapel an Ausgabegegenständen sowie 2 Eimer an Ausgabeflüssigkeit aufnehmen.
+Flüssigkeiten lassen sich daher nur entnehmen und nicht wieder einfüllen.
+<nl>
+Der Block wird vor allem zur Herstellung von <yellow><lang 'fluid_type.polyfactory.ethanol'></*> genutzt, <u><blue><polydex 'polyfactory:ethanol' usage>das sich dann in weiteren Rezepten verwenden lässt</*>.
+Außerdem für <yellow><item 'polyfactory:cheese_wheel'></>.
+<nl2>
+Dieser Block benötigt keine Rotationsenergie, arbeitet mit ihr aber schneller. Seine Belastung beträgt bei Aktivität immer 5 Einheiten.
+<nl>
+Förderbänder können ebenfalls direkt aus dem Block entnehmen bzw. in ihn einfüllen, solange sie korrekt ausgerichtet sind.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:fermenter'>Zeige das <item 'polyfactory:fermenter'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:recipe_type/fermenter' 'category'>Zeige die Rezepte dieses Blocks</>

@@ -2,6 +2,7 @@
 title=<item 'polyfactory:pipe'>
 icon=polyfactory:pipe
 category=polyfactory:fluids
+order=10
 ### EndSection: PageInfo
 Das <yellow><item 'polyfactory:pipe'></> ist ein Block zum Transport von Flüssigkeiten – für Lagerung,
 Platzierung/Entwässerung und Herstellungszwecke.

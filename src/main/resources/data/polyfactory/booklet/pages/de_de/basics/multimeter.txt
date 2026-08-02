@@ -1,0 +1,22 @@
+### Section: PageInfo
+title=<item 'polyfactory:multimeter'>
+icon=polyfactory:multimeter
+category=polyfactory:basics
+order=20
+### EndSection: PageInfo
+Das <yellow><item 'polyfactory:multimeter'></> ist ein Werkzeug, mit dem du den Zustand von Maschinen und Blöcken einfach ablesen kannst.
+<nl2>
+Während du es hältst und auf einen kompatiblen Block oder eine Entität schaust, erscheint eine Seitenleiste mit allen verfügbaren Eigenschaften.
+Derzeit werden unterstützt:
+- Redstone-Signalstärke,
+- Rotationsgeschwindigkeit, Belastungskapazität und aktive Belastung,
+- Name des Datennetzwerks (falls der Block gleichzeitig mit mehreren Netzwerken verbunden ist),
+- Anzahl der Datenanbieter und Datenempfänger je Kanal,
+- Stärke des Rohrflusses für jede Richtung,
+- aktueller Maschinenzustand (wird auch beim Überfahren in Polydex angezeigt),
+- Füllstand bei unterstützten Blöcken (wird auch beim Überfahren in Polydex angezeigt),
+- ...? ;-)
+
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:multimeter'>Zeige das <item 'polyfactory:multimeter'>-Rezept</>

@@ -2,6 +2,7 @@
 title=<item 'polyfactory:mechanical_spout'>
 icon=polyfactory:mechanical_spout
 category=polyfactory:crafting
+order=70
 ### EndSection: PageInfo
 Der <yellow><item 'polyfactory:mechanical_spout'></> ist ein 1x2x1-Maschinenblock, mit dem du Dinge mithilfe von Flüssigkeiten herstellen kannst.
 <nl2>

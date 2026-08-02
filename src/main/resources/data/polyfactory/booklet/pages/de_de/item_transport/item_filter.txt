@@ -2,6 +2,7 @@
 title=Gegenstandsfilter
 icon=polyfactory:item_filter
 category=polyfactory:item_transport
+order=10
 ### EndSection: PageInfo
 Der <yellow>Gegenstandsfilter</> ist ein Gegenstand, mit dem du einschränken kannst, welche Gegenstände von
 <item 'hopper'>, <item 'polyfactory:funnel'> und <item 'polyfactory:item_splitter'> akzeptiert werden.

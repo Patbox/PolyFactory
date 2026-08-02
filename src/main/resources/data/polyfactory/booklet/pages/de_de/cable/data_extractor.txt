@@ -1,0 +1,30 @@
+### Section: PageInfo
+title=<item 'polyfactory:data_extractor'>
+icon=polyfactory:data_extractor
+category=polyfactory:cable
+order=40
+### EndSection: PageInfo
+Der <yellow><item 'polyfactory:data_extractor'></> ist ein Datenumwandlungsblock mit einem Eingang und einem Ausgang,
+mit dem du gezielt Daten bzw. Felder aus komplexen Datentypen herauslösen kannst.
+<nl2>
+Ein- und Ausgang sind auf den Blocktexturen sichtbar gekennzeichnet: der Eingang durch zwei nach innen zeigende rote Pfeile
+und der Ausgang durch zwei nach außen zeigende grüne Pfeile.
+<nl>
+Bei allen Ein-/Ausgängen lassen sich Richtung und Kanal frei einstellen, inklusive voller Unterstützung für Überlappungen und Rückkopplungsschleifen.
+<nl>
+Das alles sowie die Arbeitsweise des Blocks kannst du mit dem <pageref '/basics/wrench'> einstellen.
+<nl2>
+Welches Feld extrahiert wird, stellst du ein, indem du den Block einfach direkt benutzt (der <item 'polyfactory:wrench'> funktioniert aber ebenfalls).
+Es öffnet sich ein Textfeld, in dem du angibst, welche Daten du brauchst. Beispiele für das Format und die unterstützten Extraktionen
+findest du in den Symbolen unten: Sie zeigen den Namen des Datentyps sowie die von ihm unterstützten Felder. Das erste Symbol zeigt zusätzlich
+die Felder, die sich aus allen Datentypen extrahieren lassen.
+<nl>
+Extrahierst du zum Beispiel `type` aus den Daten eines <item 'polyfactory:item_reader'>, erhältst du die ID des Gegenstands (etwa `polyfactory:guidebook`
+für <item 'polyfactory:guidebook'>).
+<nl>
+Einige Extraktionstypen unterstützen zudem Argumente, mit denen du noch genauer auswählen kannst, was extrahiert wird
+(zum Beispiel liefert `substring:2.7` bei `Hello World` das Ergebnis `llo W`).
+
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:data_extractor'>Zeige das <item 'polyfactory:data_extractor'>-Rezept</>

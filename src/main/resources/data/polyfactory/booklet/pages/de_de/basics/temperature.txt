@@ -2,6 +2,7 @@
 title=Temperatur
 icon=blaze_powder[item_model='polyfactory:-/sgui/elements/gen/flame_13']
 category=polyfactory:basics
+order=50
 ### EndSection: PageInfo
 
 <yellow>Temperatur</> ist eine Mechanik, die von einigen Maschinen bei der Herstellung genutzt wird. Sie wird durch das Biom

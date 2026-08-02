@@ -2,6 +2,7 @@
 title=<item 'polyfactory:fluid_tank'>
 icon=polyfactory:fluid_tank
 category=polyfactory:fluids
+order=20
 ### EndSection: PageInfo
 Der <yellow><item 'polyfactory:fluid_tank'></> ist ein Block zur Lagerung von Flüssigkeiten.
 <nl2>

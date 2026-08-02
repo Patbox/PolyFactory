@@ -2,6 +2,7 @@
 title=<item 'polyfactory:mixer'>
 icon=polyfactory:mixer
 category=polyfactory:crafting
+order=30
 ### EndSection: PageInfo
 Der <yellow><item 'polyfactory:mixer'></> ist ein 1x2x1-Herstellungs-Maschinenblock, der Rotationsenergie benötigt.
 Er hat 6 Eingabeslots, 2 Eimer Flüssigkeitsspeicher und 3 Ausgabeslots. Dieser Block nutzt das
