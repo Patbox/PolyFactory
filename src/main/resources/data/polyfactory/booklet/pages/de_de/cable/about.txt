@@ -2,6 +2,7 @@
 title=Über das Datensystem
 icon=polyfactory:cable[polyfactory:color=0x00FF00]
 category=polyfactory:cable
+order=0
 ### EndSection: PageInfo
 
 Das <yellow>Datensystem</> ist die Hauptmethode zur Übertragung, Verarbeitung und Anzeige von Informationen und ermöglicht eine bessere Automatisierung

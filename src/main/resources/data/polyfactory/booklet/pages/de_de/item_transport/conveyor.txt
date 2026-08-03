@@ -2,6 +2,7 @@
 title=<item 'polyfactory:conveyor'>
 icon=polyfactory:conveyor
 category=polyfactory:item_transport
+order=20
 ### EndSection: PageInfo
 Das <yellow><item 'polyfactory:conveyor'></> ist ein Block zum Transport von Gegenständen und Entitäten.
 Es benötigt <u><blue><pagelink 'polyfactory:rotation/about'>Rotationsenergie</*>, nutzt aber nur die

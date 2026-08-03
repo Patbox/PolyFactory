@@ -2,6 +2,7 @@
 title=<item 'polyfactory:press'>
 icon=polyfactory:press
 category=polyfactory:crafting
+order=20
 ### EndSection: PageInfo
 Die <yellow><item 'polyfactory:press'></> ist ein 1x2x1-Herstellungs-Maschinenblock, der Rotationsenergie benötigt.
 Sie hat 2 Eingänge (Haupt- und Kopfeingang) und 1 Ausgabeslot. Sie kann auch Flüssigkeiten ausgeben, wenn ein <item 'polyfactory:drain'>

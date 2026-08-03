@@ -2,6 +2,7 @@
 title=<item 'polyfactory:splitter'>
 icon=polyfactory:splitter
 category=polyfactory:item_transport
+order=25
 ### EndSection: PageInfo
 Der <yellow><item 'polyfactory:splitter'></> ist ein Verteilungsblock, der auf dem
 <u><blue><pagelink 'polyfactory:item_transport/conveyor'><item 'polyfactory:conveyor'></*> arbeitet.

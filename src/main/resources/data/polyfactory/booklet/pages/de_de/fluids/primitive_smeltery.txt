@@ -2,6 +2,7 @@
 title=<item 'polyfactory:primitive_smeltery'>
 icon=polyfactory:primitive_smeltery
 category=polyfactory:fluids
+order=50
 ### EndSection: PageInfo
 Die <yellow><item 'polyfactory:primitive_smeltery'></> ist ein 1x2x1-Block zum Einschmelzen bestimmter Materialien.
 <nl>

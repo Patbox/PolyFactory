@@ -2,6 +2,7 @@
 title=<item 'polyfactory:deep_storage_container'>
 icon=polyfactory:deep_storage_container
 category=polyfactory:item_transport
+order=80
 ### EndSection: PageInfo
 Der <yellow><item 'polyfactory:deep_storage_container'></> ist ein 2x2x2-Lagerblock.
 <nl2>

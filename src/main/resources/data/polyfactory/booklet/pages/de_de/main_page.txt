@@ -1,7 +1,9 @@
 ### Section: PageInfo
 title=<lang 'item.polyfactory.guidebook'>
 description=<lang 'item.polyfactory.guidebook.desc'>
+category=booklet:main_page
 icon=polyfactory:guidebook
+model_override=polyfactory:guidebook
 ### EndSection: PageInfo
 ### Header: <lang booklet_category.polyfactory.basics>
 ### Category Entries: polyfactory:basics

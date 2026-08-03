@@ -2,6 +2,7 @@
 title=<item 'polyfactory:smeltery'>
 icon=polyfactory:smeltery
 category=polyfactory:fluids
+order=51
 ### EndSection: PageInfo
 Die <yellow><item 'polyfactory:smeltery'></> ist ein 3x3x3-Multiblock zum Einschmelzen bestimmter Materialien.
 <nl>

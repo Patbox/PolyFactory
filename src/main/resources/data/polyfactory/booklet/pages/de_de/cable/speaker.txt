@@ -1,0 +1,28 @@
+### Section: PageInfo
+title=<item 'polyfactory:speaker'> / <item 'polyfactory:record_player'>
+icon=polyfactory:speaker
+category=polyfactory:cable
+order=80
+### EndSection: PageInfo
+Der <yellow><item 'polyfactory:speaker'></> ist ein Datenempfängerblock, mit dem du Klänge abspielen kannst.
+<nl2>
+Um Klänge abzuspielen, musst du Text-Daten in einem dieser Formate senden:
+<nl>
+<gray><red>\<instrument\></> n<yellow>\<note></> <pink><volume></*><nl>
+<gray><red>\<instrument\></> n<yellow>\<note></></*><nl>
+<gray><red>\<instrument\></> <yellow>\<pitch></> <pink><volume></*><nl>
+<gray><red>\<instrument\></> <yellow>\<pitch></></*><nl>
+Dabei ist `<instrument>` der Blockzustands- bzw. Textname des Instruments (zum Beispiel `bell`),
+`<note>` eine Notenblock-Note (von 0 bis 24), `<pitch>` die rohe Klangtonhöhe und `<volume>` die Lautstärke (von 0 bis 1.5).
+Beispieldaten sähen so aus: `banjo n12 0.8`.
+<nl2>
+Du kannst auch den unten beschriebenen <item 'polyfactory:record_player'> verwenden, um beliebige Schallplatten abzuspielen.
+<nl2><nl>
+Der <yellow><item 'polyfactory:record_player'></> ist ein Datenanbieterblock, mit dem du Musik über das Kabel-Datennetzwerk
+abspielen kannst. Er gibt den Klang nicht selbst aus, sondern benötigt dafür angeschlossene <item 'polyfactory:speaker'>-Blöcke.
+Ansonsten verhält er sich ziemlich ähnlich wie ein gewöhnlicher <item 'minecraft:jukebox'>.
+
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:speaker'>Zeige das <item 'polyfactory:speaker'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:record_player'>Zeige das <item 'polyfactory:record_player'>-Rezept</>

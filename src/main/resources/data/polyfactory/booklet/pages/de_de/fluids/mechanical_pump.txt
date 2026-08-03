@@ -2,6 +2,7 @@
 title=<item 'polyfactory:pump'>
 icon=polyfactory:pump
 category=polyfactory:fluids
+order=11
 ### EndSection: PageInfo
 Die <yellow><item 'polyfactory:pump'></> ist ein Block, der den <u><blue><pagelink './copper_pipe'>Rohr-Flüssigkeitstransport</*> antreibt.
 <nl>

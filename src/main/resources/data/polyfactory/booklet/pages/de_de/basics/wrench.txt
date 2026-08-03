@@ -2,6 +2,7 @@
 title=<item 'polyfactory:wrench'>
 icon=polyfactory:wrench
 category=polyfactory:basics
+order=10
 ### EndSection: PageInfo
 Der <yellow><item 'polyfactory:wrench'></> ist ein Werkzeug zum Konfigurieren und Verändern bestimmter Blöcke und Entitäten.
 <nl2>

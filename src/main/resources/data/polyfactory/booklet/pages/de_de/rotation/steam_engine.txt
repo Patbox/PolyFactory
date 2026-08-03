@@ -12,7 +12,7 @@ Zum Betrieb muss einfach ein ofenkompatibler Brennstoff eingelegt werden.
 <nl>
 Mit Brennstoff benötigt sie 10 Sekunden, um ihre volle Kapazität zu erreichen,
 wobei der Brennstoff anfangs deutlich schneller verbrannt wird. Sie verbraucht Brennstoff 16-mal schneller
-als ein Ofen und liefert eine Rotationsgeschwindigkeit von 110 RPM sowie eine Belastungskapazität von 100 u.
+als ein Ofen und liefert eine Rotationsgeschwindigkeit von 110 U/min sowie eine Belastungskapazität von 100 u.
 <nl2>
 Standardmäßig aktiviert sie sich automatisch mit Brennstoff. Du kannst sie aber auch so einstellen,
 dass sie ein aktives Redstone-Signal zum Starten benötigt.

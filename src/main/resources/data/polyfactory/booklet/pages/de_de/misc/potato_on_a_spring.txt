@@ -1,0 +1,17 @@
+### Section: PageInfo
+title=<item 'polyfactory:tiny_potato_spring'>
+icon=polyfactory:tiny_potato_spring
+category=polyfactory:misc
+order=9999
+### EndSection: PageInfo
+Die <yellow><item 'polyfactory:tiny_potato_spring'></> ist ein *dekorativer* Block, der als Wackelfigur unserer geliebten Tiny Potato dient,
+dem Adoptiv-Maskottchen des <u><blue><url 'https://fabricmc.net/'>Fabric-Projekts</*>.
+Sie stammt ursprünglich aus der <u><blue><url 'https://botaniamod.net/'>Botania-Mod</*>.
+<nl>
+Es gibt außerdem eine goldene Variante dieses Blocks, die sich nur optisch unterscheidet.
+<nl2>
+<gray><i>Vielleicht birgt sie das eine oder andere Geheimnis...</*>
+
+### Align: Center
+<u><blue><polydex 'polyfactory:tiny_potato_spring'>Zeige das <item 'polyfactory:tiny_potato_spring'>-Rezept</><nl>
+<u><blue><polydex 'polyfactory:golden_tiny_potato_spring'>Zeige das <item 'polyfactory:golden_tiny_potato_spring'>-Rezept</><nl>
