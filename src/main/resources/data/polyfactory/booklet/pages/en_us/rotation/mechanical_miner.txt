@@ -2,10 +2,11 @@
 title=<item 'polyfactory:miner'>
 icon=polyfactory:miner
 category=polyfactory:rotation
+order=100
 ### EndSection: PageInfo
 <yellow><item 'polyfactory:miner'></> is a rotational block that allows you to mine blocks and attack entities.
 <nl2>
-To do so, you need to first put a compatible tool into it. The damage and mining speed depends on the tool used.
+To do so, you need to first put a compatible tool or any of the <pageref '/misc/drill_head'> into it. The damage and mining speed depends on the tool used.
 Tools used by this block will get damaged. Mining/Attacking works the same as if player did it, including all side effects
 and bonuses (like drops from mobs).
 <nl>

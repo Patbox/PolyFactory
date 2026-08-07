@@ -1,0 +1,24 @@
+### Section: PageInfo
+title=<item 'polyfactory:data_memory'>
+icon=polyfactory:data_memory
+category=polyfactory:cable
+order=40
+### EndSection: PageInfo
+<yellow><item 'polyfactory:data_memory'></> is a single input to single output data block allowing you
+to store and then retransmit last data it received.
+<nl2>
+Each input and output are visually indicated on the block textures, where Input is two inner facing red arrows
+and the Output is two outwards facing green arrows.
+<nl>
+All I/O connections have fully configurable direction and channel, with support for disabling the input by setting it's input direction to `None`.
+<nl>
+You can configure them, as well as how this block operates by using the <pageref '/basics/wrench'>.
+<nl2>
+Last data it receives on the input connection will be stored in it, overriding previously stored.
+To retransmit the data, you need to power this block with Redstone.
+<nl2>
+When broken, the stored data is preserved on the item, allowing you to define it in one place and then use in another.
+
+### Body:
+### Align: Center
+<u><blue><polydex 'polyfactory:data_memory'>View the <item 'polyfactory:data_memory'> recipe</>

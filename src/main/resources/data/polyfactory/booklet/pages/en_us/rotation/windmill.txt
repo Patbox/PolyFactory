@@ -2,6 +2,7 @@
 title=Windmill
 icon=polyfactory:windmill_sail
 category=polyfactory:rotation
+order=10
 ### EndSection: PageInfo
 <yellow>Windmill</> is one of the simpler power generating structures you can make.
 <nl>

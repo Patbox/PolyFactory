@@ -1,0 +1,5 @@
+- Doubled amount of items a single Item Filter can check for (from 9 to 18)
+- You can now use the Canister to milk cows.
+- Fixed Golden Drill Head missing its material name translation.
+- Fixed Fermenter crafting sometimes locking up or loosing items.
+- Fixed Fluid Drain not ticking fluid container logic.

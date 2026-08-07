@@ -2,6 +2,7 @@
 title=Steel Gears
 icon=polyfactory:steel_gear
 category=polyfactory:rotation
+order=20
 ### EndSection: PageInfo
 <yellow><item 'polyfactory:steel_gear'></> is a rotational transmission block and a crafting ingredient.
 It can be connected with other regular steel gears by placing them on the same plane, while pointing in

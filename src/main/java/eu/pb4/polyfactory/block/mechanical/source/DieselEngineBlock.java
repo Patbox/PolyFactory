@@ -33,6 +33,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -68,7 +69,7 @@ public class DieselEngineBlock extends NetworkBlock implements FactoryBlock, Ent
             BlockValueFormatter.text(RedstoneActivationType::asName), DieselEngineBlockEntity::getRedstoneActivationType,
             DieselEngineBlockEntity::setRedstoneActivationType, WrenchModifyBlockValue.enums(RedstoneActivationType.values()));
 
-    private static final BlockConfig<?> ENGINE_GEAR_CONFIG = BlockConfig.ofBlockEntity("engine_gear", Codec.INT, DieselEngineBlockEntity.class,
+    private static final BlockConfig<?> ENGINE_GEAR_CONFIG = BlockConfig.ofBlockEntity("engine_gear", ExtraCodecs.intRange(1, 5), DieselEngineBlockEntity.class,
             BlockValueFormatter.str(String::valueOf), DieselEngineBlockEntity::getGear,
             DieselEngineBlockEntity::setGear, WrenchModifyBlockValue.simple(IntStream.rangeClosed(1, 5).boxed().toList()));
 

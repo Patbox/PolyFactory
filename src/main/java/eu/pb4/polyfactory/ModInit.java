@@ -19,6 +19,7 @@ import eu.pb4.polyfactory.ui.GuiTextures;
 import eu.pb4.polyfactory.ui.UiResourceCreator;
 import eu.pb4.polyfactory.ui.fluid.HorizontalFluidTextures;
 import eu.pb4.polyfactory.util.*;
+import eu.pb4.polyfactory.util.filter.ItemFilters;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.block.FactoryBlocks;
@@ -67,6 +68,7 @@ public class ModInit implements ModInitializer {
 		FactoryEnchantmentEffectComponents.register();
 		FactoryDataComponents.register();
 		FactoryItems.register();
+		ItemFilters.bootstrap();
 		FactoryFluids.register();
 		FactoryEntities.register();
 		FactoryEffects.register();

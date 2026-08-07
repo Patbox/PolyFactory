@@ -11,6 +11,7 @@ import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.nodes.data.ChannelReceiverSelectiveSideNode;
 import eu.pb4.polyfactory.nodes.data.DataReceiverNode;
 import eu.pb4.polyfactory.util.FactoryUtil;
+import net.minecraft.util.ExtraCodecs;
 import org.jetbrains.annotations.Nullable;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
@@ -43,7 +44,7 @@ public class NixieTubeControllerBlock extends DirectionalCabledDataBlock impleme
             NixieTubeControllerBlockEntity::scrollLoop, NixieTubeControllerBlockEntity::setScrollLoop,
             WrenchModifyBlockValue.simple((x, n) -> !x)
     );
-    public static final BlockConfig<Integer> SCROLL_SPEED = BlockConfig.ofBlockEntity("scroll_speed", Codec.INT, NixieTubeControllerBlockEntity.class,
+    public static final BlockConfig<Integer> SCROLL_SPEED = BlockConfig.ofBlockEntity("scroll_speed", ExtraCodecs.intRange(0, 80), NixieTubeControllerBlockEntity.class,
             (x, world, pos, side, state) -> Component.translatable("text.polyfactory.char_per_sec", String.format(Locale.ROOT,"%.2f", x == 0f ? 0 : (20f / x))),
             NixieTubeControllerBlockEntity::scrollSpeed, NixieTubeControllerBlockEntity::setScrollSpeed,
             WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 1 : -1), 0, 80))

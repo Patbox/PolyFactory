@@ -1,10 +1,12 @@
 package eu.pb4.polyfactory.block.fluids;
 
 import eu.pb4.factorytools.api.block.BlockEntityExtraListener;
+import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.block.FactoryBlockEntities;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidContainer;
 import eu.pb4.polyfactory.fluid.FluidContainerImpl;
+import eu.pb4.polyfactory.fluid.FluidContainerUtil;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.component.FluidComponent;
 import eu.pb4.polyfactory.util.FactoryUtil;
@@ -15,6 +17,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -136,9 +140,11 @@ public class DrainBlockEntity extends BlockEntity implements FluidInputOutput.Co
     }
 
     public static <T extends BlockEntity> void ticker(Level world, BlockPos pos, BlockState state, T t) {
-        if (!(t instanceof DrainBlockEntity be)) {
+        if (!(t instanceof DrainBlockEntity be) || !(world instanceof ServerLevel serverLevel)) {
             return;
         }
+
+        FluidContainerUtil.tick(be.container, serverLevel, pos, BlockHeat.get(world, pos));
 
         if (world.isRainingAt(pos.above())) {
             // Actually done some math:

@@ -245,7 +245,7 @@ public class FermenterBlockEntity extends TallItemMachineBlockEntity implements 
             if (!stuck) {
                 var inv = new SimpleContainer(output.getContainerSize());
                 for (int a = 0; a < output.getContainerSize(); a++) {
-                    inv.setItem(a, output.getItem(i).copy());
+                    inv.setItem(a, output.getItem(a).copy());
                 }
 
                 for (var item : self.recipes[i].value().assembleStacks(input, level.getRandom(), false)) {

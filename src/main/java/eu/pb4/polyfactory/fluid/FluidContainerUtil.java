@@ -25,6 +25,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -44,32 +45,36 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public interface FluidContainerUtil {
-    static void tick(FluidContainer container, ServerLevel world, BlockPos pos, float temperature, Consumer<ItemStack> stack) {
-        tick(container, world, Vec3.atCenterOf(pos), temperature, stack);
+    static void tick(FluidContainer container, ServerLevel level, BlockPos pos, float temperature) {
+        tick(container, level, pos, temperature, stack -> Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack));
     }
 
-    static void tick(FluidContainer container, ServerLevel world, Vec3 pos, float temperature, Consumer<ItemStack> stackConsumer) {
+    static void tick(FluidContainer container, ServerLevel level, BlockPos pos, float temperature, Consumer<ItemStack> stack) {
+        tick(container, level, Vec3.atCenterOf(pos), temperature, stack);
+    }
+
+    static void tick(FluidContainer container, ServerLevel level, Vec3 pos, float temperature, Consumer<ItemStack> stackConsumer) {
         var input = FluidContainerInput.of(container, temperature);
-        var random = world.getRandom();
+        var random = level.getRandom();
         var list = new ArrayList<Pair<ResourceKey<Recipe<?>>, List<ItemStack>>>();
-        for (var entry : ((RecipeManagerAccessor) world.recipeAccess()).getRecipes().byType(FactoryRecipeTypes.FLUID_INTERACTION)) {
+        for (var entry : ((RecipeManagerAccessor) level.recipeAccess()).getRecipes().byType(FactoryRecipeTypes.FLUID_INTERACTION)) {
             var recipe = entry.value();
-            if (!entry.value().matches(input, world)) {
+            if (!entry.value().matches(input, level)) {
                 continue;
             }
             if (recipe.particleChance(input) < random.nextFloat()) {
                 var particle = recipe.particle(input, random);
                 if (particle != null) {
-                    world.sendParticles(particle, pos.x(), pos.y(), pos.z(), 0, 0.1, 0.1, 0.1, 0.1);
+                    level.sendParticles(particle, pos.x(), pos.y(), pos.z(), 0, 0.1, 0.1, 0.1, 0.1);
                 }
                 var sound = recipe.soundEvent(input, random);
                 if (sound != null) {
-                    world.playSound(null, pos.x(), pos.y(), pos.z(), sound, SoundSource.BLOCKS, 1, 1);
+                    level.playSound(null, pos.x(), pos.y(), pos.z(), sound, SoundSource.BLOCKS, 1, 1);
                 }
             }
-            var inputFluids = recipe.fluidInput(input, world.registryAccess());
-            var outputFluids = recipe.fluidOutput(input, world.registryAccess());
-            var outputItems = recipe.itemOutput(input, world.registryAccess());
+            var inputFluids = recipe.fluidInput(input, level.registryAccess());
+            var outputFluids = recipe.fluidOutput(input, level.registryAccess());
+            var outputItems = recipe.itemOutput(input, level.registryAccess());
 
             var item = new ArrayList<ItemStack>();
 
@@ -95,7 +100,7 @@ public interface FluidContainerUtil {
 
                 appliedTimes++;
 
-                if (!recipe.matches(input, world)) {
+                if (!recipe.matches(input, level)) {
                     break;
                 }
             }
@@ -103,11 +108,11 @@ public interface FluidContainerUtil {
             list.add(new Pair<>(entry.id(), item));
 
             if (appliedTimes > 0) {
-                recipe.applyEffects(world, input, appliedTimes, null, pos);
+                recipe.applyEffects(level, input, appliedTimes, null, pos);
             }
         }
 
-        if (!list.isEmpty() && FactoryUtil.getClosestPlayer(world, BlockPos.containing(pos), 16) instanceof ServerPlayer serverPlayer) {
+        if (!list.isEmpty() && FactoryUtil.getClosestPlayer(level, BlockPos.containing(pos), 16) instanceof ServerPlayer serverPlayer) {
             for (var entry : list) {
                 CriteriaTriggers.RECIPE_CRAFTED.trigger(serverPlayer, entry.getFirst(), entry.getSecond());
             }

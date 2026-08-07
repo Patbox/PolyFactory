@@ -28,6 +28,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -35,10 +36,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.entity.animal.cow.AbstractCow;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUtils;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -55,6 +59,24 @@ public class CanisterItem extends SimplePolymerItem {
         super(settings);
         var identifier = settings.itemIdOrThrow().identifier();
         PolymerResourcePackUtils.RESOURCE_PACK_AFTER_INITIAL_CREATION_EVENT.register(builder -> this.createItemAsset(builder, identifier));
+    }
+
+    @Override
+    public InteractionResult interactLivingEntity(ItemStack itemStack, Player player, LivingEntity target, InteractionHand type) {
+        var fluids = itemStack.get(FactoryDataComponents.FLUID);
+        if (fluids == null) {
+            return super.interactLivingEntity(itemStack, player, target, type);
+        }
+
+        if (target instanceof AbstractCow cow && !cow.isBaby() && fluids.isNotFull()) {
+            player.level().playSound(null, player, SoundEvents.COW_MILK, player.getSoundSource(), 1.0F, 1.0F);
+
+            itemStack.set(FactoryDataComponents.FLUID, fluids.insert(FactoryFluids.MILK.defaultInstance(), fluids.empty(), false).component());
+            player.setItemInHand(type, itemStack);
+            return InteractionResult.SUCCESS_SERVER;
+        }
+
+        return super.interactLivingEntity(itemStack, player, target, type);
     }
 
     @Override

@@ -57,8 +57,15 @@ public class ImprovedFilterItem extends AbstractFilterItem {
         tooltip.accept(stack.getOrDefault(FactoryDataComponents.ITEM_FILTER_MATCH, Match.STRICT).asName().withStyle(ChatFormatting.YELLOW));
         tooltip.accept(stack.getOrDefault(FactoryDataComponents.ITEM_FILTER_TYPE, Type.WHITELIST).asTooltip());
 
-        for (var filtered : getStacks(stack)) {
-            tooltip.accept(Component.literal(" ").append(filtered.getHoverName()).withStyle(ChatFormatting.GRAY));
+        var stacks = getStacks(stack);
+
+        var i = 0;
+        for (; i < Math.min(stacks.size(), 6); i++) {
+            tooltip.accept(Component.literal(" ").append(stacks.get(i).getHoverName()).withStyle(ChatFormatting.GRAY));
+        }
+
+        if (i != stacks.size()) {
+            tooltip.accept(Component.literal(" ").append(Component.translatable("item.container.more_items", stacks.size() - i)).withStyle(ChatFormatting.GRAY));
         }
     }
 
@@ -95,10 +102,10 @@ public class ImprovedFilterItem extends AbstractFilterItem {
             this.stack = stack;
             this.setTitle(GuiTextures.ITEM_FILTER.apply(Component.translatable(stack.getItem().getDescriptionId())));
 
-            for (int x = 0; x < 3; x++) {
+            for (int x = 0; x < 6; x++) {
                 for (int y = 0; y < 3; y++) {
-                    int i = x + y * 3;
-                    this.setSlot(x + 2 + y * 9, new GuiElement() {
+                    int i = x + y * 6;
+                    this.setSlot(x + 1 + y * 9, new GuiElement() {
                         @Override
                         public ItemStack getItemStack() {
                             var strict = stack.get(FactoryDataComponents.ITEM_FILTER_MATCH) == Match.STRICT;
@@ -117,8 +124,8 @@ public class ImprovedFilterItem extends AbstractFilterItem {
                 }
             }
 
-            this.setSlot(0 + 6, createButton(FactoryDataComponents.ITEM_FILTER_MATCH, Match.values(), Match::createButton));
-            this.setSlot(18 + 6, createButton(FactoryDataComponents.ITEM_FILTER_TYPE, Type.values(), Type::createButton));
+            this.setSlot(0 + 8, createButton(FactoryDataComponents.ITEM_FILTER_MATCH, Match.values(), Match::createButton));
+            this.setSlot(18 + 8, createButton(FactoryDataComponents.ITEM_FILTER_TYPE, Type.values(), Type::createButton));
 
             this.open();
         }

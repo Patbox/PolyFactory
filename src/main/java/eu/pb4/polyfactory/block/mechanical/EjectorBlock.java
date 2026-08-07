@@ -33,6 +33,7 @@ import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -68,11 +69,11 @@ public class EjectorBlock extends RotationalNetworkBlock implements FactoryBlock
     public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
     private static final List<BlockConfig<?>> WRENCH_ACTIONS = List.of(
             BlockConfig.FACING_HORIZONTAL,
-            BlockConfig.ofBlockEntity("angle", Codec.FLOAT, EjectorBlockEntity.class,
+            BlockConfig.ofBlockEntity("angle", ExtraCodecs.floatRange(10, 65), EjectorBlockEntity.class,
                     (x, world, pos, side, state) -> Component.literal(String.format(Locale.ROOT, "%.0f", x)),
                     EjectorBlockEntity::angle, EjectorBlockEntity::setAngle,
                     WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 5f : -5f), 10, 65))),
-            BlockConfig.ofBlockEntity("strength", Codec.FLOAT, EjectorBlockEntity.class,
+            BlockConfig.ofBlockEntity("strength", ExtraCodecs.floatRange(1, 2.5f), EjectorBlockEntity.class,
                     (x, world, pos, side, state) -> Component.literal(String.format(Locale.ROOT, "%.2f", x)),
                     EjectorBlockEntity::strength, EjectorBlockEntity::setStrength,
                     WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.25f : -0.25f), 1, 2.5f)))

@@ -2,6 +2,7 @@
 title=<item 'polyfactory:chain_drive'>
 icon=polyfactory:chain_drive
 category=polyfactory:rotation
+order=120
 ### EndSection: PageInfo
 <yellow><item 'polyfactory:chain_drive'></> is a rotational transmission block.
 It allows to transmit rotational energy on higher distance with fewer blocks required.

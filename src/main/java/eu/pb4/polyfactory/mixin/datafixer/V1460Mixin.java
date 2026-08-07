@@ -49,6 +49,7 @@ public abstract class V1460Mixin extends Schema {
         registerInventory(schema, map, mod("primitive_smeltery"));
         registerInventory(schema, map, mod("casting_table"));
         registerInventory(schema, map, mod("item_output_buffer"));
+        registerInventory(schema, map, mod("fermenter"));
 
         schema.register(map, mod("deep_storage_container"), (name) -> DSL
                 .optionalFields("Items", DSL.list(References.ITEM_STACK.in(schema)), "icon_override", DSL.list(References.ITEM_STACK.in(schema)))
@@ -120,6 +121,7 @@ public abstract class V1460Mixin extends Schema {
         schema.registerSimple(map, mod("nozzle"));
         schema.registerSimple(map, mod("drain"));
         schema.registerSimple(map, mod("filtered_pipe"));
+        schema.registerSimple(map, mod("diesel_engine"));
         schema.registerSimple(map, mod("redstone_valve_pipe"));
         schema.registerSimple(map, mod("fluid_tank"));
         schema.registerSimple(map, mod("portable_fluid_tank"));

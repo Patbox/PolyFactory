@@ -13,6 +13,7 @@ import net.minecraft.core.FrontAndTop;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -165,7 +166,7 @@ public record BlockConfig<T>(String id, Component name, Codec<T> codec, BlockCon
 
     public static <BE> BlockConfig<Integer> ofBlockEntityInt(String id, Class<BE> tClass, int minInclusive, int maxInclusive, int displayOffset, IntFunction<String> display, Function<BE, Integer> get, BiConsumer<BE, Integer> set) {
         var tmp = ofBlockEntity(id,
-                Codec.INT,
+                ExtraCodecs.intRange(minInclusive, maxInclusive),
                 tClass,
                 (x, world, pos, side, state) -> Component.literal(display.apply(x + displayOffset)),
                 get,

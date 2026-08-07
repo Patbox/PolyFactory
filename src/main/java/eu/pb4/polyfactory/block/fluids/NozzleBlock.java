@@ -20,6 +20,7 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.BlockBoundAttachment;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.minecraft.util.ExtraCodecs;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
@@ -57,7 +58,7 @@ import net.minecraft.world.level.material.Fluids;
 
 public class NozzleBlock extends NetworkBlock implements FactoryBlock, ConfigurableBlock, PipeConnectable, BarrierBasedWaterloggable, EntityBlock, NetworkComponent.Pipe {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
-    public static final BlockConfig SPREAD = BlockConfig.ofBlockEntity("spread", Codec.FLOAT, NozzleBlockEntity.class,
+    public static final BlockConfig SPREAD = BlockConfig.ofBlockEntity("spread", ExtraCodecs.floatRange(0, 0.8f), NozzleBlockEntity.class,
             BlockValueFormatter.str(x -> String.format(Locale.ROOT,"%.2f", x)),
             NozzleBlockEntity::extraSpread, NozzleBlockEntity::setExtraSpread,
             WrenchModifyBlockValue.simple((x, n) -> FactoryUtil.wrap(x + (n ? 0.05f : -0.05f), 0f, 0.8f))

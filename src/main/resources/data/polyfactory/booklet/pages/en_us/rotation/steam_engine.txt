@@ -2,6 +2,7 @@
 title=<item 'polyfactory:steam_engine'>
 icon=polyfactory:steam_engine
 category=polyfactory:rotation
+order=11
 ### EndSection: PageInfo
 <yellow><item 'polyfactory:steam_engine'></> is a 2x3x2 block that generates rotational energy.
 <nl>
