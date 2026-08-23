@@ -132,7 +132,7 @@ public record ArtificialDyeMixingRecipe(double time,
             }
         }
 
-        colorCount = Math.min(colorCount, 1);
+        colorCount = Math.max(colorCount, 1);
 
         int r = rgb[0] / colorCount;
         int g = rgb[1] / colorCount;
