@@ -6,6 +6,7 @@ import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.recipebook.ServerPlaceRecipe;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -151,7 +152,7 @@ public class WorkbenchScreenHandler extends RecipeBookMenu {
 
             slot2.onTake(player, itemStack2);
             if (slot == 0) {
-                player.drop(itemStack2, false);
+                player.drop(itemStack2, false, Prediction.SERVER_ONLY);
             }
         }
 

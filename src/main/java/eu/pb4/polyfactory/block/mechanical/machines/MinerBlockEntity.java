@@ -349,7 +349,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
                 boolean bl2 = player.hasCorrectToolForDrops(stateFront);
                 self.activeTool.mineBlock(world, stateFront, blockPos, player);
                 if (bl && bl2) {
-                    stateFront.getBlock().playerDestroy(world, player, blockPos, stateFront, blockEntity, itemStack2);
+                    stateFront.getBlock().playerDestroy((ServerLevel) world, player, blockPos, stateFront, blockEntity, itemStack2);
                     if (self.owner != null && world.getPlayerByUUID(self.owner.id()) instanceof ServerPlayer serverPlayer) {
                         TriggerCriterion.trigger(serverPlayer, FactoryTriggers.MINER_MINES);
                     }

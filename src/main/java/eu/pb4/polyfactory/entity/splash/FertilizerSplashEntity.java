@@ -8,6 +8,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.phys.BlockHitResult;
@@ -55,10 +56,10 @@ public class FertilizerSplashEntity extends SplashEntity<Unit> {
             }
             var state = this.level().getBlockState(pos);
 
-            if (state.getBlock() instanceof BonemealableBlock bonemealableBlock && bonemealableBlock.isValidBonemealTarget(level, pos, state)) {
+            if (state.getBlock() instanceof BonemealableBlock bonemealableBlock && bonemealableBlock.isValidBonemealTarget(level, pos, state, BonemealSource.INTERACTION)) {
                 level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, pos, 15);
-                if (bonemealableBlock.isBonemealSuccess(level, this.random, pos, state)) {
-                    bonemealableBlock.performBonemeal(level, this.random, pos, state);
+                if (bonemealableBlock.isBonemealSuccess(level, this.random, pos, state, BonemealSource.INTERACTION)) {
+                    bonemealableBlock.performBonemeal(level, this.random, pos, state, BonemealSource.INTERACTION);
                 }
             }
         }

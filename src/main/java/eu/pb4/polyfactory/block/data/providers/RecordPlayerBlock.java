@@ -4,6 +4,7 @@ import eu.pb4.polyfactory.block.data.util.DirectionalCabledDataBlock;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.VirtualEntityUtils;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.minecraft.world.entity.PositionPath;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -155,7 +156,7 @@ public class RecordPlayerBlock extends DirectionalCabledDataProviderBlock {
                 }
 
                 handler.send(new ClientboundEntityPositionSyncPacket(this.soundSource.getEntityId(),
-                        new PositionMoveRotation(closest.add(0, Math.signum(closest.y - player.y) * (16 * 4 * (1 - volume) + 1), 0), Vec3.ZERO, 0, 0), false));
+                        new PositionPath.Linear(closest.add(0, Math.signum(closest.y - player.y) * (16 * 4 * (1 - volume) + 1), 0)), 0, 0, false));
             }
         }
     }

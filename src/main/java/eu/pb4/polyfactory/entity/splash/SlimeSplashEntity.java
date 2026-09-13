@@ -83,7 +83,7 @@ public class SlimeSplashEntity extends SplashEntity<Unit> {
                 AbstractCandleBlock.extinguish(null, blockState, this.level(), pos);
             } else if (CampfireBlock.isLitCampfire(blockState)) {
                 this.level().levelEvent(null, LevelEvent.SOUND_EXTINGUISH_FIRE, pos, 0);
-                CampfireBlock.dowse(this.getOwner(), this.level(), pos, blockState);
+                CampfireBlock.douse(this.getOwner(), this.level(), pos, blockState);
                 this.level().setBlockAndUpdate(pos, blockState.setValue(CampfireBlock.LIT, false));
             }
         }

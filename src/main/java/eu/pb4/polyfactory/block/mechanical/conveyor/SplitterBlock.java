@@ -192,7 +192,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
                         splitterBlockEntity.setFilterLeft(ItemStack.EMPTY);
                     } else {
                         if (!splitterBlockEntity.getFilterLeft().isEmpty()) {
-                            player.getInventory().placeItemBackInInventory(splitterBlockEntity.getFilterLeft());
+                            player.getInventory().placeItemBackInInventory(splitterBlockEntity.getFilterLeft(), Prediction.SERVER_ONLY);
                         }
                         splitterBlockEntity.setFilterLeft(stack.copyWithCount(1));
                         stack.shrink(1);
@@ -207,7 +207,7 @@ public class SplitterBlock extends Block implements FactoryBlock, MovingItemCons
                         splitterBlockEntity.setFilterRight(ItemStack.EMPTY);
                     } else {
                         if (!splitterBlockEntity.getFilterRight().isEmpty()) {
-                            player.getInventory().placeItemBackInInventory(splitterBlockEntity.getFilterRight());
+                            player.getInventory().placeItemBackInInventory(splitterBlockEntity.getFilterRight(), Prediction.SERVER_ONLY);
                         }
                         splitterBlockEntity.setFilterRight(stack.copyWithCount(1));
                         stack.shrink(1);

@@ -22,7 +22,7 @@ public class CopyReadOnlyLootFunction implements LootItemFunction {
     @Override
     public ItemStack apply(ItemStack stack, LootContext lootContext) {
         if (lootContext.hasParameter(LootContextParams.BLOCK_STATE)) {
-            var readOnly = lootContext.getOptionalParameter(LootContextParams.BLOCK_STATE).getOptionalValue(DataMemoryBlock.FACING_INPUT);
+            var readOnly = lootContext.getOptional(LootContextParams.BLOCK_STATE).getOptionalValue(DataMemoryBlock.FACING_INPUT);
             readOnly.ifPresent(aBoolean -> stack.set(FactoryDataComponents.READ_ONLY, aBoolean == OptionalDirection.NONE));
         }
 

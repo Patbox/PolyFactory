@@ -50,6 +50,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
@@ -105,15 +106,15 @@ public class CanisterItem extends SimplePolymerItem implements SwitchActionItem,
         if (fluids.get(FactoryFluids.FERTILIZER.defaultInstance()) >= FluidConstants.NUGGET
                 && level instanceof ServerLevel serverLevel
                 && blockState.getBlock() instanceof BonemealableBlock bonemealableBlock
-                && bonemealableBlock.isValidBonemealTarget(level, hitResult.getBlockPos(), blockState)) {
+                && bonemealableBlock.isValidBonemealTarget(level, hitResult.getBlockPos(), blockState, BonemealSource.INTERACTION)) {
             level.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, hitResult.getBlockPos(), 15);
 
             var res = fluids.extract(FactoryFluids.FERTILIZER.defaultInstance(), FluidConstants.NUGGET, true);
             itemStack.set(FactoryDataComponents.FLUID, res.component());
             level.playSound(null, hitResult.getBlockPos(), FactoryFluids.FERTILIZER.insertSoundEvent(), SoundSource.BLOCKS, 1f, 1);
 
-            if (bonemealableBlock.isBonemealSuccess(level, player.getRandom(), hitResult.getBlockPos(), blockState)) {
-                bonemealableBlock.performBonemeal(serverLevel, player.getRandom(), hitResult.getBlockPos(), blockState);
+            if (bonemealableBlock.isBonemealSuccess(level, player.getRandom(), hitResult.getBlockPos(), blockState, BonemealSource.INTERACTION)) {
+                bonemealableBlock.performBonemeal(serverLevel, player.getRandom(), hitResult.getBlockPos(), blockState, BonemealSource.INTERACTION);
             }
             return InteractionResult.SUCCESS_SERVER;
         }

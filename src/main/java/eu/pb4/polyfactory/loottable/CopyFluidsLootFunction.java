@@ -21,7 +21,7 @@ public class CopyFluidsLootFunction implements LootItemFunction {
     @Override
     public ItemStack apply(ItemStack stack, LootContext lootContext) {
         if (lootContext.hasParameter(LootContextParams.BLOCK_ENTITY)) {
-            if (lootContext.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof FluidContainerOwner container) {
+            if (lootContext.getOptional(LootContextParams.BLOCK_ENTITY) instanceof FluidContainerOwner container) {
                 var main = container.getMainFluidContainer();
                 if (main != null){
                     stack.set(FactoryDataComponents.FLUID, FluidComponent.copyFrom(main));

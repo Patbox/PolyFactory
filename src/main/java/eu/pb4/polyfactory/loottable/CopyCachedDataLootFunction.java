@@ -20,7 +20,7 @@ public class CopyCachedDataLootFunction implements LootItemFunction {
     @Override
     public ItemStack apply(ItemStack stack, LootContext lootContext) {
         if (lootContext.hasParameter(LootContextParams.BLOCK_ENTITY)) {
-            if (lootContext.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof DataCache provider && provider.getCachedData() != null && !provider.getCachedData().isEmpty()) {
+            if (lootContext.getOptional(LootContextParams.BLOCK_ENTITY) instanceof DataCache provider && provider.getCachedData() != null && !provider.getCachedData().isEmpty()) {
                 stack.set(FactoryDataComponents.STORED_DATA, provider.getCachedData());
             }
         }

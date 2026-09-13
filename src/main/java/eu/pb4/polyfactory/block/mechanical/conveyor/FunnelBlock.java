@@ -36,6 +36,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -281,7 +282,7 @@ public class FunnelBlock extends Block implements FactoryBlock, MovingItemConsum
 
         if (stack.getItem() instanceof AbstractFilterItem item && item.isFilterSet(stack)) {
             if (!be.getFilter().isEmpty()) {
-                player.getInventory().placeItemBackInInventory(be.getFilter());
+                player.getInventory().placeItemBackInInventory(be.getFilter(), Prediction.SERVER_ONLY);
             }
             be.setFilter(stack.copyWithCount(1));
             if (player instanceof ServerPlayer serverPlayer) {

@@ -11,6 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Util;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -106,7 +107,7 @@ public interface WrenchModifyBlockValue<T> {
                         // ignore
                     }
                 });
-                serverPlayer.swing(InteractionHand.MAIN_HAND, true);
+                serverPlayer.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
             }
             return value;
         };
@@ -139,7 +140,7 @@ public interface WrenchModifyBlockValue<T> {
                         // ignore
                     }
                 });
-                serverPlayer.swing(InteractionHand.MAIN_HAND, true);
+                serverPlayer.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
             }
             return value;
         };
@@ -189,7 +190,7 @@ public interface WrenchModifyBlockValue<T> {
                         // ignore
                     }
                 });
-                serverPlayer.swing(InteractionHand.MAIN_HAND, true);
+                serverPlayer.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
             }
             return value;
         };

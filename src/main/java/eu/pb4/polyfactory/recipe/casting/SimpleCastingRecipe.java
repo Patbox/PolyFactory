@@ -12,6 +12,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import java.util.Optional;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
@@ -46,13 +47,13 @@ public record SimpleCastingRecipe(Optional<CountedIngredient> item, FluidStack<?
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
     }
 
-    public static SimpleCastingRecipe toItem(TagKey<Item> item, FluidStack<?> stack, Item out, SoundEvent sound, int coolingTime) {
-        return new SimpleCastingRecipe(Optional.of(CountedIngredient.fromTag(1, FactoryUtil.fakeTagList(item))), stack, new ItemStackTemplate(out), false, 0,
+    public static SimpleCastingRecipe toItem(HolderSet<Item> item, FluidStack<?> stack, Item out, SoundEvent sound, int coolingTime) {
+        return new SimpleCastingRecipe(Optional.of(CountedIngredient.fromTag(1, item)), stack, new ItemStackTemplate(out), false, 0,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), CastingRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
     }
 
-    public static SimpleCastingRecipe templateDamaged(TagKey<Item> template, FluidStack<?> stack, Item out, SoundEvent sound, double coolingTicks) {
-        return new SimpleCastingRecipe(Optional.of(CountedIngredient.fromTag(0, FactoryUtil.fakeTagList(template))), stack, new ItemStackTemplate(out), false, 1,
+    public static SimpleCastingRecipe templateDamaged(HolderSet<Item> template, FluidStack<?> stack, Item out, SoundEvent sound, double coolingTicks) {
+        return new SimpleCastingRecipe(Optional.of(CountedIngredient.fromTag(0, template)), stack, new ItemStackTemplate(out), false, 1,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), CastingRecipe.getTime(stack.instance(), stack.amount()),coolingTicks);
     }
 

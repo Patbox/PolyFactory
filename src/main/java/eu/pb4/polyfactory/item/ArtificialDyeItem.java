@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.util.SimpleColoredItem;
 import eu.pb4.polymer.core.api.item.SimplePolymerItem;
 import eu.pb4.polyfactory.util.DyeColorExtra;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.entity.SignTextSlot;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -55,11 +56,11 @@ public class ArtificialDyeItem extends Item implements SignApplicator, SimpleCol
     }
 
     @Override
-    public boolean tryApplyToSign(Level world, SignBlockEntity signBlockEntity, boolean front, ItemStack itemInHand, Player player) {
+    public boolean tryApplyToSign(Level world, SignBlockEntity signBlockEntity, SignTextSlot slot, ItemStack itemInHand, Player player) {
         if (signBlockEntity.updateText((text) -> {
             var color = ColoredItem.getColor(itemInHand);
             {
-                var current = text.getMessage(0, false).getStyle().getColor();
+                var current = text.getMessages(false).getFirst().getStyle().getColor();
                 if (current != null && current.getValue() == color) {
                     return text;
                 }
@@ -87,12 +88,14 @@ public class ArtificialDyeItem extends Item implements SignApplicator, SimpleCol
                 }
 
             }
+            var mut = text.asMutable();
+
             for (int i = 0; i < 4; i++) {
-                text = text.setMessage(i, text.getMessage(i, false).copy().withStyle(x -> x.withColor(color)));
+                mut = mut.setLine(i, text.getMessages(false).get(i).copy().withStyle(x -> x.withColor(color)));
             }
 
-            return text.setColor(dyeColor);
-        }, front)) {
+            return mut.setColor(dyeColor).asImmutable();
+        }, slot)) {
             world.playSound(null, signBlockEntity.getBlockPos(), SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
             return true;
         } else {

@@ -15,6 +15,7 @@ import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,13 +24,21 @@ import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CookingFuel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class SteamEngineBlockEntity extends LockableBlockEntity implements MinimalWorldlyContainer {
     private static final int[] SLOTS = new int[]{0, 1, 2};
@@ -72,11 +81,11 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
                     var stack = self.getItem(i);
 
                     if (!stack.isEmpty()) {
-                        var value = world.fuelValues().burnDuration(stack);
-                        if (value > 0) {
+                        var value = stack.get(DataComponents.COOKING_FUEL);
+                        if (value != null) {
                             var remainder = stack.getCraftingRemainder();
                             stack.shrink(1);
-                            self.fuelTicks = value * 10;
+                            self.fuelTicks = ResolvableInt.getFromItem(stack, DataComponents.COOKING_FUEL, CookingFuel::burnTime, self.getLootContext((ServerLevel) world), 0) * 10;
                             self.fuelInitial = self.fuelTicks;
                             if (stack.isEmpty()) {
                                 self.setItem(i, ItemStack.EMPTY);
@@ -105,6 +114,10 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
                 world.setBlockAndUpdate(pos, state.setValue(SteamEngineBlock.LIT, false));
             }
         }
+    }
+
+    protected LootContext getLootContext(final ServerLevel level) {
+        return (new LootContext.Builder((new LootParams.Builder(level)).withParameter(LootContextParams.BLOCK_STATE, this.getBlockState()).withParameter(LootContextParams.BLOCK_ENTITY, this).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(this.getBlockPos())).withParameter(LootContextParams.CONTAINER, this).create(LootContextParamSets.CONTAINER_PROCESS))).create(Optional.empty());
     }
 
     public void setPowered(int id, boolean b) {
@@ -161,7 +174,7 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
 
     @Override
     public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
-        return this.level != null && this.level.fuelValues().isFuel(stack);
+        return this.level != null && stack.has(DataComponents.COOKING_FUEL);
     }
 
     @Override
@@ -196,9 +209,9 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
         public Gui(ServerPlayer player) {
             super(MenuType.GENERIC_9x2, player, false);
             this.setTitle(GuiTextures.STEAM_ENGINE.apply(SteamEngineBlockEntity.this.getBlockState().getBlock().getName()));
-            this.setSlot(9 + 3, new FuelSlot(SteamEngineBlockEntity.this, 0, player.level().fuelValues()));
-            this.setSlot(9 + 4, new FuelSlot(SteamEngineBlockEntity.this, 1, player.level().fuelValues()));
-            this.setSlot(9 + 5, new FuelSlot(SteamEngineBlockEntity.this, 2, player.level().fuelValues()));
+            this.setSlot(9 + 3, new FuelSlot(SteamEngineBlockEntity.this, 0));
+            this.setSlot(9 + 4, new FuelSlot(SteamEngineBlockEntity.this, 1));
+            this.setSlot(9 + 5, new FuelSlot(SteamEngineBlockEntity.this, 2));
             this.setSlot(4, GuiTextures.FLAME.getCeil(progress()));
             this.setSlot(7 + 9, GuiUtils.createIteratingButton(
                     SteamEngineBlockEntity.this::getRedstoneActivationType,

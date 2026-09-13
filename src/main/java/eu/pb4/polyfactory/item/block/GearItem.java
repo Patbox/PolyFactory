@@ -87,7 +87,7 @@ public class GearItem extends FactoryBlockItem {
             var newState = this.getBlock().withPropertiesOf(currentState);
             context.getLevel().setBlockAndUpdate(context.getClickedPos(), newState);
 
-            this.updateCustomBlockEntityTag(context.getClickedPos(), context.getLevel(), context.getPlayer(), context.getItemInHand(), newState);
+            this.updateCustomBlockEntityTag(context.getLevel(), context.getPlayer(), context.getClickedPos(), context.getItemInHand());
             newState.getBlock().setPlacedBy(context.getLevel(), context.getClickedPos(), newState, context.getPlayer(), context.getItemInHand());
             if (context.getPlayer() instanceof ServerPlayer player) {
                 CriteriaTriggers.PLACED_BLOCK.trigger(player, context.getClickedPos(), context.getItemInHand());

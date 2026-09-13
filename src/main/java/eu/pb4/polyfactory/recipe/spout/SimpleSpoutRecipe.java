@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.recipe.input.SingleItemWithFluid;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
@@ -69,8 +70,8 @@ public record SimpleSpoutRecipe(CountedIngredient item, List<FluidStack<?>> flui
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()), coolingTime);
     }
 
-    public static SimpleSpoutRecipe templateDamaged(TagKey<Item> template, FluidStack<?> stack, Item out, SoundEvent sound, double coolingTicks) {
-        return new SimpleSpoutRecipe(CountedIngredient.fromTag(0, FactoryUtil.fakeTagList(template)), List.of(stack), new ItemStackTemplate(out), false, 1,
+    public static SimpleSpoutRecipe templateDamaged(HolderSet<Item> template, FluidStack<?> stack, Item out, SoundEvent sound, double coolingTicks) {
+        return new SimpleSpoutRecipe(CountedIngredient.fromTag(0, template), List.of(stack), new ItemStackTemplate(out), false, 1,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()),coolingTicks);
     }
 
@@ -79,8 +80,8 @@ public record SimpleSpoutRecipe(CountedIngredient item, List<FluidStack<?>> flui
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()), coolingTicks);
     }
 
-    public static SimpleSpoutRecipe templateDamaged(TagKey<Item> template, FluidStack<?> stack, Item out, SoundEvent sound) {
-        return new SimpleSpoutRecipe(CountedIngredient.fromTag(0, FactoryUtil.fakeTagList(template)), List.of(stack), new ItemStackTemplate(out), false, 1,
+    public static SimpleSpoutRecipe templateDamaged(HolderSet<Item> template, FluidStack<?> stack, Item out, SoundEvent sound) {
+        return new SimpleSpoutRecipe(CountedIngredient.fromTag(0, template), List.of(stack), new ItemStackTemplate(out), false, 1,
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SpoutRecipe.getTime(stack.instance(), stack.amount()),0);
     }
 

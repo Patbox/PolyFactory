@@ -6,6 +6,7 @@ import eu.pb4.polyfactory.block.other.FilteredBlockEntity;
 import eu.pb4.polyfactory.item.tool.AbstractFilterItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -34,7 +35,7 @@ public class HopperBlockMixin {
         var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
         if (stack.getItem() instanceof AbstractFilterItem item && item.isFilterSet(stack)) {
             if (!be.polyfactory$getFilter().isEmpty()) {
-                player.getInventory().placeItemBackInInventory(be.polyfactory$getFilter());
+                player.getInventory().placeItemBackInInventory(be.polyfactory$getFilter(), Prediction.SERVER_ONLY);
             }
             be.polyfactory$setFilter(stack.copyWithCount(1));
             stack.shrink(1);

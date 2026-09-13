@@ -26,6 +26,7 @@ import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,6 +36,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CookingFuel;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
@@ -42,10 +44,16 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements MinimalWorldlyContainer, FluidOutput.ContainerBased {
@@ -159,11 +167,11 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
                 var stack = self.getItem(1);
 
                 if (!stack.isEmpty()) {
-                    var value = world.fuelValues().burnDuration(stack);
-                    if (value > 0) {
+                    var value = stack.get(DataComponents.COOKING_FUEL);
+                    if (value != null) {
                         var remainder = stack.getCraftingRemainder();
                         stack.shrink(1);
-                        self.fuelTicks = value;
+                        self.fuelTicks = ResolvableInt.getFromItem(stack, DataComponents.COOKING_FUEL, CookingFuel::burnTime, self.getLootContext((ServerLevel) world), 0);
                         self.fuelInitial = self.fuelTicks;
                         isFueled = true;
                         if (stack.isEmpty()) {
@@ -192,6 +200,10 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
         if (dirty) {
             self.setChanged();
         }
+    }
+
+    protected LootContext getLootContext(final ServerLevel level) {
+        return (new LootContext.Builder((new LootParams.Builder(level)).withParameter(LootContextParams.BLOCK_STATE, this.getBlockState()).withParameter(LootContextParams.BLOCK_ENTITY, this).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(this.getBlockPos())).withParameter(LootContextParams.CONTAINER, this).create(LootContextParamSets.CONTAINER_PROCESS))).create(Optional.empty());
     }
 
     private void addToOutputOrDrop(ItemStack stack) {
@@ -233,12 +245,12 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
 
     @Override
     public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
-        return this.level != null && (slot == 1 == this.level.fuelValues().isFuel(stack));
+        return this.level != null && (slot == 1 == stack.has(DataComponents.COOKING_FUEL));
     }
 
     @Override
     public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
-        return !this.level.fuelValues().isFuel(stack) && slot == 1;
+        return !stack.has(DataComponents.COOKING_FUEL) && slot == 1;
     }
 
     public void createGui(ServerPlayer player) {
@@ -274,7 +286,7 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
         public Gui(ServerPlayer player) {
             super(MenuType.GENERIC_9x3, player, false);
             this.inputSlot = new Slot(PrimitiveSmelteryBlockEntity.this, 0, 0, 0);
-            this.fuelSlot = new FuelSlot(PrimitiveSmelteryBlockEntity.this, 1, player.level().fuelValues());
+            this.fuelSlot = new FuelSlot(PrimitiveSmelteryBlockEntity.this, 1);
             this.setSlot(2, this.inputSlot);
             this.setSlot(9 * 2 + 2, this.fuelSlot);
 
@@ -357,7 +369,7 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
                     if (!this.insertItem(itemStack2, this.getVirtualSize(), this.getVirtualSize() + 36, true)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (this.player.level().fuelValues().isFuel(itemStack2)) {
+                } else if (itemStack2.has(DataComponents.COOKING_FUEL)) {
                     if (!FactoryUtil.insertItemIntoSlots(itemStack2, List.of(this.fuelSlot), false)) {
                         return ItemStack.EMPTY;
                     }

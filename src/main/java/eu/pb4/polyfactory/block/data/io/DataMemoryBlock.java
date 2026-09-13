@@ -100,12 +100,11 @@ public final class DataMemoryBlock extends DataNetworkBlock implements EntityBlo
     }
 
     @Override
-    public void playerDestroy(Level world, Player player1, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
-        if (blockEntity instanceof DataCache cache && cache.getCachedData() != null && !cache.getCachedData().isEmpty()
-                && player1 instanceof ServerPlayer player) {
+    public void playerDestroy(ServerLevel world, ServerPlayer player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
+        if (blockEntity instanceof DataCache cache && cache.getCachedData() != null && !cache.getCachedData().isEmpty()) {
             TriggerCriterion.trigger(player, FactoryTriggers.DATA_MEMORY);
         }
-        super.playerDestroy(world, player1, pos, state, blockEntity, tool);
+        super.playerDestroy(world, player, pos, state, blockEntity, tool);
     }
 
     @Override

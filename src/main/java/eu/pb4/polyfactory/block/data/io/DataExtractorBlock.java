@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.block.data.InputTransformerBlockEntity;
 import eu.pb4.polyfactory.data.DataContainer;
 import eu.pb4.polyfactory.data.DataType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.component.SwingAnimation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class DataExtractorBlock extends InputTransformerBlock {
                     (value, next, player, world, pos, side, state) -> {
                         if (player instanceof ServerPlayer serverPlayer && world.getBlockEntity(pos) instanceof DataExtractorBlockEntity be) {
                             be.openGui(serverPlayer);
-                            serverPlayer.swing(InteractionHand.MAIN_HAND, true);
+                            serverPlayer.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
                         }
                         return value;
                     }, Component.literal(Stream.concat(Stream.of(DataContainer.GENERIC_EXTRACTS), DataType.types().stream().map(DataType::fields)).flatMap(List::stream).collect(Collectors.joining(", "))))

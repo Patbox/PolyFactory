@@ -25,6 +25,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -149,7 +150,7 @@ public interface FluidContainerUtil {
                     player.getInventory().add(x);
                 }
             } else {
-                player.getInventory().placeItemBackInInventory(x);
+                player.getInventory().placeItemBackInInventory(x, Prediction.SERVER_ONLY);
             }
         }
 
@@ -294,7 +295,7 @@ public interface FluidContainerUtil {
                                     gui.getPlayer().getInventory().add(out);
                                 }
                             } else {
-                                gui.getPlayer().getInventory().placeItemBackInInventory(out);
+                                gui.getPlayer().getInventory().placeItemBackInInventory(out, Prediction.SERVER_ONLY);
                             }
                         }
                     }

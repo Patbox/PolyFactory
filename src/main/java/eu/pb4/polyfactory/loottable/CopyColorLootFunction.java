@@ -21,7 +21,7 @@ public class CopyColorLootFunction implements LootItemFunction {
     @Override
     public ItemStack apply(ItemStack stack, LootContext lootContext) {
         if (stack.getItem() instanceof ColoredItem && lootContext.hasParameter(LootContextParams.BLOCK_ENTITY)) {
-            if (lootContext.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof ColorProvider provider && !provider.isDefaultColor()) {
+            if (lootContext.getOptional(LootContextParams.BLOCK_ENTITY) instanceof ColorProvider provider && !provider.isDefaultColor()) {
                 ColoredItem.setColor(stack, provider.getColor());
             }
         }

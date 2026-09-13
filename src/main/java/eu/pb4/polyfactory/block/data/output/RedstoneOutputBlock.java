@@ -17,6 +17,7 @@ import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import it.unimi.dsi.fastutil.ints.IntList;
+import net.minecraft.world.level.block.RedstoneWireBlock;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
@@ -38,7 +39,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.RedStoneWireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -164,7 +164,7 @@ public class RedstoneOutputBlock extends DirectionalCabledDataBlock implements D
         private ItemStack createOverlay(BlockState state) {
             var stack = new ItemStack(Items.STONE);
             stack.set(DataComponents.ITEM_MODEL, state.is(FactoryBlocks.REDSTONE_OUTPUT) ? OUTPUT_OVERLAY : INPUT_OVERLAY);
-            stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), IntList.of(RedStoneWireBlock.getColorForPower(state.getValue(POWER)))));
+            stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(), IntList.of(RedstoneWireBlock.getColorForPower(state.getValue(POWER)))));
             return stack;
         }
 

@@ -9,6 +9,7 @@ import net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket;
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.entity.PositionPath;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -48,7 +49,7 @@ public class ChainItemDisplayElement extends LodItemDisplayElement {
 
         if (!pos.equals(this.lastSyncedPos)) {
             if (this.lastSyncedPos == null || this.forceSync) {
-                nearPacket = new ClientboundEntityPositionSyncPacket(this.getEntityId(), new PositionMoveRotation(pos, Vec3.ZERO, this.getYaw(), this.getPitch()), false);
+                nearPacket = new ClientboundEntityPositionSyncPacket(this.getEntityId(), new PositionPath.Linear(pos), this.getYaw(), this.getPitch(), false);
                 this.forceSync = false;
             } else {
                 nearPacket = VirtualEntityUtils.createMovePacket(this.getEntityId(), this.lastSyncedPos, pos, this.isRotationDirty(), this.getYaw(), this.getPitch());
@@ -61,7 +62,7 @@ public class ChainItemDisplayElement extends LodItemDisplayElement {
 
         if (this.farDistanceSquared != 0 && !pos.equals(this.lastSyncedPosMid) && (updateTick++) % 10 == 0) {
             if (this.lastSyncedPosMid == null || this.forceSyncMid) {
-                mediumPacket = new ClientboundEntityPositionSyncPacket(this.getEntityId(), new PositionMoveRotation(pos, Vec3.ZERO, this.getYaw(), this.getPitch()), false);
+                mediumPacket = new ClientboundEntityPositionSyncPacket(this.getEntityId(), new PositionPath.Linear(pos), this.getYaw(), this.getPitch(), false);
                 this.forceSyncMid = false;
             } else {
                 mediumPacket = VirtualEntityUtils.createMovePacket(this.getEntityId(), this.lastSyncedPosMid, pos, this.isRotationDirty(), this.getYaw(), this.getPitch());

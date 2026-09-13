@@ -56,6 +56,10 @@ public abstract class V1460Mixin extends Schema {
                 .optionalFields("Items", DSL.list(References.ITEM_STACK.in(schema)), "icon_override", DSL.list(References.ITEM_STACK.in(schema)))
         );
 
+        schema.register(map, mod("smeltery"), (name) -> DSL
+                .optionalFields("Items", DSL.list(References.ITEM_STACK.in(schema)), "positioned_states", DSL.list(References.BLOCK_STATE.in(schema)))
+        );
+
         container(schema, map, "container");
         container(schema, map, "creative_container");
 

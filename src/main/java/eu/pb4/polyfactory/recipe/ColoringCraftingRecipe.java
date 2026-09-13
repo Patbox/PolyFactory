@@ -41,11 +41,11 @@ public record ColoringCraftingRecipe(String group, Item input, Ingredient dye, i
     );
 
 
-    public static RecipeHolder<ColoringCraftingRecipe> of(HolderLookup.RegistryLookup<Item> itemWrap, String id, Item item) {
+    public static RecipeHolder<ColoringCraftingRecipe> of(HolderGetter<Item> itemWrap, String id, Item item) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("crafting/" + id), new ColoringCraftingRecipe("polyfactory:crafting/" + id, item, defaultDyes(itemWrap), 8));
     }
 
-    public static RecipeHolder<ColoringCraftingRecipe> of(HolderLookup.RegistryLookup<Item> itemWrap, String id, Item item, int count) {
+    public static RecipeHolder<ColoringCraftingRecipe> of(HolderGetter<Item> itemWrap, String id, Item item, int count) {
         return new RecipeHolder<>(FactoryUtil.recipeKey("crafting/" + id), new ColoringCraftingRecipe("polyfactory:crafting/" + id, item, defaultDyes(itemWrap), count));
     }
 

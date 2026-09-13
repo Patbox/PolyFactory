@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class PunchCardItem extends SimplePolymerItem {
         var stack = player.getItemInHand(hand);
         if (!(stack.getItem() instanceof PunchCardItem)) return;
         stack.set(FactoryDataComponents.PUNCH_CARD_DATA, List.of(text.split("\n")));
-        player.swing(hand, true);
+        player.swing(hand, SwingAnimation.DEFAULT, true);
     }
 
     @Override

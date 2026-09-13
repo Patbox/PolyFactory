@@ -2,18 +2,17 @@ package eu.pb4.polyfactory.advancement;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import eu.pb4.factorytools.api.advancement.FactoryAdvancementCriteria;
-import eu.pb4.factorytools.api.advancement.TriggerCriterion;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.advancements.triggers.Criterion;
-import net.minecraft.advancements.predicates.ContextAwarePredicate;
 import net.minecraft.advancements.predicates.ItemPredicate;
 import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 public class FluidShootsCriterion extends SimpleCriterionTrigger<FluidShootsCriterion.Condition> {
     public static Criterion<?> ofNozzle(FluidInstance<?>... fluids) {
@@ -49,7 +48,7 @@ public class FluidShootsCriterion extends SimpleCriterionTrigger<FluidShootsCrit
                 ExtraCodecs.compactListCodec(FluidInstance.CODEC).fieldOf("fluid").forGetter(Condition::fluids)
         ).apply(instance, Condition::new));
         @Override
-        public Optional<ContextAwarePredicate> player() {
+        public Optional<Holder<LootItemCondition>> player() {
             return Optional.empty();
         }
     }

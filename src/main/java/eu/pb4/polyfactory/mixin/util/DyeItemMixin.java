@@ -13,9 +13,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class DyeItemMixin {
     @ModifyReturnValue(method = "lambda$tryApplyToSign$0", at = @At("RETURN"))
     private static SignText clearColor(SignText text) {
+        var mut = text.asMutable();
         for (int i = 0; i < 4; i++) {
-            text = text.setMessage(i, text.getMessage(i, false).copy().setStyle(text.getMessage(i, false).getStyle().withColor((TextColor) null)));
+            mut = mut.setLine(i, text.getMessages(false).get(i).copy().setStyle(text.getMessages(false).get(i).getStyle().withColor((TextColor) null)));
         }
-        return text;
+        return mut.asImmutable();
     }
 }

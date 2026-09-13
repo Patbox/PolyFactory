@@ -181,7 +181,8 @@ public class FanBlockEntity extends BlockEntity {
                     }
                 }
             } else {
-                entity.hurtMarked = true;
+                // Todo
+                //entity.hurtMarked = true;
             }
         }
     }

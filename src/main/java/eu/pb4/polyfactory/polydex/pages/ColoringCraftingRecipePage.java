@@ -4,6 +4,7 @@ import eu.pb4.polydex.api.v1.recipe.PolydexEntry;
 import eu.pb4.polydex.impl.book.view.crafting.AbstractCraftingRecipePage;
 import eu.pb4.polyfactory.recipe.ColoringCraftingRecipe;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -24,7 +25,7 @@ public class ColoringCraftingRecipePage extends AbstractCraftingRecipePage<Color
     @Override
     protected SlotDisplay getStacksAt(ColoringCraftingRecipe coloringCraftingRecipe, int x, int y, PolydexEntry entry) {
         if (x == 0 && y == 0) {
-            return new SlotDisplay.TagSlotDisplay(ConventionalItemTags.DYES);
+            return new SlotDisplay.TagSlotDisplay(BuiltInRegistries.ITEM.getOrThrow(ConventionalItemTags.DYES));
         }
         if (x == 1 && y == 0) {
             return new SlotDisplay.ItemSlotDisplay(coloringCraftingRecipe.input());

@@ -9,7 +9,6 @@ import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.SpoutMolds;
 import eu.pb4.polyfactory.item.util.ColoredItem;
-import eu.pb4.polyfactory.mixin.PotionBrewingAccessor;
 import eu.pb4.polyfactory.mixin.ShapedRecipeBuilderAccessor;
 import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.other.FactorySoundEvents;
@@ -26,7 +25,6 @@ import eu.pb4.polyfactory.recipe.fluid.SimpleFluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.fluid.effects.ExplodeFluidInteractionEffect;
 import eu.pb4.polyfactory.recipe.fluid.effects.FluidInteractionEffect;
 import eu.pb4.polyfactory.recipe.grinding.SimpleGrindingRecipe;
-import eu.pb4.polyfactory.recipe.grinding.StrippingGrindingRecipe;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.*;
 import eu.pb4.polyfactory.recipe.press.FillSprayCanPressRecipe;
@@ -38,13 +36,16 @@ import eu.pb4.polyfactory.recipe.spout.RepairSpoutRecipe;
 import eu.pb4.polyfactory.recipe.spout.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.recipe.trommel.SimpleTrommelRecipe;
 import eu.pb4.polyfactory.util.DyeColorExtra;
+import eu.pb4.polyfactory.util.WoodUtil;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.triggers.InventoryChangeTrigger;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleOptions;
@@ -55,16 +56,14 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
-import net.minecraft.world.flag.FeatureFlagSet;
-import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.state.properties.WoodType;
@@ -74,7 +73,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import static eu.pb4.polyfactory.util.FactoryUtil.fakeTagList;
 import static eu.pb4.polyfactory.util.FactoryUtil.recipeKey;
 
 class RecipesProvider extends FabricRecipeProvider {
@@ -82,12 +80,13 @@ class RecipesProvider extends FabricRecipeProvider {
         super(output, registriesFuture);
     }
 
+
     @Override
-    protected RecipeProvider createRecipeProvider(HolderLookup.Provider registryLookup, RecipeOutput exporter) {
-        return new RecipeProvider(registryLookup, exporter) {
+    protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, BootstrapContext<Recipe<?>> recipes, BootstrapContext<Advancement> advancements) {
+        return new RecipeProvider(recipes, advancements) {
             @Override
             public void buildRecipes() {
-                var itemWrap = registryLookup.lookupOrThrow(Registries.ITEM);
+                var itemWrap = this.output.lookup(Registries.ITEM);
 
                 nineBlockStorageRecipes(RecipeCategory.MISC, FactoryItems.STEEL_INGOT, RecipeCategory.MISC, FactoryItems.STEEL_BLOCK, "steel_block", null, "steel_ingot_from_block", null);
 
@@ -462,7 +461,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .save(output);
 
 
-                this.of(exporter, new RecipeHolder<>(recipeKey("crafting/drill_attachment_equip"), new DrillAttachmentEquipCraftingRecipe()));
+                this.of(output, new RecipeHolder<>(recipeKey("crafting/drill_attachment_equip"), new DrillAttachmentEquipCraftingRecipe()));
 
                 this.shaped(RecipeCategory.REDSTONE, FactoryItems.FUNNEL, 1)
                         .pattern("wp ")
@@ -852,7 +851,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .input('i', FactoryItems.STEEL_INGOT)
                 .input('c', Items.COPPER_BLOCK)
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
-                .offerTo(exporter);
+                .offerTo(output);
 
         this.createShaped(RecipeCategory.REDSTONE, FactoryItems.ELECTRIC_MOTOR)
                 .pattern("scs")
@@ -863,7 +862,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 .input('i', FactoryItems.STEEL_INGOT)
                 .input('c', Items.COPPER_BLOCK)
                 .criterion("get_item", InventoryChangedCriterion.Conditions.items(FactoryItems.STEEL_PLATE))
-                .offerTo(exporter);
+                .offerTo(output);
         */
                 this.shaped(RecipeCategory.REDSTONE, FactoryItems.GEARBOX, 1)
                         .pattern("sgs")
@@ -1039,8 +1038,6 @@ class RecipesProvider extends FabricRecipeProvider {
                                 OutputStack.of(FactoryItems.SAW_DUST, 0.8f, 6), OutputStack.of(Items.STICK, 0.4f, 8)),
                         SimpleGrindingRecipe.of("stripped_wood_saw_dust", "logs_saw_dust", tag(ConventionalItemTags.STRIPPED_WOODS), 0.75, 5, 8,
                                 OutputStack.of(FactoryItems.SAW_DUST, 0.8f, 6), OutputStack.of(Items.STICK, 0.4f, 8)),
-                        StrippingGrindingRecipe.of("wood_stripping", tag(ItemTags.LOGS), 0.5, 4, 10,
-                                OutputStack.of(FactoryItems.SAW_DUST, 0.3f, 2)),
                         SimpleGrindingRecipe.of("stone_to_cobblestone", Ingredient.of(Items.STONE), 1, 5, 19, Items.COBBLESTONE),
                         SimpleGrindingRecipe.of("cobblestone_to_gravel", Ingredient.of(Items.COBBLESTONE), 2, 6, 18, Items.GRAVEL),
                         SimpleGrindingRecipe.of("diorite_to_gravel", Ingredient.of(Items.DIORITE), 2, 6, 24, OutputStack.of(Items.GRAVEL), OutputStack.of(Items.QUARTZ, 0.05f, 1)),
@@ -1116,7 +1113,23 @@ class RecipesProvider extends FabricRecipeProvider {
                         SimpleGrindingRecipe.of("leaf_litter_to_dye", "dye", Ingredient.of(Items.LEAF_LITTER), 0.5, 12, OutputStack.of(Items.DYE.brown(), 0.3f))
                 );
 
-                of(exporter,
+                for (var wood : WoodUtil.VANILLA) {
+                    var path = WoodUtil.asPath(wood);
+                    if (!WoodUtil.hasLog(wood)) {
+                        continue;
+                    }
+
+                    var log = BuiltInRegistries.ITEM.getValue(WoodUtil.getLogId(wood));
+                    var strippedLog = BuiltInRegistries.ITEM.getValue(WoodUtil.getStrippedLogId(wood));
+
+                    if (log != strippedLog && strippedLog != Items.AIR && log != Items.AIR) {
+                        of(output, SimpleGrindingRecipe.of("wood_stripping/" + path, "wood_stripping", Ingredient.of(log), 0.5, 4, 10,
+                                OutputStack.of(strippedLog),
+                                OutputStack.of(FactoryItems.SAW_DUST, 0.3f, 2)));
+                    }
+                }
+
+                of(output,
                         SimpleTrommelRecipe.of("gravel", Ingredient.of(Items.GRAVEL), 0.75, 20,
                                 OutputStack.of(Items.FLINT, 0.6f, 2),
                                 OutputStack.of(FactoryItems.RAW_IRON_NUGGET, 0.08f,2),
@@ -1144,6 +1157,12 @@ class RecipesProvider extends FabricRecipeProvider {
                                 0.4, 2, 16,
                                 OutputStack.of(Items.AZALEA, 0.05f),
                                 OutputStack.of(Items.FLOWERING_AZALEA, 0.05f),
+                                OutputStack.of(Items.STICK, 0.25f, 3),
+                                OutputStack.of(Items.LEAF_LITTER, 0.6f, 1)
+                        ),
+                        SimpleTrommelRecipe.of("poplar_leaves", Ingredient.of(Items.YELLOW_POPLAR_LEAVES, Items.ORANGE_POPLAR_LEAVES, Items.RED_POPLAR_LEAVES),
+                                0.4, 2, 16,
+                                OutputStack.of(Items.POPLAR_SAPLING, 0.1f),
                                 OutputStack.of(Items.STICK, 0.25f, 3),
                                 OutputStack.of(Items.LEAF_LITTER, 0.6f, 1)
                         ),
@@ -1212,7 +1231,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         list.add(OutputStack.of(Items.APPLE, 0.02f, 1));
                     }
 
-                    of(exporter, SimpleTrommelRecipe.of(wood.name() + "_leaves",
+                    of(output, SimpleTrommelRecipe.of(wood.name() + "_leaves",
                             Ingredient.of(leaves), 0.4, 2, 16, list.toArray(OutputStack[]::new)));
                 }
 
@@ -1444,12 +1463,12 @@ class RecipesProvider extends FabricRecipeProvider {
                         of(output, GenericMixingRecipe.ofCounted(nameSolid + "_direct", "concrete_direct",
                                 List.of(CountedIngredient.ofTag(4, itemWrap.getOrThrow(ItemTags.SMELTS_TO_GLASS)),
                                         CountedIngredient.ofItems(4, Items.GRAVEL),
-                                        CountedIngredient.ofTag(0, fakeTagList(ConventionalItemTags.WATER_BUCKETS)),
+                                        CountedIngredient.ofTag(0, lookupTag(ConventionalItemTags.WATER_BUCKETS)),
                                         CountedIngredient.ofItems(1, dye)),
                                 5, 1, 15, new ItemStackTemplate(solid, 8)));
 
                         of(output, GenericMixingRecipe.ofCounted(nameSolid + "_from_powder", "concrete_water",
-                                List.of(CountedIngredient.ofItems(1, powder), CountedIngredient.ofTag(0, fakeTagList(ConventionalItemTags.WATER_BUCKETS))),
+                                List.of(CountedIngredient.ofItems(1, powder), CountedIngredient.ofTag(0, lookupTag(ConventionalItemTags.WATER_BUCKETS))),
                                 1, 1, 4, new ItemStackTemplate(solid, 1)));
 
 
@@ -1604,7 +1623,8 @@ class RecipesProvider extends FabricRecipeProvider {
                                 400, List.of(FactoryFluids.BIODIESEL.of(18)))
                 );
 
-                for (var recipe : ((PotionBrewingAccessor) PotionBrewing.bootstrap(FeatureFlagSet.of(FeatureFlags.VANILLA))).getPotionMixes()) {
+                // Todo
+                /*for (var recipe : ((PotionBrewingAccessor) PotionBrewing.bootstrap(FeatureFlagSet.of(FeatureFlags.VANILLA))).getPotionMixes()) {
                     var from = FactoryFluids.getPotion(recipe.from());
                     var to = FactoryFluids.getPotion(recipe.to());
                     var b = new StringBuilder("mixing/brewing/");
@@ -1622,7 +1642,7 @@ class RecipesProvider extends FabricRecipeProvider {
                             new BrewingMixingRecipe(getShortString(recipe.to()).replace("long_", "").replace("strong_", ""), recipe.ingredient(), from, to, FluidConstants.BOTTLE, FluidConstants.BOTTLE * 6,
                                     20, 15, 30, 0.7f, 2f), null
                     );
-                }
+                }*/
 
                 of(output,
                         SimpleFermentingRecipe.of("sugar_cane", "", Ingredient.of(Items.SUGAR_CANE), OutputStack.of(FactoryItems.BIOMASS, 0.3f), FactoryFluids.ETHANOL.ofNuggets(3), 140),
@@ -1637,9 +1657,9 @@ class RecipesProvider extends FabricRecipeProvider {
                         SimpleFermentingRecipe.of("melon_slice", "", Ingredient.of(Items.MELON_SLICE), OutputStack.of(FactoryItems.BIOMASS, 0.05f), 120),
 
                         SimpleFermentingRecipe.of("cheese", "", Ingredient.of(Items.MILK_BUCKET), FactoryItems.CHEESE_WHEEL, 250),
-                        SimpleFermentingRecipe.of("biomass_small", "", Ingredient.of(fakeTagList(FactoryItemTags.FERMENTER_TO_BIOMASS_SMALL)), OutputStack.of(FactoryItems.BIOMASS, 0.10f), 80),
-                        SimpleFermentingRecipe.of("biomass_medium", "", Ingredient.of(fakeTagList(FactoryItemTags.FERMENTER_TO_BIOMASS_MEDIUM)), OutputStack.of(FactoryItems.BIOMASS, 0.40f), 110)//,
-                        //SimpleFermentingRecipe.of("biomass_large", "", Ingredient.of(fakeTagList(FactoryItemTags.FERMENTER_TO_BIOMASS_LARGE)), OutputStack.of(FactoryItems.BIOMASS, 0.75f, 2), 140)
+                        SimpleFermentingRecipe.of("biomass_small", "", Ingredient.of(lookupTag(FactoryItemTags.FERMENTER_TO_BIOMASS_SMALL)), OutputStack.of(FactoryItems.BIOMASS, 0.10f), 80),
+                        SimpleFermentingRecipe.of("biomass_medium", "", Ingredient.of(lookupTag(FactoryItemTags.FERMENTER_TO_BIOMASS_MEDIUM)), OutputStack.of(FactoryItems.BIOMASS, 0.40f), 110)//,
+                        //SimpleFermentingRecipe.of("biomass_large", "", Ingredient.of(fakeTag(FactoryItemTags.FERMENTER_TO_BIOMASS_LARGE)), OutputStack.of(FactoryItems.BIOMASS, 0.75f, 2), 140)
                         );
 
                 this.shapeless(RecipeCategory.FOOD, FactoryItems.CHEESE_WEDGE, 7)
@@ -1704,8 +1724,8 @@ class RecipesProvider extends FabricRecipeProvider {
                 fluidBasePotion(output, Items.LINGERING_POTION, FactoryItems.LINGERING_THROWABLE_GLASS_BOTTLE, FluidConstants.BOTTLE, SoundEvents.BOTTLE_FILL, SoundEvents.BOTTLE_EMPTY);
                 fluidBasePotion(output, FactoryItems.BRITTLE_POTION, FactoryItems.BRITTLE_GLASS_BOTTLE, FluidConstants.BOTTLE, SoundEvents.BOTTLE_FILL, SoundEvents.BOTTLE_EMPTY);
 
-                output.accept(recipeKey("drain/container_empty"), new ContainerEmptyDrainRecipe(Ingredient.of(fakeTagList(FactoryItemTags.DYNAMIC_FLUID_INTERACTION))), null);
-                output.accept(recipeKey("spout/container_fill"), new ContainerFillSpoutRecipe(Ingredient.of(fakeTagList(FactoryItemTags.DYNAMIC_FLUID_INTERACTION))), null);
+                output.accept(recipeKey("drain/container_empty"), new ContainerEmptyDrainRecipe(Ingredient.of(lookupTag(FactoryItemTags.DYNAMIC_FLUID_INTERACTION))), null);
+                output.accept(recipeKey("spout/container_fill"), new ContainerFillSpoutRecipe(Ingredient.of(lookupTag(FactoryItemTags.DYNAMIC_FLUID_INTERACTION))), null);
 
                 output.accept(recipeKey("spout/experience_repair"), new RepairSpoutRecipe(), null);
                 output.accept(recipeKey("spout/sticky_piston"), SimpleSpoutRecipe.toItem(Items.PISTON, FactoryFluids.SLIME.of(FluidConstants.BLOCK / 10), Items.STICKY_PISTON, SoundEvents.SLIME_BLOCK_PLACE), null);
@@ -1760,7 +1780,7 @@ class RecipesProvider extends FabricRecipeProvider {
                     destructiveEffectOnlyFluidInteraction(output, fluidInteractionName(FactoryFluids.BIODIESEL, s),
                             100,
                             List.of(FactoryFluids.BIODIESEL.ofMilliBucket(10), s.ofMilliBucket(1)),
-                            ExplodeFluidInteractionEffect.simple(registryLookup, 1.5f / 100f, 2f / 100f)
+                            ExplodeFluidInteractionEffect.simple(this.output, 1.5f / 100f, 2f / 100f)
                             );
                 }
 
@@ -1832,10 +1852,10 @@ class RecipesProvider extends FabricRecipeProvider {
                 output.accept(recipeKey("casting/iron_bars"), SimpleCastingRecipe.fluid(FactoryFluids.IRON.of(FluidConstants.BLOCK * 6 / 16), Items.IRON_BARS, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value(), 40), null);
 
                 of(output,
-                        SimpleSmelteryRecipe.of("minecraft_glass", ItemTags.SMELTS_TO_GLASS, FactoryFluids.GLASS.of(FluidConstants.BLOCK * 10 / 9), FactoryFluidConstants.GLASS_MELTING),
-                        SimpleSmelteryRecipe.of("minecraft_glass", ConventionalItemTags.GLASS_BLOCKS, FactoryFluids.GLASS.of(FluidConstants.BLOCK), FactoryFluidConstants.GLASS_MELTING),
-                        SimpleSmelteryRecipe.of("minecraft_glass", ConventionalItemTags.GLASS_PANES, FactoryFluids.GLASS.of(FluidConstants.BLOCK * 6 / 16), FactoryFluidConstants.GLASS_MELTING * 6 / 16),
-                        SimpleSmelteryRecipe.of("minecraft_glass", FactoryItemTags.GLASS_BOTTLE_MELTABLE, FactoryFluids.GLASS.of(FluidConstants.BLOCK / 2), FactoryFluidConstants.GLASS_MELTING / 2),
+                        SimpleSmelteryRecipe.of("minecraft_glass", lookupTag(ItemTags.SMELTS_TO_GLASS), FactoryFluids.GLASS.of(FluidConstants.BLOCK * 10 / 9), FactoryFluidConstants.GLASS_MELTING),
+                        SimpleSmelteryRecipe.of("minecraft_glass", lookupTag(ConventionalItemTags.GLASS_BLOCKS), FactoryFluids.GLASS.of(FluidConstants.BLOCK), FactoryFluidConstants.GLASS_MELTING),
+                        SimpleSmelteryRecipe.of("minecraft_glass", lookupTag(ConventionalItemTags.GLASS_PANES), FactoryFluids.GLASS.of(FluidConstants.BLOCK * 6 / 16), FactoryFluidConstants.GLASS_MELTING * 6 / 16),
+                        SimpleSmelteryRecipe.of("minecraft_glass", lookupTag(FactoryItemTags.GLASS_BOTTLE_MELTABLE), FactoryFluids.GLASS.of(FluidConstants.BLOCK / 2), FactoryFluidConstants.GLASS_MELTING / 2),
                         new RecipeHolder<>(recipeKey("casting/cauldron/glass"),
                                 SimpleCauldronCastingRecipe.toItem(FactoryFluids.GLASS.of(FluidConstants.BLOCK), Items.GLASS, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value(), 60))
                 );
@@ -1856,14 +1876,18 @@ class RecipesProvider extends FabricRecipeProvider {
                 this.netheriteSmithing(FactoryItems.DIAMOND_DRILL_HEAD, RecipeCategory.TOOLS, FactoryItems.NETHERITE_DRILL_HEAD);
             }
 
+            private HolderSet.Named<Item> lookupTag(TagKey<Item> tag) {
+                return this.output.lookup(Registries.ITEM).getOrThrow(tag);
+            }
+
             private void moldRecipes(SpoutMolds molds, FluidStack<?> fluidStack, Item item) {
                 output.accept(recipeKey("spout/" + BuiltInRegistries.ITEM.getKey(item).getPath() + "_with_molds"),
-                        SimpleSpoutRecipe.templateDamaged(molds.tag(), fluidStack,
+                        SimpleSpoutRecipe.templateDamaged(lookupTag(molds.tag()), fluidStack,
                                 item, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value(), 60), null
                 );
 
                 output.accept(recipeKey("casting/" + BuiltInRegistries.ITEM.getKey(item).getPath() + "_with_molds"),
-                        SimpleCastingRecipe.templateDamaged(molds.tag(), fluidStack,
+                        SimpleCastingRecipe.templateDamaged(lookupTag(molds.tag()), fluidStack,
                                 item, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value(), 60), null
                 );
             }
@@ -1886,7 +1910,7 @@ class RecipesProvider extends FabricRecipeProvider {
                         .save(output);
 
                 output.accept(recipeKey("casting/mold_" + mold.name().getPath()),
-                        SimpleCastingRecipe.toItem(tag, FactoryFluids.STEEL.of(FluidConstants.INGOT * 4),
+                        SimpleCastingRecipe.toItem(lookupTag(tag), FactoryFluids.STEEL.of(FluidConstants.INGOT * 4),
                                 mold.mold(), FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value(), 40), null
                 );
 
@@ -1923,7 +1947,7 @@ class RecipesProvider extends FabricRecipeProvider {
                 var group = FactoryRegistries.FLUID_TYPES.getKey(fluidType).toDebugFileName();
                 of(output,
                         raw != null ? SimpleSmelteryRecipe.of(group, raw, fluidType.of(FluidConstants.INGOT + FluidConstants.NUGGET * 3), ingotTime * 5 / 4) : null,
-                        oreBlock != null ? SimpleSmelteryRecipe.of(group, oreBlock, fluidType.of(FluidConstants.INGOT * 2), ingotTime * 3 / 2) : null,
+                        oreBlock != null ? SimpleSmelteryRecipe.of(group, lookupTag(oreBlock), fluidType.of(FluidConstants.INGOT * 2), ingotTime * 3 / 2) : null,
                         rawBlock != null ? SimpleSmelteryRecipe.of(group, rawBlock, fluidType.of((FluidConstants.INGOT + FluidConstants.NUGGET) * 9), (ingotTime * 3 / 2) * 9) : null,
                         crushed != null ? SimpleSmelteryRecipe.of(group, crushed, fluidType.of(FluidConstants.INGOT + FluidConstants.NUGGET * 3), (ingotTime * 5 / 4)) : null,
                         plate != null ? SimpleSmelteryRecipe.of(group, plate, fluidType.of(FluidConstants.INGOT), ingotTime) : null,
@@ -1960,53 +1984,53 @@ class RecipesProvider extends FabricRecipeProvider {
                 return FactoryRegistries.FLUID_TYPES.getKey(fluidA).getPath() + "_" + FactoryRegistries.FLUID_TYPES.getKey(fluidB).getPath();
             }
 
-            private void destructiveEffectOnlyFluidInteraction(RecipeOutput exporter, String name, int repeats, List<FluidStack<?>> fluids, FluidInteractionEffect... effects) {
+            private void destructiveEffectOnlyFluidInteraction(RecipeOutput output, String name, int repeats, List<FluidStack<?>> fluids, FluidInteractionEffect... effects) {
                 var base = recipeKey("fluid_interaction/" + name);
                 var remove = recipeKey("fluid_interaction/" + name + "_leftover");
 
-                exporter.accept(base, new SimpleFluidInteractionRecipe(
+                output.accept(base, new SimpleFluidInteractionRecipe(
                         fluids.stream().map(FluidInputStack::from).toList(), List.of(), List.of(), Optional.empty(), Optional.empty(), 0.25f,
                         Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, repeats, List.of(effects)
                 ), null);
 
-                exporter.accept(remove, new RemovingFluidInteractionRecipe(
+                output.accept(remove, new RemovingFluidInteractionRecipe(
                         fluids.stream().map(FluidInputStack::from).toList(), Optional.empty(), Optional.empty(), 0.25f,
                         Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY
                 ), null);
             }
 
-            private void destructiveItemCreatingFluidInteraction(RecipeOutput exporter, String name, int repeats, List<FluidStack<?>> fluids, OutputStack item, ParticleOptions particleEffect,
+            private void destructiveItemCreatingFluidInteraction(RecipeOutput output, String name, int repeats, List<FluidStack<?>> fluids, OutputStack item, ParticleOptions particleEffect,
                                                                  SoundEvent soundEvent, FluidInteractionEffect... effects) {
                 var base = recipeKey("fluid_interaction/" + name);
                 var remove = recipeKey("fluid_interaction/" + name + "_leftover");
 
-                exporter.accept(base, new SimpleFluidInteractionRecipe(
+                output.accept(base, new SimpleFluidInteractionRecipe(
                         fluids.stream().map(FluidInputStack::from).toList(), List.of(), List.of(item), Optional.of(particleEffect), Optional.of(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundEvent)), 0.25f,
                         Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, repeats, List.of(effects)
                 ), null);
 
-                exporter.accept(remove, new RemovingFluidInteractionRecipe(
+                output.accept(remove, new RemovingFluidInteractionRecipe(
                         fluids.stream().map(FluidInputStack::from).toList(), Optional.of(particleEffect), Optional.of(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundEvent)), 0.25f,
                         Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY
                 ), null);
             }
 
 
-            private void fluidBase(RecipeOutput exporter, Item withFluid, Item emptyContainer, FluidStack<?> fluid, SoundEvent fillSound, SoundEvent emptySound) {
+            private void fluidBase(RecipeOutput output, Item withFluid, Item emptyContainer, FluidStack<?> fluid, SoundEvent fillSound, SoundEvent emptySound) {
                 var base = BuiltInRegistries.ITEM.getKey(withFluid).getPath();
 
-                exporter.accept(recipeKey("drain/from_" + base), SimpleDrainRecipe.fromItem(withFluid, fluid, emptyContainer, emptySound), null);
-                exporter.accept(recipeKey("drain/to_" + base), SimpleDrainRecipe.toItem(emptyContainer, fluid, withFluid, fillSound), null);
-                exporter.accept(recipeKey("spout/to_" + base), SimpleSpoutRecipe.toItem(emptyContainer, fluid, withFluid, fillSound), null);
+                output.accept(recipeKey("drain/from_" + base), SimpleDrainRecipe.fromItem(withFluid, fluid, emptyContainer, emptySound), null);
+                output.accept(recipeKey("drain/to_" + base), SimpleDrainRecipe.toItem(emptyContainer, fluid, withFluid, fillSound), null);
+                output.accept(recipeKey("spout/to_" + base), SimpleSpoutRecipe.toItem(emptyContainer, fluid, withFluid, fillSound), null);
             }
 
             @SuppressWarnings("SameParameterValue")
-            private void fluidBasePotion(RecipeOutput exporter, Item withFluid, Item emptyContainer, long fluid, SoundEvent fillSound, SoundEvent emptySound) {
+            private void fluidBasePotion(RecipeOutput output, Item withFluid, Item emptyContainer, long fluid, SoundEvent fillSound, SoundEvent emptySound) {
                 var base = BuiltInRegistries.ITEM.getKey(withFluid).getPath();
 
-                exporter.accept(recipeKey("drain/from_" + base), PotionAddDrainRecipe.of(withFluid, fluid, emptyContainer, emptySound), null);
-                exporter.accept(recipeKey("drain/to_" + base), PotionRemoveDrainRecipe.of(emptyContainer, fluid, withFluid, fillSound), null);
-                exporter.accept(recipeKey("spout/to_" + base), PotionSpoutRecipe.of(emptyContainer, fluid, withFluid, fillSound), null);
+                output.accept(recipeKey("drain/from_" + base), PotionAddDrainRecipe.of(withFluid, fluid, emptyContainer, emptySound), null);
+                output.accept(recipeKey("drain/to_" + base), PotionRemoveDrainRecipe.of(emptyContainer, fluid, withFluid, fillSound), null);
+                output.accept(recipeKey("spout/to_" + base), PotionSpoutRecipe.of(emptyContainer, fluid, withFluid, fillSound), null);
             }
 
             private String getShortString(Holder<?> entry) {
@@ -2017,18 +2041,13 @@ class RecipesProvider extends FabricRecipeProvider {
             }
 
 
-            public void of(RecipeOutput exporter, RecipeHolder<?>... recipes) {
+            public void of(RecipeOutput output, RecipeHolder<?>... recipes) {
                 for (var recipe : recipes) {
                     if (recipe != null) {
-                        exporter.accept(recipe.id(), recipe.value(), null);
+                        output.accept(recipe.id(), recipe.value(), null);
                     }
                 }
             }
         };
-    }
-
-    @Override
-    public String getName() {
-        return "recipes";
     }
 }

@@ -8,5 +8,5 @@ import org.jspecify.annotations.Nullable;
 import java.util.function.Consumer;
 
 public interface CustomItemBrokenHandler {
-    boolean onItemBreakingDamageApplied(ItemStack itemStack, @Nullable ServerPlayer player, Consumer<Item> onBreak);
+    boolean onItemBreakingDamageApplied(ItemStack itemStack, @Nullable ServerPlayer player, Consumer<ItemStack> onBreak);
 }

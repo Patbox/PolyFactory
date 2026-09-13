@@ -17,6 +17,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -64,13 +65,13 @@ public class WrenchItem extends SimplePolymerItem implements SwitchActionItem {
                 && !main.getOrDefault(FactoryDataComponents.READ_ONLY, false)
                 && raycast instanceof BlockHitResult result
                 && WrenchHandler.of(player).useBlockAction(player, player.level(), result.getBlockPos(), result.getDirection(), true).consumesAction()) {
-            player.swing(mainHand, true);
+            player.swing(mainHand, SwingAnimation.DEFAULT, true);
         }
         if (raycast.getType() == HitResult.Type.ENTITY
                 && !main.getOrDefault(FactoryDataComponents.READ_ONLY, false)
                 && raycast instanceof EntityHitResult result
                 && WrenchHandler.of(player).useEntityAction(player, result.getEntity(), result.getLocation(), true).consumesAction()) {
-            player.swing(mainHand, true);
+            player.swing(mainHand, SwingAnimation.DEFAULT, true);
         }
 
         return true;
@@ -104,8 +105,8 @@ public class WrenchItem extends SimplePolymerItem implements SwitchActionItem {
             }
 
             var res = WrenchHandler.of(player1).useEntityAction(player1, entity, entityHitResult.getLocation(), false);
-            if (res instanceof InteractionResult.Success success && success.swingSource() == InteractionResult.SwingSource.SERVER) {
-                player.swing(hand, true);
+            if (res instanceof InteractionResult.Success success && success.swingSource() == InteractionResult.SwingSource.SERVER_ONLY) {
+                player.swing(hand, SwingAnimation.DEFAULT, true);
             }
             return res;
         }

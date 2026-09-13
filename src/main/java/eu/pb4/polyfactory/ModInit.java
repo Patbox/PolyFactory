@@ -84,6 +84,8 @@ public class ModInit implements ModInitializer {
 		FluidTextures.setup();
 		FactoryModels.load();
 
+		DynamicContent.setup();
+
 		ConveyorModels.registerAssetsEvents();
 		UiResourceCreator.setup();
 		GuiTextures.register();

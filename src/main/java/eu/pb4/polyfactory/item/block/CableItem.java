@@ -39,7 +39,7 @@ public class CableItem extends ColoredDownsampledBlockItem {
                 BlockState blockState2 = world.getBlockState(blockPos);
                 if (blockState2.is(convert.getBlock())) {
                     blockState2 = ((BlockItemAccessor) this).callUpdateBlockStateFromTag(blockPos, world, itemStack, blockState2);
-                    this.updateCustomBlockEntityTag(blockPos, world, playerEntity, itemStack, blockState2);
+                    this.updateCustomBlockEntityTag(world, playerEntity, blockPos, itemStack);
                     BlockItemAccessor.callUpdateBlockEntityComponents(world, blockPos, itemStack);
                     blockState2.getBlock().setPlacedBy(world, blockPos, blockState2, playerEntity, itemStack);
                     if (playerEntity instanceof ServerPlayer) {

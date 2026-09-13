@@ -1,6 +1,5 @@
 package eu.pb4.polyfactory.datagen;
 
-import eu.pb4.factorytools.api.block.FactoryBlock;
 import eu.pb4.polyfactory.block.FactoryBlocks;
 import eu.pb4.polyfactory.block.data.WallWithCableBlock;
 import eu.pb4.polyfactory.block.data.util.DirectionalCabledDataBlock;
@@ -15,6 +14,8 @@ import eu.pb4.polyfactory.loottable.CopyFluidsLootFunction;
 import eu.pb4.polyfactory.loottable.CopyReadOnlyLootFunction;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootSubProvider;
+import net.minecraft.advancements.predicates.BlockPredicate;
+import net.minecraft.advancements.predicates.LocationPredicate;
 import net.minecraft.advancements.predicates.StatePropertiesPredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.Item;
@@ -23,8 +24,8 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.predicates.LocationCheck;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
@@ -101,14 +102,14 @@ class LootTables extends FabricBlockLootSubProvider {
         this.dropSelf(FactoryBlocks.FLUID_TANK);
         this.add(FactoryBlocks.PORTABLE_FLUID_TANK, LootTable.lootTable().withPool(LootPool.lootPool()
                 .when(ExplosionCondition.survivesExplosion())
-                .setRolls(ConstantValue.exactly(1.0F))
+                .setRolls(ContextIntProviders.exactly(1))
                 .add(LootItem.lootTableItem(FactoryBlocks.PORTABLE_FLUID_TANK)
                         .apply(() -> CopyFluidsLootFunction.INSTANCE)
                 )));
 
         this.add(FactoryBlocks.DATA_MEMORY, LootTable.lootTable().withPool(LootPool.lootPool()
                 .when(ExplosionCondition.survivesExplosion())
-                .setRolls(ConstantValue.exactly(1.0F))
+                .setRolls(ContextIntProviders.exactly(1))
                 .add(LootItem.lootTableItem(FactoryItems.DATA_MEMORY)
                         .apply(() -> CopyCachedDataLootFunction.INSTANCE)
                         .apply(() -> CopyReadOnlyLootFunction.INSTANCE)
@@ -157,14 +158,16 @@ class LootTables extends FabricBlockLootSubProvider {
             for (int i = 0; i <= 6; i++) {
                 table.withPool(LootPool.lootPool()
                         .when(ExplosionCondition.survivesExplosion())
-                        .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(FactoryBlocks.CHEESE_WHEEL)
-                                .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(CheeseBlock.BITES, i)))
-                        .setRolls(ConstantValue.exactly(7 - i))
+                        .when(LocationCheck.checkLocation(LocationPredicate.Builder.location()
+                                .setBlock(BlockPredicate.Builder.block().of(blocks, FactoryBlocks.CHEESE_WHEEL)
+                                        .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(CheeseBlock.BITES, i)))
+                        ))
+                        .setRolls(ContextIntProviders.exactly(7 - i))
                         .add(LootItem.lootTableItem(FactoryItems.CHEESE_WEDGE))
                 );
             }
 
-            this.add(FactoryBlocks.CHEESE_WHEEL,  table);
+            this.add(FactoryBlocks.CHEESE_WHEEL, table);
         }
     }
 
@@ -176,35 +179,42 @@ class LootTables extends FabricBlockLootSubProvider {
         this.add(block, LootTable.lootTable()
                 .withPool(LootPool.lootPool()
                         .when(ExplosionCondition.survivesExplosion())
-                        .setRolls(ConstantValue.exactly(1.0F))
+                        .setRolls(ContextIntProviders.exactly(1))
                         .add(LootItem.lootTableItem(FactoryBlocks.AXLE)))
                 .withPool(LootPool.lootPool()
                         .when(ExplosionCondition.survivesExplosion())
-                        .setRolls(ConstantValue.exactly(1.0F))
+                        .setRolls(ContextIntProviders.exactly(1))
                         .add(LootItem.lootTableItem(item)))
         );
     }
 
     public <T extends Block> void createMultiPropConditionTable(T block, BiFunction<T, StatePropertiesPredicate.Builder, StatePropertiesPredicate.Builder> predicate) {
         this.add(block, LootTable.lootTable()
-                .withPool(this.applyExplosionCondition(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F))
+                .withPool(this.applyExplosionCondition(block, LootPool.lootPool().setRolls(ContextIntProviders.exactly(1))
                         .add(LootItem.lootTableItem(block)
-                                .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(block).setProperties(predicate.apply(block, StatePropertiesPredicate.Builder.properties())))))));
+                                .when(LocationCheck.checkLocation(LocationPredicate.Builder.location()
+                                        .setBlock(BlockPredicate.Builder.block()
+                                                .setProperties(predicate.apply(block, StatePropertiesPredicate.Builder.properties()))
+                                        ))
+                                )))));
     }
 
     private void addOptionalCable(Block block) {
         this.add(block, LootTable.lootTable()
                 .withPool(LootPool.lootPool()
                         .when(ExplosionCondition.survivesExplosion()
-                                .and(LootItemBlockStatePropertyCondition.hasBlockStateProperties(block).setProperties(StatePropertiesPredicate.Builder.properties()
-                                        .hasProperty(DirectionalCabledDataBlock.HAS_CABLE, true))))
+                                .and(LocationCheck.checkLocation(LocationPredicate.Builder.location()
+                                                .setBlock(BlockPredicate.Builder.block()
+                                                        .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(DirectionalCabledDataBlock.HAS_CABLE, true)))
+                                                ))
+                        )
                         .add(LootItem.lootTableItem(FactoryItems.CABLE)
                                 .apply(() -> CopyColorLootFunction.INSTANCE)
                         )
                 )
                 .withPool(LootPool.lootPool()
                         .when(ExplosionCondition.survivesExplosion())
-                        .setRolls(ConstantValue.exactly(1.0F))
+                        .setRolls(ContextIntProviders.exactly(1))
                         .add(LootItem.lootTableItem(block)))
         );
     }
@@ -218,7 +228,7 @@ class LootTables extends FabricBlockLootSubProvider {
                 )
                 .withPool(LootPool.lootPool()
                         .when(ExplosionCondition.survivesExplosion())
-                        .setRolls(ConstantValue.exactly(1.0F))
+                        .setRolls(ContextIntProviders.exactly(1))
                         .add(LootItem.lootTableItem(block.backing())))
         );
     }
@@ -230,7 +240,7 @@ class LootTables extends FabricBlockLootSubProvider {
                 )
                 .withPool(LootPool.lootPool()
                         .when(ExplosionCondition.survivesExplosion())
-                        .setRolls(ConstantValue.exactly(1.0F))
+                        .setRolls(ContextIntProviders.exactly(1))
                         .add(LootItem.lootTableItem(block.backing())))
         );
     }
@@ -243,7 +253,7 @@ class LootTables extends FabricBlockLootSubProvider {
     private void addColored(Block block, Consumer<LootTable.Builder> consumer) {
         var x = LootTable.lootTable().withPool(LootPool.lootPool()
                 .when(ExplosionCondition.survivesExplosion())
-                .setRolls(ConstantValue.exactly(1.0F))
+                .setRolls(ContextIntProviders.exactly(1))
                 .add(LootItem.lootTableItem(block)
                         .apply(() -> CopyColorLootFunction.INSTANCE)
                 ));

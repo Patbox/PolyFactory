@@ -121,7 +121,7 @@ public class ContainerBlock extends Block implements FactoryBlock, EntityBlock, 
             if (world.getBlockEntity(pos) instanceof ContainerBlockEntity be && be.checkUnlocked(player)) {
                 if (!be.isEmpty()) {
                     var stack = be.extract(player.isShiftKeyDown() ? be.getItemStack().getMaxStackSize() : 1);
-                    player.getInventory().placeItemBackInInventory(stack);
+                    player.getInventory().placeItemBackInInventory(stack, Prediction.SERVER_ONLY);
                 } else {
                     be.setItemStack(ItemStack.EMPTY);
                 }

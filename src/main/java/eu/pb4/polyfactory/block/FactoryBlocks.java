@@ -172,7 +172,7 @@ public class FactoryBlocks {
     public static final CreativeDrainBlock CREATIVE_DRAIN = register(FactoryBlockIds.CREATIVE_DRAIN, BlockBehaviour.Properties.ofFullCopy(DRAIN), settings -> new CreativeDrainBlock(settings.noLootTable().strength(-1)));
     public static final FluidTankBlock FLUID_TANK = register(FactoryBlockIds.FLUID_TANK, BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK.weathering().unaffected()), settings -> new FluidTankBlock(settings.noOcclusion()));
     public static final PortableFluidTankBlock PORTABLE_FLUID_TANK = register(FactoryBlockIds.PORTABLE_FLUID_TANK, settings -> new PortableFluidTankBlock(settings
-            .mapColor(MapColor.COLOR_ORANGE).strength(2.0F).noOcclusion().sound(SoundType.COPPER).pushReaction(PushReaction.DESTROY)));
+            .mapColor(MapColor.COLOR_ORANGE).strength(2.0F).noOcclusion().sound(SoundType.COPPER).pushReaction(PushReaction.POPPED)));
 
     public static final SimpleFastBlock STEEL_BLOCK = register(FactoryBlockIds.STEEL_BLOCK, BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK), SimpleFastBlock::create);
     public static final TpsProviderBlock TPS_PROVIDER = register(FactoryBlockIds.TPS_PROVIDER, BlockBehaviour.Properties.ofFullCopy(Blocks.COMMAND_BLOCK).noOcclusion(), TpsProviderBlock::new);

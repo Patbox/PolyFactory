@@ -23,7 +23,7 @@ public class BlockCollector {
     }
 
     private static void collectRecursive(ServerLevel world, BlockState state, HashSet<BlockPos> set, BlockPos.MutableBlockPos startMut, BlockPos.MutableBlockPos endMut, BlockPos.MutableBlockPos mut) {
-        if (set.contains(mut) || state.getPistonPushReaction() == PushReaction.BLOCK || state.getBlock() instanceof EntityBlock) {
+        if (set.contains(mut) || state.getPistonPushReaction() == PushReaction.IMMOVEABLE || state.getBlock() instanceof EntityBlock) {
             return;
         }
 

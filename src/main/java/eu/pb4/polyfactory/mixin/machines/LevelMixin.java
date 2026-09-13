@@ -37,9 +37,6 @@ public abstract class LevelMixin implements LevelAccessor {
     public abstract BlockEntity getBlockEntity(BlockPos pos);
 
     @Shadow
-    public abstract boolean setBlock(BlockPos pos, BlockState state, int flags);
-
-    @Shadow
     public abstract boolean isLoaded(BlockPos pos);
 
     @Inject(method = "updateNeighbourForOutputSignal", at = @At("HEAD"))

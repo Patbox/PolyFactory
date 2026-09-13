@@ -9,6 +9,8 @@ import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.core.registries.codec.RegistryCodecs;
+import net.minecraft.data.worldgen.BootstrapContextAccess;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -39,7 +41,7 @@ public record ExplodeFluidInteractionEffect(Optional<Holder<DamageType>> damageT
     public static final MapCodec<ExplodeFluidInteractionEffect> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             DamageType.CODEC.optionalFieldOf("damage_type").forGetter(ExplodeFluidInteractionEffect::damageType),
             LevelBasedValue.CODEC.optionalFieldOf("knockback_multiplier").forGetter(ExplodeFluidInteractionEffect::knockbackMultiplier),
-            RegistryCodecs.homogeneousList(Registries.BLOCK).optionalFieldOf("immune_blocks").forGetter(ExplodeFluidInteractionEffect::immuneBlocks),
+            RegistryCodecs.holderSet(Registries.BLOCK).optionalFieldOf("immune_blocks").forGetter(ExplodeFluidInteractionEffect::immuneBlocks),
             Vec3.CODEC.optionalFieldOf("offset", Vec3.ZERO).forGetter(ExplodeFluidInteractionEffect::offset),
             LevelBasedValue.CODEC.fieldOf("radius").forGetter(ExplodeFluidInteractionEffect::radius),
             Codec.BOOL.optionalFieldOf("create_fire", false).forGetter(ExplodeFluidInteractionEffect::createFire),
@@ -51,9 +53,9 @@ public record ExplodeFluidInteractionEffect(Optional<Holder<DamageType>> damageT
     ).apply(instance, ExplodeFluidInteractionEffect::new));
 
 
-    public static ExplodeFluidInteractionEffect simple(HolderLookup.Provider access, float power, float perLevel) {
+    public static ExplodeFluidInteractionEffect simple(BootstrapContextAccess access, float power, float perLevel) {
         return new ExplodeFluidInteractionEffect(
-                access.get(DamageTypes.EXPLOSION).map(Function.identity()),
+                access.lookup(Registries.DAMAGE_TYPE).get(DamageTypes.EXPLOSION).map(Function.identity()),
                 Optional.of(new LevelBasedValue.Constant(1)),
                 Optional.empty(),
                 Vec3.ZERO,

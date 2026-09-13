@@ -25,6 +25,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
@@ -247,7 +248,7 @@ public class MoldMakingTableBlock extends Block implements FactoryBlock, Barrier
 
                 slot.onTake(player, slotStack);
                 if (index == 1) {
-                    player.drop(slotStack, false);
+                    player.drop(slotStack, false, Prediction.SERVER_ONLY);
                 }
             }
 

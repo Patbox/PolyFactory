@@ -30,7 +30,6 @@ import eu.pb4.polyfactory.recipe.casting.SimpleCauldronCastingRecipe;
 import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
 import eu.pb4.polyfactory.recipe.fermenting.SimpleFermentingRecipe;
 import eu.pb4.polyfactory.recipe.grinding.SimpleGrindingRecipe;
-import eu.pb4.polyfactory.recipe.grinding.StrippingGrindingRecipe;
 import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.BrewingMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
@@ -67,7 +66,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleUnaryOperator;
 import java.util.stream.Collectors;
 
@@ -92,7 +90,6 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(BrewingMixingRecipe.class, BrewingMixerRecipePage::new);
 
         PolydexPage.registerRecipeViewer(SimpleGrindingRecipe.class, SimpleGrindingRecipePage::new);
-        PolydexPage.registerRecipeViewer(StrippingGrindingRecipe.class, StrippingGrindingRecipePage::new);
 
         PolydexPage.registerRecipeViewer(SimpleTrommelRecipe.class, SimpleTrommelRecipePage::new);
 

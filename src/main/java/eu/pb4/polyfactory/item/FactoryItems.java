@@ -33,9 +33,6 @@ import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
-import net.fabricmc.fabric.api.registry.CompostableRegistry;
-import net.fabricmc.fabric.api.registry.FabricPotionBrewingBuilder;
-import net.fabricmc.fabric.api.registry.FuelValueEvents;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.Registry;
@@ -297,7 +294,8 @@ public class FactoryItems {
     }
 
     public static void register() {
-        FuelValueEvents.BUILD.register(((builder, context) -> {
+        // Todo
+        /*FuelValueEvents.BUILD.register(((builder, context) -> {
             builder.add(SAW_DUST, (int) (context.baseSmeltTime() * 0.3));
             builder.add(WOODEN_PLATE, (int) (context.baseSmeltTime() * 0.6));
             builder.add(COAL_DUST, (int) (context.baseSmeltTime() * 0.8));
@@ -308,7 +306,7 @@ public class FactoryItems {
 
         FabricPotionBrewingBuilder.BUILD.register(builder -> {
             builder.addContainer(BRITTLE_POTION);
-        });
+        });*/
 
         BuiltInRegistries.ITEM.addAlias(id("copper_nugget"), Identifier.parse("copper_nugget"));
         BuiltInRegistries.ITEM.addAlias(id("fauced"), id("faucet"));

@@ -402,7 +402,7 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
                             vec.set(x - this.centerX, y - this.centerY, z - this.centerZ);
                             vec.rotate(this.newQuaternion);
                             b.add(new ClientboundEntityPositionSyncPacket(id,
-                                    new PositionMoveRotation(new Vec3(pos.x + vec.x, pos.y + vec.y - 0.5, pos.z + vec.z), Vec3.ZERO, 0, 0), false
+                                    new PositionPath.Linear(new Vec3(pos.x + vec.x, pos.y + vec.y - 0.5, pos.z + vec.z)), 0, 0, false
                             ));
                             vec2.set(x - this.centerX, y - this.centerY, z - this.centerZ);
                             vec2.rotate(this.quaternion);

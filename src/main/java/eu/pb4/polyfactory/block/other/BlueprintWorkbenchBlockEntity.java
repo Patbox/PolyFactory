@@ -30,6 +30,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -146,7 +147,7 @@ public class BlueprintWorkbenchBlockEntity extends LockableBlockEntity implement
 
         FactoryUtil.playSoundToPlayer(player,SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.5f, 1);
         TriggerCriterion.trigger(player, FactoryTriggers.CRAFT_WITH_BLUEPRINT_WORKBENCH);
-        player.swing(InteractionHand.MAIN_HAND, true);
+        player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
     }
 
     public void markSlotDirty(int index) {

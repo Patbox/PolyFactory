@@ -4,8 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.NonNullList;
+import net.minecraft.core.*;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ExtraCodecs;
@@ -25,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public record CraftingWithLeftoverRecipe<T extends CraftingRecipe>(RecipeSerializer<CraftingWithLeftoverRecipe<T>> serializer, T backingRecipe, List<Ingredient> leftovers) implements CraftingRecipe {
     public static <T extends CraftingRecipe> MapCodec<CraftingWithLeftoverRecipe<T>> createCodec(MapCodec<T> recipeCodec, Supplier<RecipeSerializer<CraftingWithLeftoverRecipe<T>>> serializer) {
@@ -45,6 +45,16 @@ public record CraftingWithLeftoverRecipe<T extends CraftingRecipe>(RecipeSeriali
     public static RecipeOutput asExporter(RecipeOutput exporter, Ingredient... leftover) {
         return new RecipeOutput() {
             @Override
+            public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> key) {
+                return exporter.lookup(key);
+            }
+
+            @Override
+            public <S> Stream<Holder.Reference<S>> listContextElements(ResourceKey<? extends Registry<? extends S>> key) {
+                return exporter.listContextElements(key);
+            }
+
+            @Override
             public void accept(ResourceKey<Recipe<?>> key, Recipe<?> recipe, @Nullable AdvancementHolder advancement) {
                 if (recipe instanceof ShapedRecipe shapedRecipe) {
                     exporter.accept(key, of(shapedRecipe, leftover), advancement);
@@ -56,11 +66,6 @@ public record CraftingWithLeftoverRecipe<T extends CraftingRecipe>(RecipeSeriali
             @Override
             public Advancement.Builder advancement() {
                 return exporter.advancement();
-            }
-
-            @Override
-            public void includeRootAdvancement() {
-                exporter.includeRootAdvancement();
             }
         };
     }

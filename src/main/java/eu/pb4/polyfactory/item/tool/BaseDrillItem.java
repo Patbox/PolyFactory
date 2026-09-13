@@ -181,9 +181,9 @@ public class BaseDrillItem extends Item implements PolymerItem, CustomItemBroken
     }
 
     @Override
-    public boolean onItemBreakingDamageApplied(ItemStack itemStack, @Nullable ServerPlayer player, Consumer<Item> onBreak) {
+    public boolean onItemBreakingDamageApplied(ItemStack itemStack, @Nullable ServerPlayer player, Consumer<ItemStack> onBreak) {
         var head = takeItemFrom(itemStack);
-        onBreak.accept(head.getItem());
+        onBreak.accept(head);
         return true;
     }
 

@@ -177,7 +177,7 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
             world.setBlockAndUpdate(pos, FactoryBlocks.CONVEYOR.withPropertiesOf(state));
             world.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(Blocks.SLIME_BLOCK.defaultBlockState()));
             if (!player.isCreative()) {
-                player.getInventory().placeItemBackInInventory(Items.SLIME_BALL.getDefaultInstance());
+                player.getInventory().placeItemBackInInventory(Items.SLIME_BALL.getDefaultInstance(), Prediction.SERVER_ONLY);
             }
 
             if (itemContainer != null && world.getBlockEntity(pos) instanceof ConveyorBlockEntity conveyor) {

@@ -39,6 +39,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.Util;
 import net.minecraft.util.random.WeightedList;
@@ -284,7 +285,7 @@ public class FactoryUtil {
 
     public static void sendVelocityDelta(ServerPlayer player, Vec3 delta) {
         player.connection.send(new ClientboundExplodePacket(new Vec3(player.getX(), player.getY() - 9999, player.getZ()), 0, 0, Optional.of(delta),
-                ParticleTypes.BUBBLE, BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.EMPTY), WeightedList.of()));
+                ParticleTypes.BUBBLE, BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.EMPTY), WeightedList.of(), false));
     }
 
     public static float wrap(float value, float min, float max) {
@@ -321,7 +322,7 @@ public class FactoryUtil {
                 return outputStack;
             } else {
                 if (!player.getInventory().add(outputStack)) {
-                    player.drop(outputStack, false);
+                    player.drop(outputStack, false, Prediction.SERVER_ONLY);
                 }
 
                 return inputStack;
@@ -655,7 +656,7 @@ public class FactoryUtil {
 
     public static Consumer<ItemStack> getItemConsumer(Entity entity) {
         if (entity instanceof Player player) {
-            return player.getInventory()::placeItemBackInInventory;
+            return stack -> player.getInventory().placeItemBackInInventory(stack, Prediction.SERVER_ONLY);
         } else if (entity instanceof Container inventory) {
             return stack -> {
                 tryInsertingRegular(inventory, stack);
@@ -731,61 +732,6 @@ public class FactoryUtil {
     /*public static ItemStack fromNbtStack(RegistryWrapper.WrapperLookup lookup, NbtElement stack) {
         return stack instanceof NbtCompound compound && compound.isEmpty() ? ItemStack.EMPTY : ItemStack.fromNbt(lookup, stack).orElse(ItemStack.EMPTY);
     }*/
-
-    public static <T> HolderSet<T> fakeTagList(TagKey<T> tag) {
-        return new HolderSet<T>() {
-            @Override
-            public Stream<Holder<T>> stream() {
-                return Stream.empty();
-            }
-
-            @Override
-            public int size() {
-                return 0;
-            }
-
-            @Override
-            public boolean isBound() {
-                return true;
-            }
-
-            @Override
-            public Either<TagKey<T>, List<Holder<T>>> unwrap() {
-                return Either.left(tag);
-            }
-
-            @Override
-            public Optional<Holder<T>> getRandomElement(RandomSource random) {
-                return Optional.empty();
-            }
-
-            @Override
-            public Holder<T> get(int index) {
-                return null;
-            }
-
-            @Override
-            public boolean contains(Holder<T> entry) {
-                return false;
-            }
-
-            @Override
-            public boolean canSerializeIn(HolderOwner<T> owner) {
-                return true;
-            }
-
-            @Override
-            public Optional<TagKey<T>> unwrapKey() {
-                return Optional.of(tag);
-            }
-
-            @NotNull
-            @Override
-            public Iterator<Holder<T>> iterator() {
-                return Collections.emptyIterator();
-            }
-        };
-    }
 
     public static boolean insertItemIntoSlots(ItemStack stack, List<Slot> slots, boolean fromLast) {
         boolean modified = false;
