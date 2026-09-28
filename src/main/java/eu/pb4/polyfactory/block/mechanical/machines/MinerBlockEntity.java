@@ -44,6 +44,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.GameMasterBlock;
+import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -332,6 +333,8 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
         var value = (int) (self.process * 10.0F);
         world.destroyBlockProgress(player.getId(), blockPos, value);
         VirtualDestroyStage.updateState(player, blockPos, stateFront, value);
+
+        world.levelEvent(null, world.getGameTime() % 4 == 0 ? LevelEvent.PARTICLES_AND_SOUND_DESTROY_PROGRESS : LevelEvent.PARTICLES_DESTROY_PROGRESS, blockPos, dir.getOpposite().ordinal());
 
         if (self.process >= 1) {
             self.process = 0;

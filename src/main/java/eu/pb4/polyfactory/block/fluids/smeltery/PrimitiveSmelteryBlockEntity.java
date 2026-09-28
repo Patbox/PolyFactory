@@ -170,9 +170,10 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
                     var value = stack.get(DataComponents.COOKING_FUEL);
                     if (value != null) {
                         var remainder = stack.getCraftingRemainder();
-                        stack.shrink(1);
                         self.fuelTicks = ResolvableInt.getFromItem(stack, DataComponents.COOKING_FUEL, CookingFuel::burnTime, self.getLootContext((ServerLevel) world), 0);
                         self.fuelInitial = self.fuelTicks;
+                        stack.shrink(1);
+
                         isFueled = true;
                         if (stack.isEmpty()) {
                             self.setItem(1, ItemStack.EMPTY);

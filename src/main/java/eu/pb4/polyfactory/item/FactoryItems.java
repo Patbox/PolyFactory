@@ -61,6 +61,7 @@ import net.minecraft.world.item.consume_effects.RemoveStatusEffectsConsumeEffect
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 
 import java.util.List;
 import java.util.function.Function;
@@ -113,8 +114,8 @@ public class FactoryItems {
     public static final WindmillSailItem WINDMILL_SAIL = register(FactoryItemIds.WINDMILL_SAIL, WindmillSailItem::new);
     public static final Item METAL_GRID = register(FactoryBlocks.METAL_GRID);
     public static final Item STRING_MESH = register(FactoryItemIds.STRING_MESH);
-    public static final Item SAW_DUST = register(FactoryItemIds.SAW_DUST);
-    public static final Item COAL_DUST = register(FactoryItemIds.COAL_DUST);
+    public static final Item SAW_DUST = register(FactoryItemIds.SAW_DUST, new Item.Properties().cookingFuel(ContextIntProviders.COOKING_TIME_BAMBOO));
+    public static final Item COAL_DUST = register(FactoryItemIds.COAL_DUST, new Item.Properties().cookingFuel(ContextIntProviders.COOKING_TIME_WOOD_SLABS));
     public static final Item NETHERRACK_DUST = register(FactoryItemIds.NETHERRACK_DUST);
     public static final Item SULFUR_DUST = register(FactoryItemIds.SULFUR_DUST);
     public static final Item ENDER_DUST = register(FactoryItemIds.ENDER_DUST);
@@ -132,7 +133,7 @@ public class FactoryItems {
     public static final Item STEEL_GEAR = register(FactoryItemIds.STEEL_GEAR, (settings) -> new GearItem(FactoryBlocks.AXLE_WITH_GEAR, settings));
     public static final Item LARGE_STEEL_GEAR = register(FactoryItemIds.LARGE_STEEL_GEAR, (settings) -> new GearItem(FactoryBlocks.AXLE_WITH_LARGE_GEAR, settings));
     public static final Item STEEL_MACHINE_GEARBOX = register(FactoryItemIds.STEEL_MACHINE_GEARBOX);
-    public static final Item WOODEN_PLATE = register(FactoryItemIds.WOODEN_PLATE);
+    public static final Item WOODEN_PLATE = register(FactoryItemIds.WOODEN_PLATE, new Item.Properties().cookingFuel(ContextIntProviders.COOKING_TIME_WOOD_ITEMS_EXTRA_SMALL));
     public static final Item TREATED_DRIED_KELP = register(FactoryItemIds.TREATED_DRIED_KELP);
     public static final Item INTEGRATED_CIRCUIT = register(FactoryItemIds.INTEGRATED_CIRCUIT);
     public static final Item REDSTONE_CHIP = register(FactoryItemIds.REDSTONE_CHIP);
@@ -208,7 +209,7 @@ public class FactoryItems {
     public static final Item BIODIESEL_BUCKET = register(FactoryItemIds.BIODIESEL_BUCKET, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET));
     public static final Item FERTILIZER_BUCKET = register(FactoryItemIds.FERTILIZER_BUCKET, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET));
 
-    public static final Item BIOMASS = register(FactoryItemIds.BIOMASS);
+    public static final Item BIOMASS = register(FactoryItemIds.BIOMASS, new Item.Properties().compostable(ContextIntProviders.COMPOSTABLE_MEDIUM_HIGH));
 
     public static final Item CRISPY_HONEY = register(FactoryItemIds.CRISPY_HONEY, settings -> new SimplePolymerItem(settings
             .food(new FoodProperties.Builder().nutrition(4).saturationModifier(0.6F).build(), Consumables.defaultFood().consumeSeconds(0.8F).build())));
@@ -294,23 +295,8 @@ public class FactoryItems {
     }
 
     public static void register() {
-        // Todo
-        /*FuelValueEvents.BUILD.register(((builder, context) -> {
-            builder.add(SAW_DUST, (int) (context.baseSmeltTime() * 0.3));
-            builder.add(WOODEN_PLATE, (int) (context.baseSmeltTime() * 0.6));
-            builder.add(COAL_DUST, (int) (context.baseSmeltTime() * 0.8));
-            builder.add(BIOMASS, (int) (context.baseSmeltTime() * 0.6));
-        }));
-
-        CompostableRegistry.INSTANCE.add(BIOMASS, 0.75f);
-
-        FabricPotionBrewingBuilder.BUILD.register(builder -> {
-            builder.addContainer(BRITTLE_POTION);
-        });*/
-
         BuiltInRegistries.ITEM.addAlias(id("copper_nugget"), Identifier.parse("copper_nugget"));
         BuiltInRegistries.ITEM.addAlias(id("fauced"), id("faucet"));
-
 
         PolymerCreativeModeTabUtils.registerPolymerCreativeModeTab(Identifier.fromNamespaceAndPath(ModInit.ID, "a_group"), CreativeModeTab.builder(CreativeModeTab.Row.BOTTOM, -1)
                 .icon(WINDMILL_SAIL::getDefaultInstance)

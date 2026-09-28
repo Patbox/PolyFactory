@@ -14,17 +14,18 @@ import eu.pb4.polyfactory.util.DyeColorExtra;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import eu.pb4.polymer.core.api.other.PolymerComponent;
 import net.fabricmc.fabric.api.item.v1.ItemComponentTooltipProviderRegistry;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.Tool;
 
@@ -81,6 +82,14 @@ public class FactoryDataComponents {
         ItemComponentTooltipProviderRegistry.addFirst(STORED_DATA);
         ItemComponentTooltipProviderRegistry.addFirst(CONFIGURATION_DATA);
         ItemComponentTooltipProviderRegistry.addFirst(SELECTED_MINING_MODE);
+
+        ItemComponentTooltipProviderRegistry.addFirst(FactoryDataComponents.DRILL_ATTACHMENT, head -> (_, consumer, _, _) -> {
+            consumer.accept(Component.translatable("text.polyfactory.attached", head.getOrDefault(DataComponents.CUSTOM_NAME, head.getOrDefault(DataComponents.ITEM_NAME, CommonComponents.EMPTY)))
+                    .withStyle(ChatFormatting.GRAY)
+            );
+        });
+
+
         BuiltInRegistries.DATA_COMPONENT_TYPE.addAlias(id("clipboard_data"), id("configuration_data"));
 
         PolymerBlockUtils.SERVER_SIDE_MINING_CHECK.register((blockState, blockPos, serverPlayer) -> serverPlayer.getMainHandItem().getOrDefault(SELECTED_MINING_MODE, MiningMode.SINGLE) != MiningMode.SINGLE);

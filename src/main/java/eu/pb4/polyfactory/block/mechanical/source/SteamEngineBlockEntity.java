@@ -84,9 +84,10 @@ public class SteamEngineBlockEntity extends LockableBlockEntity implements Minim
                         var value = stack.get(DataComponents.COOKING_FUEL);
                         if (value != null) {
                             var remainder = stack.getCraftingRemainder();
-                            stack.shrink(1);
                             self.fuelTicks = ResolvableInt.getFromItem(stack, DataComponents.COOKING_FUEL, CookingFuel::burnTime, self.getLootContext((ServerLevel) world), 0) * 10;
                             self.fuelInitial = self.fuelTicks;
+                            stack.shrink(1);
+
                             if (stack.isEmpty()) {
                                 self.setItem(i, ItemStack.EMPTY);
                             }
