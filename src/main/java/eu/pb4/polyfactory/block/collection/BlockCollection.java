@@ -2,6 +2,7 @@ package eu.pb4.polyfactory.block.collection;
 
 import eu.pb4.factorytools.api.virtualentity.ItemDisplayElementUtil;
 import eu.pb4.polyfactory.block.other.ProxyAttachement;
+import eu.pb4.polyfactory.util.ClientPlayerInterpolator;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.BlockWithElementHolder;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
@@ -44,7 +45,7 @@ import java.util.function.Consumer;
 
 public class BlockCollection extends AbstractElement implements CollisionGetter {
     public static boolean ignoreCollisions = false;
-    private final DisplayElement main = ItemDisplayElementUtil.createSimple(ItemStack.EMPTY, 2);
+    private final DisplayElement main = ItemDisplayElementUtil.createSimple(ItemStack.EMPTY, 3);
     private final int[] blockId;
     private final int[] collisionBlockId;
     private final int[] collisionBlockId2;
@@ -57,6 +58,8 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
     private float centerX;
     private float centerY;
     private float centerZ;
+    @Nullable
+    private Vec3 previousPos;
     @Nullable
     private ServerLevel level;
     private boolean quaternionDirty = false;
@@ -123,7 +126,7 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
             ));
 
             packetConsumer.accept(new ClientboundSetEntityDataPacket(id, List.of(
-                    SynchedEntityData.DataValue.create(DisplayEntityData.INTERPOLATION_DURATION, 1),
+                    SynchedEntityData.DataValue.create(DisplayEntityData.INTERPOLATION_DURATION, 3),
                     SynchedEntityData.DataValue.create(DisplayEntityData.Block.BLOCK_STATE, this.data.states()[i]),
                     SynchedEntityData.DataValue.create(DisplayEntityData.TRANSLATION, new Vector3f(x - 0.5f - this.centerX, y - 0.5f - this.centerY, z - 0.5f - this.centerZ)
                             .rotate(quaternion)),
@@ -360,7 +363,7 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
     @Override
     public void tick() {
         var newPreviousShift = new Int2ObjectOpenHashMap<Vec3>();
-        var actuallyDirty = this.quaternionDirty || !this.getCurrentPos().equals(this.getLastSyncedPos());
+        var actuallyDirty = this.quaternionDirty || !this.getCurrentPos().equals(this.previousPos);
         if (actuallyDirty || (this.ticksSinceFullResync != -1 && this.ticksSinceFullResync++ % 300 == 0)) {
             var refreshPos = this.ticksSinceFullResync % 300 == 1;
             if (this.ticksSinceFullResync > 300 && !actuallyDirty) {
@@ -368,7 +371,8 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
             }
 
             var pos = this.getCurrentPos();
-            var previous = this.getLastSyncedPos();
+            var previous = this.previousPos;
+            this.previousPos = pos;
             if (previous == null) {
                 previous = pos;
             }
@@ -413,7 +417,8 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
                                         previous.x + vec2.x + 0.5 + 0.05, previous.y + vec2.y + 0.5 + 0.25, previous.z + vec2.z + 0.5 + 0.05
                                 )) {
                                     var evec = idMap.computeIfAbsent(entity, (a) -> new Vector3f());
-                                    vec.sub(vec2);
+
+                                    /*vec.sub(vec2);
                                     evec.y = Math.max(evec.y, vec.y);
 
                                     vec.set(entity.getX() - previous.x(), entity.getY() - previous.y(), entity.getZ() - previous.z());
@@ -421,7 +426,7 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
                                     vec.rotate(quaternion);
 
                                     evec.x = (float) (vec.x - entity.getX() + previous.x());
-                                    evec.z = (float) (vec.z - entity.getZ() + previous.z());
+                                    evec.z = (float) (vec.z - entity.getZ() + previous.z());*/
                                 }
                             }
                         }
@@ -434,14 +439,9 @@ public class BlockCollection extends AbstractElement implements CollisionGetter 
                 idMap.forEach((entity, val) -> {
                     var move = diff.add(val.x, val.y, val.z);
                     if (!Mth.equal(move.lengthSqr(), 0)) {
-                        entity.move(MoverType.SHULKER, move);
+                        entity.moveOrInterpolateTo(new PositionPath.Linear(entity.getPosition(1).add(move)), 0, 0, false);
                         if (entity instanceof ServerPlayer player) {
-                            //FactoryUtil.sendVelocityDelta(player, move);
-                            FactoryUtil.runNextTick(() -> player.connection.teleport(new PositionMoveRotation(move, Vec3.ZERO, 0, 0),
-                                    EnumSet.of(Relative.X, Relative.Y, Relative.Z, Relative.DELTA_X, Relative.DELTA_Y, Relative.DELTA_Z, Relative.Y_ROT, Relative.X_ROT
-                                    )));
-
-                            //newPreviousShift.put(player.getId(), move);
+                            ClientPlayerInterpolator.interpolateTo(player, move, 0, 0);
                         }
                     }
                 });

@@ -10,8 +10,11 @@ It can't break blocks at all without a Drill Head or without a <pageref '/fluids
 <nl2>
 By right-clicking you can change it's mining mode, with them being:
 - Single - Mines a single block.
-- Area 2x2 - Mines 2x2x1 area based on where player breaks a block. Requires 3x more fuel than single mode for single use.
+- Area 2x2 - Mines 2x2x1 area based on where player breaks a block. Requires 3x more fuel than single mode for a single use.
 - Area 3x3 - Mines 3x3x1 area based on where player breaks a block. Requires 5x more fuel than single mode for a single use.
+- Veinminer 9x - Mines 9 blocks of the same type as long as they are roughly connected. Requires 6x more fuel than single mode for a single use.
+<nl>
+Additionally all multi-block mining mods cause drops to appear at the currently targeted block's position, rather than at original one.
 <nl2>
 It also has lower mining range than regular tools such as pickaxe or shovel.
 

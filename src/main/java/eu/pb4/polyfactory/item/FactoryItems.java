@@ -290,7 +290,7 @@ public class FactoryItems {
                                 registrationLookup.getOrThrow(material.incorrectBlocksForDrops())),
                         Tool.Rule.minesAndDrops(registrationLookup.getOrThrow(FactoryBlockTags.MINEABLE_WITH_DRILL),
                                 material.speed() * 1.5f)), 1.1F, 1, true))
-                .component(FactoryDataComponents.MINING_MODES, List.of(MiningMode.SINGLE, MiningMode.AREA_2X2X1, MiningMode.AREA_3X3X1))
+                .component(FactoryDataComponents.MINING_MODES, List.of(MiningMode.SINGLE, MiningMode.AREA_2X2X1, MiningMode.AREA_3X3X1, MiningMode.VEINMINER_9X))
                 ;
     }
 

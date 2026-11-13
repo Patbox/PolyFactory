@@ -150,6 +150,7 @@ public class GuiTextures {
 
         icon16("drill_icon_area_2x2x1");
         icon16("drill_icon_area_3x3x1");
+        icon16("drill_icon_veinminer_9x");
     }
 
     public static Component negativeSpace(Integer value) {

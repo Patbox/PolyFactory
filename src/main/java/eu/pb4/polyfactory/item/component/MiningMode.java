@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.item.component;
 
 import com.mojang.serialization.Codec;
+import eu.pb4.polyfactory.util.BlockTraversal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentGetter;
@@ -17,8 +18,7 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.function.Consumer;
 
 public enum MiningMode implements StringRepresentable, TooltipProvider {
@@ -66,6 +66,28 @@ public enum MiningMode implements StringRepresentable, TooltipProvider {
             };
 
             return BlockPos.betweenClosed(pos.relative(axis1.getPositive()).relative(axis2.getPositive()), pos.relative(axis1.getNegative()).relative(axis2.getNegative()));
+        }
+    },
+    VEINMINER_9X {
+        private final BlockTraversal traversal = BlockTraversal.create()
+                .connectivity(BlockTraversal.Connectivity.TWENTY_SIX)
+                .order(BlockTraversal.Order.BREADTH_FIRST);
+        @Override
+        public Iterable<BlockPos> positions(Player player, BlockGetter level, BlockPos pos, BlockState state, Direction side) {
+            var list = new ArrayList<BlockPos>();
+
+            traversal.accept(pos, (target, fromPos, depth) -> {
+                if (level.getBlockState(target).is(state.getBlock()) && depth < 10) {
+                    list.add(target.immutable());
+                    return BlockTraversal.Result.CONTINUE;
+                }
+                return BlockTraversal.Result.TERMINATE;
+            });
+
+            Collections.shuffle(list);
+            list.sort(Comparator.comparingDouble(x -> x.distSqr(pos)));
+
+            return list.subList(0, Math.min(list.size(), 9));
         }
     };
     public static final Codec<MiningMode> CODEC = StringRepresentable.fromEnum(MiningMode::values);

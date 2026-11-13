@@ -13,10 +13,18 @@ import eu.pb4.polyfactory.block.configurable.BlockConfig;
 import eu.pb4.polyfactory.block.configurable.ConfigurableBlock;
 import eu.pb4.polyfactory.models.RotationAwareModel;
 import eu.pb4.polyfactory.nodes.generic.FunctionalDirectionNode;
+import eu.pb4.polyfactory.util.ClientPlayerInterpolator;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket;
+import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerRotationPacket;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.entity.Relative;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
@@ -45,6 +53,8 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
 
 public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlock,  BarrierBasedWaterloggable, ConfigurableBlock {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
@@ -106,14 +116,20 @@ public class TurntableBlock extends RotationalNetworkBlock implements FactoryBlo
             }
             var rot = RotationUser.getRotation(world, pos);
             var speed = Math.min(rot.speed(), 1028f) * mult;
-            if (speed != 0 && !(entity instanceof ServerPlayer)) {
+            if (speed != 0) {
+                var oldPos = entity.position();
                 var rotate = (float) (rot.isNegative() ? speed : -speed);
-                entity.setYRot(entity.getYRot() + rotate);
-                entity.setYHeadRot(entity.getYHeadRot() + rotate);
+                var delta = new Vector3f((float) (pos.getX() - oldPos.x() + 0.5), (float) 0, (float) (pos.getZ() - oldPos.z() + 0.5))
+                        .rotateY(rotate * -Mth.DEG_TO_RAD);
 
-                //if (entity instanceof ServerPlayerEntity player) {
-                //    player.networkHandler.requestTeleport(new EntityPosition(Vec3d.ZERO, Vec3d.ZERO, rotate, 0), EnumSet.allOf(PositionFlag.class));
-                //}
+                var newPos = new Vec3(pos.getX() - delta.x + 0.5, entity.getY(), pos.getZ() - delta.z + 0.5);
+
+                entity.setYHeadRot(entity.getYHeadRot() + rotate);
+                entity.moveOrInterpolateTo(newPos, entity.getYRot() + rotate, 0);
+
+                if (entity instanceof ServerPlayer player) {
+                    ClientPlayerInterpolator.interpolateTo(player, newPos.subtract(oldPos), rotate, 0);
+                }
             }
         }
     }

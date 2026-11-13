@@ -113,6 +113,8 @@ public class FactoryUtil {
     public static final Map<Direction.Axis, BlockState> LIGHTNING_ROD_WATERLOGGED = Util.makeEnumMap(Direction.Axis.class,
             x -> PolymerBlockResourceUtils.requestEmpty(BlockModelType.valueOf("LIGHTNING_ROD_" + x.name() + "_WATERLOGGED")));
 
+    public static final ScopedValue<BlockPos> BLOCK_DROPS_POS_OVERRIDE = ScopedValue.newInstance();
+
     private static final List<Runnable> RUN_NEXT_TICK = new ArrayList<>();
 
     public static void runNextTick(Runnable runnable) {

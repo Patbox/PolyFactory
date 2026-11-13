@@ -58,6 +58,7 @@ public class DieselEngineBlockEntity extends LockableBlockEntity implements Flui
         this.container.writeData(view, "fluids");
         view.putFloat("state", this.state);
         view.store("redstone_activation", RedstoneActivationType.CODEC, this.activationType);
+        view.putInt("gear", this.gear);
     }
 
     @Override
@@ -66,6 +67,7 @@ public class DieselEngineBlockEntity extends LockableBlockEntity implements Flui
         this.container.readData(view, "fluids");
         this.state = view.getFloatOr("state", 0);
         this.activationType = view.read("redstone_activation", RedstoneActivationType.CODEC).orElse(RedstoneActivationType.ALWAYS);
+        this.gear = view.getIntOr("gear", 3);
     }
 
     public RedstoneActivationType getRedstoneActivationType() {

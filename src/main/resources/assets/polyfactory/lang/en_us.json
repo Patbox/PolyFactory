@@ -496,6 +496,7 @@
   "mining_mode.polyfactory.area_2x2x1": "Area 2x2",
   "mining_mode.polyfactory.area_3x3x1": "Area 3x3",
   "mining_mode.polyfactory.veinminer": "Veinminer",
+  "mining_mode.polyfactory.veinminer_9x": "Veinminer 9x",
 
   "entity.polyfactory.dynamite": "Dynamite",
   "entity.polyfactory.chain_lift": "Chain Lift",

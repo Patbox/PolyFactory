@@ -6,6 +6,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.component.MiningMode;
+import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.ServerPlayerGameModeExt;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -103,13 +104,15 @@ public class ServerPlayerGameModeMixin implements ServerPlayerGameModeExt {
                 return original.call(instance, pos);
             }
 
-            for (var p : tool.getOrDefault(FactoryDataComponents.SELECTED_MINING_MODE, MiningMode.SINGLE).positions(player, this.level, pos, level.getBlockState(pos), this.miningDirection)) {
-                var head = tool.get(FactoryDataComponents.DRILL_ATTACHMENT);
-                if (MiningMode.skipMiningFor(player, level, pos, level.getBlockState(p))) continue;
-                original.call(instance, p);
+            ScopedValue.where(FactoryUtil.BLOCK_DROPS_POS_OVERRIDE, pos).run(() -> {
+                for (var p : tool.getOrDefault(FactoryDataComponents.SELECTED_MINING_MODE, MiningMode.SINGLE).positions(player, this.level, pos, level.getBlockState(pos), this.miningDirection)) {
+                    var head = tool.get(FactoryDataComponents.DRILL_ATTACHMENT);
+                    if (MiningMode.skipMiningFor(player, level, pos, level.getBlockState(p))) continue;
+                    original.call(instance, p);
 
-                if (tool.get(FactoryDataComponents.DRILL_ATTACHMENT) != head || tool.isBroken()) return false;
-            }
+                    if (tool.get(FactoryDataComponents.DRILL_ATTACHMENT) != head || tool.isBroken()) return;
+                }
+            });
             return false;
         } finally {
             this.currentlyDestroyed = null;

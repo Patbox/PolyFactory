@@ -38,6 +38,7 @@ public class PoweredDrillItem extends BaseDrillItem {
             case SINGLE -> 1;
             case AREA_2X2X1 -> 3;
             case AREA_3X3X1 -> 5;
+            case VEINMINER_9X -> 6;
         };
     }
 
