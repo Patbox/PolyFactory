@@ -5,6 +5,7 @@ import eu.pb4.factorytools.api.recipe.CountedIngredient;
 import eu.pb4.factorytools.api.recipe.OutputStack;
 import eu.pb4.polyfactory.block.BlockHeat;
 import eu.pb4.polyfactory.fluid.*;
+import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryItemTags;
 import eu.pb4.polyfactory.item.FactoryItems;
 import eu.pb4.polyfactory.item.tool.SpoutMolds;
@@ -1343,30 +1344,35 @@ class RecipesProvider extends FabricRecipeProvider {
                     of(output,
                             new RecipeHolder<>(recipeKey("crafting/spray_can_fill"), new FillSprayCanCraftingRecipe(CraftingBookCategory.MISC)),
                             new RecipeHolder<>(recipeKey("crafting/inverted_colored_lamp"),
-                                    new ShapelessNbtCopyRecipe(info, lampInvertion,
+                                    new ShapelessComponentCopyRecipe(info, lampInvertion,
                                             new ItemStackTemplate(FactoryItems.INVERTED_LAMP),
                                             Ingredient.of(FactoryItems.LAMP),
-                                            List.of(Ingredient.of(Items.REDSTONE_TORCH)))),
+                                            List.of(Ingredient.of(Items.REDSTONE_TORCH)),
+                                            List.of(FactoryDataComponents.COLOR))),
                             new RecipeHolder<>(recipeKey("crafting/inverted_caged_lamp"),
-                                    new ShapelessNbtCopyRecipe(info, lampInvertion,
+                                    new ShapelessComponentCopyRecipe(info, lampInvertion,
                                             new ItemStackTemplate(FactoryItems.INVERTED_CAGED_LAMP),
                                             Ingredient.of(FactoryItems.CAGED_LAMP),
-                                            List.of(Ingredient.of(Items.REDSTONE_TORCH)))),
+                                            List.of(Ingredient.of(Items.REDSTONE_TORCH)),
+                                            List.of(FactoryDataComponents.COLOR))),
                             new RecipeHolder<>(recipeKey("crafting/caged_lamp"),
-                                    new ShapelessNbtCopyRecipe(info, none,
+                                    new ShapelessComponentCopyRecipe(info, none,
                                             new ItemStackTemplate(FactoryItems.CAGED_LAMP),
                                             Ingredient.of(FactoryItems.LAMP),
-                                            List.of(Ingredient.of(FactoryItems.METAL_GRID)))),
+                                            List.of(Ingredient.of(FactoryItems.METAL_GRID)),
+                                            List.of(FactoryDataComponents.COLOR))),
                             new RecipeHolder<>(recipeKey("crafting/inverted_fixture_lamp"),
-                                    new ShapelessNbtCopyRecipe(info, lampInvertion,
+                                    new ShapelessComponentCopyRecipe(info, lampInvertion,
                                             new ItemStackTemplate(FactoryItems.INVERTED_FIXTURE_LAMP),
                                             Ingredient.of(FactoryItems.FIXTURE_LAMP),
-                                            List.of(Ingredient.of(Items.REDSTONE_TORCH)))),
+                                            List.of(Ingredient.of(Items.REDSTONE_TORCH)),
+                                            List.of(FactoryDataComponents.COLOR))),
                             new RecipeHolder<>(recipeKey("crafting/fixture_lamp"),
-                                    new ShapelessNbtCopyRecipe(info, none,
+                                    new ShapelessComponentCopyRecipe(info, none,
                                             new ItemStackTemplate(FactoryItems.FIXTURE_LAMP, 3),
                                             Ingredient.of(FactoryItems.LAMP),
-                                            List.of(Ingredient.of(FactoryItems.WOODEN_PLATE))))
+                                            List.of(Ingredient.of(FactoryItems.WOODEN_PLATE)),
+                                            List.of(FactoryDataComponents.COLOR)))
                     );
                 }
 
@@ -1384,7 +1390,7 @@ class RecipesProvider extends FabricRecipeProvider {
                     x.save(output, recipeKey("colored_lamp/glass/regular_a"));
                 }
                 {
-                    var x = ShapedRecipeBuilderAccessor.createShapedRecipeBuilder(itemWrap, RecipeCategory.REDSTONE, ColoredItem.template(FactoryItems.LAMP, 1, -2))
+                    var x = ShapedRecipeBuilderAccessor.createShapedRecipeBuilder(itemWrap, RecipeCategory.REDSTONE, ColoredItem.template(FactoryItems.LAMP, 1, DyeColor.WHITE))
                             .pattern("sps")
                             .pattern("rgr")
                             .pattern("dps")
@@ -1404,7 +1410,7 @@ class RecipesProvider extends FabricRecipeProvider {
                     }
 
                     {
-                        var x = ShapedRecipeBuilderAccessor.createShapedRecipeBuilder(itemWrap, RecipeCategory.REDSTONE, ColoredItem.template(FactoryItems.LAMP, 1, -2))
+                        var x = ShapedRecipeBuilderAccessor.createShapedRecipeBuilder(itemWrap, RecipeCategory.REDSTONE, ColoredItem.template(FactoryItems.LAMP, 1, dyeColor))
                                 .pattern("sps")
                                 .pattern("rgr")
                                 .pattern("sps")

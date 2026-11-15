@@ -15,6 +15,8 @@ block that faces certain direction, it will now point at the face you targeted (
 <nl2>
 Attacking the block will allow you to change the currently selected setting to the next one, with sneaking moving it one back.
 The currently selected setting is then remembered per block/entity type.
+<nl2>
+For automated changing of Wrench-configurable values you can use <pageref '/cable/configurator'>.
 
 ### Header: Controls
 ### Align: Center

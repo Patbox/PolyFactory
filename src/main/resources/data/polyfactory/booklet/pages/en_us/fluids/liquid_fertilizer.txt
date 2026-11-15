@@ -1,0 +1,13 @@
+### Section: PageInfo
+title=<lang 'fluid_type.polyfactory.fertilizer'>
+icon=polyfactory:fertilizer_bucket
+category=polyfactory:fluids
+order=1000
+### EndSection: PageInfo
+<yellow><lang 'fluid_type.polyfactory.fertilizer'></> is a fluid that acts similarly to Bone Meal, allowing you to easily grow things
+way faster while being more efficient with it.
+<nl>
+It can be used with a <pageref './canister'> (directly) or via <item 'polyfactory:pressure_fluid_gun'> and <item 'polyfactory:nozzle'> (shoots out droplets).
+
+### Align: Center
+<u><blue><polydex 'polyfactory:fertilizer'>View the <lang 'fluid_type.polyfactory.fertilizer'> recipe</><nl>

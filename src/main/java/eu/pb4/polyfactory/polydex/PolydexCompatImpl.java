@@ -24,7 +24,7 @@ import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.polydex.pages.*;
 import eu.pb4.polyfactory.recipe.ColoringCraftingRecipe;
 import eu.pb4.polyfactory.recipe.CraftingWithLeftoverRecipe;
-import eu.pb4.polyfactory.recipe.ShapelessNbtCopyRecipe;
+import eu.pb4.polyfactory.recipe.ShapelessComponentCopyRecipe;
 import eu.pb4.polyfactory.recipe.casting.SimpleCastingRecipe;
 import eu.pb4.polyfactory.recipe.casting.SimpleCauldronCastingRecipe;
 import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
@@ -95,7 +95,7 @@ public class PolydexCompatImpl {
 
         PolydexPage.registerRecipeViewer(ColoringCraftingRecipe.class, ColoringCraftingRecipePage::new);
         //noinspection unchecked
-        PolydexPage.registerRecipeViewer(ShapelessNbtCopyRecipe.class, (x) -> new ShapelessCraftingRecipePage((RecipeHolder<ShapelessRecipe>) (Object) x));
+        PolydexPage.registerRecipeViewer(ShapelessComponentCopyRecipe.class, (x) -> new ShapelessCraftingRecipePage((RecipeHolder<ShapelessRecipe>) (Object) x));
         PolydexPage.registerRecipeViewer(SimpleSpoutRecipe.class, SimpleSpoutRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleCastingRecipe.class, SimpleCastingRecipePage::new);
         PolydexPage.registerRecipeViewer(SimpleCauldronCastingRecipe.class, SimpleCauldronCastingRecipePage::new);

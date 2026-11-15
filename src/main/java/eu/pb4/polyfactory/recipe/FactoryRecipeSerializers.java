@@ -42,7 +42,7 @@ public class FactoryRecipeSerializers {
     public static final RecipeSerializer<ArtificialDyeMixingRecipe> MIXING_ARTIFICIAL_DYE = register("mixing/artificial_dye", ArtificialDyeMixingRecipe.CODEC);
     public static final RecipeSerializer<BrewingMixingRecipe> MIXING_BREWING = register("mixing/brewing", BrewingMixingRecipe.CODEC);
     public static final RecipeSerializer<ColoringCraftingRecipe> CRAFTING_COLORING = register("crafting/coloring", ColoringCraftingRecipe.CODEC);
-    public static final RecipeSerializer<ShapelessNbtCopyRecipe> CRAFTING_SHAPELESS_NBT_COPY = register("crafting/shapeless_nbt_copy", ShapelessNbtCopyRecipe.CODEC);
+    public static final RecipeSerializer<ShapelessComponentCopyRecipe> CRAFTING_SHAPELESS_COMPONENT_COPY = register("crafting/shapeless_component_copy", ShapelessComponentCopyRecipe.CODEC);
     public static final RecipeSerializer<PRTKeySetterCraftingRecipe> CRAFTING_PRT_KEY_SETTER = register("crafting/prt_key_setter", PRTKeySetterCraftingRecipe.CODEC);
     public static final RecipeSerializer<CraftingWithLeftoverRecipe<ShapedRecipe>> CRAFTING_SHAPED_LEFTOVER = register("crafting/shaped_leftover",
             CraftingWithLeftoverRecipe.createCodec(ShapedRecipe.SERIALIZER.codec(), () -> FactoryRecipeSerializers.CRAFTING_SHAPED_LEFTOVER));

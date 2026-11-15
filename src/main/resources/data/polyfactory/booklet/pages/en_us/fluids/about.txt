@@ -16,6 +16,13 @@ If you want to input (or take) fluids into / out of some "open" blocks (think <p
 using buckets, bottles and other compatible items. This interaction can happen both in world and in the block's container interface, by targeting the visual fluid visualizer,
 while holding the item in the cursor. Do note not all blocks allow the same insertion / extraction behavior.
 <nl2>
+For most cases, fluid in this mod use following units:
+- Buckets (B) - Bucket / Block worth of fluid, equal to 81000 droplets or 1000 mB,
+- MiliBucket (mB) - 1 / 1000th of a bucket / block, equal to 81 droplets,
+- Droplet (d) - The lowest actual amount of fluid that can be used / transported, based on Fabric API's standard,
+- Ingot (I) - An ingot worth of liquid (mostly for molten metals). 1 / 9th of a bucket / block, 9000 droplets or 111.11 mB,
+- Nugget (N) - A nugget worth of liquid (mostly for molten metals) 1 / 81th of a bucket / block, 1000 droplets or 12.35 mB.
+<nl2>
 <yellow>Smelting</> is a process of melting metallic items with a Smeltery. PolyFactory adds 2 types of Smelteries:
 - <item 'polyfactory:primitive_smeltery'> - Early-game primitive and slower smeltery.
 - <item 'polyfactory:smeltery'> - Mid-game larger smeltery. It's faster and can smelt 9 items at the same time.

@@ -144,6 +144,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalWo
                 var targetState = world.getBlockState(mut);
                 if ((targetState.isAir() || (targetState.canBeReplaced() && targetState.getFluidState().isEmpty()))
                         && placableState.canSurvive(world, mut)
+                        && !world.getBlockState(mut.below()).is(placableState.getBlock())
                         && CommonProtection.canPlaceBlock(world, mut, new NameAndId(self.owner == null ? FactoryUtil.GENERIC_PROFILE : self.owner), null)) {
                     place = mut.immutable();
                     break;

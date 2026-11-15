@@ -51,6 +51,14 @@ public class ItemTagsProvider extends FabricTagsProvider.ItemTagsProvider {
                 .addOptionalTag(ItemTags.VILLAGER_PLANTABLE_SEEDS)
                 .addOptionalTag(ItemTags.SAPLINGS)
                 .addOptionalTag(ConventionalItemTags.SEEDS)
+                .addOptionalTag(ConventionalItemTags.SEEDS)
+                .add(BlockItemIds.NETHER_WART.item())
+                .add(BlockItemIds.SUGAR_CANE.item())
+                .add(BlockItemIds.WARPED_FUNGUS.item())
+                .add(BlockItemIds.CRIMSON_FUNGUS.item())
+                .add(BlockItemIds.RED_MUSHROOM.item())
+                .add(BlockItemIds.BROWN_MUSHROOM.item())
+                .add(BlockItemIds.SWEET_BERRY_CROP.item())
         ;
 
         this.tag(ConventionalItemTags.DYES)

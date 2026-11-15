@@ -1,0 +1,32 @@
+### Section: PageInfo
+title=<item 'polyfactory:diesel_engine'>
+icon=polyfactory:diesel_engine
+category=polyfactory:rotation
+order=12
+### EndSection: PageInfo
+<yellow><item 'polyfactory:diesel_engine'></> is a block that generates rotational energy.
+<nl>
+It's a good way to generate a controllable amount of energy, without requiring a lot of connecting infrastructure or space,
+at the cost of requiring <yellow>Biodiesel</>.
+<nl2>
+To power it, you need to put Biodiesel into it, either by directly interacting with it while holding a bucket/canister of it,
+or by connecting any fluid container (like <pageref '/fluids/copper_pipe'>, <pageref '/fluids/fluid_tank'>
+or <pageref '/fluids/portable_fluid_tank'>).
+<nl>
+Once it has fuel, it requires few seconds to get to it's currently selected speed,
+burning the more fuel a lot faster than once it gets going. It provides stress capacity of 100 u with its speed
+and fuel consumption depending on currently selected gear with them being:
+- 33.3 RPM on 1st gear (uses 66.6 droplets [0.82 mB] per second),
+- 66.6 RPM on 2nd gear (uses 133.3 droplets [1.65 mB] per second),
+- 100 RPM on 3rd gear (uses 200 droplets [2.47 mB] per second),
+- 133.3 RPM on 4th gear (uses 266.6 droplets [3.29 mB] per second),
+- and 166.7 RPM on 5th gear (uses 333.3 droplets [4.12 mB] per second).
+<nl>
+Gear selection can happen either via UI or with a <pageref '/basics/wrench'>
+<nl2>
+While by default it automatically activates once it has fuel, you can also set it to
+require active redstone signal for it to start.
+
+### Align: Center
+<u><blue><polydex 'polyfactory:diesel_engine'>View the <item 'polyfactory:diesel_engine'> recipe</><nl>
+<u><blue><polydex 'polyfactory:biodiesel'>View the <lang 'fluid_type.polyfactory.biodiesel'> recipe</><nl>

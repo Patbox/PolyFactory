@@ -94,7 +94,7 @@ public class DieselEngineBlockEntity extends LockableBlockEntity implements Flui
             return;
         }
 
-        int consume = Mth.lerpInt(Math.min(Math.abs(self.state - 1), 1), 10, 20) * self.gear / 3;
+        int consume = (int) (Mth.lerp(Math.min(Math.abs(self.state - 1), 1), 10, 20) * self.gear / 3);
         self.fluidPull.lowerProgress(0.01);
         if (self.activationType.isActive(state.getValue(DieselEngineBlock.POWERED))) {
             while (consume > 0 && self.container.isNotEmpty()) {

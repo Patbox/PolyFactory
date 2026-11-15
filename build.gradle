@@ -27,13 +27,17 @@ if (System.getenv("CI") != null) {
 version = version + "+" + project.minecraft_version
 
 loom {
-	accessWidenerPath = file("src/main/resources/polyfactory.accesswidener")
-}
-
-fabricApi {
-	configureDataGeneration() {
-		client = true
+	runs {
+		datagen {
+			server()
+			name = "Data Generation"
+			runDir = "build/datagen"
+			vmArg("-Dfabric-api.datagen")
+			vmArg("-Dfabric-api.datagen.modid=polyfactory")
+			vmArg("-Dfabric-api.datagen.output-dir=${file("src/main/generated")}")
+		}
 	}
+	accessWidenerPath = file("src/main/resources/polyfactory.accesswidener")
 }
 
 sourceSets {

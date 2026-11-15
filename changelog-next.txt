@@ -1,5 +1,7 @@
 - Changes to Portable Drill:
   - Added Veinminer 9x mode - It mines multiple neighboring blocks when they use the same material, up to 9 blocks total.
   - Multi-block mining modes now cause drops to spawn at the targeted block instead.
+- Mechanical Planter now works with Nether Warts, Sugar Cane, Crimson and Warped Fungus, Red and Brown Mushroom and Sweet Berry Bushes
 - Changed Turntables to work with players now.
 - Fixed Diesel Engine resetting its gear setting when loaded.
+- Fixed Colored/Caged/Fixture Lamp Recipes being a bit broken.
