@@ -1,6 +1,6 @@
 package eu.pb4.polyfactory.mixin.util;
 
-import eu.pb4.polyfactory.DynamicContent;
+import eu.pb4.polyfactory.other.DynamicContent;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import org.spongepowered.asm.mixin.Mixin;

@@ -312,7 +312,7 @@ public class PrimitiveSmelteryBlockEntity extends LockableBlockEntity implements
                             .append(Component.literal(GuiTextures.SMELTERY_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
                             .append(FluidTextures.PRIMITIVE_SMELTERY.render(PrimitiveSmelteryBlockEntity.this.fluidContainer::provideRender))
                             .append(Component.literal(GuiTextures.SMELTERY_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
-                            .append(PrimitiveSmelteryBlockEntity.this.getBlockState().getBlock().getName())
+                            .append(PrimitiveSmelteryBlockEntity.this.getName())
             );
 
 

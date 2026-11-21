@@ -345,7 +345,7 @@ public class MCrafterBlockEntity extends LockableBlockEntity implements MachineI
         public Gui(ServerPlayer player) {
             super(MenuType.GENERIC_9x3, player, false);
             this.lockedSlots = (BitSet) MCrafterBlockEntity.this.lockedSlots.clone();
-            this.setTitle(GuiTextures.CRAFTER.apply(MCrafterBlockEntity.this.getBlockState().getBlock().getName()));
+            this.setTitle(GuiTextures.CRAFTER.apply(MCrafterBlockEntity.this.getName()));
             this.setSlot(9, PolydexCompat.getButton(RecipeType.CRAFTING));
 
             for (int y = 0; y < 3; y++) {

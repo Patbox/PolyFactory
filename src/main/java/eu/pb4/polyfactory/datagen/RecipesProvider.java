@@ -1983,7 +1983,6 @@ class RecipesProvider extends FabricRecipeProvider {
                                     SimpleCauldronCastingRecipe.toItem(fluidType.of(FluidConstants.BLOCK), block, FactorySoundEvents.BLOCK_SPOUT_METAL_COOLED.value(), 60))
                     );
                 }
-
             }
 
             private String fluidInteractionName(FluidType<?> fluidA, FluidType<?> fluidB) {

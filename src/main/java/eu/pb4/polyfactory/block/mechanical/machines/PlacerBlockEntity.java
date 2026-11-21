@@ -293,7 +293,7 @@ public class PlacerBlockEntity extends LockableBlockEntity implements SingleStac
     private class Gui extends SimpleGui {
         public Gui(ServerPlayer player) {
             super(MenuType.HOPPER, player, false);
-            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(PlacerBlockEntity.this.getBlockState().getBlock().getName()));
+            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(PlacerBlockEntity.this.getName()));
             this.setSlot(2, new PredicateLimitedSlot(PlacerBlockEntity.this, 0, s -> s.getItem() instanceof BlockItem || s.is(FactoryItemTags.PLACER_USABLE)));
             this.open();
         }

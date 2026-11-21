@@ -81,6 +81,7 @@ class BlockTagsProvider extends FabricTagsProvider.BlockTagsProvider {
         this.tag(FactoryBlockTags.PIPE_CONNECTABLE)
                 .addOptionalTag(BlockTags.CAULDRONS)
                 .add(BlockItemIds.BEEHIVE.block())
+                .add(BlockItemIds.SCULK_CATALYST.block())
         ;
 
         this.tag(BlockTags.INCORRECT_FOR_WOODEN_TOOL)

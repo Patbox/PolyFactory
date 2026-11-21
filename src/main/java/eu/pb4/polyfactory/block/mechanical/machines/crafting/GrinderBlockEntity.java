@@ -245,7 +245,7 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalWo
     private class Gui extends SimpleGui {
         public Gui(ServerPlayer player) {
             super(MenuType.GENERIC_9x3, player, false);
-            this.setTitle(GuiTextures.GRINDER.apply(GrinderBlockEntity.this.getBlockState().getBlock().getName()));
+            this.setTitle(GuiTextures.GRINDER.apply(GrinderBlockEntity.this.getName()));
             this.setSlot(9, PolydexCompat.getButton(FactoryRecipeTypes.GRINDING));
 
             this.setSlot(4, new Slot(GrinderBlockEntity.this, 0, 0, 0));

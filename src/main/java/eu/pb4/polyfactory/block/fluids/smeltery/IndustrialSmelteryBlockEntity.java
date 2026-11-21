@@ -397,7 +397,7 @@ public class IndustrialSmelteryBlockEntity extends LockableBlockEntity implement
                             .append(Component.literal(GuiTextures.SMELTERY_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
                             .append(FluidTextures.SMELTERY.render(IndustrialSmelteryBlockEntity.this.fluidContainer::provideRender))
                             .append(Component.literal(GuiTextures.SMELTERY_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
-                            .append(IndustrialSmelteryBlockEntity.this.getBlockState().getBlock().getName())
+                            .append(IndustrialSmelteryBlockEntity.this.getName())
             );
 
 

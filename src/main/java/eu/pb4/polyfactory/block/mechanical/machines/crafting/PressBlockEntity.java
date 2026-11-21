@@ -400,7 +400,7 @@ public class PressBlockEntity extends TallItemMachineBlockEntity implements Outp
     private class Gui extends SimpleGui {
         public Gui(ServerPlayer player) {
             super(MenuType.GENERIC_9x3, player, false);
-            this.setTitle(GuiTextures.PRESS.apply(PressBlockEntity.this.getBlockState().getBlock().getName()));
+            this.setTitle(GuiTextures.PRESS.apply(PressBlockEntity.this.getName()));
             this.setSlot(9, PolydexCompat.getButton(FactoryRecipeTypes.PRESS));
             this.setSlot(3, new Slot(PressBlockEntity.this, INPUT_SLOT, 0, 0));
             this.setSlot(5, new Slot(PressBlockEntity.this, INPUT_2_SLOT, 0, 0));

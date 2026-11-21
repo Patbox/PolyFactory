@@ -394,7 +394,7 @@ public class MinerBlockEntity extends LockableBlockEntity implements SingleStack
     private class Gui extends SimpleGui {
         public Gui(ServerPlayer player) {
             super(MenuType.HOPPER, player, false);
-            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(MinerBlockEntity.this.getBlockState().getBlock().getName()));
+            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(MinerBlockEntity.this.getName()));
             this.setSlot(2, new TagLimitedSlot(MinerBlockEntity.this, 0, FactoryItemTags.ALLOWED_IN_MINER));
             this.open();
         }

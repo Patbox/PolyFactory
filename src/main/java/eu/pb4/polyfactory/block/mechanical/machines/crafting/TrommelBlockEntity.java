@@ -276,7 +276,7 @@ public class TrommelBlockEntity extends LockableBlockEntity implements MinimalWo
     private class Gui extends SimpleGui {
         public Gui(ServerPlayer player) {
             super(MenuType.GENERIC_9x3, player, false);
-            this.setTitle(GuiTextures.GRINDER.apply(TrommelBlockEntity.this.getBlockState().getBlock().getName()));
+            this.setTitle(GuiTextures.GRINDER.apply(TrommelBlockEntity.this.getName()));
             this.setSlot(9, PolydexCompat.getButton(FactoryRecipeTypes.TROMMEL));
 
             this.setSlot(4, new Slot(TrommelBlockEntity.this, 0, 0, 0));

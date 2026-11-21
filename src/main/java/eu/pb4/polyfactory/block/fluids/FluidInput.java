@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 
 public interface FluidInput {
+    /// Returns leftover
     long insertFluid(FluidInstance<?> type, long amount, Direction direction);
 
     interface ContainerBased extends FluidInput, FluidContainerOwner {

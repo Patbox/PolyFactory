@@ -1,4 +1,4 @@
-package eu.pb4.polyfactory;
+package eu.pb4.polyfactory.other;
 
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.recipe.OutputStack;
@@ -6,13 +6,11 @@ import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.item.FactoryItems;
-import eu.pb4.polyfactory.mixin.util.MappedRegistryMixin;
 import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
 import eu.pb4.polyfactory.recipe.grinding.SimpleGrindingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.BrewingMixingRecipe;
 import eu.pb4.polyfactory.recipe.spout.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.util.FactoryUtil;
-import eu.pb4.polyfactory.util.PolyFactoryConfig;
 import eu.pb4.polyfactory.util.WoodUtil;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.core.Holder;

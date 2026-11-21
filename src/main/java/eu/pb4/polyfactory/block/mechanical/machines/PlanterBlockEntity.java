@@ -219,7 +219,7 @@ public class PlanterBlockEntity extends LockableBlockEntity implements MinimalWo
     private class Gui extends SimpleGui {
         public Gui(ServerPlayer player) {
             super(MenuType.GENERIC_3x3, player, false);
-            this.setTitle(PlanterBlockEntity.this.getBlockState().getBlock().getName());
+            this.setTitle(PlanterBlockEntity.this.getName());
             for (int i = 0; i < 9; i++) {
                 this.setSlot(i, new TagLimitedSlot(PlanterBlockEntity.this, i, FactoryItemTags.ALLOWED_IN_PLANTER));
             }

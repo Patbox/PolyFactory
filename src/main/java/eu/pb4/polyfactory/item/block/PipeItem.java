@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -39,8 +40,8 @@ public class PipeItem extends FactoryBlockItem {
                 ItemStack itemStack = context.getItemInHand();
                 BlockState blockState2 = world.getBlockState(blockPos);
                 if (blockState2.is(convert.getBlock())) {
-                    blockState2 = ((BlockItemAccessor) this).callUpdateBlockStateFromTag(blockPos, world, itemStack, blockState2);
-                    this.updateCustomBlockEntityTag(world, playerEntity, blockPos, itemStack);
+                    blockState2 = BlockItemAccessor.callUpdateBlockStateFromTag(blockPos, world, itemStack, blockState2);
+                    updateCustomBlockEntityTag(world, playerEntity, blockPos, itemStack);
                     BlockItemAccessor.callUpdateBlockEntityComponents(world, blockPos, itemStack);
                     blockState2.getBlock().setPlacedBy(world, blockPos, blockState2, playerEntity, itemStack);
                     if (playerEntity instanceof ServerPlayer) {

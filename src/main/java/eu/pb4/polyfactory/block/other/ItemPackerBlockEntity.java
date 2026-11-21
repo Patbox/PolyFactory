@@ -218,7 +218,7 @@ public class ItemPackerBlockEntity extends LockableBlockEntity implements BlockE
     private class Gui extends SimpleGui {
         public Gui(ServerPlayer player) {
             super(MenuType.HOPPER, player, false);
-            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(ItemPackerBlockEntity.this.getBlockState().getBlock().getName()));
+            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(ItemPackerBlockEntity.this.getName()));
             this.setSlot(2, new PredicateLimitedSlot(ItemPackerBlockEntity.this, 0, stack -> ItemStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack)) != null));
             this.open();
         }

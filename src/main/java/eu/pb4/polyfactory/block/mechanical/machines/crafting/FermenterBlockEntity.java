@@ -453,7 +453,7 @@ public class FermenterBlockEntity extends TallItemMachineBlockEntity implements 
                             .append(Component.literal(GuiTextures.FERMENTER_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
                             .append(FluidTextures.MIXER.render(FermenterBlockEntity.this.fluidContainer::provideRender))
                             .append(Component.literal(GuiTextures.FERMENTER_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
-                            .append(FermenterBlockEntity.this.getBlockState().getBlock().getName())
+                            .append(FermenterBlockEntity.this.getName())
             );
 
 

@@ -506,7 +506,7 @@ public class MDrainBlockEntity extends TallItemMachineBlockEntity implements Flu
                             .append(Component.literal(GuiTextures.MECHANICAL_DRAIN_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
                             .append(FluidTextures.MIXER.render(MDrainBlockEntity.this.fluidContainer::provideRender))
                             .append(Component.literal(GuiTextures.MECHANICAL_DRAIN_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
-                            .append(MDrainBlockEntity.this.getBlockState().getBlock().getName())
+                            .append(MDrainBlockEntity.this.getName())
             );
 
 

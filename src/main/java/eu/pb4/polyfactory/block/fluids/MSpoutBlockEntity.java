@@ -418,8 +418,8 @@ public class MSpoutBlockEntity extends TallItemMachineBlockEntity implements Out
                             .append(Component.literal(GuiTextures.MECHANICAL_SPOUT_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
                             .append(FluidTextures.MIXER.render(MSpoutBlockEntity.this.fluidContainer::provideRender))
                             .append(Component.literal(GuiTextures.MECHANICAL_SPOUT_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
-                            .append(MSpoutBlockEntity.this.getBlockState().getBlock().getName()))
-                    : GuiTextures.MECHANICAL_SPOUT_NO_CONN.apply(MSpoutBlockEntity.this.getBlockState().getBlock().getName());
+                            .append(MSpoutBlockEntity.this.getName()))
+                    : GuiTextures.MECHANICAL_SPOUT_NO_CONN.apply(MSpoutBlockEntity.this.getName());
 
             var fluidSlot = FluidContainerUtil.guiElement(fluidContainer, false);
 

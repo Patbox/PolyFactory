@@ -206,7 +206,7 @@ public class DieselEngineBlockEntity extends LockableBlockEntity implements Flui
                             .append(Component.literal(GuiTextures.SMELTERY_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
                             .append(FluidTextures.DIESEL_ENGINE.render(DieselEngineBlockEntity.this.container::provideRender))
                             .append(Component.literal(GuiTextures.SMELTERY_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
-                            .append(DieselEngineBlockEntity.this.getBlockState().getBlock().getName())
+                            .append(DieselEngineBlockEntity.this.getName())
             );
 
 

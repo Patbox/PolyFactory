@@ -485,7 +485,7 @@ public class MixerBlockEntity extends TallItemMachineBlockEntity implements Flui
                             .append(Component.literal(GuiTextures.MIXER_FLUID_OFFSET + "").setStyle(UiResourceCreator.STYLE))
                             .append(FluidTextures.MIXER.render(MixerBlockEntity.this.fluidContainer::provideRender))
                             .append(Component.literal(GuiTextures.MIXER_FLUID_OFFSET_N + "").setStyle(UiResourceCreator.STYLE))
-                            .append(MixerBlockEntity.this.getBlockState().getBlock().getName())
+                            .append(MixerBlockEntity.this.getName())
             );
 
 

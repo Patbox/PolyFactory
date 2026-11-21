@@ -1,7 +1,7 @@
 package eu.pb4.polyfactory.mixin.block;
 
 import com.mojang.datafixers.util.Pair;
-import eu.pb4.polyfactory.DynamicContent;
+import eu.pb4.polyfactory.other.DynamicContent;
 import eu.pb4.polyfactory.fluid.FluidBehaviours;
 import eu.pb4.polyfactory.fluid.FluidType;
 import eu.pb4.polyfactory.other.FactoryRegistries;

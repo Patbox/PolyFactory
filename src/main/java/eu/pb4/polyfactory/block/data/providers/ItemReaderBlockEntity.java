@@ -217,7 +217,7 @@ public class ItemReaderBlockEntity extends ChanneledDataBlockEntity implements S
     private class Gui extends SimpleGui {
         public Gui(ServerPlayer player) {
             super(MenuType.HOPPER, player, false);
-            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(ItemReaderBlockEntity.this.getBlockState().getBlock().getName()));
+            this.setTitle(GuiTextures.CENTER_SLOT_GENERIC.apply(ItemReaderBlockEntity.this.getName()));
             this.setSlot(2, new Slot(ItemReaderBlockEntity.this, 0, 0, 0));
             this.open();
         }

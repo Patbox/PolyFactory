@@ -16,5 +16,7 @@ public interface BlockItemAccessor {
     }
 
     @Invoker
-    BlockState callUpdateBlockStateFromTag(BlockPos pos, Level world, ItemStack stack, BlockState state);
+    static BlockState callUpdateBlockStateFromTag(BlockPos pos, Level world, ItemStack stack, BlockState state) {
+        throw new UnsupportedOperationException();
+    }
 }

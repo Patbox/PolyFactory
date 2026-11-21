@@ -10,6 +10,7 @@ import eu.pb4.polyfactory.item.FactoryDataComponents;
 import eu.pb4.polyfactory.item.FactoryEnchantmentEffectComponents;
 import eu.pb4.polyfactory.loottable.FactoryLootTables;
 import eu.pb4.polyfactory.models.*;
+import eu.pb4.polyfactory.other.DynamicContent;
 import eu.pb4.polyfactory.other.FactoryRegistries;
 import eu.pb4.polyfactory.polydex.PolydexCompat;
 import eu.pb4.polyfactory.recipe.FactoryRecipeSerializers;

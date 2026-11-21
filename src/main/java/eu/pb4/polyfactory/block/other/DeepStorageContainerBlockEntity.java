@@ -241,7 +241,7 @@ public class DeepStorageContainerBlockEntity extends LockableBlockEntity impleme
             }
 
             this.setTitle(GuiTextures.DEEP_STORAGE_CONTAINER.apply(Component.translatable("text.polyfactory.thing_x_out_of_y",
-                    DeepStorageContainerBlockEntity.this.getBlockState().getBlock().getName(),
+                    DeepStorageContainerBlockEntity.this.getName(),
                     this.page + 1,
                     PAGE_COUNT
             )));
