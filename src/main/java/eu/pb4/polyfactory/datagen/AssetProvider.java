@@ -245,6 +245,19 @@ class AssetProvider implements DataProvider {
         var axleModel = id("block/axle_no_custom");
         var shortAxleModel = id("block/axle_short");
 
+        fromItem.accept(FactoryItems.GRINDER, id -> new ItemAsset(new CompositeItemModel(List.of(
+                new BasicItemModel(id.withPrefix("block/")),
+                new BasicItemModel(id("block/grindstone_wheel"), Optional.of(new Transformation(
+                        new Matrix4f().translate(0, 0.625f, 0))), List.of())
+        )), ItemAsset.Properties.DEFAULT));
+
+        fromItem.accept(FactoryItems.SAWMILL, id -> new ItemAsset(new CompositeItemModel(List.of(
+                new BasicItemModel(id.withPrefix("block/")),
+                new BasicItemModel(id.withPrefix("block/").withSuffix("_saw"), Optional.of(new Transformation(
+                        new Matrix4f().translate(0, 7 / 16f, 0))), List.of())
+        )), ItemAsset.Properties.DEFAULT));
+
+
         var rotationAlongsideX = Optional.of(new Transformation(new Matrix4f().translate(0.5f, 0.5f, 0.5f).rotateX(Mth.HALF_PI).translate(-0.5f, -0.5f, -0.5f)));
         var rotationAlongsideZ = Optional.of(new Transformation(new Matrix4f().translate(0.5f, 0.5f, 0.5f).rotateZ(Mth.HALF_PI).translate(-0.5f, -0.5f, -0.5f)));
         for (var item : List.of(FactoryItems.CLUTCH, FactoryItems.GEARSHIFT, FactoryItems.STRESSOMETER, FactoryItems.TACHOMETER)) {

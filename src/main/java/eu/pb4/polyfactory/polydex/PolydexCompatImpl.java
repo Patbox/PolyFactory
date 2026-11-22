@@ -36,6 +36,7 @@ import eu.pb4.polyfactory.recipe.mixing.GenericMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.RatedFluidMixingMixingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.TransformMixingRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
+import eu.pb4.polyfactory.recipe.sawmill.SimpleSawmillRecipe;
 import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
 import eu.pb4.polyfactory.recipe.spout.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.recipe.trommel.SimpleTrommelRecipe;
@@ -92,6 +93,7 @@ public class PolydexCompatImpl {
         PolydexPage.registerRecipeViewer(SimpleGrindingRecipe.class, SimpleGrindingRecipePage::new);
 
         PolydexPage.registerRecipeViewer(SimpleTrommelRecipe.class, SimpleTrommelRecipePage::new);
+        PolydexPage.registerRecipeViewer(SimpleSawmillRecipe.class, SimpleSawmillRecipePage::new);
 
         PolydexPage.registerRecipeViewer(ColoringCraftingRecipe.class, ColoringCraftingRecipePage::new);
         //noinspection unchecked

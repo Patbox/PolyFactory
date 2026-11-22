@@ -17,6 +17,7 @@
   "block.polyfactory.moldmaking_table": "Moldmaking Table",
   "block.polyfactory.grinder": "Grinder",
   "block.polyfactory.trommel": "Trommel",
+  "block.polyfactory.sawmill": "Sawmill",
   "block.polyfactory.press": "Mechanical Press",
   "block.polyfactory.miner": "Mechanical Miner",
   "block.polyfactory.placer": "Mechanical Placer",
@@ -337,6 +338,7 @@
   "item.polyfactory.wrench.action.hand_position": "Hand Position",
   "item.polyfactory.wrench.action.redstone_activation": "Redstone Activation",
   "item.polyfactory.wrench.action.engine_gear": "Gear",
+  "item.polyfactory.wrench.action.blade_angle": "Blade Angle",
   "item.polyfactory.wrench.action.allowed_fluid_amount": "Allowed Fluid Amount",
   "item.polyfactory.wrench.action.up": "Up",
   "item.polyfactory.wrench.action.down": "Down",
@@ -379,6 +381,9 @@
   "item.polyfactory.wrench.action.mechanical_crafter.active_mode.powered": "Powered",
   "item.polyfactory.wrench.action.mechanical_crafter.active_mode.not_powered": "Not Powered",
 
+  "item.polyfactory.wrench.action.blade_angle.zero": "0°",
+  "item.polyfactory.wrench.action.blade_angle.twenty_two": "22°",
+  "item.polyfactory.wrench.action.blade_angle.forty_five": "45°",
 
   "item.polyfactory.wrench.ui.set_to_range": "Set %s in range <%s; %s>",
 
@@ -516,6 +521,7 @@
   "recipe_type.polyfactory.fermenter": "Fermenter",
   "recipe_type.polyfactory.grinding": "Grinder",
   "recipe_type.polyfactory.trommel": "Trommel",
+  "recipe_type.polyfactory.sawmill": "Sawmill",
   "recipe_type.polyfactory.drain": "Drain",
   "recipe_type.polyfactory.spout": "Spout",
   "recipe_type.polyfactory.smeltery": "Smeltery",
@@ -565,6 +571,7 @@
   "text.polyfactory.polydex.minimal_speed_with_stress": "Minimal Speed: %s RPM, Stress: %s su",
   "text.polyfactory.polydex.optimal_speed_with_stress": "Optimal Speed: %s RPM, Stress: %s su",
   "text.polyfactory.polydex.required_stress": "Required Torque: %s su",
+  "text.polyfactory.polydex_blade_angle": "Required Blade Angle: %s",
 
   "polydex_category.polyfactory.fluids": "Item to Fluid",
   "polydex_category.polyfactory.polyfactory.smeltery": "Smeltery",

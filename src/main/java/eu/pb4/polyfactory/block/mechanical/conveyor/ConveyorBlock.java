@@ -709,7 +709,12 @@ public class ConveyorBlock extends RotationalNetworkBlock implements FactoryBloc
             this.movingItemContainer = container;
             container.scale(1);
             updateDelta(-1, this.delta);
-            this.addElementWithoutUpdates(container);
+            if (container.wasVisible()) {
+                this.addElementWithoutUpdates(container);
+            } else {
+                this.addElement(container);
+                container.setWasVisible(true);
+            }
         }
     }
 }

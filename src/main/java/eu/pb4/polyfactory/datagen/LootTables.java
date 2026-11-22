@@ -45,6 +45,7 @@ class LootTables extends FabricBlockLootSubProvider {
         this.dropSelf(FactoryBlocks.FAN);
         this.dropSelf(FactoryBlocks.EJECTOR);
         this.dropSelf(FactoryBlocks.GRINDER);
+        this.dropSelf(FactoryBlocks.SAWMILL);
         this.dropSelf(FactoryBlocks.PLACER);
         this.dropSelf(FactoryBlocks.STEEL_BUTTON);
         this.addTallMachineDrop(FactoryBlocks.PRESS);

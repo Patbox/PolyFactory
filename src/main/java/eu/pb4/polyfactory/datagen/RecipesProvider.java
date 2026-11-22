@@ -30,6 +30,7 @@ import eu.pb4.polyfactory.recipe.input.FluidInputStack;
 import eu.pb4.polyfactory.recipe.mixing.*;
 import eu.pb4.polyfactory.recipe.press.FillSprayCanPressRecipe;
 import eu.pb4.polyfactory.recipe.press.GenericPressRecipe;
+import eu.pb4.polyfactory.recipe.sawmill.SimpleSawmillRecipe;
 import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
 import eu.pb4.polyfactory.recipe.spout.ContainerFillSpoutRecipe;
 import eu.pb4.polyfactory.recipe.spout.PotionSpoutRecipe;
@@ -142,6 +143,18 @@ class RecipesProvider extends FabricRecipeProvider {
                         .define('s', FactoryItems.STEEL_PLATE)
                         .define('g', FactoryItems.STEEL_MACHINE_GEARBOX)
                         .define('c', FactoryItems.METAL_GRID)
+                        .unlockedBy("get_steel", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
+                        .save(output);
+
+                this.shaped(RecipeCategory.REDSTONE, FactoryItems.SAWMILL, 1)
+                        .pattern(" i ")
+                        .pattern("sas")
+                        .pattern("pwp")
+                        .define('i', Items.IRON_INGOT)
+                        .define('s', FactoryItems.STEEL_PLATE)
+                        .define('a', FactoryItems.AXLE)
+                        .define('w', Items.SMOOTH_STONE)
+                        .define('p', ItemTags.PLANKS)
                         .unlockedBy("get_steel", InventoryChangeTrigger.TriggerInstance.hasItems(FactoryItems.STEEL_INGOT))
                         .save(output);
 
@@ -1235,6 +1248,10 @@ class RecipesProvider extends FabricRecipeProvider {
                     of(output, SimpleTrommelRecipe.of(wood.name() + "_leaves",
                             Ingredient.of(leaves), 0.4, 2, 16, list.toArray(OutputStack[]::new)));
                 }
+
+                of(output,
+                        SimpleSawmillRecipe.of("cheese_wedge", Ingredient.of(FactoryItems.CHEESE_WHEEL), 0.3, 5, 8, new ItemStackTemplate(FactoryItems.CHEESE_WEDGE, 7))
+                );
 
                 oreSmelting(List.of(FactoryItems.CRUSHED_RAW_IRON), RecipeCategory.MISC, CookingBookCategory.MISC, Items.IRON_INGOT, 0.5F, 180, "iron_ingot");
                 oreSmelting(List.of(FactoryItems.CRUSHED_RAW_COPPER), RecipeCategory.MISC, CookingBookCategory.MISC, Items.COPPER_INGOT, 0.5F, 180, "copper_ingot");

@@ -1,6 +1,7 @@
 package eu.pb4.polyfactory.block;
 
 import eu.pb4.polyfactory.ModInit;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BlockItemTags;
@@ -22,6 +23,7 @@ public class FactoryBlockTags {
     public static final TagKey<Block> MINEABLE_WITH_DRILL = of("mineable/drill");
     public static final TagKey<Block> FUNNEL_IGNORE_SIDE_EXTRACT = of("funnel/ignore_side_extract");
     public static final TagKey<Block> FUNNEL_IGNORE_SIDE_INSERT = of("funnel/ignore_side_insert");
+    public static final TagKey<Block> CHAINABLE_MACHINES = of("chainable_machines");
 
     private static TagKey<Block> of(String path) {
         return TagKey.create(Registries.BLOCK, ModInit.id(path));

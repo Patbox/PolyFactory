@@ -16,8 +16,8 @@ public class SimpleMovingItemContainer implements MovingItemContainerHolder {
 
     @Nullable
     private MovingItem movingItem;
-    private AddedCallback added;
-    private RemovedCallback removed;
+    private final AddedCallback added;
+    private final RemovedCallback removed;
 
     public SimpleMovingItemContainer() {
         this(-1, NOOP_ADD, NOOP_REMOVE);
@@ -94,7 +94,9 @@ public class SimpleMovingItemContainer implements MovingItemContainerHolder {
     @Override
     public void setContainer(@Nullable MovingItem container) {
         if (container == null) {
-            this.removed.accept(this.movingItem, true);
+            if (this.movingItem != null) {
+                this.removed.accept(this.movingItem, true);
+            }
             this.movingItem = null;
         } else {
             if (this.movingItem != null) {
@@ -110,7 +112,9 @@ public class SimpleMovingItemContainer implements MovingItemContainerHolder {
     public @Nullable MovingItem pullAndRemove() {
         var x = this.movingItem;
         this.movingItem = null;
-        this.removed.accept(x, false);
+        if (x != null) {
+            this.removed.accept(x, false);
+        }
         return x;
     }
 
@@ -146,6 +150,13 @@ public class SimpleMovingItemContainer implements MovingItemContainerHolder {
             return this.movingItem.getCurrentPos();
         }
         return null;
+    }
+
+    public Vec3 getPos(Vec3 fallback) {
+        if (this.movingItem != null) {
+            return this.movingItem.getCurrentPos();
+        }
+        return fallback;
     }
 
     public void tick() {

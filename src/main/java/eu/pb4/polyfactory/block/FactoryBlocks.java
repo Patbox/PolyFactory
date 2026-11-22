@@ -72,6 +72,7 @@ public class FactoryBlocks {
     public static final DieselEngineBlock DIESEL_ENGINE = register(FactoryBlockIds.DIESEL_ENGINE, BlockBehaviour.Properties.ofFullCopy(SPLITTER).strength(3F).noOcclusion(), DieselEngineBlock::new);
 
     public static final GrinderBlock GRINDER = register(FactoryBlockIds.GRINDER, BlockBehaviour.Properties.ofFullCopy(SPLITTER).sound(SoundType.WOOD), GrinderBlock::new);
+    public static final SawmillBlock SAWMILL = register(FactoryBlockIds.SAWMILL, BlockBehaviour.Properties.ofFullCopy(SPLITTER).sound(SoundType.WOOD), SawmillBlock::new);
     public static final TrommelBlock TROMMEL = register(FactoryBlockIds.TROMMEL, BlockBehaviour.Properties.ofFullCopy(SPLITTER), TrommelBlock::new);
     public static final PressBlock PRESS = register(FactoryBlockIds.PRESS, BlockBehaviour.Properties.ofFullCopy(SPLITTER), PressBlock::new);
     public static final MixerBlock MIXER = register(FactoryBlockIds.MIXER, BlockBehaviour.Properties.ofFullCopy(SPLITTER), MixerBlock::new);

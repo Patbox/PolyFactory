@@ -13,14 +13,15 @@ public interface SimpleMovingItemContainerBlockEntity extends SimpleMovingItemCo
 
     void updatePosition(int id);
 
-    default void addMoving(int i, MovingItem x, boolean newlyAdded) {
+    default void addMoving(int i, MovingItem movingItem, boolean newlyAdded) {
         var model = this.getModel();
         if (model != null) {
-            if (newlyAdded) {
+            if (newlyAdded || !movingItem.wasVisible()) {
                 updatePosition(i);
-                model.addElement(x);
+                model.addElement(movingItem);
+                movingItem.setWasVisible(true);
             } else {
-                model.addElementWithoutUpdates(x);
+                model.addElementWithoutUpdates(movingItem);
                 updatePosition(i);
             }
         }
@@ -33,6 +34,7 @@ public interface SimpleMovingItemContainerBlockEntity extends SimpleMovingItemCo
         if (model != null) {
             if (fullRemove) {
                 model.removeElement(movingItem);
+                movingItem.setWasVisible(false);
             } else {
                 model.removeElementWithoutUpdates(movingItem);
             }

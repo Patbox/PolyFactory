@@ -26,8 +26,10 @@ public class MovingItem implements VirtualElement, SlotAccess {
     private final ItemDisplayElement riddenBase;
     private float globalScale = 1;
     private int tick;
-    private boolean isFirstMove = true;
+    private boolean resetTeleportDuration = true;
     private Vec3 pos = Vec3.ZERO;
+    private Quaternionf rotation = Direction.NORTH.getRotation();
+    private boolean wasVisible = false;
 
     @Deprecated
     public MovingItem(ItemStack stack) {
@@ -40,7 +42,6 @@ public class MovingItem implements VirtualElement, SlotAccess {
 
         for (var i = 0; i < 4; i++) {
             this.itemDisplay[i] = new LodItemDisplayElement();
-            this.itemDisplay[i].setLeftRotation(Direction.NORTH.getRotation());
             this.itemDisplay[i].setDisplayWidth(1);
             this.itemDisplay[i].setDisplayHeight(2);
             this.itemDisplay[i].setViewRange(i == 0 ? 0.5f : 0.2f);
@@ -67,7 +68,7 @@ public class MovingItem implements VirtualElement, SlotAccess {
     private void updateDisplay(int i) {
         var count = this.stack.getCount();
 
-        if (i * 16 <= count) {
+        if (i * 8 <= count) {
             this.itemDisplay[i].setItem(this.stack.copy());
         } else {
             this.itemDisplay[i].setItem(ItemStack.EMPTY);
@@ -77,7 +78,8 @@ public class MovingItem implements VirtualElement, SlotAccess {
     }
 
     private void updateScale(int i) {
-        this.itemDisplay[i].setScale(new Vector3f(0.5f * this.globalScale ));
+        this.itemDisplay[i].setScale(new Vector3f(0.5f * this.globalScale));
+        this.recalculateRotation(i);
     }
 
     @Override
@@ -167,9 +169,9 @@ public class MovingItem implements VirtualElement, SlotAccess {
             x.tick();
         }
 
-        if (this.isFirstMove) {
+        if (this.resetTeleportDuration) {
             this.riddenBase.setTeleportDuration(4);
-            this.isFirstMove = false;
+            this.resetTeleportDuration = false;
         }
 
     }
@@ -190,13 +192,19 @@ public class MovingItem implements VirtualElement, SlotAccess {
             return;
         }
 
+        this.rotation.set(quaternionf);
+
         for (var i = 0; i < 4; i++) {
-            var display = this.itemDisplay[i];
-            display.setLeftRotation(quaternionf);
-            var e = i % 2 == 1;
-            display.setTranslation(new Vector3f( (e ? i : -i) * 0.01f, i * 0.03f, (e ? i : -i) * 0.01f).rotate(quaternionf));
-            display.startInterpolationIfDirty();
+            this.recalculateRotation(i);
         }
+    }
+
+    private void recalculateRotation(int i) {
+        var display = this.itemDisplay[i];
+        display.setLeftRotation(this.rotation);
+        var e = i % 2 == 1;
+        display.setTranslation(new Vector3f( (e ? i : -i) * 0.03f, i * 0.09f, (e ? i : -i) * 0.03f).mul(this.globalScale).rotate(this.rotation));
+        display.startInterpolationIfDirty();
     }
 
     public void checkItems() {
@@ -216,5 +224,18 @@ public class MovingItem implements VirtualElement, SlotAccess {
         for (int i = 0; i < 4; i++) {
             this.updateScale(i);
         }
+    }
+
+    public void overrideInterpolationDuration(int duration) {
+        this.resetTeleportDuration = true;
+        this.riddenBase.setTeleportDuration(duration);
+    }
+
+    public boolean wasVisible() {
+        return wasVisible;
+    }
+
+    public void setWasVisible(boolean wasVisible) {
+        this.wasVisible = wasVisible;
     }
 }

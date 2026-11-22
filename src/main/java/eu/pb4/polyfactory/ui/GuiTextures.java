@@ -53,6 +53,10 @@ public class GuiTextures {
     public static final Supplier<GuiElementBuilder> BUTTON_ACTIVE_POWERED = icon32("button/active/powered");
     public static final Supplier<GuiElementBuilder> BUTTON_ACTIVE_NOT_POWERED = icon32("button/active/not_powered");
 
+    public static final Supplier<GuiElementBuilder> BUTTON_BLADE_ANGLE_ZERO = icon32("button/blade_angle/zero");
+    public static final Supplier<GuiElementBuilder> BUTTON_BLADE_ANGLE_TWENTY_TWO = icon32("button/blade_angle/twenty_two");
+    public static final Supplier<GuiElementBuilder> BUTTON_BLADE_ANGLE_FORTY_FIVE = icon32("button/blade_angle/forty_five");
+
     @SuppressWarnings("unchecked")
     public static final Supplier<GuiElementBuilder>[] BUTTON_SPEED_GEAR = IntStream.rangeClosed(0, 5).mapToObj(i -> icon32("button/speed_gear/" + i)).toArray(Supplier[]::new);
 

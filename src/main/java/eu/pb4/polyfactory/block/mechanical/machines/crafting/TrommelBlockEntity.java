@@ -175,11 +175,11 @@ public class TrommelBlockEntity extends LockableBlockEntity implements MinimalWo
                 self.process += speed;
                 self.setChanged();
                 return;
-            } else if (world.getGameTime() % 5 == 0) {
+            } else if (world.getGameTime() % 8 == 0) {
                 var dir = state.getValue(TrommelBlock.FACING).getAxis().getPositive();
                 ((ServerLevel) world).sendParticles(ParticleTypes.SMOKE,
-                        pos.getX() + 0.5 + 0.5 * dir.getStepX(), pos.getY() + 0.8f, pos.getZ() + 0.5 + 0.5 * dir.getStepZ(), 0,
-                        (Math.random() - 0.5) * 0.2, 0.04, (Math.random() - 0.5) * 0.2, 0.3);
+                        pos.getX() + 0.5 + 0.5 * dir.getStepX(), pos.getY() + 0.75, pos.getZ() + 0.5 + 0.5 * dir.getStepZ(), 3,
+                        0.25 + 0.25 * dir.getStepX(), 0.2, 0.25 + 0.25 * dir.getStepZ(), 0.01, 0.03, 0.01);
             }
 
             self.state = rot.getStateTextOrElse(rot.hasNoActiveProviders() ? TOO_SLOW_TEXT : TOO_SLOW_DISCONNECTED_TEXT);

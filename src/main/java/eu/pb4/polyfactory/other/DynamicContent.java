@@ -2,13 +2,19 @@ package eu.pb4.polyfactory.other;
 
 import com.mojang.datafixers.util.Pair;
 import eu.pb4.factorytools.api.recipe.OutputStack;
+import eu.pb4.polyfactory.block.mechanical.machines.crafting.SawmillBlock;
 import eu.pb4.polyfactory.fluid.FactoryFluids;
 import eu.pb4.polyfactory.fluid.FluidInstance;
 import eu.pb4.polyfactory.fluid.FluidStack;
 import eu.pb4.polyfactory.item.FactoryItems;
+import eu.pb4.polyfactory.mixin.ShapedRecipeAccessor;
+import eu.pb4.polyfactory.mixin.ShapedRecipePatternAccessor;
+import eu.pb4.polyfactory.mixin.ShapelessRecipeAccessor;
 import eu.pb4.polyfactory.recipe.drain.SimpleDrainRecipe;
 import eu.pb4.polyfactory.recipe.grinding.SimpleGrindingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.BrewingMixingRecipe;
+import eu.pb4.polyfactory.recipe.sawmill.SawmillRecipe;
+import eu.pb4.polyfactory.recipe.sawmill.SimpleSawmillRecipe;
 import eu.pb4.polyfactory.recipe.spout.SimpleSpoutRecipe;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polyfactory.util.WoodUtil;
@@ -19,16 +25,15 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.references.BlockItemIds;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.BlockItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.BrewingRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.PotionIngredient;
-import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.*;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.ArrayList;
@@ -127,6 +132,35 @@ public class DynamicContent {
                                     20, 15, 30, 0.7f, 2f)
                     );
                 }
+            } else if (recipe.getValue() instanceof ShapelessRecipeAccessor shapelessRecipe) {
+                var resultId = shapelessRecipe.getResult().item().unwrapKey().get();
+
+                if (resultId.identifier().getPath().endsWith("_planks") && shapelessRecipe.getIngredients().size() == 1) {
+                    var out = SimpleSawmillRecipe.of(getShortString(recipe.getKey()), shapelessRecipe.getIngredients().getFirst(),
+                            0.2 * shapelessRecipe.getResult().count(), 5, 10,
+                            OutputStack.of(shapelessRecipe.getResult().withCount((int) (shapelessRecipe.getResult().count() * 1.5))),
+                            OutputStack.of(FactoryItems.SAW_DUST, 0.8f));
+                    exported.accept(out.id(), out.value());
+                }
+            } else if (recipe.getValue() instanceof ShapedRecipeAccessor shapedRecipe && ((ShapedRecipePatternAccessor) (Object) shapedRecipe.getPattern()).getData().isPresent()) {
+                var resultId = shapedRecipe.getResult().item().unwrapKey().get();
+                var shape = ((ShapedRecipePatternAccessor) (Object) shapedRecipe.getPattern()).getData().orElseThrow();
+
+                if (shape.key().size() == 1 && resultId.identifier().getPath().endsWith("_slab")) {
+                    var out = SimpleSawmillRecipe.of(getShortString(recipe.getKey()), shape.key().values().iterator().next(),
+                            SawmillBlock.BladeAngle.ZERO,
+                            0.5, 6, 12,
+                            OutputStack.of(shapedRecipe.getResult().withCount(2)));
+
+                    exported.accept(out.id(), out.value());
+                } else if (shape.key().size() == 1 && resultId.identifier().getPath().endsWith("_stairs")) {
+                    var out = SimpleSawmillRecipe.of(getShortString(recipe.getKey()), shape.key().values().iterator().next(),
+                            SawmillBlock.BladeAngle.FORTY_FIVE,
+                            0.5, 6, 12,
+                            OutputStack.of(shapedRecipe.getResult().withCount(1)));
+
+                    exported.accept(out.id(), out.value());
+                }
             }
         }
 
@@ -146,8 +180,13 @@ public class DynamicContent {
 
     @Unique
     private static String getShortString(Holder<?> entry) {
+        return getShortString(entry.unwrapKey().orElseThrow());
+    }
+
+    @Unique
+    private static String getShortString(ResourceKey<?> entry) {
         //noinspection OptionalGetWithoutIsPresent
-        var key = entry.unwrapKey().get().identifier();
+        var key = entry.identifier();
 
         return key.getNamespace().equals(Identifier.DEFAULT_NAMESPACE) ? key.getPath().replace("/", "_") : key.toDebugFileName();
     }

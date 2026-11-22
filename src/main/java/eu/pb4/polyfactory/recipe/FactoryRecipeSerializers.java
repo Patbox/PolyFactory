@@ -12,6 +12,7 @@ import eu.pb4.polyfactory.recipe.fermenting.SimpleFermentingRecipe;
 import eu.pb4.polyfactory.recipe.fluid.RemovingFluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.fluid.SimpleFluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.grinding.SimpleGrindingRecipe;
+import eu.pb4.polyfactory.recipe.sawmill.SimpleSawmillRecipe;
 import eu.pb4.polyfactory.recipe.smeltery.SimpleSmelteryRecipe;
 import eu.pb4.polyfactory.recipe.spout.*;
 import eu.pb4.polyfactory.recipe.trommel.SimpleTrommelRecipe;
@@ -29,6 +30,7 @@ import static eu.pb4.polyfactory.ModInit.id;
 
 public class FactoryRecipeSerializers {
     public static final RecipeSerializer<SimpleGrindingRecipe> GRINDING_SIMPLE = register("grinding/simple", SimpleGrindingRecipe.CODEC);
+    public static final RecipeSerializer<SimpleSawmillRecipe> SAWMILL_SIMPLE = register("sawmill/simple", SimpleSawmillRecipe.CODEC);
 
     public static final RecipeSerializer<SimpleTrommelRecipe> TROMMEL_SIMPLE = register("trommel/simple", SimpleTrommelRecipe.CODEC);
 

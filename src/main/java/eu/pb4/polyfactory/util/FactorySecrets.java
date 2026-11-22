@@ -11,12 +11,15 @@ import java.util.UUID;
 // Small things for various people, nothing cheaty/op, so don't worry
 public class FactorySecrets {
     private static final UUID TEAL_METALS = UUID.fromString("e88b3493-ea6b-42dc-94ce-1bdfda76ebbd");
+    private static final UUID BRINGER_OF_TATERS = UUID.fromString("8c826f34-113b-4238-a173-44639c53b6e6");
     public static void onJoin(ServerGamePacketListenerImpl handler, PacketSender packetSender, MinecraftServer server) {
         var player = handler.player;
 
         if (player.getStats().getValue(Stats.CUSTOM, Stats.LEAVE_GAME) == 0) {
             if (player.getUUID().equals(TEAL_METALS)) {
                 player.addItem(ColoredItem.stack(FactoryItems.LAMP, 1, FactoryColors.YTTR_TEAL));
+            } else if (player.getUUID().equals(BRINGER_OF_TATERS)) {
+                player.addItem(FactoryItems.TINY_POTATO_SPRING.getDefaultInstance());
             }
         }
     }

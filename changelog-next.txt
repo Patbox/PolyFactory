@@ -1,3 +1,10 @@
+- Added Sawmill:
+  - A new machine block, used to cut items into different ones such as logs into planks or blocks into stairs.
+  - Logs -> Planks recipe gives 50% more items than crafting by hand, while stairs recipes are 1:1 match.
+  - It's single block sized with the back being used for input and front for output (see arrows)
+  - To work it needs to be powered with rotational energy on the sides.
+  - When powered it can also damage entities placed on top of it.
+  - Crafted with 2 planks, 1 Smooth Stone, 2 Steel Plates, 1 Axle and 1 Iron Ingot.
 - Changes to Portable Drill:
   - Added Veinminer 9x mode - It mines multiple neighboring blocks when they use the same material, up to 9 blocks total.
   - Multi-block mining modes now cause drops to spawn at the targeted block instead.
@@ -5,6 +12,8 @@
   - This causes them to generate Sculk around at the same rate as entity-death caused ones (based on xp amount).
 - Mechanical Planter now works with Nether Warts, Sugar Cane, Crimson and Warped Fungus, Red and Brown Mushroom and Sweet Berry Bushes.
 - Changed Turntables to work with players now.
+- Changed Grinder item model to include the grindstone wheel.
+- Updated locked / can't progress crafting indicator smoke particles behavior (it will now spawn for entire block rather than just from center of it).
 - Fixed gui-openable blocks not respecting custom names set via an anvil.
 - Fixed Diesel Engine resetting its gear setting when loaded.
 - Fixed Colored/Caged/Fixture Lamp Recipes being a bit broken.

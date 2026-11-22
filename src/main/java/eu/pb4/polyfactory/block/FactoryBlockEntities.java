@@ -97,6 +97,9 @@ public class FactoryBlockEntities {
     public static final BlockEntityType<GrinderBlockEntity> GRINDER = register("grinder",
              FabricBlockEntityTypeBuilder.create(GrinderBlockEntity::new, FactoryBlocks.GRINDER));
 
+    public static final BlockEntityType<SawmillBlockEntity> SAWMILL = register("sawmill",
+            FabricBlockEntityTypeBuilder.create(SawmillBlockEntity::new, FactoryBlocks.SAWMILL));
+
     public static final BlockEntityType<TrommelBlockEntity> TROMMEL = register("trommel",
             FabricBlockEntityTypeBuilder.create(TrommelBlockEntity::new, FactoryBlocks.TROMMEL));
 

@@ -193,10 +193,10 @@ public class GrinderBlockEntity extends LockableBlockEntity implements MinimalWo
                 self.process += speed;
                 self.setChanged();
                 return;
-            } else if (world.getGameTime() % 5 == 0) {
+            } else if (world.getGameTime() % 8 == 0) {
                 ((ServerLevel) world).sendParticles(ParticleTypes.SMOKE,
-                        pos.getX() + 0.5, pos.getY() + 1.3, pos.getZ() + 0.5, 0,
-                        (Math.random() - 0.5) * 0.2, 0.04, (Math.random() - 0.5) * 0.2, 0.3);
+                        pos.getX() + 0.5, pos.getY() + 0.75, pos.getZ() + 0.5, 3,
+                        0.25, 0.2, 0.25, 0.01, 0.03, 0.01);
             }
 
             self.state = rot.getStateTextOrElse(rot.hasNoActiveProviders() ? TOO_SLOW_TEXT : TOO_SLOW_DISCONNECTED_TEXT);

@@ -20,6 +20,7 @@ import eu.pb4.polyfactory.nodes.mechanical.RotationData;
 import eu.pb4.polyfactory.util.FactoryUtil;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 
@@ -55,10 +56,12 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
     private static final List<BlockConfig<?>> BLOCK_CONFIGS = List.of(
             BlockConfig.ofDirection(INPUT_FACING)
     );
+    private final Identifier model;
 
     public GrinderBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(this.defaultBlockState());
+        this.model = settings.blockIdOrThrow().identifier().withPrefix("block/");
     }
 
     @Override
@@ -172,15 +175,14 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
         }
     }
 
-    public static final class Model extends RotationAwareModel {
+    public final class Model extends RotationAwareModel {
         public static final LazyItemStack MODEL_STONE_WHEEL = ItemDisplayElementUtil.getModel(FactoryUtil.id("block/grindstone_wheel"));
 
         private final ItemDisplayElement stoneWheel;
         private final ItemDisplayElement main;
 
         private Model(ServerLevel world, BlockState state) {
-
-            this.main = ItemDisplayElementUtil.createSimple(FactoryItems.GRINDER);
+            this.main = ItemDisplayElementUtil.createSimple(model);
             this.stoneWheel = LodItemDisplayElement.createSimple(MODEL_STONE_WHEEL.get(), this.getUpdateRate(), 0.6f, 0.6f);
 
             this.updateAnimation(0, state.getValue(INPUT_FACING));
@@ -196,8 +198,7 @@ public class GrinderBlock extends RotationalNetworkBlock implements FactoryBlock
             this.main.setTransformation(mat);
 
             mat.rotateY(((float) speed));
-            mat.translate(0, 0.5f, 0);
-            mat.translate(0, -0.19f, 0);
+            mat.translate(0, 0.5f - 0.19f, 0);
             this.stoneWheel.setTransformation(mat);
         }
 

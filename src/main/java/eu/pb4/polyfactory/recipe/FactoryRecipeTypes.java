@@ -9,6 +9,7 @@ import eu.pb4.polyfactory.recipe.fluid.FluidInteractionRecipe;
 import eu.pb4.polyfactory.recipe.grinding.GrindingRecipe;
 import eu.pb4.polyfactory.recipe.mixing.MixingRecipe;
 import eu.pb4.polyfactory.recipe.press.PressRecipe;
+import eu.pb4.polyfactory.recipe.sawmill.SawmillRecipe;
 import eu.pb4.polyfactory.recipe.smeltery.SmelteryRecipe;
 import eu.pb4.polyfactory.recipe.spout.SpoutRecipe;
 import eu.pb4.polyfactory.recipe.trommel.TrommelRecipe;
@@ -20,6 +21,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 
 public class FactoryRecipeTypes {
     public static final RecipeType<GrindingRecipe> GRINDING = register("grinding");
+    public static final RecipeType<SawmillRecipe> SAWMILL = register("sawmill");
     public static final RecipeType<TrommelRecipe> TROMMEL = register("trommel");
     public static final RecipeType<PressRecipe> PRESS = register("press");
     public static final RecipeType<MixingRecipe> MIXER = register("mixer");

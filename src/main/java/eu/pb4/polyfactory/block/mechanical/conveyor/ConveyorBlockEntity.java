@@ -131,6 +131,7 @@ public class ConveyorBlockEntity extends BlockEntity implements MovingItemContai
             moveVec = moveVec.scale(0.5);
             var itemEntity = new ItemEntity(world, vec.x, vec.y, vec.z, stack, moveVec.x, moveVec.y, moveVec.z);
             itemEntity.tickCount = -20;
+            itemEntity.syncVelocity = true;
             world.addFreshEntity(itemEntity);
 
             self.delta -= speed;

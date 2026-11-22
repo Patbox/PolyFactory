@@ -1,0 +1,6 @@
+{
+	"parent": "polyfactory:block/sawmill_saw",
+	"textures": {
+		"saw": "polyfactory:block/sawmill/saw_active"
+	}
+}

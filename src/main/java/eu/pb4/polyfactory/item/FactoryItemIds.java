@@ -37,6 +37,7 @@ public class FactoryItemIds {
     public static final ResourceKey<Item> CASTING_TABLE = of(FactoryBlockIds.CASTING_TABLE);
     public static final ResourceKey<Item> SMELTERY_FAUCET = of(FactoryBlockIds.FAUCET);
     public static final ResourceKey<Item> GRINDER = of(FactoryBlockIds.GRINDER);
+    public static final ResourceKey<Item> SAWMILL = of(FactoryBlockIds.SAWMILL);
     public static final ResourceKey<Item> TROMMEL = of(FactoryBlockIds.TROMMEL);
     public static final ResourceKey<Item> PRESS = of(FactoryBlockIds.PRESS);
     public static final ResourceKey<Item> CRAFTER = of(FactoryBlockIds.CRAFTER);
